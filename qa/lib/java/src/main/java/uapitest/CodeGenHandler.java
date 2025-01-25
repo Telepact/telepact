@@ -2,6 +2,7 @@ package uapitest;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.HashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -23,200 +24,204 @@ public class CodeGenHandler extends ServerHandler_ {
 
     @Override
     public TypedMessage_<uapitest.test.Output> test(Map<String, Object> headers, uapitest.test.Input input) {
-        var outputBuilder = new uapitest.test.Output.Ok_.Builder();
-
         try {
-            System.out.println("input: " + new ObjectMapper().writeValueAsString(input.toPseudoJson()));
+            System.out.println("input: " + new ObjectMapper().writeValueAsString(input.pseudoJson));
         } catch (JsonProcessingException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
-        input.value.ifPresent(top -> {
-            top.bool.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().bool(v).build());
+        var value = new AtomicReference<>(new Value.Builder());
+
+        input.value().ifPresent(top -> {
+            top.bool().ifPresent(v -> {
+                value.set(new Value.Builder().bool(v));
+                System.out.println("bool: " + v);
             });
-            top.nullBool.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().nullBool(v).build());
+            top.nullBool().ifPresent(v -> {
+                value.set(new Value.Builder().nullBool(v));
             });
-            top.arrBool.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().arrBool(v).build());
+            top.arrBool().ifPresent(v -> {
+                value.set(new Value.Builder().arrBool(v));
             });
-            top.arrNullBool.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().arrNullBool(v).build());
+            top.arrNullBool().ifPresent(v -> {
+                value.set(new Value.Builder().arrNullBool(v));
             });
-            top.objBool.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().objBool(v).build());
+            top.objBool().ifPresent(v -> {
+                value.set(new Value.Builder().objBool(v));
             });
-            top.objNullBool.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().objNullBool(v).build());
+            top.objNullBool().ifPresent(v -> {
+                value.set(new Value.Builder().objNullBool(v));
             });
-            top.int_.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().int_(v).build());
+            top.int_().ifPresent(v -> {
+                value.set(new Value.Builder().int_(v));
             });
-            top.nullInt.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().nullInt(v).build());
+            top.nullInt().ifPresent(v -> {
+                value.set(new Value.Builder().nullInt(v));
             });
-            top.arrInt.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().arrInt(v).build());
+            top.arrInt().ifPresent(v -> {
+                value.set(new Value.Builder().arrInt(v));
             });
-            top.arrNullInt.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().arrNullInt(v).build());
+            top.arrNullInt().ifPresent(v -> {
+                value.set(new Value.Builder().arrNullInt(v));
             });
-            top.objInt.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().objInt(v).build());
+            top.objInt().ifPresent(v -> {
+                value.set(new Value.Builder().objInt(v));
             });
-            top.objNullInt.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().objNullInt(v).build());
+            top.objNullInt().ifPresent(v -> {
+                value.set(new Value.Builder().objNullInt(v));
             });
-            top.num.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().num(v).build());
+            top.num().ifPresent(v -> {
+                value.set(new Value.Builder().num(v));
             });
-            top.nullNum.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().nullNum(v).build());
+            top.nullNum().ifPresent(v -> {
+                value.set(new Value.Builder().nullNum(v));
             });
-            top.arrNum.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().arrNum(v).build());
+            top.arrNum().ifPresent(v -> {
+                value.set(new Value.Builder().arrNum(v));
             });
-            top.arrNullNum.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().arrNullNum(v).build());
+            top.arrNullNum().ifPresent(v -> {
+                value.set(new Value.Builder().arrNullNum(v));
             });
-            top.objNum.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().objNum(v).build());
+            top.objNum().ifPresent(v -> {
+                value.set(new Value.Builder().objNum(v));
             });
-            top.objNullNum.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().objNullNum(v).build());
+            top.objNullNum().ifPresent(v -> {
+                value.set(new Value.Builder().objNullNum(v));
             });
-            top.str.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().str(v).build());
+            top.str().ifPresent(v -> {
+                value.set(new Value.Builder().str(v));
             });
-            top.nullStr.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().nullStr(v).build());
+            top.nullStr().ifPresent(v -> {
+                value.set(new Value.Builder().nullStr(v));
             });
-            top.arrStr.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().arrStr(v).build());
+            top.arrStr().ifPresent(v -> {
+                value.set(new Value.Builder().arrStr(v));
             });
-            top.arrNullStr.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().arrNullStr(v).build());
+            top.arrNullStr().ifPresent(v -> {
+                value.set(new Value.Builder().arrNullStr(v));
             });
-            top.objStr.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().objStr(v).build());
+            top.objStr().ifPresent(v -> {
+                value.set(new Value.Builder().objStr(v));
             });
-            top.objNullStr.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().objNullStr(v).build());
+            top.objNullStr().ifPresent(v -> {
+                value.set(new Value.Builder().objNullStr(v));
             });
-            top.arr.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().arr(v).build());
+            top.arr().ifPresent(v -> {
+                value.set(new Value.Builder().arr(v));
             });
-            top.nullArr.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().nullArr(v).build());
+            top.nullArr().ifPresent(v -> {
+                value.set(new Value.Builder().nullArr(v));
             });
-            top.arrArr.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().arrArr(v).build());
+            top.arrArr().ifPresent(v -> {
+                value.set(new Value.Builder().arrArr(v));
             });
-            top.arrNullArr.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().arrNullArr(v).build());
+            top.arrNullArr().ifPresent(v -> {
+                value.set(new Value.Builder().arrNullArr(v));
             });
-            top.objArr.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().objArr(v).build());
+            top.objArr().ifPresent(v -> {
+                value.set(new Value.Builder().objArr(v));
             });
-            top.objNullArr.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().objNullArr(v).build());
+            top.objNullArr().ifPresent(v -> {
+                value.set(new Value.Builder().objNullArr(v));
             });
-            top.obj.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().obj(v).build());
+            top.obj().ifPresent(v -> {
+                value.set(new Value.Builder().obj(v));
             });
-            top.nullObj.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().nullObj(v).build());
+            top.nullObj().ifPresent(v -> {
+                value.set(new Value.Builder().nullObj(v));
             });
-            top.arrObj.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().arrObj(v).build());
+            top.arrObj().ifPresent(v -> {
+                value.set(new Value.Builder().arrObj(v));
             });
-            top.arrNullObj.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().arrNullObj(v).build());
+            top.arrNullObj().ifPresent(v -> {
+                value.set(new Value.Builder().arrNullObj(v));
             });
-            top.objObj.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().objObj(v).build());
+            top.objObj().ifPresent(v -> {
+                value.set(new Value.Builder().objObj(v));
             });
-            top.objNullObj.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().objNullObj(v).build());
+            top.objNullObj().ifPresent(v -> {
+                value.set(new Value.Builder().objNullObj(v));
             });
-            top.any.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().any(v).build());
+            top.any().ifPresent(v -> {
+                value.set(new Value.Builder().any(v));
             });
-            top.nullAny.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().nullAny(v).build());
+            top.nullAny().ifPresent(v -> {
+                value.set(new Value.Builder().nullAny(v));
             });
-            top.arrAny.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().arrAny(v).build());
+            top.arrAny().ifPresent(v -> {
+                value.set(new Value.Builder().arrAny(v));
             });
-            top.arrNullAny.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().arrNullAny(v).build());
+            top.arrNullAny().ifPresent(v -> {
+                value.set(new Value.Builder().arrNullAny(v));
             });
-            top.objAny.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().objAny(v).build());
+            top.objAny().ifPresent(v -> {
+                value.set(new Value.Builder().objAny(v));
             });
-            top.objNullAny.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().objNullAny(v).build());
+            top.objNullAny().ifPresent(v -> {
+                value.set(new Value.Builder().objNullAny(v));
             });
 
-            top.struct.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().struct(mapStruct(v)).build());
+            top.struct().ifPresent(v -> {
+                value.set(new Value.Builder().struct(mapStruct(v)));
             });
-            top.nullStruct.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().nullStruct(mapStruct(v)).build());
+            top.nullStruct().ifPresent(v -> {
+                value.set(new Value.Builder().nullStruct(mapStruct(v)));
             });
-            top.arrStruct.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().arrStruct(mapArr(v, s -> mapStruct(s))).build());
+            top.arrStruct().ifPresent(v -> {
+                value.set(new Value.Builder().arrStruct(mapArr(v, s -> mapStruct(s))));
             });
-            top.arrNullStruct.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().arrNullStruct(mapArr(v, s -> mapStruct(s))).build());
+            top.arrNullStruct().ifPresent(v -> {
+                value.set(new Value.Builder().arrNullStruct(mapArr(v, s -> mapStruct(s))));
             });
-            top.objStruct.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().objStruct(mapObj(v, s -> mapStruct(s))).build());
+            top.objStruct().ifPresent(v -> {
+                value.set(new Value.Builder().objStruct(mapObj(v, s -> mapStruct(s))));
             });
-            top.objNullStruct.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().objNullStruct(mapObj(v, s -> mapStruct(s))).build());
+            top.objNullStruct().ifPresent(v -> {
+                value.set(new Value.Builder().objNullStruct(mapObj(v, s -> mapStruct(s))));
             });
-            top.union.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().union(mapUnion(v)).build());
+            top.union().ifPresent(v -> {
+                value.set(new Value.Builder().union(mapUnion(v)));
             });
-            top.nullUnion.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().nullUnion(mapUnion(v)).build());
+            top.nullUnion().ifPresent(v -> {
+                value.set(new Value.Builder().nullUnion(mapUnion(v)));
             });
-            top.arrUnion.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().arrUnion(mapArr(v, u -> mapUnion(u))).build());
+            top.arrUnion().ifPresent(v -> {
+                value.set(new Value.Builder().arrUnion(mapArr(v, u -> mapUnion(u))));
             });
-            top.arrNullUnion.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().arrNullUnion(mapArr(v, u -> mapUnion(u))).build());
+            top.arrNullUnion().ifPresent(v -> {
+                value.set(new Value.Builder().arrNullUnion(mapArr(v, u -> mapUnion(u))));
             });
-            top.objUnion.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().objUnion(mapObj(v, u -> mapUnion(u))).build());
+            top.objUnion().ifPresent(v -> {
+                value.set(new Value.Builder().objUnion(mapObj(v, u -> mapUnion(u))));
             });
-            top.objNullUnion.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().objNullUnion(mapObj(v, u -> mapUnion(u))).build());
+            top.objNullUnion().ifPresent(v -> {
+                value.set(new Value.Builder().objNullUnion(mapObj(v, u -> mapUnion(u))));
             });
-            top.fn.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().fn(mapFn(v)).build());
+            top.fn().ifPresent(v -> {
+                value.set(new Value.Builder().fn(mapFn(v)));
             });
-            top.nullFn.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().nullFn(mapFn(v)).build());
+            top.nullFn().ifPresent(v -> {
+                value.set(new Value.Builder().nullFn(mapFn(v)));
             });
-            top.arrFn.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().arrFn(mapArr(v, f -> mapFn(f))).build());
+            top.arrFn().ifPresent(v -> {
+                value.set(new Value.Builder().arrFn(mapArr(v, f -> mapFn(f))));
             });
-            top.arrNullFn.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().arrNullFn(mapArr(v, f -> mapFn(f))).build());
+            top.arrNullFn().ifPresent(v -> {
+                value.set(new Value.Builder().arrNullFn(mapArr(v, f -> mapFn(f))));
             });
-            top.objFn.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().objFn(mapObj(v, f -> mapFn(f))).build());
+            top.objFn().ifPresent(v -> {
+                value.set(new Value.Builder().objFn(mapObj(v, f -> mapFn(f))));
             });
-            top.objNullFn.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().objNullFn(mapObj(v, f -> mapFn(f))).build());
+            top.objNullFn().ifPresent(v -> {
+                value.set(new Value.Builder().objNullFn(mapObj(v, f -> mapFn(f))));
             });
         });
 
-        return new TypedMessage_<test.Output>(new HashMap<>(), outputBuilder.build());
+        var ok = new test.Output.Ok_.Builder().value(value.get().build());
+        var output = test.Output.from_Ok_(ok.build());
+
+        return new TypedMessage_<test.Output>(new HashMap<>(), output);
     }
 
     private static ExStruct mapStruct(ExStruct s) {
@@ -224,24 +229,25 @@ public class CodeGenHandler extends ServerHandler_ {
             return null;
         }
         var b = new ExStruct.Builder();
-        b.required(s.required);
-        s.optional.ifPresent(b::optional);
-        s.optional2.ifPresent(b::optional2);
-        return b.build();
+        b.required(s.required());
+        s.optional().ifPresent(b::optional);
+        s.optional2().ifPresent(b::optional2);
+        return ExStruct.fromTyped(b);
     }
 
     private static ExUnion mapUnion(ExUnion u) {
         if (u == null) {
             return null;
         }
-        return switch (u) {
-            case ExUnion.NoMatch_ v -> new ExUnion.NoMatch_(v.toPseudoJson());
-            case ExUnion.One v -> new ExUnion.One.Builder().build();
+        var tv = u.getTaggedValue();
+        return switch (tv) {
+            case ExUnion.Unknown_ v -> new ExUnion(Map.of(v.tag, v.value));
+            case ExUnion.One v -> ExUnion.from_One(new ExUnion.One.Builder().build());
             case ExUnion.Two v -> {
                 var b = new ExUnion.Two.Builder();
-                b.required(v.required);
-                v.optional.ifPresent(b::optional);
-                yield b.build();
+                b.required(v.required());
+                v.optional().ifPresent(b::optional);
+                yield ExUnion.from_Two(b.build());
             }
             default -> throw new IllegalArgumentException("Unexpected value: " + u);
         };
@@ -252,8 +258,8 @@ public class CodeGenHandler extends ServerHandler_ {
             return null;
         }
         var b = new example.Input.Builder();
-        f.optional.ifPresent(b::optional);
-        b.required(f.required);
+        f.optional().ifPresent(b::optional);
+        b.required(f.required());
         return b.build();
     }
 

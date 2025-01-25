@@ -107,7 +107,7 @@ public class Main {
                     var outputMessage = generatedClient.test(requestHeaders, new test.Input(requestBody));
                     var responseHeaders = outputMessage.headers;
                     responseHeaders.put("_codegenc", true);
-                    response = new Message(responseHeaders, outputMessage.body.toPseudoJson());
+                    response = new Message(responseHeaders, outputMessage.body.pseudoJson);
                 } else {
 
                     try (var time = timers.time()) {

@@ -40,7 +40,7 @@ import java.util.HashMap;
     {%- elif typ.startswith('struct') or typ.startswith('fn') -%}
         Utility_.let({{ caller() }}, d{{ depth }} -> d{{ depth }} == null ? null : new {{ to_java_type(t) }}((Map<String, Object>) d{{ depth }}))
     {%- elif typ.startswith('union') -%}
-        Utility_.let({{ caller() }}, d{{depth}} -> d{{depth}} == null ? null : {{ to_java_type(t) }}.fromPseudoJson((Map<String, Object>) d{{depth}}))
+        Utility_.let({{ caller() }}, d{{depth}} -> d{{depth}} == null ? null : new {{ to_java_type(t) }}((Map<String, Object>) d{{depth}}))
     {%- else -%}
         ({{ to_java_type(t) }}) {{ caller() }}
     {%- endif -%}
@@ -95,13 +95,9 @@ import java.util.HashMap;
     {%- endif -%}
 {%- endmacro -%}
 
-{%- macro struct(display_name, doc, fields, implements, union_tag, modifier) %}
+{%- macro struct(display_name, doc, fields, implements, union_tag, modifier, fn) %}
     {{ docstring(doc) }}
 public {% if modifier %}{{ modifier }} {% endif %}class {{ display_name }}{% if implements %} implements {{ implements }}{% endif %} {
-    {%- for field_name, field_type in fields.items() %}
-    public final {{ to_maybe_opt_java_type(field_type, field_name) }} {{ sanitize_field_name(field_name) }};
-    {%- endfor %}
-
     public final Map<String, Object> pseudoJson;
 
     public {{ display_name }}(Map<String, Object> pseudoJson) {
@@ -119,17 +115,21 @@ public {% if modifier %}{{ modifier }} {% endif %}class {{ display_name }}{% if 
         map.put("{{ field_name }}", {% call unmarshall_java_type(field_type, 0) %}b.{{ sanitize_field_name(field_name) }}{% endcall %});
         {%- endif %}
         {%- endfor %}
+        {%- if fn %}
+        return new {{ display_name }}(Map.of("{{ fn }}", map));
+        {%- else %}
         return new {{ display_name }}(map);
+        {%- endif %}
     }
 
-    {%- for field_name, field_type in fields.items() %}
+    {% for field_name, field_type in fields.items() %}
     public {{ to_maybe_opt_java_type(field_type, field_name) }} {{ sanitize_field_name(field_name) }}() {
         return
-            {%- if '!' in field_name %} this.pseudoJson.containsKey("{{ field_name }}") ? new Optional_<{{ to_java_type(field_type) }}>({% call marshall_java_type(field_type, 0) %}this.pseudoJson.get("{{ field_name }}"){% endcall %}) : new Optional_<>()
-            {%- else %} {% call marshall_java_type(field_type, 0) %}this.pseudoJson.get("{{ field_name }}"){% endcall %}{% endif %};
+            {%- if '!' in field_name %} ((Map<String, Object>) this.pseudoJson{% if fn %}.get("{{ fn }}"){% endif %}).containsKey("{{ field_name }}") ? new Optional_<{{ to_java_type(field_type) }}>({% call marshall_java_type(field_type, 0) %}((Map<String, Object>) this.pseudoJson{% if fn %}.get("{{ fn }}"){% endif %}).get("{{ field_name }}"){% endcall %}) : new Optional_<>()
+            {%- else %} {% call marshall_java_type(field_type, 0) %}((Map<String, Object>) this.pseudoJson{% if fn %}.get("{{ fn }}"){% endif %}).get("{{ field_name }}"){% endcall %}{% endif %};
         
     };
-    {%- endfor %}
+    {% endfor %}
 
     public static class Builder {
         {%- for field_name, field_type in fields.items() %}
@@ -145,33 +145,22 @@ public {% if modifier %}{{ modifier }} {% endif %}class {{ display_name }}{% if 
             return this;
         }
         {%- endfor %}
+
+        public {{ display_name }} build() {
+            return {{ display_name }}.fromTyped(this);
+        }
     }
 }
 {%- endmacro %}
 
-{%- macro union(display_name, doc, tags) %}
+{%- macro union(display_name, doc, tags, modifier) %}
     {{ docstring(doc) }}
-public class {{ display_name }} {
+public {% if modifier %}{{ modifier }} {% endif %} class {{ display_name }} {
 
     public final Map<String, Object> pseudoJson;
 
-    {%- for tag_entry in tags %}
-        {% set tag_key = tag_entry | find_tag_key %}
-        {{ struct(tag_key, tag_entry['///'], tag_entry[tag_key], display_name + '.TaggedValue', tag_key, 'static final') | indent }}
-    {%- endfor %}
-
     public {{ display_name }}(Map<String, Object> pseudoJson) {
         this.pseudoJson = pseudoJson;
-    }
-
-    public static final class NoMatch_ implements {{ display_name }}.TaggedValue {
-        public final String tag;
-        public final Map<String, Object> payload;
-
-        public NoMatch_(String tag, Map<String, Object> payload) {
-            this.tag = tag;
-            this.payload = payload;
-        }
     }
 
     public TaggedValue getTaggedValue() {
@@ -182,7 +171,31 @@ public class {{ display_name }} {
             return new {{ tag_key }}((Map<String, Object>) this.pseudoJson.get(tag));
         }
         {%- endfor %}
-        return new NoMatch_(tag, (Map<String, Object>) this.pseudoJson.get(tag));
+        return new Unknown_(tag, (Map<String, Object>) this.pseudoJson.get(tag));
+    }
+
+    {% for tag_entry in tags %}
+        {%- set tag_key = tag_entry | find_tag_key %}
+    public static {{ display_name }} from_{{ tag_key }}({{ tag_key }} value) {
+        var map = new HashMap<String, Object>();
+        map.put("{{ tag_key }}", value.pseudoJson);
+        return new {{ display_name }}(map);
+    }
+    {% endfor %}
+
+    {%- for tag_entry in tags %}
+        {% set tag_key = tag_entry | find_tag_key %}
+        {{ struct(tag_key, tag_entry['///'], tag_entry[tag_key], display_name + '.TaggedValue', tag_key, 'static final') | indent }}
+    {%- endfor %}
+
+    public static final class Unknown_ implements {{ display_name }}.TaggedValue {
+        public final String tag;
+        public final Map<String, Object> value;
+
+        public Unknown_(String tag, Map<String, Object> value) {
+            this.tag = tag;
+            this.value = value;
+        }
     }
 
     sealed interface TaggedValue {}
@@ -192,9 +205,9 @@ public class {{ display_name }} {
 {%- macro function(display_name, data, schema_key) %}
 public final class {{ display_name }} {
 
-    {{ struct('Input', data['///'], data[schema_key], None, schema_key, 'static') | indent }}
+    {{ struct('Input', data['///'], data[schema_key], None, schema_key, 'static', schema_key) | indent }}
 
-    {{ union ('Output', data['///'], data['->']) | indent }}
+    {{ union ('Output', data['///'], data['->'], 'static') | indent }}
 }
 {%- endmacro %}
 
