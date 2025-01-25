@@ -18,184 +18,184 @@ export class CodeGenHandler extends ServerHandler_ {
         if (input.value) {
             const top = input.value;
             if (top.bool !== undefined) {
-                value.bool = top.bool;
+                value = Value.fromTyped({ bool: top.bool });
             }
             if (top.nullBool !== undefined) {
-                value.nullBool = top.nullBool;
+                value = Value.fromTyped({ nullBool: top.nullBool });
             }
             if (top.arrBool !== undefined) {
-                value.arrBool = top.arrBool;
+                value = Value.fromTyped({ arrBool: top.arrBool });
             }
             if (top.arrNullBool !== undefined) {
-                value.arrNullBool = top.arrNullBool;
+                value = Value.fromTyped({ arrNullBool: top.arrNullBool });
             }
             if (top.objBool !== undefined) {
-                value.objBool = top.objBool;
+                value = Value.fromTyped({ objBool: top.objBool });
             }
             if (top.objNullBool !== undefined) {
-                value.objNullBool = top.objNullBool;
+                value = Value.fromTyped({ objNullBool: top.objNullBool });
             }
             if (top.int !== undefined) {
-                value.int = top.int;
+                value = Value.fromTyped({ int: top.int });
             }
             if (top.nullInt !== undefined) {
-                value.nullInt = top.nullInt;
+                value = Value.fromTyped({ nullInt: top.nullInt });
             }
             if (top.arrInt !== undefined) {
-                value.arrInt = top.arrInt;
+                value = Value.fromTyped({ arrInt: top.arrInt });
             }
             if (top.arrNullInt !== undefined) {
-                value.arrNullInt = top.arrNullInt;
+                value = Value.fromTyped({ arrNullInt: top.arrNullInt });
             }
             if (top.objInt !== undefined) {
-                value.objInt = top.objInt;
+                value = Value.fromTyped({ objInt: top.objInt });
             }
             if (top.objNullInt !== undefined) {
-                value.objNullInt = top.objNullInt;
+                value = Value.fromTyped({ objNullInt: top.objNullInt });
             }
             if (top.num !== undefined) {
-                value.num = top.num;
+                value = Value.fromTyped({ num: top.num });
             }
             if (top.nullNum !== undefined) {
-                value.nullNum = top.nullNum;
+                value = Value.fromTyped({ nullNum: top.nullNum });
             }
             if (top.arrNum !== undefined) {
-                value.arrNum = top.arrNum;
+                value = Value.fromTyped({ arrNum: top.arrNum });
             }
             if (top.arrNullNum !== undefined) {
-                value.arrNullNum = top.arrNullNum;
+                value = Value.fromTyped({ arrNullNum: top.arrNullNum });
             }
             if (top.objNum !== undefined) {
-                value.objNum = top.objNum;
+                value = Value.fromTyped({ objNum: top.objNum });
             }
             if (top.objNullNum !== undefined) {
-                value.objNullNum = top.objNullNum;
+                value = Value.fromTyped({ objNullNum: top.objNullNum });
             }
             if (top.str !== undefined) {
-                value.str = top.str;
+                value = Value.fromTyped({ str: top.str });
             }
             if (top.nullStr !== undefined) {
-                value.nullStr = top.nullStr;
+                value = Value.fromTyped({ nullStr: top.nullStr });
             }
             if (top.arrStr !== undefined) {
-                value.arrStr = top.arrStr;
+                value = Value.fromTyped({ arrStr: top.arrStr });
             }
             if (top.arrNullStr !== undefined) {
-                value.arrNullStr = top.arrNullStr;
+                value = Value.fromTyped({ arrNullStr: top.arrNullStr });
             }
             if (top.objStr !== undefined) {
-                value.objStr = top.objStr;
+                value = Value.fromTyped({ objStr: top.objStr });
             }
             if (top.objNullStr !== undefined) {
-                value.objNullStr = top.objNullStr;
+                value = Value.fromTyped({ objNullStr: top.objNullStr });
             }
             if (top.arr !== undefined) {
-                value.arr = top.arr;
+                value = Value.fromTyped({ arr: top.arr });
             }
             if (top.nullArr !== undefined) {
-                value.nullArr = top.nullArr;
+                value = Value.fromTyped({ nullArr: top.nullArr });
             }
             if (top.arrArr !== undefined) {
-                value.arrArr = top.arrArr;
+                value = Value.fromTyped({ arrArr: top.arrArr });
             }
             if (top.arrNullArr !== undefined) {
-                value.arrNullArr = top.arrNullArr;
+                value = Value.fromTyped({ arrNullArr: top.arrNullArr });
             }
             if (top.objArr !== undefined) {
-                value.objArr = top.objArr;
+                value = Value.fromTyped({ objArr: top.objArr });
             }
             if (top.objNullArr !== undefined) {
-                value.objNullArr = top.objNullArr;
+                value = Value.fromTyped({ objNullArr: top.objNullArr });
             }
             if (top.obj !== undefined) {
-                value.obj = top.obj;
+                value = Value.fromTyped({ obj: top.obj });
             }
             if (top.nullObj !== undefined) {
-                value.nullObj = top.nullObj;
+                value = Value.fromTyped({ nullObj: top.nullObj });
             }
             if (top.arrObj !== undefined) {
-                value.arrObj = top.arrObj;
+                value = Value.fromTyped({ arrObj: top.arrObj });
             }
             if (top.arrNullObj !== undefined) {
-                value.arrNullObj = top.arrNullObj;
+                value = Value.fromTyped({ arrNullObj: top.arrNullObj });
             }
             if (top.objObj !== undefined) {
-                value.objObj = top.objObj;
+                value = Value.fromTyped({ objObj: top.objObj });
             }
             if (top.objNullObj !== undefined) {
-                value.objNullObj = top.objNullObj;
+                value = Value.fromTyped({ objNullObj: top.objNullObj });
             }
             if (top.any !== undefined) {
-                value.any = top.any;
+                value = Value.fromTyped({ any: top.any });
             }
             if (top.nullAny !== undefined) {
-                value.nullAny = top.nullAny;
+                value = Value.fromTyped({ nullAny: top.nullAny });
             }
             if (top.arrAny !== undefined) {
-                value.arrAny = top.arrAny;
+                value = Value.fromTyped({ arrAny: top.arrAny });
             }
             if (top.arrNullAny !== undefined) {
-                value.arrNullAny = top.arrNullAny;
+                value = Value.fromTyped({ arrNullAny: top.arrNullAny });
             }
             if (top.objAny !== undefined) {
-                value.objAny = top.objAny;
+                value = Value.fromTyped({ objAny: top.objAny });
             }
             if (top.objNullAny !== undefined) {
-                value.objNullAny = top.objNullAny;
+                value = Value.fromTyped({ objNullAny: top.objNullAny });
             }
             if (top.struct !== undefined) {
-                value.struct = this.map_struct(top.struct);
+                value = Value.fromTyped({ struct: this.map_struct(top.struct) });
             }
             if (top.nullStruct !== undefined) {
-                value.nullStruct = top.nullStruct === null ? null : this.map_struct(top.nullStruct);
+                value = Value.fromTyped({ nullStruct: top.nullStruct === null ? null : this.map_struct(top.nullStruct) });
             }
             if (top.arrStruct !== undefined) {
-                value.arrStruct = this.map_arr(top.arrStruct, this.map_struct);
+                value = Value.fromTyped({ arrStruct: this.map_arr(top.arrStruct, this.map_struct) });
             }
             if (top.arrNullStruct !== undefined) {
-                value.arrNullStruct = this.map_arr(top.arrNullStruct, (e) => e === null ? null : this.map_struct(e));
+                value = Value.fromTyped({ arrNullStruct: this.map_arr(top.arrNullStruct, (e) => e === null ? null : this.map_struct(e)) });
             }
             if (top.objStruct !== undefined) {
-                value.objStruct = this.map_obj(top.objStruct, this.map_struct);
+                value = Value.fromTyped({ objStruct: this.map_obj(top.objStruct, this.map_struct) });
             }
             if (top.objNullStruct !== undefined) {
-                value.objNullStruct = this.map_obj(top.objNullStruct, (e) => e === null ? null : this.map_struct(e));
+                value = Value.fromTyped({ objNullStruct: this.map_obj(top.objNullStruct, (e) => e === null ? null : this.map_struct(e)) });
             }
             if (top.union !== undefined) {
-                value.union = this.map_union(top.union);
+                value = Value.fromTyped({ union: this.map_union(top.union) });
             }
             if (top.nullUnion !== undefined) {
-                value.nullUnion = top.nullUnion === null ? null : this.map_union(top.nullUnion);
+                value = Value.fromTyped({ nullUnion: top.nullUnion === null ? null : this.map_union(top.nullUnion) });
             }
             if (top.arrUnion !== undefined) {
-                value.arrUnion = this.map_arr(top.arrUnion, this.map_union);
+                value = Value.fromTyped({ arrUnion: this.map_arr(top.arrUnion, this.map_union) });
             }
             if (top.arrNullUnion !== undefined) {
-                value.arrNullUnion = this.map_arr(top.arrNullUnion, (e) => e === null ? null : this.map_union(e));
+                value = Value.fromTyped({ arrNullUnion: this.map_arr(top.arrNullUnion, (e) => e === null ? null : this.map_union(e)) });
             }
             if (top.objUnion !== undefined) {
-                value.objUnion = this.map_obj(top.objUnion, this.map_union);
+                value = Value.fromTyped({ objUnion: this.map_obj(top.objUnion, this.map_union) });
             }
             if (top.objNullUnion !== undefined) {
-                value.objNullUnion = this.map_obj(top.objNullUnion, (e) => e === null ? null : this.map_union(e));
+                value = Value.fromTyped({ objNullUnion: this.map_obj(top.objNullUnion, (e) => e === null ? null : this.map_union(e)) });
             }
             if (top.fn !== undefined) {
-                value.fn = this.map_fn(top.fn);
+                value = Value.fromTyped({ fn: this.map_fn(top.fn) });
             }
             if (top.nullFn !== undefined) {
-                value.nullFn = top.nullFn === null ? null : this.map_fn(top.nullFn);
+                value = Value.fromTyped({ nullFn: top.nullFn === null ? null : this.map_fn(top.nullFn) });
             }
             if (top.arrFn !== undefined) {
-                value.arrFn = this.map_arr(top.arrFn, this.map_fn);
+                value = Value.fromTyped({ arrFn: this.map_arr(top.arrFn, this.map_fn) });
             }
             if (top.arrNullFn !== undefined) {
-                value.arrNullFn = this.map_arr(top.arrNullFn, (e) => e === null ? null : this.map_fn(e));
+                value = Value.fromTyped({ arrNullFn: this.map_arr(top.arrNullFn, (e) => e === null ? null : this.map_fn(e)) });
             }
             if (top.objFn !== undefined) {
-                value.objFn = this.map_obj(top.objFn, this.map_fn);
+                value = Value.fromTyped({ objFn: this.map_obj(top.objFn, this.map_fn) });
             }
             if (top.objNullFn !== undefined) {
-                value.objNullFn = this.map_obj(top.objNullFn, (e) => e === null ? null : this.map_fn(e));
+                value = Value.fromTyped({ objNullFn: this.map_obj(top.objNullFn, (e) => e === null ? null : this.map_fn(e)) });
             }
         }
 

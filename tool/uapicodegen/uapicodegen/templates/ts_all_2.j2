@@ -118,18 +118,15 @@ export class {{ type_display }} {
         this.pseudoJson = pseudoJson;
     }
 
-    static fromTyped(
+    static fromTyped({
         {%- for field_name, field_type in fields.items() %}
-            {%- if '!' not in field_name %}
-        {{ sanitize_field_name(field_name) }}: {{ to_maybe_opt_ts_type(field_type, field_name) }}{% if '!' in field_name %} = undefined{% endif %},
-            {%- endif %}
-        {%- endfor %}
+        {{ sanitize_field_name(field_name) }},
+        {%- endfor %}        
+    }: {
         {%- for field_name, field_type in fields.items() %}
-            {%- if '!' in field_name %}
-        {{ sanitize_field_name(field_name) }}: {{ to_maybe_opt_ts_type(field_type, field_name) }}{% if '!' in field_name %} = undefined{% endif %},
-            {%- endif %}
-        {%- endfor %}
-    ): {{ type_prefix + type_display }} {
+        {{ sanitize_field_name(field_name) }}{% if '!' in field_name %}?{% endif %}: {{ to_maybe_opt_ts_type(field_type, field_name) }}
+        {%- endfor %}        
+    }): {{ type_prefix + type_display }} {
         const input: Record<string, any> = {};
         {%- for field_name, field_type in fields.items() %}
         {%- if '!' in field_name %}
@@ -179,7 +176,7 @@ export class {{ type_display }} {
             {%- set tag_data = tag_entry[tag_key] %}
         TaggedValue_<"{{ tag_key }}", {{ tag_prefix + tag_key }}> |
         {%- endfor %} UnknownTaggedValue_ {
-        const tag = Object.keys(this.pseudoJson)[0];
+        const tag = Object.keys(this.pseudoJson)[0]!;
         {%- for tag_entry in tags %}
             {%- set tag_key = tag_entry | find_tag_key %}
         if (tag === "{{ tag_key }}") {
