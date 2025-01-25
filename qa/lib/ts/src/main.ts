@@ -16,7 +16,7 @@ import {
 import { NatsConnection, connect, Subscription } from "nats";
 import fs from "fs";
 import { min, max, mean, median, quantile } from "simple-statistics";
-import { ClientInterface_, test__Input_ } from "./gen/all_.js";
+import { ClientInterface_, test } from "./gen/all_.js";
 import { CodeGenHandler } from "./codeGenHandler.js";
 
 class Timer {
@@ -127,9 +127,9 @@ function startClientTestServer(
             const time = timer.startTimer();
             try {
                 if (useCodegen && functionName === "fn.test") {
-                    const [responseHeaders, outputBody] = await genClient.test(requestHeaders, test__Input_.fromPseudoJson(requestBody));
+                    const [responseHeaders, outputBody] = await genClient.test(requestHeaders, new test.Input(requestBody));
                     responseHeaders["_codegenc"] = true;
-                    response = new Message(responseHeaders, outputBody.toPseudoJson());
+                    response = new Message(responseHeaders, outputBody.pseudoJson);
                 } else {
                     response = await client.request(request);
                 }
@@ -324,7 +324,7 @@ function startTestServer(
         let message: Message;
         if (useCodegen) {
             console.log(`     :H ${new TextDecoder().decode(requestBytes)}`);
-            message = codeGenHandler.handler(requestMessage);
+            message = await codeGenHandler.handler(requestMessage);
             message.headers["_codegens"] = true;
         } else {
             console.log(`    <-s ${new TextDecoder().decode(requestBytes)}`);
