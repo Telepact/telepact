@@ -189,7 +189,7 @@ def _generate_internal(schema_data: list[dict[str, object]], target: str, output
             ts_schema_entries.append(schema_entry)
 
         ts_type_template = template_env.get_template(
-            'ts_all.j2')
+            'ts_all_2.j2')
 
         output = ts_type_template.render({
             'input': ts_schema_entries,
