@@ -96,7 +96,7 @@ import java.util.HashMap;
 {%- endmacro -%}
 
 {%- macro struct(display_name, doc, fields, implements, union_tag, modifier, fn) %}
-    {{ docstring(doc) }}
+    {{- docstring(doc) }}
 public {% if modifier %}{{ modifier }} {% endif %}class {{ display_name }}{% if implements %} implements {{ implements }}{% endif %} {
     public final Map<String, Object> pseudoJson;
 
@@ -135,17 +135,14 @@ public {% if modifier %}{{ modifier }} {% endif %}class {{ display_name }}{% if 
         {%- for field_name, field_type in fields.items() %}
         private {{ to_maybe_opt_java_type(field_type, field_name) }} {{ sanitize_field_name(field_name) }}{% if '!' in field_name %} = new Optional_<>(){% endif %};
         {%- endfor %}
-
         public Builder() {
         }
-
         {%- for field_name, field_type in fields.items() %}
         public Builder {{ sanitize_field_name(field_name) }}({{ to_java_type(field_type) }} {{ sanitize_field_name(field_name) }}) {
             this.{{ sanitize_field_name(field_name) }} = {% call setter_maybe_opt(field_name) %}{{ sanitize_field_name(field_name) }}{% endcall %};
             return this;
         }
         {%- endfor %}
-
         public {{ display_name }} build() {
             return {{ display_name }}.fromTyped(this);
         }
@@ -173,7 +170,6 @@ public {% if modifier %}{{ modifier }} {% endif %} class {{ display_name }} {
         {%- endfor %}
         return new Unknown_(tag, (Map<String, Object>) this.pseudoJson.get(tag));
     }
-
     {% for tag_entry in tags %}
         {%- set tag_key = tag_entry | find_tag_key %}
     public static {{ display_name }} from_{{ tag_key }}({{ tag_key }} value) {
@@ -182,12 +178,11 @@ public {% if modifier %}{{ modifier }} {% endif %} class {{ display_name }} {
         return new {{ display_name }}(map);
     }
     {% endfor %}
-
     {%- for tag_entry in tags %}
-        {% set tag_key = tag_entry | find_tag_key %}
+        {%- set tag_key = tag_entry | find_tag_key %}
         {{ struct(tag_key, tag_entry['///'], tag_entry[tag_key], display_name + '.TaggedValue', tag_key, 'static final') | indent }}
     {%- endfor %}
-
+    
     public static final class Unknown_ implements {{ display_name }}.TaggedValue {
         public final String tag;
         public final Map<String, Object> value;
@@ -204,9 +199,7 @@ public {% if modifier %}{{ modifier }} {% endif %} class {{ display_name }} {
 
 {%- macro function(display_name, data, schema_key) %}
 public final class {{ display_name }} {
-
     {{ struct('Input', data['///'], data[schema_key], None, schema_key, 'static', schema_key) | indent }}
-
     {{ union ('Output', data['///'], data['->'], 'static') | indent }}
 }
 {%- endmacro %}
