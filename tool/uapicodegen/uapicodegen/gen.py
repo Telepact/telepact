@@ -110,7 +110,7 @@ def _generate_internal(schema_data: list[dict[str, object]], target: str, output
             if schema_key.startswith("fn"):
                 functions.append(schema_key)
 
-            _write_java_file('java_type.j2', {
+            _write_java_file('java_type_2.j2', {
                 'package': java_package, 'data': schema_entry}, f"{schema_key.split('.')[1]}.java")
 
         _write_java_file('java_server.j2', {
