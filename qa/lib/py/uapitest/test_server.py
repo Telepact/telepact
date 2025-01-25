@@ -19,16 +19,7 @@ import json
 from nats.aio.client import Client as NATSClient, Subscription
 import asyncio
 import nats
-from uapi.SerializationError import SerializationError
-from uapi.Message import Message
-from uapi.Serializer import Serializer
-from uapi.Client import Client
-from uapi.Server import Server
-from uapi.UApiSchema import UApiSchema
-from uapi.MockUApiSchema import MockUApiSchema
-from uapi.MockServer import MockServer
-from uapi.UApiSchemaFiles import UApiSchemaFiles
-from uapi.UApiSchemaParseError import UApiSchemaParseError
+from uapi import SerializationError, Message, Serializer, Client, Server, UApiSchema, MockUApiSchema, MockServer, UApiSchemaFiles, UApiSchemaParseError
 import traceback
 import sys
 from concurrent.futures import ThreadPoolExecutor

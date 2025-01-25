@@ -10,3 +10,4 @@ pytest = "*"
 build = "*"
 jinja2 = "*"
 click = "*"
+uapi = {path = "./../../lib/py/dist/uapi-0.0.1-py3-none-any.whl"}

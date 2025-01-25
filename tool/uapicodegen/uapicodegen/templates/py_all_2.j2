@@ -222,14 +222,14 @@ class {{ type_display }}:
 {% endfor %}
 class ClientInterface_:
 
-    client: uapi.Client.Client
+    client: uapi.Client
 
-    def __init__(self, client: uapi.Client.Client):
+    def __init__(self, client: uapi.Client):
         self.client = client
     {% for fn in functions %}
     {%- set function_name = fn | replace('fn.', '') %}
     async def {{ function_name }}(self, headers: dict[str, object], input: {{ function_name }}.Input) -> Tuple[dict[str, object], {{ function_name }}.Output]:
-        message = await self.client.request(uapi.Message.Message(headers, input.pseudo_json))
+        message = await self.client.request(uapi.Message(headers, input.pseudo_json))
         return message.headers, {{ function_name }}.Output(message.body)
     {% endfor %}
 
@@ -240,13 +240,13 @@ class ServerHandler_:
     async def {{function_name}}(self, headers: dict[str, object], input: {{ function_name }}.Input) -> Tuple[dict[str, object], {{ function_name }}.Output]:
         raise NotImplementedError()
     {% endfor %}
-    async def handler(self, message: uapi.Message.Message) -> uapi.Message.Message:
+    async def handler(self, message: uapi.Message) -> uapi.Message:
         function_name = next(iter(message.body.keys()))
 
         {%- for fn in functions %}
         {%- set function_name = fn | replace('fn.', '') %}
         {% if loop.first %}if{% else %}elif{% endif %} function_name == "{{ fn }}":
             headers, {{ function_name }}_output = await self.{{ function_name }}(message.headers, {{ function_name }}.Input(cast(dict[str, object], message.body)))
-            return uapi.Message.Message(headers, {{ function_name }}_output.pseudo_json)
+            return uapi.Message(headers, {{ function_name }}_output.pseudo_json)
         {% endfor %}
         raise Exception("Unknown function: " + function_name)
