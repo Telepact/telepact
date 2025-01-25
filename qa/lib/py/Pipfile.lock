@@ -218,7 +218,7 @@
         },
         "uapicodegen": {
             "hashes": [
-                "sha256:d5bbd4dcd0c8366a43608be5a1fbf91b4346b37f5152e956bfd561676556515e"
+                "sha256:b058558374fdc484654b0c5a2a153cfc38fac8d39d59a28fd31657c3f3820289"
             ],
             "path": "./../../../tool/uapicodegen/dist/uapicodegen-0.0.1-py3-none-any.whl",
             "version": "==0.0.1"

@@ -19,142 +19,186 @@ class CodeGenHandler(ServerHandler_):
         if input.value():
             top = input.value()
             if top.bool_() != Undefined.Inst:
-                ok = test.Output.Ok_.from_typed(value=top.bool_())
+                ok = test.Output.Ok_.from_typed(
+                    value=Value.from_typed(bool_=top.bool_()))
             if top.nullBool() != Undefined.Inst:
-                ok = test.Output.Ok_.from_typed(nullBool=top.nullBool())
+                print("nullBool: " + str(top.nullBool()))
+                ok = test.Output.Ok_.from_typed(
+                    value=Value.from_typed(nullBool=top.nullBool()))
             if top.arrBool() != Undefined.Inst:
-                ok = test.Output.Ok_.from_typed(arrBool=top.arrBool())
+                ok = test.Output.Ok_.from_typed(
+                    value=Value.from_typed(arrBool=top.arrBool()))
             if top.arrNullBool() != Undefined.Inst:
-                ok = test.Output.Ok_.from_typed(arrNullBool=top.arrNullBool())
+                ok = test.Output.Ok_.from_typed(
+                    value=Value.from_typed(arrNullBool=top.arrNullBool()))
             if top.objBool() != Undefined.Inst:
-                ok = test.Output.Ok_.from_typed(objBool=top.objBool())
+                ok = test.Output.Ok_.from_typed(
+                    value=Value.from_typed(objBool=top.objBool()))
             if top.objNullBool() != Undefined.Inst:
-                ok = test.Output.Ok_.from_typed(objNullBool=top.objNullBool())
+                ok = test.Output.Ok_.from_typed(
+                    value=Value.from_typed(objNullBool=top.objNullBool()))
             if top.int_() != Undefined.Inst:
-                ok = test.Output.Ok_.from_typed(int_=top.int_())
+                ok = test.Output.Ok_.from_typed(
+                    value=Value.from_typed(int_=top.int_()))
             if top.nullInt() != Undefined.Inst:
-                ok = test.Output.Ok_.from_typed(nullInt=top.nullInt())
+                ok = test.Output.Ok_.from_typed(
+                    value=Value.from_typed(nullInt=top.nullInt()))
             if top.arrInt() != Undefined.Inst:
-                ok = test.Output.Ok_.from_typed(arrInt=top.arrInt())
+                ok = test.Output.Ok_.from_typed(
+                    value=Value.from_typed(arrInt=top.arrInt()))
             if top.arrNullInt() != Undefined.Inst:
-                ok = test.Output.Ok_.from_typed(arrNullInt=top.arrNullInt())
+                ok = test.Output.Ok_.from_typed(
+                    value=Value.from_typed(arrNullInt=top.arrNullInt()))
             if top.objInt() != Undefined.Inst:
-                ok = test.Output.Ok_.from_typed(objInt=top.objInt())
+                ok = test.Output.Ok_.from_typed(
+                    value=Value.from_typed(objInt=top.objInt()))
             if top.objNullInt() != Undefined.Inst:
-                ok = test.Output.Ok_.from_typed(objNullInt=top.objNullInt())
+                ok = test.Output.Ok_.from_typed(
+                    value=Value.from_typed(objNullInt=top.objNullInt()))
             if top.num() != Undefined.Inst:
-                ok = test.Output.Ok_.from_typed(num=top.num())
+                ok = test.Output.Ok_.from_typed(
+                    value=Value.from_typed(num=top.num()))
             if top.nullNum() != Undefined.Inst:
-                ok = test.Output.Ok_.from_typed(nullNum=top.nullNum())
+                ok = test.Output.Ok_.from_typed(
+                    value=Value.from_typed(nullNum=top.nullNum()))
             if top.arrNum() != Undefined.Inst:
-                ok = test.Output.Ok_.from_typed(arrNum=top.arrNum())
+                ok = test.Output.Ok_.from_typed(
+                    value=Value.from_typed(arrNum=top.arrNum()))
             if top.arrNullNum() != Undefined.Inst:
-                ok = test.Output.Ok_.from_typed(arrNullNum=top.arrNullNum())
+                ok = test.Output.Ok_.from_typed(
+                    value=Value.from_typed(arrNullNum=top.arrNullNum()))
             if top.objNum() != Undefined.Inst:
-                ok = test.Output.Ok_.from_typed(objNum=top.objNum())
+                ok = test.Output.Ok_.from_typed(
+                    value=Value.from_typed(objNum=top.objNum()))
             if top.objNullNum() != Undefined.Inst:
-                ok = test.Output.Ok_.from_typed(objNullNum=top.objNullNum())
+                ok = test.Output.Ok_.from_typed(
+                    value=Value.from_typed(objNullNum=top.objNullNum()))
             if top.str_() != Undefined.Inst:
-                ok = test.Output.Ok_.from_typed(str_=top.str_())
+                ok = test.Output.Ok_.from_typed(
+                    value=Value.from_typed(str_=top.str_()))
             if top.nullStr() != Undefined.Inst:
-                ok = test.Output.Ok_.from_typed(nullStr=top.nullStr())
+                ok = test.Output.Ok_.from_typed(
+                    value=Value.from_typed(nullStr=top.nullStr()))
             if top.arrStr() != Undefined.Inst:
-                ok = test.Output.Ok_.from_typed(arrStr=top.arrStr())
+                ok = test.Output.Ok_.from_typed(
+                    value=Value.from_typed(arrStr=top.arrStr()))
             if top.arrNullStr() != Undefined.Inst:
-                ok = test.Output.Ok_.from_typed(arrNullStr=top.arrNullStr())
+                ok = test.Output.Ok_.from_typed(
+                    value=Value.from_typed(arrNullStr=top.arrNullStr()))
             if top.objStr() != Undefined.Inst:
-                ok = test.Output.Ok_.from_typed(objStr=top.objStr())
+                ok = test.Output.Ok_.from_typed(
+                    value=Value.from_typed(objStr=top.objStr()))
             if top.objNullStr() != Undefined.Inst:
-                ok = test.Output.Ok_.from_typed(objNullStr=top.objNullStr())
+                ok = test.Output.Ok_.from_typed(
+                    value=Value.from_typed(objNullStr=top.objNullStr()))
             if top.arr() != Undefined.Inst:
-                ok = test.Output.Ok_.from_typed(arr=top.arr())
+                ok = test.Output.Ok_.from_typed(
+                    value=Value.from_typed(arr=top.arr()))
             if top.nullArr() != Undefined.Inst:
-                ok = test.Output.Ok_.from_typed(nullArr=top.nullArr())
+                ok = test.Output.Ok_.from_typed(
+                    value=Value.from_typed(nullArr=top.nullArr()))
             if top.arrArr() != Undefined.Inst:
-                ok = test.Output.Ok_.from_typed(arrArr=top.arrArr())
+                ok = test.Output.Ok_.from_typed(
+                    value=Value.from_typed(arrArr=top.arrArr()))
             if top.arrNullArr() != Undefined.Inst:
-                ok = test.Output.Ok_.from_typed(arrNullArr=top.arrNullArr())
+                ok = test.Output.Ok_.from_typed(
+                    value=Value.from_typed(arrNullArr=top.arrNullArr()))
             if top.objArr() != Undefined.Inst:
-                ok = test.Output.Ok_.from_typed(objArr=top.objArr())
+                ok = test.Output.Ok_.from_typed(
+                    value=Value.from_typed(objArr=top.objArr()))
             if top.objNullArr() != Undefined.Inst:
-                ok = test.Output.Ok_.from_typed(objNullArr=top.objNullArr())
+                ok = test.Output.Ok_.from_typed(
+                    value=Value.from_typed(objNullArr=top.objNullArr()))
             if top.obj() != Undefined.Inst:
-                ok = test.Output.Ok_.from_typed(obj=top.obj())
+                ok = test.Output.Ok_.from_typed(
+                    value=Value.from_typed(obj=top.obj()))
             if top.nullObj() != Undefined.Inst:
-                ok = test.Output.Ok_.from_typed(nullObj=top.nullObj())
+                ok = test.Output.Ok_.from_typed(
+                    value=Value.from_typed(nullObj=top.nullObj()))
             if top.arrObj() != Undefined.Inst:
-                ok = test.Output.Ok_.from_typed(arrObj=top.arrObj())
+                ok = test.Output.Ok_.from_typed(
+                    value=Value.from_typed(arrObj=top.arrObj()))
             if top.arrNullObj() != Undefined.Inst:
-                ok = test.Output.Ok_.from_typed(arrNullObj=top.arrNullObj())
+                ok = test.Output.Ok_.from_typed(
+                    value=Value.from_typed(arrNullObj=top.arrNullObj()))
             if top.objObj() != Undefined.Inst:
-                ok = test.Output.Ok_.from_typed(objObj=top.objObj())
+                ok = test.Output.Ok_.from_typed(
+                    value=Value.from_typed(objObj=top.objObj()))
             if top.objNullObj() != Undefined.Inst:
-                ok = test.Output.Ok_.from_typed(objNullObj=top.objNullObj())
+                ok = test.Output.Ok_.from_typed(
+                    value=Value.from_typed(objNullObj=top.objNullObj()))
             if top.any() != Undefined.Inst:
-                ok = test.Output.Ok_.from_typed(any=top.any())
+                ok = test.Output.Ok_.from_typed(
+                    value=Value.from_typed(any=top.any()))
             if top.nullAny() != Undefined.Inst:
-                ok = test.Output.Ok_.from_typed(nullAny=top.nullAny())
+                ok = test.Output.Ok_.from_typed(
+                    value=Value.from_typed(nullAny=top.nullAny()))
             if top.arrAny() != Undefined.Inst:
-                ok = test.Output.Ok_.from_typed(arrAny=top.arrAny())
+                ok = test.Output.Ok_.from_typed(
+                    value=Value.from_typed(arrAny=top.arrAny()))
             if top.arrNullAny() != Undefined.Inst:
-                ok = test.Output.Ok_.from_typed(arrNullAny=top.arrNullAny())
+                ok = test.Output.Ok_.from_typed(
+                    value=Value.from_typed(arrNullAny=top.arrNullAny()))
             if top.objAny() != Undefined.Inst:
-                ok = test.Output.Ok_.from_typed(objAny=top.objAny())
+                ok = test.Output.Ok_.from_typed(
+                    value=Value.from_typed(objAny=top.objAny()))
             if top.objNullAny() != Undefined.Inst:
-                ok = test.Output.Ok_.from_typed(objNullAny=top.objNullAny())
+                ok = test.Output.Ok_.from_typed(
+                    value=Value.from_typed(objNullAny=top.objNullAny()))
             if top.struct() != Undefined.Inst:
                 ok = test.Output.Ok_.from_typed(
-                    struct=self.map_struct(top.struct()))
+                    value=Value.from_typed(struct=self.map_struct(top.struct())))
             if top.nullStruct() != Undefined.Inst:
                 ok = test.Output.Ok_.from_typed(
-                    nullStruct=self.map_struct(top.nullStruct()))
+                    value=Value.from_typed(nullStruct=self.map_struct(top.nullStruct())))
             if top.arrStruct() != Undefined.Inst:
                 ok = test.Output.Ok_.from_typed(
-                    arrStruct=self.map_arr(top.arrStruct(), self.map_struct))
+                    value=Value.from_typed(arrStruct=self.map_arr(top.arrStruct(), self.map_struct)))
             if top.arrNullStruct() != Undefined.Inst:
                 ok = test.Output.Ok_.from_typed(
-                    arrNullStruct=self.map_arr(top.arrNullStruct(), self.map_struct))
+                    value=Value.from_typed(arrNullStruct=self.map_arr(top.arrNullStruct(), self.map_struct)))
             if top.objStruct() != Undefined.Inst:
                 ok = test.Output.Ok_.from_typed(
-                    objStruct=self.map_obj(top.objStruct(), self.map_struct))
+                    value=Value.from_typed(objStruct=self.map_obj(top.objStruct(), self.map_struct)))
             if top.objNullStruct() != Undefined.Inst:
                 ok = test.Output.Ok_.from_typed(
-                    objNullStruct=self.map_obj(top.objNullStruct(), self.map_struct))
+                    value=Value.from_typed(objNullStruct=self.map_obj(top.objNullStruct(), self.map_struct)))
             if top.union() != Undefined.Inst:
                 ok = test.Output.Ok_.from_typed(
-                    union=self.map_union(top.union()))
+                    value=Value.from_typed(union=self.map_union(top.union())))
             if top.nullUnion() != Undefined.Inst:
                 ok = test.Output.Ok_.from_typed(
-                    nullUnion=self.map_union(top.nullUnion()))
+                    value=Value.from_typed(nullUnion=self.map_union(top.nullUnion())))
             if top.arrUnion() != Undefined.Inst:
                 ok = test.Output.Ok_.from_typed(
-                    arrUnion=self.map_arr(top.arrUnion(), self.map_union))
+                    value=Value.from_typed(arrUnion=self.map_arr(top.arrUnion(), self.map_union)))
             if top.arrNullUnion() != Undefined.Inst:
                 ok = test.Output.Ok_.from_typed(
-                    arrNullUnion=self.map_arr(top.arrNullUnion(), self.map_union))
+                    value=Value.from_typed(arrNullUnion=self.map_arr(top.arrNullUnion(), self.map_union)))
             if top.objUnion() != Undefined.Inst:
                 ok = test.Output.Ok_.from_typed(
-                    objUnion=self.map_obj(top.objUnion(), self.map_union))
+                    value=Value.from_typed(objUnion=self.map_obj(top.objUnion(), self.map_union)))
             if top.objNullUnion() != Undefined.Inst:
                 ok = test.Output.Ok_.from_typed(
-                    objNullUnion=self.map_obj(top.objNullUnion(), self.map_union))
+                    value=Value.from_typed(objNullUnion=self.map_obj(top.objNullUnion(), self.map_union)))
             if top.fn() != Undefined.Inst:
-                ok = test.Output.Ok_.from_typed(fn=self.map_fn(top.fn()))
+                ok = test.Output.Ok_.from_typed(
+                    value=Value.from_typed(fn=self.map_fn(top.fn())))
             if top.nullFn() != Undefined.Inst:
                 ok = test.Output.Ok_.from_typed(
-                    nullFn=self.map_fn(top.nullFn()))
+                    value=Value.from_typed(nullFn=self.map_fn(top.nullFn())))
             if top.arrFn() != Undefined.Inst:
                 ok = test.Output.Ok_.from_typed(
-                    arrFn=self.map_arr(top.arrFn(), self.map_fn))
+                    value=Value.from_typed(arrFn=self.map_arr(top.arrFn(), self.map_fn)))
             if top.arrNullFn() != Undefined.Inst:
                 ok = test.Output.Ok_.from_typed(
-                    arrNullFn=self.map_arr(top.arrNullFn(), self.map_fn))
+                    value=Value.from_typed(arrNullFn=self.map_arr(top.arrNullFn(), self.map_fn)))
             if top.objFn() != Undefined.Inst:
                 ok = test.Output.Ok_.from_typed(
-                    objFn=self.map_obj(top.objFn(), self.map_fn))
+                    value=Value.from_typed(objFn=self.map_obj(top.objFn(), self.map_fn)))
             if top.objNullFn() != Undefined.Inst:
                 ok = test.Output.Ok_.from_typed(
-                    objNullFn=self.map_obj(top.objNullFn(), self.map_fn))
+                    value=Value.from_typed(objNullFn=self.map_obj(top.objNullFn(), self.map_fn)))
 
         return {}, test.Output.from_Ok_(ok)
 
