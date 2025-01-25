@@ -205,27 +205,29 @@ class CodeGenHandler(ServerHandler_):
     def map_struct(self, s: ExStruct) -> ExStruct:
         if s is None:
             return None
-        if s.optional() == Undefined.Inst:
-            return ExStruct(required=s.required())
-        else:
-            return ExStruct(required=s.required(), optional=s.optional())
+        opt_args = {}
+        if s.optional() != Undefined.Inst:
+            opt_args["optional"] = s.optional()
+        if s.optional2() != Undefined.Inst:
+            opt_args["optional2"] = s.optional2()
+        return ExStruct.from_typed(required=s.required(), **opt_args)
 
     def map_union(self, u: ExUnion) -> ExUnion:
         if u is None:
             return None
         tv = u.get_tagged_value()
         if tv.tag == "One":
-            return ExUnion.One.from_typed()
+            return ExUnion.from_One(ExUnion.One.from_typed())
         elif tv.tag == "Two":
             if tv.value.optional() == Undefined.Inst:
-                return ExUnion.Two.from_typed(
+                return ExUnion.from_Two(ExUnion.Two.from_typed(
                     required=tv.value.required()
-                )
+                ))
             else:
-                return ExUnion.Two.from_typed(
+                return ExUnion.from_Two(ExUnion.Two.from_typed(
                     required=tv.value.required(),
                     optional=tv.value.optional()
-                )
+                ))
 
     def map_fn(self, f: fnexample.Input) -> fnexample.Input:
         if f is None:

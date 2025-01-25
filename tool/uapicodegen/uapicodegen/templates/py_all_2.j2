@@ -23,8 +23,8 @@ class TaggedValue_(Generic[T, U]):
     value: U
 
     def __init__(self, tag: T, value: U) -> None:
-        self.tag_ = tag
-        self.value_ = value
+        self.tag = tag
+        self.value = value
 
 class UnknownTaggedValue_:
     tag: str
@@ -125,7 +125,7 @@ class UnknownTaggedValue_:
     {%- endif -%}
 {%- endmacro -%}
 
-{%- macro struct(type_display, doc, fields, type_prefix) %}
+{%- macro struct(type_display, doc, fields, type_prefix, fn) %}
 class {{ type_display }}:
     {{ docstring(doc) | indent }}
     pseudo_json: dict[str, object]
@@ -156,11 +156,11 @@ class {{ type_display }}:
         {%- endif %}
         {%- endfor %}
 
-        return {{ type_prefix + type_display }}(input)
+        return {{ type_prefix + type_display }}({% if fn %}{'{{ fn }}': input}{% else %}input{% endif %})
     {% for field_name, field_type in fields.items() %}
     def {{ sanitize_field_name(field_name) }}(self) -> '{{ to_maybe_opt_py_type(field_type, field_name) }}':
-        return {% if '!' in field_name %}Undefined.Inst if '{{- field_name }}' not in self.pseudo_json else {% endif -%}
-        {% call marshall_py_type(field_type, 0) %}self.pseudo_json["{{ field_name }}"]{% endcall %}
+        return {% if '!' in field_name %}Undefined.Inst if '{{- field_name }}' not in self.pseudo_json{% if fn %}["{{ fn }}"]{% endif %} else {% endif -%}
+        {% call marshall_py_type(field_type, 0) %}self.pseudo_json{% if fn %}["{{ fn }}"]{% endif %}["{{ field_name }}"]{% endcall %}
     {% endfor -%}
 {%- endmacro -%}
 
@@ -204,7 +204,7 @@ class {{ type_display }}:
 
 {%- macro function(type_display, data, schema_key) %}
 class {{ type_display }}:
-    {{- struct('Input', data['///'], data[schema_key], type_display + '.') | indent }}
+    {{- struct('Input', data['///'], data[schema_key], type_display + '.', schema_key) | indent }}
     {{- union ('Output', data['///'], data['->'], type_display + '.') | indent }}
 {%- endmacro %}
 
@@ -246,7 +246,7 @@ class ServerHandler_:
         {%- for fn in functions %}
         {%- set function_name = fn | replace('fn.', '') %}
         {% if loop.first %}if{% else %}elif{% endif %} function_name == "{{ fn }}":
-            headers, {{ function_name }}_output = await self.{{ function_name }}(message.headers, {{ function_name }}.Input(cast(dict[str, object], message.body["{{ fn }}"])))
+            headers, {{ function_name }}_output = await self.{{ function_name }}(message.headers, {{ function_name }}.Input(cast(dict[str, object], message.body)))
             return uapi.Message.Message(headers, {{ function_name }}_output.pseudo_json)
         {% endfor %}
         raise Exception("Unknown function: " + function_name)
