@@ -1,6 +1,6 @@
 [project]
 name = "uapi"
-version = "0.0.15"
+version = "0.0.16"
 description = "Universal API"
 readme = "README.md"
 requires-python = ">=3.11"
