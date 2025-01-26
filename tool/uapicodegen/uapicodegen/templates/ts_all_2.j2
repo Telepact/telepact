@@ -10,7 +10,7 @@ export class TaggedValue_<T, U> {
     }
 }
 
-export class UnknownTaggedValue_ {
+export class UntypedTaggedValue_ {
     tag: string;
     value: Record<string, any>;
 
@@ -175,7 +175,7 @@ export class {{ type_display }} {
             {%- set tag_key = tag_entry | find_tag_key %}
             {%- set tag_data = tag_entry[tag_key] %}
         TaggedValue_<"{{ tag_key }}", {{ tag_prefix + tag_key }}> |
-        {%- endfor %} UnknownTaggedValue_ {
+        {%- endfor %} UntypedTaggedValue_ {
         const tag = Object.keys(this.pseudoJson)[0]!;
         {%- for tag_entry in tags %}
             {%- set tag_key = tag_entry | find_tag_key %}
@@ -183,7 +183,7 @@ export class {{ type_display }} {
             return new TaggedValue_("{{ tag_key }}", new {{ tag_prefix + tag_key }}(this.pseudoJson["{{ tag_key }}"]));
         }
         {%- endfor %}
-        return new UnknownTaggedValue_(tag, this.pseudoJson[tag]);
+        return new UntypedTaggedValue_(tag, this.pseudoJson[tag]);
     }
 }
 

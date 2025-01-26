@@ -6,6 +6,8 @@ import jinja2
 import click
 from pathlib import Path
 import re
+from uapi import UApiSchema
+from uapi.internal.types.UStruct import UStruct
 
 
 def _validate_package(ctx: click.Context, param: click.Parameter, value: str) -> str:
@@ -17,22 +19,21 @@ def _validate_package(ctx: click.Context, param: click.Parameter, value: str) ->
 
 
 @click.command()
-@click.option('--schema', help='uAPI schema', required=True)
+@click.option('--schema-dir', help='uAPI schema directory', required=True)
 @click.option('--lang', help='Language target', required=True)
 @click.option('--out', help='Output directory', required=True)
 @click.option('--package', help='Java package', callback=_validate_package)
-def generate(schema: str, lang: str, out: str, package: str) -> None:
+def generate(schema_dir: str, lang: str, out: str, package: str) -> None:
 
     print('Starting cli...')
 
-    # read the schema data from file
-    with open(schema, "r") as f:
-        # load file into string variable
-        file_data = f.read()
-        schema_data = cast(list[dict[str, object]], json.loads(file_data))
+    uapi_schema = UApiSchema.from_directory(schema_dir)
 
     target = lang
     output_directory = out
+
+    schema_data: list[dict[str, object]] = cast(
+        list[dict[str, object]], uapi_schema.original)
 
     # Call the generate function
     _generate_internal(schema_data, target, output_directory, package)

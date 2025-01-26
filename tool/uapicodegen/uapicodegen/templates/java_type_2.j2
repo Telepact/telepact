@@ -168,7 +168,7 @@ public {% if modifier %}{{ modifier }} {% endif %} class {{ display_name }} {
             return new {{ tag_key }}((Map<String, Object>) this.pseudoJson.get(tag));
         }
         {%- endfor %}
-        return new Unknown_(tag, (Map<String, Object>) this.pseudoJson.get(tag));
+        return new Untyped_(tag, (Map<String, Object>) this.pseudoJson.get(tag));
     }
     {% for tag_entry in tags %}
         {%- set tag_key = tag_entry | find_tag_key %}
@@ -183,11 +183,11 @@ public {% if modifier %}{{ modifier }} {% endif %} class {{ display_name }} {
         {{ struct(tag_key, tag_entry['///'], tag_entry[tag_key], display_name + '.TaggedValue', tag_key, 'static final') | indent }}
     {%- endfor %}
     
-    public static final class Unknown_ implements {{ display_name }}.TaggedValue {
+    public static final class Untyped_ implements {{ display_name }}.TaggedValue {
         public final String tag;
         public final Map<String, Object> value;
 
-        public Unknown_(String tag, Map<String, Object> value) {
+        public Untyped_(String tag, Map<String, Object> value) {
             this.tag = tag;
             this.value = value;
         }

@@ -241,7 +241,7 @@ public class CodeGenHandler extends ServerHandler_ {
         }
         var tv = u.getTaggedValue();
         return switch (tv) {
-            case ExUnion.Unknown_ v -> new ExUnion(Map.of(v.tag, v.value));
+            case ExUnion.Untyped_ v -> new ExUnion(Map.of(v.tag, v.value));
             case ExUnion.One v -> ExUnion.from_One(new ExUnion.One.Builder().build());
             case ExUnion.Two v -> {
                 var b = new ExUnion.Two.Builder();

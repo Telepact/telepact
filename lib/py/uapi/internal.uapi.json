@@ -1,0 +1,242 @@
+[
+    {
+        "///": " Ping the server. ",
+        "fn.ping_": {},
+        "->": [
+            {
+                "Ok_": {}
+            }
+        ],
+        "_errors": "^errors\\.Validation_$"
+    },
+    {
+        "///": " Get the uAPI `schema` of this server. ",
+        "fn.api_": {},
+        "->": [
+            {
+                "Ok_": {
+                    "api": ["array", ["object", ["any"]]]
+                }
+            }
+        ],
+        "_errors": "^errors\\.Validation_$"
+    },
+    {
+        "_ext.Select_": {}
+    },
+    {
+        "///": " The timeout in milliseconds set by the client ",
+        "requestHeader.time_": ["integer"]
+    },
+    {
+        "///": " If set to `true`, response validation by the server will be disabled. ",
+        "requestHeader.unsafe_": ["boolean"]
+    },
+    {
+        "///": [
+            " Used to select fields from structs. It is an object of string arrays keyed by   ",
+            " struct reference name pointing to field names of that struct that should be     ",
+            " selected. Field names not included in the array are omitted in the response     ",
+            " wherever that field would have appeared.                                        "
+        ],
+        "requestHeader.select_": ["_ext.Select_"]
+    },
+    {
+        "///": [
+            " Indicates the binary checksums known by the client, which will prompt the       ",
+            " inclusion of the `bin_` response header with the binary checksum currently in   ",
+            " use by the server. If server binary checksum does not match one of the          ",
+            " client-indicated binary checksums in the `bin_` request header, then the        ",
+            " server will also include the `enc_` response header containing the binary       ",
+            " encoding, an object of possible keys mapped onto a field id.                    "
+        ],
+        "requestHeader.bin_": ["array", ["integer"]]
+    },
+    {
+        "///": [
+            " Indicates the binary checksums known by the client, which will prompt the       ",
+            " inclusion of the `bin_` response header with the binary checksum currently in   ",
+            " use by the server. If server binary checksum does not match one of the          ",
+            " client-indicated binary checksums in the `bin_` request header, then the        ",
+            " server will also include the `enc_` response header containing the binary       ",
+            " encoding, an object of possible keys mapped onto a field id.                    "
+        ],
+        "responseHeader.bin_": ["array", ["integer"]]
+    },
+    {
+        "///": [
+            " Indicates usage of the \"packed\" binary strategy on the request, if supplied     ",
+            " binary, and on the response from the server.                                    "
+        ],
+        "requestHeader.pac_": ["boolean"]
+    },
+    {
+        "///": " Indicates usage of the \"packed\" binary strategy on the response. ",
+        "responseHeader.pac_": ["boolean"]
+    },
+    {
+        "///": [
+            " The binary encoding used by the server, an object of possible keys mapped onto  ",
+            " a field id.                                                                     "
+        ],
+        "responseHeader.enc_": ["object", ["integer"]]
+    },
+    {
+        "///": " Will be reflected as-is in `responseHeader.id_`. ",
+        "requestHeader.id_": ["any"]
+    },
+    {
+        "///": " The value of `requestHeader.id_`, if provided. ",
+        "responseHeader.id_": ["any"]
+    },
+    {
+        "///": " A type. ",
+        "union.Type_": [
+            {
+                "Null": {}
+            },
+            {
+                "Boolean": {}
+            },
+            {
+                "Integer": {}
+            },
+            {
+                "Number": {}
+            },
+            {
+                "String": {}
+            },
+            {
+                "Array": {}
+            },
+            {
+                "Object": {}
+            },
+            {
+                "Any": {}
+            },
+            {
+                "Unknown": {}
+            }
+        ]
+    },
+    {
+        "///": " A reason for the validation failure in the body. ",
+        "union.ValidationFailureReason_": [
+            {
+                "TypeUnexpected": {
+                    "expected": ["union.Type_"],
+                    "actual": ["union.Type_"]
+                }
+            },
+            {
+                "NullDisallowed": {}
+            },
+            {
+                "ObjectKeyDisallowed": {}
+            },
+            {
+                "ArrayElementDisallowed": {}
+            },
+            {
+                "NumberOutOfRange": {}
+            },
+            {
+                "ObjectSizeUnexpected": {
+                    "expected": ["integer"],
+                    "actual": ["integer"]
+                }
+            },
+            {
+                "ExtensionValidationFailed": {
+                    "reason": ["string"],
+                    "data!": ["object", ["any"]]
+                }
+            },
+            {
+                "ObjectKeyRegexMatchCountUnexpected": {
+                    "regex": ["string"],
+                    "expected": ["integer"],
+                    "actual": ["integer"],
+                    "keys": ["array", ["string"]]
+                }
+            },
+            {
+                "RequiredObjectKeyMissing": {
+                    "key": ["string"]
+                }
+            },
+            {
+                "FunctionUnknown": {}
+            }
+        ]
+    },
+    {
+        "///": " A parse failure. ",
+        "union.ParseFailure_": [
+            {
+                "IncompatibleBinaryEncoding": {}
+            },
+            {
+                "///": " The binary decoder encountered a field id that could not be mapped to a key. ",
+                "BinaryDecodeFailure": {}
+            },
+            {
+                "JsonInvalid": {}
+            },
+            {
+                "ExpectedJsonArrayOfAnObjectAndAnObjectOfOneObject": {}
+            },
+            {
+                "ExpectedJsonArrayOfTwoObjects": {}
+            }
+        ]
+    },
+    {
+        "///": " A validation failure located at a `path` explained by a `reason`. ",
+        "struct.ValidationFailure_": {
+            "path": ["array", ["any"]],
+            "reason": ["union.ValidationFailureReason_"]
+        }
+    },
+    {
+        "///": " A standard error. ",
+        "errors.Validation_": [
+            {
+                "///": " The server implementation raised an unknown error. ",
+                "ErrorUnknown_": {}
+            },
+            {
+                "///": " The headers on the request are invalid. ",
+                "ErrorInvalidRequestHeaders_": {
+                    "cases": ["array", ["struct.ValidationFailure_"]]
+                }
+            },
+            {
+                "///": " The body on the request is invalid. ",
+                "ErrorInvalidRequestBody_": {
+                    "cases": ["array", ["struct.ValidationFailure_"]]
+                }
+            },
+            {
+                "///": " The headers on the response are invalid. ",
+                "ErrorInvalidResponseHeaders_": {
+                    "cases": ["array", ["struct.ValidationFailure_"]]
+                }
+            },
+            {
+                "///": " The body that the server attempted to put on the response is invalid. ",
+                "ErrorInvalidResponseBody_": {
+                    "cases": ["array", ["struct.ValidationFailure_"]]
+                }
+            },
+            {
+                "///": " The request could not be parsed as a uAPI Message. ",
+                "ErrorParseFailure_": {
+                    "reasons": ["array", ["union.ParseFailure_"]]
+                }
+            }
+        ]
+    }
+]

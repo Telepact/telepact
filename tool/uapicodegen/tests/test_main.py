@@ -12,7 +12,7 @@ def runner() -> CliRunner:
 
 def test_command_java(runner: CliRunner) -> None:
     result = runner.invoke(
-        generate, ['--schema', 'tests/data/example1.uapi.json', '--lang', 'java', '--out', 'tests/output/java', '--package', 'output'])
+        generate, ['--schema-dir', 'tests/data', '--lang', 'java', '--out', 'tests/output/java', '--package', 'output'])
 
     # print stack trace
     import traceback
@@ -33,7 +33,7 @@ def test_command_java(runner: CliRunner) -> None:
 
 def test_command_py(runner: CliRunner) -> None:
     result = runner.invoke(
-        generate, ['--schema', 'tests/data/example1.uapi.json', '--lang', 'py', '--out', 'tests/output/py'])
+        generate, ['--schema-dir', 'tests/data', '--lang', 'py', '--out', 'tests/output/py'])
 
     # print stack trace
     import traceback
@@ -54,7 +54,7 @@ def test_command_py(runner: CliRunner) -> None:
 
 def test_command_ts(runner: CliRunner) -> None:
     result = runner.invoke(
-        generate, ['--schema', 'tests/data/example1.uapi.json', '--lang', 'ts', '--out', 'tests/output/ts'])
+        generate, ['--schema-dir', 'tests/data', '--lang', 'ts', '--out', 'tests/output/ts'])
 
     # print stack trace
     import traceback

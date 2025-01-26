@@ -1,0 +1,18 @@
+[project]
+name = "jAPI-qa-test"
+version = "0.1.0"
+description = ""
+requires-python = ">=3.11"
+
+[tool.poetry]
+package-mode = false
+
+[tool.poetry.group.dev.dependencies]
+msgpack = "*"
+nats-py = "*"
+pytest = "*"
+prometheus-client = "*"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

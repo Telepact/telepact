@@ -15,8 +15,8 @@
             "build": ["array", ["integer"]],
             "build2": ["object", ["integer"]],
             "field7!": ["union.Un1?"],
-            "field8!": ["struct.Example6"],
-            "field9": ["array", ["struct.Example1"]]
+            "field8!": ["struct.Example4"],
+            "field9": ["array", ["struct.Example5"]]
         }
     },
     {
