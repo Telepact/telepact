@@ -266,13 +266,13 @@ files = [
 
 [[package]]
 name = "uapi"
-version = "0.0.14"
+version = "0.0.15"
 description = "Universal API"
 optional = false
 python-versions = ">=3.11"
 groups = ["main"]
 files = [
-    {file = "uapi-0.0.14-py3-none-any.whl", hash = "sha256:1cb78090d8f726723bb9f3acedfcbc9078c2ead54a6b5193f2937eef6f53dcf8"},
+    {file = "uapi-0.0.15-py3-none-any.whl", hash = "sha256:06dfb05455156cd8658692c9113482f8383cf0e93a4e68ad5f677b5c5c5dce24"},
 ]
 
 [package.dependencies]
@@ -280,9 +280,9 @@ msgpack = "*"
 
 [package.source]
 type = "file"
-url = "../../lib/py/dist/uapi-0.0.14-py3-none-any.whl"
+url = "../../lib/py/dist/uapi-0.0.15-py3-none-any.whl"
 
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11"
-content-hash = "c7eb79dec9bd092d59ab7a0f8d018ad47d19f98365aa0a6e7727af06913fe405"
+content-hash = "c589861ef99e1b111dcfae828f8d95e712e63cf37caa22830082daa3a55935db"
