@@ -8,12 +8,14 @@ import { processRequestObject } from './internal/ProcessRequestObject';
 export class Client {
     private adapter: (message: Message, serializer: Serializer) => Promise<Message>;
     private useBinaryDefault: boolean;
+    private alwaysSendJson: boolean;
     private timeoutMsDefault: number;
     private serializer: Serializer;
 
     constructor(adapter: (message: Message, serializer: Serializer) => Promise<Message>, options: ClientOptions) {
         this.adapter = adapter;
         this.useBinaryDefault = options.useBinary;
+        this.alwaysSendJson = options.alwaysSendJson;
         this.timeoutMsDefault = options.timeoutMsDefault;
         this.serializer = new Serializer(options.serializationImpl, new ClientBinaryEncoder(options.binaryStrategy));
     }
@@ -25,18 +27,21 @@ export class Client {
             this.serializer,
             this.timeoutMsDefault,
             this.useBinaryDefault,
+            this.alwaysSendJson,
         );
     }
 }
 
 export class ClientOptions {
     useBinary: boolean;
+    alwaysSendJson: boolean;
     timeoutMsDefault: number;
     serializationImpl: DefaultSerialization;
     binaryStrategy: DefaultClientBinaryStrategy;
 
     constructor() {
         this.useBinary = false;
+        this.alwaysSendJson = true;
         this.timeoutMsDefault = 5000;
         this.serializationImpl = new DefaultSerialization();
         this.binaryStrategy = new DefaultClientBinaryStrategy();

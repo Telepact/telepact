@@ -103,6 +103,7 @@ function startClientTestServer(
     const options = new ClientOptions();
 
     options.useBinary = defaultBinary;
+    options.alwaysSendJson = !defaultBinary;
     const client = new Client(adapter, options);
 
     const genClient = new ClientInterface_(client); 
