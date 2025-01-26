@@ -19,10 +19,10 @@ nats-py = "*"
 prometheus-client = "*"
 
 [tool.poetry.dependencies.uapicodegen]
-path = "./../../../tool/uapicodegen/dist/uapicodegen-0.0.22-py3-none-any.whl"
+path = "./../../../tool/uapicodegen/dist/uapicodegen-0.0.26-py3-none-any.whl"
 
 [tool.poetry.dependencies.uapi]
-path = "../../../lib/py/dist/uapi-0.0.19-py3-none-any.whl"
+path = "../../../lib/py/dist/uapi-0.0.23-py3-none-any.whl"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "*"

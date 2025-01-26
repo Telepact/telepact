@@ -3,6 +3,7 @@ package uapi.internal.binary;
 import static uapi.internal.binary.EncodeBody.encodeBody;
 import static uapi.internal.binary.PackBody.packBody;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -12,6 +13,12 @@ public class ServerBinaryEncode {
         final var headers = (Map<String, Object>) message.get(0);
         final var messageBody = (Map<String, Object>) message.get(1);
         final var clientKnownBinaryChecksums = (List<Integer>) headers.remove("_clientKnownBinaryChecksums");
+
+        final var resultTag = new ArrayList<>(messageBody.keySet()).get(0);
+
+        if (!resultTag.equals("Ok_")) {
+            throw new BinaryEncoderUnavailableError();
+        }
 
         if (clientKnownBinaryChecksums == null || !clientKnownBinaryChecksums.contains(binaryEncoder.checksum)) {
             headers.put("enc_", binaryEncoder.encodeMap);

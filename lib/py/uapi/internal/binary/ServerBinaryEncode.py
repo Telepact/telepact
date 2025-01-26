@@ -7,11 +7,17 @@ if TYPE_CHECKING:
 def server_binary_encode(message: list[object], binary_encoder: 'BinaryEncoding') -> list[object]:
     from uapi.internal.binary.EncodeBody import encode_body
     from uapi.internal.binary.PackBody import pack_body
+    from uapi.internal.binary.BinaryEncoderUnavailableError import BinaryEncoderUnavailableError
 
     headers = cast(dict[str, object], message[0])
     message_body = cast(dict[str, object], message[1])
     client_known_binary_checksums = cast(list[int], headers.pop(
         "_clientKnownBinaryChecksums", None))
+
+    result_tag = list(message_body.keys())[0]
+
+    if result_tag != 'Ok_':
+        raise BinaryEncoderUnavailableError()
 
     if client_known_binary_checksums is None or binary_encoder.checksum not in client_known_binary_checksums:
         headers["enc_"] = binary_encoder.encode_map

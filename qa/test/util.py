@@ -288,6 +288,8 @@ async def verify_client_case(nats_client, request, expected_response, client_fro
     response[0].pop('enc_', None)
     response[0].pop('pac_', None)
 
+    response_was_success = 'Ok_' in response[1]
+
     if expected_response:
         if assert_rules.get('setCompare', False):
             expected_response = convert_lists_to_sets(expected_response)
@@ -298,11 +300,19 @@ async def verify_client_case(nats_client, request, expected_response, client_fro
     if assert_binary:
         if not assert_rules.get('skipBinaryCheck', False):
             assert request_was_binary == True
-            assert response_was_binary == True
+
+            if response_was_success:
+                assert response_was_binary == True
+            else:
+                assert response_was_binary == False
 
         if not assert_rules.get('skipFieldIdCheck', False):
             assert request_binary_had_enough_integer_keys == True
-            assert response_binary_had_enough_integer_keys == True
+
+            if response_was_success:
+                assert response_binary_had_enough_integer_keys == True
+            else:
+                assert response_binary_had_enough_integer_keys == False
 
 
 async def send_case(nats_client: nats.aio.client.Client, request, expected_response, request_topic, just_send=False):

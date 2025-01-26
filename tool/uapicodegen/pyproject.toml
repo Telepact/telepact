@@ -1,9 +1,9 @@
 [project]
 name = "uapicodegen"
-version = "0.0.22"
+version = "0.0.26"
 description = "Universal API Code Generator"
 readme = "README.md"
-dependencies = [ "click", "jinja2", "uapi @ file:///Users/brendanbartels/workspace/jAPI/lib/py/dist/uapi-0.0.19-py3-none-any.whl",]
+dependencies = [ "click", "jinja2", "uapi @ file:///Users/brendanbartels/workspace/jAPI/lib/py/dist/uapi-0.0.23-py3-none-any.whl",]
 requires-python = ">=3.11"
 
 [build-system]

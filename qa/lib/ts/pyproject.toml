@@ -16,4 +16,4 @@ python = "^3.11"
 toml = "^0.10.2"
 
 [tool.poetry.dependencies.uapicodegen]
-path = "./../../../tool/uapicodegen/dist/uapicodegen-0.0.22-py3-none-any.whl"
+path = "./../../../tool/uapicodegen/dist/uapicodegen-0.0.26-py3-none-any.whl"
