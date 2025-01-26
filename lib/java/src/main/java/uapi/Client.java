@@ -23,6 +23,12 @@ public class Client {
         public boolean useBinary = false;
 
         /**
+         * Indicates if the client should always send JSON payloads, even if binary
+         * is enabled.
+         */
+        public boolean alwaysSendJson = true;
+
+        /**
          * Indicates the default timeout that should be used if the _tim header is not
          * set.
          */
@@ -44,6 +50,7 @@ public class Client {
     private final BiFunction<Message, Serializer, Future<Message>> adapter;
     private final Serializer serializer;
     private final boolean useBinaryDefault;
+    private final boolean alwaysSendJson;
     private final long timeoutMsDefault;
 
     /**
@@ -67,6 +74,7 @@ public class Client {
     public Client(BiFunction<Message, Serializer, Future<Message>> adapter, Options options) {
         this.adapter = adapter;
         this.useBinaryDefault = options.useBinary;
+        this.alwaysSendJson = options.alwaysSendJson;
         this.timeoutMsDefault = options.timeoutMsDefault;
         this.serializer = new Serializer(options.serializationImpl,
                 new ClientBinaryEncoder(options.binaryStrategy));
@@ -80,7 +88,7 @@ public class Client {
      */
     public Message request(Message requestMessage) {
         return processRequestObject(requestMessage, this.adapter, this.serializer,
-                this.timeoutMsDefault, this.useBinaryDefault);
+                this.timeoutMsDefault, this.useBinaryDefault, this.alwaysSendJson);
     }
 
 }

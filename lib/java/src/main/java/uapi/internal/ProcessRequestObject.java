@@ -14,7 +14,7 @@ import uapi.UApiError;
 public class ProcessRequestObject {
     public static Message processRequestObject(Message requestMessage,
             BiFunction<Message, Serializer, Future<Message>> adapter, Serializer serializer, long timeoutMsDefault,
-            boolean useBinaryDefault) {
+            boolean useBinaryDefault, boolean alwaysSendJson) {
         final Map<String, Object> header = requestMessage.headers;
 
         try {
@@ -24,6 +24,10 @@ public class ProcessRequestObject {
 
             if (useBinaryDefault) {
                 header.put("_binary", true);
+            }
+
+            if (Objects.equals(header.get("_binary"), true) && alwaysSendJson) {
+                header.put("_forceSendJson", true);
             }
 
             final var timeoutMs = ((Number) header.get("time_")).longValue();
