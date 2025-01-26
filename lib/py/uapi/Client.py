@@ -14,6 +14,7 @@ class Client:
     class Options:
         def __init__(self) -> None:
             self.use_binary = False
+            self.use_json_for_request = True
             self.timeout_ms_default = 5000
             self.serialization_impl = DefaultSerialization()
             self.binary_strategy = DefaultClientBinaryStrategy()
@@ -21,10 +22,11 @@ class Client:
     def __init__(self, adapter: Callable[['Message', 'Serializer'], Awaitable['Message']], options: 'Options'):
         self.adapter = adapter
         self.use_binary_default = options.use_binary
+        self.use_json_for_request = options.use_json_for_request
         self.timeout_ms_default = options.timeout_ms_default
         self.serializer = Serializer(
             options.serialization_impl, ClientBinaryEncoder(options.binary_strategy))
 
     async def request(self, request_message: 'Message') -> 'Message':
         from uapi.internal.ProcessRequestObject import process_request_object
-        return await process_request_object(request_message, self.adapter, self.serializer, self.timeout_ms_default, self.use_binary_default)
+        return await process_request_object(request_message, self.adapter, self.serializer, self.timeout_ms_default, self.use_binary_default, self.use_json_for_request)

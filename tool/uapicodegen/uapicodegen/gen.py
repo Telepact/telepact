@@ -20,7 +20,7 @@ def _validate_package(ctx: click.Context, param: click.Parameter, value: str) ->
 
 @click.command()
 @click.option('--schema-dir', help='uAPI schema directory', required=True)
-@click.option('--lang', help='Language target', required=True)
+@click.option('--lang', help='Language target (one of "java", "py", or "ts)', required=True)
 @click.option('--out', help='Output directory', required=True)
 @click.option('--package', help='Java package', callback=_validate_package)
 def generate(schema_dir: str, lang: str, out: str, package: str) -> None:

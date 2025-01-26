@@ -78,6 +78,7 @@ async def start_client_test_server(connection: NatsClient, metrics: CollectorReg
 
     options = Client.Options()
     options.use_binary = default_binary
+    options.use_json_for_request = not default_binary
     client = Client(adapter, options)
 
     generated_client = ClientInterface_(client)
