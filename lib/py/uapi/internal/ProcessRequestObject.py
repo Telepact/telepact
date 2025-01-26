@@ -11,7 +11,7 @@ async def process_request_object(request_message: 'Message',
                                  serializer: 'Serializer',
                                  timeout_ms_default: int,
                                  use_binary_default: bool,
-                                 use_json_for_request: bool) -> 'Message':
+                                 always_send_json: bool) -> 'Message':
     from uapi.UApiError import UApiError
 
     header: dict[str, object] = request_message.headers
@@ -23,7 +23,7 @@ async def process_request_object(request_message: 'Message',
         if use_binary_default:
             header["_binary"] = True
 
-        if header.get('_binary', False) and use_json_for_request:
+        if header.get('_binary', False) and always_send_json:
             header["_forceSendJson"] = True
 
         timeout_ms = cast(int, header.get("time_"))
