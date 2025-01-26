@@ -25,7 +25,7 @@ def _validate_package(ctx: click.Context, param: click.Parameter, value: str) ->
 @click.option('--package', help='Java package', callback=_validate_package)
 def generate(schema_dir: str, lang: str, out: str, package: str) -> None:
 
-    print('Starting cli...')
+    print('Starting CLI.')
 
     uapi_schema = UApiSchema.from_directory(schema_dir)
 
