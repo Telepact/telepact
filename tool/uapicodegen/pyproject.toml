@@ -1,6 +1,6 @@
 [project]
 name = "uapicodegen"
-version = "0.0.14"
+version = "0.0.19"
 description = "Universal API Code Generator"
 readme = "README.md"
 dependencies = [ "click", "jinja2", "uapi @ file:///Users/brendanbartels/workspace/jAPI/lib/py/dist/uapi-0.0.16-py3-none-any.whl",]

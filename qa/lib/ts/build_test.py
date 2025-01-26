@@ -9,8 +9,9 @@ target_path = os.path.join(pathlib.Path(
 this_env = os.environ.copy()
 
 
-def start(nats_url):
+def start(nats_url: str) -> subprocess.Popen:
     this_env['NATS_URL'] = nats_url
+    del this_env["VIRTUAL_ENV"]
 
     s1 = subprocess.Popen(['npm', 'uninstall', 'uapi'], cwd=this_path)
     s1.wait()
@@ -24,6 +25,9 @@ def start(nats_url):
 
     s3 = subprocess.Popen(['npm', 'run', 'build'], cwd=this_path)
     s3.wait()
+
+    p1 = subprocess.Popen(['make'], cwd=this_path, env=this_env)
+    p1.wait()
 
     p = subprocess.Popen(['npm', 'start'], cwd=this_path, env=this_env)
 
