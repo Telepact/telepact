@@ -23,6 +23,11 @@ async def handle_message(
     from uapi.internal.types.UFn import UFn
     from uapi.internal.validation.ValidateContext import ValidateContext
 
+    print('-----------------------------')
+    print('|       HandleMessage       |')
+    print('-----------------------------')
+    print('!!!!!!!!!!!!')
+
     response_headers: dict[str, object] = {}
     request_headers: dict[str, object] = request_message.headers
     request_body: dict[str, object] = request_message.body

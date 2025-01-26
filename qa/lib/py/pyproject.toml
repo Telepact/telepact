@@ -4,6 +4,10 @@ version = "0.1.0"
 description = ""
 requires-python = "^3.11"
 
+[build-system]
+requires = [ "poetry-core>=1.0.0",]
+build-backend = "poetry.core.masonry.api"
+
 [tool.poetry]
 package-mode = false
 
@@ -13,12 +17,13 @@ build = "*"
 msgpack = "*"
 nats-py = "*"
 prometheus-client = "*"
-uapicodegen = { path = "./../../../tool/uapicodegen/dist/uapicodegen-0.0.1-py3-none-any.whl" }
-uapi = { path = "./../../../lib/py/dist/uapi-0.0.5-py3-none-any.whl" }
+
+[tool.poetry.dependencies.uapicodegen]
+path = "./../../../tool/uapicodegen/dist/uapicodegen-0.0.9-py3-none-any.whl"
+
+[tool.poetry.dependencies.uapi]
+path = "../../../lib/py/dist/uapi-0.0.14-py3-none-any.whl"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "*"
-
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+toml = "*"

@@ -1,24 +1,22 @@
 [project]
 name = "uapicodegen"
-version = "0.0.1"
+version = "0.0.9"
 description = "Universal API Code Generator"
 readme = "README.md"
-dependencies = [
-    "click",
-    "jinja2",
-    "uapi @ file:///Users/brendanbartels/workspace/jAPI/lib/py/dist/uapi-0.0.5-py3-none-any.whl",
-]
+dependencies = [ "click", "jinja2", "uapi @ file:///Users/brendanbartels/workspace/jAPI/lib/py/dist/uapi-0.0.14-py3-none-any.whl",]
 requires-python = ">=3.11"
 
+[build-system]
+requires = [ "poetry-core>=1.0.0",]
+build-backend = "poetry.core.masonry.api"
+
 [tool.poetry]
-packages = [{ include = "uapicodegen" }]
+[[tool.poetry.packages]]
+include = "uapicodegen"
 
 [tool.poetry.scripts]
 uapicodegen = "uapicodegen.gen:generate"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.4"
-
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+toml = "*"
