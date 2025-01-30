@@ -1,0 +1,29 @@
+[project]
+name = "calculator-service"
+version = "0.1.0"
+description = ""
+requires-python = ">=3.11"
+
+[tool.poetry]
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.68.0"
+uvicorn = "^0.15.0"
+toml = "*"
+
+[tool.poetry.dev-dependencies]
+pytest = "^6.2"
+mypy = "^0.910"
+
+[tool.poetry.dependencies.uapi]
+path = "../../lib/py/dist/uapi-0.0.23-py3-none-any.whl"
+
+[tool.mypy]
+python_version = "3.11"
+warn_unused_configs = true
+warn_unused_ignores = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+disallow_any_explicit = false
