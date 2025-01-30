@@ -26,7 +26,6 @@ def derive_possible_select(fn_name: str, result: 'UUnion') -> dict[str, object]:
 
     sorted_type_keys = sorted(nested_types.keys())
     for k in sorted_type_keys:
-        print(f'k: {k}')
         v = nested_types[k]
         if isinstance(v, UUnion):
             union_select: dict[str, list[str]] = {}

@@ -100,11 +100,6 @@ async def api(request: Request) -> Tuple[bytes, int]:
     return response_bytes, 201
 
 
-def setup() -> None:
-    global server
-
-
 if __name__ == "__main__":
-    setup()
     uvicorn.run("calculator_service.app:app",
                 host='0.0.0.0', port=8000, reload=True)

@@ -32,9 +32,6 @@ def get_or_parse_type(path: list[object], type_name: str, ctx: 'ParseContext') -
     if existing_type is not None:
         return existing_type
 
-    if 'Select' in type_name:
-        print(f'WARNING! Creating new type_name: {type_name}')
-
     regex_string = r"^(boolean|integer|number|string|any|array|object)|((fn|(union|struct|_ext))\.([a-zA-Z_]\w*))$"
     regex = re.compile(regex_string)
 

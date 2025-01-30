@@ -114,7 +114,7 @@ public class ParseUApiSchema {
                     schemaKeys.add(schemaKey);
                     schemaKeysToIndex.put(schemaKey, index);
                     schemaKeysToDocumentName.put(schemaKey, documentName);
-                    if (!documentName.endsWith("_")) {
+                    if ("auto_".equals(documentName) || !documentName.endsWith("_")) {
                         originalSchema.put(schemaKey, def);
                     }
                 } catch (UApiSchemaParseError e) {
