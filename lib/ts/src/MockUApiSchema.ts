@@ -9,17 +9,20 @@ export class MockUApiSchema {
      */
 
     original: any[];
+    full: any[];
     parsed: Record<string, UType>;
     parsedRequestHeaders: Record<string, UFieldDeclaration>;
     parsedResponseHeaders: Record<string, UFieldDeclaration>;
 
     constructor(
         original: any[],
+        full: any[],
         parsed: Record<string, UType>,
         parsedRequestHeaders: Record<string, UFieldDeclaration>,
         parsedResponseHeaders: Record<string, UFieldDeclaration>,
     ) {
         this.original = original;
+        this.full = full;
         this.parsed = parsed;
         this.parsedRequestHeaders = parsedRequestHeaders;
         this.parsedResponseHeaders = parsedResponseHeaders;

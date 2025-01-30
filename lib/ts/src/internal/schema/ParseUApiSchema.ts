@@ -17,6 +17,7 @@ import { getPathDocumentCoordinatesPseudoJson } from './GetPathDocumentCoordinat
 
 export function parseUApiSchema(uApiSchemaDocumentNamesToJson: Record<string, string>): UApiSchema {
     const originalSchema: { [key: string]: Record<string, object> } = {};
+    const fullSchema: { [key: string]: Record<string, object> } = {};
     const parsedTypes: { [key: string]: UType } = {};
     const parseFailures: SchemaParseFailure[] = [];
     const failedTypes: Set<string> = new Set();
@@ -104,6 +105,7 @@ export function parseUApiSchema(uApiSchemaDocumentNamesToJson: Record<string, st
                 if ('auto_' === documentName || !documentName.endsWith('_')) {
                     originalSchema[schemaKey] = def_;
                 }
+                fullSchema[schemaKey] = def_;
             } catch (e) {
                 if (e instanceof UApiSchemaParseError) {
                     parseFailures.push(...e.schemaParseFailures);
@@ -326,17 +328,19 @@ export function parseUApiSchema(uApiSchemaDocumentNamesToJson: Record<string, st
         throw new UApiSchemaParseError(parseFailures, uApiSchemaDocumentNamesToJson);
     }
 
-    const sortedSchemaKeys = Object.keys(originalSchema).sort((a, b) => {
+    const sortKeys = (a: string, b: string) => {
         const aStartsWithInfo = a.startsWith('info.');
         const bStartsWithInfo = b.startsWith('info.');
         if (aStartsWithInfo && !bStartsWithInfo) return -1;
         if (!aStartsWithInfo && bStartsWithInfo) return 1;
         return a < b ? -1 : a > b ? 1 : 0;
-    });
+    };
 
-    console.log(sortedSchemaKeys);
-
+    const sortedSchemaKeys = Object.keys(originalSchema).sort(sortKeys);
     const finalOriginalSchema: Record<string, object>[] = sortedSchemaKeys.map((key) => originalSchema[key]);
 
-    return new UApiSchema(finalOriginalSchema, parsedTypes, requestHeaders, responseHeaders);
+    const sortedFullSchemaKeys = Object.keys(fullSchema).sort(sortKeys);
+    const finalFullSchema: Record<string, object>[] = sortedFullSchemaKeys.map((key) => fullSchema[key]);
+
+    return new UApiSchema(finalOriginalSchema, finalFullSchema, parsedTypes, requestHeaders, responseHeaders);
 }

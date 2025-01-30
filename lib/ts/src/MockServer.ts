@@ -29,6 +29,7 @@ export class MockServer {
 
         const uApiSchema = new UApiSchema(
             mockUApiSchema.original,
+            mockUApiSchema.full,
             mockUApiSchema.parsed,
             mockUApiSchema.parsedRequestHeaders,
             mockUApiSchema.parsedResponseHeaders,
