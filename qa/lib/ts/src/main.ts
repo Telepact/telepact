@@ -160,7 +160,7 @@ function startMockTestServer(
     frontdoorTopic: string,
     config: Record<string, any>,
 ): Subscription {
-    const uApi: UApiSchema = MockUApiSchema.fromDirectory(apiSchemaPath);
+    const uApi = MockUApiSchema.fromDirectory(apiSchemaPath);
 
     const options: MockServerOptions = new MockServerOptions();
     options.onError = (e: Error) => console.error(e);

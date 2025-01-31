@@ -11,10 +11,7 @@ export class MockServer {
      * A Mock instance of a uAPI server.
      */
 
-    constructor(
-        private mockUApiSchema: MockUApiSchema,
-        private options: MockServerOptions,
-    ) {
+    constructor(mockUApiSchema: MockUApiSchema, options: MockServerOptions) {
         this.random = new RandomGenerator(options.generatedCollectionLengthMin, options.generatedCollectionLengthMax);
         this.enableGeneratedDefaultStub = options.enableMessageResponseGeneration;
         this.enableOptionalFieldGeneration = options.enableOptionalFieldGeneration;
