@@ -205,13 +205,13 @@ files = [
 
 [[package]]
 name = "uapi"
-version = "0.0.26"
+version = "0.0.27"
 description = "Universal API"
 optional = false
 python-versions = ">=3.11"
 groups = ["main"]
 files = [
-    {file = "uapi-0.0.26-py3-none-any.whl", hash = "sha256:975a2f17abbb7a7243695fd20a9dca11134b7f44ddc3dbc76c1ede22bd3ae7a1"},
+    {file = "uapi-0.0.27-py3-none-any.whl", hash = "sha256:235ecc298fcbb5d1b80bdc44666e93c9fab5317908d4d55d6e34facb61cf2f72"},
 ]
 
 [package.dependencies]
@@ -219,29 +219,29 @@ msgpack = "*"
 
 [package.source]
 type = "file"
-url = "../../../lib/py/dist/uapi-0.0.26-py3-none-any.whl"
+url = "../../../lib/py/dist/uapi-0.0.27-py3-none-any.whl"
 
 [[package]]
 name = "uapicodegen"
-version = "0.0.29"
+version = "0.0.30"
 description = "Universal API Code Generator"
 optional = false
 python-versions = ">=3.11"
 groups = ["main"]
 files = [
-    {file = "uapicodegen-0.0.29-py3-none-any.whl", hash = "sha256:46e9ca2e6969c2fb15a7def58c6782c8b1832757e6af8ba2f69e58994328e0ab"},
+    {file = "uapicodegen-0.0.30-py3-none-any.whl", hash = "sha256:2c91b3b732158a16a3036d4e458cf032d268744db2c9ac75b728975171f4f427"},
 ]
 
 [package.dependencies]
 click = "*"
 jinja2 = "*"
-uapi = {path = "/Users/brendanbartels/workspace/jAPI/lib/py/dist/uapi-0.0.26-py3-none-any.whl"}
+uapi = {path = "/Users/brendanbartels/workspace/jAPI/lib/py/dist/uapi-0.0.27-py3-none-any.whl"}
 
 [package.source]
 type = "file"
-url = "../../../tool/uapicodegen/dist/uapicodegen-0.0.29-py3-none-any.whl"
+url = "../../../tool/uapicodegen/dist/uapicodegen-0.0.30-py3-none-any.whl"
 
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.11"
-content-hash = "9072869aa7c04d9183823d07a502980c96198605c21abeb65d6b83511d4bf580"
+content-hash = "5c506e045de4bd937ed6168866b63c066e931189162c8936f75a395a0f5caab4"

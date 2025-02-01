@@ -16,7 +16,7 @@ def generate_random_union(blueprint_value: object, use_blueprint_value: bool,
         sorted_union_tags_reference = sorted(
             union_tags_reference.items(), key=lambda x: x[0])
         random_index = ctx.random_generator.next_int_with_ceiling(
-            len(sorted_union_tags_reference) - 1)
+            len(sorted_union_tags_reference))
         union_tag, union_data = sorted_union_tags_reference[random_index]
         return {union_tag: generate_random_struct(None, False, union_data.fields, ctx)}
     else:

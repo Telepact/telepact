@@ -28,7 +28,7 @@ public class GenerateRandomUnion {
 
             Collections.sort(sortedUnionTagsReference, (e1, e2) -> e1.getKey().compareTo(e2.getKey()));
 
-            final var randomIndex = ctx.randomGenerator.nextIntWithCeiling(sortedUnionTagsReference.size() - 1);
+            final var randomIndex = ctx.randomGenerator.nextIntWithCeiling(sortedUnionTagsReference.size());
             final var unionEntry = sortedUnionTagsReference.get(randomIndex);
             final var unionTag = unionEntry.getKey();
             final var unionData = unionEntry.getValue();

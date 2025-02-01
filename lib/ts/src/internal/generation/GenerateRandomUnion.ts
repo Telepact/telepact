@@ -1,6 +1,6 @@
-import { UStruct } from "../../internal/types/UStruct";
-import { GenerateContext } from "../../internal/generation/GenerateContext";
-import { generateRandomStruct } from "../../internal/generation/GenerateRandomStruct";
+import { UStruct } from '../../internal/types/UStruct';
+import { GenerateContext } from '../../internal/generation/GenerateContext';
+import { generateRandomStruct } from '../../internal/generation/GenerateRandomStruct';
 
 export function generateRandomUnion(
     blueprintValue: any,
@@ -10,7 +10,7 @@ export function generateRandomUnion(
 ): any {
     if (!useBlueprintValue) {
         const sortedUnionTagsReference = Object.entries(unionTagsReference).sort((a, b) => a[0].localeCompare(b[0]));
-        const randomIndex = ctx.randomGenerator.nextIntWithCeiling(sortedUnionTagsReference.length - 1);
+        const randomIndex = ctx.randomGenerator.nextIntWithCeiling(sortedUnionTagsReference.length);
         const [unionTag, unionData] = sortedUnionTagsReference[randomIndex];
         return {
             [unionTag]: generateRandomStruct(null, false, unionData.fields, ctx),
