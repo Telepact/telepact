@@ -4,8 +4,22 @@ from uapi import Server, Message, UApiSchema
 import importlib.resources as pkg_resources
 import time
 import uvicorn
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+
+origins = [
+    "http://localhost:5173",
+    "http://localhost:8000",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all methods (GET, POST, etc.)
+    allow_headers=["*"],  # Allow all headers
+)
 
 
 async def handler(message: Message) -> Message:
@@ -95,7 +109,11 @@ global_computations: list[dict[str, object]] = []
 async def api(request: Request) -> Tuple[bytes, int]:
     request_bytes = await request.body()
 
+    print(f'Request: {request_bytes}')
+
     response_bytes = await server.process(request_bytes)
+
+    print(f'Response: {response_bytes}')
 
     return response_bytes, 201
 
