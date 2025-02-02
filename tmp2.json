@@ -24,7 +24,14 @@
         "///": [" A function. "],
         "fn.goForth": {
             "arg1": ["string"],
-            "arg2": ["array", ["string"]]
+            "arg2": ["array", ["string"]],
+            "anotherPattern": "string",
+            "another2": "integer",
+            "another3": ["string"],
+            "another4": [["string"]],
+            "another5": { "string": "integer" },
+            "another6": { "string": ["integer"] },
+            "another7": [{ "string": "integer" }]
         },
         "->": {
             "ok.": {
