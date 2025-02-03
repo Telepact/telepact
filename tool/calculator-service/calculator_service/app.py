@@ -116,7 +116,11 @@ async def api(request: Request) -> Response:
 
     print(f'Response: {response_bytes}')
 
-    return Response(content=response_bytes, media_type='application/octet-stream')
+    media_type = 'application/octet-stream' if response_bytes[0] == 0x92 else 'application/json'
+
+    print(f'Media type: {media_type}')
+
+    return Response(content=response_bytes, media_type=media_type)
 
 
 if __name__ == "__main__":
