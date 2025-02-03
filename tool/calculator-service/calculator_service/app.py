@@ -5,6 +5,7 @@ import importlib.resources as pkg_resources
 import time
 import uvicorn
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import Response
 
 app = FastAPI()
 
@@ -106,16 +107,16 @@ global_computations: list[dict[str, object]] = []
 
 
 @app.post('/api')
-async def api(request: Request) -> Tuple[bytes, int]:
+async def api(request: Request) -> Response:
     request_bytes = await request.body()
 
     print(f'Request: {request_bytes}')
 
-    response_bytes = await server.process(request_bytes)
+    response_bytes: bytes = await server.process(request_bytes)
 
     print(f'Response: {response_bytes}')
 
-    return response_bytes, 201
+    return Response(content=response_bytes, media_type='application/octet-stream')
 
 
 if __name__ == "__main__":
