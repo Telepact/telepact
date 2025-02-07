@@ -1,16 +1,22 @@
 # Introduction
 
-uAPI is an API expressed purely with JSON. Familiar API concepts, such
-as function calls and return values, are represented entirely with JSON
-payloads. Consequently, A uAPI can satisfy API needs across not only HTTP, but
-any inter-process communication boundary.
+uAPI (Universal API) is meant to be the API pattern for everyone. It is built on
+the universal interchange format of JSON and compatible with essentially all
+inter-process communication protocols.
 
-Wherever JSON can go, a uAPI can be served 🚀
+Wherever JSON can go, a uAPI can be served. 🚀
 
-No required client-side toolchains. Many client-side experiences. One
-server-side experience.
+Then uAPI takes "universal" a step further, establishing a robust relationship
+between servers and clients, where servers focus on one production strategy that
+can be consumed variably by clients, from maximally accessible and simple to
+maximally expressive and powerful.
 
-HTTP client example (with `cURL`):
+One server experience. Many client experiences. No required client-side
+toolchains. 💪
+
+## Example
+
+HTTP client (with `cURL`):
 
 ```bash
 $ export URL=http://example.com/api/v1
@@ -20,7 +26,7 @@ $ curl -X '[{"Authorization": "Bearer <token>"}, {"fn.sub": {"x": 1, "y": 2}}]' 
 [{}, {"Ok_": {"result": -1}}]
 ```
 
-Websocket client example (with `python`):
+Websocket client (with `python`):
 
 ```python
 # uapi_ws.py
@@ -76,12 +82,12 @@ available with limitations.
 gRPC APIs are highly efficient and leverage critical improvements offered by the
 HTTP/2 specification. They are also type-safe through generated code boundaries
 derived from a wholistic IDL that does not leak transport details. However, gRPC
-lacks overall accessibility due to reliance on libraries in a finite number of
-programming languages and expectation to generate code. And there are some API
-design limitations with gRPC, such as prohibitive rules with lists (i.e.
-repeated values), a lack of distinction between null and undefined, and a weak
-error model at the protocol layer which has prompted patching at the library
-level with limited coverage across the gRPC ecosystem.
+lacks overall accessibility due to reliance on heavy toolchains with generated
+code in a finite number of programming languages. And there are some API design
+limitations with gRPC, such as prohibitive rules with lists (i.e. repeated
+values), a lack of distinction between null and undefined, and a weak error
+model at the protocol layer which has prompted patching at the library level
+with limited coverage across the gRPC ecosystem.
 
 ## Why not GraphQL?
 
@@ -168,8 +174,8 @@ uAPI automatically performs validation of responses against the uAPI schema, and
 there is no setting for servers to turn off this behavior.
 
 This design decision is intentional. It helps maintain the high standard of type
-safety in the uAPI ecosystem by denying API providers the option to respond
-to malformed data as an inconvenience and are instead forced to deal with hard
+safety in the uAPI ecosystem by denying API providers the option to respond to
+malformed data as an inconvenience and are instead forced to deal with hard
 failures through bug reports. Hard failures also help draw attention to type
 safety deficits early in the development phase.
 
@@ -207,9 +213,9 @@ code.
 
 ### Why can't I have other non-error result union values?
 
-The only required tag for the function result union is `Ok_`. All other tags
-in the result union that are not `Ok_` are, by definition, "not okay", and will
-be interpreted as an error in all circumstances. API designers are encouraged to
+The only required tag for the function result union is `Ok_`. All other tags in
+the result union that are not `Ok_` are, by definition, "not okay", and will be
+interpreted as an error in all circumstances. API designers are encouraged to
 prefix additional result union tags with `Error` or equivalent to improve
 readability and recognition of errors.
 
@@ -221,27 +227,27 @@ with a struct, which means you can't associate union tags with simpler data
 types, like booleans or strings.
 
 This restriction is in place to uphold uAPI's value of prioritizing effective
-software evolution. Unions, like functions, are entrypoints to unique
-execution paths in software, so if software evolves such that an execution
-path requires a new "argument" like a integer, that requirement will percolate
-up to the entrypoint. If the proverbial API designer chose to associate the
-union tag directly a boolean, the API would require a breaking change to make
-room for this new integer "argument." In contrast, uAPI establishing the
-expectation that all union tags are associated with structs means the backwards
-compatible option of adding a new struct field is always available to
-software designers dealing with the needs of evolving software.
+software evolution. Unions, like functions, are entrypoints to unique execution
+paths in software, so if software evolves such that an execution path requires a
+new "argument" like a integer, that requirement will percolate up to the
+entrypoint. If the proverbial API designer chose to associate the union tag
+directly a boolean, the API would require a breaking change to make room for
+this new integer "argument." In contrast, uAPI establishing the expectation that
+all union tags are associated with structs means the backwards compatible option
+of adding a new struct field is always available to software designers dealing
+with the needs of evolving software.
 
 ### Why can I not omit fn.\* fields using the `"select_"` header?
 
-The `"select_"` header is used to omit fields from structs, which includes
-union structs, but not the argument struct included with function definitions.
+The `"select_"` header is used to omit fields from structs, which includes union
+structs, but not the argument struct included with function definitions.
 
 The function type exists so that API providers may incorporate "links" into
-their API design, such that the appearance of a function type payload can
-simply be copied and pasted verbatim into the body a new message. Tooling like
-the uAPI console specifically utilizes this technique to allow end-users to
-"click through" graphs designed by the API provider.
+their API design, such that the appearance of a function type payload can simply
+be copied and pasted verbatim into the body a new message. Tooling like the uAPI
+console specifically utilizes this technique to allow end-users to "click
+through" graphs designed by the API provider.
 
-Omitting fields in the argument struct disrupts the API provider's ability
-to established well-defined links, and consequently, the `"select_"` header is
+Omitting fields in the argument struct disrupts the API provider's ability to
+established well-defined links, and consequently, the `"select_"` header is
 disallowed from omitting fields in function argument structs.
