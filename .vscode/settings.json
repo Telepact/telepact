@@ -18,5 +18,9 @@
     },
     "[typescript]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "prettier.proseWrap": "always",
+    "[markdown]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
     }
 }

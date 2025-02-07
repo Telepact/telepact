@@ -1,7 +1,6 @@
 # Introduction
 
-uAPI (pronounced "Jay-Pee-Eye") or **J**SON **A**pplication **P**rogramming
-**I**nterface is an API expressed purely with JSON. Familiar API concepts, such
+uAPI is an API expressed purely with JSON. Familiar API concepts, such
 as function calls and return values, are represented entirely with JSON
 payloads. Consequently, A uAPI can satisfy API needs across not only HTTP, but
 any inter-process communication boundary.
@@ -15,10 +14,10 @@ HTTP client example (with `cURL`):
 
 ```bash
 $ export URL=http://example.com/api/v1
-$ curl -X '["function.add", {"Authorization": "Bearer <token>"}, {"x": 1, "y": 2}]' $URL
-["function.add", {}, {"result": 3}]
-$ curl -X '["function.sub", {"Authorization": "Bearer <token>"}, {"x": 1, "y": 2}]' $URL
-["function.sub", {}, {"result": -1}]
+$ curl -X '[{"Authorization": "Bearer <token>"}, {"fn.add": {"x": 1, "y": 2}}]' $URL
+[{}, {"Ok_": {"result": 3}}]
+$ curl -X '[{"Authorization": "Bearer <token>"}, {"fn.sub": {"x": 1, "y": 2}}]' $URL
+[{}, {"Ok_": {"result": -1}}]
 ```
 
 Websocket client example (with `python`):
@@ -35,10 +34,10 @@ print('{}'.format((ws.recv())))
 ```
 
 ```
-$ python uapi_ws.py '["function.add", {"Authorization": "Bearer <token>"}, {"x": 1, "y": 2}]'
-["function.add", {}, {"result": 3}]
-$ python uapi_ws.py '["function.sub", {"Authorization": "Bearer <token>"}, {"x": 1, "y": 2}]'
-["function.add", {}, {"result": -1}]
+$ python uapi_ws.py '[{"Authorization": "Bearer <token>"}, {"fn.add": {"x": 1, "y": 2}}]'
+[{}, {"Ok_": {"result": 3}}]
+$ python uapi_ws.py '[{"Authorization": "Bearer <token>"}, {"fn.sub": {"x": 1, "y": 2}}]'
+[{}, {"Ok_": {"result": -1}}]
 ```
 
 # Motivation
@@ -47,18 +46,17 @@ $ python uapi_ws.py '["function.sub", {"Authorization": "Bearer <token>"}, {"x":
 | --------------------------------------------------------- | ------- | ---- | ------- | ---- |
 | Transport agnosticism (can use something other than HTTP) | ❌      | ❌   | ✅      | ✅   |
 | No transport details leaked into API                      | ❌      | ✅   | ✅      | ✅   |
-| No ad-hoc serialization patterns                          | ❌      | ✅   | ✅      | ✅   |
+| No string parsing/splicity                                | ❌      | ✅   | ✅      | ✅   |
 | Support for dictionary data structures                    | ✅      | ❌   | ❌      | ✅   |
 | Low development burden for servers                        | ✅      | ✅   | ❌      | ✅   |
-| No ad-hoc libraries for clients                           | ✅      | ❌   | ❌      | ✅   |
+| No required libraries for clients                         | ✅      | ❌   | ❌      | ✅   |
 | Type-safe generated code                                  | 🤔      | ✅   | ✅      | ✅   |
-| Developer-friendly data serialization protocol with JSON  | ✅      | ❌   | 🤔      | ✅   |
+| Human-readable wire-format                                | ✅      | ❌   | 🤔      | ✅   |
 | Compact and efficient data serialization protocol         | ❌      | ✅   | ❌      | ✅   |
 | Built-in dynamic response shaping                         | ❌      | ❌   | ✅      | ✅   |
 | No ABI                                                    | ✅      | ❌   | ✅      | ✅   |
 | Expressive distinction between null and undefined         | ❌      | ❌   | ❌      | ✅   |
 | Built-in API documentation distribution                   | ❌      | ❌   | ❌      | ✅   |
-| Generic Types                                             | ❌      | ❌   | ❌      | ✅   |
 | Built-in mocking for tests                                | ❌      | ❌   | ❌      | ✅   |
 
 ## Why not RESTful APIs?
@@ -157,16 +155,12 @@ languages. By making the design entry point a struct, API designers are
 predisposed for backwards-compatible changes like appending optional struct
 fields.
 
-### Why are unions in uAPI not like traditional unions seen in C or Java?
+### Why is there no Enum type like seen in C or Java?
 
-uAPI unions take the form of the tagged unions paradigm as featured in modern
-programming languages like rust. In the particular case of uAPI, it is very
-similar to the traditional union, except that a struct is automatically attached
-to each union value.
-
-This design maximizes backwards compatible change points in the API design, as
-adding an optional field to a struct is a legal backwards compatible change. The
-traditional union can be approximated by simply leaving all union structs blank.
+uAPI achieves enumerated types with unions, which are very similar to enums as
+seen in C or Java, except that a struct is automatically attached to each value.
+The traditional enum can be approximated by simply leaving all union structs
+blank.
 
 ### Why force servers to perform response validation?
 
@@ -213,112 +207,41 @@ code.
 
 ### Why can't I have other non-error result union values?
 
-The only required value for the function result union is `ok`. All other values
-in the result union that are not `ok` are, by definition, "not okay", and will
+The only required tag for the function result union is `Ok_`. All other tags
+in the result union that are not `Ok_` are, by definition, "not okay", and will
 be interpreted as an error in all circumstances. API designers are encouraged to
-prefix additional result union values with `error` or equivalent to improve
+prefix additional result union tags with `Error` or equivalent to improve
 readability and recognition of errors.
 
 ### Why can't I associate a union tag to something besides a struct?
 
-In simpler data design situations, a designer might want to treat a union tag
-like a struct field, and associate any data type with a tag. However, in uAPI,
-all tags in unions are associated with structs, which means you can't associate
-union tags with simpler data types, like booleans or strings.
+A designer might want to treat a union tag like a struct field, and associate
+any data type with a tag. However, in uAPI, all tags in unions are associated
+with a struct, which means you can't associate union tags with simpler data
+types, like booleans or strings.
 
 This restriction is in place to uphold uAPI's value of prioritizing effective
 software evolution. Unions, like functions, are entrypoints to unique
 execution paths in software, so if software evolves such that an execution
 path requires a new "argument" like a integer, that requirement will percolate
-up to the entrypoint. If the previous API designer chose to associate the
+up to the entrypoint. If the proverbial API designer chose to associate the
 union tag directly a boolean, the API would require a breaking change to make
 room for this new integer "argument." In contrast, uAPI establishing the
 expectation that all union tags are associated with structs means the backwards
 compatible option of adding a new struct field is always available to
 software designers dealing with the needs of evolving software.
 
-### Is adding a new union value a backwards compatible change?
-
-Many API technologies will classify adding a new union value to an existing
-union as a backwards incompatible change. This is due to the potential risk of a
-client driving critical code paths off a union value, and the emergence of a
-new union value begets undefined behavior in that critical path, which invites
-bugs. And some technologies may suffer build-time failures due to the fact that
-many API technologies integrate directly with programming languages through
-generated code incorporating native unions, and many of these languages will
-simply not compile when a new union value appears in the context of a `switch`
-or `match` statement until that new value has a handling procedure implemented.
-
-uAPI takes the stance that adding a new union value to an existing union _is_ a
-backwards compatible change, on the basis of the following:
-
--   Unions are powerful typing constructs, and classifying evolution of an union as
-    backwards incompatible discourages use in favor of far more flimsy data types
-    like strings, violating uAPI's core principles of encouraging the strongest of
-    type patterns.
--   uAPI does not run the risk of build-time failures with unions since uAPI
-    unions are represented as special objects in generated code rather than native
-    unions.
--   Clients are capable of implementing error-prone code regardless of how a
-    server evolves it's API, and uAPI cannot uphold its core principle of enabling
-    API evolution if it holds servers accountable for client-side design failures.
-    Clients can neglect proper handling of null, derive internal non-public
-    implementation details by parsing strings, or base critical computation on an
-    assumption that a boolean is always true. And a server would be able to break
-    such clients by suddenly returning null, changing the string to a different
-    pattern, or returning false, but this breakage would not be due to "backwards
-    incompatible" changes. The client made invalid assumptions, which may further
-    yet be a consequence of choosing a riskier type unsafe technology stack that
-    failed to highlight such invalid assumptions. And in the same way that a
-    client should not make assumptions about patterns in strings or neglect `else`
-    cases on its critical paths, a client should not make assumptions about
-    patterns in unions or neglect default branch logic in `switch` or `match`
-    statements.
-
 ### Why can I not omit fn.\* fields using the `"select_"` header?
 
 The `"select_"` header is used to omit fields from structs, which includes
 union structs, but not the argument struct included with function definitions.
 
-The function type exists to allow API providers to design "links" into their
-API design, such that the appearance of a function type payload can simply
-be copied and pasted verbatim into the body a new message. Tooling like the
-uAPI console specifically utilizes this technique to allow end-users to
+The function type exists so that API providers may incorporate "links" into
+their API design, such that the appearance of a function type payload can
+simply be copied and pasted verbatim into the body a new message. Tooling like
+the uAPI console specifically utilizes this technique to allow end-users to
 "click through" graphs designed by the API provider.
 
 Omitting fields in the argument struct disrupts the API provider's ability
 to established well-defined links, and consequently, the `"select_"` header is
 disallowed from omitting fields in function argument structs.
-
-## Glossary
-
--   **Body** - A structured JSON object containing the primary data payload of the
-    uAPI Message.
-
--   **Client** - An entity consuming a uAPI.
-
--   **Argument** - The colloquial name for the body of a `function.*`-targeted
-    uAPI Message sent from the Client.
-
--   **Headers** - An unstructured JSON object consisting of metadata about a uAPI
-    Message.
-
--   **Message** - The JSON payload sent over the IPC boundary, comprised of a
-    single JSON array with 3 elements: (1) the target, (2) headers, (3) body.
-
--   **Result** - The colloquial name for the body of a `function.*`-targeted uAPI
-    Message sent from the Server.
-
--   **Server** - An entity providing an implementation of a uAPI and adhering to
-    the uAPI specification.
-
--   **Target** - A reference to a top-level definition in the uAPI description of
-    the uAPI server.
-
--   **uAPI Schema** - The JSON document describing the API. This document is
-    written in the JSON language following a uAPI-flavored JSON schema, but
-    conventionally, this document would be written using an IDL.
-
-# Navigation
-
--   [Specification](SPECIFICATION.md)
