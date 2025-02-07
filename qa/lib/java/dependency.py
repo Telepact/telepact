@@ -9,7 +9,7 @@ def update_versions(pyproject_path: str, codegen_version_path: str) -> None:
         pyproject_data = toml.load(file)
 
     pyproject_data['tool']['poetry']['dependencies']['uapicodegen'][
-        'path'] = f"./../../../tool/uapicodegen/dist/uapicodegen-{codegen_version}-py3-none-any.whl"
+        'path'] = f"./../../../tool/uapicodegen"
 
     with open(pyproject_path, 'w') as file:
         toml.dump(pyproject_data, file)

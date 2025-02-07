@@ -5,7 +5,7 @@ description = ""
 requires-python = "^3.11"
 
 [build-system]
-requires = [ "poetry-core>=1.0.0",]
+requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
@@ -19,10 +19,10 @@ nats-py = "*"
 prometheus-client = "*"
 
 [tool.poetry.dependencies.uapicodegen]
-path = "./../../../tool/uapicodegen/dist/uapicodegen-0.0.30-py3-none-any.whl"
+path = "./../../../tool/uapicodegen"
 
 [tool.poetry.dependencies.uapi]
-path = "../../../lib/py/dist/uapi-0.0.27-py3-none-any.whl"
+path = "../../../lib/py"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "*"

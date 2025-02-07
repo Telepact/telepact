@@ -5,7 +5,7 @@ description = ""
 requires-python = ">=3.11"
 
 [build-system]
-requires = [ "poetry-core>=1.0.0",]
+requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
@@ -16,4 +16,4 @@ python = "^3.11"
 toml = "^0.10.2"
 
 [tool.poetry.dependencies.uapicodegen]
-path = "./../../../tool/uapicodegen/dist/uapicodegen-0.0.30-py3-none-any.whl"
+path = "./../../../tool/uapicodegen"

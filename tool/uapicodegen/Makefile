@@ -19,7 +19,6 @@ $(VERSION_FILE): $(SRC_FILES) $(PYPROJECT)
 	poetry run python version.py
 
 $(PYPROJECT): $(DEP_VERSION_FILE)
-	poetry run python dependency.py
 	poetry lock
 	poetry install
 
