@@ -19,5 +19,10 @@ export default defineConfig({
 			fs: stub,
 			module: stub
 		}
+	},
+	server: {
+		fs: {
+			allow: ['stub.js']
+		}
 	}
 });

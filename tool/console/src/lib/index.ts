@@ -2,8 +2,8 @@
 import { goto } from '$app/navigation';
 import * as monaco from 'monaco-editor';
 import * as uapi from 'uapi';
-import { GenerateContext } from 'uapi/lib/src/internal/generation/GenerateContext';
-import { UFn } from 'uapi/lib/src/internal/types/UFn';
+import { GenerateContext } from 'uapi/dist/src/internal/generation/GenerateContext';
+import { UFn } from 'uapi/dist/src/internal/types/UFn';
 import { writable, type Writable } from 'svelte/store';
 
 export const responseStore: Writable<string | null> = writable(null);

@@ -3,7 +3,6 @@
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
-		"prepare": "npm install --no-save ../../lib/ts/uapi-1.0.3.tgz ../prettier-plugin-uapi/prettier-plugin-uapi-0.1.18.tgz",
 		"dev": "vite dev --force",
 		"build": "vite build",
 		"preview": "vite preview",
@@ -39,6 +38,12 @@
 		"dompurify": "^3.0.9",
 		"marked": "^12.0.0",
 		"monaco-editor": "^0.46.0",
-		"prettier": "^3.2.5"
-	}
+		"prettier": "^3.2.5",
+		"prettier-plugin-uapi": "workspace:*",
+		"uapi": "workspace:*"
+	},
+	"workspaces": [
+		"../../lib/ts",
+		"../prettier-plugin-uapi"
+	]
 }
