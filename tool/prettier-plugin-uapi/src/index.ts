@@ -1,9 +1,8 @@
-import * as prettier from "prettier";
-import parserPkg from "prettier/parser-babel";
-const { parsers: babelParsers } = parserPkg;
+import { parsers as babelParsers } from "prettier/plugins/babel";
 import markdownPlugin from "prettier/plugins/markdown";
+import { Plugin, Parser, ParserOptions, SupportLanguage, format as prettierFormat, doc, Printer, getSupportInfo } from "prettier";
 
-function padLength(strings) {
+function padLength(strings: string[]): string[] {
     const paddedStrings = strings.map((str) => {
         const paddingLength = Math.max(0, 80 - str.length);
         return " " + str.padEnd(str.length + paddingLength);
@@ -11,7 +10,7 @@ function padLength(strings) {
     return paddedStrings;
 }
 
-async function formatDocstrings(obj) {
+async function formatDocstrings(obj: any): Promise<any> {
     if (Array.isArray(obj)) {
         let newArr = [];
         for (const e of obj) {
@@ -20,17 +19,17 @@ async function formatDocstrings(obj) {
         }
         return newArr;
     } else if (typeof obj === "object" && obj !== null) {
-        let newObj = {};
+        let newObj: any = {};
         for (const [k, v] of Object.entries(obj)) {
             if (k === "///") {
                 let docstring;
                 if (typeof v === "string") {
                     docstring = v;
                 } else {
-                    docstring = v.map((e) => e.trim()).join("\n");
+                    docstring = (v as Array<string>).map((e: string) => e.trim()).join("\n");
                 }
 
-                const formattedWhole = await prettier.format(docstring, {
+                const formattedWhole = await prettierFormat(docstring, {
                     parser: "markdown",
                     printWidth: 78,
                     proseWrap: "always",
@@ -56,7 +55,7 @@ async function formatDocstrings(obj) {
     }
 }
 
-async function preprocess(text) {
+async function preprocess(text: string): Promise<string> {
     let json = JSON.parse(text);
 
     const newJson = await formatDocstrings(json);
@@ -66,9 +65,9 @@ async function preprocess(text) {
     return result;
 }
 
-const { concat, indent, line, softline, join } = prettier.doc.builders;
+const { group, line, softline, hardline, join, indent } = doc.builders;
 
-function printJsonAst(path, options, print) {
+function printJsonAst(path: any, options: any, print: any): any {
     const node = path.getValue();
 
     if (node.type === "JsonRoot") {
@@ -84,12 +83,12 @@ function printJsonAst(path, options, print) {
         if (isRoot || isComment || isUnion) {
             return [
                 "[",
-                indent(concat([softline, join(concat([",", softline]), path.map(print, "elements"))])),
+                indent(group([hardline, join(group([",", softline]), path.map(print, "elements"))])),
                 softline,
                 "]",
             ];
         } else {
-            return concat(["[", join(", ", path.map(print, "elements")), "]"]);
+            return group(["[", join(", ", path.map(print, "elements")), "]"]);
         }
     }
 
@@ -98,7 +97,7 @@ function printJsonAst(path, options, print) {
             ? "{}"
             : [
                   "{",
-                  indent(concat([softline, join(concat([",", line]), path.map(print, "properties"))])),
+                  indent(group([softline, join(group([",", line]), path.map(print, "properties"))])),
                   softline,
                   "}",
               ];
@@ -121,7 +120,7 @@ function printJsonAst(path, options, print) {
     }
 
     if (node.type === "ObjectProperty") {
-        return concat([path.call(print, "key"), ": ", path.call(print, "value")]);
+        return group([path.call(print, "key"), ": ", path.call(print, "value")]);
     }
 
     console.log(`Node type not handled: ${node.type}`);
@@ -130,34 +129,32 @@ function printJsonAst(path, options, print) {
 }
 
 const jsonParser = babelParsers["json-stringify"];
-const jsonPrinter = jsonParser.printer;
 
-const jsonExtendedPrinter = {
-    ...jsonPrinter,
+const jsonExtendedPrinter: Printer = {
     print: printJsonAst,
 };
 
 const { parse } = jsonParser;
 
-const jsonExtendedParser = {
+const jsonExtendedParser: Parser = {
     ...jsonParser,
-    parse: async (text, parsers, options) => {
+    parse: async (text: string, options: ParserOptions) => {
         console.log("Before parsing...");
         const preprocessedText = await preprocess(text);
-        const ast = parse(preprocessedText, parsers, options);
+        const ast = parse(preprocessedText, options);
         console.log("After parsing...");
         return ast;
     },
     astFormat: "uapi-ast",
 };
 
-const jsonExtended = {
+const jsonExtended: SupportLanguage = {
     name: "uapi",
     parsers: ["uapi-parse"],
     extensions: [".uapi.json"],
 };
 
-export default {
+const plugin: Plugin = {
     languages: [jsonExtended],
     parsers: {
         "uapi-parse": jsonExtendedParser,
@@ -166,3 +163,5 @@ export default {
         "uapi-ast": jsonExtendedPrinter,
     },
 };
+
+export default plugin;
