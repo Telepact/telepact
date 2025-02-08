@@ -48,21 +48,21 @@ $ python uapi_ws.py '[{"Authorization": "Bearer <token>"}, {"fn.sub": {"x": 1, "
 
 # Motivation
 
-| Capability                                                | OpenAPI | gRPC | GraphQL | uAPI |
-| --------------------------------------------------------- | ------- | ---- | ------- | ---- |
-| No transport restrictions                                 | ❌      | ❌   | ❌      | ✅   |
-| No transport details leaked into API                      | ❌      | ✅   | ✅      | ✅   |
-| No string parsing/splicing                                | ❌      | ✅   | ✅      | ✅   |
-| Low development burden for servers                        | ✅      | ✅   | ❌      | ✅   |
-| No required libraries for clients                         | ✅      | ❌   | ❌      | ✅   |
-| Type-safe generated code                                  | 🤔      | ✅   | ✅      | ✅   |
-| Human-readable wire-format                                | ✅      | ❌   | 🤔      | ✅   |
-| Built-in binary data serialization protocol               | ❌      | ✅   | ❌      | ✅   |
-| Built-in dynamic response shaping                         | ❌      | ❌   | ✅      | ✅   |
-| No required ABI                                           | ✅      | ❌   | ✅      | ✅   |
-| Expressive distinction between null and undefined         | ❌      | ❌   | ❌      | ✅   |
-| Built-in API documentation distribution                   | ❌      | ❌   | ❌      | ✅   |
-| Built-in mocking for tests                                | ❌      | ❌   | ❌      | ✅   |
+| Capability                                        | OpenAPI | gRPC | GraphQL | uAPI |
+| ------------------------------------------------- | ------- | ---- | ------- | ---- |
+| No transport restrictions                         | ❌      | ❌   | ❌      | ✅   |
+| No transport details leaked into API              | ❌      | ✅   | ✅      | ✅   |
+| No string parsing/splicing                        | ❌      | ✅   | ✅      | ✅   |
+| Low development burden for servers                | ✅      | ✅   | ❌      | ✅   |
+| No required libraries for clients                 | ✅      | ❌   | ❌      | ✅   |
+| Type-safe generated code                          | 🤔      | ✅   | ✅      | ✅   |
+| Human-readable wire-format                        | ✅      | ❌   | 🤔      | ✅   |
+| Built-in binary data serialization protocol       | ❌      | ✅   | ❌      | ✅   |
+| Built-in dynamic response shaping                 | ❌      | ❌   | ✅      | ✅   |
+| No required ABI                                   | ✅      | ❌   | ✅      | ✅   |
+| Expressive distinction between null and undefined | ❌      | ❌   | ❌      | ✅   |
+| Built-in API documentation distribution           | ❌      | ❌   | ❌      | ✅   |
+| Built-in mocking for tests                        | ❌      | ❌   | ❌      | ✅   |
 
 ## Why not RESTful APIs?
 
@@ -230,11 +230,12 @@ software evolution. Unions, like functions, are entrypoints to unique execution
 paths in software, so if software evolves such that an execution path requires a
 new "argument" like a integer, that requirement will percolate up to the
 entrypoint. If the proverbial API designer chose to associate the union tag
-directly a boolean, the API would require a breaking change to make room for
-this new integer "argument." In contrast, uAPI establishing the expectation that
-all union tags are associated with structs means the backwards compatible option
-of adding a new struct field is always available to software designers dealing
-with the needs of evolving software.
+directly to a boolean, the API would require a breaking change in the form of
+creating another tag to make room for this new integer "argument" to sit next to
+the original boolean. In contrast, uAPI establishing the expectation that all
+union tags are associated with structs means the backwards compatible option of
+adding a new struct field is always available to software designers dealing with
+the needs of evolving software.
 
 ### Why can I not omit fn.\* fields using the `"select_"` header?
 
