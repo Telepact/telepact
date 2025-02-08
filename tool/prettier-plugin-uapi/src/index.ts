@@ -83,8 +83,8 @@ function printJsonAst(path: any, options: any, print: any): any {
         if (isRoot || isComment || isUnion) {
             return [
                 "[",
-                indent(group([hardline, join(group([",", softline]), path.map(print, "elements"))])),
-                softline,
+                indent(group([hardline, join(group([",", hardline]), path.map(print, "elements"))])),
+                hardline,
                 "]",
             ];
         } else {
@@ -97,8 +97,8 @@ function printJsonAst(path: any, options: any, print: any): any {
             ? "{}"
             : [
                   "{",
-                  indent(group([softline, join(group([",", line]), path.map(print, "properties"))])),
-                  softline,
+                  indent(group([hardline, join(group([",", hardline]), path.map(print, "properties"))])),
+                  hardline,
                   "}",
               ];
     }

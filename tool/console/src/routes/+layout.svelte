@@ -101,7 +101,7 @@
 		let schema = schemaEditor.getContent();
 		let minifiedSchema = minifyJson(schema);
 		let q = new URLSearchParams($page.url.searchParams.toString());
-		q.set('s', 'draft');
+		q.set('s', '');
 		q.set('sd', minifiedSchema!);
 		q.set('v', 'sd');
 		goto(`?${q.toString()}`);
