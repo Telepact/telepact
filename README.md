@@ -50,17 +50,16 @@ $ python uapi_ws.py '[{"Authorization": "Bearer <token>"}, {"fn.sub": {"x": 1, "
 
 | Capability                                                | OpenAPI | gRPC | GraphQL | uAPI |
 | --------------------------------------------------------- | ------- | ---- | ------- | ---- |
-| Transport agnosticism (can use something other than HTTP) | ❌      | ❌   | ✅      | ✅   |
+| No transport restrictions                                 | ❌      | ❌   | ❌      | ✅   |
 | No transport details leaked into API                      | ❌      | ✅   | ✅      | ✅   |
-| No string parsing/splicity                                | ❌      | ✅   | ✅      | ✅   |
-| Support for dictionary data structures                    | ✅      | ❌   | ❌      | ✅   |
+| No string parsing/splicing                                | ❌      | ✅   | ✅      | ✅   |
 | Low development burden for servers                        | ✅      | ✅   | ❌      | ✅   |
 | No required libraries for clients                         | ✅      | ❌   | ❌      | ✅   |
 | Type-safe generated code                                  | 🤔      | ✅   | ✅      | ✅   |
 | Human-readable wire-format                                | ✅      | ❌   | 🤔      | ✅   |
-| Compact and efficient data serialization protocol         | ❌      | ✅   | ❌      | ✅   |
+| Built-in binary data serialization protocol               | ❌      | ✅   | ❌      | ✅   |
 | Built-in dynamic response shaping                         | ❌      | ❌   | ✅      | ✅   |
-| No ABI                                                    | ✅      | ❌   | ✅      | ✅   |
+| No required ABI                                           | ✅      | ❌   | ✅      | ✅   |
 | Expressive distinction between null and undefined         | ❌      | ❌   | ❌      | ✅   |
 | Built-in API documentation distribution                   | ❌      | ❌   | ❌      | ✅   |
 | Built-in mocking for tests                                | ❌      | ❌   | ❌      | ✅   |
@@ -99,7 +98,7 @@ server-side development to properly and efficiently integrate the query engine
 with the backing database. GraphQL also has limited accessibility as clients
 largely rely on GraphQL libraries to construct the query strings so as to
 minimize parse error risk. GraphQL does feature a rich data model, but it lacks
-support for common programming idioms, such as variable maps. While binary
+support for common programming idioms, such as dictionaries. While binary
 serialization is technically possible through manual configuration, it is
 largely not observed in practice due to the accessibility tax it would incur on
 both servers and clients.
