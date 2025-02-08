@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@media (prefers-color-scheme: dark) {
+	body {
+		background-color: #27272a;
+	}
+}
+
+.docstring p {
+	padding-top: 0.5em;
+	padding-bottom: 0.5em;
+}
+
+.docstring code {
+	background-color: #334155;
+	border-radius: 0.25em;
+	padding: 0.125em;
+	color: #cbd5e1;
+}

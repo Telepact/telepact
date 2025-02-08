@@ -1,0 +1,117 @@
+[
+	{
+		"///": "A calculator app that provides basic math computation capabilities.",
+		"info.Calculator": {}
+	},
+
+	{
+		"///": "A value for computation that can take either a constant or variable form.",
+		"union.Value": [
+			{
+				"Constant": {
+					"value": ["number"]
+				}
+			},
+			{
+				"Variable": {
+					"name": ["string"]
+				}
+			}
+		]
+	},
+
+	{
+		"///": "A basic mathematical operation.",
+		"union.Operation": [
+			{ "///": " Addition. ", "Add": { "nothing": ["boolean"] } },
+			{ "Sub": {} },
+			{ "Mul": {} },
+			{ "Div": {} }
+		]
+	},
+
+	{
+		"///": "A mathematical variable represented by a `name` that holds a certain `value`.",
+		"struct.Variable": {
+			"name": ["string"],
+			"value": ["number"]
+		}
+	},
+
+	{
+		"///": "Save a set of variables as a dynamic map of variable names to their value.",
+		"fn.saveVariables": {
+			"variables": ["object", ["number"]]
+		},
+		"->": [
+			{
+				"Ok_": {}
+			}
+		]
+	},
+
+	{
+		"///": "Compute the `result` of the given `x` and `y` values.",
+		"fn.compute": {
+			"x": ["union.Value"],
+			"y": ["union.Value"],
+			"op": ["union.Operation"]
+		},
+		"->": [
+			{
+				"Ok_": {
+					"result": ["number"]
+				}
+			},
+			{
+				"///": " Error when the division by zero is attempted. ",
+				"ErrorCannotDivideByZero": {}
+			}
+		]
+	},
+
+	{
+		"///": "Export all saved variables, up to an optional `limit`.",
+		"fn.exportVariables": {
+			"limit!": ["integer"]
+		},
+		"->": [
+			{
+				"Ok_": {
+					"variables": ["array", ["struct.Variable"]]
+				}
+			}
+		]
+	},
+
+	{
+		"///": "A function template.",
+		"fn.getPaperTape": {},
+		"->": [
+			{
+				"Ok_": {
+					"tape": ["array", ["struct.Computation"]]
+				}
+			}
+		]
+	},
+
+	{
+		"///": " A computation. ",
+		"struct.Computation": {
+			"firstOperand": ["union.Value"],
+			"secondOperand": ["union.Value"],
+			"operation": ["union.Operation"],
+			"timestamp": ["integer"],
+			"successful": ["boolean"]
+		}
+	},
+
+	{
+		"errors.Demo": [
+			{
+				"ErrorInvalidToken": {}
+			}
+		]
+	}
+]

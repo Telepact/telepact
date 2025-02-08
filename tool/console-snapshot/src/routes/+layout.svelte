@@ -1,0 +1,516 @@
+<script lang="ts">
+	import '../app.css';
+
+	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
+	import { UApiSchema, Message } from 'uapi';
+
+	import {
+		genExample,
+		handleRequest,
+		handleSubmitRequest,
+		minifyJson,
+		parseUApiSchema,
+		unMinifyJson
+	} from '$lib';
+
+	import MonacoEditor from '$lib/MonacoEditor.svelte';
+	import DocCard from '$lib/DocCard.svelte';
+	import TerminalIcon from '$lib/TerminalIcon.svelte';
+	import MockIcon from '$lib/MockIcon.svelte';
+	import { responseStore } from '$lib';
+
+	let requestEditor: MonacoEditor;
+	let schemaEditor: MonacoEditor;
+
+	let sourceUrl: string;
+	$: sourceUrl = $page.url.searchParams.get('s') ?? '';
+
+	let schemaSource: string;
+	$: schemaSource = $page.data.schemaSource;
+
+	let schemaSourceReadOnly: boolean;
+	$: schemaSourceReadOnly = $page.data.readonlyEditor;
+
+	let request: string | null;
+	$: request = $page.url.searchParams.get('r');
+
+	let response: string | null;
+	$: response = $responseStore;
+
+	let showInternalApi: boolean;
+	$: showInternalApi = $page.data.showInternalApi;
+
+	let uapiSchemaPromise: Promise<UApiSchema>;
+	$: uapiSchemaPromise = $page.data.fullUApiSchemaRef;
+
+	let schemaDraftPromise: Promise<string>;
+	$: schemaDraftPromise = $page.data.schemaDraft;
+
+	let filteredSchemaPseudoJsonPromise: Promise<any[]>;
+	$: filteredSchemaPseudoJsonPromise = $page.data.filteredSchemaPseudoJson;
+
+	console.log(`page.data`, $page.data);
+
+	let selectedViews: string;
+	$: selectedViews = $page.url.searchParams.get('v') ?? 'd';
+
+	let activeViews: string;
+	$: activeViews = selectedViews.substring(0, 2);
+
+	let sortDocCardsAZ: boolean;
+	$: sortDocCardsAZ = $page.url.searchParams.get('az') === '1';
+
+	let exampleFn: string;
+	$: exampleFn = $page.url.searchParams.get('mf') ?? 'fn.ping_';
+
+	let exampleHeaders: Array<string>;
+	$: exampleHeaders = ($page.url.searchParams.get('mh') ?? '').split(',');
+
+	type view = 's' | 'd' | 't' | 'r' | 'm';
+
+	let randomSeed = 1;
+
+	function handleSourceGet(e: Event) {
+		console.log(`e`, e);
+		const formData = new FormData(e.target as HTMLFormElement);
+		const sourceUrl = formData.get('url') as string;
+
+		let q = new URLSearchParams($page.url.searchParams.toString());
+
+		const existingS = q.get('s');
+
+		if (existingS !== sourceUrl) {
+			q.delete('mf');
+			q.delete('mh');
+			q.delete('r');
+			q.set('v', 'd');
+		}
+
+		q.set('s', sourceUrl ?? '');
+		goto(`?${q.toString()}`);
+	}
+
+	function thisHandleRequest() {
+		let request = requestEditor.getContent();
+		handleRequest(request, 'tr');
+		handleSubmitRequest($page.data.client, request);
+	}
+
+	function handleSchema() {
+		let schema = schemaEditor.getContent();
+		let minifiedSchema = minifyJson(schema);
+		let q = new URLSearchParams($page.url.searchParams.toString());
+		q.set('s', 'draft');
+		q.set('sd', minifiedSchema!);
+		q.set('v', 'sd');
+		goto(`?${q.toString()}`);
+	}
+
+	function toggleView(v: view) {
+		let newViews: string;
+		if (selectedViews.substring(0, 2).includes(v)) {
+			newViews = selectedViews.replace(v, '');
+		} else {
+			if (selectedViews.includes(v)) {
+				let temp = selectedViews.replace(v, '');
+				newViews = v + temp;
+			} else {
+				newViews = v + selectedViews;
+			}
+		}
+		let q = new URLSearchParams($page.url.searchParams.toString());
+		q.set('v', newViews);
+		goto(`?${q.toString()}`);
+	}
+
+	function toggleTerminal() {
+		toggleView('t');
+	}
+
+	function toggleResults() {
+		toggleView('r');
+	}
+
+	function toggleShowSchemaCode() {
+		toggleView('s');
+	}
+
+	function toggleShowDocUi() {
+		toggleView('d');
+	}
+
+	function toggleShowExample() {
+		toggleView('m');
+	}
+
+	function toggleShowInternalApi() {
+		let q = new URLSearchParams($page.url.searchParams.toString());
+		if (showInternalApi) {
+			q.delete('i');
+		} else {
+			q.set('i', '1');
+		}
+		goto(`?${q.toString()}`);
+	}
+
+	function toggleSortDocCardsAZ() {
+		let q = new URLSearchParams($page.url.searchParams.toString());
+		if (sortDocCardsAZ) {
+			q.delete('az');
+		} else {
+			q.set('az', '1');
+		}
+		goto(`?${q.toString()}`);
+	}
+
+	function incrementRandomSeed() {
+		randomSeed += 1;
+	}
+
+	function getSectionClass(v: view, activeViewsLength: number) {
+		let width = activeViewsLength === 1 ? 'w-full' : 'w-1/2';
+		if (v === 's') {
+			return 'justify-start ' + width;
+		} else if (activeViews.includes('s')) {
+			return 'justify-end ' + width;
+		} else if (v === 'd') {
+			return 'justify-start ' + width;
+		} else if (activeViews.includes('d')) {
+			return 'justify-end ' + width;
+		} else if (v === 'r') {
+			return 'justify-end ' + width;
+		} else if (activeViews.includes('r')) {
+			return 'justify-start ' + width;
+		} else if (v === 't' && activeViews.includes('m')) {
+			return 'justify-end ' + width;
+		} else if (v === 'm' && activeViews.includes('t')) {
+			return 'justify-start ' + width;
+		} else {
+			return 'justify-end ' + width;
+		}
+	}
+
+	let showDropdown = false;
+
+	function toggleDropdown() {
+		showDropdown = !showDropdown;
+	}
+
+	function closeDropdown() {
+		showDropdown = false;
+	}
+</script>
+
+<div class="text-gray-200">
+	<nav
+		on:wheel|preventDefault
+		class="fixed top-0 z-10 h-16 w-full border-y border-slate-600 bg-slate-800"
+	>
+		<div class="flex h-full items-center px-4">
+			<div class="flex basis-1/3">
+				<div class="flex items-center rounded-md py-2">
+					<div class="text-sky-400">
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke-width="1.5"
+							stroke="currentColor"
+							class="h-8 w-8"
+						>
+							<path
+								d="M 12 16 A 1 1 0 0 0 12 8 A 1 1 0 0 0 12 16 M 8 16 L 5 19 M 3 20 A 1 1 0 0 0 3 22 A 1 1 0 0 0 3 20 M 16 8 L 19 5 M 21 4 A 1 1 0 0 0 21 2 A 1 1 0 0 0 21 4 M 7 12 L 5 12 M 4 12 A 1 1 0 0 0 2 12 A 1 1 0 0 0 4 12 M 17 12 L 19 12 M 20 12 A 1 1 0 0 0 22 12 A 1 1 0 0 0 20 12 M 12 7 L 12 4 M 12 17 L 12 20 M 10 22 L 14 22 M 10 2 L 14 2"
+							/>
+						</svg>
+					</div>
+					<span class="px-2 text-lg font-semibold text-gray-100">uAPI</span>
+				</div>
+			</div>
+			<div id="view-select" class="flex basis-1/3 content-center justify-center space-x-2">
+				<div class="inline-flex rounded-md">
+					<button
+						on:click={toggleShowSchemaCode}
+						class="rounded-s-md p-2 {activeViews.includes('s')
+							? 'bg-sky-700 text-cyan-300'
+							: 'bg-slate-700 text-gray-200'}"
+					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke-width="1"
+							stroke="currentColor"
+							class="h-6 w-6"
+						>
+							<path
+								d="M 2 22 L 5 16 L 19 2 L 22 5 L 8 19 L 2 22 M 5 16 L 8 19 M 19 8 L 16 5 M 17 4 L 20 7"
+							/>
+						</svg>
+					</button>
+					<button
+						on:click={toggleShowDocUi}
+						class="p-2 {activeViews.includes('d')
+							? 'bg-sky-700 text-cyan-300'
+							: 'bg-slate-700 text-gray-200'}"
+					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke-width="1.5"
+							stroke="currentColor"
+							class="h-6 w-6"
+						>
+							<path
+								d="M 20 19 L 20 5 M 20 5 L 14 5 L 12 6 L 10 5 L 4 5 L 4 19 L 10 19 L 12 20 L 14 19 L 20 19 M 20 7 L 22 7 L 22 21 L 14 21 L 12 22 L 10 21 L 2 21 L 2 7 L 4 7 M 12 6 L 12 20 M 7 9 L 9 9 M 7 12 L 9 12 M 7 15 L 9 15 M 15 9 L 17 9 M 15 12 L 17 12 M 15 15 L 17 15"
+							/>
+						</svg>
+					</button>
+					<button
+						on:click={toggleShowExample}
+						class="rounded-e-md p-2 {activeViews.includes('m')
+							? 'bg-sky-700 text-cyan-300'
+							: 'bg-slate-700 text-gray-200'}"
+					>
+						<MockIcon />
+					</button>
+				</div>
+				<div class="inline-flex rounded-md">
+					<button
+						on:click={toggleTerminal}
+						class="rounded-s-md p-2 {activeViews.includes('t')
+							? 'bg-emerald-900 text-green-300'
+							: 'bg-slate-700 text-gray-200'}"
+					>
+						<TerminalIcon />
+					</button>
+					<button
+						on:click={toggleResults}
+						class="rounded-e-md p-2 {activeViews.includes('r')
+							? 'bg-emerald-900 text-green-300'
+							: 'bg-slate-700 text-gray-200'}"
+					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke-width="1.5"
+							stroke="currentColor"
+							class="h-6 w-6"
+						>
+							<path
+								d="M 22 15 L 22 6 M 22 6 L 2 6 L 2 15 M 5 12 L 19 12 M 17 12 L 17 22 L 7 22 L 7 12 M 2 15 L 7 15 M 17 15 L 22 15 M 7 6 L 7 2 L 17 2 L 17 6 M 20 8 L 19 8 L 19 9 L 20 9 M 10 15 L 14 15 M 10 18 L 14 18 Z"
+							/>
+						</svg>
+					</button>
+				</div>
+			</div>
+			<div class="flex basis-1/3 justify-end">
+				<form class="flex space-x-2" on:submit|preventDefault={handleSourceGet}>
+					<div class="flex rounded-md border border-gray-500">
+						<label
+							for="url"
+							class="content-center rounded-l-md bg-zinc-600 px-2 py-2 text-sm font-medium text-gray-200"
+							>Source</label
+						>
+						<div>
+							<input
+								type="text"
+								name="url"
+								id="url"
+								placeholder="(draft mode)"
+								value={sourceUrl}
+								class="rounded-r-md border-0 bg-zinc-700 py-2 placeholder:text-gray-400 focus:border-gray-500 focus:ring-1 focus:ring-inset focus:ring-gray-500"
+							/>
+						</div>
+					</div>
+					<button
+						type="submit"
+						class="rounded-md bg-sky-700 px-3 py-2 text-sm font-semibold text-white hover:bg-sky-600"
+						>Load</button
+					>
+				</form>
+			</div>
+		</div>
+	</nav>
+
+	<main class="mt-16 flex h-[calc(100vh-4em)] bg-zinc-800">
+		{#await Promise.all( [uapiSchemaPromise, filteredSchemaPseudoJsonPromise, schemaDraftPromise] )}
+			<span>loading schema</span>
+		{:then [uapiSchema, filteredSchemaPseudoJson, schemaDraft]}
+			{#if activeViews.includes('s')}
+				<div
+					class="flex h-[calc(100vh-4em)] {getSectionClass('s', activeViews.length)}"
+					on:wheel|preventDefault
+				>
+					<div class="flex w-full flex-col p-6">
+						<div class="flex justify-between">
+							<h1 class="pb-4 text-xl font-semibold text-gray-100">Schema (JSON)</h1>
+							{#if !schemaSourceReadOnly}
+								<div>
+									<button
+										on:click={handleSchema}
+										class="rounded-md bg-sky-700 px-3 py-2 text-sm font-semibold text-white hover:bg-sky-600"
+										>Save</button
+									>
+								</div>
+							{/if}
+						</div>
+						<div class="grow border border-zinc-600">
+							<MonacoEditor
+								id="schema"
+								readOnly={schemaSourceReadOnly}
+								json={schemaDraft}
+								ctrlEnter={handleSchema}
+								filename="schema.uapi.json"
+								bind:this={schemaEditor}
+							/>
+						</div>
+					</div>
+				</div>
+			{/if}
+			{#if activeViews.includes('d')}
+				<div class="flex overflow-scroll {getSectionClass('d', activeViews.length)}">
+					<div class="flex w-full flex-col p-6">
+						<div>
+							<h1 class="pb-4 text-xl font-semibold text-gray-100">Schema</h1>
+						</div>
+						{#key sortDocCardsAZ}
+							{#each parseUApiSchema(filteredSchemaPseudoJson, uapiSchema, sortDocCardsAZ, showInternalApi) as entry}
+								{#if showInternalApi || !(Object.keys(entry)[0].split('.')[1] ?? '').endsWith('_')}
+									<DocCard {entry} {uapiSchema} />
+								{/if}
+							{/each}
+						{/key}
+						<div class="flex justify-center pb-4">
+							<button
+								on:click={toggleShowInternalApi}
+								class="mt-4 rounded-md bg-sky-700 px-3 py-2 text-sm font-semibold text-white hover:bg-sky-600"
+								>{showInternalApi
+									? 'Hide Internal Api'
+									: 'Show Internal Api'}</button
+							>
+						</div>
+					</div>
+				</div>
+			{/if}
+			{#if activeViews.includes('m')}
+				<div class="flex overflow-scroll {getSectionClass('m', activeViews.length)}">
+					<div class="flex w-full flex-col p-6">
+						<div class="flex items-start justify-between">
+							<h1 class="pb-4 text-xl font-semibold text-gray-100">Mocked Example</h1>
+							<button
+								on:click={incrementRandomSeed}
+								class="rounded-md bg-sky-700 px-3 py-2 text-sm font-semibold text-white hover:bg-sky-600"
+							>
+								Regenerate
+							</button>
+						</div>
+						{#key randomSeed + exampleFn}
+							{#await genExample(exampleFn, exampleHeaders, uapiSchema)}
+								<div class="mb-4">
+									<span>Loading...<span> </span></span>
+								</div>
+							{:then example}
+								<div class="flex h-full flex-col space-y-2">
+									<div class="h-1/2 grow border border-zinc-600">
+										<MonacoEditor
+											id={'requestExample'}
+											readOnly={true}
+											json={example.request}
+											allowLinks={false}
+											filename={'requestExample.json'}
+											minimap={false}
+										/>
+									</div>
+									<div class="ml-4 shrink">
+										<span class="text-3xl text-emerald-500">→</span>
+									</div>
+									<div class="h-1/2 grow border border-zinc-600">
+										<MonacoEditor
+											id={'responseExample'}
+											readOnly={true}
+											json={example.response}
+											allowLinks={false}
+											filename={'responseExample.json'}
+											lineNumbers={false}
+											minimap={false}
+										/>
+									</div>
+								</div>
+							{/await}
+						{/key}
+					</div>
+				</div>
+			{/if}
+		{:catch error}
+			<span>failed to get schema</span>
+		{/await}
+		{#if activeViews.includes('t')}
+			<div class="flex h-[calc(100vh-4em)] {getSectionClass('t', activeViews.length)}">
+				<form
+					data-sveltekit-keepfocus
+					on:submit|preventDefault={thisHandleRequest}
+					class="flex w-full flex-col bg-zinc-700 p-6"
+				>
+					<div class="flex justify-between">
+						<h1 class="pb-4 text-xl font-semibold text-gray-100">Request</h1>
+						<div>
+							<button
+								type="submit"
+								class="rounded-md bg-sky-700 px-3 py-2 text-sm font-semibold text-white hover:bg-sky-600"
+								>Submit</button
+							>
+						</div>
+					</div>
+					{#key request}
+						<div class="grow border border-zinc-600">
+							<MonacoEditor
+								id="request"
+								readOnly={false}
+								json={unMinifyJson(request)}
+								ctrlEnter={() => thisHandleRequest()}
+								filename="request.json"
+								bind:this={requestEditor}
+							/>
+						</div>
+					{/key}
+				</form>
+			</div>
+		{/if}
+		{#if activeViews.includes('r')}
+			<div class="flex h-[calc(100vh-4em)] {getSectionClass('r', activeViews.length)}">
+				{#if response}
+					<div class="flex w-full flex-col bg-zinc-700 p-6">
+						<h1 class="mb-4 text-xl font-semibold text-gray-100">Response</h1>
+						{#await response}
+							<div class="mb-4 grow">
+								<span>Loading...<span> </span></span>
+							</div>
+						{:then d}
+							{#key d}
+								<div class="grow border border-zinc-600">
+									<MonacoEditor
+										id="response"
+										readOnly={true}
+										json={d}
+										allowLinks={true}
+										filename="response.json"
+									/>
+								</div>
+							{/key}
+						{/await}
+					</div>
+				{:else}
+					<div class="grid h-full w-full place-content-center">
+						<div>
+							<span>Click "Submit" on Request pane to fetch response.</span>
+						</div>
+					</div>
+				{/if}
+			</div>
+		{/if}
+		<slot />
+	</main>
+</div>
