@@ -13,3 +13,11 @@ export * from './MockUApiSchema';
 export * from './UApiSchemaParseError';
 export * from './UApiSchemaFiles';
 export { default as jsonSchema } from '../inc/json-schema.json';
+
+import { GenerateContext } from './internal/generation/GenerateContext';
+import { UFn } from './internal/types/UFn';
+
+export const _internal = {
+    GenerateContext,
+    UFn,
+};

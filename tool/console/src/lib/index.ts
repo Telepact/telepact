@@ -2,8 +2,7 @@
 import { goto } from '$app/navigation';
 import * as monaco from 'monaco-editor';
 import * as uapi from 'uapi';
-import { GenerateContext } from 'uapi/dist/src/internal/generation/GenerateContext';
-import { UFn } from 'uapi/dist/src/internal/types/UFn';
+import { _internal } from 'uapi';
 import { writable, type Writable } from 'svelte/store';
 
 export const responseStore: Writable<string | null> = writable(null);
@@ -113,7 +112,7 @@ export function generateExample(schemaKey: string, schemaInst: uapi.UApiSchema) 
 		null,
 		false,
 		[],
-		new GenerateContext(true, true, true, '', random)
+		new _internal.GenerateContext(true, true, true, '', random)
 	);
 	return JSON.stringify(example, null, 2);
 }
@@ -128,7 +127,7 @@ export function generateFnResultExample(
 		blueprintValue,
 		useBlueprintValue,
 		[],
-		new GenerateContext(true, true, true, fn, random)
+		new _internal.GenerateContext(true, true, true, fn, random)
 	);
 	return JSON.stringify(exampleResult, null, 2);
 }
@@ -141,13 +140,13 @@ export function generateHeaderExample(schemaKey: string, schemaInst: uapi.UApiSc
 		header = schemaInst.parsedRequestHeaders[key]?.typeDeclaration?.generateRandomValue(
 			null,
 			false,
-			new GenerateContext(true, true, true, schemaKey, random)
+			new _internal.GenerateContext(true, true, true, schemaKey, random)
 		);
 	} else if (type == 'responseHeader') {
 		header = schemaInst.parsedResponseHeaders[key]?.typeDeclaration?.generateRandomValue(
 			null,
 			false,
-			new GenerateContext(true, true, true, schemaKey, random)
+			new _internal.GenerateContext(true, true, true, schemaKey, random)
 		);
 	} else {
 		throw Error(`Unknown header type ${schemaKey}`);
@@ -164,7 +163,7 @@ export async function genExample(fn: string, headers: Array<string>, schemaInst:
 		null,
 		false,
 		[],
-		new GenerateContext(true, true, true, fn, random)
+		new _internal.GenerateContext(true, true, true, fn, random)
 	);
 	let requestHeaders: Record<string, any> = {};
 	for (const header of headers) {
@@ -173,7 +172,7 @@ export async function genExample(fn: string, headers: Array<string>, schemaInst:
 		]?.typeDeclaration?.generateRandomValue(
 			null,
 			false,
-			new GenerateContext(true, true, true, fn, random)
+			new _internal.GenerateContext(true, true, true, fn, random)
 		);
 	}
 	let request = [requestHeaders, example];
@@ -278,7 +277,13 @@ export function parseUApiSchema(
 				null,
 				false,
 				[],
-				new GenerateContext(true, false, true, schemaKey, new uapi.RandomGenerator(2, 2))
+				new _internal.GenerateContext(
+					true,
+					false,
+					true,
+					schemaKey,
+					new uapi.RandomGenerator(2, 2)
+				)
 			);
 			let exampleCallJson = JSON.stringify([{}, exampleCall]);
 
