@@ -13,15 +13,11 @@ def start(nats_url: str) -> subprocess.Popen:
     this_env['NATS_URL'] = nats_url
     del this_env["VIRTUAL_ENV"]
 
-    s1 = subprocess.Popen(['npm', 'uninstall', 'uapi'], cwd=this_path)
+    s1 = subprocess.Popen(['npm', 'install'], cwd=this_path)
     s1.wait()
 
     s = subprocess.Popen(['npm', 'run', 'build'], cwd=target_path)
     s.wait()
-
-    s2 = subprocess.Popen(['npm', 'install', '--no-save',
-                          './../../../lib/ts/uapi-1.0.3.tgz'], cwd=this_path)
-    s2.wait()
 
     s3 = subprocess.Popen(['npm', 'run', 'build'], cwd=this_path)
     s3.wait()
