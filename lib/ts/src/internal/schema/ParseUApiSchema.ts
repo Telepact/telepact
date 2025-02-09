@@ -14,6 +14,8 @@ import { parseHeadersType } from '../../internal/schema/ParseHeadersType';
 import { UError } from '../../internal/types/UError';
 import { ParseContext } from '../../internal/schema/ParseContext';
 import { getPathDocumentCoordinatesPseudoJson } from './GetPathDocumentCoordinatesPseudoJson';
+import { UHeaders } from '../types/UHeaders';
+import { catchHeaderCollisions } from './CatchHeaderCollisions';
 
 export function parseUApiSchema(uApiSchemaDocumentNamesToJson: Record<string, string>): UApiSchema {
     const originalSchema: { [key: string]: Record<string, object> } = {};
@@ -121,7 +123,6 @@ export function parseUApiSchema(uApiSchemaDocumentNamesToJson: Record<string, st
     }
 
     const headerKeys: Set<string> = new Set();
-    const responseHeaderKeys: Set<string> = new Set();
     const errorKeys: Set<string> = new Set();
 
     for (const schemaKey of schemaKeys) {
@@ -253,6 +254,8 @@ export function parseUApiSchema(uApiSchemaDocumentNamesToJson: Record<string, st
     const requestHeaders: { [key: string]: UFieldDeclaration } = {};
     const responseHeaders: { [key: string]: UFieldDeclaration } = {};
 
+    const headers: UHeaders[] = [];
+
     for (const headerKey of headerKeys) {
         const thisIndex = schemaKeysToIndex[headerKey];
         const thisDocumentName = schemaKeysToDocumentName[headerKey];
@@ -260,7 +263,7 @@ export function parseUApiSchema(uApiSchemaDocumentNamesToJson: Record<string, st
         const def_ = uApiSchemaPseudoJson[thisIndex] as { [key: string]: any };
 
         try {
-            const requestHeaderType = parseHeadersType(
+            const headerType = parseHeadersType(
                 [thisIndex],
                 def_,
                 headerKey,
@@ -275,8 +278,7 @@ export function parseUApiSchema(uApiSchemaDocumentNamesToJson: Record<string, st
                     failedTypes,
                 ),
             );
-            Object.assign(requestHeaders, requestHeaderType.requestHeaders);
-            Object.assign(responseHeaders, requestHeaderType.responseHeaders);
+            headers.push(headerType);
         } catch (e) {
             if (e instanceof UApiSchemaParseError) {
                 parseFailures.push(...e.schemaParseFailures);
@@ -288,6 +290,31 @@ export function parseUApiSchema(uApiSchemaDocumentNamesToJson: Record<string, st
 
     if (parseFailures.length > 0) {
         throw new UApiSchemaParseError(parseFailures, uApiSchemaDocumentNamesToJson);
+    }
+
+    try {
+        catchHeaderCollisions(
+            uApiSchemaDocumentNamesToPseudoJson,
+            headerKeys,
+            schemaKeysToIndex,
+            schemaKeysToDocumentName,
+            uApiSchemaDocumentNamesToJson,
+        );
+    } catch (e) {
+        if (e instanceof UApiSchemaParseError) {
+            parseFailures.push(...e.schemaParseFailures);
+        } else {
+            throw e;
+        }
+    }
+
+    if (parseFailures.length > 0) {
+        throw new UApiSchemaParseError(parseFailures, uApiSchemaDocumentNamesToJson);
+    }
+
+    for (const header of headers) {
+        Object.assign(requestHeaders, header.requestHeaders);
+        Object.assign(responseHeaders, header.responseHeaders);
     }
 
     const sortKeys = (a: string, b: string) => {

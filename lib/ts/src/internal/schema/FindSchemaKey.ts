@@ -7,7 +7,7 @@ export function findSchemaKey(
     index: number,
     documentNamesToJson: Record<string, string>,
 ): string {
-    const regex = /^(((fn|errors|requestHeader|responseHeader|info)|((struct|union|_ext)(<[0-2]>)?))\..*)/;
+    const regex = /^(((fn|errors|headers|info)|((struct|union|_ext)(<[0-2]>)?))\..*)/;
     const matches: string[] = [];
 
     const keys = Object.keys(definition).sort();

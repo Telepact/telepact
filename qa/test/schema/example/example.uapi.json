@@ -153,9 +153,11 @@
         ]
     },
     {
-        "requestHeader.in": ["boolean"]
-    },
-    {
-        "responseHeader.out": ["boolean"]
+        "headers.ExampleHeaders": {
+            "in": ["boolean"]
+        },
+        "->": {
+            "out": ["boolean"]
+        }
     }
 ]

@@ -8,7 +8,7 @@ all: dep $(BUILT)
 $(BUILT): $(CODEGEN_DEP_VERSION_FILE)
 	poetry lock
 	poetry install
-	poetry run python -m uapicodegen --schema-dir ../../test/schema/example --lang ts --out src/gen --package uapitest
+#	poetry run python -m uapicodegen --schema-dir ../../test/schema/example --lang ts --out src/gen --package uapitest
 
 dep:
 	cd ../../../tool/uapicodegen && make

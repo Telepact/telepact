@@ -4,14 +4,14 @@ import { UFieldDeclaration } from '../../internal/types/UFieldDeclaration';
 import { ParseContext } from '../../internal/schema/ParseContext';
 import { parseStructFields } from './ParseStructFields';
 import { SchemaParseFailure } from './SchemaParseFailure';
-import { ParsedHeaders } from './ParsedHeaders';
+import { UHeaders } from '../../internal/types/UHeaders';
 
 export function parseHeadersType(
     path: any[],
     headersDefinitionAsParsedJson: { [key: string]: any },
     schemaKey: string,
     ctx: ParseContext,
-): ParsedHeaders {
+): UHeaders {
     const parseFailures: SchemaParseFailure[] = [];
     const requestHeaders: { [key: string]: UFieldDeclaration } = {};
     const responseHeaders: { [key: string]: UFieldDeclaration } = {};
@@ -101,5 +101,5 @@ export function parseHeadersType(
         throw new UApiSchemaParseError(parseFailures, ctx.uapiSchemaDocumentNamesToJson);
     }
 
-    return new ParsedHeaders(requestHeaders, responseHeaders);
+    return new UHeaders(schemaKey, requestHeaders, responseHeaders);
 }

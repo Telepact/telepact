@@ -6,7 +6,8 @@
         ],
         "headers.Auth_": {
             "auth_": ["struct.Auth_"]
-        }
+        },
+        "->": {}
     },
     {
         "///": " A standard error. ",
