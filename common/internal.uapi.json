@@ -25,69 +25,74 @@
         "_ext.Select_": {}
     },
     {
-        "///": " The timeout in milliseconds set by the client ",
-        "requestHeader.time_": ["integer"]
-    },
-    {
-        "///": " If set to `true`, response validation by the server will be disabled. ",
-        "requestHeader.unsafe_": ["boolean"]
-    },
-    {
-        "///": [
-            " Used to select fields from structs. It is an object of string arrays keyed by   ",
-            " struct reference name pointing to field names of that struct that should be     ",
-            " selected. Field names not included in the array are omitted in the response     ",
-            " wherever that field would have appeared.                                        "
-        ],
-        "requestHeader.select_": ["_ext.Select_"]
+        "///": " The `time_` header indicates the request timeout honored by the client. ",
+        "headers.Time_": {
+            "time_": ["integer"]
+        },
+        "->": {}
     },
     {
         "///": [
-            " Indicates the binary checksums known by the client, which will prompt the       ",
-            " inclusion of the `bin_` response header with the binary checksum currently in   ",
-            " use by the server. If server binary checksum does not match one of the          ",
-            " client-indicated binary checksums in the `bin_` request header, then the        ",
-            " server will also include the `enc_` response header containing the binary       ",
-            " encoding, an object of possible keys mapped onto a field id.                    "
+            " If `unsafe_` is set to `true`, response validation by the server will be        ",
+            " disabled. The server will the client-provided the value of `unsafe_` header in  ",
+            " the response.                                                                   "
         ],
-        "requestHeader.bin_": ["array", ["integer"]]
+        "headers.Unsafe_": {
+            "unsafe_": ["boolean"]
+        },
+        "->": {
+            "unsafe_": ["boolean"]
+        }
+    },
+    {
+        "///": " The `select_` header is used to select fields from structs. ",
+        "headers.Select_": {
+            "select_": ["_ext.Select_"]
+        },
+        "->": {}
     },
     {
         "///": [
-            " Indicates the binary checksums known by the client, which will prompt the       ",
-            " inclusion of the `bin_` response header with the binary checksum currently in   ",
-            " use by the server. If server binary checksum does not match one of the          ",
-            " client-indicated binary checksums in the `bin_` request header, then the        ",
-            " server will also include the `enc_` response header containing the binary       ",
-            " encoding, an object of possible keys mapped onto a field id.                    "
+            " The `bin_` header indicates the valid checksums of binary encodings negotiated  ",
+            " between the client and server. If the client sends a `bin_` header with any     ",
+            " value, the server will respond with a `bin_` header with an array containing    ",
+            " the currently supported binary encoding checksum. If the client's provided      ",
+            " checksum does not match the server's checksum, the server will also send an     ",
+            " `enc_` header containing the binary encoding, which is a map of field names to  ",
+            " field ids. The response body may also be encoded in binary.                     ",
+            "                                                                                 ",
+            " The `pac_` header can also be used to indicate usage of 'packed' binary         ",
+            " encoding strategy. If the client submits a `pac_` header with a `true` value,   ",
+            " the server will respond with a `pac_` header with a `true` value.               "
         ],
-        "responseHeader.bin_": ["array", ["integer"]]
+        "headers.Binary_": {
+            "bin_": ["array", ["integer"]],
+            "pac_": ["boolean"]
+        },
+        "->": {
+            "bin_": ["array", ["integer"]],
+            "enc_": ["object", ["integer"]],
+            "pac_": ["boolean"]
+        }
+    },
+    {
+        "///": " The `warn_` header is used to send warnings to the client. ",
+        "headers.Warning_": {},
+        "->": {
+            "warn_": ["array", ["string"]]
+        }
     },
     {
         "///": [
-            " Indicates usage of the \"packed\" binary strategy on the request, if supplied     ",
-            " binary, and on the response from the server.                                    "
+            " The `id_` header is used to correlate requests and responses. The server will   ",
+            " reflect the client-provided `id_` header as-is.                                 "
         ],
-        "requestHeader.pac_": ["boolean"]
-    },
-    {
-        "///": " Indicates usage of the \"packed\" binary strategy on the response. ",
-        "responseHeader.pac_": ["boolean"]
-    },
-    {
-        "///": [
-            " The binary encoding used by the server, an object of possible keys mapped onto  ",
-            " a field id.                                                                     "
-        ],
-        "responseHeader.enc_": ["object", ["integer"]]
-    },
-    {
-        "///": " Will be reflected as-is in `responseHeader.id_`. ",
-        "requestHeader.id_": ["any"]
-    },
-    {
-        "///": " The value of `requestHeader.id_`, if provided. ",
-        "responseHeader.id_": ["any"]
+        "headers.Id_": {
+            "id_": ["any"]
+        },
+        "->": {
+            "id_": ["any"]
+        }
     },
     {
         "///": " A type. ",

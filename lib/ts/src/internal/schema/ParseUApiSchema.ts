@@ -120,18 +120,15 @@ export function parseUApiSchema(uApiSchemaDocumentNamesToJson: Record<string, st
         throw new UApiSchemaParseError(parseFailures, uApiSchemaDocumentNamesToJson);
     }
 
-    const requestHeaderKeys: Set<string> = new Set();
+    const headerKeys: Set<string> = new Set();
     const responseHeaderKeys: Set<string> = new Set();
     const errorKeys: Set<string> = new Set();
 
     for (const schemaKey of schemaKeys) {
         if (schemaKey.startsWith('info.')) {
             continue;
-        } else if (schemaKey.startsWith('requestHeader.')) {
-            requestHeaderKeys.add(schemaKey);
-            continue;
-        } else if (schemaKey.startsWith('responseHeader.')) {
-            responseHeaderKeys.add(schemaKey);
+        } else if (schemaKey.startsWith('headers.')) {
+            headerKeys.add(schemaKey);
             continue;
         } else if (schemaKey.startsWith('errors.')) {
             errorKeys.add(schemaKey);
@@ -256,19 +253,17 @@ export function parseUApiSchema(uApiSchemaDocumentNamesToJson: Record<string, st
     const requestHeaders: { [key: string]: UFieldDeclaration } = {};
     const responseHeaders: { [key: string]: UFieldDeclaration } = {};
 
-    for (const requestHeaderKey of requestHeaderKeys) {
-        const thisIndex = schemaKeysToIndex[requestHeaderKey];
-        const thisDocumentName = schemaKeysToDocumentName[requestHeaderKey];
+    for (const headerKey of headerKeys) {
+        const thisIndex = schemaKeysToIndex[headerKey];
+        const thisDocumentName = schemaKeysToDocumentName[headerKey];
         const uApiSchemaPseudoJson = uApiSchemaDocumentNamesToPseudoJson[thisDocumentName];
         const def_ = uApiSchemaPseudoJson[thisIndex] as { [key: string]: any };
-        const headerField = requestHeaderKey.slice('requestHeader.'.length);
 
         try {
             const requestHeaderType = parseHeadersType(
-                [thisIndex, requestHeaderKey],
+                [thisIndex],
                 def_,
-                requestHeaderKey,
-                headerField,
+                headerKey,
                 new ParseContext(
                     thisDocumentName,
                     uApiSchemaDocumentNamesToPseudoJson,
@@ -280,41 +275,8 @@ export function parseUApiSchema(uApiSchemaDocumentNamesToJson: Record<string, st
                     failedTypes,
                 ),
             );
-            requestHeaders[requestHeaderType.fieldName] = requestHeaderType;
-        } catch (e) {
-            if (e instanceof UApiSchemaParseError) {
-                parseFailures.push(...e.schemaParseFailures);
-            } else {
-                throw e;
-            }
-        }
-    }
-
-    for (const responseHeaderKey of responseHeaderKeys) {
-        const thisIndex = schemaKeysToIndex[responseHeaderKey];
-        const thisDocumentName = schemaKeysToDocumentName[responseHeaderKey];
-        const uApiSchemaPseudoJson = uApiSchemaDocumentNamesToPseudoJson[thisDocumentName];
-        const def_ = uApiSchemaPseudoJson[thisIndex] as { [key: string]: any };
-        const headerField = responseHeaderKey.slice('responseHeader.'.length);
-
-        try {
-            const responseHeaderType = parseHeadersType(
-                [thisIndex, responseHeaderKey],
-                def_,
-                responseHeaderKey,
-                headerField,
-                new ParseContext(
-                    thisDocumentName,
-                    uApiSchemaDocumentNamesToPseudoJson,
-                    uApiSchemaDocumentNamesToJson,
-                    schemaKeysToDocumentName,
-                    schemaKeysToIndex,
-                    parsedTypes,
-                    parseFailures,
-                    failedTypes,
-                ),
-            );
-            responseHeaders[responseHeaderType.fieldName] = responseHeaderType;
+            Object.assign(requestHeaders, requestHeaderType.requestHeaders);
+            Object.assign(responseHeaders, requestHeaderType.responseHeaders);
         } catch (e) {
             if (e instanceof UApiSchemaParseError) {
                 parseFailures.push(...e.schemaParseFailures);
