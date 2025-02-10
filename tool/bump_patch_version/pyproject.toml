@@ -1,0 +1,21 @@
+[project]
+name = "bump_patch_version"
+version = "0.1.5"
+description = "A CLI tool to bump the patch version of a project."
+requires-python = ">=3.11"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+version = "0.1.1"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+click = "^8.0.0"
+toml = "^0.10.2"
+lxml = "^5.3.1"
+
+[tool.poetry.scripts]
+bump-patch-version = "bump_patch_version.cli:main"
