@@ -7,7 +7,6 @@ import java.util.Map;
 public class GetPathDocumentCoordinatesPseudoJson {
 
     public static Map<String, Object> getPathDocumentCoordinatesPseudoJson(List<Object> path, String document) {
-        System.out.println("getPathDocumentCoordinatesPseudoJson: path=" + path + ", document=" + document);
         Iterator<CharacterPosition> reader = stringReader(document);
         return findCoordinates(path, reader, null, null);
     }
@@ -39,7 +38,6 @@ public class GetPathDocumentCoordinatesPseudoJson {
 
     private static Map<String, Object> findCoordinates(List<Object> path, Iterator<CharacterPosition> reader,
             Integer ovRow, Integer ovCol) {
-        System.out.println("findCoordinates: path=" + path);
 
         while (reader.hasNext()) {
             CharacterPosition cp = reader.next();
@@ -72,7 +70,6 @@ public class GetPathDocumentCoordinatesPseudoJson {
     }
 
     private static Map<String, Object> findCoordinatesObject(List<Object> path, Iterator<CharacterPosition> reader) {
-        System.out.println("findCoordinatesObject: path=" + path);
         Integer workingKeyRowStart = null;
         Integer workingKeyColStart = null;
         String workingKey = null;
