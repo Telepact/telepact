@@ -22,7 +22,6 @@ export const ssr = false;
 export const load: LayoutLoad = async ({ url, params, route, fetch }) => {
 	console.log('layout load');
 	let schemaSource = url.searchParams.get('s') ?? '';
-	let schemaDraft = url.searchParams.get('sd');
 	let showInternalApi = url.searchParams.get('i') === '1';
 
 	let result: {
@@ -32,7 +31,7 @@ export const load: LayoutLoad = async ({ url, params, route, fetch }) => {
 		schemaSource?: string;
 	} = {};
 	if (schemaSource === '') {
-		let schemaDraft = url.searchParams.get('sd') as string;
+		let schemaDraft = (url.searchParams.get('sd') as string) ?? '[{"info.Example":{}}]';
 
 		let uapiSchema = MockUApiSchema.fromJson(schemaDraft);
 

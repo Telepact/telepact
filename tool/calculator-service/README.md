@@ -11,7 +11,7 @@ poetry install
 ## Running the Server
 
 ```sh
-poetry run python calculator_service/app.py
+poetry run python -m calculator_service
 ```
 
 ## Running Tests

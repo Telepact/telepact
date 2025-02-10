@@ -421,21 +421,20 @@ files = [
 
 [[package]]
 name = "uapi"
-version = "0.0.27"
+version = "0.0.35"
 description = "Universal API"
 optional = false
 python-versions = ">=3.11"
 groups = ["main"]
-files = [
-    {file = "uapi-0.0.27-py3-none-any.whl", hash = "sha256:235ecc298fcbb5d1b80bdc44666e93c9fab5317908d4d55d6e34facb61cf2f72"},
-]
+files = []
+develop = false
 
 [package.dependencies]
 msgpack = "*"
 
 [package.source]
-type = "file"
-url = "../../lib/py/dist/uapi-0.0.27-py3-none-any.whl"
+type = "directory"
+url = "../../lib/py"
 
 [[package]]
 name = "uvicorn"
@@ -460,4 +459,4 @@ standard = ["PyYAML (>=5.1)", "colorama (>=0.4)", "httptools (==0.2.*)", "python
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.11"
-content-hash = "133328bcf03d6a81950803fc0542ae83764ef3c93ed80028efd06f3504358276"
+content-hash = "285214674b1b93a23a94cf9eaa576158a5caa62261ef0c3c201ba79c5ef334ae"

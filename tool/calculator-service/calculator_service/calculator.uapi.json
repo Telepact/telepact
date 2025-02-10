@@ -104,5 +104,15 @@
             "timestamp": ["integer"],
             "successful": ["boolean"]
         }
+    },
+    {
+        "fn.showExample": {},
+        "->": [
+            {
+                "Ok_": {
+                    "link": ["fn.compute"]
+                }
+            }
+        ]
     }
 ]
