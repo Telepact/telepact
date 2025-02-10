@@ -35,7 +35,7 @@ export function parseHeadersType(
         parseFailures.push(...branchParseFailures);
     } else {
         try {
-            const requestFields = parseStructFields(path, requestHeadersDef, ctx);
+            const requestFields = parseStructFields(thisPath, requestHeadersDef, ctx);
 
             // All headers are optional
             for (const field in requestFields) {
@@ -80,7 +80,7 @@ export function parseHeadersType(
         parseFailures.push(...branchParseFailures);
     } else {
         try {
-            const responseFields = parseStructFields(path, responseHeadersDef, ctx);
+            const responseFields = parseStructFields(responsePath, responseHeadersDef, ctx);
 
             // All headers are optional
             for (const field in responseFields) {
