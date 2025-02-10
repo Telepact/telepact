@@ -8,9 +8,9 @@ class UHeaders:
     def __init__(
             self,
             name: str,
-            requestHeaders: dict[str, 'UFieldDeclaration'],
-            responseHeaders: dict[str, 'UFieldDeclaration']
+            request_headers: dict[str, 'UFieldDeclaration'],
+            response_headers: dict[str, 'UFieldDeclaration']
     ) -> None:
         self.name = name
-        self.requestHeaders = requestHeaders
-        self.responseHeaders = responseHeaders
+        self.request_headers = request_headers
+        self.response_headers = response_headers

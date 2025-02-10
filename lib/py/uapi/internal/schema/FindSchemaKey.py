@@ -6,7 +6,7 @@ def find_schema_key(document_name: str, definition: dict[str, object], index: in
     from uapi.internal.schema.SchemaParseFailure import SchemaParseFailure
     import re
 
-    regex = "^(((fn|errors|requestHeader|responseHeader|info)|((struct|union|_ext)(<[0-2]>)?))\\..*)"
+    regex = "^(((fn|errors|headers|info)|((struct|union|_ext)(<[0-2]>)?))\\..*)"
     matches = []
 
     keys = sorted(list(definition.keys()))

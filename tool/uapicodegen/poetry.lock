@@ -266,7 +266,7 @@ files = [
 
 [[package]]
 name = "uapi"
-version = "0.0.31"
+version = "0.0.35"
 description = "Universal API"
 optional = false
 python-versions = ">=3.11"

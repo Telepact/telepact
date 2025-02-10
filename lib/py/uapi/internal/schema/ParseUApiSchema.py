@@ -27,6 +27,9 @@ def parse_uapi_schema(
     from uapi.internal.schema.GetPathDocumentCoordinatesPseudoJson import get_path_document_coordinates_pseudo_json
     from uapi.internal.types.UError import UError
     from collections import OrderedDict
+    from uapi.internal.types.UHeaders import UHeaders
+    from uapi.internal.schema.CatchHeaderCollisions import catch_header_collisions
+
 
     original_schema: dict[str, object] = {}
     parsed_types: dict[str, UType] = {}
@@ -113,18 +116,14 @@ def parse_uapi_schema(
         raise UApiSchemaParseError(
             parse_failures, uapi_schema_document_names_to_json)
 
-    request_header_keys: set[str] = set()
-    response_header_keys: set[str] = set()
+    header_keys: set[str] = set()
     error_keys: set[str] = set()
 
     for schema_key in schema_keys:
         if schema_key.startswith("info."):
             continue
-        elif schema_key.startswith("requestHeader."):
-            request_header_keys.add(schema_key)
-            continue
-        elif schema_key.startswith("responseHeader."):
-            response_header_keys.add(schema_key)
+        elif schema_key.startswith("headers."):
+            header_keys.add(schema_key)
             continue
         elif schema_key.startswith("errors."):
             error_keys.add(schema_key)
@@ -206,23 +205,20 @@ def parse_uapi_schema(
         except UApiSchemaParseError as e:
             parse_failures.extend(e.schema_parse_failures)
 
-    request_headers: dict[str, UFieldDeclaration] = {}
-    response_headers: dict[str, UFieldDeclaration] = {}
+    headers: list[UHeaders] = []
 
-    for request_header_key in request_header_keys:
-        this_index = schema_keys_to_index[request_header_key]
-        this_document_name = schema_keys_to_document_names[request_header_key]
+    for header_key in header_keys:
+        this_index = schema_keys_to_index[header_key]
+        this_document_name = schema_keys_to_document_names[header_key]
         u_api_schema_pseudo_json = u_api_schema_document_name_to_pseudo_json[
             this_document_name]
         def_ = cast(dict[str, object],
                     u_api_schema_pseudo_json[this_index])
-        header_field = request_header_key[len("requestHeader."):]
-
         try:
-            request_header_type = parse_headers_type(
-                [this_index, request_header_key],
-                def_[request_header_key],
-                header_field,
+            header_type = parse_headers_type(
+                [this_index],
+                def_,
+                header_key,
                 ParseContext(
                     this_document_name,
                     u_api_schema_document_name_to_pseudo_json,
@@ -234,42 +230,29 @@ def parse_uapi_schema(
                     failed_types
                 )
             )
-            request_headers[request_header_type.field_name] = request_header_type
-        except UApiSchemaParseError as e:
-            parse_failures.extend(e.schema_parse_failures)
-
-    for response_header_key in response_header_keys:
-        this_index = schema_keys_to_index[response_header_key]
-        this_document_name = schema_keys_to_document_names[response_header_key]
-        u_api_schema_pseudo_json = u_api_schema_document_name_to_pseudo_json[
-            this_document_name]
-        def_ = cast(dict[str, object],
-                    u_api_schema_pseudo_json[this_index])
-        header_field = response_header_key[len("responseHeader."):]
-
-        try:
-            response_header_type = parse_headers_type(
-                [this_index, response_header_key],
-                def_[response_header_key],
-                header_field,
-                ParseContext(
-                    this_document_name,
-                    u_api_schema_document_name_to_pseudo_json,
-                    uapi_schema_document_names_to_json,
-                    schema_keys_to_document_names,
-                    schema_keys_to_index,
-                    parsed_types,
-                    parse_failures,
-                    failed_types,
-                )
-            )
-            response_headers[response_header_type.field_name] = response_header_type
+            headers.append(header_type)
         except UApiSchemaParseError as e:
             parse_failures.extend(e.schema_parse_failures)
 
     if parse_failures:
         raise UApiSchemaParseError(
             parse_failures, uapi_schema_document_names_to_json)
+    
+    try:
+        catch_header_collisions(u_api_schema_document_name_to_pseudo_json, header_keys, schema_keys_to_index, schema_keys_to_document_names, uapi_schema_document_names_to_json)
+    except UApiSchemaParseError as e:
+        parse_failures.extend(e.schema_parse_failures)
+
+    if parse_failures:
+        raise UApiSchemaParseError(
+            parse_failures, uapi_schema_document_names_to_json)
+
+    request_headers: dict[str, UFieldDeclaration] = {}
+    response_headers: dict[str, UFieldDeclaration] = {}
+
+    for header in headers:
+        request_headers.update(header.request_headers)
+        response_headers.update(header.response_headers)
 
     final_original_schema = [original_schema[k]
                              for k in sorted(original_schema.keys(), key=lambda k: (not k.startswith("info."), k))]

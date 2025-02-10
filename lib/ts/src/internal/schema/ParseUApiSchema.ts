@@ -251,9 +251,6 @@ export function parseUApiSchema(uApiSchemaDocumentNamesToJson: Record<string, st
         }
     }
 
-    const requestHeaders: { [key: string]: UFieldDeclaration } = {};
-    const responseHeaders: { [key: string]: UFieldDeclaration } = {};
-
     const headers: UHeaders[] = [];
 
     for (const headerKey of headerKeys) {
@@ -311,6 +308,9 @@ export function parseUApiSchema(uApiSchemaDocumentNamesToJson: Record<string, st
     if (parseFailures.length > 0) {
         throw new UApiSchemaParseError(parseFailures, uApiSchemaDocumentNamesToJson);
     }
+
+    const requestHeaders: { [key: string]: UFieldDeclaration } = {};
+    const responseHeaders: { [key: string]: UFieldDeclaration } = {};
 
     for (const header of headers) {
         Object.assign(requestHeaders, header.requestHeaders);
