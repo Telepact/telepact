@@ -49,10 +49,11 @@
 		goto(`?${q.toString()}#${schemaKey}`);
 	}
 
-	function toggleHeaderForExample() {
-		let header = schemaKey.replace('requestHeader.', '');
+	function toggleHeaderForExample(header: string, schemaKey: string) {
+		console.log(`toggleHeaderForExample`, header, schemaKey);
 		let q = new URLSearchParams($page.url.searchParams.toString());
-		let existingHeaders = (q.get('mh') ?? '').split(',');
+		let existingHeaders = (q.get('mh') ?? '').split(',').filter((h) => h !== '');
+		console.log(`existingHeaders`, existingHeaders);
 		let newHeaders = existingHeaders.includes(header)
 			? existingHeaders.filter((h) => h !== header)
 			: [...existingHeaders, header];
@@ -109,20 +110,6 @@
 			<div>
 				<button
 					on:click={applyFunctionToExample}
-					class="group flex items-center space-x-2 py-2"
-				>
-					<span class="group-hover:underline">Simulate</span>
-					<div class="rounded-lg p-1 group-hover:bg-sky-700 group-hover:text-cyan-300">
-						<MockIcon />
-					</div>
-				</button>
-			</div>
-		{/if}
-		{#if schemaKey.startsWith('requestHeader')}
-			<span class="grow" />
-			<div>
-				<button
-					on:click={toggleHeaderForExample}
 					class="group flex items-center space-x-2 py-2"
 				>
 					<span class="group-hover:underline">Simulate</span>
@@ -249,27 +236,58 @@
 
 			<Example {schemaKey} generate={() => generateExample(schemaKey, uapiSchema)} />
 		{:else if isHeaderData(data)}
-			<div
-				class="rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-			>
-				<div class="w-full border-gray-200 px-4 py-2 dark:border-gray-600">
-					<span class="rounded-sm bg-gray-600 px-2 py-1 font-mono"
-						>{data.name.split('.')[1]}</span
-					>
-					<span class="px-1">:</span>
-					<span class="rounded-full py-1">
-						<TypeRef types={data.data} />
-					</span>
+			<div>
+				{#if description}
+					<div class="docstring font-normal text-gray-700 dark:text-gray-400">
+						{@html description}
+					</div>
+				{/if}
+
+				<DocCardStructFields fields={data.requestData}>
+					<div slot="field" let:header>
+						<button
+							on:click={() => toggleHeaderForExample(header, schemaKey)}
+							class="group flex items-center space-x-2"
+						>
+							<span class="group-hover:underline">Simulate</span>
+							<div
+								class="rounded-lg px-1 group-hover:bg-sky-700 group-hover:text-cyan-300"
+							>
+								<MockIcon />
+							</div>
+						</button>
+					</div>
+				</DocCardStructFields>
+
+				{#if Object.keys(data.requestData).length > 0}
+					<Example
+						schemaKey={'request.' + schemaKey}
+						generate={() =>
+							generateHeaderExample(
+								'request',
+								Object.keys(data.requestData),
+								uapiSchema
+							)}
+					/>
+				{/if}
+				<div class="pl-4">
+					<span class="text-3xl text-emerald-500">→</span>
 				</div>
+
+				<DocCardStructFields fields={data.responseData} />
+
+				{#if Object.keys(data.responseData).length > 0}
+					<Example
+						schemaKey={'response.' + schemaKey}
+						generate={() =>
+							generateHeaderExample(
+								'response',
+								Object.keys(data.responseData),
+								uapiSchema
+							)}
+					/>
+				{/if}
 			</div>
-
-			{#if description}
-				<div class="docstring font-normal text-gray-700 dark:text-gray-400">
-					{@html description}
-				</div>
-			{/if}
-
-			<Example {schemaKey} generate={() => generateHeaderExample(schemaKey, uapiSchema)} />
 		{:else if description}
 			<div class="docstring font-normal text-gray-700 dark:text-gray-400">
 				{@html description}

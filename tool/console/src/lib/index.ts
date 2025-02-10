@@ -87,7 +87,8 @@ export interface HeaderData {
 	type: 'header';
 	name: string;
 	doc: string | string[];
-	data: any;
+	requestData: Record<string, any>;
+	responseData: Record<string, any>;
 }
 
 export function isFnTypeData(data: any): data is FnTypeData {
@@ -123,7 +124,7 @@ export function generateFnResultExample(
 	blueprintValue: any,
 	useBlueprintValue: boolean
 ) {
-	let exampleResult = (schemaInst.parsed[fn] as UFn).result.generateRandomValue(
+	let exampleResult = schemaInst.parsed[fn].result.generateRandomValue(
 		blueprintValue,
 		useBlueprintValue,
 		[],
@@ -132,29 +133,36 @@ export function generateFnResultExample(
 	return JSON.stringify(exampleResult, null, 2);
 }
 
-export function generateHeaderExample(schemaKey: string, schemaInst: uapi.UApiSchema) {
-	let [type, key] = schemaKey.split('.');
-	let header: any;
+export function generateHeaderExample(
+	headerType: 'request' | 'response',
+	headers: string[],
+	schemaInst: uapi.UApiSchema
+) {
 	console.log(`schemaInst.parsedRequestHeaders ${Object.keys(schemaInst.parsedRequestHeaders)}`);
-	if (type == 'requestHeader') {
-		header = schemaInst.parsedRequestHeaders[key]?.typeDeclaration?.generateRandomValue(
-			null,
-			false,
-			new _internal.GenerateContext(true, true, true, schemaKey, random)
-		);
-	} else if (type == 'responseHeader') {
-		header = schemaInst.parsedResponseHeaders[key]?.typeDeclaration?.generateRandomValue(
-			null,
-			false,
-			new _internal.GenerateContext(true, true, true, schemaKey, random)
-		);
-	} else {
-		throw Error(`Unknown header type ${schemaKey}`);
+	let genHeaders: Record<string, any> = {};
+	for (const header of headers) {
+		if (headerType == 'request') {
+			const genHeader = schemaInst.parsedRequestHeaders[
+				header
+			]?.typeDeclaration?.generateRandomValue(
+				null,
+				false,
+				new _internal.GenerateContext(true, true, true, 'fn.ping_', random)
+			);
+			genHeaders[header] = genHeader;
+		} else {
+			const genHeader = schemaInst.parsedResponseHeaders[
+				header
+			]?.typeDeclaration?.generateRandomValue(
+				null,
+				false,
+				new _internal.GenerateContext(true, true, true, 'fn.ping_', random)
+			);
+			genHeaders[header] = genHeader;
+		}
 	}
 
-	console.log(`Generated header ${header} for ${schemaKey}`);
-
-	return JSON.stringify({ [key]: header }, null, 2);
+	return JSON.stringify(genHeaders, null, 2);
 }
 
 export async function genExample(fn: string, headers: Array<string>, schemaInst: uapi.UApiSchema) {
@@ -301,17 +309,16 @@ export function parseUApiSchema(
 				exampleCallJson: exampleCallJson,
 				inheritedErrors: inheritedErrors
 			};
-		} else if (
-			schemaKey.startsWith('requestHeader') ||
-			schemaKey.startsWith('responseHeader')
-		) {
+		} else if (schemaKey.startsWith('headers')) {
 			let doc = e['///'];
-			let typeData = e[schemaKey];
+			let requestData = e[schemaKey];
+			let responseData = e['->'];
 			data = {
 				type: 'header',
 				name: schemaKey,
 				doc: doc,
-				data: typeData
+				requestData: requestData,
+				responseData: responseData
 			} as HeaderData;
 		} else {
 			data = e[schemaKey];
@@ -352,8 +359,7 @@ export function parseUApiSchema(
 }
 
 export function findSchemaKey(definition: Record<string, any>): string {
-	const regex =
-		'^(((fn|errors|info|requestHeader|responseHeader)|((struct|union|_ext)(<[0-2]>)?))\\..*)';
+	const regex = '^(((fn|errors|info|headers)|((struct|union|_ext)(<[0-2]>)?))\\..*)';
 	const matches: string[] = [];
 
 	for (const e of Object.keys(definition)) {
