@@ -4,14 +4,14 @@ import { getPathDocumentCoordinatesPseudoJson } from '../../internal/schema/GetP
 
 export function catchHeaderCollisions(
     uApiSchemaNameToPseudoJson: Record<string, any[]>,
-    headerkeys: Set<string>,
+    headerKeys: Set<string>,
     keysToIndex: Record<string, number>,
     schemaKeysToDocumentNames: Record<string, string>,
     documentNamesToJson: Record<string, string>,
 ): void {
     const parseFailures: SchemaParseFailure[] = [];
 
-    const headerKeysList = [...headerkeys];
+    const headerKeysList = [...headerKeys];
 
     headerKeysList.sort((k1, k2) => {
         const documentName1 = schemaKeysToDocumentNames[k1];
