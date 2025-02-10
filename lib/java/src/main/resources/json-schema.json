@@ -100,7 +100,7 @@
                 "minProperties": 2,
                 "patternProperties": {
                     "^fn\\.[a-zA-Z_]\\w*": {
-                        "description": "A function that accepts an argument argument and returns a result union that is either an Ok struct or an error union.",
+                        "description": "A function that accepts an argument struct and returns a result union that is either an `Ok_` struct or an error struct.",
                         "type": "object",
                         "additionalProperties": false,
                         "patternProperties": {

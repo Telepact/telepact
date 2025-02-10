@@ -11,7 +11,7 @@ public class FindSchemaKey {
 
     public static String findSchemaKey(String documentName, Map<String, Object> definition, int index,
             Map<String, String> documentNamesToJson) {
-        final var regex = "^(((fn|errors|requestHeader|responseHeader|info)|((struct|union|_ext)(<[0-2]>)?))\\..*)";
+        final var regex = "^(((fn|errors|headers|info)|((struct|union|_ext)(<[0-2]>)?))\\..*)";
         final var matches = new ArrayList<String>();
 
         final var keys = definition.keySet().stream().sorted().toList();

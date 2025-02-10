@@ -1,37 +1,95 @@
 package uapi.internal.schema;
 
-import static uapi.internal.schema.GetTypeUnexpectedParseFailure.getTypeUnexpectedParseFailure;
-import static uapi.internal.schema.ParseTypeDeclaration.parseTypeDeclaration;
+import uapi.internal.types.UFieldDeclaration;
+import uapi.internal.types.UHeaders;
+import uapi.UApiSchemaParseError;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
-import uapi.UApiSchemaParseError;
-import uapi.internal.types.UFieldDeclaration;
+import static uapi.internal.schema.ParseStructFields.parseStructFields;
 
 public class ParseHeadersType {
-    static UFieldDeclaration parseHeadersType(
+
+    public static UHeaders parseHeadersType(
             List<Object> path,
             Map<String, Object> headersDefinitionAsParsedJson,
             String schemaKey,
-            String headerField,
-            ParseContext ctx) {
-        var typeDeclarationValue = headersDefinitionAsParsedJson.get(schemaKey);
+            ParseContext ctx) throws UApiSchemaParseError {
+        List<SchemaParseFailure> parseFailures = new ArrayList<>();
+        Map<String, UFieldDeclaration> requestHeaders = new HashMap<>();
+        Map<String, UFieldDeclaration> responseHeaders = new HashMap<>();
 
-        if (!(typeDeclarationValue instanceof List)) {
-            throw new UApiSchemaParseError(
-                    getTypeUnexpectedParseFailure(ctx.documentName, path, typeDeclarationValue, "Array"),
-                    ctx.uApiSchemaDocumentNamesToJson);
+        Object requestHeadersDef = headersDefinitionAsParsedJson.get(schemaKey);
+
+        List<Object> thisPath = new ArrayList<>(path);
+        thisPath.add(schemaKey);
+
+        if (!(requestHeadersDef instanceof Map)) {
+            List<SchemaParseFailure> branchParseFailures = GetTypeUnexpectedParseFailure.getTypeUnexpectedParseFailure(
+                    ctx.documentName,
+                    thisPath,
+                    requestHeadersDef,
+                    "Object");
+            parseFailures.addAll(branchParseFailures);
+        } else {
+            try {
+                Map<String, UFieldDeclaration> requestFields = parseStructFields(thisPath,
+                        (Map<String, Object>) requestHeadersDef, ctx);
+
+                // All headers are optional
+                final var finalRequestFields = requestFields.entrySet().stream()
+                        .collect(Collectors.toMap(e -> e.getKey(), e -> new UFieldDeclaration(e.getValue().fieldName,
+                                e.getValue().typeDeclaration, true)));
+
+                requestHeaders.putAll(finalRequestFields);
+            } catch (UApiSchemaParseError e) {
+                parseFailures.addAll(e.schemaParseFailures);
+            }
         }
-        final List<Object> typeDeclarationArray = (List<Object>) typeDeclarationValue;
 
-        try {
-            final var typeDeclaration = parseTypeDeclaration(
-                    path, typeDeclarationArray, ctx);
+        String responseKey = "->";
+        List<Object> responsePath = new ArrayList<>(path);
+        responsePath.add(responseKey);
 
-            return new UFieldDeclaration(headerField, typeDeclaration, false);
-        } catch (UApiSchemaParseError e) {
-            throw new UApiSchemaParseError(e.schemaParseFailures, ctx.uApiSchemaDocumentNamesToJson);
+        if (!headersDefinitionAsParsedJson.containsKey(responseKey)) {
+            parseFailures.add(
+                    new SchemaParseFailure(ctx.documentName, responsePath, "RequiredObjectKeyMissing",
+                            Map.of("key", responseKey)));
         }
+
+        Object responseHeadersDef = headersDefinitionAsParsedJson.get(responseKey);
+
+        if (!(responseHeadersDef instanceof Map)) {
+            List<SchemaParseFailure> branchParseFailures = GetTypeUnexpectedParseFailure.getTypeUnexpectedParseFailure(
+                    ctx.documentName,
+                    thisPath,
+                    responseHeadersDef,
+                    "Object");
+            parseFailures.addAll(branchParseFailures);
+        } else {
+            try {
+                Map<String, UFieldDeclaration> responseFields = ParseStructFields.parseStructFields(responsePath,
+                        (Map<String, Object>) responseHeadersDef, ctx);
+
+                // All headers are optional
+                final var finalResponseFields = responseFields.entrySet().stream()
+                        .collect(Collectors.toMap(e -> e.getKey(), e -> new UFieldDeclaration(e.getValue().fieldName,
+                                e.getValue().typeDeclaration, true)));
+
+                responseHeaders.putAll(finalResponseFields);
+            } catch (UApiSchemaParseError e) {
+                parseFailures.addAll(e.schemaParseFailures);
+            }
+        }
+
+        if (!parseFailures.isEmpty()) {
+            throw new UApiSchemaParseError(parseFailures, ctx.uApiSchemaDocumentNamesToJson);
+        }
+
+        return new UHeaders(schemaKey, requestHeaders, responseHeaders);
     }
 }
