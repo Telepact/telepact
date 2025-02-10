@@ -12,8 +12,7 @@ def generate_random_union(blueprint_value: object, use_blueprint_value: bool,
                           union_tags_reference: dict[str, 'UStruct'], ctx: 'GenerateContext') -> object:
     from uapi.internal.generation.GenerateRandomStruct import generate_random_struct
 
-    # remove this comment
-    # more
+    # TODO: remove this comment, more
 
     if not use_blueprint_value:
         sorted_union_tags_reference = sorted(

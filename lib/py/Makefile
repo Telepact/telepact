@@ -1,22 +1,12 @@
-PYPROJECT = pyproject.toml
 VERSION_FILE = VERSION.txt
 SRC_FILES = $(shell find uapi -name '*.py' -o -name '*.toml' -o -name '*.json')
-BUILD_DIR = dist
-BUILD_MARKER = $(BUILD_DIR)/.built
+PYPROJECT_FILE = pyproject.toml
 
-.PHONY: all build clean
+.PHONY: all
 
-all: build
-
-build: $(BUILD_MARKER)
-
-$(BUILD_MARKER): $(VERSION_FILE)
-	poetry build --clean
-	touch $(BUILD_MARKER)
+all: $(VERSION_FILE)
 
 $(VERSION_FILE): $(SRC_FILES)
-	poetry run python version.py
-
-clean:
-	rm -rf dist/
-	rm -f $(VERSION_FILE)
+	@awk -F. '{print $$1"."$$2"."$$3+1}' $(VERSION_FILE) > $(VERSION_FILE).tmp && mv $(VERSION_FILE).tmp $(VERSION_FILE)
+	@sed -i '' 's/^version = ".*"/version = \"$(shell cat $(VERSION_FILE))\"/' $(PYPROJECT_FILE)
+	@echo "Version updated to $$(cat $(VERSION_FILE))"
