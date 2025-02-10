@@ -1,30 +1,14 @@
 PYPROJECT = pyproject.toml
-VERSION_FILE = VERSION.txt
 SRC_FILES = $(shell find uapicodegen -name '*.py' -o -name '*.toml' -o -name '*.j2')
-BUILD_DIR = dist
-BUILD_MARKER = $(BUILD_DIR)/.built
 DEP_VERSION_FILE = ../../lib/py/VERSION.txt
+UAPI_PYPROJECT = ../../lib/py/pyproject.toml
 
-.PHONY: all build clean check dep
+.PHONY: all dep
 
-all: dep check build
+all: dep $(PYPROJECT)
 
-build: $(BUILD_MARKER)
-
-$(BUILD_MARKER): $(VERSION_FILE)
-	poetry build --clean
-	touch $(BUILD_MARKER)
-
-$(VERSION_FILE): $(SRC_FILES) $(PYPROJECT)
-	poetry run python version.py
-
-$(PYPROJECT): $(DEP_VERSION_FILE)
-	poetry lock
-	poetry install
+${PYPROJECT}: $(SRC_FILES) $(UAPI_PYPROJECT)
+	@bump-patch-version || (echo "Install bump-patch-version with 'pipx install ../../tool/bump_patch_version'" && exit 1)
 
 dep:
 	cd ../../lib/py && make
-
-clean:
-	rm -rf dist/
-	rm -f $(VERSION_FILE)

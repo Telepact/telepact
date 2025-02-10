@@ -1,5 +1,5 @@
 BUILT = .built
-UAPI_DEP_VERSION_FILE = ../../../lib/py/VERSION.txt
+UAPI_DEP_VERSION_FILE = ../../../lib/py/pyproject.toml
 CODEGEN_DEP_VERSION_FILE = ../../../tool/uapicodegen/VERSION.txt
 
 .PHONY: all dep
