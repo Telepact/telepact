@@ -9,7 +9,7 @@ $(BUILT_FILE): $(CODEGEN_PYPROJECT)
 	poetry lock
 	poetry install
 	poetry run python -m uapicodegen --schema-dir ../../test/schema/example --lang java --out src/gen/java/uapitest --package uapitest
-	touch $(BUILT)
+	touch $(BUILT_FILE)
 
 dep:
 	cd ../../../tool/uapicodegen && make
