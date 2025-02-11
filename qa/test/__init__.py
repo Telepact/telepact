@@ -1,4 +1,4 @@
-import pytest
+# import pytest
 
-pytest.register_assert_rewrite("qa.test.util")
+# pytest.register_assert_rewrite("qa.test.util")
 

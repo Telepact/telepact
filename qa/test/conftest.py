@@ -1,16 +1,16 @@
 import subprocess
 import pytest
 import asyncio
-from qa.test.cases import cases as basic_cases
-from qa.test.binary_cases import cases as binary_cases
-from qa.test.binary_cases import binary_client_rotation_cases
-from qa.test.mock_cases import cases as mock_cases
-from qa.test.mock_cases import invalid_cases as mock_invalid_cases
-from qa.test.mockgen_cases import cases as mockgen_cases
-from qa.test.parse_cases import cases as parse_cases
-from qa.test.garbage_cases import cases as garbage_cases
-from qa.test.auth_cases import cases as auth_cases
-from qa.test.util import increment, ping, startup_check
+from cases import cases as basic_cases
+from binary_cases import cases as binary_cases
+from binary_cases import binary_client_rotation_cases
+from mock_cases import cases as mock_cases
+from mock_cases import invalid_cases as mock_invalid_cases
+from mockgen_cases import cases as mockgen_cases
+from parse_cases import cases as parse_cases
+from garbage_cases import cases as garbage_cases
+from auth_cases import cases as auth_cases
+from util import increment, ping, startup_check
 import json
 import importlib
 import nats
