@@ -47,7 +47,7 @@ def _regex_replace(s: str, find: str, replace: str) -> str:
 
 def _find_schema_key(schema_data: dict[str, object]) -> str:
     for key in schema_data:
-        if key.startswith("struct") or key.startswith("union") or key.startswith("fn") or key.startswith("requestHeader") or key.startswith("responseHeader") or key.startswith('info'):
+        if key.startswith("struct") or key.startswith("union") or key.startswith("fn") or key.startswith("headers") or key.startswith('info'):
             return key
     raise Exception("No schema key found for " + str(schema_data.keys()))
 
@@ -105,7 +105,7 @@ def _generate_internal(schema_data: list[dict[str, object]], target: str, output
 
         for schema_entry in schema_data:
             schema_key = _find_schema_key(schema_entry)
-            if schema_key.startswith('info') or schema_key.startswith('requestHeader') or schema_key.startswith('responseHeader'):
+            if schema_key.startswith('info') or schema_key.startswith('headers'):
                 continue
 
             if schema_key.startswith("fn"):

@@ -1,11 +1,11 @@
-BUILT = .built
-CODEGEN_DEP_VERSION_FILE = ../../../tool/uapicodegen/VERSION.txt
+BUILT_FILE = .built
+CODEGEN_PYPROJECT = ../../../tool/uapicodegen/pyproject.toml
 
 .PHONY: all dep
 
-all: dep $(BUILT)
+all: dep $(BUILT_FILE)
 
-$(BUILT): $(CODEGEN_DEP_VERSION_FILE)
+$(BUILT_FILE): $(CODEGEN_PYPROJECT)
 	poetry lock
 	poetry install
 	poetry run python -m uapicodegen --schema-dir ../../test/schema/example --lang java --out src/gen/java/uapitest --package uapitest
