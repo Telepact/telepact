@@ -14,7 +14,8 @@ import {
     UApiSchemaFiles
 } from "uapi";
 import { NatsConnection, connect, Subscription } from "nats";
-import fs from "fs";
+import * as fs from "fs";
+import * as path from 'path';
 import { min, max, mean, median, quantile } from "simple-statistics";
 import { ClientInterface_, test } from "./gen/all_.js";
 import { CodeGenHandler } from "./codeGenHandler.js";
@@ -160,7 +161,7 @@ function startMockTestServer(
     frontdoorTopic: string,
     config: Record<string, any>,
 ): Subscription {
-    const uApi = MockUApiSchema.fromDirectory(apiSchemaPath);
+    const uApi = MockUApiSchema.fromDirectory(apiSchemaPath, fs, path);
 
     const options: MockServerOptions = new MockServerOptions();
     options.onError = (e: Error) => console.error(e);
@@ -207,7 +208,7 @@ function startSchemaTestServer(
     frontdoorTopic: string,
     config?: Record<string, any>,
 ): Subscription {
-    const uApi: UApiSchema = UApiSchema.fromDirectory(apiSchemaPath);
+    const uApi: UApiSchema = UApiSchema.fromDirectory(apiSchemaPath, fs, path);
 
     const timer = registry.createTimer(frontdoorTopic);
 
@@ -237,7 +238,7 @@ function startSchemaTestServer(
             } else if (inputTag === "Directory") {
                 const unionValue = input[inputTag];
                 const schemaDirectory = unionValue["schemaDirectory"];
-                UApiSchema.fromDirectory(schemaDirectory);
+                UApiSchema.fromDirectory(schemaDirectory, fs, path);
             } else {
                 throw new Error("Invalid input tag");
             }
@@ -295,7 +296,7 @@ function startTestServer(
     authRequired: boolean,
     useCodegen: boolean
 ): Subscription {
-    const files = new UApiSchemaFiles(apiSchemaPath);
+    const files = new UApiSchemaFiles(apiSchemaPath, fs, path);
     const alternateMap: Record<string, string> = { ...files.filenamesToJson };
     alternateMap['backwardsCompatibleChange'] = `
         [

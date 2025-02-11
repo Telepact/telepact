@@ -12,6 +12,7 @@ export * from './UApiSchema';
 export * from './MockUApiSchema';
 export * from './UApiSchemaParseError';
 export * from './UApiSchemaFiles';
+export * from './fileSystem';
 export { default as jsonSchema } from '../inc/json-schema.json';
 
 import { GenerateContext } from './internal/generation/GenerateContext';

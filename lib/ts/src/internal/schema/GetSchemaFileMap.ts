@@ -1,7 +1,6 @@
-import * as fs from 'fs';
-import * as path from 'path';
+import { FsModule, PathModule } from '../../fileSystem';
 
-export function getSchemaFileMap(directory: string): Record<string, string> {
+export function getSchemaFileMap(directory: string, fs: FsModule, path: PathModule): Record<string, string> {
     const finalJsonDocuments: Record<string, string> = {};
 
     const paths = fs.readdirSync(directory).map((file) => path.join(directory, file));

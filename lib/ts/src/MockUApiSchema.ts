@@ -2,6 +2,7 @@ import { UFieldDeclaration } from './internal/types/UFieldDeclaration';
 import { UType } from './internal/types/UType';
 import { createMockUApiSchemaFromFileJsonMap } from './internal/schema/CreateMockUApiSchemaFromFileJsonMap';
 import { getSchemaFileMap } from './internal/schema/GetSchemaFileMap';
+import { FsModule, PathModule } from './fileSystem';
 
 export class MockUApiSchema {
     /**
@@ -36,8 +37,8 @@ export class MockUApiSchema {
         return createMockUApiSchemaFromFileJsonMap(jsonDocuments);
     }
 
-    static fromDirectory(directory: string): MockUApiSchema {
-        const m = getSchemaFileMap(directory);
+    static fromDirectory(directory: string, fs: FsModule, path: PathModule): MockUApiSchema {
+        const m = getSchemaFileMap(directory, fs, path);
         return createMockUApiSchemaFromFileJsonMap(m);
     }
 }

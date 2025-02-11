@@ -2,6 +2,7 @@ import { createUApiSchemaFromFileJsonMap } from './internal/schema/CreateUApiSch
 import { getSchemaFileMap } from './internal/schema/GetSchemaFileMap';
 import { UFieldDeclaration } from './internal/types/UFieldDeclaration';
 import { UType } from './internal/types/UType';
+import { FsModule, PathModule } from './fileSystem';
 
 export class UApiSchema {
     /**
@@ -36,8 +37,13 @@ export class UApiSchema {
         return createUApiSchemaFromFileJsonMap(fileJsonMap);
     }
 
-    static fromDirectory(directory: string): UApiSchema {
-        const m = getSchemaFileMap(directory);
+    /**
+     * @param fs - node fs
+     * @param path - node path
+     */
+    static fromDirectory(directory: string, fs: FsModule, path: PathModule): UApiSchema {
+        // TODO
+        const m = getSchemaFileMap(directory, fs, path);
         return createUApiSchemaFromFileJsonMap(m);
     }
 }
