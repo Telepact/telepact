@@ -1,8 +1,5 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
-import path from 'path';
-
-const stub = path.resolve(__dirname, 'stub.js');
 
 export default defineConfig({
 	plugins: [sveltekit()],
@@ -15,10 +12,7 @@ export default defineConfig({
 		}
 	},
 	resolve: {
-		alias: {
-			fs: stub,
-			module: stub
-		}
+		alias: { fs: 'data:text/javascript,export default {};' }
 	},
 	server: {
 		fs: {

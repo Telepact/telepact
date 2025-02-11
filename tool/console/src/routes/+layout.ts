@@ -5,6 +5,7 @@ import {
 	MockServerOptions,
 	ServerOptions,
 	Server,
+	Serializer,
 	UApiSchema,
 	Message,
 	MockUApiSchema
@@ -18,6 +19,7 @@ import estreePlugin from 'prettier/plugins/estree';
 import babelPlugin from 'prettier/plugins/babel';
 
 export const ssr = false;
+export const prerender = true;
 
 export const load: LayoutLoad = async ({ url, params, route, fetch }) => {
 	console.log('layout load');
@@ -43,7 +45,7 @@ export const load: LayoutLoad = async ({ url, params, route, fetch }) => {
 		};
 		let mockServer = new MockServer(uapiSchema, mockServerOptions);
 
-		let mockClient = new Client(async (m, s) => {
+		let mockClient = new Client(async (m: Message, s: Serializer) => {
 			let req = s.serialize(m);
 			let res = await mockServer.process(req);
 			return s.deserialize(res);
@@ -56,7 +58,7 @@ export const load: LayoutLoad = async ({ url, params, route, fetch }) => {
 			readonlyEditor: false
 		};
 	} else if (schemaSource?.startsWith('http')) {
-		let client = new Client(async (m, s) => {
+		let client = new Client(async (m: Message, s: Serializer) => {
 			let req = s.serialize(m);
 			let res = await fetch(schemaSource, {
 				method: 'POST',
@@ -107,7 +109,7 @@ export const load: LayoutLoad = async ({ url, params, route, fetch }) => {
 		};
 		let server = new Server(uapiSchema, handler, serverOptions);
 
-		let client = new Client(async (m, s) => {
+		let client = new Client(async (m: Message, s: Serializer) => {
 			let req = s.serialize(m);
 			let res = await server.process(req);
 			return s.deserialize(res);

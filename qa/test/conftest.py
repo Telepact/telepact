@@ -12,10 +12,8 @@ from garbage_cases import cases as garbage_cases
 from auth_cases import cases as auth_cases
 from util import increment, ping, startup_check
 import json
-import importlib
 import nats
 import os
-import pathlib
 
 
 def get_lib_modules():
