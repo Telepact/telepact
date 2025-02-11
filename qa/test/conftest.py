@@ -15,6 +15,7 @@ import json
 import importlib
 import nats
 import os
+import pathlib
 
 
 def get_lib_modules():
@@ -75,10 +76,13 @@ def nats_client(loop, nats_server):
 def dispatcher_server(loop, nats_server, request, nats_client):
     nats_url = nats_server
     lib_name = request.param
-    test_module_name = 'qa.lib.{}.build_test'.format(lib_name)
-    l = importlib.import_module(test_module_name, package="..")
 
-    s: subprocess.Popen = l.start(nats_url)
+    env_vars = os.environ.copy()
+    del env_vars['VIRTUAL_ENV']
+    env_vars['NATS_URL'] = nats_url
+
+    path = '../lib/' + lib_name
+    s = subprocess.Popen(['./setup.sh'], cwd=path, env=env_vars)
 
     try:
         startup_check(loop, lambda: ping(nats_client, lib_name), times=20)
