@@ -21,10 +21,18 @@ import babelPlugin from 'prettier/plugins/babel';
 export const ssr = false;
 export const prerender = true;
 
+declare global {
+	interface Window {
+		getAuthHeader: () => Promise<Record<string, object>>;
+	}
+}
+
 export const load: LayoutLoad = async ({ url, params, route, fetch }) => {
 	console.log('layout load');
 	let schemaSource = url.searchParams.get('s') ?? '';
 	let showInternalApi = url.searchParams.get('i') === '1';
+
+	const getAuthHeader = window.getAuthHeader;
 
 	let result: {
 		client?: Client;
@@ -59,6 +67,11 @@ export const load: LayoutLoad = async ({ url, params, route, fetch }) => {
 		};
 	} else if (schemaSource?.startsWith('http')) {
 		let client = new Client(async (m: Message, s: Serializer) => {
+			if (getAuthHeader !== undefined) {
+				let authHeader = await getAuthHeader();
+				m.headers['auth_'] = authHeader;
+			}
+
 			let req = s.serialize(m);
 			let res = await fetch(schemaSource, {
 				method: 'POST',

@@ -25,6 +25,14 @@ export const stockPingResponse = `[
 
 const random = new uapi.RandomGenerator(2, 2);
 
+declare global {
+	interface Window {
+		authHook: () => void;
+	}
+}
+
+const authHook = window.authHook;
+
 export function minifyJson(json: string) {
 	let pseudoJson = JSON.parse(json);
 	return JSON.stringify(pseudoJson);
