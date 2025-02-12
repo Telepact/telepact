@@ -1,0 +1,13 @@
+{
+  "name": "uapi-wrapped",
+  "version": "1.0.0",
+  "description": "A Dart library for wrapping an npm package.",
+  "main": "index.js",
+  "private": true,
+  "dependencies": {
+    "uapi": "workspace:*"
+  },
+  "workspaces": [
+    "../uapi"
+  ]
+}
