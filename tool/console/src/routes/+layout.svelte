@@ -50,6 +50,9 @@
 	let filteredSchemaPseudoJsonPromise: Promise<any[]>;
 	$: filteredSchemaPseudoJsonPromise = $page.data.filteredSchemaPseudoJson;
 
+	let authManaged: boolean;
+	$: authManaged = $page.data.authManaged;
+
 	console.log(`page.data`, $page.data);
 
 	let selectedViews: string;
@@ -469,7 +472,7 @@
 							<MonacoEditor
 								id="request"
 								readOnly={false}
-								json={unMinifyJson(request)}
+								json={unMinifyJson(request, authManaged)}
 								ctrlEnter={() => thisHandleRequest()}
 								filename="request.json"
 								bind:this={requestEditor}

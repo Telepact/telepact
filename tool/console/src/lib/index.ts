@@ -25,24 +25,21 @@ export const stockPingResponse = `[
 
 const random = new uapi.RandomGenerator(2, 2);
 
-declare global {
-	interface Window {
-		authHook: () => void;
-	}
-}
-
-const authHook = window.authHook;
-
 export function minifyJson(json: string) {
 	let pseudoJson = JSON.parse(json);
 	return JSON.stringify(pseudoJson);
 }
 
-export function unMinifyJson(json: string | null) {
+export function unMinifyJson(json: string | null, authManaged: boolean = false) {
 	if (!json) {
 		return stockPingRequest;
 	}
 	let pseudoJson = JSON.parse(json);
+
+	if (authManaged) {
+		pseudoJson[0]['auth_'] = '{{managed}}';
+	}
+
 	return JSON.stringify(pseudoJson, null, 2);
 }
 

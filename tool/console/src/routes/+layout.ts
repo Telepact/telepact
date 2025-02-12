@@ -33,6 +33,9 @@ export const load: LayoutLoad = async ({ url, params, route, fetch }) => {
 	let showInternalApi = url.searchParams.get('i') === '1';
 
 	const getAuthHeader = window.getAuthHeader;
+	const authManaged = getAuthHeader !== undefined;
+
+	console.log(`authManaged ${authManaged}`);
 
 	let result: {
 		client?: Client;
@@ -186,11 +189,13 @@ export const load: LayoutLoad = async ({ url, params, route, fetch }) => {
 			...result,
 			fullUApiSchemaRef: finalFullUApiSchemaRef,
 			filteredSchemaPseudoJson: filteredSchemaPseudoJson,
-			schemaDraft: formattedSchemaDraft
+			schemaDraft: formattedSchemaDraft,
+			authManaged: authManaged
 		};
 	} else {
 		return {
-			...result
+			...result,
+			authManaged: authManaged
 		};
 	}
 };
