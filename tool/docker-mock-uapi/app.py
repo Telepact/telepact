@@ -83,10 +83,14 @@ async def startup_event():
 
         api_json = json.dumps(api)
 
+
         schema = MockUApiSchema.from_json(api_json)
     elif uapi_directory_env_var_is_set:
         directory: str = get_uapi_directory_env_var()
         schema = MockUApiSchema.from_directory(directory)
+
+    print('uAPI JSON:')
+    print(schema.original)
 
     mock_server_options = MockServer.Options()
     global mock_server
