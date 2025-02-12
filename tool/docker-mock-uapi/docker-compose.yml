@@ -2,22 +2,25 @@ version: '3.8'
 
 services:
   app:
-    build: .
+    build: 
+      context: ../..
+      dockerfile: tool/docker-mock-uapi/Dockerfile
     ports:
       - "8080:8080"
     volumes:
-      - .:/app
       - ../../qa/test/schema/calculator:/app/schema
     environment:
       PYTHONUNBUFFERED: 1
       UAPI_DIRECTORY: /app/schema
 
   app2:
-    build: .
+    build: 
+      context: ../..
+      dockerfile: tool/docker-mock-uapi/Dockerfile
     ports:
       - "8081:8080"
     volumes:
-      - .:/app
+      - ../../qa/test/schema/calculator:/app/schema
     environment:
       PYTHONUNBUFFERED: 1
       UAPI_URL: http://app:8080/api

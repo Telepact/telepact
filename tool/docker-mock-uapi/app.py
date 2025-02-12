@@ -11,23 +11,29 @@ import asyncio
 import json
 import os
 import requests
+from fastapi.responses import Response
+from fastapi import FastAPI, Query, Request
+
 
 app = FastAPI()
 
-mock_server: MockServer
+global mock_server
 
 
 @app.post('/api')
-async def post_endpoint(request: Request) -> Tuple[bytes, int]:
+async def post_endpoint(request: Request) -> Response:
     request_bytes = await request.body()
     # Process the data and request_bytes as needed
 
     response_bytes = await mock_server.process(request_bytes)
 
-    return response_bytes, 201
+    media_type = 'application/octet-stream' if response_bytes[0] == 0x92 else 'application/json'
+
+    return Response(content=response_bytes, media_type=media_type)
 
 
-async def main_handler() -> None:
+@app.on_event('startup')
+async def startup_event():
     uapi_url_env_var_is_set = 'UAPI_URL' in os.environ
 
     def get_uapi_url_env_var() -> str:
@@ -60,7 +66,16 @@ async def main_handler() -> None:
 
         uapi_client = Client(adapter, options)
 
-        response_message = await uapi_client.request(Message({}, {'fn.api_': {}}))
+        retries = 3
+        for attempt in range(retries):
+            try:
+                response_message = await uapi_client.request(Message({}, {'fn.api_': {}}))
+                break
+            except Exception as e:
+                if attempt < retries - 1:
+                    await asyncio.sleep(1)
+                else:
+                    raise e
 
         if 'Ok_' not in response_message.body:
             raise Exception("Invalid url: " + str(response_message))
@@ -77,9 +92,7 @@ async def main_handler() -> None:
     global mock_server
     mock_server = MockServer(schema, mock_server_options)
 
-    import uvicorn
-    uvicorn.run(app, host='0.0.0.0', port=8080)
-
 
 if __name__ == '__main__':
-    asyncio.run(main_handler())
+    import uvicorn
+    uvicorn.run(app, host='0.0.0.0', port=8080)
