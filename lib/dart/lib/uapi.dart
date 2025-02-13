@@ -1,3 +1,3 @@
-library <project_name>;
+library uapi;
 
 export 'bindings.dart';

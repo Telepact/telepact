@@ -1,63 +1,15 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:async';
-import 'package:nats/nats.dart';
-import 'package:simple_statistics/simple_statistics.dart';
-import 'package:path/path.dart' as path;
-
-class Timer {
-  List<double> values = [];
-
-  Function startTimer() {
-    final start = DateTime.now().millisecondsSinceEpoch;
-    return () {
-      final end = DateTime.now().millisecondsSinceEpoch;
-      values.add(end - start);
-    };
-  }
-}
-
-class Registry {
-  Map<String, Timer> timers = {};
-
-  Timer createTimer(String name) {
-    final timer = Timer();
-    timers[name] = timer;
-    return timer;
-  }
-
-  void report() {
-    for (final entry in timers.entries) {
-      final name = entry.key;
-      final timer = entry.value;
-      final fileName = './metrics/$name.csv';
-
-      if (!File(fileName).existsSync()) {
-        try {
-          Directory('./metrics').createSync();
-        } catch (e) {}
-
-        final header = 'count,min,max,mean,median,p75,p95,p99\n';
-        File(fileName).writeAsStringSync(header);
-      }
-
-      final v = timer.values;
-      final row = '${v.length},${min(v)},${max(v)},${mean(v)},${median(v)},${quantile(v, 0.75)},${quantile(v, 0.95)},${quantile(v, 0.99)}\n';
-
-      File(fileName).writeAsStringSync(row, mode: FileMode.append);
-    }
-  }
-}
+import 'package:dart_nats/dart_nats.dart';
+import 'package:uapi/uapi.dart';
 
 Future<Subscription> startClientTestServer(
     NatsConnection connection,
-    Registry registry,
     String clientFrontdoorTopic,
     String clientBackdoorTopic,
     bool defaultBinary,
     bool useCodegen) async {
-  final timer = registry.createTimer(clientBackdoorTopic);
-
   final adapter = (Message m, Serializer s) async {
     try {
       Uint8List requestBytes;
@@ -110,7 +62,6 @@ Future<Subscription> startClientTestServer(
     final argument = entry.value;
 
     Message response;
-    final time = timer.startTimer();
     try {
       if (useCodegen && functionName == 'fn.test') {
         final result = await genClient.test(requestHeaders, test.Input(requestBody));
@@ -122,7 +73,6 @@ Future<Subscription> startClientTestServer(
         response = await client.request(request);
       }
     } finally {
-      time();
     }
 
     final responsePseudoJson = [response.headers, response.body];
@@ -139,7 +89,6 @@ Future<Subscription> startClientTestServer(
 
 Future<Subscription> startMockTestServer(
     NatsConnection connection,
-    Registry registry,
     String apiSchemaPath,
     String frontdoorTopic,
     Map<String, dynamic> config) async {
@@ -156,8 +105,6 @@ Future<Subscription> startMockTestServer(
       ..enableMessageResponseGeneration = config['enableGen'];
   }
 
-  final timer = registry.createTimer(frontdoorTopic);
-
   final server = MockServer(uApi, options);
 
   final subscription = await connection.subscribe(frontdoorTopic);
@@ -167,11 +114,9 @@ Future<Subscription> startMockTestServer(
     print('    ->S ${utf8.decode(requestBytes)}');
 
     Uint8List responseBytes;
-    final time = timer.startTimer();
     try {
       responseBytes = await server.process(requestBytes);
     } finally {
-      time();
     }
 
     print('    <-S ${utf8.decode(responseBytes)}');
@@ -184,12 +129,9 @@ Future<Subscription> startMockTestServer(
 
 Future<Subscription> startSchemaTestServer(
     NatsConnection connection,
-    Registry registry,
     String apiSchemaPath,
     String frontdoorTopic) async {
   final uApi = UApiSchema.fromDirectory(apiSchemaPath, FileSystemEntity, path);
-
-  final timer = registry.createTimer(frontdoorTopic);
 
   final handler = (Message requestMessage) async {
     final requestBody = requestMessage.body;
@@ -241,11 +183,9 @@ Future<Subscription> startSchemaTestServer(
     print('    ->S ${utf8.decode(requestBytes)}');
 
     Uint8List responseBytes;
-    final time = timer.startTimer();
     try {
       responseBytes = await server.process(requestBytes);
     } finally {
-      time();
     }
 
     print('    <-S ${utf8.decode(responseBytes)}');
@@ -258,7 +198,6 @@ Future<Subscription> startSchemaTestServer(
 
 Future<Subscription> startTestServer(
     NatsConnection connection,
-    Registry registry,
     String apiSchemaPath,
     String frontdoorTopic,
     String backdoorTopic,
@@ -277,7 +216,6 @@ Future<Subscription> startTestServer(
   final uApi = UApiSchema.fromFileJsonMap(files.filenamesToJson);
   final alternateUApi = UApiSchema.fromFileJsonMap(alternateMap);
 
-  final timer = registry.createTimer(frontdoorTopic);
   final serveAlternateServer = ValueNotifier<bool>(false);
 
   final codeGenHandler = CodeGenHandler();
@@ -353,7 +291,6 @@ Future<Subscription> startTestServer(
 
     print('    ->S ${utf8.decode(requestBytes)}');
     Uint8List responseBytes;
-    final time = timer.startTimer();
     try {
       if (serveAlternateServer.value) {
         responseBytes = await alternateServer.process(requestBytes);
@@ -361,7 +298,6 @@ Future<Subscription> startTestServer(
         responseBytes = await server.process(requestBytes);
       }
     } finally {
-      time();
     }
 
     print('    <-S ${utf8.decode(responseBytes)}');
@@ -380,7 +316,6 @@ Future<void> runDispatcherServer() async {
     throw Exception('NATS_URL env var not set');
   }
 
-  final registry = Registry();
   final servers = <String, Subscription>{};
 
   final connection = await Nats.connect(natsUrl);
@@ -424,7 +359,7 @@ Future<void> runDispatcherServer() async {
           final useCodegen = payload['useCodeGen'] ?? false;
 
           final d = await startTestServer(
-              connection, registry, apiSchemaPath, frontdoorTopic, backdoorTopic, authRequired, useCodegen);
+              connection, apiSchemaPath, frontdoorTopic, backdoorTopic, authRequired, useCodegen);
 
           servers[id] = d;
           break;
@@ -436,7 +371,7 @@ Future<void> runDispatcherServer() async {
           final useCodegen = payload['useCodeGen'] ?? false;
 
           final d = await startClientTestServer(
-              connection, registry, clientFrontdoorTopic, clientBackdoorTopic, useBinary, useCodegen);
+              connection, clientFrontdoorTopic, clientBackdoorTopic, useBinary, useCodegen);
 
           servers[id] = d;
           break;
@@ -445,7 +380,7 @@ Future<void> runDispatcherServer() async {
           final apiSchemaPath = payload['apiSchemaPath'] as String;
           final frontdoorTopic = payload['frontdoorTopic'] as String;
           final config = payload['config'] as Map<String, dynamic>;
-          final d = await startMockTestServer(connection, registry, apiSchemaPath, frontdoorTopic, config);
+          final d = await startMockTestServer(connection, apiSchemaPath, frontdoorTopic, config);
 
           servers[id] = d;
           break;
@@ -453,7 +388,7 @@ Future<void> runDispatcherServer() async {
           final id = payload['id'] as String;
           final apiSchemaPath = payload['apiSchemaPath'] as String;
           final frontdoorTopic = payload['frontdoorTopic'] as String;
-          final d = await startSchemaTestServer(connection, registry, apiSchemaPath, frontdoorTopic);
+          final d = await startSchemaTestServer(connection, apiSchemaPath, frontdoorTopic);
 
           servers[id] = d;
           break;
@@ -479,8 +414,6 @@ Future<void> runDispatcherServer() async {
   });
 
   await done.future;
-
-  registry.report();
 
   print('Dispatcher exiting');
 }

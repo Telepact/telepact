@@ -1,6 +1,5 @@
 import 'package:node_interop/node.dart';
 import 'package:node_interop/util.dart';
-import 'package:node_io/node_io.dart';
 
 final dynamic _npmPackage = require('uapi');
 
@@ -46,12 +45,12 @@ class Checksum {
       : _instance = callConstructor(getProperty(_npmPackage, 'Checksum'), [value, expiration]);
 }
 
-interface ClientBinaryStrategy {
+abstract class ClientBinaryStrategy {
     void updateChecksum(String newChecksum);
     dynamic getCurrentChecksums();
 }
 
-class DefaultClientBinaryStrategy implements ClientBinaryStrategy {
+class DefaultClientBinaryStrategy extends ClientBinaryStrategy {
   final dynamic _instance;
 
   DefaultClientBinaryStrategy()
@@ -66,14 +65,14 @@ class DefaultClientBinaryStrategy implements ClientBinaryStrategy {
   }
 }
 
-interface Serialization {
+abstract class Serialization {
     Uint8List toJson(dynamic uapiMessage);
     Uint8List toMsgpack(dynamic uapiMessage);
     dynamic fromJson(Uint8List bytes);
     dynamic fromMsgpack(Uint8List bytes);
 }
 
-class DefaultSerialization {
+class DefaultSerialization extends Serialization {
   final dynamic _instance;
 
   DefaultSerialization()
@@ -222,13 +221,6 @@ class UApiSchemaFiles {
 
   UApiSchemaFiles(String directory, dynamic fs, dynamic path)
       : _instance = callConstructor(getProperty(_npmPackage, 'UApiSchemaFiles'), [directory, fs, path]);
-}
-
-// Bindings for ClientBinaryStrategy class
-class ClientBinaryStrategy {
-  final dynamic _instance;
-
-  ClientBinaryStrategy() : _instance = callConstructor(getProperty(_npmPackage, 'ClientBinaryStrategy'), []);
 }
 
 // Bindings for BinaryEncoderUnavailableError class

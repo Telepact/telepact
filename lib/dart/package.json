@@ -8,6 +8,6 @@
     "uapi": "workspace:*"
   },
   "workspaces": [
-    "../uapi"
+    "../ts"
   ]
 }

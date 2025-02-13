@@ -8,3 +8,4 @@ environment:
 dependencies:
   uapi:
     path: ../../../lib/dart
+  dart_nats: ^0.6.5
