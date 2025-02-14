@@ -6,3 +6,6 @@ environment:
 
 dependencies:
   node_interop: ^2.1.0
+
+dev_dependencies:
+  test: ^1.16.0
