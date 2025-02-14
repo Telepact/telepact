@@ -11,7 +11,9 @@
             "program": "test",
             "args": [
                 "-p",
-                "chrome"
+                "chrome",
+                "--precompiled=web",
+                "--chrome-arg=--headless=false"
             ]
         }
     ]

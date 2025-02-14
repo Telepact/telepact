@@ -8,21 +8,17 @@ import 'package:test/test.dart';
 import 'package:uapi/uapi.dart';
 import 'dart:typed_data';
 
-Future<void> loadJavaScript(String src) {
-  final script = ScriptElement()
-    ..type = 'application/javascript'
-    ..src = src;
-  document.body?.append(script);
-  return script.onLoad.first;
-}
-
 void main() {
   group('Server', () {
-    setUpAll(() async {
-      await loadJavaScript('index.cjs.js');
-    });
-
     test('should process request message bytes', () async {
+      // Print all files loaded in the browser
+      print(window.document.getElementsByTagName('script'));
+
+      // Print the names of the javascript files loaded in the browser
+      print(window.document
+          .getElementsByTagName('script')
+          .map((e) => (e as ScriptElement).src));
+
       final uapiPseudoJson = [
         {
           "struct.Data": {
@@ -32,9 +28,6 @@ void main() {
       ];
       final uapiJson = jsonEncode(uapiPseudoJson);
       final uapiSchema = UApiSchema.fromJson(uapiJson);
-      if (uapiSchema == null) {
-        fail('uapiSchema is null');
-      }
 
       JSPromise handler(Message requestMessage) {
         return Future.value(Message(JSObject(), JSObject())).toJS;
@@ -42,9 +35,6 @@ void main() {
 
       final serverOptions = ServerOptions()..authRequired = false;
       final server = Server(uapiSchema, handler.toJS, serverOptions);
-      if (server == null) {
-        fail('server is null');
-      }
 
       final requestMessageBytes = Uint8List.fromList([1, 2, 3]);
       dynamic request = [
