@@ -1,17 +1,9 @@
-@JS()
-library uapi;
-
-import 'package:js/js.dart';
+import 'dart:js_interop';
 import 'dart:typed_data';
 
-@JS('uapi.RandomGenerator')
-class RandomGenerator {
-  external int seed;
-  external int collectionLengthMin;
-  external int collectionLengthMax;
-  external int count;
-
-  external RandomGenerator(int collectionLengthMin, int collectionLengthMax);
+extension type RandomGenerator._(JSObject _) implements JSObject {
+  external factory RandomGenerator(
+      int collectionLengthMin, int collectionLengthMax);
   external void setSeed(int seed);
   external int nextInt();
   external int nextIntWithCeiling(int ceiling);
@@ -21,94 +13,100 @@ class RandomGenerator {
   external int nextCollectionLength();
 }
 
-@JS('uapi.Checksum')
-class Checksum {
+extension type Checksum._(JSObject _) implements JSObject {
   external String value;
   external int expiration;
 
   external Checksum(String value, int expiration);
 }
 
-@JS('uapi.DefaultClientBinaryStrategy')
-class DefaultClientBinaryStrategy {
-  external Checksum primary;
-  external Checksum secondary;
-  external DateTime lastUpdate;
+extension type DefaultClientBinaryStrategy._(JSObject _) implements JSObject {
+  external Checksum get primary;
+  external Checksum get secondary;
 
-  external DefaultClientBinaryStrategy();
+  external factory DefaultClientBinaryStrategy();
   external void updateChecksum(String newChecksum);
-  external List<Checksum> getCurrentChecksums();
+  external JSArray<JSNumber> getCurrentChecksums();
 }
 
-@JS('uapi.Message')
-class Message {
-  external Map<String, dynamic> headers;
-  external Map<String, dynamic> body;
+extension type Message._(JSObject _) implements JSObject {
+  external JSObject get headers;
+  external JSObject get body;
 
-  external Message(Map<String, dynamic> headers, Map<String, dynamic> body);
-  external String getBodyTarget();
-  external dynamic getBodyPayload();
+  external factory Message(JSObject headers, JSObject body);
 }
 
-@JS('uapi.DefaultSerialization')
-class DefaultSerialization {
-  external DefaultSerialization();
-  external Uint8List toJson(dynamic uapiMessage);
-  external Uint8List toMsgpack(dynamic uapiMessage);
-  external dynamic fromJson(Uint8List bytes);
-  external dynamic fromMsgpack(Uint8List bytes);
+extension type DefaultSerialization._(JSObject _) implements JSObject {
+  external factory DefaultSerialization();
+  external JSUint8Array toJson(JSAny uapiMessage);
+  external JSUint8Array toMsgpack(JSAny uapiMessage);
+  external JSAny fromJson(JSUint8Array bytes);
+  external JSAny fromMsgpack(JSUint8Array bytes);
 }
 
-@JS('uapi.Serializer')
-class Serializer {
-  external Serializer(
-      DefaultSerialization serializationImpl, dynamic binaryEncoder);
-  external Uint8List serialize(Message message);
-  external Message deserialize(Uint8List messageBytes);
+extension type Serializer._(JSObject _) implements JSObject {
+  external factory Serializer(
+      DefaultSerialization serializationImpl, JSAny binaryEncoder);
+  external JSUint8Array serialize(Message message);
+  external Message deserialize(JSUint8Array messageBytes);
 }
 
-@JS('uapi.Client')
-class Client {
-  external Client(dynamic adapter, dynamic options);
-  external Future<Message> request(Message requestMessage);
+extension type Client._(JSObject _) implements JSObject {
+  external factory Client(
+      JSExportedDartFunction adapter, ClientOptions options);
+  external JSPromise<Message> request(Message requestMessage);
 }
 
-@JS('uapi.Server')
-class Server {
-  external Server(dynamic uApiSchema, dynamic handler, dynamic options);
-  external Future<Uint8List> process(Uint8List requestMessageBytes);
+extension type ClientOptions._(JSObject _) implements JSObject {
+  external bool get useBinary;
+  external bool get alwaysSendJson;
+  external int get timeoutMsDefault;
+  external DefaultSerialization get serializationImpl;
+  external DefaultClientBinaryStrategy get binaryStrategy;
+
+  external factory ClientOptions();
 }
 
-@JS('uapi.ServerOptions')
-class ServerOptions {
-  external ServerOptions();
-  external void setOnError(Function onError);
-  external void setOnRequest(Function onRequest);
-  external void setOnResponse(Function onResponse);
-  external void setAuthRequired(bool authRequired);
-  external void setSerialization(DefaultSerialization serialization);
+extension type Server._(JSObject _) implements JSObject {
+  external factory Server(
+      UApiSchema uApiSchema, JSFunction handler, ServerOptions options);
+  external JSPromise<JSUint8Array> process(JSUint8Array requestMessageBytes);
 }
 
-@JS('uapi.UApiSchema')
-class UApiSchema {
-  external UApiSchema(dynamic original, dynamic full, dynamic parsed,
-      dynamic parsedRequestHeaders, dynamic parsedResponseHeaders);
+extension type ServerOptions._(JSObject _) implements JSObject {
+  external JSFunction get onError;
+  external JSFunction get onRequest;
+  external JSFunction get onResponse;
+  external bool get authRequired;
+  external void set authRequired(bool value);
+  external DefaultSerialization get serialization;
+
+  external factory ServerOptions();
+}
+
+extension type UApiSchema._(JSObject _) implements JSObject {
+  external JSArray get original;
+  external JSArray get full;
+  external JSObject get parsed;
+  external JSObject get parsedRequestHeaders;
+  external JSObject get parsedResponseHeaders;
+
+  external factory UApiSchema(JSArray original, JSArray full, JSObject parsed,
+      JSObject parsedRequestHeaders, JSObject parsedResponseHeaders);
   external static UApiSchema fromJson(String json);
-  external static UApiSchema fromFileJsonMap(Map<String, String> fileJsonMap);
+  external static UApiSchema fromFileJsonMap(JSObject fileJsonMap);
   external static UApiSchema fromDirectory(
-      String directory, dynamic fs, dynamic path);
+      String directory, JSAny fs, JSAny path);
 }
 
-@JS('uapi.MockServer')
-class MockServer {
-  external MockServer(dynamic mockUApiSchema, dynamic options);
-  external Future<Uint8List> process(Uint8List message);
+extension type MockServer._(JSObject _) implements JSObject {
+  external factory MockServer(JSAny mockUApiSchema, JSAny options);
+  external JSPromise<JSUint8Array> process(JSUint8Array message);
 }
 
-@JS('uapi.MockServerOptions')
-class MockServerOptions {
-  external MockServerOptions();
-  external void setOnError(Function onError);
+extension type MockServerOptions._(JSObject _) implements JSObject {
+  external factory MockServerOptions();
+  external void setOnError(JSFunction onError);
   external void setEnableMessageResponseGeneration(bool enable);
   external void setEnableOptionalFieldGeneration(bool enable);
   external void setRandomizeOptionalFieldGeneration(bool enable);
@@ -116,112 +114,91 @@ class MockServerOptions {
   external void setGeneratedCollectionLengthMax(int max);
 }
 
-@JS('uapi.MockUApiSchema')
-class MockUApiSchema {
-  external MockUApiSchema(dynamic original, dynamic full, dynamic parsed,
-      dynamic parsedRequestHeaders, dynamic parsedResponseHeaders);
+extension type MockUApiSchema._(JSObject _) implements JSObject {
+  external factory MockUApiSchema(JSAny original, JSAny full, JSAny parsed,
+      JSAny parsedRequestHeaders, JSAny parsedResponseHeaders);
   external static MockUApiSchema fromJson(String json);
-  external static MockUApiSchema fromFileJsonMap(
-      Map<String, String> fileJsonMap);
+  external static MockUApiSchema fromFileJsonMap(JSObject fileJsonMap);
   external static MockUApiSchema fromDirectory(
-      String directory, dynamic fs, dynamic path);
+      String directory, JSAny fs, JSAny path);
 }
 
-@JS('uapi.ClientBinaryEncoder')
-class ClientBinaryEncoder {
-  external ClientBinaryEncoder(dynamic binaryChecksumStrategy);
-  external dynamic encode(dynamic message);
-  external dynamic decode(dynamic message);
+extension type ClientBinaryEncoder._(JSObject _) implements JSObject {
+  external factory ClientBinaryEncoder(JSAny binaryChecksumStrategy);
+  external JSAny encode(JSAny message);
+  external JSAny decode(JSAny message);
 }
 
-@JS('uapi.ServerBinaryEncoder')
-class ServerBinaryEncoder {
-  external ServerBinaryEncoder(dynamic binaryEncoder);
-  external dynamic encode(dynamic message);
-  external dynamic decode(dynamic message);
+extension type ServerBinaryEncoder._(JSObject _) implements JSObject {
+  external factory ServerBinaryEncoder(JSAny binaryEncoder);
+  external JSAny encode(JSAny message);
+  external JSAny decode(JSAny message);
 }
 
-@JS('uapi.BinaryEncoding')
-class BinaryEncoding {
-  external BinaryEncoding(dynamic binaryEncodingMap, int checksum);
+extension type BinaryEncoding._(JSObject _) implements JSObject {
+  external factory BinaryEncoding(JSAny binaryEncodingMap, int checksum);
 }
 
-@JS('uapi.MockInvocation')
-class MockInvocation {
-  external String functionName;
-  external dynamic functionArgument;
-  external bool verified;
+extension type MockInvocation._(JSObject _) implements JSObject {
+  external String get functionName;
+  external JSAny get functionArgument;
+  external bool get verified;
 
-  external MockInvocation(String functionName, dynamic functionArgument);
+  external factory MockInvocation(String functionName, JSAny functionArgument);
 }
 
-@JS('uapi.MockStub')
-class MockStub {
-  external String whenFunction;
-  external dynamic whenArgument;
-  external dynamic thenResult;
-  external bool allowArgumentPartialMatch;
-  external int count;
+extension type MockStub._(JSObject _) implements JSObject {
+  external String get whenFunction;
+  external JSAny get whenArgument;
+  external JSAny get thenResult;
+  external bool get allowArgumentPartialMatch;
+  external int get count;
 
-  external MockStub(String whenFunction, dynamic whenArgument,
-      dynamic thenResult, bool allowArgumentPartialMatch, int count);
+  external factory MockStub(String whenFunction, JSAny whenArgument,
+      JSAny thenResult, bool allowArgumentPartialMatch, int count);
 }
 
-@JS('uapi.ClientBinaryStrategy')
-class ClientBinaryStrategy {
-  external ClientBinaryStrategy();
+extension type ClientBinaryStrategy._(JSObject _) implements JSObject {
+  external factory ClientBinaryStrategy();
 }
 
-@JS('uapi.UApiSchemaFiles')
-class UApiSchemaFiles {
-  external UApiSchemaFiles(String directory, dynamic fs, dynamic path);
-  external Map<String, String> get filenamesToJson;
+extension type UApiSchemaFiles._(JSObject _) implements JSObject {
+  external JSObject get filenamesToJson;
+
+  external factory UApiSchemaFiles(String directory, JSAny fs, JSAny path);
 }
 
-@JS('uapi.UApiSchemaParseError')
-class UApiSchemaParseError {
-  external List<dynamic> schemaParseFailures;
-  external List<dynamic> schemaParseFailuresPseudoJson;
-
-  external UApiSchemaParseError(List<dynamic> schemaParseFailures,
-      Map<String, String> documentNamesToJson, dynamic cause);
+extension type UApiSchemaParseError._(JSObject _) implements JSObject {
+  external JSArray get schemaParseFailures;
+  external JSAny get schemaParseFailuresPseudoJson;
 }
 
-@JS('uapi.SerializationError')
-class SerializationError {
-  external SerializationError(dynamic cause);
+extension type SerializationError._(JSObject _) implements JSObject {
+  external factory SerializationError(Error cause);
 }
 
-@JS('uapi.UApiError')
-class UApiError {
-  external UApiError(dynamic arg);
+extension type UApiError._(JSObject _) implements JSObject {}
+
+extension type ValidationFailure._(JSObject _) implements JSObject {
+  external String get path;
+  external String get reason;
+  external JSAny get data;
+
+  external factory ValidationFailure(String path, String reason, JSAny data);
 }
 
-@JS('uapi.ValidationFailure')
-class ValidationFailure {
-  external String path;
-  external String reason;
-  external dynamic data;
-
-  external ValidationFailure(String path, String reason, dynamic data);
+extension type InvalidMessage._(JSObject _) implements JSObject {
+  external factory InvalidMessage(JSAny cause);
 }
 
-@JS('uapi.InvalidMessage')
-class InvalidMessage {
-  external InvalidMessage(dynamic cause);
+extension type InvalidMessageBody._(JSObject _) implements JSObject {
+  external factory InvalidMessageBody();
 }
 
-@JS('uapi.InvalidMessageBody')
-class InvalidMessageBody {
-  external InvalidMessageBody();
+extension type BinaryEncoderUnavailableError._(JSObject _) implements JSObject {
+  external factory BinaryEncoderUnavailableError();
 }
 
-@JS('uapi.BinaryEncoderUnavailableError')
-class BinaryEncoderUnavailableError {
-  external BinaryEncoderUnavailableError();
-}
-
-@JS('uapi.BinaryEncodingMissing')
-class BinaryEncodingMissing {
-  external BinaryEncodingMissing(dynamic key);
+extension type BinaryEncodingMissing._(JSObject _) implements JSObject {
+  external factory BinaryEncodingMissing(JSAny key);
 }
