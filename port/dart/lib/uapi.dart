@@ -1,5 +1,6 @@
 import 'dart:js_interop';
 import 'dart:typed_data';
+import 'dart:js';
 
 extension type RandomGenerator._(JSObject _) implements JSObject {
   external factory RandomGenerator(
@@ -173,9 +174,7 @@ extension type UApiSchemaParseError._(JSObject _) implements JSObject {
   external JSAny get schemaParseFailuresPseudoJson;
 }
 
-extension type SerializationError._(JSObject _) implements JSObject {
-  external factory SerializationError(Error cause);
-}
+extension type SerializationError._(JSObject _) implements JSObject {}
 
 extension type UApiError._(JSObject _) implements JSObject {}
 

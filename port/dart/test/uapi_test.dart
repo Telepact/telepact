@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:html';
 import 'dart:js_interop';
+import 'dart:js_interop_unsafe';
 
 import 'package:node_interop/util.dart';
 import 'package:test/test.dart';
@@ -35,12 +36,12 @@ void main() {
         fail('uapiSchema is null');
       }
 
-      final handler = (Message requestMessage) async {
-        return Message(JSObject(), JSObject());
-      };
+      JSPromise handler(Message requestMessage) {
+        return Future.value(Message(JSObject(), JSObject())).toJS;
+      }
 
       final serverOptions = ServerOptions()..authRequired = false;
-      final server = Server(uapiSchema, handler, serverOptions);
+      final server = Server(uapiSchema, handler.toJS, serverOptions);
       if (server == null) {
         fail('server is null');
       }
@@ -51,11 +52,11 @@ void main() {
         {"ping_": {}}
       ];
       dynamic requestBytes = jsonEncode(request);
-      final responseBytes = await server.process(requestBytes);
+      final responseBytes = await server.process(requestBytes).toDart;
       if (responseBytes == null) {
         fail('responseBytes is null');
       }
-      dynamic response = jsonDecode(utf8.decode(responseBytes));
+      dynamic response = jsonDecode(utf8.decode(responseBytes.toDart));
       dynamic expectedResponse = [
         {},
         {"Ok_": {}}
