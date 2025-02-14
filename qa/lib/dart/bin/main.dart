@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:async';
-import 'package:dart_nats/dart_nats.dart';
+import 'dart:vmservice_io';
 import 'package:uapi/uapi.dart';
+import 'dart:typed_data';
+import 'nats_wrapped.dart';
 
 Future<Subscription> startClientTestServer(
     NatsConnection connection,
@@ -318,12 +320,13 @@ Future<void> runDispatcherServer() async {
 
   final servers = <String, Subscription>{};
 
-  final connection = await Nats.connect(natsUrl);
+  final natsOpts = ConnectionOptions(servers: natsUrl);
+  final connection = await connect(natsOpts);
 
   final done = Completer<void>();
-  final subscription = await connection.subscribe('ts');
+  final subscription = await connection.subscribe('ts', SubscriptionOptions());
 
-  subscription.stream.listen((msg) async {
+  await for (final msg in subscription) {
     final requestBytes = msg.data;
     final requestJson = utf8.decode(requestBytes);
 

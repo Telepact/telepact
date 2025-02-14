@@ -8,5 +8,6 @@ environment:
 dependencies:
   uapi:
     path: ../../../lib/dart
+  node_interop: ^2.1.0
 
 

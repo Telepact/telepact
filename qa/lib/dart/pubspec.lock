@@ -18,7 +18,7 @@ packages:
     source: hosted
     version: "1.16.0"
   node_interop:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: node_interop
       sha256: "3af2420c728173806f4378cf89c53ba9f27f7f67792b898561bff9d390deb98e"

@@ -1,0 +1,10 @@
+{
+  "name": "nats-wrapped",
+  "version": "1.0.0",
+  "description": "A Dart library for wrapping an npm package.",
+  "main": "index.js",
+  "private": true,
+  "dependencies": {
+    "nats.ws": "^1.30.1"
+  }
+}
