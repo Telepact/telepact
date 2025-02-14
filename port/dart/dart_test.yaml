@@ -1,4 +1,0 @@
-presets:
-  browser:
-    precompiled:
-      - test/index.cjs
