@@ -76,17 +76,16 @@ void main() {
 
       dynamic request = [
         {},
-        {"ping_": {}}
+        {"fn.ping_": {}}
       ];
-      dynamic requestBytes = jsonEncode(request);
-      print('Request bytes: $requestBytes');
+      dynamic requestJson = jsonEncode(request);
+      print('Request bytes: $requestJson');
+
+      final requestBytes = Uint8List.fromList(utf8.encode(requestJson));
 
       print('Processing request');
-      final responseBytes = await server.process(requestBytes).toDart;
+      final responseBytes = await server.process(requestBytes.toJS).toDart;
       print('Response bytes: $responseBytes');
-      if (responseBytes == null) {
-        fail('responseBytes is null');
-      }
 
       dynamic response = jsonDecode(utf8.decode(responseBytes.toDart));
       print('Response: $response');
