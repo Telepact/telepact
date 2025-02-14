@@ -1,16 +1,4 @@
-# dart_test.yaml
 presets:
-  chrome:
-    platforms:
-      - chrome
+  browser:
     precompiled:
-      # Specify the directory where precompiled assets are located.
-      dir: web
-    overrides:
-      chrome:
-        configuration:
-          - name: chrome
-            flags:
-              - --headless=false
-    concurrency: 1
-    timeout: 5m
+      - test/index.cjs

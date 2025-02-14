@@ -19,6 +19,21 @@ void main() {
           .getElementsByTagName('script')
           .map((e) => (e as ScriptElement).src));
 
+      // Print the first 10 lines of each script file
+      for (var scriptElement
+          in window.document.getElementsByTagName('script')) {
+        final src = (scriptElement as ScriptElement).src;
+        if (src.isNotEmpty) {
+          print("Checking contents");
+          final scriptContent = await HttpRequest.getString(src);
+          final lines = scriptContent.split('\n');
+          print('First 10 lines of $src:');
+          for (var i = 0; i < 10 && i < lines.length; i++) {
+            print(lines[i]);
+          }
+        }
+      }
+
       final uapiPseudoJson = [
         {
           "struct.Data": {

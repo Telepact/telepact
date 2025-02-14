@@ -1,6 +1,5 @@
 import 'dart:js_interop';
 import 'dart:typed_data';
-import 'dart:js';
 
 extension type RandomGenerator._(JSObject _) implements JSObject {
   external factory RandomGenerator(
