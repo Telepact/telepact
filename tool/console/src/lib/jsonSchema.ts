@@ -32,8 +32,8 @@ export function createJsonSchema(uapi: UApiSchema): string {
 
 	const jsonSchema: any = {
 		$schema: 'http://json-schema.org/draft-07/schema#',
-		type: 'object',
-		properties: {},
+		type: 'array',
+		prefixItems: [{ type: 'object' }, { $ref: '#/$defs/fn.ping_' }],
 		$defs: definitions
 	};
 
@@ -47,14 +47,6 @@ export function createJsonSchema(uapi: UApiSchema): string {
 				key.startsWith('errors.')
 			) {
 				definitions[key] = convertType(item[key]);
-			}
-		}
-	}
-
-	for (const item of original) {
-		for (const key in item) {
-			if (key.startsWith('fn.')) {
-				jsonSchema.properties[key] = { $ref: `#/$defs/${key}` };
 			}
 		}
 	}
