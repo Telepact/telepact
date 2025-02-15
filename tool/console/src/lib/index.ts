@@ -238,8 +238,6 @@ export function parseUApiSchema(
 	console.log(`Parsing schema with ${schemaInst} ${schemaInst.full} ${schemaInst.original}`);
 	let pseudoJson: Record<string, any>[] = showInternalApi ? schemaInst.full : schemaInst.original;
 
-	createJsonSchema(schemaInst);
-
 	let preppedPseudoJson = pseudoJson.map((e) => [findSchemaKey(e), e] as [string, any]);
 
 	let availableErrors = preppedPseudoJson
@@ -331,6 +329,23 @@ export function parseUApiSchema(
 		} else {
 			data = e[schemaKey];
 		}
+
+		const jsonSchema = createJsonSchema(schemaInst);
+
+		monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
+			schemas: [
+				{
+					uri: 'internal://server/jsonschema.json',
+					fileMatch: ['schema.uapi.json'],
+					schema: uapi.jsonSchema
+				},
+				{
+					uri: 'internal://server/jsonschema.json',
+					fileMatch: ['request.json'],
+					schema: jsonSchema
+				}
+			]
+		});
 
 		return {
 			name: schemaKey,

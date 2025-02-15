@@ -40,20 +40,24 @@ export function createJsonSchema(uapi: UApiSchema): string {
 	for (const item of original) {
 		for (const key in item) {
 			if (
-				key.startsWith('fn.') ||
 				key.startsWith('headers.') ||
 				key.startsWith('union.') ||
 				key.startsWith('struct.') ||
 				key.startsWith('errors.')
 			) {
 				definitions[key] = convertType(item[key]);
+			} else if (key.startsWith('fn.')) {
+				definitions[key] = {
+					type: 'object',
+					properties: {
+						[key]: convertType(item[key])
+					}
+				};
 			}
 		}
 	}
 
-	let schema = JSON.stringify(jsonSchema, null, 2);
+	console.log(JSON.stringify(jsonSchema, null, 2));
 
-	console.log(schema);
-
-	return schema;
+	return jsonSchema;
 }
