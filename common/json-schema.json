@@ -155,6 +155,38 @@
             {
                 "type": "object",
                 "additionalProperties": false,
+                "minProperties": 2,
+                "patternProperties": {
+                    "^headers\\.[a-zA-Z_]\\w*": {
+                        "description": "A function that accepts an argument struct and returns a result union that is either an `Ok_` struct or an error struct.",
+                        "type": "object",
+                        "additionalProperties": false,
+                        "patternProperties": {
+                            "^[a-zA-Z_]\\w*!?$": {
+                                "$ref": "#/$defs/typeDeclaration"
+                            }
+                        }
+                    }
+                },
+                "required": ["->"],
+                "properties": {
+                    "->": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "patternProperties": {
+                            "^[a-zA-Z_]\\w*!?$": {
+                                "$ref": "#/$defs/typeDeclaration"
+                            }
+                        }
+                    },
+                    "///": {
+                        "anyOf": [{ "type": "string" }, { "type": "array", "items": { "type": "string" } }]
+                    }
+                }
+            },
+            {
+                "type": "object",
+                "additionalProperties": false,
                 "minProperties": 1,
                 "patternProperties": {
                     "^errors\\.[a-zA-Z_]\\w*": {
