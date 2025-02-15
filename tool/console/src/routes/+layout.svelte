@@ -302,35 +302,37 @@
 						<MockIcon />
 					</button>
 				</div>
-				<div class="inline-flex rounded-md">
-					<button
-						on:click={toggleTerminal}
-						class="rounded-s-md p-2 {activeViews.includes('t')
-							? 'bg-emerald-900 text-green-300'
-							: 'bg-slate-700 text-gray-200'}"
-					>
-						<TerminalIcon />
-					</button>
-					<button
-						on:click={toggleResults}
-						class="rounded-e-md p-2 {activeViews.includes('r')
-							? 'bg-emerald-900 text-green-300'
-							: 'bg-slate-700 text-gray-200'}"
-					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke-width="1.5"
-							stroke="currentColor"
-							class="h-6 w-6"
+				{#if schemaSource !== 'draft'}
+					<div class="inline-flex rounded-md">
+						<button
+							on:click={toggleTerminal}
+							class="rounded-s-md p-2 {activeViews.includes('t')
+								? 'bg-emerald-900 text-green-300'
+								: 'bg-slate-700 text-gray-200'}"
 						>
-							<path
-								d="M 22 15 L 22 6 M 22 6 L 2 6 L 2 15 M 5 12 L 19 12 M 17 12 L 17 22 L 7 22 L 7 12 M 2 15 L 7 15 M 17 15 L 22 15 M 7 6 L 7 2 L 17 2 L 17 6 M 20 8 L 19 8 L 19 9 L 20 9 M 10 15 L 14 15 M 10 18 L 14 18 Z"
-							/>
-						</svg>
-					</button>
-				</div>
+							<TerminalIcon />
+						</button>
+						<button
+							on:click={toggleResults}
+							class="rounded-e-md p-2 {activeViews.includes('r')
+								? 'bg-emerald-900 text-green-300'
+								: 'bg-slate-700 text-gray-200'}"
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke-width="1.5"
+								stroke="currentColor"
+								class="h-6 w-6"
+							>
+								<path
+									d="M 22 15 L 22 6 M 22 6 L 2 6 L 2 15 M 5 12 L 19 12 M 17 12 L 17 22 L 7 22 L 7 12 M 2 15 L 7 15 M 17 15 L 22 15 M 7 6 L 7 2 L 17 2 L 17 6 M 20 8 L 19 8 L 19 9 L 20 9 M 10 15 L 14 15 M 10 18 L 14 18 Z"
+								/>
+							</svg>
+						</button>
+					</div>
+				{/if}
 			</div>
 			<div class="flex basis-1/3 justify-end">
 				<form class="flex space-x-2" on:submit|preventDefault={handleSourceGet}>
@@ -473,69 +475,71 @@
 		{:catch error}
 			<span>failed to get schema</span>
 		{/await}
-		{#if activeViews.includes('t')}
-			<div class="flex h-[calc(100vh-4em)] {getSectionClass('t', activeViews.length)}">
-				<form
-					data-sveltekit-keepfocus
-					on:submit|preventDefault={thisHandleRequest}
-					class="flex w-full flex-col bg-zinc-700 p-6"
-				>
-					<div class="flex justify-between">
-						<h1 class="pb-4 text-xl font-semibold text-gray-100">Request</h1>
-						<div>
-							<button
-								type="submit"
-								class="rounded-md bg-sky-700 px-3 py-2 text-sm font-semibold text-white hover:bg-sky-600"
-								>Submit</button
-							>
-						</div>
-					</div>
-					{#key request}
-						<div class="grow border border-zinc-600">
-							<MonacoEditor
-								id="request"
-								readOnly={false}
-								json={unMinifyJson(request, authManaged)}
-								ctrlEnter={() => thisHandleRequest()}
-								filename="request.json"
-								bind:this={requestEditor}
-							/>
-						</div>
-					{/key}
-				</form>
-			</div>
-		{/if}
-		{#if activeViews.includes('r')}
-			<div class="flex h-[calc(100vh-4em)] {getSectionClass('r', activeViews.length)}">
-				{#if response}
-					<div class="flex w-full flex-col bg-zinc-700 p-6">
-						<h1 class="mb-4 text-xl font-semibold text-gray-100">Response</h1>
-						{#await response}
-							<div class="mb-4 grow">
-								<span>Loading...<span> </span></span>
+		{#if schemaSource !== 'draft'}
+			{#if activeViews.includes('t')}
+				<div class="flex h-[calc(100vh-4em)] {getSectionClass('t', activeViews.length)}">
+					<form
+						data-sveltekit-keepfocus
+						on:submit|preventDefault={thisHandleRequest}
+						class="flex w-full flex-col bg-zinc-700 p-6"
+					>
+						<div class="flex justify-between">
+							<h1 class="pb-4 text-xl font-semibold text-gray-100">Request</h1>
+							<div>
+								<button
+									type="submit"
+									class="rounded-md bg-sky-700 px-3 py-2 text-sm font-semibold text-white hover:bg-sky-600"
+									>Submit</button
+								>
 							</div>
-						{:then d}
-							{#key d}
-								<div class="grow border border-zinc-600">
-									<MonacoEditor
-										id="response"
-										readOnly={true}
-										json={d}
-										allowLinks={true}
-										filename="response.json"
-									/>
-								</div>
-							{/key}
-						{/await}
-					</div>
-				{:else}
-					<div class="grid h-full w-full place-content-center">
-						<div>
-							<span>Click "Submit" on Request pane to fetch response.</span>
 						</div>
-					</div>
-				{/if}
-			</div>
+						{#key request}
+							<div class="grow border border-zinc-600">
+								<MonacoEditor
+									id="request"
+									readOnly={false}
+									json={unMinifyJson(request, authManaged)}
+									ctrlEnter={() => thisHandleRequest()}
+									filename="request.json"
+									bind:this={requestEditor}
+								/>
+							</div>
+						{/key}
+					</form>
+				</div>
+			{/if}
+			{#if activeViews.includes('r')}
+				<div class="flex h-[calc(100vh-4em)] {getSectionClass('r', activeViews.length)}">
+					{#if response}
+						<div class="flex w-full flex-col bg-zinc-700 p-6">
+							<h1 class="mb-4 text-xl font-semibold text-gray-100">Response</h1>
+							{#await response}
+								<div class="mb-4 grow">
+									<span>Loading...<span> </span></span>
+								</div>
+							{:then d}
+								{#key d}
+									<div class="grow border border-zinc-600">
+										<MonacoEditor
+											id="response"
+											readOnly={true}
+											json={d}
+											allowLinks={true}
+											filename="response.json"
+										/>
+									</div>
+								{/key}
+							{/await}
+						</div>
+					{:else}
+						<div class="grid h-full w-full place-content-center">
+							<div>
+								<span>Click "Submit" on Request pane to fetch response.</span>
+							</div>
+						</div>
+					{/if}
+				</div>
+			{/if}
 		{/if}
 		<slot />
 	</main>
