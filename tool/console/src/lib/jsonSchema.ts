@@ -15,8 +15,14 @@ export function createJsonSchema(uapi: UApiSchema): Record<string, any> {
 				case 'object':
 					return { type: 'object', additionalProperties: convertType(subType) };
 				default:
-					console.log('type', type);
+					console.log('array type', type);
 					if (type.startsWith('struct.')) {
+						return { $ref: `#/$defs/${type}` };
+					} else if (type.startsWith('union.')) {
+						return { $ref: `#/$defs/${type}` };
+					} else if (type.startsWith('fn')) {
+						return { $ref: `#/$defs/${type}` };
+					} else if (type.startsWith('headers.')) {
 						return { $ref: `#/$defs/${type}` };
 					}
 					return { type };
@@ -32,6 +38,7 @@ export function createJsonSchema(uapi: UApiSchema): Record<string, any> {
 		}
 	}
 
+	const headers = {};
 	const functions = [];
 
 	for (const item of original) {
@@ -76,9 +83,16 @@ export function createJsonSchema(uapi: UApiSchema): Record<string, any> {
 				additionalProperties: false
 			};
 		} else if (schemaKey.startsWith('headers.')) {
-			definitions[schemaKey] = convertType(item[schemaKey]);
+			let theseHeaders = item[schemaKey];
+			Object.assign(headers, theseHeaders);
 		}
 	}
+
+	const allHeaders: Record<string, any> = {};
+	Object.entries(headers).forEach(([header, type]) => {
+		let props: Record<string, any> = {};
+		allHeaders[header] = convertType(type);
+	});
 
 	const oneOfEachFunctions = {
 		oneOf: functions.map((fn) => ({ $ref: `#/$defs/${fn}` }))
@@ -87,7 +101,14 @@ export function createJsonSchema(uapi: UApiSchema): Record<string, any> {
 	const jsonSchema: any = {
 		$schema: '"https://json-schema.org/draft/2020-12/schema"',
 		type: 'array',
-		prefixItems: [{ type: 'object' }, oneOfEachFunctions],
+		prefixItems: [
+			{
+				type: 'object',
+				properties: allHeaders,
+				additionalProperties: false
+			},
+			oneOfEachFunctions
+		],
 		$defs: definitions
 	};
 
