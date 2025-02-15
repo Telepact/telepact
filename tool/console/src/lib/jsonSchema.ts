@@ -24,6 +24,8 @@ export function createJsonSchema(uapi: UApiSchema): Record<string, any> {
 						return { $ref: `#/$defs/${type}` };
 					} else if (type.startsWith('headers.')) {
 						return { $ref: `#/$defs/${type}` };
+					} else if (type.startsWith('_ext.')) {
+						return {};
 					}
 					return { type };
 			}
@@ -85,6 +87,8 @@ export function createJsonSchema(uapi: UApiSchema): Record<string, any> {
 		} else if (schemaKey.startsWith('headers.')) {
 			let theseHeaders = item[schemaKey];
 			Object.assign(headers, theseHeaders);
+		} else if (schemaKey.startsWith('_ext.')) {
+			definitions[schemaKey] = convertType(item[schemaKey]);
 		}
 	}
 
