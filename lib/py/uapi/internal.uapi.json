@@ -79,7 +79,7 @@
         "///": " The `warn_` header is used to send warnings to the client. ",
         "headers.Warning_": {},
         "->": {
-            "warn_": ["array", ["string"]]
+            "warn_": ["array", ["any"]]
         }
     },
     {

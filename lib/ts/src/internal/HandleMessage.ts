@@ -115,7 +115,9 @@ export async function handleMessage(
         .filter(filterOutWarnings);
     if (callValidationFailures.length > 0) {
         if (warnings.length > 0) {
-            responseHeaders['_warnings'] = mapValidationFailuresToInvalidFieldCases(warnings);
+            const existingWarnings = responseHeaders['warn_'] || [];
+            const moreWarnings = mapValidationFailuresToInvalidFieldCases(warnings);
+            responseHeaders['warn_'] = existingWarnings.concat(moreWarnings);
         }
 
         return getInvalidErrorMessage(
@@ -160,7 +162,9 @@ export async function handleMessage(
             .filter(filterOutWarnings);
 
         if (warnings.length > 0) {
-            responseHeaders['_warnings'] = mapValidationFailuresToInvalidFieldCases(warnings);
+            const existingWarnings = responseHeaders['warn_'] || [];
+            const moreWarnings = mapValidationFailuresToInvalidFieldCases(warnings);
+            responseHeaders['warn_'] = existingWarnings.concat(moreWarnings);
         }
 
         if (resultValidationFailures.length > 0) {
