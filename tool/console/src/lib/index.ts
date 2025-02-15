@@ -4,6 +4,7 @@ import * as monaco from 'monaco-editor';
 import * as uapi from 'uapi';
 import { _internal } from 'uapi';
 import { writable, type Writable } from 'svelte/store';
+import { createJsonSchema } from './jsonSchema';
 
 export const responseStore: Writable<string | null> = writable(null);
 
@@ -236,6 +237,8 @@ export function parseUApiSchema(
 ): TypeData[] {
 	console.log(`Parsing schema with ${schemaInst} ${schemaInst.full} ${schemaInst.original}`);
 	let pseudoJson: Record<string, any>[] = showInternalApi ? schemaInst.full : schemaInst.original;
+
+	createJsonSchema(schemaInst);
 
 	let preppedPseudoJson = pseudoJson.map((e) => [findSchemaKey(e), e] as [string, any]);
 
