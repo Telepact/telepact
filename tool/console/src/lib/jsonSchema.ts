@@ -90,7 +90,6 @@ export function createJsonSchema(uapi: UApiSchema): Record<string, any> {
 
 	const allHeaders: Record<string, any> = {};
 	Object.entries(headers).forEach(([header, type]) => {
-		let props: Record<string, any> = {};
 		allHeaders[header] = convertType(type);
 	});
 
@@ -105,7 +104,7 @@ export function createJsonSchema(uapi: UApiSchema): Record<string, any> {
 			{
 				type: 'object',
 				properties: allHeaders,
-				additionalProperties: false
+				additionalProperties: true
 			},
 			oneOfEachFunctions
 		],
