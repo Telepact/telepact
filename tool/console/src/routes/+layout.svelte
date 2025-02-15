@@ -3,7 +3,7 @@
 
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
-	import { UApiSchema, Message } from 'uapi';
+	import { UApiSchema, Message, jsonSchema } from 'uapi';
 
 	import {
 		genExample,
@@ -19,6 +19,9 @@
 	import TerminalIcon from '$lib/TerminalIcon.svelte';
 	import MockIcon from '$lib/MockIcon.svelte';
 	import { responseStore } from '$lib';
+	import { onMount } from 'svelte';
+	import { createJsonSchema } from '$lib/jsonSchema';
+	import * as monaco from 'monaco-editor';
 
 	let requestEditor: MonacoEditor;
 	let schemaEditor: MonacoEditor;
@@ -69,6 +72,26 @@
 
 	let exampleHeaders: Array<string>;
 	$: exampleHeaders = ($page.url.searchParams.get('mh') ?? '').split(',');
+
+	onMount(() => {
+		uapiSchemaPromise.then((e) => {
+			const requestJsonSchema = createJsonSchema(e);
+			monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
+				schemas: [
+					{
+						uri: 'internal://server/jsonschema-uapi.json',
+						fileMatch: ['schema.uapi.json'],
+						schema: jsonSchema
+					},
+					{
+						uri: 'internal://server/jsonschema-request.json',
+						fileMatch: ['request.json'],
+						schema: requestJsonSchema
+					}
+				]
+			});
+		});
+	});
 
 	type view = 's' | 'd' | 't' | 'r' | 'm';
 

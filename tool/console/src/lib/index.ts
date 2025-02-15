@@ -6,6 +6,10 @@ import { _internal } from 'uapi';
 import { writable, type Writable } from 'svelte/store';
 import { createJsonSchema } from './jsonSchema';
 
+export function createJsonSchema2(uapi: uapi.UApiSchema): Record<string, any> {
+	return createJsonSchema(uapi);
+}
+
 export const responseStore: Writable<string | null> = writable(null);
 
 export const stockPingRequest = `[
@@ -330,23 +334,6 @@ export function parseUApiSchema(
 			data = e[schemaKey];
 		}
 
-		const jsonSchema = createJsonSchema(schemaInst);
-
-		monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
-			schemas: [
-				{
-					uri: 'internal://server/jsonschema.json',
-					fileMatch: ['schema.uapi.json'],
-					schema: uapi.jsonSchema
-				},
-				{
-					uri: 'internal://server/jsonschema.json',
-					fileMatch: ['request.json'],
-					schema: jsonSchema
-				}
-			]
-		});
-
 		return {
 			name: schemaKey,
 			doc: e['///'],
@@ -401,15 +388,15 @@ export function findSchemaKey(definition: Record<string, any>): string {
 }
 
 monaco.languages.typescript.typescriptDefaults.setEagerModelSync(true);
-monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
-	schemas: [
-		{
-			uri: 'internal://server/jsonschema.json',
-			fileMatch: ['schema.uapi.json'],
-			schema: uapi.jsonSchema
-		}
-	]
-});
+// monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
+// 	schemas: [
+// 		{
+// 			uri: 'internal://server/jsonschema.json',
+// 			fileMatch: ['schema.uapi.json'],
+// 			schema: uapi.jsonSchema
+// 		}
+// 	]
+// });
 monaco.languages.registerLinkProvider('json', {
 	provideLinks: (
 		model: monaco.editor.ITextModel,

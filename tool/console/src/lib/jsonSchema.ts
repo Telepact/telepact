@@ -1,7 +1,8 @@
+import { findSchemaKey } from '$lib';
 import type { UApiSchema } from 'uapi';
 
-export function createJsonSchema(uapi: UApiSchema): string {
-	let original = uapi.original;
+export function createJsonSchema(uapi: UApiSchema): Record<string, any> {
+	let original = uapi.full;
 
 	const definitions: any = {};
 
@@ -14,6 +15,7 @@ export function createJsonSchema(uapi: UApiSchema): string {
 				case 'object':
 					return { type: 'object', additionalProperties: convertType(subType) };
 				default:
+					console.log('type', type);
 					if (type.startsWith('struct.')) {
 						return { $ref: `#/$defs/${type}` };
 					}
@@ -24,38 +26,70 @@ export function createJsonSchema(uapi: UApiSchema): string {
 			for (const key in uapiType) {
 				properties[key] = convertType(uapiType[key]);
 			}
-			return { type: 'object', properties };
+			return { type: 'object', properties, additionalProperties: false };
 		} else {
 			return { type: uapiType };
 		}
 	}
 
-	const jsonSchema: any = {
-		$schema: 'http://json-schema.org/draft-07/schema#',
-		type: 'array',
-		prefixItems: [{ type: 'object' }, { $ref: '#/$defs/fn.ping_' }],
-		$defs: definitions
-	};
+	const functions = [];
 
 	for (const item of original) {
-		for (const key in item) {
-			if (
-				key.startsWith('headers.') ||
-				key.startsWith('union.') ||
-				key.startsWith('struct.') ||
-				key.startsWith('errors.')
-			) {
-				definitions[key] = convertType(item[key]);
-			} else if (key.startsWith('fn.')) {
-				definitions[key] = {
-					type: 'object',
-					properties: {
-						[key]: convertType(item[key])
-					}
-				};
-			}
+		var schemaKey = findSchemaKey(item);
+		console.log('schemaKey', schemaKey);
+
+		if (schemaKey.startsWith('struct.')) {
+			definitions[schemaKey] = convertType(item[schemaKey]);
+		} else if (schemaKey.startsWith('union.')) {
+			definitions[schemaKey] = {
+				oneOf: item[schemaKey].map((type: any) => {
+					let tag = Object.keys(type).filter((k) => k !== '///')[0];
+					return {
+						type: 'object',
+						required: [tag],
+						properties: {
+							[tag]: convertType(type[tag])
+						}
+					};
+				})
+			};
+		} else if (schemaKey.startsWith('errors.')) {
+			definitions[schemaKey] = {
+				oneOf: item[schemaKey].map((type: any) => {
+					let tag = Object.keys(type).filter((k) => k !== '///')[0];
+					return {
+						type: 'object',
+						required: [tag],
+						properties: {
+							[tag]: convertType(type[tag])
+						}
+					};
+				})
+			};
+		} else if (schemaKey.startsWith('fn.')) {
+			functions.push(schemaKey);
+			definitions[schemaKey] = {
+				type: 'object',
+				properties: {
+					[schemaKey]: convertType(item[schemaKey])
+				},
+				additionalProperties: false
+			};
+		} else if (schemaKey.startsWith('headers.')) {
+			definitions[schemaKey] = convertType(item[schemaKey]);
 		}
 	}
+
+	const oneOfEachFunctions = {
+		oneOf: functions.map((fn) => ({ $ref: `#/$defs/${fn}` }))
+	};
+
+	const jsonSchema: any = {
+		$schema: '"https://json-schema.org/draft/2020-12/schema"',
+		type: 'array',
+		prefixItems: [{ type: 'object' }, oneOfEachFunctions],
+		$defs: definitions
+	};
 
 	console.log(JSON.stringify(jsonSchema, null, 2));
 
