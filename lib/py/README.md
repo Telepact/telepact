@@ -3,5 +3,5 @@
 To build:
 
 ```
-pipenv run python -m build
+poetry build
 ```
