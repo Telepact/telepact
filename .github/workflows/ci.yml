@@ -94,19 +94,19 @@ jobs:
                   pipx install poetry
 
             - name: Download ts build artifacts
-              uses: actions/download-artifact@v2
+              uses: actions/download-artifact@v4
               with:
                   name: build-uapi-ts
                   path: lib/ts/dist
 
             - name: Download java build artifacts
-              uses: actions/download-artifact@v2
+              uses: actions/download-artifact@v4
               with:
                   name: build-uapi-java
                   path: lib/java/target
 
             - name: Download py build artifacts
-              uses: actions/download-artifact@v2
+              uses: actions/download-artifact@v4
               with:
                   name: build-uapi-py
                   path: lib/py/dist
