@@ -3,6 +3,6 @@ src/test/java/io/github/brenbar/uapi/GeneratedTests.java
 src/test/java/io/github/brenbar/uapi/GeneratedMockTests.java
 src/test/java/io/github/brenbar/uapi/GeneratedMockInvalidStubTests.java
 target/
-src/main/resources/internal.uapi.json
-src/main/resources/mock-internal.uapi.json
-src/main/resources/auth.uapi.json
+src/main/resources/*.json
+src/main/resources/LICENSE
+src/main/resources/NOTICE
