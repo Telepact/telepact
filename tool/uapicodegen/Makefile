@@ -8,7 +8,7 @@ UAPI_PYPROJECT = ../../lib/py/pyproject.toml
 all: dep $(PYPROJECT)
 
 ${PYPROJECT}: $(SRC_FILES) $(UAPI_PYPROJECT)
-	@bump-patch-version || (echo "Install bump-patch-version with 'pipx install ../../tool/bump_patch_version'" && exit 1)
+	@uapi-version bump || (echo "Install uapi-version bump with 'pipx install ../../tool/uapi_version'" && exit 1)
 
 dep:
 	cd ../../lib/py && make

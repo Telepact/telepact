@@ -1,7 +1,7 @@
 [project]
-name = "bump_patch_version"
+name = "uapi_version"
 version = "0.1.5"
-description = "A CLI tool to bump the patch version of a project."
+description = "A CLI tool to update versions in uapi sub projects."
 requires-python = ">=3.11"
 
 [build-system]
@@ -18,4 +18,4 @@ toml = "^0.10.2"
 lxml = "^5.3.1"
 
 [tool.poetry.scripts]
-bump-patch-version = "bump_patch_version.cli:main"
+uapi-version = "uapi_version.cli:main"

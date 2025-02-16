@@ -1,25 +1,18 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project
-  xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
->
+<?xml version='1.0' encoding='UTF-8'?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-
   <groupId>uapitest</groupId>
   <artifactId>uapitest</artifactId>
   <version>1.0-SNAPSHOT</version>
-
   <properties>
     <maven.compiler.source>21</maven.compiler.source>
     <maven.compiler.target>21</maven.compiler.target>
   </properties>
-
   <dependencies>
     <dependency>
       <groupId>io.github.brenbar</groupId>
       <artifactId>uapi</artifactId>
-      <version>0.0.23</version>
+      <version>0.0.32</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
@@ -42,7 +35,6 @@
       <version>4.2.19</version>
     </dependency>
   </dependencies>
-
   <build>
     <plugins>
       <plugin>
@@ -76,7 +68,6 @@
               <goal>copy-dependencies</goal>
             </goals>
           </execution>
-
           <execution>
             <id>unpack-jacoco</id>
             <phase>package</phase>
@@ -112,7 +103,7 @@
               <arguments>
                 <argument>${argLine}</argument>
                 <argument>-classpath</argument>
-                <classpath />
+                <classpath/>
                 <argument>uapitest.Main</argument>
               </arguments>
             </configuration>
@@ -127,19 +118,13 @@
               <executable>java</executable>
               <arguments>
                 <argument>-jar</argument>
-                <argument
-                  >${project.build.directory}/dependency/lib/jacococli.jar</argument
-                >
+                <argument>${project.build.directory}/dependency/lib/jacococli.jar</argument>
                 <argument>report</argument>
                 <argument>${project.build.directory}/jacoco.exec</argument>
                 <argument>--classfiles</argument>
-                <argument
-                  >${project.build.directory}/dependency/uapi-1.0-SNAPSHOT.jar</argument
-                >
+                <argument>${project.build.directory}/dependency/uapi-1.0-SNAPSHOT.jar</argument>
                 <argument>--sourcefiles</argument>
-                <argument
-                  >${project.basedir}/../../../lib/java/src/main/java</argument
-                >
+                <argument>${project.basedir}/../../../lib/java/src/main/java</argument>
                 <argument>--html</argument>
                 <argument>${project.build.directory}/codecoverage</argument>
               </arguments>

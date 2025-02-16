@@ -205,7 +205,7 @@ files = [
 
 [[package]]
 name = "uapi"
-version = "0.0.44"
+version = "0.0.46"
 description = "Universal API"
 optional = false
 python-versions = ">=3.11"
@@ -222,7 +222,7 @@ url = "../../../lib/py"
 
 [[package]]
 name = "uapicodegen"
-version = "0.0.42"
+version = "0.0.44"
 description = "Universal API Code Generator"
 optional = false
 python-versions = "^3.11"

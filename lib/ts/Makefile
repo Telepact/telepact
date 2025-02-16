@@ -8,7 +8,7 @@ COMMON_JSON_FILES = $(shell find ../../common -name '*.uapi.json')
 all: $(PACKAGE_JSON_FILE)
 
 $(PACKAGE_JSON_FILE): $(SRC_FILES) $(JSON_FILES)
-	bump-patch-version || (echo "Install bump-patch-version with 'pipx install ../../tool/bump_patch_version'" && exit 1)
+	uapi-version bump || (echo "Install uapi-version bump with 'pipx install ../../tool/uapi_version'" && exit 1)
 
 $(JSON_FILES): $(COMMON_JSON_FILES)
 	cp ../../common/*.uapi.json inc

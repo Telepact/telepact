@@ -20,7 +20,7 @@ import uapi.internal.types.UUnion;
 
 public class ConstructBinaryEncoding {
 
-    public static List<String> traceType(UTypeDeclaration typeDeclaration) {
+    private static List<String> traceType(UTypeDeclaration typeDeclaration) {
         final var thisAllKeys = new ArrayList<String>();
 
         if (typeDeclaration.type instanceof UArray) {
@@ -60,7 +60,6 @@ public class ConstructBinaryEncoding {
 
     public static BinaryEncoding constructBinaryEncoding(UApiSchema uApiSchema) {
         final var allKeys = new TreeSet<String>();
-
         final var functions = new ArrayList<Map.Entry<String, UFn>>();
 
         for (final var entry : uApiSchema.parsed.entrySet()) {
@@ -97,9 +96,6 @@ public class ConstructBinaryEncoding {
 
         final var sortedAllKeys = new ArrayList<>(allKeys);
         Collections.sort(sortedAllKeys);
-
-        System.out.println("Sorted all keys:");
-        System.out.println(sortedAllKeys);
 
         final var binaryEncoding = new HashMap<String, Integer>();
         for (int index = 0; index < sortedAllKeys.size(); index++) {
