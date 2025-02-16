@@ -9,6 +9,38 @@ import { UArray } from '../types/UArray';
 import { UObject } from '../types/UObject';
 import { UTypeDeclaration } from '../types/UTypeDeclaration';
 
+function traceType(typeDeclaration: UTypeDeclaration): string[] {
+    const thisAllKeys: string[] = [];
+
+    if (typeDeclaration.type instanceof UArray) {
+        const theseKeys2 = traceType(typeDeclaration.typeParameters[0]);
+        thisAllKeys.push(...theseKeys2);
+    } else if (typeDeclaration.type instanceof UObject) {
+        const theseKeys2 = traceType(typeDeclaration.typeParameters[0]);
+        thisAllKeys.push(...theseKeys2);
+    } else if (typeDeclaration.type instanceof UStruct) {
+        const structFields = typeDeclaration.type.fields;
+        for (const [structFieldKey, structField] of Object.entries(structFields)) {
+            thisAllKeys.push(structFieldKey);
+            const moreKeys = traceType(structField.typeDeclaration);
+            thisAllKeys.push(...moreKeys);
+        }
+    } else if (typeDeclaration.type instanceof UUnion) {
+        const unionTags = typeDeclaration.type.tags;
+        for (const [tagKey, tagValue] of Object.entries(unionTags)) {
+            thisAllKeys.push(tagKey);
+            const structFields = tagValue.fields;
+            for (const [structFieldKey, structField] of Object.entries(structFields)) {
+                thisAllKeys.push(structFieldKey);
+                const moreKeys = traceType(structField.typeDeclaration);
+                thisAllKeys.push(...moreKeys);
+            }
+        }
+    }
+
+    return thisAllKeys;
+}
+
 export function constructBinaryEncoding(uApiSchema: UApiSchema): BinaryEncoding {
     const allKeys: Set<string> = new Set();
 
@@ -19,38 +51,6 @@ export function constructBinaryEncoding(uApiSchema: UApiSchema): BinaryEncoding 
             functions.push([key, value]);
         }
     }
-
-    const traceType = (typeDeclaration: UTypeDeclaration) => {
-        const thisAllKeys: string[] = [];
-
-        if (typeDeclaration.type instanceof UArray) {
-            const theseKeys2 = traceType(typeDeclaration.typeParameters[0]);
-            thisAllKeys.push(...theseKeys2);
-        } else if (typeDeclaration.type instanceof UObject) {
-            const theseKeys2 = traceType(typeDeclaration.typeParameters[0]);
-            thisAllKeys.push(...theseKeys2);
-        } else if (typeDeclaration.type instanceof UStruct) {
-            const structFields = typeDeclaration.type.fields;
-            for (const [structFieldKey, structField] of Object.entries(structFields)) {
-                thisAllKeys.push(structFieldKey);
-                const moreKeys = traceType(structField.typeDeclaration);
-                thisAllKeys.push(...moreKeys);
-            }
-        } else if (typeDeclaration.type instanceof UUnion) {
-            const unionTags = typeDeclaration.type.tags;
-            for (const [tagKey, tagValue] of Object.entries(unionTags)) {
-                thisAllKeys.push(tagKey);
-                const structFields = tagValue.fields;
-                for (const [structFieldKey, structField] of Object.entries(structFields)) {
-                    thisAllKeys.push(structFieldKey);
-                    const moreKeys = traceType(structField.typeDeclaration);
-                    thisAllKeys.push(...moreKeys);
-                }
-            }
-        }
-
-        return thisAllKeys;
-    };
 
     for (const [key, value] of functions) {
         allKeys.add(key);

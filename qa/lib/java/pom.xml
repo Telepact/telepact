@@ -19,7 +19,7 @@
     <dependency>
       <groupId>io.github.brenbar</groupId>
       <artifactId>uapi</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>0.0.23</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
