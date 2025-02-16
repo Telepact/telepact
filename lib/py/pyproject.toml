@@ -20,7 +20,10 @@ include = [
     "uapi/internal.uapi.json",
     "uapi/mock-internal.uapi.json",
     "uapi/json-schema.json",
+    "uapi/LICENSE",
+    "uapi/NOTICE",
 ]
+
 [[tool.poetry.packages]]
 include = "uapi"
 
