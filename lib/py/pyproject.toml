@@ -2,17 +2,25 @@
 name = "uapi"
 version = "0.0.47"
 description = "Universal API"
-readme = "README.md"
 requires-python = ">=3.11"
-classifiers = [ "Programming Language :: Python :: 3", "Operating System :: OS Independent",]
-dependencies = [ "msgpack",]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+dependencies = ["msgpack"]
+license = "Apache-2.0"
 
 [build-system]
-requires = [ "poetry-core>=1.0.0",]
+requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
-include = [ "uapi/auth.uapi.json", "uapi/internal.uapi.json", "uapi/mock-internal.uapi.json",]
+include = [
+    "uapi/auth.uapi.json",
+    "uapi/internal.uapi.json",
+    "uapi/mock-internal.uapi.json",
+    "uapi/json-schema.json",
+]
 [[tool.poetry.packages]]
 include = "uapi"
 
