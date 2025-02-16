@@ -13,7 +13,7 @@ jobs:
             - name: Set up Node.js
               uses: actions/setup-node@v2
               with:
-                  node-version: "14"
+                  node-version: "16"
 
             - name: Install dependencies
               run: |
@@ -35,6 +35,7 @@ jobs:
               uses: actions/setup-java@v2
               with:
                   java-version: "21"
+                  distribution: "amazon-corretto"
 
             - name: Install dependencies and build
               run: |
@@ -52,6 +53,15 @@ jobs:
               with:
                   python-version: "3.11"
 
+            - name: Install pipx
+              run: |
+                  python3 -m pip install --user pipx
+                  python3 -m pipx ensurepath
+
+            - name: Install Poetry
+              run: |
+                  pipx install poetry
+
             - name: Install dependencies
               run: |
                   cd lib/py
@@ -68,6 +78,20 @@ jobs:
         steps:
             - name: Checkout code
               uses: actions/checkout@v2
+
+            - name: Set up Python
+              uses: actions/setup-python@v2
+              with:
+                  python-version: "3.11"
+
+            - name: Install pipx
+              run: |
+                  python3 -m pip install --user pipx
+                  python3 -m pipx ensurepath
+
+            - name: Install Poetry
+              run: |
+                  pipx install poetry
 
             - name: Download ts build artifacts
               uses: actions/download-artifact@v2
