@@ -4,7 +4,6 @@ import { createChecksum } from '../../internal/binary/CreateChecksum';
 import { UUnion } from '../../internal/types/UUnion';
 import { UStruct } from '../../internal/types/UStruct';
 import { UFn } from '../../internal/types/UFn';
-import { UFieldDeclaration } from '../../internal/types/UFieldDeclaration';
 import { UArray } from '../types/UArray';
 import { UObject } from '../types/UObject';
 import { UTypeDeclaration } from '../types/UTypeDeclaration';

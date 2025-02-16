@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.github.brenbar</groupId>
   <artifactId>uapi</artifactId>
-  <version>0.0.32</version>
+  <version>0.0.33</version>
   <properties>
     <maven.compiler.source>21</maven.compiler.source>
     <maven.compiler.target>21</maven.compiler.target>

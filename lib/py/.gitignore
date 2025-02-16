@@ -1,2 +1,5 @@
 dist/
 .venv/
+uapi/*.json
+uapi/LICENSE
+uapi/NOTICE
