@@ -34,6 +34,13 @@ jobs:
           cd lib/ts
           make
 
+      - name: Upload ts build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-uapi-ts
+          path: lib/ts/dist
+          retention-days: 1
+
   build-uapi-java:
     runs-on: ubuntu-latest
     steps:
@@ -65,6 +72,13 @@ jobs:
           cd lib/java
           make
 
+      - name: Upload java build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-uapi-java
+          path: lib/java/target
+          retention-days: 1
+
   build-uapi-py:
     runs-on: ubuntu-latest
     steps:
@@ -93,6 +107,13 @@ jobs:
         run: |
           cd lib/py
           make
+
+      - name: Upload py build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-uapi-py
+          path: lib/py/dist
+          retention-days: 1
 
   # TODO: Dart
 
