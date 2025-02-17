@@ -1,5 +1,5 @@
 .dart_tool
-lib/js/
+!lib/js/
 node_modules/
-LICENSE
-NOTICE
+!LICENSE
+!NOTICE
