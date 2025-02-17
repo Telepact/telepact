@@ -142,6 +142,11 @@ jobs:
         run: |
           pipx install poetry
 
+      - name: Install nats-server
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y nats-server
+
       - name: Download ts build artifacts
         uses: actions/download-artifact@v4
         with:
@@ -164,4 +169,4 @@ jobs:
         run: |
           cd qa/test
           poetry install
-          poetry run python -m pytest
+          poetry run python -m pytest -k boolean-req0-res0

@@ -1,6 +1,6 @@
 [project]
 name = "uapicodegen"
-version = "0.0.44"
+version = "0.0.45"
 description = "Universal API Code Generator"
 readme = "README.md"
 requires-python = ">=3.11"
