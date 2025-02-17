@@ -4,12 +4,8 @@ PUBSPEC_FILE = pubspec.yaml
 .PHONY: all
 
 all: $(PUBSPEC_FILE)
-	mkdir -p inc
-	cp ../../common/*.json inc
-	mkdir -p dist
-	cp ../../LICENSE ../../NOTICE dist
+	cp ../../LICENSE ../../NOTICE ./
 	npm install
-	npm run build
 	
 	npx rollup -c rollup.crc32.config.js
 	npx rollup -c rollup.msgpackr.config.js
