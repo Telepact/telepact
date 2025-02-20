@@ -7,7 +7,7 @@ all: $(POM_FILE)
 	mkdir -p src/main/resources
 	cp ../../common/*.json src/main/resources
 	cp ../../LICENSE ../../NOTICE src/main/resources
-	mvn install
+	mvn install -q -B
 
 $(POM_FILE): $(SRC_FILES)
 	uapi-version bump || (echo "Install uapi-version bump with 'pipx install ../../tool/uapi_version'" && exit 1)

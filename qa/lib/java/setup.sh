@@ -6,4 +6,4 @@ unset VIRTUAL_ENV
 
 make
 
-mvn verify
+mvn verify -q -B
