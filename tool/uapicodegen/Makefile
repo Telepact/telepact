@@ -6,6 +6,7 @@ UAPI_PYPROJECT = ../../lib/py/pyproject.toml
 
 all: dep $(PYPROJECT)
 	cp ../../LICENSE ../../NOTICE uapicodegen
+	rm -rf tmp
 	mkdir -p tmp
 	tar -xzvf ../../lib/py/dist/*.tar.gz -C tmp
 	rm -rf uapicodegen/uapi
