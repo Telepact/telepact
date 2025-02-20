@@ -3,6 +3,7 @@ import os
 from lxml import etree as ET
 import json
 import toml
+import yaml
 
 
 def bump_version(version: str) -> str:
@@ -47,6 +48,15 @@ def bump() -> None:
         with open("pyproject.toml", "w") as f:
             toml.dump(data, f)
         click.echo(f"Updated pyproject.toml to version {new_version}")
+    elif os.path.exists("pubspec.yaml"):
+        with open("pubspec.yaml", "r") as f:
+            data = yaml.safe_load(f)
+        version = data["version"]
+        new_version = bump_version(version)
+        data["version"] = new_version
+        with open("pubspec.yaml", "w") as f:
+            yaml.safe_dump(data, f)
+        click.echo(f"Updated pubspec.yaml to version {new_version}")
     else:
         click.echo("No supported project file found.")
 
@@ -92,6 +102,17 @@ def depset(version: str) -> None:
                 f"Set uapi dependency to version {version} in pyproject.toml")
         else:
             click.echo("uapi dependency not found in pyproject.toml")
+    elif os.path.exists("pubspec.yaml"):
+        with open("pubspec.yaml", "r") as f:
+            data = yaml.safe_load(f)
+        if "dependencies" in data and "uapi" in data["dependencies"]:
+            data["dependencies"]["uapi"] = version
+            with open("pubspec.yaml", "w") as f:
+                yaml.safe_dump(data, f)
+            click.echo(
+                f"Set uapi dependency to version {version} in pubspec.yaml")
+        else:
+            click.echo("uapi dependency not found in pubspec.yaml")
     else:
         click.echo("No supported project file found.")
 
@@ -113,6 +134,11 @@ def get() -> None:
         with open("pyproject.toml", "r") as f:
             data = toml.load(f)
         version = data["project"]["version"]
+        click.echo(version, nl=False)
+    elif os.path.exists("pubspec.yaml"):
+        with open("pubspec.yaml", "r") as f:
+            data = yaml.safe_load(f)
+        version = data["version"]
         click.echo(version, nl=False)
     else:
         click.echo("No supported project file found.", nl=False)

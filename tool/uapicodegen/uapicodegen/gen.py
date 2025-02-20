@@ -6,8 +6,8 @@ import jinja2
 import click
 from pathlib import Path
 import re
-from uapi import UApiSchema
-from uapi.internal.types.UStruct import UStruct
+from .uapi import UApiSchema
+from .uapi.internal.types.UStruct import UStruct
 
 
 def _validate_package(ctx: click.Context, param: click.Parameter, value: str) -> str:

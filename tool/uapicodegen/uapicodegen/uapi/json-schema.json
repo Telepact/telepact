@@ -1,0 +1,336 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "array",
+    "items": {
+        "oneOf": [
+            {
+                "type": "object",
+                "additionalProperties": false,
+                "minProperties": 1,
+                "patternProperties": {
+                    "^info\\.[a-zA-Z_]\\w*": {
+                        "type": "object",
+                        "description": "Information about the API.",
+                        "additionalProperties": false
+                    }
+                },
+                "properties": {
+                    "///": {
+                        "anyOf": [{ "type": "string" }, { "type": "array", "items": { "type": "string" } }]
+                    }
+                }
+            },
+            {
+                "type": "object",
+                "additionalProperties": false,
+                "minProperties": 1,
+                "patternProperties": {
+                    "^struct\\.[a-zA-Z_]\\w*?": {
+                        "type": "object",
+                        "description": "A struct with 0 or more fields.",
+                        "additionalProperties": false,
+                        "patternProperties": {
+                            "^[a-zA-Z_]\\w*!?$": {
+                                "$ref": "#/$defs/typeDeclaration"
+                            }
+                        }
+                    }
+                },
+                "properties": {
+                    "///": {
+                        "anyOf": [{ "type": "string" }, { "type": "array", "items": { "type": "string" } }]
+                    }
+                }
+            },
+            {
+                "type": "object",
+                "additionalProperties": false,
+                "minProperties": 1,
+                "patternProperties": {
+                    "union\\.[a-zA-Z_]\\w*$": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "description": "An union with 1 or more fields huzzah.",
+                            "minProperties": 1,
+                            "patternProperties": {
+                                "^[a-zA-Z_]\\w*?$": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "patternProperties": {
+                                        "^[a-zA-Z_]\\w*!?$": {
+                                            "$ref": "#/$defs/typeDeclaration"
+                                        }
+                                    }
+                                }
+                            },
+                            "if": {
+                                "properties": {
+                                    "///": {
+                                        "type": ["string", "array"]
+                                    }
+                                }
+                            },
+                            "then": {
+                                "maxProperties": 2,
+                                "properties": {
+                                    "///": {
+                                        "anyOf": [
+                                            { "type": "string" },
+                                            { "type": "array", "items": { "type": "string" } }
+                                        ]
+                                    }
+                                }
+                            },
+                            "else": {
+                                "maxProperties": 1
+                            }
+                        }
+                    }
+                },
+                "properties": {
+                    "///": {
+                        "anyOf": [{ "type": "string" }, { "type": "array", "items": { "type": "string" } }]
+                    }
+                }
+            },
+            {
+                "type": "object",
+                "additionalProperties": false,
+                "minProperties": 2,
+                "patternProperties": {
+                    "^fn\\.[a-zA-Z_]\\w*": {
+                        "description": "A function that accepts an argument struct and returns a result union that is either an `Ok_` struct or an error struct.",
+                        "type": "object",
+                        "additionalProperties": false,
+                        "patternProperties": {
+                            "^[a-zA-Z_]\\w*!?$": {
+                                "$ref": "#/$defs/typeDeclaration"
+                            }
+                        }
+                    }
+                },
+                "required": ["->"],
+                "properties": {
+                    "->": {
+                        "type": "array",
+                        "prefixItems": [
+                            {
+                                "type": "object",
+                                "required": ["Ok_"],
+                                "properties": {
+                                    "Ok_": {
+                                        "type": "object",
+                                        "additionalProperties": false,
+                                        "patternProperties": {
+                                            "^[a-zA-Z_]\\w*!?$": {
+                                                "$ref": "#/$defs/typeDeclaration"
+                                            }
+                                        }
+                                    }
+                                },
+                                "additionalProperties": false
+                            }
+                        ],
+                        "items": {
+                            "type": "object",
+                            "patternProperties": {
+                                "^[a-zA-Z_]\\w*?$": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "patternProperties": {
+                                        "^[a-zA-Z_]\\w*!?$": {
+                                            "$ref": "#/$defs/typeDeclaration"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "///": {
+                        "anyOf": [{ "type": "string" }, { "type": "array", "items": { "type": "string" } }]
+                    }
+                }
+            },
+            {
+                "type": "object",
+                "additionalProperties": false,
+                "minProperties": 2,
+                "patternProperties": {
+                    "^headers\\.[a-zA-Z_]\\w*": {
+                        "description": "A function that accepts an argument struct and returns a result union that is either an `Ok_` struct or an error struct.",
+                        "type": "object",
+                        "additionalProperties": false,
+                        "patternProperties": {
+                            "^[a-zA-Z_]\\w*!?$": {
+                                "$ref": "#/$defs/typeDeclaration"
+                            }
+                        }
+                    }
+                },
+                "required": ["->"],
+                "properties": {
+                    "->": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "patternProperties": {
+                            "^[a-zA-Z_]\\w*!?$": {
+                                "$ref": "#/$defs/typeDeclaration"
+                            }
+                        }
+                    },
+                    "///": {
+                        "anyOf": [{ "type": "string" }, { "type": "array", "items": { "type": "string" } }]
+                    }
+                }
+            },
+            {
+                "type": "object",
+                "additionalProperties": false,
+                "minProperties": 1,
+                "patternProperties": {
+                    "^errors\\.[a-zA-Z_]\\w*": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "description": "An union with 1 or more fields huzzah.",
+                            "minProperties": 1,
+                            "patternProperties": {
+                                "^[a-zA-Z_]\\w*?$": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "patternProperties": {
+                                        "^[a-zA-Z_]\\w*!?$": {
+                                            "$ref": "#/$defs/typeDeclaration"
+                                        }
+                                    }
+                                }
+                            },
+                            "if": {
+                                "properties": {
+                                    "///": {
+                                        "type": ["string", "array"]
+                                    }
+                                }
+                            },
+                            "then": {
+                                "maxProperties": 2,
+                                "properties": {
+                                    "///": {
+                                        "anyOf": [
+                                            { "type": "string" },
+                                            { "type": "array", "items": { "type": "string" } }
+                                        ]
+                                    }
+                                }
+                            },
+                            "else": {
+                                "maxProperties": 1
+                            }
+                        }
+                    }
+                },
+                "properties": {
+                    "///": {
+                        "anyOf": [{ "type": "string" }, { "type": "array", "items": { "type": "string" } }]
+                    }
+                }
+            }
+        ]
+    },
+    "$defs": {
+        "typeDeclaration": {
+            "type": "array",
+            "if": {
+                "prefixItems": [
+                    {
+                        "type": "string",
+                        "pattern": "^((boolean|integer|number|string|any)|(fn|union|struct)\\.([a-zA-Z_]\\w*))(\\?)?$"
+                    }
+                ]
+            },
+            "then": {
+                "prefixItems": [
+                    {
+                        "type": "string",
+                        "pattern": "^((boolean|integer|number|string|any)|(fn|union|struct)\\.([a-zA-Z_]\\w*))(\\?)?$"
+                    }
+                ],
+                "items": false,
+                "minItems": 1,
+                "maxItems": 1
+            },
+            "else": {
+                "if": {
+                    "prefixItems": [
+                        {
+                            "type": "string",
+                            "pattern": "^((array|object)|(fn|(union|struct)<1>)\\.([a-zA-Z_]\\w*))(\\?)?$"
+                        }
+                    ]
+                },
+                "then": {
+                    "prefixItems": [
+                        {
+                            "type": "string",
+                            "pattern": "^((array|object)|(fn|(union|struct)<1>)\\.([a-zA-Z_]\\w*))(\\?)?$"
+                        }
+                    ],
+                    "items": { "$ref": "#/$defs/typeDeclaration" },
+                    "minItems": 2,
+                    "maxItems": 2
+                },
+                "else": {
+                    "if": {
+                        "prefixItems": [
+                            {
+                                "type": "string",
+                                "pattern": "^(fn|(union|struct)<2>)\\.([a-zA-Z_]\\w*)(\\?)?$"
+                            }
+                        ]
+                    },
+                    "then": {
+                        "prefixItems": [
+                            {
+                                "type": "string",
+                                "pattern": "^(fn|(union|struct)<2>)\\.([a-zA-Z_]\\w*)(\\?)?$"
+                            }
+                        ],
+                        "items": { "$ref": "#/$defs/typeDeclaration" },
+                        "minItems": 3,
+                        "maxItems": 3
+                    },
+                    "else": {
+                        "if": {
+                            "prefixItems": [
+                                {
+                                    "type": "string",
+                                    "pattern": "^(fn|(union|struct)<3>)\\.([a-zA-Z_]\\w*)(\\?)?$"
+                                }
+                            ]
+                        },
+                        "then": {
+                            "prefixItems": [
+                                {
+                                    "type": "string",
+                                    "pattern": "^(fn|(union|struct)<3>)\\.([a-zA-Z_]\\w*)(\\?)?$"
+                                }
+                            ],
+                            "items": { "$ref": "#/$defs/typeDeclaration" },
+                            "minItems": 4,
+                            "maxItems": 4
+                        },
+                        "else": {
+                            "prefixItems": [
+                                {
+                                    "type": "string",
+                                    "pattern": "^((boolean|integer|number|string|any|array|object)|(fn|(union|struct)(<[0-3]>)?)\\.([a-zA-Z_]\\w*))(\\?)?$"
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

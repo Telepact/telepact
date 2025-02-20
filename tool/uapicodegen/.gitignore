@@ -1,2 +1,6 @@
 dist/
+vendor/
 .venv/
+uapicodegen/LICENSE
+uapicodegen/NOTICE
+tmp/

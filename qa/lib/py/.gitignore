@@ -2,3 +2,4 @@ metrics.txt
 uapitest/gen/
 .venv/
 .built
+uapi.tar.gz

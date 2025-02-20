@@ -204,25 +204,8 @@ files = [
 ]
 
 [[package]]
-name = "uapi"
-version = "0.0.47"
-description = "Universal API"
-optional = false
-python-versions = ">=3.11"
-groups = ["main"]
-files = []
-develop = false
-
-[package.dependencies]
-msgpack = "*"
-
-[package.source]
-type = "directory"
-url = "../../../lib/py"
-
-[[package]]
 name = "uapicodegen"
-version = "0.0.45"
+version = "0.0.54"
 description = "Universal API Code Generator"
 optional = false
 python-versions = "^3.11"
@@ -233,8 +216,8 @@ develop = false
 [package.dependencies]
 click = "*"
 jinja2 = "*"
+msgpack = "^1.1.0"
 toml = "*"
-uapi = {path = "../../lib/py"}
 
 [package.source]
 type = "directory"
@@ -243,4 +226,4 @@ url = "../../../tool/uapicodegen"
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.11"
-content-hash = "8c20d49bd5efbf86a16ff63185c528dbc9a975ce8a940534846ff15fecc644a4"
+content-hash = "6ae9c280b9c5cdfd69193a0d1e1433bcad1718698fdbcb8c6c1b2ccb4e4d4689"

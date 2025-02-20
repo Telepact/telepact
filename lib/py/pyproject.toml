@@ -1,31 +1,22 @@
 [project]
 name = "uapi"
-version = "0.0.47"
+version = "0.0.52"
 description = "Universal API"
 requires-python = ">=3.11"
-classifiers = [
-    "Programming Language :: Python :: 3",
-    "Operating System :: OS Independent",
-]
-dependencies = ["msgpack"]
+classifiers = [ "Programming Language :: Python :: 3", "Operating System :: OS Independent",]
 license = "Apache-2.0"
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
+requires = [ "poetry-core>=1.0.0",]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
-include = [
-    "uapi/auth.uapi.json",
-    "uapi/internal.uapi.json",
-    "uapi/mock-internal.uapi.json",
-    "uapi/json-schema.json",
-    "uapi/LICENSE",
-    "uapi/NOTICE",
-]
-
+include = [ "uapi/auth.uapi.json", "uapi/internal.uapi.json", "uapi/mock-internal.uapi.json", "uapi/json-schema.json", "uapi/LICENSE", "uapi/NOTICE",]
 [[tool.poetry.packages]]
 include = "uapi"
+
+[tool.poetry.dependencies]
+msgpack = "^1.1.0"
 
 [tool.poetry.group.dev.dependencies]
 nats-py = "*"

@@ -1,6 +1,6 @@
 [project]
 name = "uapicodegen"
-version = "0.0.45"
+version = "0.0.54"
 description = "Universal API Code Generator"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -21,9 +21,8 @@ python = "^3.11"
 toml = "*"
 click = "*"
 jinja2 = "*"
+msgpack = "^1.1.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "*"
-
-[tool.poetry.dependencies.uapi]
-path = "../../lib/py"
+pyinstaller = "*"

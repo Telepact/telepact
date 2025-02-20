@@ -1,6 +1,6 @@
 import uapi.types
 import uapi._util
-from uapi._util_types import _RandomGenerator
+from ..._util_types import _RandomGenerator
 
 if __name__ == '__main__':
     r = _RandomGenerator(3, 3)

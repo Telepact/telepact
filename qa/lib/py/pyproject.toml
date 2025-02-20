@@ -21,9 +21,9 @@ prometheus-client = "*"
 [tool.poetry.dependencies.uapicodegen]
 path = "./../../../tool/uapicodegen"
 
-[tool.poetry.dependencies.uapi]
-path = "../../../lib/py"
-
 [tool.poetry.group.dev.dependencies]
 pytest = "*"
 toml = "*"
+
+[tool.poetry.dependencies.uapi]
+path = "uapi.tar.gz"
