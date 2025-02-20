@@ -10,8 +10,11 @@ $(BUILT_FILE): $(CODEGEN_PYPROJECT) $(JAVA_POM_FILE)
 	poetry lock
 	poetry install
 	poetry run python -m uapicodegen --schema-dir ../../test/schema/example --lang java --out src/gen/java/uapitest --package uapitest
+	mkdir -p target
+	cp ../../../lib/java/target/*.jar target/uapi.jar
+	mvn install:install-file -Dfile=target/uapi.jar -DgroupId=io.github.brenbar -DartifactId=uapi -Dversion=1.0 -Dpackaging=jar
+
 	touch $(BUILT_FILE)
-	UAPI_VERSION=$$(cd ../../../lib/java && uapi-version get) && uapi-version depset $$UAPI_VERSION || (echo "Install uapi-version bump with 'pipx install ../../tool/uapi_version'" && exit 1)
 
 
 dep:
