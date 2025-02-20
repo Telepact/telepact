@@ -3,4 +3,5 @@ vendor/
 .venv/
 uapicodegen/LICENSE
 uapicodegen/NOTICE
+uapicodegen/uapi
 tmp/
