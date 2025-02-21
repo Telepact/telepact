@@ -20,6 +20,7 @@ prometheus-client = "*"
 
 [tool.poetry.dependencies.uapicodegen]
 path = "./../../../tool/uapicodegen"
+develop = true
 
 [tool.poetry.group.dev.dependencies]
 pytest = "*"

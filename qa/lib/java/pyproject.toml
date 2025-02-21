@@ -17,3 +17,4 @@ toml = "*"
 
 [tool.poetry.dependencies.uapicodegen]
 path = "target/uapicodegen.tar.gz"
+develop = true
