@@ -6,7 +6,7 @@ CODEGEN_PYPROJECT = ../../../tool/uapicodegen/pyproject.toml
 all: dep $(BUILT_FILE)
 
 $(BUILT_FILE): $(CODEGEN_PYPROJECT)
-	uapicodegen --schema-dir ../../test/schema/example --lang ts --out src/gen --package uapitest
+	uapicodegen --schema-dir ../../test/schema/example --lang ts --out src/gen
 
 dep:
 	@cd ../../../tool/uapicodegen && make
