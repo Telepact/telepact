@@ -115,6 +115,42 @@ jobs:
           path: lib/py/dist
           retention-days: 1
 
+  build-uapicodegen:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install pipx
+        run: |
+          python3 -m pip install --user pipx
+          python3 -m pipx ensurepath
+
+      - name: Install version tooling
+        run: |
+          pipx install tool/uapi_version
+
+      - name: Install Poetry
+        run: |
+          pipx install poetry
+
+      - name: Install dependencies
+        run: |
+          cd tool/uapicodegen
+          make
+
+      - name: Upload uapicodegen build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-uapicodegen
+          path: tool/uapicodegen/dist
+          retention-days: 1
+
   # TODO: Dart
 
   run-tests:
@@ -170,6 +206,16 @@ jobs:
         with:
           name: build-uapi-py
           path: lib/py/dist
+
+      - name: Download uapicodegen build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-uapicodegen
+          path: tool/uapicodegen/dist
+
+      - name: Install Poetry
+        run: |
+          pipx install tool/uapicodegen/dist/uapicodegen-*.tar.gz
 
       - name: Run tests
         run: |

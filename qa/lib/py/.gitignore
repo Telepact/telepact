@@ -3,4 +3,3 @@ uapitest/gen/
 .venv/
 .built
 uapi.tar.gz
-uapicodegen.tar.gz

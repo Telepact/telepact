@@ -25,6 +25,3 @@ develop = true
 [tool.poetry.group.dev.dependencies]
 pytest = "*"
 toml = "*"
-
-[tool.poetry.dependencies.uapi]
-path = "uapi.tar.gz"
