@@ -18,10 +18,6 @@ msgpack = "*"
 nats-py = "*"
 prometheus-client = "*"
 
-[tool.poetry.dependencies.uapicodegen]
-path = "uapicodegen.tar.gz"
-develop = true
-
 [tool.poetry.group.dev.dependencies]
 pytest = "*"
 toml = "*"
