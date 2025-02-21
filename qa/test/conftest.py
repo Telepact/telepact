@@ -83,7 +83,7 @@ def dispatcher_server(loop, nats_server, request, nats_client):
     s = subprocess.Popen(['./setup.sh'], cwd=path, env=env_vars)
 
     try:
-        startup_check(loop, lambda: ping(nats_client, lib_name), times=20)
+        startup_check(loop, lambda: ping(nats_client, lib_name), times=30)
     except Exception:
         raise
 
@@ -96,7 +96,7 @@ def dispatcher_server(loop, nats_server, request, nats_client):
     loop.run_until_complete(t2())
 
     try:
-        s.wait(timeout=10)
+        s.wait(timeout=20)
     except subprocess.TimeoutExpired:
         s.terminate()
         s.wait()

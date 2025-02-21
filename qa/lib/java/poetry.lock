@@ -211,7 +211,7 @@ optional = false
 python-versions = ">=3.11"
 groups = ["main"]
 files = [
-    {file = "uapicodegen.tar.gz", hash = "sha256:7a8e2c9191bbb059627b07e39601560152ef89b3896b24689f85444db24faa51"},
+    {file = "uapicodegen.tar.gz", hash = "sha256:35a2b8c1ffde0ee1c28a26b94dbcc33453eeb1321553aa5025d7983aa60f2f3b"},
 ]
 
 [package.dependencies]

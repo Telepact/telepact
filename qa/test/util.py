@@ -367,7 +367,7 @@ async def ping(nats_client, topic):
     await nats_client.request(topic, req.encode(), timeout=1)
 
 
-def startup_check(loop: asyncio.AbstractEventLoop, verify, times=10):
+def startup_check(loop: asyncio.AbstractEventLoop, verify, times=20):
     async def check():
         ex: Exception = None
         for _ in range(times):

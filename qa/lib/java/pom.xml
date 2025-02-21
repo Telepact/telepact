@@ -10,6 +10,11 @@
   </properties>
   <dependencies>
     <dependency>
+      <groupId>io.github.brenbar</groupId>
+      <artifactId>uapi</artifactId>
+      <version>1.0</version>
+    </dependency>
+    <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
       <version>2.18.2</version>
@@ -29,6 +34,11 @@
       <artifactId>metrics-core</artifactId>
       <version>4.2.19</version>
     </dependency>
+    <dependency>
+      <groupId>org.msgpack</groupId>
+      <artifactId>jackson-dataformat-msgpack</artifactId>
+      <version>0.9.9</version>
+    </dependency>    
   </dependencies>
   <build>
     <plugins>
@@ -117,7 +127,7 @@
                 <argument>report</argument>
                 <argument>${project.build.directory}/jacoco.exec</argument>
                 <argument>--classfiles</argument>
-                <argument>${project.build.directory}/dependency/uapi-1.0-SNAPSHOT.jar</argument>
+                <argument>${project.build.directory}/dependency/uapi-1.0.jar</argument>
                 <argument>--sourcefiles</argument>
                 <argument>${project.basedir}/../../../lib/java/src/main/java</argument>
                 <argument>--html</argument>
