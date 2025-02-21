@@ -8,6 +8,7 @@ all: dep $(BUILT_FILE)
 
 $(BUILT_FILE): $(UAPI_PYPROJECT) $(CODEGEN_PYPROJECT)
 	cp ../../../lib/py/dist/*.tar.gz uapi.tar.gz
+	cp ../../../tool/uapicodegen/dist/*.tar.gz uapicodegen.tar.gz
 	poetry lock
 	poetry install
 	poetry run python -m uapicodegen --schema-dir ../../test/schema/example --lang py --out uapitest/gen --package uapitest

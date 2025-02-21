@@ -6,6 +6,7 @@ CODEGEN_PYPROJECT = ../../../tool/uapicodegen/pyproject.toml
 all: dep $(BUILT_FILE)
 
 $(BUILT_FILE): $(CODEGEN_PYPROJECT)
+	cp ../../../tool/uapicodegen/dist/*.tar.gz uapicodegen.tar.gz
 	poetry lock
 	poetry install
 	poetry run python -m uapicodegen --schema-dir ../../test/schema/example --lang ts --out src/gen --package uapitest

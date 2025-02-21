@@ -19,7 +19,7 @@ nats-py = "*"
 prometheus-client = "*"
 
 [tool.poetry.dependencies.uapicodegen]
-path = "./../../../tool/uapicodegen"
+path = "uapicodegen.tar.gz"
 develop = true
 
 [tool.poetry.group.dev.dependencies]

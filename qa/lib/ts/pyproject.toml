@@ -16,5 +16,5 @@ python = "^3.11"
 toml = "^0.10.2"
 
 [tool.poetry.dependencies.uapicodegen]
-path = "../../../tool/uapicodegen"
+path = "uapicodegen.tar.gz"
 develop = true
