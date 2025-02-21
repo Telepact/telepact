@@ -12,6 +12,7 @@ all: dep $(PYPROJECT)
 	rm -rf uapicodegen/uapi
 	mv tmp/*/uapi uapicodegen/uapi
 
+	rm -rf dist
 	poetry install
 	poetry build
 

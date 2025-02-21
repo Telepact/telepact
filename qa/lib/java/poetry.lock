@@ -208,22 +208,23 @@ name = "uapicodegen"
 version = "0.0.54"
 description = "Universal API Code Generator"
 optional = false
-python-versions = "^3.11"
+python-versions = ">=3.11"
 groups = ["main"]
-files = []
-develop = false
+files = [
+    {file = "uapicodegen.tar.gz", hash = "sha256:7a8e2c9191bbb059627b07e39601560152ef89b3896b24689f85444db24faa51"},
+]
 
 [package.dependencies]
 click = "*"
 jinja2 = "*"
-msgpack = "^1.1.0"
+msgpack = ">=1.1.0,<2.0.0"
 toml = "*"
 
 [package.source]
-type = "directory"
-url = "../../../tool/uapicodegen"
+type = "file"
+url = "target/uapicodegen.tar.gz"
 
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.11"
-content-hash = "6ae9c280b9c5cdfd69193a0d1e1433bcad1718698fdbcb8c6c1b2ccb4e4d4689"
+content-hash = "dcb03e3df0fab60231edd47d1c00dce362218ea939c2637784ff445a013c08b9"

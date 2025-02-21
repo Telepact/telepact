@@ -10,12 +10,9 @@ requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
-include = ["uapicodegen/uapi", "uapi/LICENSE", "uapi/NOTICE"]
+include = ["uapicodegen/uapi/**/*", "uapi/LICENSE", "uapi/NOTICE"]
 [[tool.poetry.packages]]
 include = "uapicodegen"
-
-[tool.poetry.scripts]
-uapicodegen = "uapicodegen.gen:generate"
 
 [tool.poetry.dependencies]
 python = "^3.11"
@@ -27,3 +24,6 @@ msgpack = "^1.1.0"
 [tool.poetry.dev-dependencies]
 pytest = "*"
 pyinstaller = "*"
+
+[tool.poetry.scripts]
+uapicodegen = "uapicodegen.gen:generate"
