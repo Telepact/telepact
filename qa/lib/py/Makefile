@@ -12,7 +12,7 @@ $(BUILT_FILE): $(UAPI_PYPROJECT) $(CODEGEN_PYPROJECT)
 	poetry lock
 	poetry install
 
-	uapicodegen --schema-dir ../../test/schema/example --lang java --out src/gen/java/uapitest --package uapitest
+	uapicodegen --schema-dir ../../test/schema/example --lang py --out uapitest/gen
 
 
 dep:
