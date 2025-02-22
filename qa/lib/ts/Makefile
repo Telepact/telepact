@@ -7,7 +7,8 @@ all: dep $(BUILT_FILE)
 
 $(BUILT_FILE): $(CODEGEN_PYPROJECT)
 	uapicodegen --schema-dir ../../test/schema/example --lang ts --out src/gen
-	ls src/gen
+	npm install
+	npm run build
 
 dep:
 	@cd ../../../tool/uapicodegen && make
