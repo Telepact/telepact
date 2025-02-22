@@ -17,5 +17,4 @@ $(BUILT_FILE): $(UAPI_PYPROJECT) $(CODEGEN_PYPROJECT)
 
 dep:
 	cd ../../../lib/py && make
-	cd ../../../tool/uapicodegen && make
 

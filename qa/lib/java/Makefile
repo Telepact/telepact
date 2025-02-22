@@ -16,6 +16,5 @@ $(BUILT_FILE): $(CODEGEN_PYPROJECT) $(JAVA_POM_FILE)
 
 
 dep:
-	cd ../../../tool/uapicodegen && make
 	cd ../../../lib/java && make
 
