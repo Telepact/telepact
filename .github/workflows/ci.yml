@@ -228,4 +228,4 @@ jobs:
         run: |
           cd qa/test
           poetry install
-          poetry run python -m pytest -k boolean-req0-res0 -s
+          poetry run python -m pytest
