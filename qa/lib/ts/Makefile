@@ -7,6 +7,7 @@ all: dep $(BUILT_FILE)
 
 $(BUILT_FILE): $(CODEGEN_PYPROJECT)
 	uapicodegen --schema-dir ../../test/schema/example --lang ts --out src/gen
+	ls src/gen
 
 dep:
 	@cd ../../../tool/uapicodegen && make
