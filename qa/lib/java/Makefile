@@ -1,12 +1,11 @@
 BUILT_FILE = .built
-CODEGEN_PYPROJECT = ../../../tool/uapicodegen/pyproject.toml
 JAVA_POM_FILE = ../../../lib/java/pom.xml
 
 .PHONY: all dep
 
 all: dep $(BUILT_FILE)
 
-$(BUILT_FILE): $(CODEGEN_PYPROJECT) $(JAVA_POM_FILE)
+$(BUILT_FILE): $(JAVA_POM_FILE)
 	mkdir -p target
 
 	cp ../../../lib/java/target/*.jar target/uapi.jar

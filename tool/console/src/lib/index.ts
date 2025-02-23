@@ -1,8 +1,8 @@
 // place files you want to import through the `$lib` alias in this folder.
 import { goto } from '$app/navigation';
 import * as monaco from 'monaco-editor';
-import * as uapi from 'uapi';
-import { _internal } from 'uapi';
+import * as uapi from './uapi/index.esm.js';
+import { _internal } from './uapi/index.esm.js';
 import { writable, type Writable } from 'svelte/store';
 import { createJsonSchema } from './jsonSchema';
 

@@ -1,5 +1,5 @@
 import { findSchemaKey } from '$lib';
-import type { UApiSchema } from 'uapi';
+import type { UApiSchema } from './uapi/index.esm';
 
 export function createJsonSchema(uapi: UApiSchema): Record<string, any> {
 	let original = uapi.full;

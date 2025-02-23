@@ -35,15 +35,15 @@
 	"type": "module",
 	"dependencies": {
 		"@prettier/sync": "^0.5.1",
+		"crc-32": "^1.2.2",
 		"dompurify": "^3.0.9",
 		"marked": "^12.0.0",
 		"monaco-editor": "^0.52.2",
+		"msgpackr": "^1.11.2",
 		"prettier": "^3.4.2",
-		"uapi": "workspace:*",
 		"prettier-plugin-uapi": "workspace:*"
 	},
 	"workspaces": [
-		"../../lib/ts",
 		"../prettier-plugin-uapi"
 	],
 	"files": [

@@ -15,7 +15,7 @@
 		type TypeData
 	} from '$lib';
 	import { page } from '$app/stores';
-	import { UApiSchema } from 'uapi';
+	import { UApiSchema } from './uapi/index.esm';
 	import { onMount } from 'svelte';
 	import MonacoEditor from './MonacoEditor.svelte';
 	import TypeRef from './TypeRef.svelte';

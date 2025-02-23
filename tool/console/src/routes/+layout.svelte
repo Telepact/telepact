@@ -3,7 +3,7 @@
 
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
-	import { UApiSchema, Message, jsonSchema } from 'uapi';
+	import { UApiSchema, Message, jsonSchema } from '$lib/uapi/index.esm';
 
 	import {
 		genExample,

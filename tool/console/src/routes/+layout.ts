@@ -9,7 +9,7 @@ import {
 	UApiSchema,
 	Message,
 	MockUApiSchema
-} from 'uapi';
+} from '$lib/uapi/index.esm';
 import type { LayoutLoad } from './$types';
 import demoSchemaPseudoJson from './demo.uapi.json';
 import prettier from 'prettier/standalone';
