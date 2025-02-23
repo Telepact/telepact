@@ -11,6 +11,7 @@ export function createJsonSchema2(uapi: uapi.UApiSchema): Record<string, any> {
 }
 
 export const responseStore: Writable<string | null> = writable(null);
+const authHeaderStore: Writable<Record<string, any> | null> = writable(null);
 
 export const stockPingRequest = `[
   {},
@@ -30,8 +31,18 @@ export const stockPingResponse = `[
 
 const random = new uapi.RandomGenerator(2, 2);
 
-export function minifyJson(json: string) {
+export function minifyJson(json: string, redactAuthHeader = false) {
 	let pseudoJson = JSON.parse(json);
+
+	if (redactAuthHeader) {
+		let authHeader = pseudoJson[0]['auth_'];
+
+		if (authHeader !== undefined) {
+			pseudoJson[0]['auth_'] = '{{redacted}}';
+			authHeaderStore.set(authHeader);
+		}
+	}
+
 	return JSON.stringify(pseudoJson);
 }
 
@@ -45,11 +56,21 @@ export function unMinifyJson(json: string | null, authManaged: boolean = false) 
 		pseudoJson[0]['auth_'] = '{{managed}}';
 	}
 
+	let authHeader = pseudoJson[0]['auth_'];
+	if (authHeader === '{{redacted}}') {
+		authHeaderStore.subscribe((authHeader) => {
+			if (authHeader !== null) {
+				pseudoJson[0]['auth_'] = authHeader;
+			}
+		})();
+		authHeaderStore.set(null);
+	}
+
 	return JSON.stringify(pseudoJson, null, 2);
 }
 
 export function handleRequest(request: string, viewQuery: string) {
-	let minifiedRequest = minifyJson(request);
+	let minifiedRequest = minifyJson(request, true);
 	let q = new URLSearchParams(window.location.search);
 	if (viewQuery !== undefined) {
 		q.set('v', viewQuery);
