@@ -421,7 +421,7 @@ files = [
 
 [[package]]
 name = "uapi"
-version = "0.0.35"
+version = "0.0.54"
 description = "Universal API"
 optional = false
 python-versions = ">=3.11"
@@ -430,7 +430,7 @@ files = []
 develop = false
 
 [package.dependencies]
-msgpack = "*"
+msgpack = "^1.1.0"
 
 [package.source]
 type = "directory"

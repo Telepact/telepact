@@ -250,7 +250,7 @@
 							/>
 						</svg>
 					</div>
-					<span class="px-2 text-lg font-semibold text-gray-100">uAPI</span>
+					<h1 class="px-2 text-lg font-semibold text-gray-100">uAPI</h1>
 				</div>
 			</div>
 			<div id="view-select" class="flex basis-1/3 content-center justify-center space-x-2">

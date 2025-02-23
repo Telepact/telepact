@@ -89,7 +89,7 @@ async def handler(message: Message) -> Message:
     elif function_name == 'fn.getPaperTape':
         # Assuming computations are stored in a global list
         return Message({}, {'Ok_': {"tape": global_computations}})
-    
+
     elif function_name == 'fn.showExample':
         return Message({}, {'Ok_': {'link': {'fn.compute': {'x': {'Constant': {'value': 5}}, 'y': {'Constant': {'value': 7}}, 'op': {'Add': {}}}}}})
 
@@ -127,6 +127,11 @@ async def api(request: Request) -> Response:
 
     return Response(content=response_bytes, media_type=media_type)
 
-if __name__ == "__main__":
+
+def run_main():
     uvicorn.run("calculator_service.__main__:app",
                 host='0.0.0.0', port=8000, reload=True)
+
+
+if __name__ == "__main__":
+    run_main()
