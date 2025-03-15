@@ -57,3 +57,21 @@ install-cli:
 
 uninstall-cli:
 	pipx uninstall msgpact-cli
+
+prettier:
+	cd tool/prettier-plugin-msgpact && make
+
+clean-prettier:
+	cd tool/prettier-plugin-msgpact && make clean
+
+console:
+	cd tool/console && make
+
+dev-console:
+	cd tool/console && make dev
+
+clean-console:
+	cd tool/console && make clean
+
+test-console:
+	cd tool/console && make test

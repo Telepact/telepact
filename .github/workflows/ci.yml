@@ -112,7 +112,6 @@ jobs:
           path: tool/cli/dist
           retention-days: 1
 
-  # TODO: Dart
   build-msgpact-dart:
     runs-on: ubuntu-latest
     needs: [build-msgpact-ts]
@@ -141,6 +140,59 @@ jobs:
 
       - name: Run tests
         run: make test-dart
+
+  build-msgpact-prettier:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: make prettier
+
+      - name: Upload prettier build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-msgpact-prettier
+          path: tool/prettier-plugin-msgpact/dist
+          retention-days: 1
+
+  build-msgpact-console:
+    runs-on: ubuntu-latest
+    needs: [build-msgpact-ts, build-msgpact-cli, build-msgpact-prettier]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download ts build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-msgpact-ts
+          path: lib/ts/dist
+
+      - name: Download msgpact-cli build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-msgpact-cli
+          path: tool/cli/dist
+
+      - name: Download prettier build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-msgpact-prettier
+          path: tool/prettier-plugin-msgpact/dist
+      
+      - name: Install CLI
+        run: make install-cli
+
+      - name: Build console
+        run: make console
+      
+      - name: Install Playwright Browsers
+        run: pipx playwright install -y
+      
+      - name: Run tests
+        run: make test-console
 
 
   run-tests:
@@ -198,7 +250,7 @@ jobs:
           name: build-msgpact-cli
           path: tool/cli/dist
 
-      - name: Install Poetry
+      - name: Install CLI
         run: make install-cli
 
       - name: Run tests

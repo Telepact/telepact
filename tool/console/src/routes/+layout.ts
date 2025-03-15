@@ -13,7 +13,7 @@ import {
 import type { LayoutLoad } from './$types';
 import demoSchemaPseudoJson from './demo.msgpact.json';
 import prettier from 'prettier/standalone';
-import msgpactPlugin from 'prettier-plugin-msgpact';
+import msgpactPlugin from '$lib/prettier-plugin-msgpact/index.esm';
 import markdownPlugin from 'prettier/plugins/markdown';
 import estreePlugin from 'prettier/plugins/estree';
 import babelPlugin from 'prettier/plugins/babel';
