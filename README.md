@@ -1,7 +1,7 @@
 # Introduction
 
-MsgPact is API ecosystem fueled by messages. It's design is built on
-the universal interchange format of JSON and compatible with essentially all
+MsgPact is an API ecosystem fueled by messages. It is built on the
+universal interchange format of JSON and compatible with essentially all
 inter-process communication protocols.
 
 Wherever JSON can go, a MsgPact API can be served. 🚀
