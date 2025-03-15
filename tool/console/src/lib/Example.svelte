@@ -43,6 +43,7 @@
 				json={generate()}
 				allowLinks={false}
 				filename={schemaKey + '.json'}
+				ariaLabel={schemaKey + '.example'}
 				fullHeight={false}
 				lineNumbers={false}
 				minimap={false}

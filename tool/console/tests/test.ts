@@ -1,5 +1,6 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 import { text } from 'stream/consumers';
+import { demoSchema } from './constants';
 
 test('Console is working correctly', async ({ page }) => {
 	await page.goto('/');
@@ -28,125 +29,24 @@ test('Console is working correctly', async ({ page }) => {
 		await page.keyboard.press('Control+C');
 	}
 
-	const clipboardText = await page.evaluate(() => navigator.clipboard.readText());
-	expect(clipboardText).toBe(
-`[
-  {
-    "///": " A calculator app that provides basic math computation capabilities. ",
-    "info.Calculator": {}
-  },
-  {
-    "///": " Compute the \`result\` of the given \`x\` and \`y\` values. ",
-    "fn.compute": {
-      "x": ["union.Value"],
-      "y": ["union.Value"],
-      "op": ["union.Operation"]
-    },
-    "->": [
-      {
-        "Ok_": {
-          "result": ["number"]
-        }
-      },
-      {
-        "ErrorCannotDivideByZero": {}
-      }
-    ]
-  },
-  {
-    "///": " Export all saved variables, up to an optional \`limit\`. ",
-    "fn.exportVariables": {
-      "limit!": ["integer"]
-    },
-    "->": [
-      {
-        "Ok_": {
-          "variables": ["array", ["struct.Variable"]]
-        }
-      }
-    ]
-  },
-  {
-    "///": " A function template. ",
-    "fn.getPaperTape": {},
-    "->": [
-      {
-        "Ok_": {
-          "tape": ["array", ["struct.Computation"]]
-        }
-      }
-    ]
-  },
-  {
-    "///": " Save a set of variables as a dynamic map of variable names to their value. ",
-    "fn.saveVariables": {
-      "variables": ["object", ["number"]]
-    },
-    "->": [
-      {
-        "Ok_": {}
-      }
-    ]
-  },
-  {
-    "fn.showExample": {},
-    "->": [
-      {
-        "Ok_": {
-          "link": ["fn.compute"]
-        }
-      }
-    ]
-  },
-  {
-    "///": " A computation. ",
-    "struct.Computation": {
-      "firstOperand": ["union.Value"],
-      "secondOperand": ["union.Value"],
-      "operation": ["union.Operation"],
-      "timestamp": ["integer"],
-      "successful": ["boolean"]
-    }
-  },
-  {
-    "///": " A mathematical variable represented by a \`name\` that holds a certain \`value\`. ",
-    "struct.Variable": {
-      "name": ["string"],
-      "value": ["number"]
-    }
-  },
-  {
-    "///": " A basic mathematical operation. ",
-    "union.Operation": [
-      {
-        "Add": {}
-      },
-      {
-        "Sub": {}
-      },
-      {
-        "Mul": {}
-      },
-      {
-        "Div": {}
-      }
-    ]
-  },
-  {
-    "///": " A value for computation that can take either a constant or variable form. ",
-    "union.Value": [
-      {
-        "Constant": {
-          "value": ["number"]
-        }
-      },
-      {
-        "Variable": {
-          "name": ["string"]
-        }
-      }
-    ]
-  }
-]`);
+	expect(await getClipboardText(page)).toBe(demoSchema);
+
+	await textAreaElement.locator("..").click();
+	await page.keyboard.press('a');
+
+	// Editor should not have changed, since it is not editable
+	expect(await getClipboardText(page)).toBe(demoSchema);
 });
+
+async function getClipboardText(page: Page): Promise<string> {
+	if (process.platform === 'darwin') {
+		await page.keyboard.press('Meta+A');
+		await page.keyboard.press('Meta+C');
+	} else {
+		await page.keyboard.press('Control+A');
+		await page.keyboard.press('Control+C');
+	}
+
+	return await page.evaluate(() => navigator.clipboard.readText());
+}
 
