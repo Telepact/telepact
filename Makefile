@@ -46,14 +46,14 @@ clean-dart:
 test-dart:
 	cd port/dart && make test
 
-codegen:
-	cd tool/msgpact_codegen && make
+cli:
+	cd tool/cli && make
 
-clean-codegen:
-	cd tool/msgpact_codegen && make clean
+clean-cli:
+	cd tool/cli && make clean
 
-install-codegen:
-	pipx install $(wildcard tool/msgpact_codegen/dist/msgpact_codegen-*.tar.gz)
+install-cli:
+	pipx install $(wildcard tool/cli/dist/msgpact_cli-*.tar.gz)
 
-uninstall-codegen:
-	pipx uninstall msgpact-codegen
+uninstall-cli:
+	pipx uninstall msgpact

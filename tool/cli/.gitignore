@@ -1,0 +1,6 @@
+dist/
+.venv/
+msgpact_cli/LICENSE
+msgpact_cli/NOTICE
+msgpact_cli/msgpact
+tmp/

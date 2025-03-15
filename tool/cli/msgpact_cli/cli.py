@@ -1,3 +1,9 @@
+import click
+import os
+from lxml import etree as ET
+import json
+import toml
+import yaml
 import argparse
 import json
 import shutil
@@ -9,6 +15,12 @@ import re
 from .msgpact import MsgPactSchema
 
 
+def bump_version(version: str) -> str:
+    major, minor, patch = map(int, version.split('.'))
+    patch += 1
+    return f"{major}.{minor}.{patch}"
+
+
 def _validate_package(ctx: click.Context, param: click.Parameter, value: str) -> str:
     lang = ctx.params.get('lang')
     if lang == 'java' and not value:
@@ -17,14 +29,25 @@ def _validate_package(ctx: click.Context, param: click.Parameter, value: str) ->
     return value
 
 
+@click.group()
+def main() -> None:
+    pass
+
+
 @click.command()
 @click.option('--schema-dir', help='msgPact schema directory', required=True)
-@click.option('--lang', help='Language target (one of "java", "py", or "ts)', required=True)
+@click.option('--lang', help='Language target (one of "java", "py", or "ts")', required=True)
 @click.option('--out', help='Output directory', required=True)
-@click.option('--package', help='Java package', callback=_validate_package)
-def generate(schema_dir: str, lang: str, out: str, package: str) -> None:
+@click.option('--package', help='Java package (use if --lang is "java")', callback=_validate_package)
+def codegen(schema_dir: str, lang: str, out: str, package: str) -> None:
 
-    print('Starting CLI')
+    print('MsgPact CLI')
+    print('Schema directory:', schema_dir)
+    print('Language target:', lang)
+    print('Output directory:', out)
+    if package:
+        print('Java package:', package)
+
 
     msgpact_schema = MsgPactSchema.from_directory(schema_dir)
 
@@ -67,7 +90,7 @@ def _generate_internal(schema_data: list[dict[str, object]], target: str, output
     # Load jinja template from file
     # Adjust the path to your template directory if necessary
     template_loader = jinja2.PackageLoader(
-        'msgpact_codegen', 'templates')
+        'msgpact_cli', 'templates')
     template_env = jinja2.Environment(
         loader=template_loader, extensions=['jinja2.ext.do'])
 
@@ -212,3 +235,9 @@ def _generate_internal(schema_data: list[dict[str, object]], target: str, output
 
         else:
             print(output)
+
+
+main.add_command(codegen)
+
+if __name__ == "__main__":
+    main()

@@ -1,7 +1,7 @@
 .PHONY: all dep
 
 all: dep
-	msgpact-codegen --schema-dir ../../test/schema/example --lang ts --out src/gen
+	msgpact codegen --schema-dir ../../test/schema/example --lang ts --out src/gen
 	npm install
 	npm run build
 

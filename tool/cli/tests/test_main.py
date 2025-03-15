@@ -1,7 +1,7 @@
 import pytest
 from click.testing import CliRunner
 # Adjust the import path according to your project structure
-from msgpact_codegen.gen import generate
+from msgpact_cli.cli import main
 import traceback
 
 
@@ -12,7 +12,7 @@ def runner() -> CliRunner:
 
 def test_command_java(runner: CliRunner) -> None:
     result = runner.invoke(
-        generate, ['--schema-dir', 'tests/data', '--lang', 'java', '--out', 'tests/output/java', '--package', 'output'])
+        main, ['codegen', '--schema-dir', 'tests/data', '--lang', 'java', '--out', 'tests/output/java', '--package', 'output'])
 
     # print stack trace
     import traceback
@@ -33,7 +33,7 @@ def test_command_java(runner: CliRunner) -> None:
 
 def test_command_py(runner: CliRunner) -> None:
     result = runner.invoke(
-        generate, ['--schema-dir', 'tests/data', '--lang', 'py', '--out', 'tests/output/py'])
+        main, ['codegen', '--schema-dir', 'tests/data', '--lang', 'py', '--out', 'tests/output/py'])
 
     # print stack trace
     import traceback
@@ -54,7 +54,7 @@ def test_command_py(runner: CliRunner) -> None:
 
 def test_command_ts(runner: CliRunner) -> None:
     result = runner.invoke(
-        generate, ['--schema-dir', 'tests/data', '--lang', 'ts', '--out', 'tests/output/ts'])
+        main, ['codegen', '--schema-dir', 'tests/data', '--lang', 'ts', '--out', 'tests/output/ts'])
 
     # print stack trace
     import traceback

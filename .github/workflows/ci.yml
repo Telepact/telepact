@@ -76,7 +76,7 @@ jobs:
           path: lib/py/dist
           retention-days: 1
 
-  build-msgpact-codegen:
+  build-msgpact-cli:
     runs-on: ubuntu-latest
     needs: [build-msgpact-py]
     steps:
@@ -102,14 +102,14 @@ jobs:
           name: build-msgpact-py
           path: lib/py/dist
 
-      - name: Build codegen
-        run: make codegen
+      - name: Build cli
+        run: make cli
 
-      - name: Upload msgpact-codegen build artifacts
+      - name: Upload msgpact-cli build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: build-msgpact-codegen
-          path: tool/msgpact_codegen/dist
+          name: build-msgpact-cli
+          path: tool/cli/dist
           retention-days: 1
 
   # TODO: Dart
@@ -145,7 +145,7 @@ jobs:
 
   run-tests:
     runs-on: ubuntu-latest
-    needs: [build-msgpact-ts, build-msgpact-java, build-msgpact-py, build-msgpact-codegen]
+    needs: [build-msgpact-ts, build-msgpact-java, build-msgpact-py, build-msgpact-cli]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -192,14 +192,14 @@ jobs:
           name: build-msgpact-py
           path: lib/py/dist
 
-      - name: Download msgpact-codegen build artifacts
+      - name: Download msgpact-cli build artifacts
         uses: actions/download-artifact@v4
         with:
-          name: build-msgpact-codegen
-          path: tool/msgpact_codegen/dist
+          name: build-msgpact-cli
+          path: tool/cli/dist
 
       - name: Install Poetry
-        run: make install-codegen
+        run: make install-cli
 
       - name: Run tests
         run: make test

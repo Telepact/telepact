@@ -12,7 +12,7 @@ $(BUILT_FILE): $(JAVA_POM_FILE)
 	cp ../../../lib/java/target/*.jar target/msgpact.jar
 	mvn install:install-file -Dfile=target/msgpact.jar -DgroupId=io.github.msgpact -DartifactId=msgpact -Dversion=1.0 -Dpackaging=jar
 
-	msgpact-codegen --schema-dir ../../test/schema/example --lang java --out src/gen/java/msgpacttest --package msgpacttest
+	msgpact codegen --schema-dir ../../test/schema/example --lang java --out src/gen/java/msgpacttest --package msgpacttest
 
 
 dep:
