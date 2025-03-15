@@ -22,7 +22,7 @@
 		class="group mt-2 flex items-center rounded-lg hover:underline"
 	>
 		<h6 class="rounded-md p-2 {showExample ? 'border border-slate-500 font-bold' : ''}">
-			{showExample ? 'Hide' : ''} Example
+			{showExample ? 'Hide Example' : 'Example'}
 		</h6>
 	</button>
 	{#if showExample}

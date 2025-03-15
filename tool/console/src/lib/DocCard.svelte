@@ -153,7 +153,6 @@
 
 					<div class="flex items-center justify-center space-x-2">
 						<button
-							aria-label="Result Example"
 							on:click={toggleShowExample}
 							class="group mt-2 flex items-center rounded-lg hover:underline"
 						>
@@ -162,7 +161,7 @@
 									? 'border border-slate-500 font-bold'
 									: ''}"
 							>
-								{showExample ? 'Hide' : ''} Example
+								{showExample ? 'Hide Example' : 'Example'}
 							</h6>
 						</button>
 						{#if showExample}
