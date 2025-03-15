@@ -62,7 +62,7 @@ test.describe('Loading from demo server', () => {
 		).toBe(demoSchema);
 	});
 
-	test('Doc UI works correctly', async ({ page }) => {
+	test('Doc UI shows examples correctly', async ({ page }) => {
 	
 		let infoCard = page.getByRole('region', { name: 'info.Calculator'});
 		await expect(
@@ -184,8 +184,28 @@ test.describe('Loading from demo server', () => {
 				]
 			}
 		});
+		
+	});
 
+	test('Doc UI follows links correctly', async ({ page }) => {
+			
+		let fnCard = page.getByRole('region', { name: 'fn.compute'});
+		await expect(
+			fnCard,
+			"showExample function should be visible"
+		).toBeVisible();
 
+		await expect(
+			page.getByRole('region', { name: 'union.Value'}),
+			"Value struct should not yet be visible"
+		).not.toBeInViewport();
+
+		await fnCard.getByRole('link', { name: 'Value'}).first().click();
+
+		await expect(
+			page.getByRole('region', { name: 'union.Value'}),
+			"Value struct should be visible"
+		).toBeInViewport();
 	
 	});
 	
