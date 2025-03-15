@@ -254,4 +254,7 @@ jobs:
         run: make install-cli
 
       - name: Run tests
-        run: make test-trace-java
+        run: |
+          make test-trace-java
+          make test-trace-ts
+          make test-trace-py
