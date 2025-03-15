@@ -256,6 +256,8 @@
 			<div id="view-select" class="flex basis-1/3 content-center justify-center space-x-2">
 				<div class="inline-flex rounded-md">
 					<button
+						aria-label="Toggle Schema"
+						aria-pressed={activeViews.includes('s')}
 						on:click={toggleShowSchemaCode}
 						class="rounded-s-md p-2 {activeViews.includes('s')
 							? 'bg-sky-700 text-cyan-300'
@@ -275,6 +277,8 @@
 						</svg>
 					</button>
 					<button
+						aria-label="Toggle Documentation"
+						aria-pressed={activeViews.includes('d')}
 						on:click={toggleShowDocUi}
 						class="p-2 {activeViews.includes('d')
 							? 'bg-sky-700 text-cyan-300'
@@ -392,6 +396,7 @@
 								json={schemaDraft}
 								ctrlEnter={handleSchema}
 								filename="schema.msgpact.json"
+								ariaLabel="schema"
 								bind:this={schemaEditor}
 							/>
 						</div>
@@ -449,6 +454,7 @@
 											json={example.request}
 											allowLinks={false}
 											filename={'requestExample.json'}
+											ariaLabel='requestExample'
 											minimap={false}
 										/>
 									</div>
@@ -462,6 +468,7 @@
 											json={example.response}
 											allowLinks={false}
 											filename={'responseExample.json'}
+											ariaLabel='responseExample'
 											lineNumbers={false}
 											minimap={false}
 										/>
@@ -501,6 +508,7 @@
 									json={unMinifyJson(request, authManaged)}
 									ctrlEnter={() => thisHandleRequest()}
 									filename="request.json"
+									ariaLabel="request"
 									bind:this={requestEditor}
 								/>
 							</div>
@@ -526,6 +534,7 @@
 											json={d}
 											allowLinks={true}
 											filename="response.json"
+											ariaLabel="response"
 										/>
 									</div>
 								{/key}

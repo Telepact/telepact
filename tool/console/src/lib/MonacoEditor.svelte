@@ -16,6 +16,7 @@
 	export let fullHeight: boolean = true;
 	export let lineNumbers: boolean = true;
 	export let minimap: boolean = true;
+	export let ariaLabel: string;
 
 	export const getContent = () => {
 		return editor.getValue();
@@ -63,7 +64,9 @@
 				lineNumbers: lineNumbers ? 'on' : 'off',
 				minimap: {
 					enabled: minimap
-				}
+				},
+				ariaLabel: ariaLabel,
+				ariaRequired: true
 			},
 			{
 				textModelService: null

@@ -17,7 +17,10 @@ const config: PlaywrightTestConfig = {
 	testDir: 'tests',
 	testMatch: /(.+\.)?(test|spec)\.[jt]s/,
 	use: {
-		baseURL: 'http://localhost:5173'
+		baseURL: 'http://localhost:5173',
+		contextOptions: {
+			permissions: ['clipboard-read']
+		}
 	}
 };
 
