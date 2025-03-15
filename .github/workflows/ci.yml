@@ -192,7 +192,9 @@ jobs:
         run: npx playwright install --force
       
       - name: Run tests
-        run: make test-console
+        run: |
+          make console
+          make test-console
 
 
   run-tests:

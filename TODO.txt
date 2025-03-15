@@ -1,1 +1,2 @@
 - Remove idl folder
+- @msgpack/msgpack might be an unused dependency in lib/ts
