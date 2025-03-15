@@ -15,7 +15,7 @@
 		type TypeData
 	} from '$lib';
 	import { page } from '$app/stores';
-	import { UApiSchema } from './uapi/index.esm';
+	import { MsgPactSchema } from './msgpact/index.esm';
 	import { onMount } from 'svelte';
 	import MonacoEditor from './MonacoEditor.svelte';
 	import TypeRef from './TypeRef.svelte';
@@ -23,7 +23,7 @@
 	import MockIcon from './MockIcon.svelte';
 
 	export let entry: TypeData;
-	export let uapiSchema: UApiSchema;
+	export let msgpactSchema: MsgPactSchema;
 
 	let argumentExampleMonaco: MonacoEditor;
 
@@ -129,7 +129,7 @@
 				</div>
 			{/if}
 
-			<Example {schemaKey} generate={() => generateExample(schemaKey, uapiSchema)} />
+			<Example {schemaKey} generate={() => generateExample(schemaKey, msgpactSchema)} />
 		{:else if isFnTypeData(data)}
 			<div class="space-y-1">
 				<DocCardStructFields fields={data.args} />
@@ -139,7 +139,7 @@
 					</div>
 				{/if}
 
-				<Example {schemaKey} generate={() => generateExample(schemaKey, uapiSchema)} />
+				<Example {schemaKey} generate={() => generateExample(schemaKey, msgpactSchema)} />
 
 				<div>
 					<span class="text-3xl text-emerald-500">→</span>
@@ -186,7 +186,7 @@
 								readOnly={true}
 								json={generateFnResultExample(
 									schemaKey,
-									uapiSchema,
+									msgpactSchema,
 									includeErrorsInExample
 										? null
 										: {
@@ -234,7 +234,7 @@
 				<DocCardEnumTags tags={data} />
 			</div>
 
-			<Example {schemaKey} generate={() => generateExample(schemaKey, uapiSchema)} />
+			<Example {schemaKey} generate={() => generateExample(schemaKey, msgpactSchema)} />
 		{:else if isHeaderData(data)}
 			<div>
 				{#if description}
@@ -266,7 +266,7 @@
 							generateHeaderExample(
 								'request',
 								Object.keys(data.requestData),
-								uapiSchema
+								msgpactSchema
 							)}
 					/>
 				{/if}
@@ -283,7 +283,7 @@
 							generateHeaderExample(
 								'response',
 								Object.keys(data.responseData),
-								uapiSchema
+								msgpactSchema
 							)}
 					/>
 				{/if}

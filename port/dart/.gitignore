@@ -3,3 +3,4 @@ lib/js/
 node_modules/
 LICENSE
 NOTICE
+package-lock.json

@@ -1,6 +1,6 @@
 import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure';
 import { ValidationFailure } from '../../internal/validation/ValidationFailure';
-import { stringName } from '../../internal/types/UString';
+import { stringName } from '../types/VString';
 
 export function validateString(value: any): ValidationFailure[] {
     if (typeof value === 'string') {

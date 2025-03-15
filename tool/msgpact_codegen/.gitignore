@@ -1,0 +1,7 @@
+dist/
+vendor/
+.venv/
+msgpact_codegen/LICENSE
+msgpact_codegen/NOTICE
+msgpact_codegen/msgpact
+tmp/

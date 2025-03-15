@@ -1,0 +1,34 @@
+from typing import TYPE_CHECKING
+from .VType import VType
+
+if TYPE_CHECKING:
+    from ..validation.ValidateContext import ValidateContext
+    from ..generation.GenerateContext import GenerateContext
+    from ...RandomGenerator import RandomGenerator
+    from ..validation.ValidationFailure import ValidationFailure
+    from .VStruct import VStruct
+    from .VTypeDeclaration import VTypeDeclaration
+
+_UNION_NAME: str = "Object"
+
+
+class VUnion(VType):
+
+    def __init__(self, name: str, tags: dict[str, 'VStruct'], tag_indices: dict[str, int]) -> None:
+        self.name = name
+        self.tags = tags
+        self.tag_indices = tag_indices
+
+    def get_type_parameter_count(self) -> int:
+        return 0
+
+    def validate(self, value: object, type_parameters: list['VTypeDeclaration'], ctx: 'ValidateContext') -> list['ValidationFailure']:
+        from ..validation.ValidateUnion import validate_union
+        return validate_union(value, self.name, self.tags, ctx)
+
+    def generate_random_value(self, blueprint_value: object, use_blueprint_value: bool, type_parameters: list['VTypeDeclaration'], ctx: 'GenerateContext') -> object:
+        from ..generation.GenerateRandomUnion import generate_random_union
+        return generate_random_union(blueprint_value, use_blueprint_value, self.tags, ctx)
+
+    def get_name(self) -> str:
+        return _UNION_NAME

@@ -1,8 +1,13 @@
 {
+    "name": "msgpact",
+    "private": true,
     "devDependencies": {
         "prettier": "3.2.5"
     },
     "dependencies": {
-        "prettier-plugin-uapi": "file:tool/prettier-plugin-uapi/prettier-plugin-uapi-0.1.18.tgz"
-    }
+        "prettier-plugin-msgpact": "workspace:*"
+    },
+    "workspaces": [
+        "tool/prettier-plugin-msgpact"
+    ]
 }

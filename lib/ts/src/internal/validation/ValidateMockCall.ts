@@ -1,16 +1,16 @@
-import { ValidationFailure } from "../../internal/validation/ValidationFailure";
-import { UType } from "../../internal/types/UType";
-import { getTypeUnexpectedValidationFailure } from "../../internal/validation/GetTypeUnexpectedValidationFailure";
-import { UFn } from "../../internal/types/UFn";
-import { ValidateContext } from "./ValidateContext";
+import { ValidationFailure } from '../../internal/validation/ValidationFailure';
+import { VType } from '../types/VType';
+import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure';
+import { VFn } from '../types/VFn';
+import { ValidateContext } from './ValidateContext';
 
 export function validateMockCall(
     givenObj: any,
-    types: Record<string, UType>,
+    types: Record<string, VType>,
     ctx: ValidateContext,
 ): ValidationFailure[] {
-    if (!(typeof givenObj === "object" && !Array.isArray(givenObj))) {
-        return getTypeUnexpectedValidationFailure([], givenObj, "Object");
+    if (!(typeof givenObj === 'object' && !Array.isArray(givenObj))) {
+        return getTypeUnexpectedValidationFailure([], givenObj, 'Object');
     }
 
     const givenMap = givenObj;
@@ -22,7 +22,7 @@ export function validateMockCall(
     const matches = keys.filter((k) => regexString.test(k));
     if (matches.length !== 1) {
         return [
-            new ValidationFailure([], "ObjectKeyRegexMatchCountUnexpected", {
+            new ValidationFailure([], 'ObjectKeyRegexMatchCountUnexpected', {
                 regex: regexString.toString().slice(1, -1),
                 actual: matches.length,
                 expected: 1,
@@ -32,7 +32,7 @@ export function validateMockCall(
     }
 
     const functionName = matches[0];
-    const functionDef = types[functionName] as UFn;
+    const functionDef = types[functionName] as VFn;
     const input = givenMap[functionName];
 
     const functionDefCall = functionDef.call;
@@ -48,5 +48,5 @@ export function validateMockCall(
         inputFailuresWithPath.push(new ValidationFailure(newPath, failure.reason, failure.data));
     }
 
-    return inputFailuresWithPath.filter((failure) => failure.reason !== "RequiredObjectKeyMissing");
+    return inputFailuresWithPath.filter((failure) => failure.reason !== 'RequiredObjectKeyMissing');
 }

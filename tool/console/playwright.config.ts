@@ -8,7 +8,7 @@ const config: PlaywrightTestConfig = {
 			reuseExistingServer: !process.env.CI
 		},
 		{
-			command: 'uapi_example',
+			command: 'msgpact_example',
 			port: 8000,
 			reuseExistingServer: !process.env.CI,
 			stdout: 'pipe'

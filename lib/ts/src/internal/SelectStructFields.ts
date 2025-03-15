@@ -1,19 +1,19 @@
-import { UArray } from "../internal/types/UArray";
-import { UFn } from "../internal/types/UFn";
-import { UObject } from "../internal/types/UObject";
-import { UStruct } from "../internal/types/UStruct";
-import { UUnion } from "../internal/types/UUnion";
-import { UTypeDeclaration } from "../internal/types/UTypeDeclaration";
+import { VArray } from './types/VArray';
+import { VFn } from './types/VFn';
+import { VObject } from './types/VObject';
+import { VStruct } from './types/VStruct';
+import { VUnion } from './types/VUnion';
+import { VTypeDeclaration } from './types/VTypeDeclaration';
 
 export function selectStructFields(
-    typeDeclaration: UTypeDeclaration,
+    typeDeclaration: VTypeDeclaration,
     value: any,
     selectedStructFields: { [key: string]: any },
 ): any {
     const typeDeclarationType = typeDeclaration.type;
     const typeDeclarationTypeParams = typeDeclaration.typeParameters;
 
-    if (typeDeclarationType instanceof UStruct) {
+    if (typeDeclarationType instanceof VStruct) {
         const fields = typeDeclarationType.fields;
         const structName = typeDeclarationType.name;
         const selectedFields = selectedStructFields[structName] as string[] | undefined;
@@ -35,7 +35,7 @@ export function selectStructFields(
         }
 
         return finalMap;
-    } else if (typeDeclarationType instanceof UFn) {
+    } else if (typeDeclarationType instanceof VFn) {
         const valueAsMap = value as { [key: string]: any };
         const [unionTag, unionData] = Object.entries(valueAsMap)[0];
         const fnName = typeDeclarationType.name;
@@ -60,7 +60,7 @@ export function selectStructFields(
         }
 
         return { [unionTag]: finalMap };
-    } else if (typeDeclarationType instanceof UUnion) {
+    } else if (typeDeclarationType instanceof VUnion) {
         const valueAsMap = value as { [key: string]: any };
         const [unionTag, unionData] = Object.entries(valueAsMap)[0];
 
@@ -95,7 +95,7 @@ export function selectStructFields(
         }
 
         return { [unionTag]: finalMap };
-    } else if (typeDeclarationType instanceof UObject) {
+    } else if (typeDeclarationType instanceof VObject) {
         const nestedTypeDeclaration = typeDeclarationTypeParams[0];
         const valueAsMap = value as { [key: string]: any };
 
@@ -107,7 +107,7 @@ export function selectStructFields(
         }
 
         return finalMap;
-    } else if (typeDeclarationType instanceof UArray) {
+    } else if (typeDeclarationType instanceof VArray) {
         const nestedType = typeDeclarationTypeParams[0];
         const valueAsList = value as any[];
 

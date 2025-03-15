@@ -1,13 +1,13 @@
-import { GenerateContext } from "./GenerateContext";
-import { generateRandomUnion } from "./GenerateRandomUnion";
-import { UFn } from "../types/UFn";
-import { UType } from "../types/UType";
+import { GenerateContext } from './GenerateContext';
+import { generateRandomUnion } from './GenerateRandomUnion';
+import { VFn } from '../types/VFn';
+import { VType } from '../types/VType';
 
-export function generateRandomUMockCall(types: { [key: string]: UType }, ctx: GenerateContext) {
-    const functions: Array<UFn> = Object.entries(types)
-        .filter(([key, value]) => value instanceof UFn)
-        .filter(([key, value]) => !key.endsWith("_"))
-        .map(([key, value]) => value as UFn);
+export function generateRandomUMockCall(types: { [key: string]: VType }, ctx: GenerateContext) {
+    const functions: Array<VFn> = Object.entries(types)
+        .filter(([key, value]) => value instanceof VFn)
+        .filter(([key, value]) => !key.endsWith('_'))
+        .map(([key, value]) => value as VFn);
 
     functions.sort((fn1, fn2) => fn1.name.localeCompare(fn2.name));
 

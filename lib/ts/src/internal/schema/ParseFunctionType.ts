@@ -1,29 +1,29 @@
-import { UFn } from '../../internal/types/UFn';
-import { UUnion } from '../../internal/types/UUnion';
+import { VFn } from '../types/VFn';
+import { VUnion } from '../types/VUnion';
 import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
 import { getTypeUnexpectedParseFailure } from '../../internal/schema/GetTypeUnexpectedParseFailure';
 import { parseStructType } from '../../internal/schema/ParseStructType';
 import { parseUnionType } from '../../internal/schema/ParseUnionType';
-import { UApiSchemaParseError } from '../../UApiSchemaParseError';
+import { MsgPactSchemaParseError } from '../../MsgPactSchemaParseError';
 import { ParseContext } from '../../internal/schema/ParseContext';
 import { getOrParseType } from './GetOrParseType';
 import { derivePossibleSelect } from './DerivePossibleSelect';
-import { USelect } from '../types/USelect';
+import { VSelect } from '../types/VSelect';
 
 export function parseFunctionType(
     path: any[],
     functionDefinitionAsParsedJson: { [key: string]: any },
     schemaKey: string,
     ctx: ParseContext,
-): UFn {
+): VFn {
     const parseFailures: SchemaParseFailure[] = [];
 
-    let callType: UUnion | null = null;
+    let callType: VUnion | null = null;
     try {
         const argType = parseStructType(path, functionDefinitionAsParsedJson, schemaKey, ['->', '_errors'], ctx);
-        callType = new UUnion(schemaKey, { [schemaKey]: argType }, { [schemaKey]: 0 });
+        callType = new VUnion(schemaKey, { [schemaKey]: argType }, { [schemaKey]: 0 });
     } catch (e) {
-        if (e instanceof UApiSchemaParseError) {
+        if (e instanceof MsgPactSchemaParseError) {
             parseFailures.push(...e.schemaParseFailures);
         } else {
             throw e;
@@ -32,7 +32,7 @@ export function parseFunctionType(
 
     const resultSchemaKey = '->';
 
-    let resultType: UUnion | null = null;
+    let resultType: VUnion | null = null;
     if (!(resultSchemaKey in functionDefinitionAsParsedJson)) {
         parseFailures.push(
             new SchemaParseFailure(ctx.documentName, path, 'RequiredObjectKeyMissing', { key: resultSchemaKey }),
@@ -48,7 +48,7 @@ export function parseFunctionType(
                 ctx,
             );
         } catch (e) {
-            if (e instanceof UApiSchemaParseError) {
+            if (e instanceof MsgPactSchemaParseError) {
                 parseFailures.push(...e.schemaParseFailures);
             } else {
                 throw e;
@@ -83,12 +83,12 @@ export function parseFunctionType(
     }
 
     if (parseFailures.length > 0) {
-        throw new UApiSchemaParseError(parseFailures, ctx.uapiSchemaDocumentNamesToJson);
+        throw new MsgPactSchemaParseError(parseFailures, ctx.msgpactSchemaDocumentNamesToJson);
     }
 
-    const fnSelectType = derivePossibleSelect(schemaKey, resultType as UUnion);
-    const selectType = getOrParseType([], '_ext.Select_', ctx) as USelect;
+    const fnSelectType = derivePossibleSelect(schemaKey, resultType as VUnion);
+    const selectType = getOrParseType([], '_ext.Select_', ctx) as VSelect;
     selectType.possibleSelects[schemaKey] = fnSelectType;
 
-    return new UFn(schemaKey, callType as UUnion, resultType as UUnion, errorsRegex as string);
+    return new VFn(schemaKey, callType as VUnion, resultType as VUnion, errorsRegex as string);
 }

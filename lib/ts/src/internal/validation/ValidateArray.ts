@@ -1,12 +1,12 @@
-import { UTypeDeclaration } from '../../internal/types/UTypeDeclaration';
+import { VTypeDeclaration } from '../types/VTypeDeclaration';
 import { ValidationFailure } from '../../internal/validation/ValidationFailure';
 import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure';
-import { arrayName } from '../types/UArray';
+import { arrayName } from '../types/VArray';
 import { ValidateContext } from './ValidateContext';
 
 export function validateArray(
     value: any,
-    typeParameters: UTypeDeclaration[],
+    typeParameters: VTypeDeclaration[],
     ctx: ValidateContext,
 ): ValidationFailure[] {
     if (Array.isArray(value)) {

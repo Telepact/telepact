@@ -2,5 +2,5 @@
 
 make
 
-poetry run python -m uapitest
+poetry run python -m msgpact_test
 

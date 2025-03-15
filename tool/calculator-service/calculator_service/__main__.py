@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Query, Request
 from typing import Dict, Tuple, cast
-from uapi import Server, Message, UApiSchema
+from msgpact import Server, Message, MsgPactSchema
 import importlib.resources as pkg_resources
 import time
 import uvicorn
@@ -96,14 +96,14 @@ async def handler(message: Message) -> Message:
     raise Exception("Invalid function")
 
 # Load json from file
-with pkg_resources.open_text('calculator_service', 'calculator.uapi.json') as file:
-    uapi_json = file.read()
+with pkg_resources.open_text('calculator_service', 'calculator.msgpact.json') as file:
+    msgpact_json = file.read()
 
-uapi_schema = UApiSchema.from_json(uapi_json)
+msgpact_schema = MsgPactSchema.from_json(msgpact_json)
 
 server_options = Server.Options()
 server_options.auth_required = False
-server = Server(uapi_schema, handler, server_options)
+server = Server(msgpact_schema, handler, server_options)
 
 print('Server defined')
 

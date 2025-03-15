@@ -4,25 +4,11 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-uapi-ts:
+  build-msgpact-ts:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: Install pipx
-        run: |
-          python3 -m pip install --user pipx
-          python3 -m pipx ensurepath
-
-      - name: Install version tooling
-        run: |
-          pipx install tool/uapi_version
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -30,36 +16,20 @@ jobs:
           node-version: "16"
 
       - name: Build ts
-        run: |
-          cd lib/ts
-          make
+        run: make ts
 
       - name: Upload ts build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: build-uapi-ts
+          name: build-msgpact-ts
           path: lib/ts/dist
           retention-days: 1
 
-  build-uapi-java:
+  build-msgpact-java:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: Install pipx
-        run: |
-          python3 -m pip install --user pipx
-          python3 -m pipx ensurepath
-
-      - name: Install version tooling
-        run: |
-          pipx install tool/uapi_version
 
       - name: Set up Java
         uses: actions/setup-java@v4
@@ -68,18 +38,16 @@ jobs:
           distribution: "corretto"
 
       - name: Build java
-        run: |
-          cd lib/java
-          make
+        run: make java
 
       - name: Upload java build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: build-uapi-java
+          name: build-msgpact-java
           path: lib/java/target
           retention-days: 1
 
-  build-uapi-py:
+  build-msgpact-py:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -95,29 +63,22 @@ jobs:
           python3 -m pip install --user pipx
           python3 -m pipx ensurepath
 
-      - name: Install version tooling
-        run: |
-          pipx install tool/uapi_version
-
       - name: Install Poetry
-        run: |
-          pipx install poetry
+        run: pipx install poetry
 
       - name: Install dependencies
-        run: |
-          cd lib/py
-          make
+        run: make py
 
       - name: Upload py build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: build-uapi-py
+          name: build-msgpact-py
           path: lib/py/dist
           retention-days: 1
 
-  build-uapicodegen:
+  build-msgpact-codegen:
     runs-on: ubuntu-latest
-    needs: [build-uapi-py]
+    needs: [build-msgpact-py]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -132,37 +93,59 @@ jobs:
           python3 -m pip install --user pipx
           python3 -m pipx ensurepath
 
-      - name: Install version tooling
-        run: |
-          pipx install tool/uapi_version
-
       - name: Install Poetry
-        run: |
-          pipx install poetry
+        run: pipx install poetry
 
       - name: Download py build artifacts
         uses: actions/download-artifact@v4
         with:
-          name: build-uapi-py
+          name: build-msgpact-py
           path: lib/py/dist
 
-      - name: Install dependencies
-        run: |
-          cd tool/uapicodegen
-          make
+      - name: Build codegen
+        run: make codegen
 
-      - name: Upload uapicodegen build artifacts
+      - name: Upload msgpact-codegen build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: build-uapicodegen
-          path: tool/uapicodegen/dist
+          name: build-msgpact-codegen
+          path: tool/msgpact_codegen/dist
           retention-days: 1
 
   # TODO: Dart
+  build-msgpact-dart:
+    runs-on: ubuntu-latest
+    needs: [build-msgpact-ts]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Dart
+        uses: dart-lang/setup-dart@v1
+        with:
+          sdk: 3.6
+
+      - name: Install Chrome
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y google-chrome-stable
+
+      - name: Download ts build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-msgpact-ts
+          path: lib/ts/dist
+
+      - name: Build dart
+        run: make dart
+
+      - name: Run tests
+        run: make test-dart
+
 
   run-tests:
     runs-on: ubuntu-latest
-    needs: [build-uapi-ts, build-uapi-java, build-uapi-py, build-uapicodegen]
+    needs: [build-msgpact-ts, build-msgpact-java, build-msgpact-py, build-msgpact-codegen]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -177,13 +160,8 @@ jobs:
           python3 -m pip install --user pipx
           python3 -m pipx ensurepath
 
-      - name: Install version tooling
-        run: |
-          pipx install tool/uapi_version
-
       - name: Install Poetry
-        run: |
-          pipx install poetry
+        run: pipx install poetry
 
       - name: Set up Java
         uses: actions/setup-java@v4
@@ -199,33 +177,29 @@ jobs:
       - name: Download ts build artifacts
         uses: actions/download-artifact@v4
         with:
-          name: build-uapi-ts
+          name: build-msgpact-ts
           path: lib/ts/dist
 
       - name: Download java build artifacts
         uses: actions/download-artifact@v4
         with:
-          name: build-uapi-java
+          name: build-msgpact-java
           path: lib/java/target
 
       - name: Download py build artifacts
         uses: actions/download-artifact@v4
         with:
-          name: build-uapi-py
+          name: build-msgpact-py
           path: lib/py/dist
 
-      - name: Download uapicodegen build artifacts
+      - name: Download msgpact-codegen build artifacts
         uses: actions/download-artifact@v4
         with:
-          name: build-uapicodegen
-          path: tool/uapicodegen/dist
+          name: build-msgpact-codegen
+          path: tool/msgpact_codegen/dist
 
       - name: Install Poetry
-        run: |
-          pipx install tool/uapicodegen/dist/uapicodegen-*.tar.gz
+        run: make install-codegen
 
       - name: Run tests
-        run: |
-          cd qa/test
-          poetry install
-          poetry run python -m pytest
+        run: make test

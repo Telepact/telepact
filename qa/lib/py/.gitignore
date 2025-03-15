@@ -1,6 +1,6 @@
 metrics.txt
-uapitest/gen/
+msgpact_test/gen/
 .venv/
 .built
-uapi.tar.gz
+msgpact.tar.gz
 poetry.lock

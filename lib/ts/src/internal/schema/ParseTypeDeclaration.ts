@@ -1,15 +1,15 @@
 import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
-import { UTypeDeclaration } from '../../internal/types/UTypeDeclaration';
-import { UApiSchemaParseError } from '../../UApiSchemaParseError';
+import { VTypeDeclaration } from '../types/VTypeDeclaration';
+import { MsgPactSchemaParseError } from '../../MsgPactSchemaParseError';
 import { getOrParseType } from '../../internal/schema/GetOrParseType';
 import { getTypeUnexpectedParseFailure } from '../../internal/schema/GetTypeUnexpectedParseFailure';
 import { ParseContext } from '../../internal/schema/ParseContext';
 
-export function parseTypeDeclaration(path: any[], typeDeclarationArray: any[], ctx: ParseContext): UTypeDeclaration {
+export function parseTypeDeclaration(path: any[], typeDeclarationArray: any[], ctx: ParseContext): VTypeDeclaration {
     if (!typeDeclarationArray.length) {
-        throw new UApiSchemaParseError(
+        throw new MsgPactSchemaParseError(
             [new SchemaParseFailure(ctx.documentName, path, 'EmptyArrayDisallowed', {})],
-            ctx.uapiSchemaDocumentNamesToJson,
+            ctx.msgpactSchemaDocumentNamesToJson,
         );
     }
 
@@ -18,7 +18,7 @@ export function parseTypeDeclaration(path: any[], typeDeclarationArray: any[], c
 
     if (typeof baseType !== 'string') {
         const thisParseFailures = getTypeUnexpectedParseFailure(ctx.documentName, basePath, baseType, 'String');
-        throw new UApiSchemaParseError(thisParseFailures, ctx.uapiSchemaDocumentNamesToJson);
+        throw new MsgPactSchemaParseError(thisParseFailures, ctx.msgpactSchemaDocumentNamesToJson);
     }
 
     const rootTypeString = baseType;
@@ -28,13 +28,13 @@ export function parseTypeDeclaration(path: any[], typeDeclarationArray: any[], c
 
     const matcher = rootTypeString.match(regex);
     if (!matcher) {
-        throw new UApiSchemaParseError(
+        throw new MsgPactSchemaParseError(
             [
                 new SchemaParseFailure(ctx.documentName, basePath, 'StringRegexMatchFailed', {
                     regex: regexString.toString().slice(1, -1),
                 }),
             ],
-            ctx.uapiSchemaDocumentNamesToJson,
+            ctx.msgpactSchemaDocumentNamesToJson,
         );
     }
 
@@ -45,19 +45,19 @@ export function parseTypeDeclaration(path: any[], typeDeclarationArray: any[], c
 
     const givenTypeParameterCount = typeDeclarationArray.length - 1;
     if (type_.getTypeParameterCount() !== givenTypeParameterCount) {
-        throw new UApiSchemaParseError(
+        throw new MsgPactSchemaParseError(
             [
                 new SchemaParseFailure(ctx.documentName, path, 'ArrayLengthUnexpected', {
                     actual: typeDeclarationArray.length,
                     expected: type_.getTypeParameterCount() + 1,
                 }),
             ],
-            ctx.uapiSchemaDocumentNamesToJson,
+            ctx.msgpactSchemaDocumentNamesToJson,
         );
     }
 
     const parseFailures: SchemaParseFailure[] = [];
-    const typeParameters: UTypeDeclaration[] = [];
+    const typeParameters: VTypeDeclaration[] = [];
     const givenTypeParameters = typeDeclarationArray.slice(1);
 
     for (let index = 1; index <= givenTypeParameters.length; index++) {
@@ -80,8 +80,8 @@ export function parseTypeDeclaration(path: any[], typeDeclarationArray: any[], c
     }
 
     if (parseFailures.length > 0) {
-        throw new UApiSchemaParseError(parseFailures, ctx.uapiSchemaDocumentNamesToJson);
+        throw new MsgPactSchemaParseError(parseFailures, ctx.msgpactSchemaDocumentNamesToJson);
     }
 
-    return new UTypeDeclaration(type_, nullable, typeParameters);
+    return new VTypeDeclaration(type_, nullable, typeParameters);
 }

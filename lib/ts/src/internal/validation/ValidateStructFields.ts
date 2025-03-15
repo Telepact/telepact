@@ -1,9 +1,9 @@
 import { ValidationFailure } from '../../internal/validation/ValidationFailure';
-import { UFieldDeclaration } from '../../internal/types/UFieldDeclaration';
+import { VFieldDeclaration } from '../types/VFieldDeclaration';
 import { ValidateContext } from './ValidateContext';
 
 export function validateStructFields(
-    fields: Record<string, UFieldDeclaration>,
+    fields: Record<string, VFieldDeclaration>,
     selectedFields: string[] | null,
     actualStruct: Record<string, any>,
     ctx: ValidateContext,

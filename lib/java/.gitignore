@@ -1,7 +1,7 @@
 .idea/
-src/test/java/io/github/brenbar/uapi/GeneratedTests.java
-src/test/java/io/github/brenbar/uapi/GeneratedMockTests.java
-src/test/java/io/github/brenbar/uapi/GeneratedMockInvalidStubTests.java
+src/test/java/io/github/brenbar/msgpact/GeneratedTests.java
+src/test/java/io/github/brenbar/msgpact/GeneratedMockTests.java
+src/test/java/io/github/brenbar/msgpact/GeneratedMockInvalidStubTests.java
 target/
 src/main/resources/*.json
 src/main/resources/LICENSE

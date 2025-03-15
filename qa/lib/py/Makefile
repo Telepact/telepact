@@ -1,17 +1,14 @@
-UAPI_PYPROJECT = ../../../lib/py/pyproject.toml
-BUILT_FILE=.built
-
 .PHONY: all dep
 
-all: dep $(BUILT_FILE)
-
-$(BUILT_FILE): $(UAPI_PYPROJECT)
-	cp ../../../lib/py/dist/*.tar.gz uapi.tar.gz
+all: dep
+	cp ../../../lib/py/dist/*.tar.gz msgpact.tar.gz
 
 	poetry lock
+	poetry remove msgpact || echo "no-op"
+	poetry add ./msgpact.tar.gz
 	poetry install
 
-	uapicodegen --schema-dir ../../test/schema/example --lang py --out uapitest/gen
+	msgpact-codegen --schema-dir ../../test/schema/example --lang py --out msgpact_test/gen
 
 
 dep:

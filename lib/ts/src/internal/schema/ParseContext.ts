@@ -1,29 +1,29 @@
 import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
-import { UType } from '../../internal/types/UType';
+import { VType } from '../types/VType';
 
 export class ParseContext {
     public readonly documentName: string;
-    public readonly uapiSchemaDocumentNamesToPseudoJson: { [key: string]: any[] };
-    public readonly uapiSchemaDocumentNamesToJson: { [key: string]: string };
+    public readonly msgpactSchemaDocumentNamesToPseudoJson: { [key: string]: any[] };
+    public readonly msgpactSchemaDocumentNamesToJson: { [key: string]: string };
     public readonly schemaKeysToDocumentName: { [key: string]: string };
     public readonly schemaKeysToIndex: { [key: string]: number };
-    public readonly parsedTypes: { [key: string]: UType };
+    public readonly parsedTypes: { [key: string]: VType };
     public readonly allParseFailures: SchemaParseFailure[];
     public readonly failedTypes: Set<string>;
 
     constructor(
         documentName: string,
-        uapiSchemaDocumentNamesToPseudoJson: { [key: string]: any[] },
-        uapiSchemaDocumentNamesToJson: { [key: string]: string },
+        msgpactSchemaDocumentNamesToPseudoJson: { [key: string]: any[] },
+        msgpactSchemaDocumentNamesToJson: { [key: string]: string },
         schemaKeysToDocumentName: { [key: string]: string },
         schemaKeysToIndex: { [key: string]: number },
-        parsedTypes: { [key: string]: UType },
+        parsedTypes: { [key: string]: VType },
         allParseFailures: SchemaParseFailure[],
         failedTypes: Set<string>,
     ) {
         this.documentName = documentName;
-        this.uapiSchemaDocumentNamesToPseudoJson = uapiSchemaDocumentNamesToPseudoJson;
-        this.uapiSchemaDocumentNamesToJson = uapiSchemaDocumentNamesToJson;
+        this.msgpactSchemaDocumentNamesToPseudoJson = msgpactSchemaDocumentNamesToPseudoJson;
+        this.msgpactSchemaDocumentNamesToJson = msgpactSchemaDocumentNamesToJson;
         this.schemaKeysToDocumentName = schemaKeysToDocumentName;
         this.schemaKeysToIndex = schemaKeysToIndex;
         this.parsedTypes = parsedTypes;
@@ -34,8 +34,8 @@ export class ParseContext {
     public copy({ documentName }: { documentName?: string }): ParseContext {
         return new ParseContext(
             documentName ?? this.documentName,
-            this.uapiSchemaDocumentNamesToPseudoJson,
-            this.uapiSchemaDocumentNamesToJson,
+            this.msgpactSchemaDocumentNamesToPseudoJson,
+            this.msgpactSchemaDocumentNamesToJson,
             this.schemaKeysToDocumentName,
             this.schemaKeysToIndex,
             this.parsedTypes,

@@ -3,4 +3,4 @@ metrics/
 bin/
 src/gen
 .built
-uapicodegen.tar.gz
+msgpactcodegen.tar.gz

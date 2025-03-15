@@ -1,20 +1,28 @@
-SRC_FILES = $(shell find lib -name '*.dart')
-PUBSPEC_FILE = pubspec.yaml
-
 .PHONY: all
 
-all: $(PUBSPEC_FILE)
+all:
 	cp ../../LICENSE ../../NOTICE ./
 	npm install
 	
 	npx rollup -c rollup.crc32.config.js
 	npx rollup -c rollup.msgpackr.config.js
 
-	cp node_modules/uapi/dist/index.iife.js lib/js/uapi.js
+	mkdir -p lib/js
+	cp node_modules/msgpact/dist/index.iife.js lib/js/msgpact.js
 	cp dist/crc32.iife.js lib/js/crc32.js
 	cp dist/msgpackr.iife.js lib/js/msgpackr.js	
 
+	dart pub get
+
 	dart analyze
 
-$(PUBSPEC_FILE): $(SRC_FILES)
-	uapi-version bump || (echo "Install uapi-version bump with 'pipx install ../../tool/uapi_version'" && exit 1)
+clean:
+	rm -rf lib/js
+	rm -rf dist
+	rm -rf node_modules
+	rm -f LICENSE NOTICE
+	rm -rf .dart_tool
+
+.PHONY: test
+test:
+	dart test -p chrome

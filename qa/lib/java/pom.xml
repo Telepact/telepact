@@ -1,8 +1,8 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>uapitest</groupId>
-  <artifactId>uapitest</artifactId>
+  <groupId>msgpact</groupId>
+  <artifactId>msgpact</artifactId>
   <version>1.0-SNAPSHOT</version>
   <properties>
     <maven.compiler.source>21</maven.compiler.source>
@@ -10,8 +10,8 @@
   </properties>
   <dependencies>
     <dependency>
-      <groupId>io.github.brenbar</groupId>
-      <artifactId>uapi</artifactId>
+      <groupId>io.github.msgpact</groupId>
+      <artifactId>msgpact</artifactId>
       <version>1.0</version>
     </dependency>
     <dependency>
@@ -109,7 +109,7 @@
                 <argument>${argLine}</argument>
                 <argument>-classpath</argument>
                 <classpath/>
-                <argument>uapitest.Main</argument>
+                <argument>msgpacttest.Main</argument>
               </arguments>
             </configuration>
           </execution>
@@ -127,7 +127,7 @@
                 <argument>report</argument>
                 <argument>${project.build.directory}/jacoco.exec</argument>
                 <argument>--classfiles</argument>
-                <argument>${project.build.directory}/dependency/uapi-1.0.jar</argument>
+                <argument>${project.build.directory}/msgpact.jar</argument>
                 <argument>--sourcefiles</argument>
                 <argument>${project.basedir}/../../../lib/java/src/main/java</argument>
                 <argument>--html</argument>

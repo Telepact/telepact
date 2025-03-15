@@ -1,27 +1,27 @@
 import { Message } from '../Message';
-import { UTypeDeclaration } from '../internal/types/UTypeDeclaration';
-import { UUnion } from '../internal/types/UUnion';
+import { VTypeDeclaration } from './types/VTypeDeclaration';
+import { VUnion } from './types/VUnion';
 import { ValidationFailure } from '../internal/validation/ValidationFailure';
-import { UType } from '../internal/types/UType';
-import { UApiSchema } from '../UApiSchema';
+import { VType } from './types/VType';
+import { MsgPactSchema } from '../MsgPactSchema';
 import { selectStructFields } from '../internal/SelectStructFields';
 import { getInvalidErrorMessage } from '../internal/validation/GetInvalidErrorMessage';
 import { validateHeaders } from '../internal/validation/ValidateHeaders';
 import { validateResult } from '../internal/validation/ValidateResult';
-import { UFn } from '../internal/types/UFn';
+import { VFn } from './types/VFn';
 import { mapValidationFailuresToInvalidFieldCases } from './validation/MapValidationFailuresToInvalidFieldCases';
 import { ValidateContext } from './validation/ValidateContext';
 
 export async function handleMessage(
     requestMessage: Message,
-    uApiSchema: UApiSchema,
+    msgPactSchema: MsgPactSchema,
     handler: (message: Message) => Promise<Message>,
     onError: (error: Error) => void,
 ): Promise<Message> {
     const responseHeaders: Record<string, any> = {};
     const requestHeaders: Record<string, any> = requestMessage.headers;
     const requestBody: Record<string, any> = requestMessage.body;
-    const parsedUApiSchema: Record<string, UType> = uApiSchema.parsed;
+    const parsedMsgPactSchema: Record<string, VType> = msgPactSchema.parsed;
     const requestEntry: [string, any] = Object.entries(requestBody)[0];
 
     const requestTargetInit = requestEntry[0];
@@ -29,7 +29,7 @@ export async function handleMessage(
 
     let unknownTarget: string | null;
     let requestTarget: string;
-    if (!(requestTargetInit in parsedUApiSchema)) {
+    if (!(requestTargetInit in parsedMsgPactSchema)) {
         unknownTarget = requestTargetInit;
         requestTarget = 'fn.ping_';
     } else {
@@ -37,8 +37,8 @@ export async function handleMessage(
         requestTarget = requestTargetInit;
     }
 
-    const functionType = parsedUApiSchema[requestTarget] as UFn;
-    const resultUnionType: UUnion = functionType.result;
+    const functionType = parsedMsgPactSchema[requestTarget] as VFn;
+    const resultUnionType: VUnion = functionType.result;
 
     const callId = requestHeaders['id_'];
     if (callId !== undefined) {
@@ -58,7 +58,7 @@ export async function handleMessage(
 
     const requestHeaderValidationFailures: ValidationFailure[] = validateHeaders(
         requestHeaders,
-        uApiSchema.parsedRequestHeaders,
+        msgPactSchema.parsedRequestHeaders,
         functionType,
     );
     if (requestHeaderValidationFailures.length > 0) {
@@ -99,7 +99,7 @@ export async function handleMessage(
         return new Message(responseHeaders, newErrorResult);
     }
 
-    const functionTypeCall: UUnion = functionType.call;
+    const functionTypeCall: VUnion = functionType.call;
 
     const warnings: ValidationFailure[] = [];
     const filterOutWarnings = (e: ValidationFailure) => {
@@ -136,7 +136,7 @@ export async function handleMessage(
     if (requestTarget === 'fn.ping_') {
         resultMessage = new Message({}, { Ok_: {} });
     } else if (requestTarget === 'fn.api_') {
-        resultMessage = new Message({}, { Ok_: { api: uApiSchema.original } });
+        resultMessage = new Message({}, { Ok_: { api: msgPactSchema.original } });
     } else {
         try {
             resultMessage = await handler(callMessage);
@@ -177,7 +177,7 @@ export async function handleMessage(
         }
         const responseHeaderValidationFailures: ValidationFailure[] = validateHeaders(
             finalResponseHeaders,
-            uApiSchema.parsedResponseHeaders,
+            msgPactSchema.parsedResponseHeaders,
             functionType,
         );
         if (responseHeaderValidationFailures.length > 0) {
@@ -193,7 +193,7 @@ export async function handleMessage(
     let finalResultUnion: Record<string, any>;
     if (selectStructFieldsHeader !== null) {
         finalResultUnion = selectStructFields(
-            new UTypeDeclaration(resultUnionType, false, []),
+            new VTypeDeclaration(resultUnionType, false, []),
             resultUnion,
             selectStructFieldsHeader,
         ) as Record<string, any>;

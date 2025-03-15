@@ -1,12 +1,12 @@
-import { UFieldDeclaration } from '../../internal/types/UFieldDeclaration';
-import { UFn } from '../../internal/types/UFn';
+import { VFieldDeclaration } from '../types/VFieldDeclaration';
+import { VFn } from '../types/VFn';
 import { ValidationFailure } from '../../internal/validation/ValidationFailure';
 import { ValidateContext } from './ValidateContext';
 
 export function validateHeaders(
     headers: Record<string, any>,
-    parsedRequestHeaders: Record<string, UFieldDeclaration>,
-    functionType: UFn,
+    parsedRequestHeaders: Record<string, VFieldDeclaration>,
+    functionType: VFn,
 ): ValidationFailure[] {
     const validationFailures: ValidationFailure[] = [];
 

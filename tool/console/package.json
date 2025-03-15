@@ -1,5 +1,5 @@
 {
-	"name": "uapi-console",
+	"name": "msgpact-console",
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
@@ -41,10 +41,10 @@
 		"monaco-editor": "^0.52.2",
 		"msgpackr": "^1.11.2",
 		"prettier": "^3.4.2",
-		"prettier-plugin-uapi": "workspace:*"
+		"prettier-plugin-msgpact": "workspace:*"
 	},
 	"workspaces": [
-		"../prettier-plugin-uapi"
+		"../prettier-plugin-msgpact"
 	],
 	"files": [
 		"src",

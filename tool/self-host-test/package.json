@@ -14,7 +14,7 @@
 		"file-loader": "^6.0.0"		
 	},
 	"dependencies": {
-		"uapi-console": "workspace:*"
+		"msgpact-console": "workspace:*"
 	},
 	"type": "module",
 	"workspaces": [

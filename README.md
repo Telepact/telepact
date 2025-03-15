@@ -1,13 +1,13 @@
 # Introduction
 
-uAPI (Universal API) is meant to be the API pattern for everyone. It is built on
+MsgPact is API ecosystem fueled by messages. It's design is built on
 the universal interchange format of JSON and compatible with essentially all
 inter-process communication protocols.
 
-Wherever JSON can go, a uAPI can be served. 🚀
+Wherever JSON can go, a MsgPact API can be served. 🚀
 
-Then uAPI takes "universal" a step further, establishing a robust relationship
-between servers and clients, where servers focus on one production strategy that
+Additionally, MsgPact establishes a robust relationship between servers and
+clients, where servers focus on one production strategy that
 can be consumed variably by clients, from maximally accessible and simple to
 maximally expressive and powerful.
 
@@ -29,7 +29,7 @@ $ curl -X '[{"Authorization": "Bearer <token>"}, {"fn.sub": {"x": 1, "y": 2}}]' 
 Websocket client (with `python`):
 
 ```python
-# uapi_ws.py
+# msgpact_ws.py
 
 import sys
 import json
@@ -40,15 +40,15 @@ print('{}'.format((ws.recv())))
 ```
 
 ```
-$ python uapi_ws.py '[{"Authorization": "Bearer <token>"}, {"fn.add": {"x": 1, "y": 2}}]'
+$ python msgpact_ws.py '[{"Authorization": "Bearer <token>"}, {"fn.add": {"x": 1, "y": 2}}]'
 [{}, {"Ok_": {"result": 3}}]
-$ python uapi_ws.py '[{"Authorization": "Bearer <token>"}, {"fn.sub": {"x": 1, "y": 2}}]'
+$ python msgpact_ws.py '[{"Authorization": "Bearer <token>"}, {"fn.sub": {"x": 1, "y": 2}}]'
 [{}, {"Ok_": {"result": -1}}]
 ```
 
 # Motivation
 
-| Capability                                        | OpenAPI | gRPC | GraphQL | uAPI |
+| Capability                                        | OpenAPI | gRPC | GraphQL | MsgPact |
 | ------------------------------------------------- | ------- | ---- | ------- | ---- |
 | No transport restrictions                         | ❌      | ❌   | ❌      | ✅   |
 | No transport details leaked into API              | ❌      | ✅   | ✅      | ✅   |
@@ -103,25 +103,25 @@ serialization is technically possible through manual configuration, it is
 largely not observed in practice due to the accessibility tax it would incur on
 both servers and clients.
 
-## Why uAPI?
+## Why MsgPact?
 
-uAPI takes all of the strengths of REST, gRPC, and GraphQL and combines them
+MsgPact takes all of the strengths of REST, gRPC, and GraphQL and combines them
 into a simple but careful design. It is built, first and foremost, on JSON with
 transport agnosticism to maximize accessibility to clients that want to
 integrate using only the native JSON and networking capabilities of their
 preferred programming language and/or industry standard library. It achieves
 type safety through built-in server-side validation against a server-defined API
 schema, complete with typing options that allow for modeling all common
-programming data types. And then from that baseline, uAPI critically allows
+programming data types. And then from that baseline, MsgPact critically allows
 clients to upgrade their experience as deemed appropriate by the client,
 optionally using:
 
--   uAPI client libraries that help facilitate crafting of uAPI messages
+-   MsgPact client libraries that help facilitate crafting of MsgPact messages
 -   Generated code for further increased type safety
 -   A built-in binary serialization protocol for optimized efficiency
 -   A built-in mechanism to omit fields from responses for optimized efficiency
 
-These client features are built-in via the uAPI library used by the server, such
+These client features are built-in via the MsgPact library used by the server, such
 that all of these features are available to the client automatically, without
 any configuration by the server.
 
@@ -129,12 +129,12 @@ any configuration by the server.
 
 ### Why have both optional and nullable fields?
 
-uAPI allows API designers to mark a field as optional (the field might be
+MsgPact allows API designers to mark a field as optional (the field might be
 omitted) as well as mark the field type as nullable (the field might appear with
 a null value).
 
 These design options are both present to maximize the design expressiveness of
-the API. uAPI leverages optionality to accomplish the expressiveness of
+the API. MsgPact leverages optionality to accomplish the expressiveness of
 `undefined` in languages like TypeScript. While `null` is a value that can be
 passed around like a string or number, `undefined` or optionality can not be
 passed around but is rather an incidental property of the shape of the data
@@ -143,10 +143,10 @@ to erase just one field of a model, where null can be used to indicate the
 erasure of data, and optionality can be used to omit all fields except the one
 field you want to erase.
 
-### Why do functions in uAPI not support positional arguments?
+### Why do functions in MsgPact not support positional arguments?
 
-uAPI functions are automatically associated with an argument struct and an
-result struct that API designers can use to colloquially define arguments and
+MsgPact functions are automatically associated with an argument struct and a
+result struct that API designers can use to define colloquial arguments and
 return values, respectively. The colloquial arguments being supplied via the
 argument struct will be inherently unordered due to the nature of JSON objects,
 and there is no way to approximate traditional positional arguments at the root
@@ -162,18 +162,18 @@ fields.
 
 ### Why is there no Enum type like seen in C or Java?
 
-uAPI achieves enumerated types with unions, which are very similar to enums as
+MsgPact achieves enumerated types with unions, which are very similar to enums as
 seen in C or Java, except that a struct is automatically attached to each value.
 The traditional enum can be approximated by simply leaving all union structs
 blank.
 
 ### Why force servers to perform response validation?
 
-uAPI automatically performs validation of responses against the uAPI schema, and
+MsgPact automatically performs validation of responses against the MsgPact schema, and
 there is no setting for servers to turn off this behavior.
 
 This design decision is intentional. It helps maintain the high standard of type
-safety in the uAPI ecosystem by denying API providers the option to respond to
+safety in the MsgPact ecosystem by denying API providers the option to respond to
 malformed data as an inconvenience and are instead forced to deal with hard
 failures through bug reports. Hard failures also help draw attention to type
 safety deficits early in the development phase.
@@ -185,8 +185,8 @@ to turn off this response validation by submitting their requests with the
 
 ### If all I want is compact binary serialization, why not just use gRPC?
 
-uAPI and gRPC both have compact binary serialization for drastically improved
-efficiency over conventional serialization such as JSON. However, uAPI brings a
+MsgPact and gRPC both have compact binary serialization for drastically improved
+efficiency over conventional serialization such as JSON. However, MsgPact brings a
 critical new innovation to the space of RPC and binary serialization in that it
 _does not leak the ABI into the API_.
 
@@ -203,9 +203,9 @@ need to guard against interface drift between the API and the ABI, typically by
 complying with a set of policies concerning how those field ids are defined and
 how they can change.
 
-uAPI breaks free from the conventional practice of defining and maintaining
+MsgPact breaks free from the conventional practice of defining and maintaining
 field ids, and instead accomplishes client and server agreement over field ids
-through a client-server handshake at runtime. In consequence, uAPI boasts a far
+through a client-server handshake at runtime. In consequence, MsgPact boasts a far
 simpler developer experience during the API design phase as well as the unique
 privilege of allowing clients to leverage binary serialization without generated
 code.
@@ -221,18 +221,18 @@ readability and recognition of errors.
 ### Why can't I associate a union tag to something besides a struct?
 
 A designer might want to treat a union tag like a struct field, and associate
-any data type with a tag. However, in uAPI, all tags in unions are associated
+any data type with a tag. However, in MsgPact, all tags in unions are associated
 with a struct, which means you can't associate union tags with simpler data
 types, like booleans or strings.
 
-This restriction is in place to uphold uAPI's value of prioritizing effective
+This restriction is in place to uphold MsgPact's value of prioritizing effective
 software evolution. Unions, like functions, are entrypoints to unique execution
 paths in software, so if software evolves such that an execution path requires a
 new "argument" like a integer, that requirement will percolate up to the
 entrypoint. If the proverbial API designer chose to associate the union tag
 directly to a boolean, the API would require a breaking change in the form of
 creating another tag to make room for this new integer "argument" to sit next to
-the original boolean. In contrast, uAPI establishing the expectation that all
+the original boolean. In contrast, MsgPact establishing the expectation that all
 union tags are associated with structs means the backwards compatible option of
 adding a new struct field is always available to software designers dealing with
 the needs of evolving software.
@@ -244,7 +244,7 @@ structs, but not the argument struct included with function definitions.
 
 The function type exists so that API providers may incorporate "links" into
 their API design, such that the appearance of a function type payload can simply
-be copied and pasted verbatim into the body a new message. Tooling like the uAPI
+be copied and pasted verbatim into the body a new message. Tooling like the MsgPact
 console specifically utilizes this technique to allow end-users to "click
 through" graphs designed by the API provider.
 

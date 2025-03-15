@@ -1,20 +1,20 @@
-import { ValidationFailure } from "../../internal/validation/ValidationFailure";
-import { getTypeUnexpectedValidationFailure } from "../../internal/validation/GetTypeUnexpectedValidationFailure";
-import { UStruct } from "../../internal/types/UStruct";
-import { UType } from "../../internal/types/UType";
-import { UUnion } from "../../internal/types/UUnion";
-import { UFn } from "../../internal/types/UFn";
-import { ValidateContext } from "./ValidateContext";
+import { ValidationFailure } from '../../internal/validation/ValidationFailure';
+import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure';
+import { VStruct } from '../types/VStruct';
+import { VType } from '../types/VType';
+import { VUnion } from '../types/VUnion';
+import { VFn } from '../types/VFn';
+import { ValidateContext } from './ValidateContext';
 
 export function validateMockStub(
     givenObj: any,
-    types: { [key: string]: UType },
+    types: { [key: string]: VType },
     ctx: ValidateContext,
 ): ValidationFailure[] {
     const validationFailures: ValidationFailure[] = [];
 
-    if (!(typeof givenObj === "object" && !Array.isArray(givenObj))) {
-        return getTypeUnexpectedValidationFailure([], givenObj, "Object");
+    if (!(typeof givenObj === 'object' && !Array.isArray(givenObj))) {
+        return getTypeUnexpectedValidationFailure([], givenObj, 'Object');
     }
 
     const givenMap: { [key: string]: any } = givenObj;
@@ -26,7 +26,7 @@ export function validateMockStub(
     const matches = keys.filter((k) => regexString.test(k));
     if (matches.length !== 1) {
         return [
-            new ValidationFailure([], "ObjectKeyRegexMatchCountUnexpected", {
+            new ValidationFailure([], 'ObjectKeyRegexMatchCountUnexpected', {
                 regex: regexString.toString().slice(1, -1),
                 actual: matches.length,
                 expected: 1,
@@ -36,12 +36,12 @@ export function validateMockStub(
     }
 
     const functionName = matches[0];
-    const functionDef = types[functionName] as UFn;
+    const functionDef = types[functionName] as VFn;
     const input = givenMap[functionName];
 
-    const functionDefCall: UUnion = functionDef.call;
+    const functionDefCall: VUnion = functionDef.call;
     const functionDefName: string = functionDef.name;
-    const functionDefCallTags: { [key: string]: UStruct } = functionDefCall.tags;
+    const functionDefCallTags: { [key: string]: VStruct } = functionDefCall.tags;
     const inputFailures = functionDefCallTags[functionDefName].validate(input, [], ctx);
 
     const inputFailuresWithPath: ValidationFailure[] = [];
@@ -52,15 +52,15 @@ export function validateMockStub(
     }
 
     const inputFailuresWithoutMissingRequired = inputFailuresWithPath.filter(
-        (f) => f.reason !== "RequiredObjectKeyMissing",
+        (f) => f.reason !== 'RequiredObjectKeyMissing',
     );
 
     validationFailures.push(...inputFailuresWithoutMissingRequired);
 
-    const resultDefKey = "->";
+    const resultDefKey = '->';
 
     if (!(resultDefKey in givenMap)) {
-        validationFailures.push(new ValidationFailure([], "RequiredObjectKeyMissing", { key: resultDefKey }));
+        validationFailures.push(new ValidationFailure([], 'RequiredObjectKeyMissing', { key: resultDefKey }));
     } else {
         const output = givenMap[resultDefKey];
         const outputFailures = functionDef.result.validate(output, [], ctx);
@@ -73,7 +73,7 @@ export function validateMockStub(
         }
 
         const failuresWithoutMissingRequired = outputFailuresWithPath.filter(
-            (f) => f.reason !== "RequiredObjectKeyMissing",
+            (f) => f.reason !== 'RequiredObjectKeyMissing',
         );
 
         validationFailures.push(...failuresWithoutMissingRequired);
@@ -81,7 +81,7 @@ export function validateMockStub(
 
     const disallowedFields = Object.keys(givenMap).filter((k) => !matches.includes(k) && k !== resultDefKey);
     for (const disallowedField of disallowedFields) {
-        validationFailures.push(new ValidationFailure([disallowedField], "ObjectKeyDisallowed", {}));
+        validationFailures.push(new ValidationFailure([disallowedField], 'ObjectKeyDisallowed', {}));
     }
 
     return validationFailures;

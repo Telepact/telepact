@@ -1,8 +1,8 @@
 import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
-import { UStruct } from '../../internal/types/UStruct';
+import { VStruct } from '../types/VStruct';
 import { getTypeUnexpectedParseFailure } from '../../internal/schema/GetTypeUnexpectedParseFailure';
 import { parseStructFields } from '../../internal/schema/ParseStructFields';
-import { UApiSchemaParseError } from '../../UApiSchemaParseError';
+import { MsgPactSchemaParseError } from '../../MsgPactSchemaParseError';
 import { ParseContext } from '../../internal/schema/ParseContext';
 
 export function parseStructType(
@@ -11,7 +11,7 @@ export function parseStructType(
     schemaKey: string,
     ignoreKeys: string[],
     ctx: ParseContext,
-): UStruct {
+): VStruct {
     const parseFailures: SchemaParseFailure[] = [];
     const otherKeys = new Set(Object.keys(structDefinitionAsPseudoJson));
 
@@ -41,10 +41,10 @@ export function parseStructType(
     }
 
     if (parseFailures.length > 0) {
-        throw new UApiSchemaParseError(parseFailures, ctx.uapiSchemaDocumentNamesToJson);
+        throw new MsgPactSchemaParseError(parseFailures, ctx.msgpactSchemaDocumentNamesToJson);
     }
 
     const fields = parseStructFields(thisPath, definition, ctx);
 
-    return new UStruct(schemaKey, fields);
+    return new VStruct(schemaKey, fields);
 }

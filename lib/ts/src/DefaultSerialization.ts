@@ -5,13 +5,13 @@ export class DefaultSerialization implements Serialization {
     private packr = new Packr({ mapsAsObjects: false, useRecords: false });
     private unpackr = new Unpackr({ mapsAsObjects: false, useRecords: false });
 
-    public toJson(uapiMessage: any): Uint8Array {
-        const jsonStr = JSON.stringify(uapiMessage);
+    public toJson(msgpactMessage: any): Uint8Array {
+        const jsonStr = JSON.stringify(msgpactMessage);
         return new TextEncoder().encode(jsonStr);
     }
 
-    public toMsgpack(uapiMessage: any): Uint8Array {
-        return this.packr.encode(uapiMessage);
+    public toMsgpack(msgpactMessage: any): Uint8Array {
+        return this.packr.encode(msgpactMessage);
     }
 
     public fromJson(bytes: Uint8Array): any {

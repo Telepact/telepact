@@ -1,14 +1,14 @@
 import { ValidationFailure } from '../../internal/validation/ValidationFailure';
-import { UType } from '../../internal/types/UType';
-import { UTypeDeclaration } from '../../internal/types/UTypeDeclaration';
+import { VType } from '../types/VType';
+import { VTypeDeclaration } from '../types/VTypeDeclaration';
 import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure';
 import { ValidateContext } from './ValidateContext';
 
 export function validateValueOfType(
     value: any,
-    thisType: UType,
+    thisType: VType,
     nullable: boolean,
-    typeParameters: UTypeDeclaration[],
+    typeParameters: VTypeDeclaration[],
     ctx: ValidateContext,
 ): ValidationFailure[] {
     if (value === null) {

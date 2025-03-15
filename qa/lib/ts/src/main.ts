@@ -1,5 +1,5 @@
 import {
-    UApiSchemaParseError,
+    MsgPactSchemaParseError,
     Client,
     ClientOptions,
     Server,
@@ -9,10 +9,10 @@ import {
     Serializer,
     MockServer,
     MockServerOptions,
-    UApiSchema,
-    MockUApiSchema,
-    UApiSchemaFiles
-} from "uapi";
+    MsgPactSchema,
+    MockMsgPactSchema,
+    MsgPactSchemaFiles
+} from "msgpact";
 import { NatsConnection, connect, Subscription } from "nats";
 import * as fs from "fs";
 import * as path from 'path';
@@ -161,7 +161,7 @@ function startMockTestServer(
     frontdoorTopic: string,
     config: Record<string, any>,
 ): Subscription {
-    const uApi = MockUApiSchema.fromDirectory(apiSchemaPath, fs, path);
+    const msgPact = MockMsgPactSchema.fromDirectory(apiSchemaPath, fs, path);
 
     const options: MockServerOptions = new MockServerOptions();
     options.onError = (e: Error) => console.error(e);
@@ -175,7 +175,7 @@ function startMockTestServer(
 
     const timer = registry.createTimer(frontdoorTopic);
 
-    const server: MockServer = new MockServer(uApi, options); // Assuming MockServer constructor requires uApi and options
+    const server: MockServer = new MockServer(msgPact, options); // Assuming MockServer constructor requires msgPact and options
 
     const subscription: Subscription = connection.subscribe(frontdoorTopic);
     (async () => {
@@ -208,7 +208,7 @@ function startSchemaTestServer(
     frontdoorTopic: string,
     config?: Record<string, any>,
 ): Subscription {
-    const uApi: UApiSchema = UApiSchema.fromDirectory(apiSchemaPath, fs, path);
+    const msgPact: MsgPactSchema = MsgPactSchema.fromDirectory(apiSchemaPath, fs, path);
 
     const timer = registry.createTimer(frontdoorTopic);
 
@@ -227,18 +227,18 @@ function startSchemaTestServer(
                 const extendJson = unionValue["extend!"];
 
                 if (extendJson != null) {
-                    UApiSchema.fromFileJsonMap({'default': schemaJson, 'extend': extendJson});
+                    MsgPactSchema.fromFileJsonMap({'default': schemaJson, 'extend': extendJson});
                 } else {
-                    UApiSchema.fromJson(schemaJson);
+                    MsgPactSchema.fromJson(schemaJson);
                 }
             } else if (inputTag === "Json") {
                 const unionValue = input[inputTag];
                 const schemaJson = unionValue["schema"];
-                UApiSchema.fromJson(schemaJson);
+                MsgPactSchema.fromJson(schemaJson);
             } else if (inputTag === "Directory") {
                 const unionValue = input[inputTag];
                 const schemaDirectory = unionValue["schemaDirectory"];
-                UApiSchema.fromDirectory(schemaDirectory, fs, path);
+                MsgPactSchema.fromDirectory(schemaDirectory, fs, path);
             } else {
                 throw new Error("Invalid input tag");
             }
@@ -248,7 +248,7 @@ function startSchemaTestServer(
                 {},
                 {
                     ErrorValidationFailure: {
-                        cases: (e as UApiSchemaParseError).schemaParseFailuresPseudoJson,
+                        cases: (e as MsgPactSchemaParseError).schemaParseFailuresPseudoJson,
                     },
                 },
             );
@@ -261,7 +261,7 @@ function startSchemaTestServer(
     options.onError = (e: Error) => console.error(e);
     options.authRequired = false;
 
-    const server: Server = new Server(uApi, handler, options);
+    const server: Server = new Server(msgPact, handler, options);
 
     const sub: Subscription = connection.subscribe(frontdoorTopic);
     (async () => {
@@ -296,7 +296,7 @@ function startTestServer(
     authRequired: boolean,
     useCodegen: boolean
 ): Subscription {
-    const files = new UApiSchemaFiles(apiSchemaPath, fs, path);
+    const files = new MsgPactSchemaFiles(apiSchemaPath, fs, path);
     const alternateMap: Record<string, string> = { ...files.filenamesToJson };
     alternateMap['backwardsCompatibleChange'] = `
         [
@@ -306,8 +306,8 @@ function startTestServer(
         ]
     `;
 
-    const uApi: UApiSchema = UApiSchema.fromFileJsonMap(files.filenamesToJson);
-    const alternateUApi: UApiSchema = UApiSchema.fromFileJsonMap(alternateMap);
+    const msgPact: MsgPactSchema = MsgPactSchema.fromFileJsonMap(files.filenamesToJson);
+    const alternateMsgPact: MsgPactSchema = MsgPactSchema.fromFileJsonMap(alternateMap);
 
     const timer = registry.createTimer(frontdoorTopic);
     const serveAlternateServer = { value: false };
@@ -372,12 +372,12 @@ function startTestServer(
     };
     options.authRequired = authRequired;
 
-    const server: Server = new Server(uApi, handler, options);
+    const server: Server = new Server(msgPact, handler, options);
 
     const alternateOptions = new ServerOptions();
     alternateOptions.onError = (e) => console.error(e);
     alternateOptions.authRequired = authRequired;
-    const alternateServer: Server = new Server(alternateUApi, handler, alternateOptions);
+    const alternateServer: Server = new Server(alternateMsgPact, handler, alternateOptions);
 
     const subscription: Subscription = connection.subscribe(frontdoorTopic);
     (async () => {

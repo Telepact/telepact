@@ -1,6 +1,6 @@
 import { ValidationFailure } from '../../internal/validation/ValidationFailure';
 import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure';
-import { booleanName } from '../../internal/types/UBoolean';
+import { booleanName } from '../types/VBoolean';
 
 export function validateBoolean(value: any): ValidationFailure[] {
     if (typeof value === 'boolean') {

@@ -1,0 +1,254 @@
+import { Message, Client } from 'msgpact';
+
+export class TaggedValue_<T, U> {
+    tag: T;
+    value: U;
+
+    constructor(tag: T, value: U) {
+        this.tag = tag;
+        this.value = value;
+    }
+}
+
+export class UntypedTaggedValue_ {
+    tag: string;
+    value: Record<string, any>;
+
+    constructor(tag: string, value: Record<string, any>) {
+        this.tag = tag;
+        this.value = value;
+    }
+}
+
+{%- macro to_ts_type(t, append_nullable=True) %}
+    {%- set nullable = '?' in t[0] -%}
+    {%- set typ = t[0] | replace('?', '') -%}
+    {%- if typ == 'array' -%}
+        Array<{{ to_ts_type(t[1:][0]) }}>
+    {%- elif typ == 'object' -%}
+        Record<string, {{ to_ts_type(t[1:][0]) }}>
+    {%- elif typ == 'boolean' -%}
+        boolean
+    {%- elif typ == 'integer' or typ == 'number' -%}
+        number
+    {%- elif typ == 'string' -%}
+        string
+    {%- elif typ == 'any' -%}
+        any
+    {%- elif typ.startswith('fn.') -%}
+        {{ typ | regex_replace('^.*\\.', '') }}.Input
+    {%- else -%}
+        {{ typ | regex_replace('^.*\\.', '') }}
+    {%- endif -%}
+    {%- if append_nullable and nullable %} | null{%- endif -%}
+{%- endmacro -%}
+
+{%- macro marshall_ts_type(t, depth) -%}
+    {%- set nullable = '?' in t[0] %}
+    {%- set typ = t[0] | replace('?', '') -%}
+    {%- if typ == 'array' -%}
+        ((d{{ depth }}: {{ to_ts_type(t) }}) => {% if nullable %}d{{ depth }} === null ? null : {% endif %}d{{ depth }}.map((e{{ depth }}) => {% call marshall_ts_type(t[1:][0], depth + 1) %}e{{ depth }}{% endcall %}))({{ caller() }})
+    {%- elif typ == 'object' -%}
+        ((d{{ depth }}: {{ to_ts_type(t) }}) => {% if nullable %}d{{ depth }} === null ? null : {% endif %}Object.fromEntries(Object.entries(d{{ depth }}).map(([k{{ depth }}, v{{ depth }}]) => [k{{ depth }}, {% call marshall_ts_type(t[1:][0], depth + 1) %}v{{ depth }}{% endcall %}])))({{ caller() }})
+    {%- elif typ.startswith('struct') or typ.startswith('fn') -%}
+        ((d{{ depth }}: any) => {% if nullable %}d{{ depth }} === null ? null : {% endif %}new {{ to_ts_type(t, False) }}(d{{ depth }}))({{ caller() }})
+    {%- elif typ.startswith('union') -%}
+        ((d{{ depth }}: any) => {% if nullable %}d{{ depth }} === null ? null : {% endif %}new {{ to_ts_type(t, False) }}(d{{ depth }}))({{ caller() }})
+    {%- else -%}
+        {{ caller() }}
+    {%- endif -%}
+{%- endmacro -%}
+
+{%- macro unmarshall_ts_type(t, depth) -%}
+    {%- set nullable = '?' in t[0] %}
+    {%- set typ = t[0] | replace('?', '') -%}
+    {%- if typ == 'array' -%}
+        ((d{{ depth }}) => {% if nullable %}d{{ depth }} === null ? null : {% endif %}d{{ depth }}.map((e{{ depth }}) => {% call unmarshall_ts_type(t[1:][0], depth + 1) %}e{{ depth }}{% endcall %}))({{ caller() }})
+    {%- elif typ == 'object' -%}
+        ((d{{ depth }}) => {% if nullable %}d{{ depth }} === null ? null : {% endif %}Object.fromEntries(Object.entries(d{{ depth }}).map(([k{{ depth }}, v{{ depth }}]) => [k{{ depth }}, {% call unmarshall_ts_type(t[1:][0], depth + 1) %}v{{ depth }}{% endcall %}])))({{ caller() }})
+    {%- elif typ.startswith('struct') or typ.startswith('fn') or typ.startswith('union') -%}
+        ((d{{ depth }}) => {% if nullable %}d{{ depth }} === null ? null : {% endif %}d{{ depth }}.pseudoJson)({{ caller() }})
+    {%- else -%}
+        {{ caller() }}
+    {%- endif -%}
+{%- endmacro -%}
+
+{%- macro to_maybe_opt_ts_type(type, field_name) -%}
+    {%- if '!' in field_name -%}
+        {{- to_ts_type(type) }} | undefined
+    {%- else %}
+        {{- to_ts_type(type) }}
+    {%- endif %}
+{%- endmacro -%}
+
+{%- macro setter_maybe_opt(field_name) -%}
+    {{ caller() }}
+{%- endmacro -%}
+
+{%- macro docstring(doc) -%}
+    {%- if doc -%}
+    /**
+        {%- if doc is iterable and doc is not string -%}
+            {%- for line in doc %}
+     * {{ line }}
+            {%- endfor %}
+        {%- else %}
+     * {{ doc }}
+        {%- endif %}
+     */
+    {%- endif %}
+{%- endmacro -%}
+
+{%- macro sanitize_field_name(field_name) -%}
+    {%- set sanitized_name =  field_name | replace('!', '') -%}
+    {%- set ts_keywords = ['boolean', 'number', 'string', 'null', 'undefined', 'true', 'false', 'if', 'else', 'for', 'while', 'do', 'switch', 'case', 'default', 'break', 'continue', 'function', 'return', 'var', 'let', 'const', 'new', 'this', 'super', 'class', 'extends', 'import', 'export', 'implements', 'interface', 'public', 'private', 'protected', 'static', 'yield', 'async', 'await', 'try', 'catch', 'finally', 'throw', 'typeof', 'instanceof', 'void', 'delete', 'in', 'of', 'with'] %}
+    {%- if sanitized_name in ts_keywords -%}
+        {{- sanitized_name + '_' -}}
+    {%- else -%}
+        {{- sanitized_name -}}
+    {%- endif -%}
+{%- endmacro -%}
+
+{%- macro struct(type_display, doc, fields, type_prefix, fn) %}
+export class {{ type_display }} {
+    {{ docstring(doc) | indent }}
+    pseudoJson: Record<string, any>;
+
+    constructor(pseudoJson: Record<string, any>) {
+        this.pseudoJson = pseudoJson;
+    }
+
+    static fromTyped({
+        {%- for field_name, field_type in fields.items() %}
+        {{ sanitize_field_name(field_name) }},
+        {%- endfor %}        
+    }: {
+        {%- for field_name, field_type in fields.items() %}
+        {{ sanitize_field_name(field_name) }}{% if '!' in field_name %}?{% endif %}: {{ to_maybe_opt_ts_type(field_type, field_name) }},
+        {%- endfor %}        
+    }): {{ type_prefix + type_display }} {
+        const input: Record<string, any> = {};
+        {%- for field_name, field_type in fields.items() %}
+        {%- if '!' in field_name %}
+        if ({{ sanitize_field_name(field_name) }} !== undefined) {
+            input["{{ field_name }}"] = {% call unmarshall_ts_type(field_type, 0) %}{{ sanitize_field_name(field_name) }}{% endcall %};
+        }
+        {%- else %}
+        input["{{ field_name }}"] = {% call unmarshall_ts_type(field_type, 0) %}{{ sanitize_field_name(field_name) }}{% endcall %};
+        {%- endif %}
+        {%- endfor %}
+
+        return new {{ type_prefix + type_display }}({% if fn %}{"{{ fn }}": input}{% else %}input{% endif %});
+    }
+
+    {%- for field_name, field_type in fields.items() %}
+    {{ sanitize_field_name(field_name) }}(): {{ to_maybe_opt_ts_type(field_type, field_name) }} {
+        return {% if '!' in field_name %}!("{{ field_name }}" in this.pseudoJson{% if fn %}["{{ fn }}"]{% endif %}) ? undefined :{% endif %}
+        {%- call marshall_ts_type(field_type, 0) %}this.pseudoJson{% if fn %}["{{ fn }}"]{% endif %}["{{ field_name }}"]{% endcall %};
+    }
+    {%- endfor %}
+}
+{%- endmacro -%}
+
+{%- macro union(type_display, doc, tags, type_prefix) %}
+    {%- set tag_prefix = type_prefix + type_display + '.' %}
+export class {{ type_display }} {
+    {{ docstring(doc) | indent }}
+    pseudoJson: Record<string, any>;
+
+    constructor(pseudoJson: Record<string, any>) {
+        this.pseudoJson = pseudoJson;
+    }
+
+    {%- for tag_entry in tags %}
+        {%- set tag_key = tag_entry | find_tag_key %}
+        {%- set tag_data = tag_entry[tag_key] %}
+    static from_{{ tag_key }}(payload: {{ tag_prefix + tag_key }}): {{ type_prefix + type_display }} {
+        return new {{ type_prefix + type_display }}({
+            "{{ tag_key }}": payload.pseudoJson
+        });
+    }
+    {%- endfor %}
+
+    getTaggedValue(): 
+        {%- for tag_entry in tags %}
+            {%- set tag_key = tag_entry | find_tag_key %}
+            {%- set tag_data = tag_entry[tag_key] %}
+        TaggedValue_<"{{ tag_key }}", {{ tag_prefix + tag_key }}> |
+        {%- endfor %} UntypedTaggedValue_ {
+        const tag = Object.keys(this.pseudoJson)[0]!;
+        {%- for tag_entry in tags %}
+            {%- set tag_key = tag_entry | find_tag_key %}
+        if (tag === "{{ tag_key }}") {
+            return new TaggedValue_("{{ tag_key }}", new {{ tag_prefix + tag_key }}(this.pseudoJson["{{ tag_key }}"]));
+        }
+        {%- endfor %}
+        return new UntypedTaggedValue_(tag, this.pseudoJson[tag]);
+    }
+}
+
+export namespace {{ type_display }} {
+{%- for tag_entry in tags %}
+    {%- set tag_key = tag_entry | find_tag_key %}
+    {{ struct(tag_key, tag_entry['///'], tag_entry[tag_key], tag_prefix) | indent }}
+{%- endfor %}
+}
+{%- endmacro -%}
+
+{%- macro function(type_display, data, schema_key) %}
+export namespace {{ type_display }} {
+    {{ struct('Input', data['///'], data[schema_key], type_display + '.', schema_key) | indent }}
+    {{ union('Output', data['///'], data['->'], type_display + '.') | indent }}
+}
+{%- endmacro -%}
+
+{%- for schema_entry in input %}
+    {%- set schema_key = schema_entry | find_schema_key %}
+    {%- set ts_name = schema_key | regex_replace('^.*\\.', '') %}
+    {%- if schema_key.startswith('struct') %}
+        {{ struct(ts_name, schema_entry['///'], schema_entry[schema_key], '') }}
+    {%- elif schema_key.startswith('union') %}
+        {{ union(ts_name, schema_entry['///'], schema_entry[schema_key], '') }}
+    {%- elif schema_key.startswith('fn') %}
+        {{ function(ts_name, schema_entry, schema_key) }}
+    {%- endif %}
+{% endfor %}
+
+export class ClientInterface_ {
+    client: Client;
+
+    constructor(client: Client) {
+        this.client = client;
+    }
+
+    {% for fn in functions %}
+    {%- set function_name = fn | replace('fn.', '') %}
+    async {{ function_name }}(headers: Record<string, any>, input: {{ function_name }}.Input): Promise<[Record<string, any>, {{ function_name }}.Output]> {
+        const message = await this.client.request(new Message(headers, input.pseudoJson));
+        return [message.headers, new {{ function_name }}.Output(message.body)];
+    }
+    {%- endfor %}
+}
+
+export class ServerHandler_ {
+    {% for fn in functions %}
+    {%- set function_name = fn | replace('fn.', '') %}
+    async {{ function_name }}(headers: Record<string, any>, input: {{ function_name }}.Input): Promise<[Record<string, any>, {{ function_name }}.Output]> {
+        throw new Error('Not implemented');
+    }
+    {%- endfor %}
+
+    async handler(message: Message): Promise<Message> {
+        const functionName = Object.keys(message.body)[0];
+
+        {% for fn in functions %}
+        {%- set function_name = fn | replace('fn.', '') %}
+        {% if loop.first %}if{% else %}else if{% endif %} (functionName === "{{ fn }}") {
+            const [headers, output] = await this.{{ function_name }}(message.headers, new {{ function_name }}.Input(message.body));
+            return new Message(headers, output.pseudoJson);
+        }
+        {%- endfor %}
+
+        throw new Error("Unknown function: " + functionName);
+    }
+}

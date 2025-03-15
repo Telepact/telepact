@@ -3,14 +3,14 @@
 
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
-	import { UApiSchema, Message, jsonSchema } from '$lib/uapi/index.esm';
+	import { MsgPactSchema, Message, jsonSchema } from '$lib/msgpact/index.esm';
 
 	import {
 		genExample,
 		handleRequest,
 		handleSubmitRequest,
 		minifyJson,
-		parseUApiSchema,
+		parseMsgPactSchema,
 		unMinifyJson
 	} from '$lib';
 
@@ -44,8 +44,8 @@
 	let showInternalApi: boolean;
 	$: showInternalApi = $page.data.showInternalApi;
 
-	let uapiSchemaPromise: Promise<UApiSchema>;
-	$: uapiSchemaPromise = $page.data.fullUApiSchemaRef;
+	let msgpactSchemaPromise: Promise<MsgPactSchema>;
+	$: msgpactSchemaPromise = $page.data.fullMsgPactSchemaRef;
 
 	let schemaDraftPromise: Promise<string>;
 	$: schemaDraftPromise = $page.data.schemaDraft;
@@ -74,13 +74,13 @@
 	$: exampleHeaders = ($page.url.searchParams.get('mh') ?? '').split(',');
 
 	onMount(() => {
-		uapiSchemaPromise.then((e) => {
+		msgpactSchemaPromise.then((e) => {
 			const requestJsonSchema = createJsonSchema(e);
 			monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
 				schemas: [
 					{
-						uri: 'internal://server/jsonschema-uapi.json',
-						fileMatch: ['schema.uapi.json'],
+						uri: 'internal://server/jsonschema-msgpact.json',
+						fileMatch: ['schema.msgpact.json'],
 						schema: jsonSchema
 					},
 					{
@@ -250,7 +250,7 @@
 							/>
 						</svg>
 					</div>
-					<h1 class="px-2 text-lg font-semibold text-gray-100">uAPI</h1>
+					<h1 class="px-2 text-lg font-semibold text-gray-100">MsgPact</h1>
 				</div>
 			</div>
 			<div id="view-select" class="flex basis-1/3 content-center justify-center space-x-2">
@@ -364,9 +364,9 @@
 	</nav>
 
 	<main class="mt-16 flex h-[calc(100vh-4em)] bg-zinc-800">
-		{#await Promise.all( [uapiSchemaPromise, filteredSchemaPseudoJsonPromise, schemaDraftPromise] )}
+		{#await Promise.all( [msgpactSchemaPromise, filteredSchemaPseudoJsonPromise, schemaDraftPromise] )}
 			<span>loading schema</span>
-		{:then [uapiSchema, filteredSchemaPseudoJson, schemaDraft]}
+		{:then [msgpactSchema, filteredSchemaPseudoJson, schemaDraft]}
 			{#if activeViews.includes('s')}
 				<div
 					class="flex h-[calc(100vh-4em)] {getSectionClass('s', activeViews.length)}"
@@ -391,7 +391,7 @@
 								readOnly={schemaSourceReadOnly}
 								json={schemaDraft}
 								ctrlEnter={handleSchema}
-								filename="schema.uapi.json"
+								filename="schema.msgpact.json"
 								bind:this={schemaEditor}
 							/>
 						</div>
@@ -405,9 +405,9 @@
 							<h1 class="pb-4 text-xl font-semibold text-gray-100">Schema</h1>
 						</div>
 						{#key sortDocCardsAZ}
-							{#each parseUApiSchema(filteredSchemaPseudoJson, uapiSchema, sortDocCardsAZ, showInternalApi) as entry}
+							{#each parseMsgPactSchema(filteredSchemaPseudoJson, msgpactSchema, sortDocCardsAZ, showInternalApi) as entry}
 								{#if showInternalApi || !(Object.keys(entry)[0].split('.')[1] ?? '').endsWith('_')}
-									<DocCard {entry} {uapiSchema} />
+									<DocCard {entry} {msgpactSchema} />
 								{/if}
 							{/each}
 						{/key}
@@ -436,7 +436,7 @@
 							</button>
 						</div>
 						{#key randomSeed + exampleFn}
-							{#await genExample(exampleFn, exampleHeaders, uapiSchema)}
+							{#await genExample(exampleFn, exampleHeaders, msgpactSchema)}
 								<div class="mb-4">
 									<span>Loading...<span> </span></span>
 								</div>

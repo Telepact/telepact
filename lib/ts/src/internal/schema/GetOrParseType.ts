@@ -1,24 +1,24 @@
-import { UApiSchemaParseError } from '../../UApiSchemaParseError';
+import { MsgPactSchemaParseError } from '../../MsgPactSchemaParseError';
 import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
-import { UType } from '../../internal/types/UType';
-import { UObject } from '../../internal/types/UObject';
-import { UArray } from '../../internal/types/UArray';
-import { UBoolean } from '../../internal/types/UBoolean';
-import { UInteger } from '../../internal/types/UInteger';
-import { UNumber } from '../../internal/types/UNumber';
-import { UString } from '../../internal/types/UString';
-import { UAny } from '../../internal/types/UAny';
+import { VType } from '../types/VType';
+import { VObject } from '../types/VObject';
+import { VArray } from '../types/VArray';
+import { VBoolean } from '../types/VBoolean';
+import { VInteger } from '../types/VInteger';
+import { VNumber } from '../types/VNumber';
+import { VString } from '../types/VString';
+import { VAny } from '../types/VAny';
 import { parseFunctionType } from '../../internal/schema/ParseFunctionType';
 import { parseStructType } from '../../internal/schema/ParseStructType';
 import { parseUnionType } from '../../internal/schema/ParseUnionType';
-import { USelect } from '../../internal/types/USelect';
-import { UMockCall } from '../../internal/types/UMockCall';
-import { UMockStub } from '../../internal/types/UMockStub';
+import { VSelect } from '../types/VSelect';
+import { VMockCall } from '../types/VMockCall';
+import { VMockStub } from '../types/VMockStub';
 import { ParseContext } from '../../internal/schema/ParseContext';
 
-export function getOrParseType(path: any[], typeName: string, ctx: ParseContext): UType {
+export function getOrParseType(path: any[], typeName: string, ctx: ParseContext): VType {
     if (ctx.failedTypes.has(typeName)) {
-        throw new UApiSchemaParseError([], ctx.uapiSchemaDocumentNamesToJson);
+        throw new MsgPactSchemaParseError([], ctx.msgpactSchemaDocumentNamesToJson);
     }
 
     const existingType = ctx.parsedTypes[typeName];
@@ -31,9 +31,9 @@ export function getOrParseType(path: any[], typeName: string, ctx: ParseContext)
 
     const matcher = typeName.match(regex);
     if (!matcher) {
-        throw new UApiSchemaParseError(
+        throw new MsgPactSchemaParseError(
             [new SchemaParseFailure(ctx.documentName, path, 'StringRegexMatchFailed', { regex: regexString })],
-            ctx.uapiSchemaDocumentNamesToJson,
+            ctx.msgpactSchemaDocumentNamesToJson,
         );
     }
 
@@ -41,13 +41,13 @@ export function getOrParseType(path: any[], typeName: string, ctx: ParseContext)
     if (standardTypeName) {
         return (
             {
-                boolean: new UBoolean(),
-                integer: new UInteger(),
-                number: new UNumber(),
-                string: new UString(),
-                array: new UArray(),
-                object: new UObject(),
-            }[standardTypeName] || new UAny()
+                boolean: new VBoolean(),
+                integer: new VInteger(),
+                number: new VNumber(),
+                string: new VString(),
+                array: new VArray(),
+                object: new VObject(),
+            }[standardTypeName] || new VAny()
         );
     }
 
@@ -55,16 +55,16 @@ export function getOrParseType(path: any[], typeName: string, ctx: ParseContext)
     const thisIndex = ctx.schemaKeysToIndex[customTypeName];
     const thisDocumentName = ctx.schemaKeysToDocumentName[customTypeName];
     if (thisIndex === undefined) {
-        throw new UApiSchemaParseError(
+        throw new MsgPactSchemaParseError(
             [new SchemaParseFailure(ctx.documentName, path, 'TypeUnknown', { name: customTypeName })],
-            ctx.uapiSchemaDocumentNamesToJson,
+            ctx.msgpactSchemaDocumentNamesToJson,
         );
     }
-    const definition = ctx.uapiSchemaDocumentNamesToPseudoJson[thisDocumentName][thisIndex] as {
+    const definition = ctx.msgpactSchemaDocumentNamesToPseudoJson[thisDocumentName][thisIndex] as {
         [key: string]: object;
     };
 
-    let type: UType;
+    let type: VType;
     try {
         if (customTypeName.startsWith('struct')) {
             type = parseStructType(
@@ -92,18 +92,18 @@ export function getOrParseType(path: any[], typeName: string, ctx: ParseContext)
             );
         } else {
             const possibleTypeExtension = {
-                '_ext.Select_': new USelect(),
-                '_ext.Call_': new UMockCall(ctx.parsedTypes),
-                '_ext.Stub_': new UMockStub(ctx.parsedTypes),
+                '_ext.Select_': new VSelect(),
+                '_ext.Call_': new VMockCall(ctx.parsedTypes),
+                '_ext.Stub_': new VMockStub(ctx.parsedTypes),
             }[customTypeName];
             if (!possibleTypeExtension) {
-                throw new UApiSchemaParseError(
+                throw new MsgPactSchemaParseError(
                     [
                         new SchemaParseFailure(ctx.documentName, [thisIndex], 'TypeExtensionImplementationMissing', {
                             name: customTypeName,
                         }),
                     ],
-                    ctx.uapiSchemaDocumentNamesToJson,
+                    ctx.msgpactSchemaDocumentNamesToJson,
                 );
             }
             type = possibleTypeExtension;
@@ -113,10 +113,10 @@ export function getOrParseType(path: any[], typeName: string, ctx: ParseContext)
 
         return type;
     } catch (e) {
-        if (e instanceof UApiSchemaParseError) {
+        if (e instanceof MsgPactSchemaParseError) {
             ctx.allParseFailures.push(...e.schemaParseFailures);
             ctx.failedTypes.add(customTypeName);
-            throw new UApiSchemaParseError([], ctx.uapiSchemaDocumentNamesToJson);
+            throw new MsgPactSchemaParseError([], ctx.msgpactSchemaDocumentNamesToJson);
         }
         throw e;
     }

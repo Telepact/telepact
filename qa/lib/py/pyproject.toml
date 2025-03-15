@@ -1,5 +1,5 @@
 [project]
-name = "uapitest"
+name = "msgpacttest"
 version = "0.1.0"
 description = ""
 requires-python = ">=3.11"
@@ -17,10 +17,8 @@ build = "*"
 msgpack = "*"
 nats-py = "*"
 prometheus-client = "*"
+msgpact = {path = "msgpact.tar.gz"}
 
 [tool.poetry.group.dev.dependencies]
 pytest = "*"
 toml = "*"
-
-[tool.poetry.dependencies.uapi]
-path = "uapi.tar.gz"

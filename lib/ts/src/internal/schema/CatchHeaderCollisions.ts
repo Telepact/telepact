@@ -1,9 +1,9 @@
-import { UApiSchemaParseError } from '../../UApiSchemaParseError';
+import { MsgPactSchemaParseError } from '../../MsgPactSchemaParseError';
 import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
 import { getPathDocumentCoordinatesPseudoJson } from '../../internal/schema/GetPathDocumentCoordinatesPseudoJson';
 
 export function catchHeaderCollisions(
-    uApiSchemaNameToPseudoJson: Record<string, any[]>,
+    msgPactSchemaNameToPseudoJson: Record<string, any[]>,
     headerKeys: Set<string>,
     keysToIndex: Record<string, number>,
     schemaKeysToDocumentNames: Record<string, string>,
@@ -36,11 +36,11 @@ export function catchHeaderCollisions(
             const documentName = schemaKeysToDocumentNames[defKey];
             const otherDocumentName = schemaKeysToDocumentNames[otherDefKey];
 
-            const uApiSchemaPseudoJson = uApiSchemaNameToPseudoJson[documentName];
-            const otherUApiSchemaPseudoJson = uApiSchemaNameToPseudoJson[otherDocumentName];
+            const msgPactSchemaPseudoJson = msgPactSchemaNameToPseudoJson[documentName];
+            const otherMsgPactSchemaPseudoJson = msgPactSchemaNameToPseudoJson[otherDocumentName];
 
-            const def = uApiSchemaPseudoJson[index] as Record<string, object>;
-            const otherDef = otherUApiSchemaPseudoJson[otherIndex] as Record<string, object>;
+            const def = msgPactSchemaPseudoJson[index] as Record<string, object>;
+            const otherDef = otherMsgPactSchemaPseudoJson[otherIndex] as Record<string, object>;
 
             const headerDef = def[defKey] as Record<string, object>;
             const otherHeaderDef = otherDef[otherDefKey] as Record<string, object>;
@@ -80,6 +80,6 @@ export function catchHeaderCollisions(
     }
 
     if (parseFailures.length > 0) {
-        throw new UApiSchemaParseError(parseFailures, documentNamesToJson);
+        throw new MsgPactSchemaParseError(parseFailures, documentNamesToJson);
     }
 }

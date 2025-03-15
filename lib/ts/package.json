@@ -1,5 +1,5 @@
 {
-  "name": "uapi",
+  "name": "msgpact",
   "version": "0.0.18",
   "description": "",
   "type": "module",
@@ -16,7 +16,6 @@
     }
   },
   "scripts": {
-    "prepare": "mkdir -p inc && cp ../../common/* ./inc/",
     "build": "tsc && rollup -c"
   },
   "devDependencies": {

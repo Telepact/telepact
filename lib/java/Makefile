@@ -1,13 +1,12 @@
-SRC_FILES = $(shell find src -name '*.java')
-POM_FILE = pom.xml
+.PHONY: all clean
 
-.PHONY: all
-
-all: $(POM_FILE)
+all:
 	mkdir -p src/main/resources
 	cp ../../common/*.json src/main/resources
 	cp ../../LICENSE ../../NOTICE src/main/resources
-	mvn install -q -B
+	mvn install
 
-$(POM_FILE): $(SRC_FILES)
-	uapi-version bump || (echo "Install uapi-version bump with 'pipx install ../../tool/uapi_version'" && exit 1)
+clean:
+	mvn clean
+	rm -rf src/main/resources
+	rm -rf target

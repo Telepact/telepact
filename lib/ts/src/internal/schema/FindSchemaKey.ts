@@ -1,4 +1,4 @@
-import { UApiSchemaParseError } from '../../UApiSchemaParseError';
+import { MsgPactSchemaParseError } from '../../MsgPactSchemaParseError';
 import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
 
 export function findSchemaKey(
@@ -27,6 +27,6 @@ export function findSchemaKey(
             expected: 1,
             keys: keys,
         });
-        throw new UApiSchemaParseError([parseFailure], documentNamesToJson);
+        throw new MsgPactSchemaParseError([parseFailure], documentNamesToJson);
     }
 }

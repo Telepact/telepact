@@ -1,0 +1,18 @@
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .internal.schema.SchemaParseFailure import SchemaParseFailure
+
+
+class MsgPactSchemaParseError(Exception):
+    """
+    Indicates failure to parse a msgPact Schema.
+    """
+
+    def __init__(self, schema_parse_failures: list['SchemaParseFailure'], msgpact_schema_document_names_to_json: dict[str, str]):
+        from .internal.schema.MapSchemaParseFailuresToPseudoJson import map_schema_parse_failures_to_pseudo_json
+        super().__init__(str(map_schema_parse_failures_to_pseudo_json(
+            schema_parse_failures, msgpact_schema_document_names_to_json)))
+        self.schema_parse_failures = schema_parse_failures
+        self.schema_parse_failures_pseudo_json = map_schema_parse_failures_to_pseudo_json(
+            schema_parse_failures, msgpact_schema_document_names_to_json)

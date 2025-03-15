@@ -1,12 +1,12 @@
 {
     "tabWidth": 4,
     "printWidth": 120,
-    "plugins": ["prettier-plugin-uapi"],
+    "plugins": ["prettier-plugin-msgpact"],
     "overrides": [
         {
-            "files": "*.uapi.json",
+            "files": "*.msgpact.json",
             "options": {
-                "parser": "uapi-parse"
+                "parser": "msgpact-parse"
             }
         },
         {

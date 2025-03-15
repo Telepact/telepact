@@ -1,16 +1,16 @@
-SRC_FILES = $(shell find uapi -name '*.py')
-PYPROJECT_FILE = pyproject.toml
-JSON_FILES = $(shell find uapi -name '*.uapi.json')
-COMMON_JSON_FILES = $(shell find ../../common -name '*.uapi.json')
+.PHONY: all clean
 
-.PHONY: all
-
-all: $(PYPROJECT_FILE)
-	mkdir -p uapi/json
-	cp ../../common/*.uapi.json uapi/json
+all:
+	mkdir -p msgpact/json
+	cp ../../common/*.json msgpact/json
+	cp ../../LICENSE ../../NOTICE msgpact/
 	
 	rm -rf dist
+	poetry install
 	poetry build
 
-$(PYPROJECT_FILE): $(SRC_FILES)
-	@uapi-version bump || (echo "Install uapi-version bump with 'pipx install ../../tool/uapi_version'" && exit 1)
+clean:
+	rm -rf dist
+	rm -rf msgpact/json
+	rm -f msgpact/LICENSE msgpact/NOTICE
+	poetry env remove --all

@@ -1,6 +1,6 @@
 import { Message } from '../Message';
 import { Serializer } from '../Serializer';
-import { UApiError } from '../UApiError';
+import { MsgPactError } from '../MsgPactError';
 import { objectsAreEqual } from '../internal/ObjectsAreEqual';
 
 function timeoutPromise(timeoutMs: number): Promise<never> {
@@ -51,6 +51,6 @@ export async function processRequestObject(
 
         return responseMessage;
     } catch (e) {
-        throw new UApiError(e as Error);
+        throw new MsgPactError(e as Error);
     }
 }

@@ -1,0 +1,29 @@
+{
+    "name": "prettier-plugin-msgpact",
+    "version": "0.1.18",
+    "description": "Prettier plugin to format msgpact docstrings.",
+    "main": "dist/index.cjs.js",
+    "module": "dist/index.esm.js",
+    "types": "dist/index.d.ts",
+    "private": true,
+    "keywords": [
+        "prettier",
+        "plugin",
+        "msgpact"
+    ],
+    "dependencies": {
+        "@prettier/sync": "^0.5.2",
+        "prettier": "^3.4.2"
+    },
+    "devDependencies": {
+        "@rollup/plugin-commonjs": "^21.0.1",
+        "@rollup/plugin-node-resolve": "^13.0.6",
+        "@rollup/plugin-typescript": "^8.2.5",
+        "rollup": "^2.56.3",
+        "tslib": "^2.8.1",
+        "typescript": "^4.5.4"
+    },
+    "scripts": {
+        "build": "tsc && rollup -c"
+    }
+}

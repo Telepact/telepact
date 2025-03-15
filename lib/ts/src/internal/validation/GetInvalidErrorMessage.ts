@@ -1,13 +1,13 @@
-import { UUnion } from "../../internal/types/UUnion";
-import { ValidationFailure } from "../../internal/validation/ValidationFailure";
-import { mapValidationFailuresToInvalidFieldCases } from "../../internal/validation/MapValidationFailuresToInvalidFieldCases";
-import { validateResult } from "../../internal/validation/ValidateResult";
-import { Message } from "../../Message";
+import { VUnion } from '../types/VUnion';
+import { ValidationFailure } from '../../internal/validation/ValidationFailure';
+import { mapValidationFailuresToInvalidFieldCases } from '../../internal/validation/MapValidationFailuresToInvalidFieldCases';
+import { validateResult } from '../../internal/validation/ValidateResult';
+import { Message } from '../../Message';
 
 export function getInvalidErrorMessage(
     error: string,
     validationFailures: ValidationFailure[],
-    resultUnionType: UUnion,
+    resultUnionType: VUnion,
     responseHeaders: { [key: string]: any },
 ): Message {
     const validationFailureCases = mapValidationFailuresToInvalidFieldCases(validationFailures);

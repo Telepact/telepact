@@ -1,17 +1,17 @@
-import { UApiSchema } from './UApiSchema';
+import { MsgPactSchema } from './MsgPactSchema';
 import { MockInvocation } from './internal/mock/MockInvocation';
 import { MockStub } from './internal/mock/MockStub';
 import { Server, ServerOptions as ServerOptions } from './Server';
 import { RandomGenerator } from './RandomGenerator';
 import { mockHandle } from './internal/mock/MockHandle';
-import { MockUApiSchema } from './MockUApiSchema';
+import { MockMsgPactSchema } from './MockMsgPactSchema';
 
 export class MockServer {
     /**
-     * A Mock instance of a uAPI server.
+     * A Mock instance of a msgPact server.
      */
 
-    constructor(mockUApiSchema: MockUApiSchema, options: MockServerOptions) {
+    constructor(mockMsgPactSchema: MockMsgPactSchema, options: MockServerOptions) {
         this.random = new RandomGenerator(options.generatedCollectionLengthMin, options.generatedCollectionLengthMax);
         this.enableGeneratedDefaultStub = options.enableMessageResponseGeneration;
         this.enableOptionalFieldGeneration = options.enableOptionalFieldGeneration;
@@ -24,15 +24,15 @@ export class MockServer {
         serverOptions.onError = options.onError;
         serverOptions.authRequired = false;
 
-        const uApiSchema = new UApiSchema(
-            mockUApiSchema.original,
-            mockUApiSchema.full,
-            mockUApiSchema.parsed,
-            mockUApiSchema.parsedRequestHeaders,
-            mockUApiSchema.parsedResponseHeaders,
+        const msgPactSchema = new MsgPactSchema(
+            mockMsgPactSchema.original,
+            mockMsgPactSchema.full,
+            mockMsgPactSchema.parsed,
+            mockMsgPactSchema.parsedRequestHeaders,
+            mockMsgPactSchema.parsedResponseHeaders,
         );
 
-        this.server = new Server(uApiSchema, this.handle, serverOptions);
+        this.server = new Server(msgPactSchema, this.handle, serverOptions);
     }
 
     private random: RandomGenerator;
@@ -45,10 +45,10 @@ export class MockServer {
 
     async process(message: Uint8Array): Promise<Uint8Array> {
         /**
-         * Process a given uAPI Request Message into a uAPI Response Message.
+         * Process a given msgPact Request Message into a msgPact Response Message.
          *
-         * @param message - The uAPI request message.
-         * @returns The uAPI response message.
+         * @param message - The msgPact request message.
+         * @returns The msgPact response message.
          */
         return await this.server.process(message);
     }
@@ -59,7 +59,7 @@ export class MockServer {
             this.stubs,
             this.invocations,
             this.random,
-            this.server.uApiSchema,
+            this.server.msgPactSchema,
             this.enableGeneratedDefaultStub,
             this.enableOptionalFieldGeneration,
             this.randomizeOptionalFieldGeneration,

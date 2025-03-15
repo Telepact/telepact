@@ -1,6 +1,6 @@
 import { ValidationFailure } from '../../internal/validation/ValidationFailure';
 import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure';
-import { integerName } from '../../internal/types/UInteger';
+import { integerName } from '../types/VInteger';
 
 export function validateInteger(value: any): ValidationFailure[] {
     if (typeof value === 'number' && Number.isInteger(value)) {

@@ -1,10 +1,10 @@
 import { GenerateContext } from '../../internal/generation/GenerateContext';
-import { UTypeDeclaration } from '../types/UTypeDeclaration';
+import { VTypeDeclaration } from '../types/VTypeDeclaration';
 
 export function generateRandomArray(
     blueprintValue: any,
     useBlueprintValue: boolean,
-    typeParameters: UTypeDeclaration[],
+    typeParameters: VTypeDeclaration[],
     ctx: GenerateContext,
 ): any[] {
     const nestedTypeDeclaration = typeParameters[0];

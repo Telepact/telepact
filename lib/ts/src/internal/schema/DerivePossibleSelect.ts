@@ -1,12 +1,12 @@
-import { UType } from "../types/UType";
-import { UUnion } from "../types/UUnion";
-import { UFn } from "../types/UFn";
-import { UStruct } from "../types/UStruct";
-import { UFieldDeclaration } from "../types/UFieldDeclaration";
+import { VType } from '../types/VType';
+import { VUnion } from '../types/VUnion';
+import { VFn } from '../types/VFn';
+import { VStruct } from '../types/VStruct';
+import { VFieldDeclaration } from '../types/VFieldDeclaration';
 
-export function derivePossibleSelect(fnName: string, result: UUnion): Record<string, any> {
-    const nestedTypes: Record<string, UType> = {};
-    const okFields: Record<string, UFieldDeclaration> = result.tags["Ok_"].fields;
+export function derivePossibleSelect(fnName: string, result: VUnion): Record<string, any> {
+    const nestedTypes: Record<string, VType> = {};
+    const okFields: Record<string, VFieldDeclaration> = result.tags['Ok_'].fields;
 
     const okFieldNames = Object.keys(okFields);
     okFieldNames.sort();
@@ -15,7 +15,7 @@ export function derivePossibleSelect(fnName: string, result: UUnion): Record<str
 
     const possibleSelect: Record<string, object> = {};
 
-    possibleSelect["->"] = {
+    possibleSelect['->'] = {
         Ok_: okFieldNames,
     };
 
@@ -23,7 +23,7 @@ export function derivePossibleSelect(fnName: string, result: UUnion): Record<str
     for (const k of sortedTypeKeys) {
         console.log(`k: ${k}`);
         const v = nestedTypes[k];
-        if (v instanceof UUnion) {
+        if (v instanceof VUnion) {
             const unionSelect: Record<string, object> = {};
             const sortedTagKeys = Object.keys(v.tags).sort();
             for (const c of sortedTagKeys) {
@@ -38,7 +38,7 @@ export function derivePossibleSelect(fnName: string, result: UUnion): Record<str
             }
 
             possibleSelect[k] = unionSelect;
-        } else if (v instanceof UStruct) {
+        } else if (v instanceof VStruct) {
             const structSelect: Array<string> = [];
             const sortedFieldNames = Object.keys(v.fields).sort();
             for (const fieldName of sortedFieldNames) {
@@ -52,15 +52,15 @@ export function derivePossibleSelect(fnName: string, result: UUnion): Record<str
     return possibleSelect;
 }
 
-function findNestedTypes(fields: Record<string, UFieldDeclaration>, nestedTypes: Record<string, UType>) {
+function findNestedTypes(fields: Record<string, VFieldDeclaration>, nestedTypes: Record<string, VType>) {
     for (const field of Object.values(fields)) {
         const typ = field.typeDeclaration.type;
-        if (typ instanceof UUnion) {
+        if (typ instanceof VUnion) {
             nestedTypes[typ.name] = typ;
             for (const c of Object.values(typ.tags)) {
                 findNestedTypes(c.fields, nestedTypes);
             }
-        } else if (typ instanceof UStruct) {
+        } else if (typ instanceof VStruct) {
             nestedTypes[typ.name] = typ;
             findNestedTypes(typ.fields, nestedTypes);
         }

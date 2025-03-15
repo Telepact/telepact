@@ -1,6 +1,6 @@
 import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
-import { UError } from '../../internal/types/UError';
-import { UApiSchemaParseError } from '../../UApiSchemaParseError';
+import { VError } from '../types/VError';
+import { MsgPactSchemaParseError } from '../../MsgPactSchemaParseError';
 import { parseUnionType } from '../../internal/schema/ParseUnionType';
 import { ParseContext } from '../../internal/schema/ParseContext';
 
@@ -9,7 +9,7 @@ export function parseErrorType(
     errorDefinitionAsParsedJson: { [key: string]: any },
     schemaKey: string,
     ctx: ParseContext,
-): UError {
+): VError {
     const parseFailures: SchemaParseFailure[] = [];
 
     const otherKeys = Object.keys(errorDefinitionAsParsedJson).filter((key) => key !== schemaKey && key !== '///');
@@ -22,10 +22,10 @@ export function parseErrorType(
     }
 
     if (parseFailures.length > 0) {
-        throw new UApiSchemaParseError(parseFailures, ctx.uapiSchemaDocumentNamesToJson);
+        throw new MsgPactSchemaParseError(parseFailures, ctx.msgpactSchemaDocumentNamesToJson);
     }
 
     const error = parseUnionType(path, errorDefinitionAsParsedJson, schemaKey, [], [], ctx);
 
-    return new UError(schemaKey, error);
+    return new VError(schemaKey, error);
 }

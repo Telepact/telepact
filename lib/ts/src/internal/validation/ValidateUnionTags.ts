@@ -1,18 +1,18 @@
-import { ValidationFailure } from "../../internal/validation/ValidationFailure";
-import { UStruct } from "../../internal/types/UStruct";
-import { getTypeUnexpectedValidationFailure } from "../../internal/validation/GetTypeUnexpectedValidationFailure";
-import { validateUnionStruct } from "../../internal/validation/ValidateUnionStruct";
-import { ValidateContext } from "./ValidateContext";
+import { ValidationFailure } from '../../internal/validation/ValidationFailure';
+import { VStruct } from '../types/VStruct';
+import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure';
+import { validateUnionStruct } from '../../internal/validation/ValidateUnionStruct';
+import { ValidateContext } from './ValidateContext';
 
 export function validateUnionTags(
-    referenceTags: Record<string, UStruct>,
+    referenceTags: Record<string, VStruct>,
     selectedTags: Record<string, any>,
     actual: Record<any, any>,
     ctx: ValidateContext,
 ): ValidationFailure[] {
     if (Object.keys(actual).length !== 1) {
         return [
-            new ValidationFailure([], "ObjectSizeUnexpected", {
+            new ValidationFailure([], 'ObjectSizeUnexpected', {
                 actual: Object.keys(actual).length,
                 expected: 1,
             }),
@@ -23,10 +23,10 @@ export function validateUnionTags(
 
     const referenceStruct = referenceTags[unionTarget];
     if (referenceStruct === undefined) {
-        return [new ValidationFailure([unionTarget], "ObjectKeyDisallowed", {})];
+        return [new ValidationFailure([unionTarget], 'ObjectKeyDisallowed', {})];
     }
 
-    if (typeof unionPayload === "object" && !Array.isArray(unionPayload)) {
+    if (typeof unionPayload === 'object' && !Array.isArray(unionPayload)) {
         const nestedValidationFailures = validateUnionStruct(
             referenceStruct,
             unionTarget,
@@ -43,6 +43,6 @@ export function validateUnionTags(
 
         return nestedValidationFailuresWithPath;
     } else {
-        return getTypeUnexpectedValidationFailure([unionTarget], unionPayload, "Object");
+        return getTypeUnexpectedValidationFailure([unionTarget], unionPayload, 'Object');
     }
 }

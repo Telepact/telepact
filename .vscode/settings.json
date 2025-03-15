@@ -1,7 +1,7 @@
 {
     "json.schemas": [
         {
-            "fileMatch": ["*.uapi.json"],
+            "fileMatch": ["*.msgpact.json"],
             "url": "./common/json-schema.json"
         }
     ],

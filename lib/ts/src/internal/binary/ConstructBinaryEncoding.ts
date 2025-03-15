@@ -1,30 +1,30 @@
-import { UApiSchema } from '../../UApiSchema';
+import { MsgPactSchema } from '../../MsgPactSchema';
 import { BinaryEncoding } from '../../internal/binary/BinaryEncoding';
 import { createChecksum } from '../../internal/binary/CreateChecksum';
-import { UUnion } from '../../internal/types/UUnion';
-import { UStruct } from '../../internal/types/UStruct';
-import { UFn } from '../../internal/types/UFn';
-import { UArray } from '../types/UArray';
-import { UObject } from '../types/UObject';
-import { UTypeDeclaration } from '../types/UTypeDeclaration';
+import { VUnion } from '../types/VUnion';
+import { VStruct } from '../types/VStruct';
+import { VFn } from '../types/VFn';
+import { VArray } from '../types/VArray';
+import { VObject } from '../types/VObject';
+import { VTypeDeclaration } from '../types/VTypeDeclaration';
 
-function traceType(typeDeclaration: UTypeDeclaration): string[] {
+function traceType(typeDeclaration: VTypeDeclaration): string[] {
     const thisAllKeys: string[] = [];
 
-    if (typeDeclaration.type instanceof UArray) {
+    if (typeDeclaration.type instanceof VArray) {
         const theseKeys2 = traceType(typeDeclaration.typeParameters[0]);
         thisAllKeys.push(...theseKeys2);
-    } else if (typeDeclaration.type instanceof UObject) {
+    } else if (typeDeclaration.type instanceof VObject) {
         const theseKeys2 = traceType(typeDeclaration.typeParameters[0]);
         thisAllKeys.push(...theseKeys2);
-    } else if (typeDeclaration.type instanceof UStruct) {
+    } else if (typeDeclaration.type instanceof VStruct) {
         const structFields = typeDeclaration.type.fields;
         for (const [structFieldKey, structField] of Object.entries(structFields)) {
             thisAllKeys.push(structFieldKey);
             const moreKeys = traceType(structField.typeDeclaration);
             thisAllKeys.push(...moreKeys);
         }
-    } else if (typeDeclaration.type instanceof UUnion) {
+    } else if (typeDeclaration.type instanceof VUnion) {
         const unionTags = typeDeclaration.type.tags;
         for (const [tagKey, tagValue] of Object.entries(unionTags)) {
             thisAllKeys.push(tagKey);
@@ -40,13 +40,13 @@ function traceType(typeDeclaration: UTypeDeclaration): string[] {
     return thisAllKeys;
 }
 
-export function constructBinaryEncoding(uApiSchema: UApiSchema): BinaryEncoding {
+export function constructBinaryEncoding(msgPactSchema: MsgPactSchema): BinaryEncoding {
     const allKeys: Set<string> = new Set();
 
-    const functions: [string, UFn][] = [];
+    const functions: [string, VFn][] = [];
 
-    for (const [key, value] of Object.entries(uApiSchema.parsed)) {
-        if (value instanceof UFn) {
+    for (const [key, value] of Object.entries(msgPactSchema.parsed)) {
+        if (value instanceof VFn) {
             functions.push([key, value]);
         }
     }

@@ -1,13 +1,13 @@
-import { UError } from "../../internal/types/UError";
-import { UType } from "../../internal/types/UType";
-import { SchemaParseFailure } from "../../internal/schema/SchemaParseFailure";
-import { UApiSchemaParseError } from "../../UApiSchemaParseError";
-import { UFn } from "../../internal/types/UFn";
-import { getPathDocumentCoordinatesPseudoJson } from "../../internal/schema/GetPathDocumentCoordinatesPseudoJson";
+import { VError } from '../types/VError';
+import { VType } from '../types/VType';
+import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
+import { MsgPactSchemaParseError } from '../../MsgPactSchemaParseError';
+import { VFn } from '../types/VFn';
+import { getPathDocumentCoordinatesPseudoJson } from '../../internal/schema/GetPathDocumentCoordinatesPseudoJson';
 
 export function applyErrorToParsedTypes(
-    error: UError,
-    parsedTypes: { [key: string]: UType },
+    error: VError,
+    parsedTypes: { [key: string]: VType },
     schemaKeysToDocumentNames: { [key: string]: string },
     schemaKeysToIndex: { [key: string]: number },
     documentNamesToJson: { [key: string]: string },
@@ -21,7 +21,7 @@ export function applyErrorToParsedTypes(
     for (const parsedTypeName in parsedTypes) {
         const parsedType = parsedTypes[parsedTypeName];
 
-        if (!(parsedType instanceof UFn)) {
+        if (!(parsedType instanceof VFn)) {
             continue;
         }
 
@@ -48,14 +48,14 @@ export function applyErrorToParsedTypes(
                 const errorTagIndex = error.errors.tagIndices[newKey];
                 const otherDocumentName = schemaKeysToDocumentNames[fnName];
                 const fnErrorTagIndex = f.result.tagIndices[newKey];
-                const otherPath = [otherPathIndex, "->", fnErrorTagIndex, newKey];
+                const otherPath = [otherPathIndex, '->', fnErrorTagIndex, newKey];
                 const otherDocumentJson = documentNamesToJson[otherDocumentName];
                 const otherLocation = getPathDocumentCoordinatesPseudoJson(otherPath, otherDocumentJson);
                 parseFailures.push(
                     new SchemaParseFailure(
                         documentName,
                         [errorIndex, errorKey, errorTagIndex, newKey],
-                        "PathCollision",
+                        'PathCollision',
                         { document: otherDocumentName, path: otherPath, location: otherLocation },
                     ),
                 );
@@ -66,6 +66,6 @@ export function applyErrorToParsedTypes(
     }
 
     if (parseFailures.length > 0) {
-        throw new UApiSchemaParseError(parseFailures, documentNamesToJson);
+        throw new MsgPactSchemaParseError(parseFailures, documentNamesToJson);
     }
 }

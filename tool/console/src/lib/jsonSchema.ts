@@ -1,14 +1,14 @@
 import { findSchemaKey } from '$lib';
-import type { UApiSchema } from './uapi/index.esm';
+import type { MsgPactSchema } from './msgpact/index.esm';
 
-export function createJsonSchema(uapi: UApiSchema): Record<string, any> {
-	let original = uapi.full;
+export function createJsonSchema(msgpact: MsgPactSchema): Record<string, any> {
+	let original = msgpact.full;
 
 	const definitions: any = {};
 
-	function convertType(uapiType: any): any {
-		if (Array.isArray(uapiType)) {
-			const [type, subType] = uapiType;
+	function convertType(msgpactType: any): any {
+		if (Array.isArray(msgpactType)) {
+			const [type, subType] = msgpactType;
 			switch (type) {
 				case 'array':
 					return { type: 'array', items: convertType(subType) };
@@ -29,14 +29,14 @@ export function createJsonSchema(uapi: UApiSchema): Record<string, any> {
 					}
 					return { type };
 			}
-		} else if (typeof uapiType === 'object') {
+		} else if (typeof msgpactType === 'object') {
 			const properties: any = {};
-			for (const key in uapiType) {
-				properties[key] = convertType(uapiType[key]);
+			for (const key in msgpactType) {
+				properties[key] = convertType(msgpactType[key]);
 			}
 			return { type: 'object', properties, additionalProperties: false };
 		} else {
-			return { type: uapiType };
+			return { type: msgpactType };
 		}
 	}
 

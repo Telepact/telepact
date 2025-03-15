@@ -1,20 +1,20 @@
-import { UApiSchemaParseError } from '../../UApiSchemaParseError';
+import { MsgPactSchemaParseError } from '../../MsgPactSchemaParseError';
 import { getTypeUnexpectedParseFailure } from '../../internal/schema/GetTypeUnexpectedParseFailure';
-import { UFieldDeclaration } from '../../internal/types/UFieldDeclaration';
+import { VFieldDeclaration } from '../types/VFieldDeclaration';
 import { ParseContext } from '../../internal/schema/ParseContext';
 import { parseStructFields } from './ParseStructFields';
 import { SchemaParseFailure } from './SchemaParseFailure';
-import { UHeaders } from '../../internal/types/UHeaders';
+import { VHeaders } from '../types/VHeaders';
 
 export function parseHeadersType(
     path: any[],
     headersDefinitionAsParsedJson: { [key: string]: any },
     schemaKey: string,
     ctx: ParseContext,
-): UHeaders {
+): VHeaders {
     const parseFailures: SchemaParseFailure[] = [];
-    const requestHeaders: { [key: string]: UFieldDeclaration } = {};
-    const responseHeaders: { [key: string]: UFieldDeclaration } = {};
+    const requestHeaders: { [key: string]: VFieldDeclaration } = {};
+    const responseHeaders: { [key: string]: VFieldDeclaration } = {};
 
     const requestHeadersDef = headersDefinitionAsParsedJson[schemaKey];
 
@@ -44,7 +44,7 @@ export function parseHeadersType(
 
             Object.assign(requestHeaders, requestFields);
         } catch (e) {
-            if (e instanceof UApiSchemaParseError) {
+            if (e instanceof MsgPactSchemaParseError) {
                 parseFailures.push(...e.schemaParseFailures);
             } else {
                 throw e;
@@ -89,7 +89,7 @@ export function parseHeadersType(
 
             Object.assign(responseHeaders, responseFields);
         } catch (e) {
-            if (e instanceof UApiSchemaParseError) {
+            if (e instanceof MsgPactSchemaParseError) {
                 parseFailures.push(...e.schemaParseFailures);
             } else {
                 throw e;
@@ -98,8 +98,8 @@ export function parseHeadersType(
     }
 
     if (parseFailures.length > 0) {
-        throw new UApiSchemaParseError(parseFailures, ctx.uapiSchemaDocumentNamesToJson);
+        throw new MsgPactSchemaParseError(parseFailures, ctx.msgpactSchemaDocumentNamesToJson);
     }
 
-    return new UHeaders(schemaKey, requestHeaders, responseHeaders);
+    return new VHeaders(schemaKey, requestHeaders, responseHeaders);
 }

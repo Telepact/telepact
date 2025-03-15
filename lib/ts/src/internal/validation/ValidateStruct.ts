@@ -1,14 +1,14 @@
-import { UFieldDeclaration } from '../../internal/types/UFieldDeclaration';
+import { VFieldDeclaration } from '../types/VFieldDeclaration';
 import { ValidationFailure } from '../../internal/validation/ValidationFailure';
 import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure';
 import { validateStructFields } from '../../internal/validation/ValidateStructFields';
-import { structName } from '../../internal/types/UStruct';
+import { structName } from '../types/VStruct';
 import { ValidateContext } from './ValidateContext';
 
 export function validateStruct(
     value: any,
     name: string,
-    fields: Record<string, UFieldDeclaration>,
+    fields: Record<string, VFieldDeclaration>,
     ctx: ValidateContext,
 ): ValidationFailure[] {
     if (typeof value === 'object' && !Array.isArray(value)) {

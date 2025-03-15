@@ -1,13 +1,13 @@
-import { UType } from '../../internal/types/UType';
-import { UTypeDeclaration } from '../../internal/types/UTypeDeclaration';
+import { VType } from '../types/VType';
+import { VTypeDeclaration } from '../types/VTypeDeclaration';
 import { GenerateContext } from '../../internal/generation/GenerateContext';
 
 export function generateRandomValueOfType(
     blueprintValue: any,
     useBlueprintValue: boolean,
-    thisType: UType,
+    thisType: VType,
     nullable: boolean,
-    typeParameters: UTypeDeclaration[],
+    typeParameters: VTypeDeclaration[],
     ctx: GenerateContext,
 ): any {
     if (nullable && !useBlueprintValue && ctx.randomGenerator.nextBoolean()) {

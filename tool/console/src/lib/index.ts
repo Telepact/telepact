@@ -1,13 +1,13 @@
 // place files you want to import through the `$lib` alias in this folder.
 import { goto } from '$app/navigation';
 import * as monaco from 'monaco-editor';
-import * as uapi from './uapi/index.esm.js';
-import { _internal } from './uapi/index.esm.js';
+import * as msgpact from './msgpact/index.esm.js';
+import { _internal } from './msgpact/index.esm.js';
 import { writable, type Writable } from 'svelte/store';
 import { createJsonSchema } from './jsonSchema';
 
-export function createJsonSchema2(uapi: uapi.UApiSchema): Record<string, any> {
-	return createJsonSchema(uapi);
+export function createJsonSchema2(msgpact: msgpact.MsgPactSchema): Record<string, any> {
+	return createJsonSchema(msgpact);
 }
 
 export const responseStore: Writable<string | null> = writable(null);
@@ -29,7 +29,7 @@ export const stockPingResponse = `[
 ]
 `;
 
-const random = new uapi.RandomGenerator(2, 2);
+const random = new msgpact.RandomGenerator(2, 2);
 
 export function minifyJson(json: string, redactAuthHeader = false) {
 	let pseudoJson = JSON.parse(json);
@@ -79,12 +79,12 @@ export function handleRequest(request: string, viewQuery: string) {
 	goto(`?${q.toString()}`);
 }
 
-export function handleSubmitRequest(client: uapi.Client, request: string) {
+export function handleSubmitRequest(client: msgpact.Client, request: string) {
 	let requestPseudoJson = JSON.parse(request);
-	let requestMessage = new uapi.Message(requestPseudoJson[0], requestPseudoJson[1]);
+	let requestMessage = new msgpact.Message(requestPseudoJson[0], requestPseudoJson[1]);
 	client
 		.request(requestMessage)
-		.then((rs: uapi.Message) => JSON.stringify([rs.headers, rs.body], null, 2))
+		.then((rs: msgpact.Message) => JSON.stringify([rs.headers, rs.body], null, 2))
 		.then((res) => {
 			responseStore.set(res);
 		});
@@ -139,7 +139,7 @@ export function isHeaderData(data: any): data is HeaderData {
 	return (data as HeaderData).type === 'header';
 }
 
-export function generateExample(schemaKey: string, schemaInst: uapi.UApiSchema) {
+export function generateExample(schemaKey: string, schemaInst: msgpact.MsgPactSchema) {
 	let example = schemaInst.parsed[schemaKey].generateRandomValue(
 		null,
 		false,
@@ -151,7 +151,7 @@ export function generateExample(schemaKey: string, schemaInst: uapi.UApiSchema) 
 
 export function generateFnResultExample(
 	fn: string,
-	schemaInst: uapi.UApiSchema,
+	schemaInst: msgpact.MsgPactSchema,
 	blueprintValue: any,
 	useBlueprintValue: boolean
 ) {
@@ -167,7 +167,7 @@ export function generateFnResultExample(
 export function generateHeaderExample(
 	headerType: 'request' | 'response',
 	headers: string[],
-	schemaInst: uapi.UApiSchema
+	schemaInst: msgpact.MsgPactSchema
 ) {
 	console.log(`schemaInst.parsedRequestHeaders ${Object.keys(schemaInst.parsedRequestHeaders)}`);
 	let genHeaders: Record<string, any> = {};
@@ -196,7 +196,11 @@ export function generateHeaderExample(
 	return JSON.stringify(genHeaders, null, 2);
 }
 
-export async function genExample(fn: string, headers: Array<string>, schemaInst: uapi.UApiSchema) {
+export async function genExample(
+	fn: string,
+	headers: Array<string>,
+	schemaInst: msgpact.MsgPactSchema
+) {
 	console.log(`Generating example for ${fn} with headers ${headers}`);
 	let example = schemaInst.parsed[fn].generateRandomValue(
 		null,
@@ -217,15 +221,15 @@ export async function genExample(fn: string, headers: Array<string>, schemaInst:
 	let request = [requestHeaders, example];
 	let requestJson = JSON.stringify(request, null, 2);
 	let requestBytes = new TextEncoder().encode(requestJson);
-	let mockServerOptions = new uapi.MockServerOptions();
-	let mockUapi = new uapi.MockUApiSchema(
+	let mockServerOptions = new msgpact.MockServerOptions();
+	let mockMsgPact = new msgpact.MockMsgPactSchema(
 		schemaInst.original,
 		schemaInst.full,
 		schemaInst.parsed,
 		schemaInst.parsedRequestHeaders,
 		schemaInst.parsedResponseHeaders
 	);
-	let mockServer = new uapi.MockServer(mockUapi, mockServerOptions);
+	let mockServer = new msgpact.MockServer(mockMsgPact, mockServerOptions);
 	let responseBytes = await mockServer.process(requestBytes);
 	try {
 		let responseJson = new TextDecoder().decode(responseBytes);
@@ -254,9 +258,9 @@ export async function genExample(fn: string, headers: Array<string>, schemaInst:
 	}
 }
 
-export function parseUApiSchema(
+export function parseMsgPactSchema(
 	schema: any[],
-	schemaInst: uapi.UApiSchema,
+	schemaInst: msgpact.MsgPactSchema,
 	sortDocCardsAZ: boolean,
 	showInternalApi: boolean
 ): TypeData[] {
@@ -321,7 +325,7 @@ export function parseUApiSchema(
 					false,
 					true,
 					schemaKey,
-					new uapi.RandomGenerator(2, 2)
+					new msgpact.RandomGenerator(2, 2)
 				)
 			);
 			let exampleCallJson = JSON.stringify([{}, exampleCall]);
@@ -413,8 +417,8 @@ monaco.languages.typescript.typescriptDefaults.setEagerModelSync(true);
 // 	schemas: [
 // 		{
 // 			uri: 'internal://server/jsonschema.json',
-// 			fileMatch: ['schema.uapi.json'],
-// 			schema: uapi.jsonSchema
+// 			fileMatch: ['schema.msgpact.json'],
+// 			schema: msgpact.jsonSchema
 // 		}
 // 	]
 // });

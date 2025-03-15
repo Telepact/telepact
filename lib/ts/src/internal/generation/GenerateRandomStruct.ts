@@ -1,10 +1,10 @@
-import { UFieldDeclaration } from '../../internal/types/UFieldDeclaration';
+import { VFieldDeclaration } from '../types/VFieldDeclaration';
 import { GenerateContext } from '../../internal/generation/GenerateContext';
 
 export function generateRandomStruct(
     blueprintValue: any,
     useBlueprintValue: boolean,
-    referenceStruct: { [key: string]: UFieldDeclaration },
+    referenceStruct: { [key: string]: VFieldDeclaration },
     ctx: GenerateContext,
 ): any {
     const startingStruct = useBlueprintValue ? blueprintValue : {};

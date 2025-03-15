@@ -6,12 +6,13 @@ JAVA_POM_FILE = ../../../lib/java/pom.xml
 all: dep $(BUILT_FILE)
 
 $(BUILT_FILE): $(JAVA_POM_FILE)
+	rm -rf target
 	mkdir -p target
 
-	cp ../../../lib/java/target/*.jar target/uapi.jar
-	mvn install:install-file -Dfile=target/uapi.jar -DgroupId=io.github.brenbar -DartifactId=uapi -Dversion=1.0 -Dpackaging=jar
+	cp ../../../lib/java/target/*.jar target/msgpact.jar
+	mvn install:install-file -Dfile=target/msgpact.jar -DgroupId=io.github.msgpact -DartifactId=msgpact -Dversion=1.0 -Dpackaging=jar
 
-	uapicodegen --schema-dir ../../test/schema/example --lang java --out src/gen/java/uapitest --package uapitest
+	msgpact-codegen --schema-dir ../../test/schema/example --lang java --out src/gen/java/msgpacttest --package msgpacttest
 
 
 dep:

@@ -26,11 +26,11 @@ toml = "*"
 pytest = "^6.2"
 mypy = "^0.910"
 
-[tool.poetry.dependencies.uapi]
+[tool.poetry.dependencies.msgpact]
 path = "../../lib/py"
 
 [tool.poetry.scripts]
-uapi_example = "calculator_service.__main__:run_main"
+msgpact_example = "calculator_service.__main__:run_main"
 
 [tool.poetry]
 include = ["calculator_service"]

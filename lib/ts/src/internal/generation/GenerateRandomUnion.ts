@@ -1,11 +1,11 @@
-import { UStruct } from '../../internal/types/UStruct';
+import { VStruct } from '../types/VStruct';
 import { GenerateContext } from '../../internal/generation/GenerateContext';
 import { generateRandomStruct } from '../../internal/generation/GenerateRandomStruct';
 
 export function generateRandomUnion(
     blueprintValue: any,
     useBlueprintValue: boolean,
-    unionTagsReference: { [key: string]: UStruct },
+    unionTagsReference: { [key: string]: VStruct },
     ctx: GenerateContext,
 ): any {
     if (!useBlueprintValue) {

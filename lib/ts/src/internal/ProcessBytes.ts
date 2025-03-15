@@ -1,5 +1,5 @@
 import { Serializer } from '../Serializer';
-import { UApiSchema } from '../UApiSchema';
+import { MsgPactSchema } from '../MsgPactSchema';
 import { Message } from '../Message';
 import { handleMessage } from '../internal/HandleMessage';
 import { parseRequestMessage } from '../internal/ParseRequestMessage';
@@ -12,14 +12,14 @@ export type MessageHandler = (message: Message) => Promise<Message>;
 export async function processBytes(
     requestMessageBytes: Uint8Array,
     serializer: Serializer,
-    uapiSchema: UApiSchema,
+    msgpactSchema: MsgPactSchema,
     onError: ErrorHandler,
     onRequest: RequestHandler,
     onResponse: ResponseHandler,
     handler: MessageHandler,
 ): Promise<Uint8Array> {
     try {
-        const requestMessage = parseRequestMessage(requestMessageBytes, serializer, uapiSchema, onError);
+        const requestMessage = parseRequestMessage(requestMessageBytes, serializer, msgpactSchema, onError);
 
         try {
             onRequest(requestMessage);
@@ -27,7 +27,7 @@ export async function processBytes(
             // Handle error
         }
 
-        const responseMessage = await handleMessage(requestMessage, uapiSchema, handler, onError);
+        const responseMessage = await handleMessage(requestMessage, msgpactSchema, handler, onError);
 
         try {
             onResponse(responseMessage);
