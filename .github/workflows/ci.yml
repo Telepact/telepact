@@ -189,7 +189,7 @@ jobs:
         run: make console
       
       - name: Install Playwright Browsers
-        run: pipx playwright install --force
+        run: npx playwright install --force
       
       - name: Run tests
         run: make test-console
