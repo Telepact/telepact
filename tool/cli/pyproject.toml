@@ -10,6 +10,9 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 version = "0.1.1"
+include = ["msgpact_cli/msgpact/**/*"]
+[[tool.poetry.packages]]
+include = "msgpact_cli"
 
 [tool.poetry.dependencies]
 python = "^3.11"
@@ -19,6 +22,8 @@ lxml = "^5.3.1"
 pyyaml = "^6.0.2"
 jinja2 = "*"
 msgpack = "^1.1.0"
+fastapi = "^0.68.0"
+uvicorn = "^0.15.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "*"

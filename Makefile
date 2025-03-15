@@ -56,4 +56,4 @@ install-cli:
 	pipx install $(wildcard tool/cli/dist/msgpact_cli-*.tar.gz)
 
 uninstall-cli:
-	pipx uninstall msgpact
+	pipx uninstall msgpact-cli

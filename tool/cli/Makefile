@@ -10,6 +10,7 @@ all: dep
 	rm -rf tmp
 
 	rm -rf dist
+	poetry lock
 	poetry install
 	poetry build
 
