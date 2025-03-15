@@ -81,8 +81,9 @@
 	});
 </script>
 
-<div
+<section
 	id={schemaKey}
+	aria-label={schemaKey}
 	class="mb-2 rounded-lg border border-gray-200 bg-white p-6 shadow dark:border-gray-700 dark:bg-gray-800"
 >
 	<div class="flex w-full items-center pb-4">
@@ -132,6 +133,7 @@
 			<Example {schemaKey} generate={() => generateExample(schemaKey, msgpactSchema)} />
 		{:else if isFnTypeData(data)}
 			<div class="space-y-1">
+				<section aria-label="Arguments">
 				<DocCardStructFields fields={data.args} />
 				{#if description}
 					<div class="docstring font-normal text-gray-700 dark:text-gray-400">
@@ -140,88 +142,93 @@
 				{/if}
 
 				<Example {schemaKey} generate={() => generateExample(schemaKey, msgpactSchema)} />
+				</section>
 
-				<div>
-					<span class="text-3xl text-emerald-500">→</span>
-				</div>
+				<section aria-label="Result">
+					<div>
+						<span class="text-3xl text-emerald-500">→</span>
+					</div>
 
-				<DocCardEnumTags tags={data.results} />
+					<DocCardEnumTags tags={data.results} />
 
-				<div class="flex items-center justify-center space-x-2">
-					<button
-						on:click={toggleShowExample}
-						class="group mt-2 flex items-center rounded-lg hover:underline"
-					>
-						<h6
-							class="rounded-md p-2 {showExample
-								? 'border border-slate-500 font-bold'
-								: ''}"
-						>
-							{showExample ? 'Hide' : ''} Example
-						</h6>
-					</button>
-					{#if showExample}
+					<div class="flex items-center justify-center space-x-2">
 						<button
-							on:click={incrementRandomSeed}
+							aria-label="Result Example"
+							on:click={toggleShowExample}
 							class="group mt-2 flex items-center rounded-lg hover:underline"
 						>
-							<h6 class="rounded-md border border-slate-500 p-2 font-bold">
-								Regenerate
+							<h6
+								class="rounded-md p-2 {showExample
+									? 'border border-slate-500 font-bold'
+									: ''}"
+							>
+								{showExample ? 'Hide' : ''} Example
 							</h6>
 						</button>
-						<label>
-							<input
-								type="checkbox"
-								class="mr-1"
-								bind:checked={includeErrorsInExample}
-							/> Include Errors
-						</label>
-					{/if}
-				</div>
-				{#if showExample}
-					<div class="py-2">
-						{#key randomSeed}
-							<MonacoEditor
-								id={schemaKey}
-								readOnly={true}
-								json={generateFnResultExample(
-									schemaKey,
-									msgpactSchema,
-									includeErrorsInExample
-										? null
-										: {
-												Ok_: {}
-											},
-									!includeErrorsInExample
-								)}
-								allowLinks={false}
-								filename={schemaKey + '.result.json'}
-								fullHeight={false}
-								lineNumbers={false}
-								minimap={false}
-							/>
-						{/key}
+						{#if showExample}
+							<button
+								on:click={incrementRandomSeed}
+								class="group mt-2 flex items-center rounded-lg hover:underline"
+							>
+								<h6 class="rounded-md border border-slate-500 p-2 font-bold">
+									Regenerate
+								</h6>
+							</button>
+							<label>
+								<input
+									type="checkbox"
+									class="mr-1"
+									bind:checked={includeErrorsInExample}
+								/> Include Errors
+							</label>
+						{/if}
 					</div>
-				{/if}
-
-				{#if data.inheritedErrors?.length ?? 0 > 0}
-					<div class="pt-4">
-						<div class="border-t border-gray-500 pt-2">
-							<h6 class="font-bold tracking-tight">Also includes:</h6>
-							<ul>
-								{#each data.inheritedErrors as inheritedError}
-									<ul>
-										<a
-											href={`#${inheritedError}`}
-											class="text-md pl-4 text-sky-400 hover:underline"
-											>{inheritedError}</a
-										>
-									</ul>
-								{/each}
-							</ul>
+					{#if showExample}
+						<div class="py-2">
+							{#key randomSeed}
+								<MonacoEditor
+									id={schemaKey}
+									readOnly={true}
+									json={generateFnResultExample(
+										schemaKey,
+										msgpactSchema,
+										includeErrorsInExample
+											? null
+											: {
+													Ok_: {}
+												},
+										!includeErrorsInExample
+									)}
+									allowLinks={false}
+									filename={schemaKey + '.result.json'}
+									ariaLabel={schemaKey + '.result.example'}
+									fullHeight={false}
+									lineNumbers={false}
+									minimap={false}
+								/>
+							{/key}
 						</div>
-					</div>
-				{/if}
+					{/if}
+
+					{#if data.inheritedErrors?.length ?? 0 > 0}
+						<div class="pt-4">
+							<div class="border-t border-gray-500 pt-2">
+								<h6 class="font-bold tracking-tight">Also includes:</h6>
+								<ul>
+									{#each data.inheritedErrors as inheritedError}
+										<ul>
+											<a
+												href={`#${inheritedError}`}
+												class="text-md pl-4 text-sky-400 hover:underline"
+												>{inheritedError}</a
+											>
+										</ul>
+									{/each}
+								</ul>
+							</div>
+						</div>
+					{/if}
+				</section>
 			</div>
 		{:else if isUnionTagTypeData(data)}
 			{#if description}
@@ -294,4 +301,4 @@
 			</div>
 		{/if}
 	</div>
-</div>
+</section>
