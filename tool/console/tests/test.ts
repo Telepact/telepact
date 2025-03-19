@@ -1,5 +1,5 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
-import { demoSchema } from './constants';
+import { schema } from './constants';
 
 async function selectAllCopyAndGet(page: Page, locator: Locator): Promise<string> {
 	await locator.click();
@@ -26,7 +26,7 @@ test.describe('Loading from demo server', () => {
 		).toBeVisible();
 		
 		let source = page.getByRole('textbox', { name: 'Source' });
-		await source.fill('http://localhost:8000/api');
+		await source.fill('http://localhost:8080/api');
 		await page.getByRole('button', { name: 'Load'}).click();
 	});
 
@@ -47,11 +47,11 @@ test.describe('Loading from demo server', () => {
 			textAreaElement,
 			"Schema text area should be visible after clicking the button"
 		).toBeVisible();
-	
+
 		expect(
 			await selectAllCopyAndGet(page, textAreaElement.locator("..")),
 			"Clipboard should contain the schema text"
-		).toBe(demoSchema);
+		).toBe(schema);
 	
 		await textAreaElement.locator("..").click();
 		await page.keyboard.press('a');
@@ -59,21 +59,21 @@ test.describe('Loading from demo server', () => {
 		expect(
 			await selectAllCopyAndGet(page, textAreaElement.locator("..")),
 			"Editor should not have changed since it is not editable"
-		).toBe(demoSchema);
+		).toBe(schema);
 	});
 
 	test('Doc UI shows examples correctly', async ({ page }) => {
 	
-		let infoCard = page.getByRole('region', { name: 'info.Calculator'});
+		let infoCard = page.getByRole('region', { name: 'info.DevConsole'});
 		await expect(
 			infoCard,
-			"Calculator info should be visible"
+			"DevConsole info should be visible"
 		).toBeVisible();
 	
-		let fnCard = page.getByRole('region', { name: 'fn.exportVariables'});
+		let fnCard = page.getByRole('region', { name: 'fn.fn1'});
 		await expect(
 			fnCard,
-			"exportVariables function should be visible"
+			"fn1 function should be visible"
 		).toBeVisible();
 	
 		let fnArguments = fnCard.getByRole('region', { name: 'Arguments'});
@@ -104,7 +104,7 @@ test.describe('Loading from demo server', () => {
 			"Regenerate button should be visible after example is shown"
 		).toBeVisible();
 	
-		let fnArgumentsExample = fnArguments.getByRole('textbox', { name: 'fn.exportVariables.example'});
+		let fnArgumentsExample = fnArguments.getByRole('textbox', { name: 'fn.fn1.example'});
 		await expect(
 			fnArgumentsExample,
 			"Example text area should be visible after clicking the button"
@@ -118,13 +118,13 @@ test.describe('Loading from demo server', () => {
 			fnArgExamplePsuedoJson,
 			"Example text should be valid JSON"
 		).toMatchObject({
-			"fn.exportVariables": {
+			"fn.fn1": {
 			}
 		});
 	
-		if ("limit!" in fnArgExamplePsuedoJson["fn.exportVariables"]) {
+		if ("limit!" in fnArgExamplePsuedoJson["fn.fn1"]) {
 			expect(
-				typeof fnArgExamplePsuedoJson["fn.exportVariables"]["limit!"],
+				typeof fnArgExamplePsuedoJson["fn.fn1"]["limit!"],
 				"Generated example should have correct types"
 			).toBe('number');
 		}
@@ -157,7 +157,7 @@ test.describe('Loading from demo server', () => {
 			"Regenerate button should be visible after example is shown"
 		).toBeVisible();
 
-		let fnResultExample = fnResult.getByRole('textbox', { name: 'fn.exportVariables.result.example'});
+		let fnResultExample = fnResult.getByRole('textbox', { name: 'fn.fn1.result.example'});
 		await expect(
 			fnResultExample,
 			"Example text area should be visible after clicking the button"
@@ -172,14 +172,14 @@ test.describe('Loading from demo server', () => {
 			"Example text should be valid JSON"
 		).toMatchObject({
 			"Ok_": {
-				"variables": [
+				"output1": [
 					{
-						"name": expect.any(String),
-						"value": expect.any(Number)
+						"field1": expect.any(String),
+						"field2": expect.any(Number)
 					},
 					{
-						"name": expect.any(String),
-						"value": expect.any(Number)
+						"field1": expect.any(String),
+						"field2": expect.any(Number)
 					}
 				]
 			}
@@ -189,22 +189,22 @@ test.describe('Loading from demo server', () => {
 
 	test('Doc UI follows links correctly', async ({ page }) => {
 			
-		let fnCard = page.getByRole('region', { name: 'fn.compute'});
+		let fnCard = page.getByRole('region', { name: 'fn.fn1'});
 		await expect(
 			fnCard,
-			"showExample function should be visible"
+			"fn1 function should be visible"
 		).toBeVisible();
 
 		await expect(
-			page.getByRole('region', { name: 'union.Value'}),
-			"Value struct should not yet be visible"
+			page.getByRole('region', { name: 'struct.Struct1'}),
+			"Struct1 struct should not yet be visible"
 		).not.toBeInViewport();
 
-		await fnCard.getByRole('link', { name: 'Value'}).first().click();
+		await fnCard.getByRole('link', { name: 'Struct1'}).first().click();
 
 		await expect(
-			page.getByRole('region', { name: 'union.Value'}),
-			"Value struct should be visible"
+			page.getByRole('region', { name: 'struct.Struct1'}),
+			"Struct1 struct should be visible"
 		).toBeInViewport();
 	
 	});

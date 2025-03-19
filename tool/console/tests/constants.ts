@@ -1,118 +1,42 @@
-export const demoSchema = `[
+export const schema = `[
   {
-    "///": " A calculator app that provides basic math computation capabilities. ",
-    "info.Calculator": {}
+    "info.DevConsole": {}
   },
   {
-    "///": " Compute the \`result\` of the given \`x\` and \`y\` values. ",
-    "fn.compute": {
-      "x": ["union.Value"],
-      "y": ["union.Value"],
-      "op": ["union.Operation"]
+    "fn.fn1": {
+      "input1": ["string"],
+      "input2": ["integer"]
     },
     "->": [
       {
         "Ok_": {
-          "result": ["number"]
-        }
-      },
-      {
-        "ErrorCannotDivideByZero": {}
-      }
-    ]
-  },
-  {
-    "///": " Export all saved variables, up to an optional \`limit\`. ",
-    "fn.exportVariables": {
-      "limit!": ["integer"]
-    },
-    "->": [
-      {
-        "Ok_": {
-          "variables": ["array", ["struct.Variable"]]
+          "output1": ["array", ["struct.Struct1"]]
         }
       }
     ]
   },
   {
-    "///": " A function template. ",
-    "fn.getPaperTape": {},
-    "->": [
-      {
-        "Ok_": {
-          "tape": ["array", ["struct.Computation"]]
-        }
-      }
-    ]
-  },
-  {
-    "///": " Save a set of variables as a dynamic map of variable names to their value. ",
-    "fn.saveVariables": {
-      "variables": ["object", ["number"]]
-    },
-    "->": [
-      {
-        "Ok_": {}
-      }
-    ]
-  },
-  {
-    "fn.showExample": {},
-    "->": [
-      {
-        "Ok_": {
-          "link": ["fn.compute"]
-        }
-      }
-    ]
-  },
-  {
-    "///": " A computation. ",
-    "struct.Computation": {
-      "firstOperand": ["union.Value"],
-      "secondOperand": ["union.Value"],
-      "operation": ["union.Operation"],
-      "timestamp": ["integer"],
-      "successful": ["boolean"]
+    "struct.Pad1": {
+      "field1": ["string"],
+      "field2": ["integer"]
     }
   },
   {
-    "///": " A mathematical variable represented by a \`name\` that holds a certain \`value\`. ",
-    "struct.Variable": {
-      "name": ["string"],
-      "value": ["number"]
+    "struct.Pad2": {
+      "field1": ["string"],
+      "field2": ["integer"]
     }
   },
   {
-    "///": " A basic mathematical operation. ",
-    "union.Operation": [
-      {
-        "Add": {}
-      },
-      {
-        "Sub": {}
-      },
-      {
-        "Mul": {}
-      },
-      {
-        "Div": {}
-      }
-    ]
+    "struct.Pad3": {
+      "field1": ["string"],
+      "field2": ["integer"]
+    }
   },
   {
-    "///": " A value for computation that can take either a constant or variable form. ",
-    "union.Value": [
-      {
-        "Constant": {
-          "value": ["number"]
-        }
-      },
-      {
-        "Variable": {
-          "name": ["string"]
-        }
-      }
-    ]
+    "struct.Struct1": {
+      "field1": ["string"],
+      "field2": ["integer"]
+    }
   }
 ]`;

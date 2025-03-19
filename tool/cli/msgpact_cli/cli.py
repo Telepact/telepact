@@ -248,14 +248,9 @@ def _generate_internal(schema_data: list[dict[str, object]], target: str, output
 def demo_server() -> None:
     app = FastAPI()
 
-    origins = [
-        "http://localhost:5173",
-        "http://localhost:8000",
-    ]
-
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=origins,
+        allow_origins=["*"],  # Any origin
         allow_credentials=True,
         allow_methods=["*"],  # Allow all methods (GET, POST, etc.)
         allow_headers=["*"],  # Allow all headers
@@ -370,6 +365,14 @@ def demo_server() -> None:
 @click.option('--dir', help='Directory of MsgPact schemas', required=False, envvar='MSGPACT_DIRECTORY')
 def mock(http_url: str, dir: str) -> None:
     app = FastAPI()
+
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],  # Any origin
+        allow_credentials=True,
+        allow_methods=["*"],  # Allow all methods (GET, POST, etc.)
+        allow_headers=["*"],  # Allow all headers
+    )
 
     if http_url:
         url: str = http_url
