@@ -1,6 +1,10 @@
 #!/bin/bash
 
-docker-compose up --build -d
+docker compose up --build -d
+if [ $? -ne 0 ]; then
+  echo "Failed to start docker compose."
+  exit 1
+fi
 
 # Ensure docker-compose down runs even if there is a failure
 trap 'docker-compose down' EXIT
