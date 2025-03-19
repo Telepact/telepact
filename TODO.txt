@@ -1,2 +1,3 @@
 - Remove idl folder
 - @msgpack/msgpack might be an unused dependency in lib/ts
+- Replace info. with msgpact. and don't show type in console

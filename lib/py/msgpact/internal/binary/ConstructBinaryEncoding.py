@@ -74,7 +74,6 @@ def construct_binary_encoding(u_api_schema: 'MsgPactSchema') -> 'BinaryEncoding'
 
     sorted_all_keys = sorted(all_keys)
 
-    print('Sorted all keys:')
     binary_encoding = {key: i for i, key in enumerate(sorted_all_keys)}
     final_string = "\n".join(sorted_all_keys)
     checksum = create_checksum(final_string)

@@ -71,9 +71,6 @@ export function constructBinaryEncoding(msgPactSchema: MsgPactSchema): BinaryEnc
 
     const sortedAllKeys = Array.from(allKeys).sort();
 
-    console.log('Sorted all keys:');
-    console.log(sortedAllKeys);
-
     const binaryEncoding = new Map<string, number>();
     sortedAllKeys.forEach((key, index) => {
         binaryEncoding.set(key, index);

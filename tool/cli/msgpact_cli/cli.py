@@ -12,14 +12,14 @@ import jinja2
 import click
 from pathlib import Path
 import re
-from .msgpact import MsgPactSchema
 from fastapi import FastAPI, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
 import importlib.resources as pkg_resources
 import time
 import uvicorn
-from .msgpact import Server, Message, MsgPactSchema
+from .msgpact import Server, Message, MsgPactSchema, MockMsgPactSchema, MockServer
+import pprint
 
 
 def bump_version(version: str) -> str:
@@ -364,8 +364,73 @@ def demo_server() -> None:
 
     uvicorn.run(app, host='0.0.0.0', port=8000)
 
+
+@click.command()
+@click.option('--http-url', help='HTTP URL of a MsgPact API', required=False, envvar='MSGPACT_HTTP_URL')
+@click.option('--dir', help='Directory of MsgPact schemas', required=False, envvar='MSGPACT_DIRECTORY')
+def mock(http_url: str, dir: str) -> None:
+    app = FastAPI()
+
+    if http_url:
+        url: str = http_url
+
+        async def adapter(m: Message, s: Serializer) -> Message:
+            try:
+                request_bytes = s.serialize(m)
+            except SerializationError as e:
+                if isinstance(e.__context__, OverflowError):
+                    return Message({"numberTooBig": True}, {"ErrorUnknown_": {}})
+                else:
+                    raise
+
+            response = requests.post(url, data=request_bytes)
+            response_bytes = response.content
+            response_message = s.deserialize(response_bytes)
+            return response_message
+
+        options = Client.Options()
+        msgpact_client = Client(adapter, options)
+
+        retries = 3
+        for attempt in range(retries):
+            try:
+                response_message = asyncio.run(msgpact_client.request(Message({}, {'fn.api_': {}})))
+                break
+            except Exception as e:
+                if attempt < retries - 1:
+                    time.sleep(1)
+                else:
+                    raise e
+
+        if 'Ok_' not in response_message.body:
+            raise Exception("Invalid url: " + str(response_message))
+        api = cast(dict[str, object], response_message.body['Ok_'])['api']
+        api_json = json.dumps(api)
+        schema = MockMsgPactSchema.from_json(api_json)
+    elif dir:
+        directory: str = dir
+        schema = MockMsgPactSchema.from_directory(directory)
+    else:
+        raise click.BadParameter('Either --http-url or --dir must be provided.')
+
+    print('msgPact JSON:')
+    print(json.dumps(schema.original, indent=4))
+
+    mock_server_options = MockServer.Options()
+    mock_server = MockServer(schema, mock_server_options)
+
+    @app.post('/api')
+    async def api(request: Request) -> Response:
+        request_bytes = await request.body()
+        response_bytes = await mock_server.process(request_bytes)
+        media_type = 'application/octet-stream' if response_bytes[0] == 0x92 else 'application/json'
+        return Response(content=response_bytes, media_type=media_type)
+
+    uvicorn.run(app, host='0.0.0.0', port=8080)
+
 main.add_command(codegen)
 main.add_command(demo_server)
+main.add_command(mock)
 
 if __name__ == "__main__":
     main()
