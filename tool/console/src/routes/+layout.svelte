@@ -298,6 +298,8 @@
 						</svg>
 					</button>
 					<button
+						aria-label="Toggle Simulation"
+						aria-pressed={activeViews.includes('m')}					
 						on:click={toggleShowExample}
 						class="rounded-e-md p-2 {activeViews.includes('m')
 							? 'bg-sky-700 text-cyan-300'

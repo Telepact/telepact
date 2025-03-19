@@ -63,6 +63,8 @@ test.describe('Loading from demo server', () => {
 	});
 
 	test('Doc UI shows examples correctly', async ({ page }) => {
+
+		await expect(page.getByRole('heading', {name: 'Schema'})).toBeVisible();
 	
 		let infoCard = page.getByRole('region', { name: 'info.DevConsole'});
 		await expect(
@@ -208,6 +210,75 @@ test.describe('Loading from demo server', () => {
 		).toBeInViewport();
 	
 	});
+
+	test('Doc UI correctly navigates to simulation', async ({ page }) => {
+	
+		let fnCard = page.getByRole('region', { name: 'fn.fn1'});
+		await expect(
+			fnCard,
+			"fn1 function should be visible"
+		).toBeVisible();
+
+		await expect(page.getByRole('button', { name: 'Toggle Simulation', pressed: false })).toBeVisible();
+
+		await fnCard.getByRole('button', { name: 'Simulate'}).click();
+
+		await expect(
+			page.getByRole('button', { name: 'Toggle Simulation', pressed: true }),
+			"Schema should be visible after navigating to simulation"
+		).toBeVisible();
+
+		let requestSimulation = page.getByRole('textbox', { name: 'requestExample'});
+		await expect(
+			requestSimulation,
+			"Request simulation should be visible"
+		).toBeVisible();
+	
+		let requestSimulationText = await selectAllCopyAndGet(page, requestSimulation.locator(".."));
+	
+		let requestSimulationPseudoJson = JSON.parse(requestSimulationText);
+	
+		expect(
+			requestSimulationPseudoJson,
+			"Request simluation should be valid json"
+		).toMatchObject([{
+		}, {
+			"fn.fn1": {
+				"input1": expect.any(String),
+				"input2": expect.any(Number)
+			}
+		}]);
+		
+		let responseSimulation = page.getByRole('textbox', { name: 'responseExample'});
+		await expect(
+			responseSimulation,
+			"Response simluation should be visible"
+		).toBeVisible();
+	
+		let responseSimulationText = await selectAllCopyAndGet(page, responseSimulation.locator(".."));
+	
+		let responseSimulationPseudoJson = JSON.parse(responseSimulationText);
+	
+		expect(
+			responseSimulationPseudoJson,
+			"Response simulation should be valid json"
+		).toMatchObject([{}, {
+			"Ok_": {
+				"output1": [
+				{
+					"field1": expect.any(String),
+					"field2": expect.any(Number)
+				},
+				{
+					"field1": expect.any(String),
+					"field2": expect.any(Number)
+				}
+			]
+		}
+		}]);			
+		
+	});
+
 	
 });
 
