@@ -6,7 +6,6 @@ on:
 jobs:
   build-msgpact-ts:
     runs-on: ubuntu-latest
-    retention-days: 7
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -28,7 +27,6 @@ jobs:
 
   build-msgpact-java:
     runs-on: ubuntu-latest
-    retention-days: 7
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -51,7 +49,6 @@ jobs:
 
   build-msgpact-py:
     runs-on: ubuntu-latest
-    retention-days: 7
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -82,7 +79,6 @@ jobs:
   build-msgpact-cli:
     runs-on: ubuntu-latest
     needs: [build-msgpact-py]
-    retention-days: 14
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -119,7 +115,6 @@ jobs:
   build-msgpact-dart:
     runs-on: ubuntu-latest
     needs: [build-msgpact-ts]
-    retention-days: 14
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -148,7 +143,6 @@ jobs:
 
   build-msgpact-prettier:
     runs-on: ubuntu-latest
-    retention-days: 14
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -166,7 +160,6 @@ jobs:
   build-msgpact-console:
     runs-on: ubuntu-latest
     needs: [build-msgpact-ts, build-msgpact-cli, build-msgpact-prettier]
-    retention-days: 14
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -204,7 +197,6 @@ jobs:
   build-msgpact-docker:
     runs-on: ubuntu-latest
     needs: [build-msgpact-cli]
-    retention-days: 14
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -224,7 +216,6 @@ jobs:
   run-tests:
     runs-on: ubuntu-latest
     needs: [build-msgpact-ts, build-msgpact-java, build-msgpact-py, build-msgpact-cli]
-    retention-days: 14
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
