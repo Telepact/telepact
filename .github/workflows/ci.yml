@@ -194,6 +194,24 @@ jobs:
       - name: Run tests
         run: DEBUG=pw:api make test-console
 
+  build-msgpact-docker:
+    runs-on: ubuntu-latest
+    needs: [build-msgpact-cli]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download msgpact-cli build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-msgpact-cli
+          path: tool/cli/dist
+
+      - name: Build Docker image
+        run: make docker
+
+      - name: Test Docker image
+        run: make test-docker
 
   run-tests:
     runs-on: ubuntu-latest

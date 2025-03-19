@@ -75,3 +75,15 @@ clean-console:
 
 test-console:
 	cd tool/console && make test
+
+docker:
+	cd tool/docker && make
+
+dev-docker:
+	cd tool/docker && make dev
+
+test-docker:
+	cd tool/docker && make test
+
+clean-docker:
+	cd tool/docker && make clean

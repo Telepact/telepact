@@ -4,3 +4,5 @@
 - For the random string generation, use random rowds rather than random chars
 - Improve consistency around simluation naming. Still have lingering
   ideas around mock and example.
+- Expose mock server options as command-line args in the cli
+- Remove unnecessary "msgpact" everywhere in github actions

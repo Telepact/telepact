@@ -18,9 +18,10 @@ from fastapi.responses import Response
 import importlib.resources as pkg_resources
 import time
 import uvicorn
-from .msgpact import Server, Message, MsgPactSchema, MockMsgPactSchema, MockServer
+from .msgpact import Client, Server, Message, Serializer, MsgPactSchema, MockMsgPactSchema, MockServer
 import pprint
-
+import asyncio
+import requests
 
 def bump_version(version: str) -> str:
     major, minor, patch = map(int, version.split('.'))
