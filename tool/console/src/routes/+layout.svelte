@@ -302,7 +302,7 @@
 					</button>
 					<button
 						aria-label="Toggle Simulation"
-						aria-pressed={activeViews.includes('m')}					
+						aria-pressed={activeViews.includes('m')}
 						on:click={toggleShowExample}
 						class="rounded-e-md p-2 {activeViews.includes('m')
 							? 'bg-sky-700 text-cyan-300'
@@ -314,6 +314,8 @@
 				{#if schemaSource !== 'draft'}
 					<div class="inline-flex rounded-md">
 						<button
+							aria-label="Toggle Terminal"
+							aria-pressed={activeViews.includes('t')}
 							on:click={toggleTerminal}
 							class="rounded-s-md p-2 {activeViews.includes('t')
 								? 'bg-emerald-900 text-green-300'
@@ -322,6 +324,8 @@
 							<TerminalIcon />
 						</button>
 						<button
+							aria-label="Toggle Results"
+							aria-pressed={activeViews.includes('r')}
 							on:click={toggleResults}
 							class="rounded-e-md p-2 {activeViews.includes('r')
 								? 'bg-emerald-900 text-green-300'

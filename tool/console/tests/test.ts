@@ -279,6 +279,68 @@ test.describe('Loading from demo server', () => {
 		
 	});
 
+	test('Terminal functions corectly', async ({ page }) => {
+
+		await expect(page.getByRole('heading', {name: 'Request'})).not.toBeVisible();
+
+		await page.getByRole('button', { name: 'Toggle Terminal', pressed: false}).click();
+
+		await expect(page.getByRole('heading', {name: 'Request'})).toBeVisible();
+
+		await expect(
+			page.getByRole('button', { name: 'Toggle Terminal', pressed: true }),
+			"Terminal should be visible after clicking the button"
+		).toBeVisible();
+
+		let request = page.getByRole('textbox', { name: 'request'});
+		await expect(
+			request,
+			"Request simulation should be visible"
+		).toBeVisible();
+	
+		let requestText = await selectAllCopyAndGet(page, request.locator(".."));
+	
+		let requestPseudoJson = JSON.parse(requestText);
+	
+		expect(
+			requestPseudoJson,
+			"Request simluation should be valid json"
+		).toEqual([{
+		}, {
+			"fn.ping_": {
+			}
+		}]);
+
+		await expect(page.getByRole('heading', { name: 'Response'})).not.toBeVisible();
+
+		await expect(page.getByRole('button', {name: 'Toggle Results', pressed: false})).toBeVisible();
+		
+		await page.getByRole('button', { name: 'Submit'}).click();
+
+		await expect(page.getByRole('heading', { name: 'Response'})).toBeVisible();
+
+		await expect(page.getByRole('button', {name: 'Toggle Results', pressed: true})).toBeVisible();
+
+		let response = page.getByRole('textbox', { name: 'response'});
+		await expect(
+			response,
+			"response simulation should be visible"
+		).toBeVisible();
+	
+		let responseText = await selectAllCopyAndGet(page, response.locator(".."));
+	
+		let responsePseudoJson = JSON.parse(responseText);
+	
+		expect(
+			responsePseudoJson,
+			"response simluation should be valid json"
+		).toEqual([{
+		}, {
+			"Ok_": {
+			}
+		}]);		
+		
+	});
 	
 });
 
