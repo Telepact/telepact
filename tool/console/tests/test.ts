@@ -338,8 +338,48 @@ test.describe('Loading from demo server', () => {
 		}, {
 			"Ok_": {
 			}
-		}]);		
+		}]);
 		
+		await request.locator('..').click();
+
+		if (process.platform === 'darwin') {
+			await page.keyboard.press('Meta+A');
+		} else {
+			await page.keyboard.press('Control+A');
+		}
+
+		await page.keyboard.press('Backspace');
+
+		await page.keyboard.type('[{}, {"fn.fn1": {"input1": "hello", "input2": 42}}]');
+
+		await page.getByRole('button', { name: 'Submit'}).click();
+
+
+		let response2 = page.getByRole('textbox', { name: 'response'});
+	
+		let response2Text = await selectAllCopyAndGet(page, response2.locator(".."));
+	
+		let response2PseudoJson = JSON.parse(response2Text);
+
+		console.log(response2PseudoJson);
+	
+		expect(
+			response2PseudoJson,
+			"response simluation should be valid json"
+		).toMatchObject([{}, {
+			"Ok_": {
+				"output1": [
+				{
+					"field1": expect.any(String),
+					"field2": expect.any(Number)
+				},
+				{
+					"field1": expect.any(String),
+					"field2": expect.any(Number)
+				}
+			]
+		}
+		}]);		
 	});
 	
 });
