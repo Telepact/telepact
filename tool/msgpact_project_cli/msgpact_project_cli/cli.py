@@ -147,7 +147,7 @@ def get() -> None:
 
 @click.command()
 @click.argument('version')
-def apply(version: str) -> None:
+def set_version(version: str) -> None:
     updated = False
 
     if os.path.exists("pom.xml"):
@@ -193,7 +193,7 @@ def apply(version: str) -> None:
 main.add_command(bump)
 main.add_command(depset)
 main.add_command(get)
-main.add_command(apply)
+main.add_command(set_version)
 
 if __name__ == "__main__":
     main()

@@ -91,24 +91,24 @@ test-docker:
 clean-docker:
 	cd sdk/docker && make clean
 
-msgpact-version:
-	cd tool/msgpact_version && make
+project-cli:
+	cd tool/msgpact_project_cli && make
 
-clean-msgpact-version:
-	cd tool/msgpact_version && make clean
+clean-project-cli:
+	cd tool/msgpact_project_cli && make clean
 
-install-msgpact-version:
-	pipx install $(wildcard tool/msgpact_version/dist/msgpact_version-*.tar.gz)
+install-project-cli:
+	pipx install $(wildcard tool/msgpact_project_cli/dist/msgpact_project_cli-*.tar.gz)
 
-uninstall-msgpact-version:
-	pipx uninstall msgpact-version
+uninstall-project-cli:
+	pipx uninstall msgpact-project
 
 version:
-	cd lib/java && msgpact-version apply ${VERSION}
-	cd lib/py && msgpact-version apply ${VERSION}
-	cd lib/ts && msgpact-version apply ${VERSION}
-	cd bind/dart && msgpact-version apply ${VERSION}
-	cd sdk/cli && msgpact-version apply ${VERSION}
-	cd sdk/prettier-plugin-msgpact && msgpact-version apply ${VERSION}
-	cd sdk/console && msgpact-version apply ${VERSION}
+	cd lib/java && msgpact-project set-version ${VERSION}
+	cd lib/py && msgpact-project set-version ${VERSION}
+	cd lib/ts && msgpact-project set-version ${VERSION}
+	cd bind/dart && msgpact-project set-version ${VERSION}
+	cd sdk/cli && msgpact-project set-version ${VERSION}
+	cd sdk/prettier-plugin-msgpact && msgpact-project set-version ${VERSION}
+	cd sdk/console && msgpact-project set-version ${VERSION}
 
