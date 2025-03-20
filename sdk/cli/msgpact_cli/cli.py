@@ -366,7 +366,8 @@ def demo_server() -> None:
 @click.option('--dir', help='Directory of MsgPact schemas', required=False, envvar='MSGPACT_DIRECTORY')
 @click.option('--generated-collection-length-min', default=0, help='Minimum length of generated collections')
 @click.option('--generated-collection-length-max', default=3, help='Maximum length of generated collections')
-def mock(http_url: str, dir: str, generated_collection_length_min: int, generated_collection_length_max: int) -> None:
+@click.option('--port', default=8080, help='Port to run the mock server on')
+def mock(http_url: str, dir: str, generated_collection_length_min: int, generated_collection_length_max: int, port: int) -> None:
     print(f'http_url: {http_url}')
     print(f'dir: {dir}')
     print(f'generated_collection_length_min: {generated_collection_length_min}')
@@ -438,7 +439,7 @@ def mock(http_url: str, dir: str, generated_collection_length_min: int, generate
         media_type = 'application/octet-stream' if response_bytes[0] == 0x92 else 'application/json'
         return Response(content=response_bytes, media_type=media_type)
 
-    uvicorn.run(app, host='0.0.0.0', port=8080)
+    uvicorn.run(app, host='0.0.0.0', port=port)
 
 main.add_command(codegen)
 main.add_command(demo_server)

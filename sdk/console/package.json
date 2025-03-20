@@ -4,6 +4,7 @@
 	"private": true,
 	"scripts": {
 		"dev": "vite dev --force",
+		"dev:test": "vite dev --port 3001 --force",
 		"build": "vite build",
 		"preview": "vite preview",
 		"test": "playwright test",

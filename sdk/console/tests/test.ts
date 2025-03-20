@@ -26,7 +26,7 @@ test.describe('Loading from demo server', () => {
 		).toBeVisible();
 		
 		let source = page.getByRole('textbox', { name: 'Source' });
-		await source.fill('http://localhost:8080/api');
+		await source.fill('http://localhost:8085/api');
 		await page.getByRole('button', { name: 'Load'}).click();
 	});
 

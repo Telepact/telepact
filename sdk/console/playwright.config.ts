@@ -3,21 +3,19 @@ import type { PlaywrightTestConfig } from '@playwright/test';
 const config: PlaywrightTestConfig = {
 	webServer: [
 		{
-			command: 'npm run dev',
-			port: 5173,
-			reuseExistingServer: !process.env.CI
+			command: 'npm run dev:test',
+			port: 3001
 		},
 		{
-			command: 'msgpact mock --dir tests/schema --generated-collection-length-min 2 --generated-collection-length-max 2',
-			port: 8080,
-			reuseExistingServer: !process.env.CI,
+			command: 'msgpact mock --port 8085 --dir tests/schema --generated-collection-length-min 2 --generated-collection-length-max 2',
+			port: 8085,
 			stdout: 'pipe'
 		}
 	],
 	testDir: 'tests',
 	testMatch: /(.+\.)?(test|spec)\.[jt]s/,
 	use: {
-		baseURL: 'http://localhost:5173',
+		baseURL: 'http://localhost:3001',
 		contextOptions: {
 			permissions: ['clipboard-read']
 		}
