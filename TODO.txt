@@ -1,6 +1,14 @@
+High:
 - Formally vendor msgpact ts in dart lib
 - Add license header to all coding files
 
+Medium:
+- Add http url as a MsgPact source for code generation
+- Add websocket support in doc ui
+- Add websocket support in cli
+- Add websocket support for mock docker
+
+Low:
 - Remove idl folder
 - @msgpack/msgpack might be an unused dependency in lib/ts
 - Replace info. with msgpact. and don't show type in console
