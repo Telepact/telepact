@@ -194,11 +194,15 @@ def set_version(version: str) -> None:
 @click.argument('license_header_path')
 @click.argument('file_path')
 def license_header(license_header_path, file_path):
-    def get_comment_syntax(file_extension):
-        if file_extension in ['.py']:
-            return '#'
-        elif file_extension in ['.java', '.ts', '.dart']:
-            return '//'
+    def get_comment_syntax(file_extension, file_name):
+        if file_extension in ['.py', '.sh', '.yaml', '.yml', '.toml'] or file_name == 'Dockerfile':
+            return '#', ''
+        elif file_extension in ['.java', '.ts', '.dart', '.js']:
+            return '//', ''
+        elif file_extension in ['.html', '.xml', '.svelte']:
+            return '<!--', '-->'
+        elif file_extension == '.css':
+            return '/*', '*/'
         else:
             raise ValueError(f"Unsupported file extension: {file_extension}")
 
@@ -206,7 +210,7 @@ def license_header(license_header_path, file_path):
         with open(file_path, 'r') as file:
             return file.readlines()
 
-    def update_file(file_path, license_header, comment_syntax):
+    def update_file(file_path, license_header, start_comment_syntax, end_comment_syntax):
         with open(file_path, 'r') as file:
             lines = file.readlines()
 
@@ -228,8 +232,9 @@ def license_header(license_header_path, file_path):
         if start_license_header_index is not None and end_license_header_index is not None:
             lines = lines[end_license_header_index + 1:]
 
-        license_text = ''.join([f"{comment_syntax}  {line}" for line in license_header])
-        new_banner = f"{comment_syntax}  {header_start}\n{comment_syntax}\n{license_text.strip()}\n{comment_syntax}\n{comment_syntax}  {header_end}\n\n"
+        max_length = max(len(line.strip()) for line in license_header)
+        license_text = ''.join([f"{start_comment_syntax}  {line.strip().ljust(max_length)} {end_comment_syntax}\n" for line in license_header])
+        new_banner = f"{start_comment_syntax}  {header_start.ljust(max_length)} {end_comment_syntax}\n{license_text.strip()}\n{start_comment_syntax}  {header_end.ljust(max_length)} {end_comment_syntax}\n\n"
 
         new_content = new_banner + ''.join(lines)
 
@@ -241,10 +246,11 @@ def license_header(license_header_path, file_path):
         print(f"Updated license header in {file_path}")
 
     license_header = read_license_header(license_header_path)
-    file_extension = os.path.splitext(file_path)[1]
-    if file_extension in ['.py', '.java', '.ts', '.dart']:
-        comment_syntax = get_comment_syntax(file_extension)
-        update_file(file_path, license_header, comment_syntax)
+    file_extension = os.path.splitext(file_path)[1].lower()
+    file_name = os.path.basename(file_path)
+    if file_extension in ['.py', '.java', '.ts', '.dart', '.sh', '.js', '.yaml', '.yml', '.toml', '.html', '.css', '.xml', '.svelte'] or file_name == 'Dockerfile':
+        start_comment_syntax, end_comment_syntax = get_comment_syntax(file_extension, file_name)
+        update_file(file_path, license_header, start_comment_syntax, end_comment_syntax)
     else:
         print(f"Unsupported file extension: {file_extension}")
 

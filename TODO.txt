@@ -18,3 +18,4 @@ Low:
   ideas around mock and example.
 - Expose mock server options as command-line args in the cli
 - Remove unnecessary "msgpact" everywhere in github actions
+- Console light mode and listen to os setting
