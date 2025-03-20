@@ -5,10 +5,10 @@ clean-java:
 	cd lib/java && make clean
 
 test-java:
-	cd qa/test && make test-java
+	cd test/runner && make test-java
 
 test-trace-java:
-	cd qa/test && make test-trace-java
+	cd test/runner && make test-trace-java
 
 py:
 	cd lib/py && make
@@ -17,10 +17,10 @@ clean-py:
 	cd lib/py && make clean
 
 test-py:
-	cd qa/test && make test-py
+	cd test/runner && make test-py
 
 test-trace-py:
-	cd qa/test && make test-trace-py
+	cd test/runner && make test-trace-py
 
 ts:
 	cd lib/ts && make
@@ -29,13 +29,14 @@ clean-ts:
 	cd lib/ts && make clean
 
 test-ts:
-	cd qa/test && make test-ts
+	cd test/runner && make test-ts
 
 test-trace-ts:
-	cd qa/test && make test-trace-ts
+	cd test/runner && make test-trace-ts
 
+.PHONY: test
 test:
-	cd qa/test && make test
+	cd test/runner && make test
 
 dart:
 	cd bind/dart && make

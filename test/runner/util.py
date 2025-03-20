@@ -15,13 +15,13 @@ should_abort = False
 
 
 class Constants:
-    example_api_path = '../../test/schema/example'
-    binary_api_path = '../../test/schema/binary'
-    schema_api_path = '../../test/schema/parse'
-    load_api_path = '../../test/schema/load'
-    auth_api_path = '../../test/schema/auth'
-    mockgen_api_path = '../../test/schema/mockgen'
-    calculator_api_path = '../../test/schema/calculator'
+    example_api_path = '../../runner/schema/example'
+    binary_api_path = '../../runner/schema/binary'
+    schema_api_path = '../../runner/schema/parse'
+    load_api_path = '../../runner/schema/load'
+    auth_api_path = '../../runner/schema/auth'
+    mockgen_api_path = '../../runner/schema/mockgen'
+    calculator_api_path = '../../runner/schema/calculator'
     nats_url = 'nats://127.0.0.1:4222'
     frontdoor_topic = 'frontdoor'
     intermediate_topic = 'intermediate'

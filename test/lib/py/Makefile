@@ -8,7 +8,7 @@ all: dep
 	poetry add ./msgpact.tar.gz
 	poetry install
 
-	msgpact codegen --schema-dir ../../test/schema/example --lang py --out msgpact_test/gen
+	msgpact codegen --schema-dir ../../runner/schema/example --lang py --out msgpact_test/gen
 
 
 dep:

@@ -6,3 +6,4 @@
   ideas around mock and example.
 - Expose mock server options as command-line args in the cli
 - Remove unnecessary "msgpact" everywhere in github actions
+- mabye: Prepend all headers with @ symbol (or similar idea)

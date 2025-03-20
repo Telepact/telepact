@@ -6,7 +6,7 @@ services:
     ports:
       - "8081:8080"
     volumes:
-      - ../../qa/test/schema/calculator:/app/schema
+      - ../../test/runner/schema/calculator:/app/schema
     environment:
       PYTHONUNBUFFERED: 1
       MSGPACT_DIRECTORY: /app/schema
