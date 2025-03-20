@@ -14,6 +14,7 @@ click = "^8.0.0"
 toml = "^0.10.2"
 lxml = "^5.3.1"
 pyyaml = "^6.0.2"
+"ruamel.yaml" = "0.18.10"
 
 [tool.poetry.scripts]
 msgpact-version = "msgpact_version.cli:main"

@@ -1,8 +1,8 @@
 name: msgpact
 description: A Dart library for wrapping an npm package.
-version: 0.0.1
+version: 1.0.0-alpha.1
 environment:
-  sdk: "^3.6.0"
+  sdk: ^3.6.0
 
 dependencies:
   node_interop: ^2.1.0
@@ -13,5 +13,5 @@ dev_dependencies:
 license: Apache-2.0
 
 include:
-  - LICENSE
-  - NOTICE
+- LICENSE
+- NOTICE

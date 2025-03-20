@@ -3,8 +3,9 @@ import os
 from lxml import etree as ET
 import json
 import toml
-import yaml
+from ruamel.yaml import YAML
 
+yaml = YAML()
 
 def bump_version(version: str) -> str:
     major, minor, patch = map(int, version.split('.'))
@@ -50,12 +51,12 @@ def bump() -> None:
         click.echo(f"Updated pyproject.toml to version {new_version}")
     elif os.path.exists("pubspec.yaml"):
         with open("pubspec.yaml", "r") as f:
-            data = yaml.safe_load(f)
+            data = yaml.load(f)
         version = data["version"]
         new_version = bump_version(version)
         data["version"] = new_version
         with open("pubspec.yaml", "w") as f:
-            yaml.safe_dump(data, f)
+            yaml.dump(data, f)
         click.echo(f"Updated pubspec.yaml to version {new_version}")
     else:
         click.echo("No supported project file found.")
@@ -104,11 +105,11 @@ def depset(version: str) -> None:
             click.echo("msgpact dependency not found in pyproject.toml")
     elif os.path.exists("pubspec.yaml"):
         with open("pubspec.yaml", "r") as f:
-            data = yaml.safe_load(f)
+            data = yaml.load(f)
         if "dependencies" in data and "msgpact" in data["dependencies"]:
             data["dependencies"]["msgpact"] = version
             with open("pubspec.yaml", "w") as f:
-                yaml.safe_dump(data, f)
+                yaml.dump(data, f)
             click.echo(
                 f"Set msgpact dependency to version {version} in pubspec.yaml")
         else:
@@ -137,7 +138,7 @@ def get() -> None:
         click.echo(version, nl=False)
     elif os.path.exists("pubspec.yaml"):
         with open("pubspec.yaml", "r") as f:
-            data = yaml.safe_load(f)
+            data = yaml.load(f)
         version = data["version"]
         click.echo(version, nl=False)
     else:
@@ -178,10 +179,10 @@ def apply(version: str) -> None:
 
     if os.path.exists("pubspec.yaml"):
         with open("pubspec.yaml", "r") as f:
-            data = yaml.safe_load(f)
+            data = yaml.load(f)
         data["version"] = version
         with open("pubspec.yaml", "w") as f:
-            yaml.safe_dump(data, f)
+            yaml.dump(data, f)
         click.echo(f"Set pubspec.yaml to version {version}")
         updated = True
 
