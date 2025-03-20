@@ -38,13 +38,13 @@ test:
 	cd qa/test && make test
 
 dart:
-	cd port/dart && make
+	cd bind/dart && make
 
 clean-dart:
-	cd port/dart && make clean
+	cd bind/dart && make clean
 
 test-dart:
-	cd port/dart && make test
+	cd bind/dart && make test
 
 cli:
 	cd tool/cli && make
