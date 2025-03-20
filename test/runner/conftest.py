@@ -15,6 +15,9 @@ import json
 import nats
 import os
 
+def pytest_runtest_makereport(item, call):
+    if call.excinfo is not None and call.excinfo.typename != "AssertionError":
+        pytest.exit("Aborting tests due to an error.")
 
 def get_lib_modules():
     result = [f for f in os.listdir('../../lib')
