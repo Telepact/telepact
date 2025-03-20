@@ -9,7 +9,7 @@ all:
 
 	rm -rf src/lib/prettier-plugin-msgpact
 	mkdir -p src/lib/prettier-plugin-msgpact
-	cp -r ../../tool/prettier-plugin-msgpact/dist/* src/lib/prettier-plugin-msgpact
+	cp -r ../../sdk/prettier-plugin-msgpact/dist/* src/lib/prettier-plugin-msgpact
 	
 	npm install	
 
