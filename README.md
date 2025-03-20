@@ -20,8 +20,21 @@ For explanations of various design decisions, see [the FAQ](./doc/faq.md).
 
 # Development
 
-The MsgPact project is structed as a monorepo. The project-root contains a Makefile
-which delegates build commands to the various subprojects.
+The MsgPact project is structed as a monorepo.
+
+- `common` - files commonly used across the MsgPact ecosystem
+- `bind` - contains lightweight wrapper libraries that use bindings to
+   expose a formal MsgPact implementation in a language not yet targetted by
+   a formal MsgPact implementation.
+- `lib` - contains all formal library implementations of MsgPact in various
+   programming languages
+   MsgPact library into a different programming language
+- `test` - contains the test framework that enforces the MsgPact specification
+   on all implementations found in `lib`
+- `sdk` - contains various programs that assist developing with the MsgPact
+   ecosystem
+- `tool` - contains various programs meant to help the development of the
+   MsgPact project
 
 # Licensing
 MsgPact is licensed under the Apache License, Version 2.0. See [LICENSE](LICENSE) for the full license text. See [NOTICE](NOTICE) for copyright information.

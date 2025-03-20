@@ -48,43 +48,52 @@ test-dart:
 	cd bind/dart && make test
 
 cli:
-	cd tool/cli && make
+	cd sdk/cli && make
 
 clean-cli:
-	cd tool/cli && make clean
+	cd sdk/cli && make clean
 
 install-cli:
-	pipx install $(wildcard tool/cli/dist/msgpact_cli-*.tar.gz)
+	pipx install $(wildcard sdk/cli/dist/msgpact_cli-*.tar.gz)
 
 uninstall-cli:
 	pipx uninstall msgpact-cli
 
 prettier:
-	cd tool/prettier-plugin-msgpact && make
+	cd sdk/prettier-plugin-msgpact && make
 
 clean-prettier:
-	cd tool/prettier-plugin-msgpact && make clean
+	cd sdk/prettier-plugin-msgpact && make clean
 
 console:
-	cd tool/console && make
+	cd sdk/console && make
 
 dev-console:
-	cd tool/console && make dev
+	cd sdk/console && make dev
 
 clean-console:
-	cd tool/console && make clean
+	cd sdk/console && make clean
 
 test-console:
-	cd tool/console && make test
+	cd sdk/console && make test
 
 docker:
-	cd tool/docker && make
+	cd sdk/docker && make
 
 dev-docker:
-	cd tool/docker && make dev
+	cd sdk/docker && make dev
 
 test-docker:
-	cd tool/docker && make test
+	cd sdk/docker && make test
 
 clean-docker:
-	cd tool/docker && make clean
+	cd sdk/docker && make clean
+
+msgpact-version:
+	cd tool/msgpact_version && make
+
+clean-msgpact-version:
+	cd tool/msgpact_version && make clean
+
+install-msgpact-version:
+	pipx install $(wildcard tool/msgpact_version/dist/msgpact_version-*.tar.gz)

@@ -144,9 +144,55 @@ def get() -> None:
         click.echo("No supported project file found.", nl=False)
 
 
+@click.command()
+@click.argument('version')
+def apply(version: str) -> None:
+    updated = False
+
+    if os.path.exists("pom.xml"):
+        parser = ET.XMLParser(remove_blank_text=True)
+        tree = ET.parse("pom.xml", parser)
+        root = tree.getroot()
+        root.find("{http://maven.apache.org/POM/4.0.0}version").text = version
+        tree.write("pom.xml", xml_declaration=True, encoding='utf-8', pretty_print=True)
+        click.echo(f"Set pom.xml to version {version}")
+        updated = True
+
+    if os.path.exists("package.json"):
+        with open("package.json", "r") as f:
+            data = json.load(f)
+        data["version"] = version
+        with open("package.json", "w") as f:
+            json.dump(data, f, indent=2)
+        click.echo(f"Set package.json to version {version}")
+        updated = True
+
+    if os.path.exists("pyproject.toml"):
+        with open("pyproject.toml", "r") as f:
+            data = toml.load(f)
+        data["project"]["version"] = version
+        with open("pyproject.toml", "w") as f:
+            toml.dump(data, f)
+        click.echo(f"Set pyproject.toml to version {version}")
+        updated = True
+
+    if os.path.exists("pubspec.yaml"):
+        with open("pubspec.yaml", "r") as f:
+            data = yaml.safe_load(f)
+        data["version"] = version
+        with open("pubspec.yaml", "w") as f:
+            yaml.safe_dump(data, f)
+        click.echo(f"Set pubspec.yaml to version {version}")
+        updated = True
+
+    if not updated:
+        click.echo("No supported project file found.")
+
+
 main.add_command(bump)
 main.add_command(depset)
 main.add_command(get)
+main.add_command(apply)
 
 if __name__ == "__main__":
     main()
