@@ -97,3 +97,6 @@ clean-msgpact-version:
 
 install-msgpact-version:
 	pipx install $(wildcard tool/msgpact_version/dist/msgpact_version-*.tar.gz)
+
+uninstall-msgpact-version:
+	pipx uninstall msgpact-version

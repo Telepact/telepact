@@ -324,7 +324,7 @@ test.describe('Loading from demo server', () => {
 		let response = page.getByRole('textbox', { name: 'response'});
 		await expect(
 			response,
-			"response simulation should be visible"
+			"response should be visible"
 		).toBeVisible();
 	
 		let responseText = await selectAllCopyAndGet(page, response.locator(".."));
@@ -333,7 +333,7 @@ test.describe('Loading from demo server', () => {
 	
 		expect(
 			responsePseudoJson,
-			"response simluation should be valid json"
+			"response should be valid json"
 		).toEqual([{
 		}, {
 			"Ok_": {
@@ -361,11 +361,11 @@ test.describe('Loading from demo server', () => {
 	
 		let response2PseudoJson = JSON.parse(response2Text);
 
-		console.log(response2PseudoJson);
+		console.log(JSON.stringify(response2PseudoJson));
 	
 		expect(
 			response2PseudoJson,
-			"response simluation should be valid json"
+			"response should be valid json"
 		).toMatchObject([{}, {
 			"Ok_": {
 				"output1": [

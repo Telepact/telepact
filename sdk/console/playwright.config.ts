@@ -8,7 +8,7 @@ const config: PlaywrightTestConfig = {
 			reuseExistingServer: !process.env.CI
 		},
 		{
-			command: 'msgpact mock --dir tests/schema',
+			command: 'msgpact mock --dir tests/schema --generated-collection-length-min 2 --generated-collection-length-max 2',
 			port: 8080,
 			reuseExistingServer: !process.env.CI,
 			stdout: 'pipe'

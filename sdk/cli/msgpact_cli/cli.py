@@ -364,7 +364,13 @@ def demo_server() -> None:
 @click.command()
 @click.option('--http-url', help='HTTP URL of a MsgPact API', required=False, envvar='MSGPACT_HTTP_URL')
 @click.option('--dir', help='Directory of MsgPact schemas', required=False, envvar='MSGPACT_DIRECTORY')
-def mock(http_url: str, dir: str) -> None:
+@click.option('--generated-collection-length-min', default=0, help='Minimum length of generated collections')
+@click.option('--generated-collection-length-max', default=3, help='Maximum length of generated collections')
+def mock(http_url: str, dir: str, generated_collection_length_min: int, generated_collection_length_max: int) -> None:
+    print(f'http_url: {http_url}')
+    print(f'dir: {dir}')
+    print(f'generated_collection_length_min: {generated_collection_length_min}')
+    print(f'generated_collection_length_max: {generated_collection_length_max}')
     app = FastAPI()
 
     app.add_middleware(
@@ -421,6 +427,8 @@ def mock(http_url: str, dir: str) -> None:
     print(json.dumps(schema.original, indent=4))
 
     mock_server_options = MockServer.Options()
+    mock_server_options.generated_collection_length_min = generated_collection_length_min
+    mock_server_options.generated_collection_length_max = generated_collection_length_max
     mock_server = MockServer(schema, mock_server_options)
 
     @app.post('/api')
