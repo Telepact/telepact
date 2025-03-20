@@ -16,8 +16,9 @@ import nats
 import os
 
 def pytest_runtest_makereport(item, call):
-    if call.excinfo is not None and call.excinfo.typename != "AssertionError":
+    if call.excinfo is not None and call.excinfo.typename not in ("AssertionError", "Skipped"):
         print(f"Error: {call.excinfo.value}")
+        print(f"Type: {call.excinfo.typename}")
         print(f"Traceback: {call.excinfo.traceback}")
         item.session.shouldstop = "Skipping all future tests due to an error."
 
