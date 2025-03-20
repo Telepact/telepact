@@ -2,6 +2,7 @@ High:
 - Add license header to all coding files
 
 Medium:
+- maybe: Prepend all headers with @ symbol (or similar idea)
 - Add http url as a MsgPact source for code generation
 - Add websocket support in doc ui
 - Add websocket support in cli
@@ -16,5 +17,3 @@ Low:
   ideas around mock and example.
 - Expose mock server options as command-line args in the cli
 - Remove unnecessary "msgpact" everywhere in github actions
-- maybe: Prepend all headers with @ symbol (or similar idea)
-- docker test does not need to reference the calculator.msgpact.json file
