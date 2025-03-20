@@ -1,5 +1,4 @@
 High:
-- Formally vendor msgpact ts in dart lib
 - Add license header to all coding files
 
 Medium:
