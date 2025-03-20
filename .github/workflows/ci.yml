@@ -109,7 +109,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: build-msgpact-cli
-          path: tool/cli/dist
+          path: sdk/cli/dist
           retention-days: 1
 
   build-msgpact-dart:
@@ -154,7 +154,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: build-msgpact-prettier
-          path: tool/prettier-plugin-msgpact/dist
+          path: sdk/prettier-plugin-msgpact/dist
           retention-days: 1
 
   build-msgpact-console:
@@ -174,13 +174,13 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: build-msgpact-cli
-          path: tool/cli/dist
+          path: sdk/cli/dist
 
       - name: Download prettier build artifacts
         uses: actions/download-artifact@v4
         with:
           name: build-msgpact-prettier
-          path: tool/prettier-plugin-msgpact/dist
+          path: sdk/prettier-plugin-msgpact/dist
       
       - name: Install CLI
         run: make install-cli
@@ -205,7 +205,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: build-msgpact-cli
-          path: tool/cli/dist
+          path: sdk/cli/dist
 
       - name: Build Docker image
         run: make docker
@@ -266,7 +266,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: build-msgpact-cli
-          path: tool/cli/dist
+          path: sdk/cli/dist
 
       - name: Install CLI
         run: make install-cli
