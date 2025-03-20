@@ -1,5 +1,5 @@
 name: msgpact
-description: A Dart library for wrapping an npm package.
+description: A Dart library for wrapping the msgpact npm package.
 version: 1.0.0-alpha.1
 environment:
   sdk: ^3.6.0

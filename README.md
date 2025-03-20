@@ -28,7 +28,6 @@ The MsgPact project is structed as a monorepo.
    a formal MsgPact implementation.
 - `lib` - contains all formal library implementations of MsgPact in various
    programming languages
-   MsgPact library into a different programming language
 - `test` - contains the test framework that enforces the MsgPact specification
    on all implementations found in `lib`
 - `sdk` - contains various programs that assist developing with the MsgPact
