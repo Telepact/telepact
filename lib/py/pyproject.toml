@@ -1,20 +1,17 @@
 [project]
 name = "msgpact"
-version = "0.0.54"
+version = "1.0.0-alpha.1"
 description = "MsgPact"
 requires-python = ">=3.11"
-classifiers = [
-    "Programming Language :: Python :: 3",
-    "Operating System :: OS Independent",
-]
+classifiers = [ "Programming Language :: Python :: 3", "Operating System :: OS Independent",]
 license = "Apache-2.0"
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
+requires = [ "poetry-core>=1.0.0",]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
-include = ["msgpact/json/*", "msgpact/LICENSE", "msgpact/NOTICE"]
+include = [ "msgpact/json/*", "msgpact/LICENSE", "msgpact/NOTICE",]
 [[tool.poetry.packages]]
 include = "msgpact"
 

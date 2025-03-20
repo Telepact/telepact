@@ -104,10 +104,9 @@ uninstall-msgpact-version:
 	pipx uninstall msgpact-version
 
 version:
-	cd lib/java && msgpact-version $(VERSION)
-#	cd lib/py && msgpact-version $(VERSION)
-#	cd lib/ts && msgpact-version $(VERSION)
-#	cd bind/dart && msgpact-version $(VERSION)
-#	cd sdk/cli && msgpact-version $(VERSION)
-#	cd sdk/prettier-plugin-msgpact && msgpact-version $(VERSION)
-#	cd sdk/console && msgpact-version $(VERSION)
+	cd lib/java && msgpact-version apply ${VERSION}
+	cd lib/py && msgpact-version apply ${VERSION}
+	cd lib/ts && msgpact-version apply ${VERSION}
+	cd sdk/cli && msgpact-version apply ${VERSION}
+	cd sdk/prettier-plugin-msgpact && msgpact-version apply ${VERSION}
+	cd sdk/console && msgpact-version apply ${VERSION}
