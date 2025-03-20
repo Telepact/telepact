@@ -192,11 +192,8 @@ def set_version(version: str) -> None:
 
 @click.command()
 @click.argument('license_header_path')
-@click.argument('directory')
-def license_header(license_header_path, directory):
-    print(f"license_header_path: {license_header_path}")
-    print(f"directory: {directory}")
-
+@click.argument('file_path')
+def license_header(license_header_path, file_path):
     def get_comment_syntax(file_extension):
         if file_extension in ['.py']:
             return '#'
@@ -213,30 +210,28 @@ def license_header(license_header_path, directory):
         with open(file_path, 'r') as file:
             lines = file.readlines()
 
-        original_content = '\n'.join(lines)
+        original_content = ''.join(lines)
 
         start_license_header_index = None
         end_license_header_index = None
 
-        header_start = '==--------------------------- MsgPact Notice ---------------------------=='
-        header_end = '==---------------------------------====---------------------------------=='
+        header_start = '---'
+        header_end   = '---'
 
         for i, line in enumerate(lines):
-            if f"{comment_syntax} {header_start}" in line:
+            if start_license_header_index is None and f"{header_start}" in line:
                 start_license_header_index = i
-            if f"{comment_syntax} {header_end}" in line:
-                end_license_header_index = i
+            elif start_license_header_index is not None and f"{header_end}" in line:
+                end_license_header_index = i + 1
                 break
 
-        if start_license_header_index is None or end_license_header_index is None:
-            return
+        if start_license_header_index is not None and end_license_header_index is not None:
+            lines = lines[end_license_header_index + 1:]
 
-        lines = lines[end_license_header_index + 1:]
+        license_text = ''.join([f"{comment_syntax}  {line}" for line in license_header])
+        new_banner = f"{comment_syntax}  {header_start}\n{comment_syntax}\n{license_text.strip()}\n{comment_syntax}\n{comment_syntax}  {header_end}\n\n"
 
-        license_text = ''.join([f"{comment_syntax} {line}" for line in license_header])
-        new_banner = f"{comment_syntax} {header_start}\n{license_text}\n{comment_syntax} {header_end}\n"
-
-        new_content = new_banner + '\n'.join(lines)
+        new_content = new_banner + ''.join(lines)
 
         if new_content == original_content:
             return
@@ -245,21 +240,19 @@ def license_header(license_header_path, directory):
             file.write(new_content)
         print(f"Updated license header in {file_path}")
 
-
     license_header = read_license_header(license_header_path)
-
-    for root, _, files in os.walk(directory):
-        for file in files:
-            file_extension = os.path.splitext(file)[1]
-            if file_extension in ['.py', '.java', '.ts', '.dart']:
-                file_path = os.path.join(root, file)
-                comment_syntax = get_comment_syntax(file_extension)
-                update_file(file_path, license_header, comment_syntax)
+    file_extension = os.path.splitext(file_path)[1]
+    if file_extension in ['.py', '.java', '.ts', '.dart']:
+        comment_syntax = get_comment_syntax(file_extension)
+        update_file(file_path, license_header, comment_syntax)
+    else:
+        print(f"Unsupported file extension: {file_extension}")
 
 main.add_command(bump)
 main.add_command(depset)
 main.add_command(get)
 main.add_command(set_version)
+main.add_command(license_header)
 
 if __name__ == "__main__":
     main()

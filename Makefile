@@ -111,3 +111,6 @@ version:
 	cd sdk/cli && msgpact-project set-version ${VERSION}
 	cd sdk/prettier-plugin-msgpact && msgpact-project set-version ${VERSION}
 	cd sdk/console && msgpact-project set-version ${VERSION}
+
+license:
+	msgpact-project license-header LICENSE_HEADER.txt lib/py/msgpact
