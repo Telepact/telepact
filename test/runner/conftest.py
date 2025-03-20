@@ -17,6 +17,8 @@ import os
 
 def pytest_runtest_makereport(item, call):
     if call.excinfo is not None and call.excinfo.typename != "AssertionError":
+        print(f"Error: {call.excinfo.value}")
+        print(f"Traceback: {call.excinfo.traceback}")
         item.session.shouldstop = "Skipping all future tests due to an error."
 
 def get_lib_modules():
