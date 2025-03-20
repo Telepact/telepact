@@ -1,4 +1,5 @@
 - Formally vendor msgpact ts in dart lib
+- Add license header to all coding files
 
 - Remove idl folder
 - @msgpack/msgpack might be an unused dependency in lib/ts
