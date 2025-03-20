@@ -101,7 +101,7 @@ install-project-cli:
 	pipx install $(wildcard tool/msgpact_project_cli/dist/msgpact_project_cli-*.tar.gz)
 
 uninstall-project-cli:
-	pipx uninstall msgpact-project
+	pipx uninstall msgpact-project-cli
 
 version:
 	cd lib/java && msgpact-project set-version ${VERSION}
@@ -111,4 +111,3 @@ version:
 	cd sdk/cli && msgpact-project set-version ${VERSION}
 	cd sdk/prettier-plugin-msgpact && msgpact-project set-version ${VERSION}
 	cd sdk/console && msgpact-project set-version ${VERSION}
-
