@@ -9,7 +9,7 @@ dev:
 	docker-compose up --build
 
 test:
-	./test.sh
+	bash test.sh
 
 clean:
 	rm -f msgpact_cli.tar.gz

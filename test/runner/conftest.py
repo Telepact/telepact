@@ -86,7 +86,7 @@ def dispatcher_server(loop, nats_server, request, nats_client):
     env_vars['NATS_URL'] = nats_url
 
     path = '../lib/' + lib_name
-    s = subprocess.Popen(['./setup.sh'], cwd=path, env=env_vars)
+    s = subprocess.Popen(['bash', 'setup.sh'], cwd=path, env=env_vars)
 
     try:
         startup_check(loop, lambda: ping(nats_client, lib_name), times=30)

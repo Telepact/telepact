@@ -1,5 +1,3 @@
-#!/bin/bash
-
 docker compose up --build -d
 if [ $? -ne 0 ]; then
   echo "Failed to start docker compose."
