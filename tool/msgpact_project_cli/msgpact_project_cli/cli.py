@@ -196,13 +196,13 @@ def set_version(version: str) -> None:
 def license_header(license_header_path):
     def get_comment_syntax(file_extension, file_name):
         if file_extension in ['.py', '.sh', '.yaml', '.yml'] or file_name == 'Dockerfile' or file_name == 'Makefile':
-            return '#', ''
+            return '#|', ''
         elif file_extension in ['.java', '.ts', '.dart', '.js']:
-            return '//', ''
+            return '//|', ''
         elif file_extension in ['.html', '.svelte']:
-            return '<!--', '-->'
+            return '<!--|', '|-->'
         elif file_extension == '.css':
-            return '/*', '*/'
+            return '/*|', '|*/'
         else:
             raise ValueError(f"Unsupported file extension: {file_extension}")
 
@@ -219,7 +219,7 @@ def license_header(license_header_path):
         first_non_header_index = None
 
         for i, line in enumerate(lines):
-            if line.startswith(f"{start_comment_syntax}|"):
+            if line.startswith(f"{start_comment_syntax}"):
                 first_non_header_index = i
                 continue
             break
@@ -228,12 +228,12 @@ def license_header(license_header_path):
             lines = lines[(first_non_header_index + 1) + 1:]
 
         max_length = max(len(line.strip()) for line in license_header) + 2
-        license_text = ''.join([f"{start_comment_syntax}|  {line.strip().ljust(max_length)}{end_comment_syntax}\n" for line in license_header])
+        license_text = ''.join([f"{start_comment_syntax}  {line.strip().ljust(max_length)}{end_comment_syntax}".strip() + "\n" for line in license_header])
 
         new_banner = ""
-        new_banner += f"{start_comment_syntax}|" + ('  ' + f"{''.ljust(max_length)}" if end_comment_syntax else '') + f"{end_comment_syntax}\n"
+        new_banner += f"{start_comment_syntax}  {''.ljust(max_length)}{end_comment_syntax}".strip() + "\n"
         new_banner += f"{license_text.strip()}\n"
-        new_banner += f"{start_comment_syntax}|" + ('  ' + f"{''.ljust(max_length)}" if end_comment_syntax else '') + f"{end_comment_syntax}\n\n"
+        new_banner += f"{start_comment_syntax}  {''.ljust(max_length)}{end_comment_syntax}".strip() + "\n\n"
 
         new_content = new_banner + ''.join(lines)
 
