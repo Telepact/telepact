@@ -128,7 +128,7 @@ jobs:
           path: sdk/cli/dist
           retention-days: 1
 
-    build-telepact-project-cli:
+  build-telepact-project-cli:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -264,7 +264,7 @@ jobs:
         with:
           name: build-telepact-project-cli
           path: tool/telepact_project_cli/dist
-      
+
       - name: Install Project CLI
         run: make install-project-cli
 
@@ -290,7 +290,7 @@ jobs:
         with:
           name: build-telepact-project-cli
           path: tool/telepact_project_cli/dist
-      
+
       - name: Install Project CLI
         run: make install-project-cli
 
