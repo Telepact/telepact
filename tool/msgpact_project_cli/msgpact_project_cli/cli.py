@@ -195,7 +195,7 @@ def set_version(version: str) -> None:
 @click.argument('file_path')
 def license_header(license_header_path, file_path):
     def get_comment_syntax(file_extension, file_name):
-        if file_extension in ['.py', '.sh', '.yaml', '.yml'] or file_name == 'Dockerfile':
+        if file_extension in ['.py', '.sh', '.yaml', '.yml'] or file_name == 'Dockerfile' or file_name == 'Makefile':
             return '#', ''
         elif file_extension in ['.java', '.ts', '.dart', '.js']:
             return '//', ''
@@ -223,10 +223,13 @@ def license_header(license_header_path, file_path):
         header_end   = '---'
 
         for i, line in enumerate(lines):
-            if start_license_header_index is None and f"{header_start}" in line:
+            if start_license_header_index is None and f"{start_comment_syntax}  {header_start}" in line:
                 start_license_header_index = i
             elif start_license_header_index is not None and f"{header_end}" in line:
                 end_license_header_index = i + 1
+                break
+            elif i > 50:
+                # If we don't find a header in 50 lines, we're not going to find one
                 break
 
         if start_license_header_index is not None and end_license_header_index is not None:
@@ -239,16 +242,17 @@ def license_header(license_header_path, file_path):
         new_content = new_banner + ''.join(lines)
 
         if new_content == original_content:
+            print(f"Up-to-date: {file_path}")
             return
 
         with open(file_path, 'w') as file:
             file.write(new_content)
-        print(f"Success: {file_path}")
+        print(f"Re-written: {file_path}")
 
     license_header = read_license_header(license_header_path)
     file_extension = os.path.splitext(file_path)[1].lower()
     file_name = os.path.basename(file_path)
-    if file_name != 'pubspec.yaml' and file_extension in ['.py', '.java', '.ts', '.dart', '.sh', '.js', '.yaml', '.yml', '.html', '.css', '.svelte'] or file_name == 'Dockerfile':
+    if file_name != 'pubspec.yaml' and file_extension in ['.py', '.java', '.ts', '.dart', '.sh', '.js', '.yaml', '.yml', '.html', '.css', '.svelte'] or file_name == 'Dockerfile' or file_name == 'Makefile':
         start_comment_syntax, end_comment_syntax = get_comment_syntax(file_extension, file_name)
         update_file(file_path, license_header, start_comment_syntax, end_comment_syntax)
     else:
