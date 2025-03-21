@@ -1,6 +1,4 @@
 High:
-- Add license header to all coding files
-- Add a CI verification step using project cli that ensures all projects match VERSION.txt
 
 Medium:
 - maybe: Prepend all headers with @ symbol (or similar idea)
