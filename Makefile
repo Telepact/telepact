@@ -113,4 +113,4 @@ version:
 	cd sdk/console && msgpact-project set-version ${VERSION}
 
 license:
-	msgpact-project license-header LICENSE_HEADER.txt lib/py/msgpact
+	git ls-files | xargs -I {} msgpact-project license-header LICENSE_HEADER.txt {}
