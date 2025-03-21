@@ -248,7 +248,7 @@ def license_header(license_header_path, file_path):
     license_header = read_license_header(license_header_path)
     file_extension = os.path.splitext(file_path)[1].lower()
     file_name = os.path.basename(file_path)
-    if file_extension in ['.py', '.java', '.ts', '.dart', '.sh', '.js', '.yaml', '.yml', '.html', '.css', '.svelte'] or file_name == 'Dockerfile' or file_name != 'pubspec.yaml':
+    if file_name != 'pubspec.yaml' and file_extension in ['.py', '.java', '.ts', '.dart', '.sh', '.js', '.yaml', '.yml', '.html', '.css', '.svelte'] or file_name == 'Dockerfile':
         start_comment_syntax, end_comment_syntax = get_comment_syntax(file_extension, file_name)
         update_file(file_path, license_header, start_comment_syntax, end_comment_syntax)
     else:
