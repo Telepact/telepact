@@ -5,6 +5,7 @@ from lxml import etree as ET
 import json
 import toml
 from ruamel.yaml import YAML
+import subprocess
 
 yaml = YAML()
 
@@ -192,8 +193,7 @@ def set_version(version: str) -> None:
 
 @click.command()
 @click.argument('license_header_path')
-@click.argument('file_path')
-def license_header(license_header_path, file_path):
+def license_header(license_header_path):
     def get_comment_syntax(file_extension, file_name):
         if file_extension in ['.py', '.sh', '.yaml', '.yml'] or file_name == 'Dockerfile' or file_name == 'Makefile':
             return '#', ''
@@ -222,18 +222,16 @@ def license_header(license_header_path, file_path):
         header_start = '---'
         header_end   = '---'
 
-        for i, line in enumerate(lines):
-            if start_license_header_index is None and f"{start_comment_syntax}  {header_start}" in line:
-                start_license_header_index = i
-            elif start_license_header_index is not None and f"{header_end}" in line:
-                end_license_header_index = i + 1
-                break
-            elif i > 50:
-                # If we don't find a header in 50 lines, we're not going to find one
-                break
+        first_non_header_index = None
 
-        if start_license_header_index is not None and end_license_header_index is not None:
-            lines = lines[end_license_header_index + 1:]
+        for i, line in enumerate(lines):
+            if line.startswith(f"{start_comment_syntax}|"):
+                first_non_header_index = i
+                continue
+            break
+
+        if first_non_header_index is not None:
+            lines = lines[(first_non_header_index + 1) + 1:]
 
         max_length = max(len(line.strip()) for line in license_header)
         license_text = ''.join([f"{start_comment_syntax}  {line.strip().ljust(max_length)} {end_comment_syntax}\n" for line in license_header])
@@ -249,14 +247,18 @@ def license_header(license_header_path, file_path):
             file.write(new_content)
         print(f"Re-written: {file_path}")
 
-    license_header = read_license_header(license_header_path)
-    file_extension = os.path.splitext(file_path)[1].lower()
-    file_name = os.path.basename(file_path)
-    if file_name != 'pubspec.yaml' and file_extension in ['.py', '.java', '.ts', '.dart', '.sh', '.js', '.yaml', '.yml', '.html', '.css', '.svelte'] or file_name == 'Dockerfile' or file_name == 'Makefile':
-        start_comment_syntax, end_comment_syntax = get_comment_syntax(file_extension, file_name)
-        update_file(file_path, license_header, start_comment_syntax, end_comment_syntax)
-    else:
-        print(f"ERROR: {file_path} - Unsupported file extension {file_extension}")
+    cli_command = subprocess.run(['git', 'ls-files'], stdout=subprocess.PIPE, text=True)
+    files = cli_command.stdout.splitlines()
+
+    for file_path in files:
+        license_header = read_license_header(license_header_path)
+        file_extension = os.path.splitext(file_path)[1].lower()
+        file_name = os.path.basename(file_path)
+        if file_name != 'pubspec.yaml' and file_extension in ['.py', '.java', '.ts', '.dart', '.sh', '.js', '.yaml', '.yml', '.html', '.css', '.svelte'] or file_name == 'Dockerfile' or file_name == 'Makefile':
+            start_comment_syntax, end_comment_syntax = get_comment_syntax(file_extension, file_name)
+            update_file(file_path, license_header, start_comment_syntax, end_comment_syntax)
+        else:
+            print(f"ERROR: {file_path} - Unsupported file extension {file_extension}")
 
 main.add_command(bump)
 main.add_command(depset)
