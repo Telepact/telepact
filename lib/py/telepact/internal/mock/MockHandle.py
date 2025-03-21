@@ -26,7 +26,7 @@ if TYPE_CHECKING:
 
 
 async def mock_handle(request_message: 'Message', stubs: list['MockStub'], invocations: list['MockInvocation'],
-                      random: 'RandomGenerator', u_api_schema: 'TelepactSchema', enable_generated_default_stub: bool,
+                      random: 'RandomGenerator', telepact_schema: 'TelepactSchema', enable_generated_default_stub: bool,
                       enable_optional_field_generation: bool, randomize_optional_field_generation: bool) -> 'Message':
     from ...internal.mock.IsSubMap import is_sub_map
     from ...internal.mock.Verify import verify
@@ -89,7 +89,7 @@ async def mock_handle(request_message: 'Message', stubs: list['MockStub'], invoc
     else:
         invocations.append(MockInvocation(function_name, dict(argument)))
 
-        definition = cast(VFn, u_api_schema.parsed.get(function_name))
+        definition = cast(VFn, telepact_schema.parsed.get(function_name))
 
         for stub in stubs:
             if stub.count == 0:

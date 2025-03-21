@@ -57,7 +57,7 @@ def parse_vers_api_schema(
     ordered_document_names = sorted(
         list(telepact_schema_document_names_to_json.keys()))
 
-    u_api_schema_document_name_to_pseudo_json: dict[str, list[object]] = {}
+    telepact_schema_document_name_to_pseudo_json: dict[str, list[object]] = {}
 
     for document_name, telepact_schema_json in telepact_schema_document_names_to_json.items():
         try:
@@ -73,13 +73,13 @@ def parse_vers_api_schema(
             raise TelepactSchemaParseError(
                 this_parse_failure, telepact_schema_document_names_to_json)
 
-        u_api_schema_document_name_to_pseudo_json[document_name] = telepact_schema_pseudo_json_init
+        telepact_schema_document_name_to_pseudo_json[document_name] = telepact_schema_pseudo_json_init
 
     for document_name in ordered_document_names:
-        u_api_schema_pseudo_json = u_api_schema_document_name_to_pseudo_json[document_name]
+        telepact_schema_pseudo_json = telepact_schema_document_name_to_pseudo_json[document_name]
 
         index = -1
-        for definition in u_api_schema_pseudo_json:
+        for definition in telepact_schema_pseudo_json:
 
             index += 1
             loop_path = [index]
@@ -153,7 +153,7 @@ def parse_vers_api_schema(
                 schema_key,
                 ParseContext(
                     document_name,
-                    u_api_schema_document_name_to_pseudo_json,
+                    telepact_schema_document_name_to_pseudo_json,
                     telepact_schema_document_names_to_json,
                     schema_keys_to_document_names,
                     schema_keys_to_index,
@@ -174,10 +174,10 @@ def parse_vers_api_schema(
     for this_key in error_keys:
         this_index = schema_keys_to_index[this_key]
         this_document_name = schema_keys_to_document_names[this_key]
-        u_api_schema_pseudo_json = u_api_schema_document_name_to_pseudo_json[
+        telepact_schema_pseudo_json = telepact_schema_document_name_to_pseudo_json[
             this_document_name]
         def_ = cast(dict[str, object],
-                    u_api_schema_pseudo_json[this_index])
+                    telepact_schema_pseudo_json[this_index])
 
         try:
             error = parse_error_type(
@@ -186,7 +186,7 @@ def parse_vers_api_schema(
                 this_key,
                 ParseContext(
                     this_document_name,
-                    u_api_schema_document_name_to_pseudo_json,
+                    telepact_schema_document_name_to_pseudo_json,
                     telepact_schema_document_names_to_json,
                     schema_keys_to_document_names,
                     schema_keys_to_index,
@@ -204,7 +204,7 @@ def parse_vers_api_schema(
             parse_failures, telepact_schema_document_names_to_json)
 
     try:
-        catch_error_collisions(u_api_schema_document_name_to_pseudo_json,
+        catch_error_collisions(telepact_schema_document_name_to_pseudo_json,
                                error_keys, schema_keys_to_index, schema_keys_to_document_names, telepact_schema_document_names_to_json)
     except TelepactSchemaParseError as e:
         parse_failures.extend(e.schema_parse_failures)
@@ -225,10 +225,10 @@ def parse_vers_api_schema(
     for header_key in header_keys:
         this_index = schema_keys_to_index[header_key]
         this_document_name = schema_keys_to_document_names[header_key]
-        u_api_schema_pseudo_json = u_api_schema_document_name_to_pseudo_json[
+        telepact_schema_pseudo_json = telepact_schema_document_name_to_pseudo_json[
             this_document_name]
         def_ = cast(dict[str, object],
-                    u_api_schema_pseudo_json[this_index])
+                    telepact_schema_pseudo_json[this_index])
         try:
             header_type = parse_headers_type(
                 [this_index],
@@ -236,7 +236,7 @@ def parse_vers_api_schema(
                 header_key,
                 ParseContext(
                     this_document_name,
-                    u_api_schema_document_name_to_pseudo_json,
+                    telepact_schema_document_name_to_pseudo_json,
                     telepact_schema_document_names_to_json,
                     schema_keys_to_document_names,
                     schema_keys_to_index,
@@ -254,7 +254,7 @@ def parse_vers_api_schema(
             parse_failures, telepact_schema_document_names_to_json)
 
     try:
-        catch_header_collisions(u_api_schema_document_name_to_pseudo_json, header_keys,
+        catch_header_collisions(telepact_schema_document_name_to_pseudo_json, header_keys,
                                 schema_keys_to_index, schema_keys_to_document_names, telepact_schema_document_names_to_json)
     except TelepactSchemaParseError as e:
         parse_failures.extend(e.schema_parse_failures)

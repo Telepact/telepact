@@ -17,7 +17,7 @@
 from typing import cast
 
 
-def catch_error_collisions(u_api_schema_name_to_pseudo_json: dict[str, list[object]], error_keys: set[str], keys_to_index: dict[str, int], schema_keys_to_document_name: dict[str, str], document_names_to_json: dict[str, str]) -> None:
+def catch_error_collisions(telepact_schema_name_to_pseudo_json: dict[str, list[object]], error_keys: set[str], keys_to_index: dict[str, int], schema_keys_to_document_name: dict[str, str], document_names_to_json: dict[str, str]) -> None:
     from ...TelepactSchemaParseError import TelepactSchemaParseError
     from ...internal.schema.SchemaParseFailure import SchemaParseFailure
     from ...internal.schema.GetPathDocumentCoordinatesPseudoJson import get_path_document_coordinates_pseudo_json
@@ -38,12 +38,12 @@ def catch_error_collisions(u_api_schema_name_to_pseudo_json: dict[str, list[obje
             document_name = schema_keys_to_document_name[def_key]
             other_document_name = schema_keys_to_document_name[other_def_key]
 
-            u_api_schema_pseudo_json = u_api_schema_name_to_pseudo_json[document_name]
-            other_u_api_schema_pseudo_json = u_api_schema_name_to_pseudo_json[other_document_name]
+            telepact_schema_pseudo_json = telepact_schema_name_to_pseudo_json[document_name]
+            other_telepact_schema_pseudo_json = telepact_schema_name_to_pseudo_json[other_document_name]
 
-            def_ = cast(dict[str, object], u_api_schema_pseudo_json[index])
+            def_ = cast(dict[str, object], telepact_schema_pseudo_json[index])
             other_def = cast(dict[str, object],
-                             other_u_api_schema_pseudo_json[other_index])
+                             other_telepact_schema_pseudo_json[other_index])
 
             err_def = cast(list[object], def_[def_key])
             other_err_def = cast(list[object], other_def[other_def_key])

@@ -28,7 +28,7 @@ if TYPE_CHECKING:
 
 async def handle_message(
     request_message: 'Message',
-    u_api_schema: 'TelepactSchema',
+    telepact_schema: 'TelepactSchema',
     handler: Callable[['Message'], Awaitable['Message']],
     on_error: Callable[[Exception], None],
 ) -> 'Message':
@@ -44,7 +44,7 @@ async def handle_message(
     response_headers: dict[str, object] = {}
     request_headers: dict[str, object] = request_message.headers
     request_body: dict[str, object] = request_message.body
-    parsed_u_api_schema: dict[str, VType] = u_api_schema.parsed
+    parsed_telepact_schema: dict[str, VType] = telepact_schema.parsed
     request_entry: tuple[str, object] = next(iter(request_body.items()))
 
     request_target_init = request_entry[0]
@@ -53,14 +53,14 @@ async def handle_message(
 
     unknown_target: str | None
     request_target: str
-    if request_target_init not in parsed_u_api_schema:
+    if request_target_init not in parsed_telepact_schema:
         unknown_target = request_target_init
         request_target = "fn.ping_"
     else:
         unknown_target = None
         request_target = request_target_init
 
-    function_type = cast(VFn, parsed_u_api_schema[request_target])
+    function_type = cast(VFn, parsed_telepact_schema[request_target])
     result_union_type: VUnion = function_type.result
 
     call_id = request_headers.get("id_")
@@ -78,7 +78,7 @@ async def handle_message(
         return Message(response_headers, new_error_result)
 
     request_header_validation_failures: list[ValidationFailure] = validate_headers(
-        request_headers, u_api_schema.parsed_request_headers, function_type
+        request_headers, telepact_schema.parsed_request_headers, function_type
     )
     if request_header_validation_failures:
         return get_invalid_error_message(
@@ -139,7 +139,7 @@ async def handle_message(
     if request_target == "fn.ping_":
         result_message = Message({}, {"Ok_": {}})
     elif request_target == "fn.api_":
-        result_message = Message({}, {"Ok_": {"api": u_api_schema.original}})
+        result_message = Message({}, {"Ok_": {"api": telepact_schema.original}})
     else:
         try:
             result_message = await handler(call_message)
@@ -172,7 +172,7 @@ async def handle_message(
                 f"Response validation failed: {result_validation_failures}. Actual response: {result_union}"))
             return res
         response_header_validation_failures: list[ValidationFailure] = validate_headers(
-            final_response_headers, u_api_schema.parsed_response_headers, function_type
+            final_response_headers, telepact_schema.parsed_response_headers, function_type
         )
         if response_header_validation_failures:
             return get_invalid_error_message(

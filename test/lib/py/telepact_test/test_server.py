@@ -133,7 +133,7 @@ async def start_client_test_server(connection: NatsClient, metrics: CollectorReg
 
 async def start_mock_test_server(connection: NatsClient, metrics: Any, api_schema_path: str,
                                  frontdoor_topic: str, config: Dict[str, Any]) -> Subscription:
-    u_api = MockTelepactSchema.from_directory(api_schema_path)
+    telepact = MockTelepactSchema.from_directory(api_schema_path)
 
     options = MockServer.Options()
     options.on_error = on_err
@@ -147,7 +147,7 @@ async def start_mock_test_server(connection: NatsClient, metrics: Any, api_schem
 
     timers = Summary(frontdoor_topic.replace(
         '.', '_').replace('-', '_'), '', registry=metrics)
-    server = MockServer(u_api, options)
+    server = MockServer(telepact, options)
 
     async def message_handler(msg: Msg) -> None:
         nonlocal server
@@ -171,7 +171,7 @@ async def start_mock_test_server(connection: NatsClient, metrics: Any, api_schem
 
 
 async def start_schema_test_server(connection: NatsClient, metrics: CollectorRegistry, api_schema_path: str, frontdoor_topic: str) -> Subscription:
-    u_api = TelepactSchema.from_directory(api_schema_path)
+    telepact = TelepactSchema.from_directory(api_schema_path)
 
     timers = Summary(frontdoor_topic.replace(
         '.', '_').replace('-', '_'), '', registry=metrics)
@@ -214,7 +214,7 @@ async def start_schema_test_server(connection: NatsClient, metrics: CollectorReg
     options = Server.Options()
     options.on_error = on_err
     options.auth_required = False
-    server = Server(u_api, handler, options)
+    server = Server(telepact, handler, options)
 
     async def handle_message(msg: Msg) -> None:
         nonlocal server
@@ -248,8 +248,8 @@ async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, 
             ]
             """
 
-    u_api = TelepactSchema.from_file_json_map(files.filenames_to_json)
-    alternate_u_api = TelepactSchema.from_file_json_map(alternate_map)
+    telepact = TelepactSchema.from_file_json_map(files.filenames_to_json)
+    alternate_telepact = TelepactSchema.from_file_json_map(alternate_map)
 
     timers = Summary(frontdoor_topic.replace(
         '.', '_').replace('-', '_'), '', registry=metrics)
@@ -311,12 +311,12 @@ async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, 
     options.on_response = on_response_err
     options.auth_required = auth_required
 
-    server = Server(u_api, handler, options)
+    server = Server(telepact, handler, options)
     alternate_options = Server.Options()
     alternate_options.on_error = on_err
     alternate_options.auth_required = auth_required
     alternate_server = Server(
-        alternate_u_api, handler, alternate_options)
+        alternate_telepact, handler, alternate_options)
 
     async def handle_test_message(msg: Msg) -> None:
         nonlocal serve_alternate_server

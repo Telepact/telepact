@@ -41,7 +41,7 @@ class Server:
             self.auth_required = True
             self.serialization = DefaultSerialization()
 
-    def __init__(self, u_api_schema: 'TelepactSchema', handler: Callable[['Message'], Awaitable['Message']], options: Options):
+    def __init__(self, telepact_schema: 'TelepactSchema', handler: Callable[['Message'], Awaitable['Message']], options: Options):
         """
         Create a server with the given telepact schema and handler.
         """
@@ -52,13 +52,13 @@ class Server:
         self.on_request = options.on_request
         self.on_response = options.on_response
 
-        self.u_api_schema = u_api_schema
+        self.telepact_schema = telepact_schema
 
-        binary_encoding = construct_binary_encoding(self.u_api_schema)
+        binary_encoding = construct_binary_encoding(self.telepact_schema)
         binary_encoder = ServerBinaryEncoder(binary_encoding)
         self.serializer = Serializer(options.serialization, binary_encoder)
 
-        if "struct.Auth_" not in self.u_api_schema.parsed and options.auth_required:
+        if "struct.Auth_" not in self.telepact_schema.parsed and options.auth_required:
             raise RuntimeError(
                 "Unauthenticated server. Either define a `struct.Auth_` in your schema or set `options.auth_required` to `false`."
             )
@@ -69,5 +69,5 @@ class Server:
         """
         from .internal.ProcessBytes import process_bytes
 
-        return await process_bytes(request_message_bytes, self.serializer, self.u_api_schema, self.on_error,
+        return await process_bytes(request_message_bytes, self.serializer, self.telepact_schema, self.on_error,
                                    self.on_request, self.on_response, self.handler)

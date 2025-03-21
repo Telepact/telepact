@@ -59,7 +59,7 @@ def trace_type(type_declaration: 'VTypeDeclaration') -> list[str]:
     return this_all_keys
 
 
-def construct_binary_encoding(u_api_schema: 'TelepactSchema') -> 'BinaryEncoding':
+def construct_binary_encoding(telepact_schema: 'TelepactSchema') -> 'BinaryEncoding':
     from ..types.VTypeDeclaration import VTypeDeclaration
     from ..types.VFn import VFn
 
@@ -67,7 +67,7 @@ def construct_binary_encoding(u_api_schema: 'TelepactSchema') -> 'BinaryEncoding
 
     functions: list[Tuple[str, VFn]] = []
 
-    for key, value in u_api_schema.parsed.items():
+    for key, value in telepact_schema.parsed.items():
         if isinstance(value, VFn):
             functions.append((key, value))
 

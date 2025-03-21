@@ -77,5 +77,5 @@ class MockServer:
     async def _handle(self, request_message: 'Message') -> 'Message':
         from .internal.mock.MockHandle import mock_handle
         return await mock_handle(request_message, self.stubs, self.invocations, self.random,
-                                 self.server.u_api_schema, self.enableGeneratedDefaultStub,
+                                 self.server.telepact_schema, self.enableGeneratedDefaultStub,
                                  self.enable_optional_field_generation, self.randomize_optional_field_generation)

@@ -80,10 +80,10 @@ def get_or_parse_type(path: list[object], type_name: str, ctx: 'ParseContext') -
                                 "name": custom_type_name})],
             ctx.telepact_schema_document_names_to_json)
 
-    u_api_schema_pseudo_json = cast(
+    telepact_schema_pseudo_json = cast(
         list[object], ctx.telepact_schema_document_names_to_pseudo_json.get(this_document_name))
     definition = cast(
-        dict[str, object], u_api_schema_pseudo_json[this_index])
+        dict[str, object], telepact_schema_pseudo_json[this_index])
 
     type: 'VType'
     try:
