@@ -113,4 +113,4 @@ version:
 	cd sdk/console && msgpact-project set-version ${VERSION}
 
 license-header:
-	git ls-files | xargs -I {} msgpact-project license-header LICENSE_HEADER.txt {}
+	msgpact-project license-header LICENSE_HEADER.txt
