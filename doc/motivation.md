@@ -1,7 +1,7 @@
 
 # Motivation
 
-| Capability                                        | OpenAPI | gRPC | GraphQL | MsgPact |
+| Capability                                        | OpenAPI | gRPC | GraphQL | Telepact |
 | ------------------------------------------------- | ------- | ---- | ------- | ---- |
 | No transport restrictions                         | ❌      | ❌   | ❌      | ✅   |
 | No transport details leaked into API              | ❌      | ✅   | ✅      | ✅   |
@@ -56,24 +56,24 @@ serialization is technically possible through manual configuration, it is
 largely not observed in practice due to the accessibility tax it would incur on
 both servers and clients.
 
-## Why MsgPact?
+## Why Telepact?
 
-MsgPact takes all of the strengths of REST, gRPC, and GraphQL and combines them
+Telepact takes all of the strengths of REST, gRPC, and GraphQL and combines them
 into a simple but careful design. It is built, first and foremost, on JSON with
 transport agnosticism to maximize accessibility to clients that want to
 integrate using only the native JSON and networking capabilities of their
 preferred programming language and/or industry standard library. It achieves
 type safety through built-in server-side validation against a server-defined API
 schema, complete with typing options that allow for modeling all common
-programming data types. And then from that baseline, MsgPact critically allows
+programming data types. And then from that baseline, Telepact critically allows
 clients to upgrade their experience as deemed appropriate by the client,
 optionally using:
 
--   MsgPact client libraries that help facilitate crafting of MsgPact messages
+-   Telepact client libraries that help facilitate crafting of Telepact messages
 -   Generated code for further increased type safety
 -   A built-in binary serialization protocol for optimized efficiency
 -   A built-in mechanism to omit fields from responses for optimized efficiency
 
-These client features are built-in via the MsgPact library used by the server, such
+These client features are built-in via the Telepact library used by the server, such
 that all of these features are available to the client automatically, without
 any configuration by the server.

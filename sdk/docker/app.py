@@ -1,12 +1,12 @@
 from typing import Tuple, cast
 from fastapi import FastAPI, Request
-from msgpact.MsgPactSchema import MsgPactSchema
-from msgpact.Client import Client
-from msgpact.Message import Message
-from msgpact.Serializer import Serializer
-from msgpact.SerializationError import SerializationError
-from msgpact.MockServer import MockServer
-from msgpact.MockMsgPactSchema import MockMsgPactSchema
+from telepact.TelepactSchema import TelepactSchema
+from telepact.Client import Client
+from telepact.Message import Message
+from telepact.Serializer import Serializer
+from telepact.SerializationError import SerializationError
+from telepact.MockServer import MockServer
+from telepact.MockTelepactSchema import MockTelepactSchema
 import asyncio
 import json
 import os
@@ -34,18 +34,18 @@ async def post_endpoint(request: Request) -> Response:
 
 @app.on_event('startup')
 async def startup_event():
-    msgpact_url_env_var_is_set = 'MSGPACT_URL' in os.environ
+    telepact_url_env_var_is_set = 'TELEPACT_URL' in os.environ
 
-    def get_msgpact_url_env_var() -> str:
-        return os.environ['MSGPACT_URL']
+    def get_telepact_url_env_var() -> str:
+        return os.environ['TELEPACT_URL']
 
-    msgpact_directory_env_var_is_set = 'MSGPACT_DIRECTORY' in os.environ
+    telepact_directory_env_var_is_set = 'TELEPACT_DIRECTORY' in os.environ
 
-    def get_msgpact_directory_env_var() -> str:
-        return os.environ['MSGPACT_DIRECTORY']
+    def get_telepact_directory_env_var() -> str:
+        return os.environ['TELEPACT_DIRECTORY']
 
-    if msgpact_url_env_var_is_set:
-        url: str = get_msgpact_url_env_var()
+    if telepact_url_env_var_is_set:
+        url: str = get_telepact_url_env_var()
 
         async def adapter(m: Message, s: Serializer) -> Message:
             try:
@@ -64,12 +64,12 @@ async def startup_event():
 
         options = Client.Options()
 
-        msgpact_client = Client(adapter, options)
+        telepact_client = Client(adapter, options)
 
         retries = 3
         for attempt in range(retries):
             try:
-                response_message = await msgpact_client.request(Message({}, {'fn.api_': {}}))
+                response_message = await telepact_client.request(Message({}, {'fn.api_': {}}))
                 break
             except Exception as e:
                 if attempt < retries - 1:
@@ -83,12 +83,12 @@ async def startup_event():
 
         api_json = json.dumps(api)
 
-        schema = MockMsgPactSchema.from_json(api_json)
-    elif msgpact_directory_env_var_is_set:
-        directory: str = get_msgpact_directory_env_var()
-        schema = MockMsgPactSchema.from_directory(directory)
+        schema = MockTelepactSchema.from_json(api_json)
+    elif telepact_directory_env_var_is_set:
+        directory: str = get_telepact_directory_env_var()
+        schema = MockTelepactSchema.from_directory(directory)
 
-    print('msgPact JSON:')
+    print('telepact JSON:')
     print(schema.original)
 
     mock_server_options = MockServer.Options()

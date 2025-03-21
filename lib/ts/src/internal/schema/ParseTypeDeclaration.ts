@@ -1,15 +1,15 @@
 import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
 import { VTypeDeclaration } from '../types/VTypeDeclaration';
-import { MsgPactSchemaParseError } from '../../MsgPactSchemaParseError';
+import { TelepactSchemaParseError } from '../../TelepactSchemaParseError';
 import { getOrParseType } from '../../internal/schema/GetOrParseType';
 import { getTypeUnexpectedParseFailure } from '../../internal/schema/GetTypeUnexpectedParseFailure';
 import { ParseContext } from '../../internal/schema/ParseContext';
 
 export function parseTypeDeclaration(path: any[], typeDeclarationArray: any[], ctx: ParseContext): VTypeDeclaration {
     if (!typeDeclarationArray.length) {
-        throw new MsgPactSchemaParseError(
+        throw new TelepactSchemaParseError(
             [new SchemaParseFailure(ctx.documentName, path, 'EmptyArrayDisallowed', {})],
-            ctx.msgpactSchemaDocumentNamesToJson,
+            ctx.telepactSchemaDocumentNamesToJson,
         );
     }
 
@@ -18,7 +18,7 @@ export function parseTypeDeclaration(path: any[], typeDeclarationArray: any[], c
 
     if (typeof baseType !== 'string') {
         const thisParseFailures = getTypeUnexpectedParseFailure(ctx.documentName, basePath, baseType, 'String');
-        throw new MsgPactSchemaParseError(thisParseFailures, ctx.msgpactSchemaDocumentNamesToJson);
+        throw new TelepactSchemaParseError(thisParseFailures, ctx.telepactSchemaDocumentNamesToJson);
     }
 
     const rootTypeString = baseType;
@@ -28,13 +28,13 @@ export function parseTypeDeclaration(path: any[], typeDeclarationArray: any[], c
 
     const matcher = rootTypeString.match(regex);
     if (!matcher) {
-        throw new MsgPactSchemaParseError(
+        throw new TelepactSchemaParseError(
             [
                 new SchemaParseFailure(ctx.documentName, basePath, 'StringRegexMatchFailed', {
                     regex: regexString.toString().slice(1, -1),
                 }),
             ],
-            ctx.msgpactSchemaDocumentNamesToJson,
+            ctx.telepactSchemaDocumentNamesToJson,
         );
     }
 
@@ -45,14 +45,14 @@ export function parseTypeDeclaration(path: any[], typeDeclarationArray: any[], c
 
     const givenTypeParameterCount = typeDeclarationArray.length - 1;
     if (type_.getTypeParameterCount() !== givenTypeParameterCount) {
-        throw new MsgPactSchemaParseError(
+        throw new TelepactSchemaParseError(
             [
                 new SchemaParseFailure(ctx.documentName, path, 'ArrayLengthUnexpected', {
                     actual: typeDeclarationArray.length,
                     expected: type_.getTypeParameterCount() + 1,
                 }),
             ],
-            ctx.msgpactSchemaDocumentNamesToJson,
+            ctx.telepactSchemaDocumentNamesToJson,
         );
     }
 
@@ -80,7 +80,7 @@ export function parseTypeDeclaration(path: any[], typeDeclarationArray: any[], c
     }
 
     if (parseFailures.length > 0) {
-        throw new MsgPactSchemaParseError(parseFailures, ctx.msgpactSchemaDocumentNamesToJson);
+        throw new TelepactSchemaParseError(parseFailures, ctx.telepactSchemaDocumentNamesToJson);
     }
 
     return new VTypeDeclaration(type_, nullable, typeParameters);

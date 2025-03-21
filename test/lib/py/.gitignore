@@ -1,6 +1,6 @@
 metrics.txt
-msgpact_test/gen/
+telepact_test/gen/
 .venv/
 .built
-msgpact.tar.gz
+telepact.tar.gz
 poetry.lock

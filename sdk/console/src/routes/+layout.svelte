@@ -3,14 +3,14 @@
 
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
-	import { MsgPactSchema, Message, jsonSchema } from '$lib/msgpact/index.esm';
+	import { TelepactSchema, Message, jsonSchema } from '$lib/telepact/index.esm';
 
 	import {
 		genExample,
 		handleRequest,
 		handleSubmitRequest,
 		minifyJson,
-		parseMsgPactSchema,
+		parseTelepactSchema,
 		unMinifyJson
 	} from '$lib';
 
@@ -44,8 +44,8 @@
 	let showInternalApi: boolean;
 	$: showInternalApi = $page.data.showInternalApi;
 
-	let msgpactSchemaPromise: Promise<MsgPactSchema>;
-	$: msgpactSchemaPromise = $page.data.fullMsgPactSchemaRef;
+	let telepactSchemaPromise: Promise<TelepactSchema>;
+	$: telepactSchemaPromise = $page.data.fullTelepactSchemaRef;
 
 	let schemaDraftPromise: Promise<string>;
 	$: schemaDraftPromise = $page.data.schemaDraft;
@@ -74,13 +74,13 @@
 	$: exampleHeaders = ($page.url.searchParams.get('mh') ?? '').split(',');
 
 	onMount(() => {
-		msgpactSchemaPromise.then((e) => {
+		telepactSchemaPromise.then((e) => {
 			const requestJsonSchema = createJsonSchema(e);
 			monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
 				schemas: [
 					{
-						uri: 'internal://server/jsonschema-msgpact.json',
-						fileMatch: ['schema.msgpact.json'],
+						uri: 'internal://server/jsonschema-telepact.json',
+						fileMatch: ['schema.telepact.json'],
 						schema: jsonSchema
 					},
 					{
@@ -253,7 +253,7 @@
 							/>
 						</svg>
 					</div>
-					<h1 class="px-2 text-lg font-semibold text-gray-100">MsgPact</h1>
+					<h1 class="px-2 text-lg font-semibold text-gray-100">Telepact</h1>
 				</div>
 			</div>
 			<div id="view-select" class="flex basis-1/3 content-center justify-center space-x-2">
@@ -377,9 +377,9 @@
 	</nav>
 
 	<main class="mt-16 flex h-[calc(100vh-4em)] bg-zinc-800">
-		{#await Promise.all( [msgpactSchemaPromise, filteredSchemaPseudoJsonPromise, schemaDraftPromise] )}
+		{#await Promise.all( [telepactSchemaPromise, filteredSchemaPseudoJsonPromise, schemaDraftPromise] )}
 			<span>loading schema</span>
-		{:then [msgpactSchema, filteredSchemaPseudoJson, schemaDraft]}
+		{:then [telepactSchema, filteredSchemaPseudoJson, schemaDraft]}
 			{#if activeViews.includes('s')}
 				<div
 					class="flex h-[calc(100vh-4em)] {getSectionClass('s', activeViews.length)}"
@@ -404,7 +404,7 @@
 								readOnly={schemaSourceReadOnly}
 								json={schemaDraft}
 								ctrlEnter={handleSchema}
-								filename="schema.msgpact.json"
+								filename="schema.telepact.json"
 								ariaLabel="schema"
 								bind:this={schemaEditor}
 							/>
@@ -419,9 +419,9 @@
 							<h1 class="pb-4 text-xl font-semibold text-gray-100">Schema</h1>
 						</div>
 						{#key sortDocCardsAZ}
-							{#each parseMsgPactSchema(filteredSchemaPseudoJson, msgpactSchema, sortDocCardsAZ, showInternalApi) as entry}
+							{#each parseTelepactSchema(filteredSchemaPseudoJson, telepactSchema, sortDocCardsAZ, showInternalApi) as entry}
 								{#if showInternalApi || !(Object.keys(entry)[0].split('.')[1] ?? '').endsWith('_')}
-									<DocCard {entry} {msgpactSchema} />
+									<DocCard {entry} {telepactSchema} />
 								{/if}
 							{/each}
 						{/key}
@@ -450,7 +450,7 @@
 							</button>
 						</div>
 						{#key randomSeed + exampleFn}
-							{#await genExample(exampleFn, exampleHeaders, msgpactSchema)}
+							{#await genExample(exampleFn, exampleHeaders, telepactSchema)}
 								<div class="mb-4">
 									<span>Loading...<span> </span></span>
 								</div>

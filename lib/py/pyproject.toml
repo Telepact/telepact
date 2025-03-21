@@ -1,7 +1,7 @@
 [project]
-name = "msgpact"
+name = "telepact"
 version = "1.0.0-alpha.1"
-description = "MsgPact"
+description = "Telepact"
 requires-python = ">=3.11"
 classifiers = [ "Programming Language :: Python :: 3", "Operating System :: OS Independent",]
 license = "Apache-2.0"
@@ -11,9 +11,9 @@ requires = [ "poetry-core>=1.0.0",]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
-include = [ "msgpact/json/*", "msgpact/LICENSE", "msgpact/NOTICE",]
+include = [ "telepact/json/*", "telepact/LICENSE", "telepact/NOTICE",]
 [[tool.poetry.packages]]
-include = "msgpact"
+include = "telepact"
 
 [tool.poetry.dependencies]
 msgpack = "^1.1.0"

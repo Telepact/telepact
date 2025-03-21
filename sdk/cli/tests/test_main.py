@@ -1,7 +1,7 @@
 import pytest
 from click.testing import CliRunner
 # Adjust the import path according to your project structure
-from msgpact_cli.cli import main
+from telepact_cli.cli import main
 import traceback
 
 

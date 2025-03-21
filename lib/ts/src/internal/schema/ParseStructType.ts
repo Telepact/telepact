@@ -2,7 +2,7 @@ import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
 import { VStruct } from '../types/VStruct';
 import { getTypeUnexpectedParseFailure } from '../../internal/schema/GetTypeUnexpectedParseFailure';
 import { parseStructFields } from '../../internal/schema/ParseStructFields';
-import { MsgPactSchemaParseError } from '../../MsgPactSchemaParseError';
+import { TelepactSchemaParseError } from '../../TelepactSchemaParseError';
 import { ParseContext } from '../../internal/schema/ParseContext';
 
 export function parseStructType(
@@ -41,7 +41,7 @@ export function parseStructType(
     }
 
     if (parseFailures.length > 0) {
-        throw new MsgPactSchemaParseError(parseFailures, ctx.msgpactSchemaDocumentNamesToJson);
+        throw new TelepactSchemaParseError(parseFailures, ctx.telepactSchemaDocumentNamesToJson);
     }
 
     const fields = parseStructFields(thisPath, definition, ctx);

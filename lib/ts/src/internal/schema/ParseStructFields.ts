@@ -1,6 +1,6 @@
 import { VFieldDeclaration } from '../types/VFieldDeclaration';
 import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
-import { MsgPactSchemaParseError } from '../../MsgPactSchemaParseError';
+import { TelepactSchemaParseError } from '../../TelepactSchemaParseError';
 import { parseField } from '../../internal/schema/ParseField';
 import { ParseContext } from '../../internal/schema/ParseContext';
 import { getPathDocumentCoordinatesPseudoJson } from '../../internal/schema/GetPathDocumentCoordinatesPseudoJson';
@@ -20,7 +20,7 @@ export function parseStructFields(
             if (fieldNoOpt === existingFieldNoOpt) {
                 const finalPath = [...path, fieldDeclaration];
                 const finalOtherPath = [...path, existingField];
-                const finalOtherDocumentJson = ctx.msgpactSchemaDocumentNamesToJson[ctx.documentName];
+                const finalOtherDocumentJson = ctx.telepactSchemaDocumentNamesToJson[ctx.documentName];
                 const finalOtherLocation = getPathDocumentCoordinatesPseudoJson(finalOtherPath, finalOtherDocumentJson);
                 parseFailures.push(
                     new SchemaParseFailure(ctx.documentName, finalPath, 'PathCollision', {
@@ -37,7 +37,7 @@ export function parseStructFields(
             const fieldName = parsedField.fieldName;
             fields[fieldName] = parsedField;
         } catch (e) {
-            if (e instanceof MsgPactSchemaParseError) {
+            if (e instanceof TelepactSchemaParseError) {
                 parseFailures.push(...e.schemaParseFailures);
             } else {
                 throw e;
@@ -46,7 +46,7 @@ export function parseStructFields(
     }
 
     if (parseFailures.length > 0) {
-        throw new MsgPactSchemaParseError(parseFailures, ctx.msgpactSchemaDocumentNamesToJson);
+        throw new TelepactSchemaParseError(parseFailures, ctx.telepactSchemaDocumentNamesToJson);
     }
 
     return fields;

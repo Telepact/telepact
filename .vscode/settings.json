@@ -1,7 +1,7 @@
 {
     "json.schemas": [
         {
-            "fileMatch": ["*.msgpact.json"],
+            "fileMatch": ["*.telepact.json"],
             "url": "./common/json-schema.json"
         }
     ],

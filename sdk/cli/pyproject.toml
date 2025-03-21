@@ -1,7 +1,7 @@
 [project]
-name = "msgpact_cli"
+name = "telepact_cli"
 version = "1.0.0-alpha.1"
-description = "A CLI tool for variouos local MsgPact operations."
+description = "A CLI tool for variouos local Telepact operations."
 requires-python = ">=3.11"
 
 [build-system]
@@ -10,9 +10,9 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 version = "0.1.1"
-include = [ "msgpact_cli/msgpact/**/*",]
+include = [ "telepact_cli/telepact/**/*",]
 [[tool.poetry.packages]]
-include = "msgpact_cli"
+include = "telepact_cli"
 
 [tool.poetry.dependencies]
 python = "^3.11"
@@ -30,4 +30,4 @@ requests = "*"
 pytest = "*"
 
 [tool.poetry.scripts]
-msgpact = "msgpact_cli.cli:main"
+telepact = "telepact_cli.cli:main"

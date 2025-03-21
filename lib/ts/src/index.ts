@@ -8,10 +8,10 @@ export * from './DefaultClientBinaryStrategy';
 export * from './ClientBinaryStrategy';
 export * from './SerializationError';
 export * from './Serialization';
-export * from './MsgPactSchema';
-export * from './MockMsgPactSchema';
-export * from './MsgPactSchemaParseError';
-export * from './MsgPactSchemaFiles';
+export * from './TelepactSchema';
+export * from './MockTelepactSchema';
+export * from './TelepactSchemaParseError';
+export * from './TelepactSchemaFiles';
 export * from './fileSystem';
 export { default as jsonSchema } from '../inc/json-schema.json';
 

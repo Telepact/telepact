@@ -8,7 +8,7 @@ all:
 	npx rollup -c rollup.msgpackr.config.js
 
 	mkdir -p lib/js
-	cp ../../lib/ts/dist/index.iife.js lib/js/msgpact.js
+	cp ../../lib/ts/dist/index.iife.js lib/js/telepact.js
 	cp dist/crc32.iife.js lib/js/crc32.js
 	cp dist/msgpackr.iife.js lib/js/msgpackr.js	
 

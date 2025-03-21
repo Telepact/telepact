@@ -5,7 +5,7 @@ export function getSchemaFileMap(directory: string, fs: FsModule, path: PathModu
 
     const paths = fs.readdirSync(directory).map((file) => path.join(directory, file));
     for (const filePath of paths) {
-        if (filePath.endsWith('.msgpact.json')) {
+        if (filePath.endsWith('.telepact.json')) {
             const content = fs.readFileSync(filePath, 'utf-8');
             const relativePath = path.relative(directory, filePath);
             finalJsonDocuments[relativePath] = content;

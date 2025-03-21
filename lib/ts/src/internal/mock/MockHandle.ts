@@ -2,11 +2,11 @@ import { Message } from '../../Message';
 import { MockInvocation } from '../../internal/mock/MockInvocation';
 import { MockStub } from '../../internal/mock/MockStub';
 import { RandomGenerator } from '../../RandomGenerator';
-import { MsgPactSchema } from '../../MsgPactSchema';
+import { TelepactSchema } from '../../TelepactSchema';
 import { isSubMap } from '../../internal/mock/IsSubMap';
 import { verify } from '../../internal/mock/Verify';
 import { verifyNoMoreInteractions } from '../../internal/mock/VerifyNoMoreInteractions';
-import { MsgPactError } from '../../MsgPactError';
+import { TelepactError } from '../../TelepactError';
 import { VFn } from '../types/VFn';
 import { objectsAreEqual } from '../../internal/ObjectsAreEqual';
 import { GenerateContext } from '../generation/GenerateContext';
@@ -16,7 +16,7 @@ export async function mockHandle(
     stubs: MockStub[],
     invocations: MockInvocation[],
     random: RandomGenerator,
-    msgPactSchema: MsgPactSchema,
+    telepactSchema: TelepactSchema,
     enableGeneratedDefaultStub: boolean,
     enableOptionalFieldGeneration: boolean,
     randomizeOptionalFieldGeneration: boolean,
@@ -67,7 +67,7 @@ export async function mockHandle(
     } else {
         invocations.push(new MockInvocation(functionName, argument));
 
-        const definition = msgPactSchema.parsed[functionName] as VFn;
+        const definition = telepactSchema.parsed[functionName] as VFn;
 
         for (const stub of stubs) {
             if (stub.count === 0) {
@@ -149,7 +149,7 @@ export async function mockHandle(
             const randomOkStruct = randomOkStructInit as Record<string, any>;
             return new Message({}, { Ok_: randomOkStruct });
         } else {
-            throw new MsgPactError(`Unexpected unknown function: ${functionName}`);
+            throw new TelepactError(`Unexpected unknown function: ${functionName}`);
         }
     }
 }

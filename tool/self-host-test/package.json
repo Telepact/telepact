@@ -14,7 +14,7 @@
 		"file-loader": "^6.0.0"		
 	},
 	"dependencies": {
-		"msgpact-console": "workspace:*"
+		"telepact-console": "workspace:*"
 	},
 	"type": "module",
 	"workspaces": [

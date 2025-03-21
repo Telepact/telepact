@@ -1,4 +1,4 @@
-import { MsgPactSchemaParseError } from '../../MsgPactSchemaParseError';
+import { TelepactSchemaParseError } from '../../TelepactSchemaParseError';
 import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
 
 export function findSchemaKey(
@@ -27,6 +27,6 @@ export function findSchemaKey(
             expected: 1,
             keys: keys,
         });
-        throw new MsgPactSchemaParseError([parseFailure], documentNamesToJson);
+        throw new TelepactSchemaParseError([parseFailure], documentNamesToJson);
     }
 }

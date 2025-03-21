@@ -4,7 +4,7 @@ import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
 import { getTypeUnexpectedParseFailure } from '../../internal/schema/GetTypeUnexpectedParseFailure';
 import { parseStructType } from '../../internal/schema/ParseStructType';
 import { parseUnionType } from '../../internal/schema/ParseUnionType';
-import { MsgPactSchemaParseError } from '../../MsgPactSchemaParseError';
+import { TelepactSchemaParseError } from '../../TelepactSchemaParseError';
 import { ParseContext } from '../../internal/schema/ParseContext';
 import { getOrParseType } from './GetOrParseType';
 import { derivePossibleSelect } from './DerivePossibleSelect';
@@ -23,7 +23,7 @@ export function parseFunctionType(
         const argType = parseStructType(path, functionDefinitionAsParsedJson, schemaKey, ['->', '_errors'], ctx);
         callType = new VUnion(schemaKey, { [schemaKey]: argType }, { [schemaKey]: 0 });
     } catch (e) {
-        if (e instanceof MsgPactSchemaParseError) {
+        if (e instanceof TelepactSchemaParseError) {
             parseFailures.push(...e.schemaParseFailures);
         } else {
             throw e;
@@ -48,7 +48,7 @@ export function parseFunctionType(
                 ctx,
             );
         } catch (e) {
-            if (e instanceof MsgPactSchemaParseError) {
+            if (e instanceof TelepactSchemaParseError) {
                 parseFailures.push(...e.schemaParseFailures);
             } else {
                 throw e;
@@ -83,7 +83,7 @@ export function parseFunctionType(
     }
 
     if (parseFailures.length > 0) {
-        throw new MsgPactSchemaParseError(parseFailures, ctx.msgpactSchemaDocumentNamesToJson);
+        throw new TelepactSchemaParseError(parseFailures, ctx.telepactSchemaDocumentNamesToJson);
     }
 
     const fnSelectType = derivePossibleSelect(schemaKey, resultType as VUnion);

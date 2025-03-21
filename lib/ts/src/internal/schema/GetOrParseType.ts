@@ -1,4 +1,4 @@
-import { MsgPactSchemaParseError } from '../../MsgPactSchemaParseError';
+import { TelepactSchemaParseError } from '../../TelepactSchemaParseError';
 import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
 import { VType } from '../types/VType';
 import { VObject } from '../types/VObject';
@@ -18,7 +18,7 @@ import { ParseContext } from '../../internal/schema/ParseContext';
 
 export function getOrParseType(path: any[], typeName: string, ctx: ParseContext): VType {
     if (ctx.failedTypes.has(typeName)) {
-        throw new MsgPactSchemaParseError([], ctx.msgpactSchemaDocumentNamesToJson);
+        throw new TelepactSchemaParseError([], ctx.telepactSchemaDocumentNamesToJson);
     }
 
     const existingType = ctx.parsedTypes[typeName];
@@ -31,9 +31,9 @@ export function getOrParseType(path: any[], typeName: string, ctx: ParseContext)
 
     const matcher = typeName.match(regex);
     if (!matcher) {
-        throw new MsgPactSchemaParseError(
+        throw new TelepactSchemaParseError(
             [new SchemaParseFailure(ctx.documentName, path, 'StringRegexMatchFailed', { regex: regexString })],
-            ctx.msgpactSchemaDocumentNamesToJson,
+            ctx.telepactSchemaDocumentNamesToJson,
         );
     }
 
@@ -55,12 +55,12 @@ export function getOrParseType(path: any[], typeName: string, ctx: ParseContext)
     const thisIndex = ctx.schemaKeysToIndex[customTypeName];
     const thisDocumentName = ctx.schemaKeysToDocumentName[customTypeName];
     if (thisIndex === undefined) {
-        throw new MsgPactSchemaParseError(
+        throw new TelepactSchemaParseError(
             [new SchemaParseFailure(ctx.documentName, path, 'TypeUnknown', { name: customTypeName })],
-            ctx.msgpactSchemaDocumentNamesToJson,
+            ctx.telepactSchemaDocumentNamesToJson,
         );
     }
-    const definition = ctx.msgpactSchemaDocumentNamesToPseudoJson[thisDocumentName][thisIndex] as {
+    const definition = ctx.telepactSchemaDocumentNamesToPseudoJson[thisDocumentName][thisIndex] as {
         [key: string]: object;
     };
 
@@ -97,13 +97,13 @@ export function getOrParseType(path: any[], typeName: string, ctx: ParseContext)
                 '_ext.Stub_': new VMockStub(ctx.parsedTypes),
             }[customTypeName];
             if (!possibleTypeExtension) {
-                throw new MsgPactSchemaParseError(
+                throw new TelepactSchemaParseError(
                     [
                         new SchemaParseFailure(ctx.documentName, [thisIndex], 'TypeExtensionImplementationMissing', {
                             name: customTypeName,
                         }),
                     ],
-                    ctx.msgpactSchemaDocumentNamesToJson,
+                    ctx.telepactSchemaDocumentNamesToJson,
                 );
             }
             type = possibleTypeExtension;
@@ -113,10 +113,10 @@ export function getOrParseType(path: any[], typeName: string, ctx: ParseContext)
 
         return type;
     } catch (e) {
-        if (e instanceof MsgPactSchemaParseError) {
+        if (e instanceof TelepactSchemaParseError) {
             ctx.allParseFailures.push(...e.schemaParseFailures);
             ctx.failedTypes.add(customTypeName);
-            throw new MsgPactSchemaParseError([], ctx.msgpactSchemaDocumentNamesToJson);
+            throw new TelepactSchemaParseError([], ctx.telepactSchemaDocumentNamesToJson);
         }
         throw e;
     }

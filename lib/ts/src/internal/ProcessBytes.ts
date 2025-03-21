@@ -1,5 +1,5 @@
 import { Serializer } from '../Serializer';
-import { MsgPactSchema } from '../MsgPactSchema';
+import { TelepactSchema } from '../TelepactSchema';
 import { Message } from '../Message';
 import { handleMessage } from '../internal/HandleMessage';
 import { parseRequestMessage } from '../internal/ParseRequestMessage';
@@ -12,14 +12,14 @@ export type MessageHandler = (message: Message) => Promise<Message>;
 export async function processBytes(
     requestMessageBytes: Uint8Array,
     serializer: Serializer,
-    msgpactSchema: MsgPactSchema,
+    telepactSchema: TelepactSchema,
     onError: ErrorHandler,
     onRequest: RequestHandler,
     onResponse: ResponseHandler,
     handler: MessageHandler,
 ): Promise<Uint8Array> {
     try {
-        const requestMessage = parseRequestMessage(requestMessageBytes, serializer, msgpactSchema, onError);
+        const requestMessage = parseRequestMessage(requestMessageBytes, serializer, telepactSchema, onError);
 
         try {
             onRequest(requestMessage);
@@ -27,7 +27,7 @@ export async function processBytes(
             // Handle error
         }
 
-        const responseMessage = await handleMessage(requestMessage, msgpactSchema, handler, onError);
+        const responseMessage = await handleMessage(requestMessage, telepactSchema, handler, onError);
 
         try {
             onResponse(responseMessage);

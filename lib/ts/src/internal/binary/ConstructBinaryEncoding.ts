@@ -1,4 +1,4 @@
-import { MsgPactSchema } from '../../MsgPactSchema';
+import { TelepactSchema } from '../../TelepactSchema';
 import { BinaryEncoding } from '../../internal/binary/BinaryEncoding';
 import { createChecksum } from '../../internal/binary/CreateChecksum';
 import { VUnion } from '../types/VUnion';
@@ -40,12 +40,12 @@ function traceType(typeDeclaration: VTypeDeclaration): string[] {
     return thisAllKeys;
 }
 
-export function constructBinaryEncoding(msgPactSchema: MsgPactSchema): BinaryEncoding {
+export function constructBinaryEncoding(telepactSchema: TelepactSchema): BinaryEncoding {
     const allKeys: Set<string> = new Set();
 
     const functions: [string, VFn][] = [];
 
-    for (const [key, value] of Object.entries(msgPactSchema.parsed)) {
+    for (const [key, value] of Object.entries(telepactSchema.parsed)) {
         if (value instanceof VFn) {
             functions.push([key, value]);
         }

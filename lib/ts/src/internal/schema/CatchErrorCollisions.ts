@@ -1,9 +1,9 @@
-import { MsgPactSchemaParseError } from '../../MsgPactSchemaParseError';
+import { TelepactSchemaParseError } from '../../TelepactSchemaParseError';
 import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
 import { getPathDocumentCoordinatesPseudoJson } from '../../internal/schema/GetPathDocumentCoordinatesPseudoJson';
 
 export function catchErrorCollisions(
-    msgPactSchemaNameToPseudoJson: Record<string, any[]>,
+    telepactSchemaNameToPseudoJson: Record<string, any[]>,
     errorKeys: Set<string>,
     keysToIndex: Record<string, number>,
     schemaKeysToDocumentNames: Record<string, string>,
@@ -36,11 +36,11 @@ export function catchErrorCollisions(
             const documentName = schemaKeysToDocumentNames[defKey];
             const otherDocumentName = schemaKeysToDocumentNames[otherDefKey];
 
-            const msgPactSchemaPseudoJson = msgPactSchemaNameToPseudoJson[documentName];
-            const otherMsgPactSchemaPseudoJson = msgPactSchemaNameToPseudoJson[otherDocumentName];
+            const telepactSchemaPseudoJson = telepactSchemaNameToPseudoJson[documentName];
+            const otherTelepactSchemaPseudoJson = telepactSchemaNameToPseudoJson[otherDocumentName];
 
-            const def = msgPactSchemaPseudoJson[index] as Record<string, object>;
-            const otherDef = otherMsgPactSchemaPseudoJson[otherIndex] as Record<string, object>;
+            const def = telepactSchemaPseudoJson[index] as Record<string, object>;
+            const otherDef = otherTelepactSchemaPseudoJson[otherIndex] as Record<string, object>;
 
             const errDef = def[defKey] as object[];
             const otherErrDef = otherDef[otherDefKey] as object[];
@@ -79,6 +79,6 @@ export function catchErrorCollisions(
     }
 
     if (parseFailures.length > 0) {
-        throw new MsgPactSchemaParseError(parseFailures, documentNamesToJson);
+        throw new TelepactSchemaParseError(parseFailures, documentNamesToJson);
     }
 }

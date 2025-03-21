@@ -1,17 +1,17 @@
-import { MsgPactSchema } from './MsgPactSchema';
+import { TelepactSchema } from './TelepactSchema';
 import { MockInvocation } from './internal/mock/MockInvocation';
 import { MockStub } from './internal/mock/MockStub';
 import { Server, ServerOptions as ServerOptions } from './Server';
 import { RandomGenerator } from './RandomGenerator';
 import { mockHandle } from './internal/mock/MockHandle';
-import { MockMsgPactSchema } from './MockMsgPactSchema';
+import { MockTelepactSchema } from './MockTelepactSchema';
 
 export class MockServer {
     /**
-     * A Mock instance of a msgPact server.
+     * A Mock instance of a telepact server.
      */
 
-    constructor(mockMsgPactSchema: MockMsgPactSchema, options: MockServerOptions) {
+    constructor(mockTelepactSchema: MockTelepactSchema, options: MockServerOptions) {
         this.random = new RandomGenerator(options.generatedCollectionLengthMin, options.generatedCollectionLengthMax);
         this.enableGeneratedDefaultStub = options.enableMessageResponseGeneration;
         this.enableOptionalFieldGeneration = options.enableOptionalFieldGeneration;
@@ -24,15 +24,15 @@ export class MockServer {
         serverOptions.onError = options.onError;
         serverOptions.authRequired = false;
 
-        const msgPactSchema = new MsgPactSchema(
-            mockMsgPactSchema.original,
-            mockMsgPactSchema.full,
-            mockMsgPactSchema.parsed,
-            mockMsgPactSchema.parsedRequestHeaders,
-            mockMsgPactSchema.parsedResponseHeaders,
+        const telepactSchema = new TelepactSchema(
+            mockTelepactSchema.original,
+            mockTelepactSchema.full,
+            mockTelepactSchema.parsed,
+            mockTelepactSchema.parsedRequestHeaders,
+            mockTelepactSchema.parsedResponseHeaders,
         );
 
-        this.server = new Server(msgPactSchema, this.handle, serverOptions);
+        this.server = new Server(telepactSchema, this.handle, serverOptions);
     }
 
     private random: RandomGenerator;
@@ -45,10 +45,10 @@ export class MockServer {
 
     async process(message: Uint8Array): Promise<Uint8Array> {
         /**
-         * Process a given msgPact Request Message into a msgPact Response Message.
+         * Process a given telepact Request Message into a telepact Response Message.
          *
-         * @param message - The msgPact request message.
-         * @returns The msgPact response message.
+         * @param message - The telepact request message.
+         * @returns The telepact response message.
          */
         return await this.server.process(message);
     }
@@ -59,7 +59,7 @@ export class MockServer {
             this.stubs,
             this.invocations,
             this.random,
-            this.server.msgPactSchema,
+            this.server.telepactSchema,
             this.enableGeneratedDefaultStub,
             this.enableOptionalFieldGeneration,
             this.randomizeOptionalFieldGeneration,

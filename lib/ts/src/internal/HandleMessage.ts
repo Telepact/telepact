@@ -3,7 +3,7 @@ import { VTypeDeclaration } from './types/VTypeDeclaration';
 import { VUnion } from './types/VUnion';
 import { ValidationFailure } from '../internal/validation/ValidationFailure';
 import { VType } from './types/VType';
-import { MsgPactSchema } from '../MsgPactSchema';
+import { TelepactSchema } from '../TelepactSchema';
 import { selectStructFields } from '../internal/SelectStructFields';
 import { getInvalidErrorMessage } from '../internal/validation/GetInvalidErrorMessage';
 import { validateHeaders } from '../internal/validation/ValidateHeaders';
@@ -14,14 +14,14 @@ import { ValidateContext } from './validation/ValidateContext';
 
 export async function handleMessage(
     requestMessage: Message,
-    msgPactSchema: MsgPactSchema,
+    telepactSchema: TelepactSchema,
     handler: (message: Message) => Promise<Message>,
     onError: (error: Error) => void,
 ): Promise<Message> {
     const responseHeaders: Record<string, any> = {};
     const requestHeaders: Record<string, any> = requestMessage.headers;
     const requestBody: Record<string, any> = requestMessage.body;
-    const parsedMsgPactSchema: Record<string, VType> = msgPactSchema.parsed;
+    const parsedTelepactSchema: Record<string, VType> = telepactSchema.parsed;
     const requestEntry: [string, any] = Object.entries(requestBody)[0];
 
     const requestTargetInit = requestEntry[0];
@@ -29,7 +29,7 @@ export async function handleMessage(
 
     let unknownTarget: string | null;
     let requestTarget: string;
-    if (!(requestTargetInit in parsedMsgPactSchema)) {
+    if (!(requestTargetInit in parsedTelepactSchema)) {
         unknownTarget = requestTargetInit;
         requestTarget = 'fn.ping_';
     } else {
@@ -37,7 +37,7 @@ export async function handleMessage(
         requestTarget = requestTargetInit;
     }
 
-    const functionType = parsedMsgPactSchema[requestTarget] as VFn;
+    const functionType = parsedTelepactSchema[requestTarget] as VFn;
     const resultUnionType: VUnion = functionType.result;
 
     const callId = requestHeaders['id_'];
@@ -58,7 +58,7 @@ export async function handleMessage(
 
     const requestHeaderValidationFailures: ValidationFailure[] = validateHeaders(
         requestHeaders,
-        msgPactSchema.parsedRequestHeaders,
+        telepactSchema.parsedRequestHeaders,
         functionType,
     );
     if (requestHeaderValidationFailures.length > 0) {
@@ -136,7 +136,7 @@ export async function handleMessage(
     if (requestTarget === 'fn.ping_') {
         resultMessage = new Message({}, { Ok_: {} });
     } else if (requestTarget === 'fn.api_') {
-        resultMessage = new Message({}, { Ok_: { api: msgPactSchema.original } });
+        resultMessage = new Message({}, { Ok_: { api: telepactSchema.original } });
     } else {
         try {
             resultMessage = await handler(callMessage);
@@ -177,7 +177,7 @@ export async function handleMessage(
         }
         const responseHeaderValidationFailures: ValidationFailure[] = validateHeaders(
             finalResponseHeaders,
-            msgPactSchema.parsedResponseHeaders,
+            telepactSchema.parsedResponseHeaders,
             functionType,
         );
         if (responseHeaderValidationFailures.length > 0) {

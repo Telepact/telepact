@@ -1,14 +1,14 @@
 import { findSchemaKey } from '$lib';
-import type { MsgPactSchema } from './msgpact/index.esm';
+import type { TelepactSchema } from './telepact/index.esm';
 
-export function createJsonSchema(msgpact: MsgPactSchema): Record<string, any> {
-	let original = msgpact.full;
+export function createJsonSchema(telepact: TelepactSchema): Record<string, any> {
+	let original = telepact.full;
 
 	const definitions: any = {};
 
-	function convertType(msgpactType: any): any {
-		if (Array.isArray(msgpactType)) {
-			const [type, subType] = msgpactType;
+	function convertType(telepactType: any): any {
+		if (Array.isArray(telepactType)) {
+			const [type, subType] = telepactType;
 			switch (type) {
 				case 'array':
 					return { type: 'array', items: convertType(subType) };
@@ -29,14 +29,14 @@ export function createJsonSchema(msgpact: MsgPactSchema): Record<string, any> {
 					}
 					return { type };
 			}
-		} else if (typeof msgpactType === 'object') {
+		} else if (typeof telepactType === 'object') {
 			const properties: any = {};
-			for (const key in msgpactType) {
-				properties[key] = convertType(msgpactType[key]);
+			for (const key in telepactType) {
+				properties[key] = convertType(telepactType[key]);
 			}
 			return { type: 'object', properties, additionalProperties: false };
 		} else {
-			return { type: msgpactType };
+			return { type: telepactType };
 		}
 	}
 

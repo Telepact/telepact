@@ -1,2 +1,2 @@
-# MsgPact CLI
+# Telepact CLI
 TODO

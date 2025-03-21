@@ -8,8 +8,8 @@ node_modules
 !.env.example
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
-src/lib/msgpact
-src/lib/prettier-plugin-msgpact
+src/lib/telepact
+src/lib/prettier-plugin-telepact
 LICENSE
 NOTICE
 test-results

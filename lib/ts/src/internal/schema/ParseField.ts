@@ -1,6 +1,6 @@
 import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
 import { VFieldDeclaration } from '../types/VFieldDeclaration';
-import { MsgPactSchemaParseError } from '../../MsgPactSchemaParseError';
+import { TelepactSchemaParseError } from '../../TelepactSchemaParseError';
 import { getTypeUnexpectedParseFailure } from '../../internal/schema/GetTypeUnexpectedParseFailure';
 import { ParseContext } from '../../internal/schema/ParseContext';
 import { parseTypeDeclaration } from './ParseTypeDeclaration';
@@ -17,9 +17,9 @@ export function parseField(
     const matcher = fieldDeclaration.match(regex);
     if (!matcher) {
         const finalPath = [...path, fieldDeclaration];
-        throw new MsgPactSchemaParseError(
+        throw new TelepactSchemaParseError(
             [new SchemaParseFailure(ctx.documentName, finalPath, 'KeyRegexMatchFailed', { regex: regexString })],
-            ctx.msgpactSchemaDocumentNamesToJson,
+            ctx.telepactSchemaDocumentNamesToJson,
         );
     }
 
@@ -29,9 +29,9 @@ export function parseField(
     const thisPath = [...path, fieldName];
 
     if (!Array.isArray(typeDeclarationValue)) {
-        throw new MsgPactSchemaParseError(
+        throw new TelepactSchemaParseError(
             getTypeUnexpectedParseFailure(ctx.documentName, thisPath, typeDeclarationValue, 'Array'),
-            ctx.msgpactSchemaDocumentNamesToJson,
+            ctx.telepactSchemaDocumentNamesToJson,
         );
     }
     const typeDeclarationArray = typeDeclarationValue;

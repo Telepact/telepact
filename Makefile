@@ -56,16 +56,16 @@ clean-cli:
 	cd sdk/cli && make clean
 
 install-cli:
-	pipx install $(wildcard sdk/cli/dist/msgpact_cli-*.tar.gz)
+	pipx install $(wildcard sdk/cli/dist/telepact_cli-*.tar.gz)
 
 uninstall-cli:
-	pipx uninstall msgpact-cli
+	pipx uninstall telepact-cli
 
 prettier:
-	cd sdk/prettier-plugin-msgpact && make
+	cd sdk/prettier-plugin-telepact && make
 
 clean-prettier:
-	cd sdk/prettier-plugin-msgpact && make clean
+	cd sdk/prettier-plugin-telepact && make clean
 
 console:
 	cd sdk/console && make
@@ -92,25 +92,25 @@ clean-docker:
 	cd sdk/docker && make clean
 
 project-cli:
-	cd tool/msgpact_project_cli && make
+	cd tool/telepact_project_cli && make
 
 clean-project-cli:
-	cd tool/msgpact_project_cli && make clean
+	cd tool/telepact_project_cli && make clean
 
 install-project-cli:
-	pipx install $(wildcard tool/msgpact_project_cli/dist/msgpact_project_cli-*.tar.gz)
+	pipx install $(wildcard tool/telepact_project_cli/dist/telepact_project_cli-*.tar.gz)
 
 uninstall-project-cli:
-	pipx uninstall msgpact-project-cli
+	pipx uninstall telepact-project-cli
 
 version:
-	cd lib/java && msgpact-project set-version ${VERSION}
-	cd lib/py && msgpact-project set-version ${VERSION}
-	cd lib/ts && msgpact-project set-version ${VERSION}
-	cd bind/dart && msgpact-project set-version ${VERSION}
-	cd sdk/cli && msgpact-project set-version ${VERSION}
-	cd sdk/prettier-plugin-msgpact && msgpact-project set-version ${VERSION}
-	cd sdk/console && msgpact-project set-version ${VERSION}
+	cd lib/java && telepact-project set-version ${VERSION}
+	cd lib/py && telepact-project set-version ${VERSION}
+	cd lib/ts && telepact-project set-version ${VERSION}
+	cd bind/dart && telepact-project set-version ${VERSION}
+	cd sdk/cli && telepact-project set-version ${VERSION}
+	cd sdk/prettier-plugin-telepact && telepact-project set-version ${VERSION}
+	cd sdk/console && telepact-project set-version ${VERSION}
 
 license-header:
-	msgpact-project license-header LICENSE_HEADER.txt
+	telepact-project license-header LICENSE_HEADER.txt

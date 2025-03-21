@@ -1,7 +1,7 @@
 import { VError } from '../types/VError';
 import { VType } from '../types/VType';
 import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
-import { MsgPactSchemaParseError } from '../../MsgPactSchemaParseError';
+import { TelepactSchemaParseError } from '../../TelepactSchemaParseError';
 import { VFn } from '../types/VFn';
 import { getPathDocumentCoordinatesPseudoJson } from '../../internal/schema/GetPathDocumentCoordinatesPseudoJson';
 
@@ -66,6 +66,6 @@ export function applyErrorToParsedTypes(
     }
 
     if (parseFailures.length > 0) {
-        throw new MsgPactSchemaParseError(parseFailures, documentNamesToJson);
+        throw new TelepactSchemaParseError(parseFailures, documentNamesToJson);
     }
 }

@@ -7,7 +7,7 @@ const config: PlaywrightTestConfig = {
 			port: 3001
 		},
 		{
-			command: 'msgpact mock --port 8085 --dir tests/schema --generated-collection-length-min 2 --generated-collection-length-max 2',
+			command: 'telepact mock --port 8085 --dir tests/schema --generated-collection-length-min 2 --generated-collection-length-max 2',
 			port: 8085,
 			stdout: 'pipe'
 		}

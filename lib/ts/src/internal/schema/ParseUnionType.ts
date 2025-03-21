@@ -1,6 +1,6 @@
 import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
 import { VUnion } from '../types/VUnion';
-import { MsgPactSchemaParseError } from '../../MsgPactSchemaParseError';
+import { TelepactSchemaParseError } from '../../TelepactSchemaParseError';
 import { getTypeUnexpectedParseFailure } from '../../internal/schema/GetTypeUnexpectedParseFailure';
 import { parseStructFields } from '../../internal/schema/ParseStructFields';
 import { VStruct } from '../types/VStruct';
@@ -36,7 +36,7 @@ export function parseUnionType(
     if (!Array.isArray(defInit)) {
         const finalParseFailures = getTypeUnexpectedParseFailure(ctx.documentName, thisPath, defInit, 'Array');
         parseFailures.push(...finalParseFailures);
-        throw new MsgPactSchemaParseError(parseFailures, ctx.msgpactSchemaDocumentNamesToJson);
+        throw new TelepactSchemaParseError(parseFailures, ctx.telepactSchemaDocumentNamesToJson);
     }
 
     const definition2 = defInit;
@@ -54,7 +54,7 @@ export function parseUnionType(
     }
 
     if (parseFailures.length > 0) {
-        throw new MsgPactSchemaParseError(parseFailures, ctx.msgpactSchemaDocumentNamesToJson);
+        throw new TelepactSchemaParseError(parseFailures, ctx.telepactSchemaDocumentNamesToJson);
     }
 
     if (definition.length === 0) {
@@ -133,7 +133,7 @@ export function parseUnionType(
             tags[unionTag] = unionStruct;
             tagIndices[unionTag] = i;
         } catch (e) {
-            if (e instanceof MsgPactSchemaParseError) {
+            if (e instanceof TelepactSchemaParseError) {
                 parseFailures.push(...e.schemaParseFailures);
             } else {
                 throw e;
@@ -142,7 +142,7 @@ export function parseUnionType(
     }
 
     if (parseFailures.length > 0) {
-        throw new MsgPactSchemaParseError(parseFailures, ctx.msgpactSchemaDocumentNamesToJson);
+        throw new TelepactSchemaParseError(parseFailures, ctx.telepactSchemaDocumentNamesToJson);
     }
 
     return new VUnion(schemaKey, tags, tagIndices);

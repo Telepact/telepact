@@ -1,5 +1,5 @@
 dist/
 .venv/
-msgpact/json/
-msgpact/LICENSE
-msgpact/NOTICE
+telepact/json/
+telepact/LICENSE
+telepact/NOTICE

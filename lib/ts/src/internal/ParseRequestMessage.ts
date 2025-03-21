@@ -1,5 +1,5 @@
 import { Serializer } from '../Serializer';
-import { MsgPactSchema } from '../MsgPactSchema';
+import { TelepactSchema } from '../TelepactSchema';
 import { Message } from '../Message';
 import { BinaryEncoderUnavailableError } from '../internal/binary/BinaryEncoderUnavailableError';
 import { BinaryEncodingMissing } from '../internal/binary/BinaryEncodingMissing';
@@ -9,7 +9,7 @@ import { InvalidMessageBody } from '../internal/validation/InvalidMessageBody';
 export function parseRequestMessage(
     requestMessageBytes: Uint8Array,
     serializer: Serializer,
-    msgpactSchema: MsgPactSchema,
+    telepactSchema: TelepactSchema,
     onError: (error: Error) => void,
 ): Message {
     try {

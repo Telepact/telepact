@@ -11,11 +11,11 @@ module.exports = {
   plugins: [
     new CopyWebpackPlugin({
       patterns: [
-        { from: 'node_modules/msgpact-console/build/_app', to: '_app' },
+        { from: 'node_modules/telepact-console/build/_app', to: '_app' },
       ],
     }),    
     new HtmlWebpackPlugin({
-      template: 'node_modules/msgpact-console/build/index.html',
+      template: 'node_modules/telepact-console/build/index.html',
     }),
   ],
   devServer: {

@@ -1,6 +1,6 @@
 import { Message } from '../Message';
 import { Serializer } from '../Serializer';
-import { MsgPactError } from '../MsgPactError';
+import { TelepactError } from '../TelepactError';
 import { objectsAreEqual } from '../internal/ObjectsAreEqual';
 
 function timeoutPromise(timeoutMs: number): Promise<never> {
@@ -51,6 +51,6 @@ export async function processRequestObject(
 
         return responseMessage;
     } catch (e) {
-        throw new MsgPactError(e as Error);
+        throw new TelepactError(e as Error);
     }
 }

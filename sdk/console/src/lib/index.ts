@@ -1,13 +1,13 @@
 // place files you want to import through the `$lib` alias in this folder.
 import { goto } from '$app/navigation';
 import * as monaco from 'monaco-editor';
-import * as msgpact from './msgpact/index.esm.js';
-import { _internal } from './msgpact/index.esm.js';
+import * as telepact from './telepact/index.esm.js';
+import { _internal } from './telepact/index.esm.js';
 import { writable, type Writable } from 'svelte/store';
 import { createJsonSchema } from './jsonSchema';
 
-export function createJsonSchema2(msgpact: msgpact.MsgPactSchema): Record<string, any> {
-	return createJsonSchema(msgpact);
+export function createJsonSchema2(telepact: telepact.TelepactSchema): Record<string, any> {
+	return createJsonSchema(telepact);
 }
 
 export const responseStore: Writable<string | null> = writable(null);
@@ -29,7 +29,7 @@ export const stockPingResponse = `[
 ]
 `;
 
-const random = new msgpact.RandomGenerator(2, 2);
+const random = new telepact.RandomGenerator(2, 2);
 
 export function minifyJson(json: string, redactAuthHeader = false) {
 	let pseudoJson = JSON.parse(json);
@@ -79,12 +79,12 @@ export function handleRequest(request: string, viewQuery: string) {
 	goto(`?${q.toString()}`);
 }
 
-export function handleSubmitRequest(client: msgpact.Client, request: string) {
+export function handleSubmitRequest(client: telepact.Client, request: string) {
 	let requestPseudoJson = JSON.parse(request);
-	let requestMessage = new msgpact.Message(requestPseudoJson[0], requestPseudoJson[1]);
+	let requestMessage = new telepact.Message(requestPseudoJson[0], requestPseudoJson[1]);
 	client
 		.request(requestMessage)
-		.then((rs: msgpact.Message) => JSON.stringify([rs.headers, rs.body], null, 2))
+		.then((rs: telepact.Message) => JSON.stringify([rs.headers, rs.body], null, 2))
 		.then((res) => {
 			responseStore.set(res);
 		});
@@ -139,7 +139,7 @@ export function isHeaderData(data: any): data is HeaderData {
 	return (data as HeaderData).type === 'header';
 }
 
-export function generateExample(schemaKey: string, schemaInst: msgpact.MsgPactSchema) {
+export function generateExample(schemaKey: string, schemaInst: telepact.TelepactSchema) {
 	let example = schemaInst.parsed[schemaKey].generateRandomValue(
 		null,
 		false,
@@ -151,7 +151,7 @@ export function generateExample(schemaKey: string, schemaInst: msgpact.MsgPactSc
 
 export function generateFnResultExample(
 	fn: string,
-	schemaInst: msgpact.MsgPactSchema,
+	schemaInst: telepact.TelepactSchema,
 	blueprintValue: any,
 	useBlueprintValue: boolean
 ) {
@@ -167,7 +167,7 @@ export function generateFnResultExample(
 export function generateHeaderExample(
 	headerType: 'request' | 'response',
 	headers: string[],
-	schemaInst: msgpact.MsgPactSchema
+	schemaInst: telepact.TelepactSchema
 ) {
 	console.log(`schemaInst.parsedRequestHeaders ${Object.keys(schemaInst.parsedRequestHeaders)}`);
 	let genHeaders: Record<string, any> = {};
@@ -199,7 +199,7 @@ export function generateHeaderExample(
 export async function genExample(
 	fn: string,
 	headers: Array<string>,
-	schemaInst: msgpact.MsgPactSchema
+	schemaInst: telepact.TelepactSchema
 ) {
 	console.log(`Generating example for ${fn} with headers ${headers}`);
 	let example = schemaInst.parsed[fn].generateRandomValue(
@@ -221,15 +221,15 @@ export async function genExample(
 	let request = [requestHeaders, example];
 	let requestJson = JSON.stringify(request, null, 2);
 	let requestBytes = new TextEncoder().encode(requestJson);
-	let mockServerOptions = new msgpact.MockServerOptions();
-	let mockMsgPact = new msgpact.MockMsgPactSchema(
+	let mockServerOptions = new telepact.MockServerOptions();
+	let mockTelepact = new telepact.MockTelepactSchema(
 		schemaInst.original,
 		schemaInst.full,
 		schemaInst.parsed,
 		schemaInst.parsedRequestHeaders,
 		schemaInst.parsedResponseHeaders
 	);
-	let mockServer = new msgpact.MockServer(mockMsgPact, mockServerOptions);
+	let mockServer = new telepact.MockServer(mockTelepact, mockServerOptions);
 	let responseBytes = await mockServer.process(requestBytes);
 	try {
 		let responseJson = new TextDecoder().decode(responseBytes);
@@ -258,9 +258,9 @@ export async function genExample(
 	}
 }
 
-export function parseMsgPactSchema(
+export function parseTelepactSchema(
 	schema: any[],
-	schemaInst: msgpact.MsgPactSchema,
+	schemaInst: telepact.TelepactSchema,
 	sortDocCardsAZ: boolean,
 	showInternalApi: boolean
 ): TypeData[] {
@@ -325,7 +325,7 @@ export function parseMsgPactSchema(
 					false,
 					true,
 					schemaKey,
-					new msgpact.RandomGenerator(2, 2)
+					new telepact.RandomGenerator(2, 2)
 				)
 			);
 			let exampleCallJson = JSON.stringify([{}, exampleCall]);
@@ -417,8 +417,8 @@ monaco.languages.typescript.typescriptDefaults.setEagerModelSync(true);
 // 	schemas: [
 // 		{
 // 			uri: 'internal://server/jsonschema.json',
-// 			fileMatch: ['schema.msgpact.json'],
-// 			schema: msgpact.jsonSchema
+// 			fileMatch: ['schema.telepact.json'],
+// 			schema: telepact.jsonSchema
 // 		}
 // 	]
 // });

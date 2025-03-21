@@ -1,12 +1,12 @@
 {
     "tabWidth": 4,
     "printWidth": 120,
-    "plugins": ["prettier-plugin-msgpact"],
+    "plugins": ["prettier-plugin-telepact"],
     "overrides": [
         {
-            "files": "*.msgpact.json",
+            "files": "*.telepact.json",
             "options": {
-                "parser": "msgpact-parse"
+                "parser": "telepact-parse"
             }
         },
         {

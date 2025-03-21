@@ -21,8 +21,8 @@ test.describe('Loading from demo server', () => {
 	test.beforeEach(async ({ page }) => {
 		await page.goto('/');
 		await expect(
-			page.getByRole('heading', { name: 'MsgPact' }),
-			"Page should have a heading with the text 'MsgPact'"
+			page.getByRole('heading', { name: 'Telepact' }),
+			"Page should have a heading with the text 'Telepact'"
 		).toBeVisible();
 		
 		let source = page.getByRole('textbox', { name: 'Source' });

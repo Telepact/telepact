@@ -1,14 +1,14 @@
 .PHONY: all dep
 
 all: dep
-	cp ../../../lib/py/dist/*.tar.gz msgpact.tar.gz
+	cp ../../../lib/py/dist/*.tar.gz telepact.tar.gz
 
 	poetry lock
-	poetry remove msgpact || echo "no-op"
-	poetry add ./msgpact.tar.gz
+	poetry remove telepact || echo "no-op"
+	poetry add ./telepact.tar.gz
 	poetry install
 
-	msgpact codegen --schema-dir ../../runner/schema/example --lang py --out msgpact_test/gen
+	telepact codegen --schema-dir ../../runner/schema/example --lang py --out telepact_test/gen
 
 
 dep:

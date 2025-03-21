@@ -1,5 +1,5 @@
 [project]
-name = "msgpacttest"
+name = "telepacttest"
 version = "0.1.0"
 description = ""
 requires-python = ">=3.11"
@@ -17,7 +17,7 @@ build = "*"
 msgpack = "*"
 nats-py = "*"
 prometheus-client = "*"
-msgpact = {path = "msgpact.tar.gz"}
+telepact = {path = "telepact.tar.gz"}
 
 [tool.poetry.group.dev.dependencies]
 pytest = "*"

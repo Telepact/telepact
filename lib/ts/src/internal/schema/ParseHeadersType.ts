@@ -1,4 +1,4 @@
-import { MsgPactSchemaParseError } from '../../MsgPactSchemaParseError';
+import { TelepactSchemaParseError } from '../../TelepactSchemaParseError';
 import { getTypeUnexpectedParseFailure } from '../../internal/schema/GetTypeUnexpectedParseFailure';
 import { VFieldDeclaration } from '../types/VFieldDeclaration';
 import { ParseContext } from '../../internal/schema/ParseContext';
@@ -44,7 +44,7 @@ export function parseHeadersType(
 
             Object.assign(requestHeaders, requestFields);
         } catch (e) {
-            if (e instanceof MsgPactSchemaParseError) {
+            if (e instanceof TelepactSchemaParseError) {
                 parseFailures.push(...e.schemaParseFailures);
             } else {
                 throw e;
@@ -89,7 +89,7 @@ export function parseHeadersType(
 
             Object.assign(responseHeaders, responseFields);
         } catch (e) {
-            if (e instanceof MsgPactSchemaParseError) {
+            if (e instanceof TelepactSchemaParseError) {
                 parseFailures.push(...e.schemaParseFailures);
             } else {
                 throw e;
@@ -98,7 +98,7 @@ export function parseHeadersType(
     }
 
     if (parseFailures.length > 0) {
-        throw new MsgPactSchemaParseError(parseFailures, ctx.msgpactSchemaDocumentNamesToJson);
+        throw new TelepactSchemaParseError(parseFailures, ctx.telepactSchemaDocumentNamesToJson);
     }
 
     return new VHeaders(schemaKey, requestHeaders, responseHeaders);

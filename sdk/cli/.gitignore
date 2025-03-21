@@ -1,6 +1,6 @@
 dist/
 .venv/
-msgpact_cli/LICENSE
-msgpact_cli/NOTICE
-msgpact_cli/msgpact
+telepact_cli/LICENSE
+telepact_cli/NOTICE
+telepact_cli/telepact
 tmp/

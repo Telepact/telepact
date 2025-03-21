@@ -1,5 +1,5 @@
 import {
-    MsgPactSchemaParseError,
+    TelepactSchemaParseError,
     Client,
     ClientOptions,
     Server,
@@ -9,10 +9,10 @@ import {
     Serializer,
     MockServer,
     MockServerOptions,
-    MsgPactSchema,
-    MockMsgPactSchema,
-    MsgPactSchemaFiles
-} from "msgpact";
+    TelepactSchema,
+    MockTelepactSchema,
+    TelepactSchemaFiles
+} from "telepact";
 import { NatsConnection, connect, Subscription } from "nats";
 import * as fs from "fs";
 import * as path from 'path';
@@ -161,7 +161,7 @@ function startMockTestServer(
     frontdoorTopic: string,
     config: Record<string, any>,
 ): Subscription {
-    const msgPact = MockMsgPactSchema.fromDirectory(apiSchemaPath, fs, path);
+    const telepact = MockTelepactSchema.fromDirectory(apiSchemaPath, fs, path);
 
     const options: MockServerOptions = new MockServerOptions();
     options.onError = (e: Error) => console.error(e);
@@ -175,7 +175,7 @@ function startMockTestServer(
 
     const timer = registry.createTimer(frontdoorTopic);
 
-    const server: MockServer = new MockServer(msgPact, options); // Assuming MockServer constructor requires msgPact and options
+    const server: MockServer = new MockServer(telepact, options); // Assuming MockServer constructor requires telepact and options
 
     const subscription: Subscription = connection.subscribe(frontdoorTopic);
     (async () => {
@@ -208,7 +208,7 @@ function startSchemaTestServer(
     frontdoorTopic: string,
     config?: Record<string, any>,
 ): Subscription {
-    const msgPact: MsgPactSchema = MsgPactSchema.fromDirectory(apiSchemaPath, fs, path);
+    const telepact: TelepactSchema = TelepactSchema.fromDirectory(apiSchemaPath, fs, path);
 
     const timer = registry.createTimer(frontdoorTopic);
 
@@ -227,18 +227,18 @@ function startSchemaTestServer(
                 const extendJson = unionValue["extend!"];
 
                 if (extendJson != null) {
-                    MsgPactSchema.fromFileJsonMap({'default': schemaJson, 'extend': extendJson});
+                    TelepactSchema.fromFileJsonMap({'default': schemaJson, 'extend': extendJson});
                 } else {
-                    MsgPactSchema.fromJson(schemaJson);
+                    TelepactSchema.fromJson(schemaJson);
                 }
             } else if (inputTag === "Json") {
                 const unionValue = input[inputTag];
                 const schemaJson = unionValue["schema"];
-                MsgPactSchema.fromJson(schemaJson);
+                TelepactSchema.fromJson(schemaJson);
             } else if (inputTag === "Directory") {
                 const unionValue = input[inputTag];
                 const schemaDirectory = unionValue["schemaDirectory"];
-                MsgPactSchema.fromDirectory(schemaDirectory, fs, path);
+                TelepactSchema.fromDirectory(schemaDirectory, fs, path);
             } else {
                 throw new Error("Invalid input tag");
             }
@@ -248,7 +248,7 @@ function startSchemaTestServer(
                 {},
                 {
                     ErrorValidationFailure: {
-                        cases: (e as MsgPactSchemaParseError).schemaParseFailuresPseudoJson,
+                        cases: (e as TelepactSchemaParseError).schemaParseFailuresPseudoJson,
                     },
                 },
             );
@@ -261,7 +261,7 @@ function startSchemaTestServer(
     options.onError = (e: Error) => console.error(e);
     options.authRequired = false;
 
-    const server: Server = new Server(msgPact, handler, options);
+    const server: Server = new Server(telepact, handler, options);
 
     const sub: Subscription = connection.subscribe(frontdoorTopic);
     (async () => {
@@ -296,7 +296,7 @@ function startTestServer(
     authRequired: boolean,
     useCodegen: boolean
 ): Subscription {
-    const files = new MsgPactSchemaFiles(apiSchemaPath, fs, path);
+    const files = new TelepactSchemaFiles(apiSchemaPath, fs, path);
     const alternateMap: Record<string, string> = { ...files.filenamesToJson };
     alternateMap['backwardsCompatibleChange'] = `
         [
@@ -306,8 +306,8 @@ function startTestServer(
         ]
     `;
 
-    const msgPact: MsgPactSchema = MsgPactSchema.fromFileJsonMap(files.filenamesToJson);
-    const alternateMsgPact: MsgPactSchema = MsgPactSchema.fromFileJsonMap(alternateMap);
+    const telepact: TelepactSchema = TelepactSchema.fromFileJsonMap(files.filenamesToJson);
+    const alternateTelepact: TelepactSchema = TelepactSchema.fromFileJsonMap(alternateMap);
 
     const timer = registry.createTimer(frontdoorTopic);
     const serveAlternateServer = { value: false };
@@ -372,12 +372,12 @@ function startTestServer(
     };
     options.authRequired = authRequired;
 
-    const server: Server = new Server(msgPact, handler, options);
+    const server: Server = new Server(telepact, handler, options);
 
     const alternateOptions = new ServerOptions();
     alternateOptions.onError = (e) => console.error(e);
     alternateOptions.authRequired = authRequired;
-    const alternateServer: Server = new Server(alternateMsgPact, handler, alternateOptions);
+    const alternateServer: Server = new Server(alternateTelepact, handler, alternateOptions);
 
     const subscription: Subscription = connection.subscribe(frontdoorTopic);
     (async () => {

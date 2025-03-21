@@ -2,12 +2,12 @@
 
 ## Why have both optional and nullable fields?
 
-MsgPact allows API designers to mark a field as optional (the field might be
+Telepact allows API designers to mark a field as optional (the field might be
 omitted) as well as mark the field type as nullable (the field might appear with
 a null value).
 
 These design options are both present to maximize the design expressiveness of
-the API. MsgPact leverages optionality to accomplish the expressiveness of
+the API. Telepact leverages optionality to accomplish the expressiveness of
 `undefined` in languages like TypeScript. While `null` is a value that can be
 passed around like a string or number, `undefined` or optionality can not be
 passed around but is rather an incidental property of the shape of the data
@@ -16,9 +16,9 @@ to erase just one field of a model, where null can be used to indicate the
 erasure of data, and optionality can be used to omit all fields except the one
 field you want to erase.
 
-## Why do functions in MsgPact not support positional arguments?
+## Why do functions in Telepact not support positional arguments?
 
-MsgPact functions are automatically associated with an argument struct and a
+Telepact functions are automatically associated with an argument struct and a
 result struct that API designers can use to define colloquial arguments and
 return values, respectively. The colloquial arguments being supplied via the
 argument struct will be inherently unordered due to the nature of JSON objects,
@@ -35,18 +35,18 @@ fields.
 
 ## Why is there no Enum type like seen in C or Java?
 
-MsgPact achieves enumerated types with unions, which are very similar to enums as
+Telepact achieves enumerated types with unions, which are very similar to enums as
 seen in C or Java, except that a struct is automatically attached to each value.
 The traditional enum can be approximated by simply leaving all union structs
 blank.
 
 ## Why force servers to perform response validation?
 
-MsgPact automatically performs validation of responses against the MsgPact schema, and
+Telepact automatically performs validation of responses against the Telepact schema, and
 there is no setting for servers to turn off this behavior.
 
 This design decision is intentional. It helps maintain the high standard of type
-safety in the MsgPact ecosystem by denying API providers the option to respond to
+safety in the Telepact ecosystem by denying API providers the option to respond to
 malformed data as an inconvenience and are instead forced to deal with hard
 failures through bug reports. Hard failures also help draw attention to type
 safety deficits early in the development phase.
@@ -58,8 +58,8 @@ to turn off this response validation by submitting their requests with the
 
 ## If all I want is compact binary serialization, why not just use gRPC?
 
-MsgPact and gRPC both have compact binary serialization for drastically improved
-efficiency over conventional serialization such as JSON. However, MsgPact brings a
+Telepact and gRPC both have compact binary serialization for drastically improved
+efficiency over conventional serialization such as JSON. However, Telepact brings a
 critical new innovation to the space of RPC and binary serialization in that it
 _does not leak the ABI into the API_.
 
@@ -76,9 +76,9 @@ need to guard against interface drift between the API and the ABI, typically by
 complying with a set of policies concerning how those field ids are defined and
 how they can change.
 
-MsgPact breaks free from the conventional practice of defining and maintaining
+Telepact breaks free from the conventional practice of defining and maintaining
 field ids, and instead accomplishes client and server agreement over field ids
-through a client-server handshake at runtime. In consequence, MsgPact boasts a far
+through a client-server handshake at runtime. In consequence, Telepact boasts a far
 simpler developer experience during the API design phase as well as the unique
 privilege of allowing clients to leverage binary serialization without generated
 code.
@@ -94,18 +94,18 @@ readability and recognition of errors.
 ## Why can't I associate a union tag to something besides a struct?
 
 A designer might want to treat a union tag like a struct field, and associate
-any data type with a tag. However, in MsgPact, all tags in unions are associated
+any data type with a tag. However, in Telepact, all tags in unions are associated
 with a struct, which means you can't associate union tags with simpler data
 types, like booleans or strings.
 
-This restriction is in place to uphold MsgPact's value of prioritizing effective
+This restriction is in place to uphold Telepact's value of prioritizing effective
 software evolution. Unions, like functions, are entrypoints to unique execution
 paths in software, so if software evolves such that an execution path requires a
 new "argument" like a integer, that requirement will percolate up to the
 entrypoint. If the proverbial API designer chose to associate the union tag
 directly to a boolean, the API would require a breaking change in the form of
 creating another tag to make room for this new integer "argument" to sit next to
-the original boolean. In contrast, MsgPact establishing the expectation that all
+the original boolean. In contrast, Telepact establishing the expectation that all
 union tags are associated with structs means the backwards compatible option of
 adding a new struct field is always available to software designers dealing with
 the needs of evolving software.
@@ -117,7 +117,7 @@ structs, but not the argument struct included with function definitions.
 
 The function type exists so that API providers may incorporate "links" into
 their API design, such that the appearance of a function type payload can simply
-be copied and pasted verbatim into the body a new message. Tooling like the MsgPact
+be copied and pasted verbatim into the body a new message. Tooling like the Telepact
 console specifically utilizes this technique to allow end-users to "click
 through" graphs designed by the API provider.
 

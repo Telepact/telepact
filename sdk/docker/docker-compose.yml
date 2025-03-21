@@ -9,7 +9,7 @@ services:
       - ./schema:/app/schema
     environment:
       PYTHONUNBUFFERED: 1
-      MSGPACT_DIRECTORY: /app/schema
+      TELEPACT_DIRECTORY: /app/schema
 
   app2:
     build: .
@@ -17,6 +17,6 @@ services:
       - "8082:8080"
     environment:
       PYTHONUNBUFFERED: 1
-      MSGPACT_HTTP_URL: http://app:8080/api
+      TELEPACT_HTTP_URL: http://app:8080/api
       
 

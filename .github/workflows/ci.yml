@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-msgpact-ts:
+  build-telepact-ts:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -21,11 +21,11 @@ jobs:
       - name: Upload ts build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: build-msgpact-ts
+          name: build-telepact-ts
           path: lib/ts/dist
           retention-days: 1
 
-  build-msgpact-java:
+  build-telepact-java:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -43,11 +43,11 @@ jobs:
       - name: Upload java build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: build-msgpact-java
+          name: build-telepact-java
           path: lib/java/target
           retention-days: 1
 
-  build-msgpact-py:
+  build-telepact-py:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -72,13 +72,13 @@ jobs:
       - name: Upload py build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: build-msgpact-py
+          name: build-telepact-py
           path: lib/py/dist
           retention-days: 1
 
-  build-msgpact-cli:
+  build-telepact-cli:
     runs-on: ubuntu-latest
-    needs: [build-msgpact-py]
+    needs: [build-telepact-py]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -99,22 +99,22 @@ jobs:
       - name: Download py build artifacts
         uses: actions/download-artifact@v4
         with:
-          name: build-msgpact-py
+          name: build-telepact-py
           path: lib/py/dist
 
       - name: Build cli
         run: make cli
 
-      - name: Upload msgpact-cli build artifacts
+      - name: Upload telepact-cli build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: build-msgpact-cli
+          name: build-telepact-cli
           path: sdk/cli/dist
           retention-days: 1
 
-  build-msgpact-dart:
+  build-telepact-dart:
     runs-on: ubuntu-latest
-    needs: [build-msgpact-ts]
+    needs: [build-telepact-ts]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -132,7 +132,7 @@ jobs:
       - name: Download ts build artifacts
         uses: actions/download-artifact@v4
         with:
-          name: build-msgpact-ts
+          name: build-telepact-ts
           path: lib/ts/dist
 
       - name: Build dart
@@ -141,7 +141,7 @@ jobs:
       - name: Run tests
         run: make test-dart
 
-  build-msgpact-prettier:
+  build-telepact-prettier:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -153,13 +153,13 @@ jobs:
       - name: Upload prettier build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: build-msgpact-prettier
-          path: sdk/prettier-plugin-msgpact/dist
+          name: build-telepact-prettier
+          path: sdk/prettier-plugin-telepact/dist
           retention-days: 1
 
-  build-msgpact-console:
+  build-telepact-console:
     runs-on: ubuntu-latest
-    needs: [build-msgpact-ts, build-msgpact-cli, build-msgpact-prettier]
+    needs: [build-telepact-ts, build-telepact-cli, build-telepact-prettier]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -167,20 +167,20 @@ jobs:
       - name: Download ts build artifacts
         uses: actions/download-artifact@v4
         with:
-          name: build-msgpact-ts
+          name: build-telepact-ts
           path: lib/ts/dist
 
-      - name: Download msgpact-cli build artifacts
+      - name: Download telepact-cli build artifacts
         uses: actions/download-artifact@v4
         with:
-          name: build-msgpact-cli
+          name: build-telepact-cli
           path: sdk/cli/dist
 
       - name: Download prettier build artifacts
         uses: actions/download-artifact@v4
         with:
-          name: build-msgpact-prettier
-          path: sdk/prettier-plugin-msgpact/dist
+          name: build-telepact-prettier
+          path: sdk/prettier-plugin-telepact/dist
       
       - name: Install CLI
         run: make install-cli
@@ -194,17 +194,17 @@ jobs:
       - name: Run tests
         run: DEBUG=pw:api make test-console
 
-  build-msgpact-docker:
+  build-telepact-docker:
     runs-on: ubuntu-latest
-    needs: [build-msgpact-cli]
+    needs: [build-telepact-cli]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Download msgpact-cli build artifacts
+      - name: Download telepact-cli build artifacts
         uses: actions/download-artifact@v4
         with:
-          name: build-msgpact-cli
+          name: build-telepact-cli
           path: sdk/cli/dist
 
       - name: Build Docker image
@@ -215,7 +215,7 @@ jobs:
 
   run-tests:
     runs-on: ubuntu-latest
-    needs: [build-msgpact-ts, build-msgpact-java, build-msgpact-py, build-msgpact-cli]
+    needs: [build-telepact-ts, build-telepact-java, build-telepact-py, build-telepact-cli]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -247,25 +247,25 @@ jobs:
       - name: Download ts build artifacts
         uses: actions/download-artifact@v4
         with:
-          name: build-msgpact-ts
+          name: build-telepact-ts
           path: lib/ts/dist
 
       - name: Download java build artifacts
         uses: actions/download-artifact@v4
         with:
-          name: build-msgpact-java
+          name: build-telepact-java
           path: lib/java/target
 
       - name: Download py build artifacts
         uses: actions/download-artifact@v4
         with:
-          name: build-msgpact-py
+          name: build-telepact-py
           path: lib/py/dist
 
-      - name: Download msgpact-cli build artifacts
+      - name: Download telepact-cli build artifacts
         uses: actions/download-artifact@v4
         with:
-          name: build-msgpact-cli
+          name: build-telepact-cli
           path: sdk/cli/dist
 
       - name: Install CLI

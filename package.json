@@ -1,13 +1,13 @@
 {
-    "name": "msgpact",
+    "name": "telepact",
     "private": true,
     "devDependencies": {
         "prettier": "3.2.5"
     },
     "dependencies": {
-        "prettier-plugin-msgpact": "workspace:*"
+        "prettier-plugin-telepact": "workspace:*"
     },
     "workspaces": [
-        "tool/prettier-plugin-msgpact"
+        "tool/prettier-plugin-telepact"
     ]
 }

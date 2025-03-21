@@ -22,7 +22,7 @@ async function copyDir(src, dest) {
     return {
       name: 'copy-files',
       writeBundle: async () => {
-        const srcDir = resolve(__dirname, 'node_modules/msgpact-console/build');
+        const srcDir = resolve(__dirname, 'node_modules/telepact-console/build');
         const destDir = resolve(__dirname, 'dist');
         await copyDir(srcDir, destDir);
         //throw new Error('Interrupted');

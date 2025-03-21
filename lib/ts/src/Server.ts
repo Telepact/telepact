@@ -2,7 +2,7 @@ import { DefaultSerialization } from './DefaultSerialization';
 import { Serializer } from './Serializer';
 import { ServerBinaryEncoder } from './internal/binary/ServerBinaryEncoder';
 import { Message } from './Message';
-import { MsgPactSchema } from './MsgPactSchema';
+import { TelepactSchema } from './TelepactSchema';
 import { constructBinaryEncoding } from './internal/binary/ConstructBinaryEncoding';
 import { processBytes } from './internal/ProcessBytes';
 
@@ -11,22 +11,22 @@ export class Server {
     onError: (error: any) => void;
     onRequest: (message: Message) => void;
     onResponse: (message: Message) => void;
-    msgPactSchema: MsgPactSchema;
+    telepactSchema: TelepactSchema;
     serializer: Serializer;
 
-    constructor(msgPactSchema: MsgPactSchema, handler: (message: Message) => Promise<Message>, options: ServerOptions) {
+    constructor(telepactSchema: TelepactSchema, handler: (message: Message) => Promise<Message>, options: ServerOptions) {
         this.handler = handler;
         this.onError = options.onError;
         this.onRequest = options.onRequest;
         this.onResponse = options.onResponse;
 
-        this.msgPactSchema = msgPactSchema;
+        this.telepactSchema = telepactSchema;
 
-        const binaryEncoding = constructBinaryEncoding(this.msgPactSchema);
+        const binaryEncoding = constructBinaryEncoding(this.telepactSchema);
         const binaryEncoder = new ServerBinaryEncoder(binaryEncoding);
         this.serializer = new Serializer(options.serialization, binaryEncoder);
 
-        if (!('struct.Auth_' in this.msgPactSchema.parsed) && options.authRequired) {
+        if (!('struct.Auth_' in this.telepactSchema.parsed) && options.authRequired) {
             throw new Error(
                 'Unauthenticated server. Either define a non-empty `struct._Auth` in your schema or set `options.authRequired` to `false`.',
             );
@@ -37,7 +37,7 @@ export class Server {
         return await processBytes(
             requestMessageBytes,
             this.serializer,
-            this.msgPactSchema,
+            this.telepactSchema,
             this.onError,
             this.onRequest,
             this.onResponse,

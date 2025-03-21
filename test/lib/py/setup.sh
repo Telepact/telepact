@@ -1,4 +1,4 @@
 make
 
-poetry run python -m msgpact_test
+poetry run python -m telepact_test
 

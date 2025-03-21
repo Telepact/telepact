@@ -1,6 +1,6 @@
 import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
 import { VError } from '../types/VError';
-import { MsgPactSchemaParseError } from '../../MsgPactSchemaParseError';
+import { TelepactSchemaParseError } from '../../TelepactSchemaParseError';
 import { parseUnionType } from '../../internal/schema/ParseUnionType';
 import { ParseContext } from '../../internal/schema/ParseContext';
 
@@ -22,7 +22,7 @@ export function parseErrorType(
     }
 
     if (parseFailures.length > 0) {
-        throw new MsgPactSchemaParseError(parseFailures, ctx.msgpactSchemaDocumentNamesToJson);
+        throw new TelepactSchemaParseError(parseFailures, ctx.telepactSchemaDocumentNamesToJson);
     }
 
     const error = parseUnionType(path, errorDefinitionAsParsedJson, schemaKey, [], [], ctx);

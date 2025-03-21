@@ -6,14 +6,14 @@ import {
 	ServerOptions,
 	Server,
 	Serializer,
-	MsgPactSchema,
+	TelepactSchema,
 	Message,
-	MockMsgPactSchema
-} from '$lib/msgpact/index.esm';
+	MockTelepactSchema
+} from '$lib/telepact/index.esm';
 import type { LayoutLoad } from './$types';
-import demoSchemaPseudoJson from './demo.msgpact.json';
+import demoSchemaPseudoJson from './demo.telepact.json';
 import prettier from 'prettier/standalone';
-import msgpactPlugin from '$lib/prettier-plugin-msgpact/index.esm';
+import telepactPlugin from '$lib/prettier-plugin-telepact/index.esm';
 import markdownPlugin from 'prettier/plugins/markdown';
 import estreePlugin from 'prettier/plugins/estree';
 import babelPlugin from 'prettier/plugins/babel';
@@ -47,7 +47,7 @@ export const load: LayoutLoad = async ({ url, params, route, fetch }) => {
 	if (schemaSource === '') {
 		let schemaDraft = (url.searchParams.get('sd') as string) ?? '[{"info.Example":{}}]';
 
-		let msgpactSchema = MockMsgPactSchema.fromJson(schemaDraft);
+		let telepactSchema = MockTelepactSchema.fromJson(schemaDraft);
 
 		let mockServerOptions = new MockServerOptions();
 		mockServerOptions.generatedCollectionLengthMin = 2;
@@ -55,7 +55,7 @@ export const load: LayoutLoad = async ({ url, params, route, fetch }) => {
 		mockServerOptions.onError = (e) => {
 			console.log(e);
 		};
-		let mockServer = new MockServer(msgpactSchema, mockServerOptions);
+		let mockServer = new MockServer(telepactSchema, mockServerOptions);
 
 		let mockClient = new Client(async (m: Message, s: Serializer) => {
 			let req = s.serialize(m);
@@ -93,7 +93,7 @@ export const load: LayoutLoad = async ({ url, params, route, fetch }) => {
 			readonlyEditor: true
 		};
 	} else if (schemaSource === 'demo') {
-		let msgpactSchema = MsgPactSchema.fromJson(JSON.stringify(demoSchemaPseudoJson));
+		let telepactSchema = TelepactSchema.fromJson(JSON.stringify(demoSchemaPseudoJson));
 
 		let serverOptions = new ServerOptions();
 		serverOptions.authRequired = false;
@@ -124,7 +124,7 @@ export const load: LayoutLoad = async ({ url, params, route, fetch }) => {
 				throw new Error('Not implemented');
 			}
 		};
-		let server = new Server(msgpactSchema, handler, serverOptions);
+		let server = new Server(telepactSchema, handler, serverOptions);
 
 		let client = new Client(async (m: Message, s: Serializer) => {
 			let req = s.serialize(m);
@@ -154,8 +154,8 @@ export const load: LayoutLoad = async ({ url, params, route, fetch }) => {
 				console.log(`Failed to get schema: ${e}`);
 			});
 
-		const finalFullMsgPactSchemaRef = schemaPseudoJson.then((e) =>
-			MsgPactSchema.fromJson(JSON.stringify(e, null, 2))
+		const finalFullTelepactSchemaRef = schemaPseudoJson.then((e) =>
+			TelepactSchema.fromJson(JSON.stringify(e, null, 2))
 		);
 
 		const filteredSchemaPseudoJson = schemaPseudoJson.then((e) =>
@@ -179,16 +179,16 @@ export const load: LayoutLoad = async ({ url, params, route, fetch }) => {
 			console.log(`Successfully got schema from ${schemaSource}`);
 			let filteredJson = JSON.stringify(e, null, 2);
 			return prettier.format(filteredJson, {
-				parser: 'msgpact-parse',
+				parser: 'telepact-parse',
 				printWidth: 78,
 				proseWrap: 'always',
-				plugins: [babelPlugin, estreePlugin, markdownPlugin, msgpactPlugin]
+				plugins: [babelPlugin, estreePlugin, markdownPlugin, telepactPlugin]
 			});
 		});
 
 		return {
 			...result,
-			fullMsgPactSchemaRef: finalFullMsgPactSchemaRef,
+			fullTelepactSchemaRef: finalFullTelepactSchemaRef,
 			filteredSchemaPseudoJson: filteredSchemaPseudoJson,
 			schemaDraft: formattedSchemaDraft,
 			authManaged: authManaged

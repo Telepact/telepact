@@ -6,12 +6,12 @@ ENV PATH="/root/.local/bin:${PATH}"
 
 WORKDIR /app
 
-COPY msgpact_cli.tar.gz msgpact_cli.tar.gz
+COPY telepact_cli.tar.gz telepact_cli.tar.gz
 
-RUN pipx install msgpact_cli.tar.gz
+RUN pipx install telepact_cli.tar.gz
 
-RUN which msgpact
+RUN which telepact
 
 EXPOSE 8080
 
-CMD ["msgpact", "mock"]
+CMD ["telepact", "mock"]
