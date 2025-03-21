@@ -227,7 +227,7 @@ def license_header(license_header_path):
         if first_non_header_index is not None:
             lines = lines[(first_non_header_index + 1) + 1:]
 
-        max_length = max(len(line.strip()) for line in license_header) + 1
+        max_length = max(len(line.strip()) for line in license_header) + 2
         license_text = ''.join([f"{start_comment_syntax}|  {line.strip().ljust(max_length)}{end_comment_syntax}\n" for line in license_header])
 
         new_banner = ""
