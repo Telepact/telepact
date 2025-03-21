@@ -82,7 +82,8 @@ public class MockServer {
     /**
      * Create a mock server with the given telepact Schema.
      * 
-     * @param telepactSchemaAsJson
+     * @param mockTelepactSchema the mock telepact schema
+     * @param options the options for the mock server
      */
     public MockServer(MockTelepactSchema mockTelepactSchema, Options options) {
         this.random = new RandomGenerator(options.generatedCollectionLengthMin, options.generatedCollectionLengthMax);
@@ -103,8 +104,8 @@ public class MockServer {
     /**
      * Process a given telepact Request Message into a telepact Response Message.
      * 
-     * @param requestMessageBytes
-     * @return
+     * @param message the request message bytes
+     * @return the response message bytes
      */
     public byte[] process(byte[] message) {
         return this.server.process(message);

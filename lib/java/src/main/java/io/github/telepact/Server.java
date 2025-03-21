@@ -23,7 +23,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import io.github.telepact.internal.binary.ServerBinaryEncoder;
-import io.github.telepact.internal.types.VStruct;
 
 /**
  * A telepact Server.
@@ -75,8 +74,9 @@ public class Server {
     /**
      * Create a server with the given telepact schema and handler.
      * 
-     * @param telepactSchemaAsJson
-     * @param handler
+     * @param telepactSchema The schema to be used by the server.
+     * @param handler The function to handle incoming messages.
+     * @param options The options for configuring the server.
      */
     public Server(TelepactSchema telepactSchema, Function<Message, Message> handler, Options options) {
         this.handler = handler;
@@ -98,8 +98,8 @@ public class Server {
     /**
      * Process a given telepact Request Message into a telepact Response Message.
      * 
-     * @param requestMessageBytes
-     * @return
+     * @param requestMessageBytes The bytes of the request message to be processed.
+     * @return The bytes of the response message.
      */
     public byte[] process(byte[] requestMessageBytes) {
         return processBytes(requestMessageBytes, this.serializer, this.telepactSchema, this.onError,

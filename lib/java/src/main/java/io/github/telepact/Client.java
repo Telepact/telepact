@@ -85,7 +85,8 @@ public class Client {
      * };
      * </pre>
      * 
-     * @param adapter
+     * @param adapter The transport adapter function.
+     * @param options The client options.
      */
     public Client(BiFunction<Message, Serializer, Future<Message>> adapter, Options options) {
         this.adapter = adapter;
@@ -99,8 +100,8 @@ public class Client {
     /**
      * Submit a telepact Request Message. Returns a telepact Response Message.
      * 
-     * @param request
-     * @return
+     * @param requestMessage The request message to be sent.
+     * @return The response message received.
      */
     public Message request(Message requestMessage) {
         return processRequestObject(requestMessage, this.adapter, this.serializer,
