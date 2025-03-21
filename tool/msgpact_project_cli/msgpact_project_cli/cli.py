@@ -216,12 +216,6 @@ def license_header(license_header_path):
 
         original_content = ''.join(lines)
 
-        start_license_header_index = None
-        end_license_header_index = None
-
-        header_start = '---'
-        header_end   = '---'
-
         first_non_header_index = None
 
         for i, line in enumerate(lines):
@@ -233,9 +227,13 @@ def license_header(license_header_path):
         if first_non_header_index is not None:
             lines = lines[(first_non_header_index + 1) + 1:]
 
-        max_length = max(len(line.strip()) for line in license_header)
-        license_text = ''.join([f"{start_comment_syntax}  {line.strip().ljust(max_length)} {end_comment_syntax}\n" for line in license_header])
-        new_banner = f"{start_comment_syntax}  {header_start.ljust(max_length)} {end_comment_syntax}\n{license_text.strip()}\n{start_comment_syntax}  {header_end.ljust(max_length)} {end_comment_syntax}\n\n"
+        max_length = max(len(line.strip()) for line in license_header) + 1
+        license_text = ''.join([f"{start_comment_syntax}|  {line.strip().ljust(max_length)}{end_comment_syntax}\n" for line in license_header])
+
+        new_banner = ""
+        new_banner += f"{start_comment_syntax}|" + {''.ljust(max_length)} if end_comment_syntax else '' + f"{end_comment_syntax}\n"
+        new_banner += f"{license_text.strip()}\n"
+        new_banner += f"{start_comment_syntax}|" + {''.ljust(max_length)} if end_comment_syntax else '' + f"{end_comment_syntax}\n\n"
 
         new_content = new_banner + ''.join(lines)
 
