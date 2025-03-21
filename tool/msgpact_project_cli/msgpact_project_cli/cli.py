@@ -195,11 +195,11 @@ def set_version(version: str) -> None:
 @click.argument('file_path')
 def license_header(license_header_path, file_path):
     def get_comment_syntax(file_extension, file_name):
-        if file_extension in ['.py', '.sh', '.yaml', '.yml', '.toml'] or file_name == 'Dockerfile':
+        if file_extension in ['.py', '.sh', '.yaml', '.yml'] or file_name == 'Dockerfile':
             return '#', ''
         elif file_extension in ['.java', '.ts', '.dart', '.js']:
             return '//', ''
-        elif file_extension in ['.html', '.xml', '.svelte']:
+        elif file_extension in ['.html', '.svelte']:
             return '<!--', '-->'
         elif file_extension == '.css':
             return '/*', '*/'
@@ -243,16 +243,16 @@ def license_header(license_header_path, file_path):
 
         with open(file_path, 'w') as file:
             file.write(new_content)
-        print(f"Updated license header in {file_path}")
+        print(f"Success: {file_path}")
 
     license_header = read_license_header(license_header_path)
     file_extension = os.path.splitext(file_path)[1].lower()
     file_name = os.path.basename(file_path)
-    if file_extension in ['.py', '.java', '.ts', '.dart', '.sh', '.js', '.yaml', '.yml', '.toml', '.html', '.css', '.xml', '.svelte'] or file_name == 'Dockerfile':
+    if file_extension in ['.py', '.java', '.ts', '.dart', '.sh', '.js', '.yaml', '.yml', '.html', '.css', '.svelte'] or file_name == 'Dockerfile' or file_name != 'pubspec.yaml':
         start_comment_syntax, end_comment_syntax = get_comment_syntax(file_extension, file_name)
         update_file(file_path, license_header, start_comment_syntax, end_comment_syntax)
     else:
-        print(f"Unsupported file extension: {file_extension}")
+        print(f"ERROR: {file_path} - Unsupported file extension {file_extension}")
 
 main.add_command(bump)
 main.add_command(depset)
