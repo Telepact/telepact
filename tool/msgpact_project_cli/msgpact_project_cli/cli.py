@@ -231,9 +231,9 @@ def license_header(license_header_path):
         license_text = ''.join([f"{start_comment_syntax}|  {line.strip().ljust(max_length)}{end_comment_syntax}\n" for line in license_header])
 
         new_banner = ""
-        new_banner += f"{start_comment_syntax}|" + {''.ljust(max_length)} if end_comment_syntax else '' + f"{end_comment_syntax}\n"
+        new_banner += f"{start_comment_syntax}|" + f"{''.ljust(max_length)}" if end_comment_syntax else '' + f"{end_comment_syntax}\n"
         new_banner += f"{license_text.strip()}\n"
-        new_banner += f"{start_comment_syntax}|" + {''.ljust(max_length)} if end_comment_syntax else '' + f"{end_comment_syntax}\n\n"
+        new_banner += f"{start_comment_syntax}|" + f"{''.ljust(max_length)}" if end_comment_syntax else '' + f"{end_comment_syntax}\n\n"
 
         new_content = new_banner + ''.join(lines)
 
