@@ -112,5 +112,5 @@ version:
 	cd sdk/prettier-plugin-msgpact && msgpact-project set-version ${VERSION}
 	cd sdk/console && msgpact-project set-version ${VERSION}
 
-license:
+license-header:
 	git ls-files | xargs -I {} msgpact-project license-header LICENSE_HEADER.txt {}
