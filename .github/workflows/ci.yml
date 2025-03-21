@@ -128,6 +128,30 @@ jobs:
           path: sdk/cli/dist
           retention-days: 1
 
+    build-telepact-project-cli:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Poetry
+        run: pipx install poetry
+
+      - name: Build project-cli
+        run: make project-cli
+
+      - name: Upload telepact-project-cli build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-telepact-project-cli
+          path: tool/telepact_project_cli/dist
+          retention-days: 1
+
   build-telepact-dart:
     runs-on: ubuntu-latest
     needs: [build-telepact-ts]
@@ -235,6 +259,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Download telepact-project-cli build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-telepact-project-cli
+          path: tool/telepact_project_cli/dist
+      
+      - name: Install Project CLI
+        run: make install-project-cli
+
       - name: Run license check
         run: make license-header
 
@@ -251,6 +284,15 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Download telepact-project-cli build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-telepact-project-cli
+          path: tool/telepact_project_cli/dist
+      
+      - name: Install Project CLI
+        run: make install-project-cli
 
       - name: Run version check
         run: make version
