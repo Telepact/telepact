@@ -20,3 +20,4 @@ Low:
 - Expose mock server options as command-line args in the cli
 - Remove unnecessary "telepact" everywhere in github actions
 - Console light mode and listen to os setting
+- Remove no-op output from `make license-header` and `make version`
