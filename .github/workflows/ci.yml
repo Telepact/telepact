@@ -274,11 +274,9 @@ jobs:
 
       - name: Check for changes
         run: |
-          if [ -n "$(git status --porcelain)" ]; then
-            echo "ERROR: License headers missing or obsolete.\nTo fix, run 'make license-header' and git commit the changes."
-            exit 1
-          else
-            echo "License headers up-to-date."
+          git status --porcelain | grep . && \
+          (echo "ERROR: License headers missing or obsolete.\nTo fix, run 'make license-header' and git commit the changes." && exit 1) || \
+          echo "License headers up-to-date."
 
   check-version:
     runs-on: ubuntu-latest
@@ -301,11 +299,9 @@ jobs:
 
       - name: Check for changes
         run: |
-          if [ -n "$(git status --porcelain)" ]; then
-            echo "ERROR: Misaligned versions.\nTo fix, run 'make version' and git commit the changes."
-            exit 1
-          else
-            echo "Versions up-to-date."
+          git status --porcelain | grep . && \
+          (echo "ERROR: Misaligned versions.\nTo fix, run 'make version' and git commit the changes." && exit 1) || \
+          echo "Versions up-to-date."
 
   run-tests:
     runs-on: ubuntu-latest
