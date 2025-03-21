@@ -49,6 +49,8 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 
 class DefaultSerialization implements Serialization {
 
+    // TODO: Remove this when new MsgPack feature is released.
+    //       https://github.com/msgpack/msgpack-java/pull/868
     static class CustomMessagePackGenerator extends MessagePackGenerator {
 
         private Method cachedMethod = null;
@@ -79,6 +81,8 @@ class DefaultSerialization implements Serialization {
         }
     }
 
+    // TODO: Remove this when new MsgPack feature is released.
+    //       https://github.com/msgpack/msgpack-java/pull/868
     static class CustomMessagePackFactory extends MessagePackFactory {
         public CustomMessagePackFactory() {
             super();
@@ -93,6 +97,8 @@ class DefaultSerialization implements Serialization {
         }
     }
 
+    // TODO: Replace reflection logic when new MsgPack feature is released.
+    //       https://github.com/msgpack/msgpack-java/pull/868
     static class MessagePackMapDeserializer extends MapDeserializer {
 
         public static KeyDeserializer keyDeserializer = new KeyDeserializer() {
