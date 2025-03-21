@@ -255,6 +255,7 @@ jobs:
 
   check-license-header:
     runs-on: ubuntu-latest
+    needs: [build-telepact-project-cli]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -281,6 +282,7 @@ jobs:
 
   check-version:
     runs-on: ubuntu-latest
+    needs: [build-telepact-project-cli]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
