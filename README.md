@@ -1,6 +1,7 @@
 # Introduction
 
-Telepact is an API ecosystem fueled by messages.
+Telepact is an API ecosystem for bridging programs across inter-process
+communication boundaries.
 
 It follows 4 principles:
 1. **Accessibility** - Whether you're bringing sophisticated toolchains or a
