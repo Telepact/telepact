@@ -74,11 +74,6 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install pipx
-        run: |
-          python3 -m pip install --user pipx
-          python3 -m pipx ensurepath
-
       - name: Install Poetry
         run: pipx install poetry
 
@@ -103,11 +98,6 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-
-      - name: Install pipx
-        run: |
-          python3 -m pip install --user pipx
-          python3 -m pipx ensurepath
 
       - name: Install Poetry
         run: pipx install poetry
@@ -320,11 +310,6 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-
-      - name: Install pipx
-        run: |
-          python3 -m pip install --user pipx
-          python3 -m pipx ensurepath
 
       - name: Install Poetry
         run: pipx install poetry
