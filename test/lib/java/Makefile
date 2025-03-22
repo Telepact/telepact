@@ -13,9 +13,8 @@
 #|  See the License for the specific language governing permissions and
 #|  limitations under the License.
 #|
-.PHONY: all dep
 
-all: dep
+target: dep
 	rm -rf target
 	mkdir -p target
 
@@ -24,5 +23,6 @@ all: dep
 
 	telepact codegen --schema-dir ../../runner/schema/example --lang java --out src/gen/java/telepacttest --package telepacttest
 
+.PHONY: dep
 dep:
 	cd ../../../lib/java && make
