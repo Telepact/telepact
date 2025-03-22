@@ -23,6 +23,12 @@ target: dep
 
 	telepact codegen --schema-dir ../../runner/schema/example --lang java --out src/gen/java/telepacttest --package telepacttest
 
-.PHONY: dep
 dep:
 	cd ../../../lib/java && make
+
+test-server:
+	mvn verify
+
+clean:
+	rm -rf target
+	rm -rf .m2

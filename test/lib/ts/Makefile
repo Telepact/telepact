@@ -14,8 +14,6 @@
 #|  limitations under the License.
 #|
 
-.PHONY: all dep
-
 all: dep
 	telepact codegen --schema-dir ../../runner/schema/example --lang ts --out src/gen
 	npm install
@@ -23,3 +21,13 @@ all: dep
 
 dep:
 	cd ../../../lib/ts && make
+
+test-server:
+	npm start
+
+clean:
+	rm -rf src/gen
+	rm -rf dist
+	rm -rf node_modules
+	rm -f package-lock.json
+	cd ../../../lib/ts && make clean

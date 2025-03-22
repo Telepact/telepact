@@ -14,8 +14,6 @@
 #|  limitations under the License.
 #|
 
-.PHONY: all dep
-
 all: dep
 	cp ../../../lib/py/dist/*.tar.gz telepact.tar.gz
 
@@ -26,7 +24,15 @@ all: dep
 
 	telepact codegen --schema-dir ../../runner/schema/example --lang py --out telepact_test/gen
 
-
 dep:
 	cd ../../../lib/py && make
 
+test-server:
+	poetry run python -m telepact_test
+
+clean:
+	rm -f telepact.tar.gz
+	rm -rf telepact_test/gen
+	rm -rf telepact_test/__pycache__
+	rm -f poetry.lock
+	poetry env remove --all

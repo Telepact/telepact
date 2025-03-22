@@ -14,14 +14,16 @@
 #|  limitations under the License.
 #|
 
-target: src
+SRC_FILES := $(shell find src -type f)
+
+target: $(SRC_FILES)
 	mkdir -p src/main/resources
 	cp ../../common/*.json src/main/resources
 	cp ../../LICENSE ../../NOTICE src/main/resources
-	mvn -q install
+	mvn install -s settings.xml
 
 .PHONY: clean
 clean:
-	mvn clean
 	rm -rf src/main/resources
 	rm -rf target
+	rm -rf .m2

@@ -16,6 +16,9 @@
 
 VERSION := $(shell cat VERSION.txt)
 
+noop:
+	@echo "No-op. Specify a target."
+
 java:
 	cd lib/java && make
 
@@ -55,6 +58,12 @@ test-trace-ts:
 .PHONY: test
 test:
 	cd test/runner && make test
+
+clean-test:
+	cd test/runner && make clean
+	cd test/lib/java && make clean
+	cd test/lib/py && make clean
+	cd test/lib/ts && make clean
 
 dart:
 	cd bind/dart && make

@@ -6,3 +6,4 @@ target/
 src/main/resources/*.json
 src/main/resources/LICENSE
 src/main/resources/NOTICE
+.m2/

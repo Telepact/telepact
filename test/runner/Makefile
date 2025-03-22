@@ -14,26 +14,40 @@
 #|  limitations under the License.
 #|
 
-test: setup
+test: setup java py ts
 	poetry run python -m pytest
 
-test-java: setup
+test-java: setup java
 	poetry run python -m pytest -k [java
 
-test-trace-java: setup
+test-trace-java: setup java
 	poetry run python -m pytest -k test_client_server_case[java-0] -s -vv
 
-test-py: setup
+test-py: setup py
 	poetry run python -m pytest -k [py
 
-test-trace-py: setup
+test-trace-py: setup py
 	poetry run python -m pytest -k test_client_server_case[py-0] -s -vv
 
-test-ts: setup
+test-ts: setup ts
 	poetry run python -m pytest -k [ts
 
-test-trace-ts: setup
+test-trace-ts: setup ts
 	poetry run python -m pytest -k test_client_server_case[ts-0] -s -vv
 
 setup:
 	poetry install
+
+java:
+	cd ../lib/java && make
+
+py:
+	cd ../lib/py && make
+
+ts:
+	cd ../lib/ts && make
+
+clean:
+	rm -rf .pytest_cache
+	rm -rf __pycache__
+	poetry env remove --all

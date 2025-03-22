@@ -4,3 +4,4 @@ bin/
 src/gen
 .built
 telepactcodegen.tar.gz
+package-lock.json
