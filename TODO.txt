@@ -4,16 +4,16 @@ High:
 - Get a build bot configured that on every PR, version bumps, commits machine parsable notes about what changed
 
 Medium:
-- maybe: Prepend all headers with @ symbol (or similar idea)
+- Add backwards compatibility check to cli
 - Add http url as a Telepact source for code generation
 - Add websocket support in doc ui
 - Add websocket support in cli
 - Add websocket support for mock docker
 
 Low:
-- Replace info. with telepact. and don't show type in console
+- Maybe: replace info. with telepact. and don't show type in console
 - For the random string generation, use random words rather than random chars
-- Improve consistency around simluation naming. Still have lingering
+- console: Improve consistency around simluation naming. Still have lingering
   ideas around mock and example.
 - Expose mock server options as command-line args in the cli
 - Console light mode and listen to os setting
