@@ -72,8 +72,8 @@ def test_client_server_codegen_case(loop, client_server_codegen_proc, nats_clien
 
         expected_headers = expected_response[0]
 
-        expected_headers['_codegenc'] = True
-        expected_headers['_codegens'] = True
+        expected_headers['@codegenc_'] = True
+        expected_headers['@codegens_'] = True
 
         await verify_client_case(nats_client, dc(req), expected_response, *topics)
 

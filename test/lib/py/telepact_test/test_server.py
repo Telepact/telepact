@@ -114,7 +114,7 @@ async def start_client_test_server(connection: NatsClient, metrics: CollectorReg
         async def c() -> 'Message':
             if use_codegen and function_name == "fn.test":
                 headers, output = await generated_client.test(request_headers, fntest.Input(request_body))
-                headers['_codegenc'] = True
+                headers['@codegenc_'] = True
                 return Message(headers, output.pseudo_json)
             else:
                 return await client.request(Message(request_headers, request_body))
@@ -275,7 +275,7 @@ async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, 
         if use_codegen:
             print(f"     :H {request_bytes}")
             message = await code_gen_handler.handler(request_message)
-            message.headers['_codegens'] = True
+            message.headers['@codegens_'] = True
         else:
             print(f"    <-s {request_bytes}")
 

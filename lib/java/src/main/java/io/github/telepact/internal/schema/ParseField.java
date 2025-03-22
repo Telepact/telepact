@@ -38,7 +38,8 @@ public class ParseField {
             ParseContext ctx) {
         final var headerRegexString = "^@[a-z][a-zA-Z0-9_]*$";
         final var regexString = "^([a-z][a-zA-Z0-9_]*)(!)?$";
-        final var regex = Pattern.compile(isHeader ? headerRegexString : regexString);
+        final var regexToUse = isHeader ? headerRegexString : regexString;
+        final var regex = Pattern.compile(regexToUse);
 
         final var matcher = regex.matcher(fieldDeclaration);
         if (!matcher.find()) {
@@ -46,7 +47,7 @@ public class ParseField {
             finalPath.add(fieldDeclaration);
 
             throw new TelepactSchemaParseError(List.of(new SchemaParseFailure(ctx.documentName, finalPath,
-                    "KeyRegexMatchFailed", Map.of("regex", regexString))), ctx.telepactSchemaDocumentNamesToJson);
+                    "KeyRegexMatchFailed", Map.of("regex", regexToUse))), ctx.telepactSchemaDocumentNamesToJson);
         }
 
         final var fieldName = matcher.group(0);

@@ -40,7 +40,7 @@ public class MockHandle {
             boolean enableOptionalFieldGeneration, boolean randomizeOptionalFieldGeneration) {
         final Map<String, Object> header = requestMessage.headers;
 
-        final var enableGenerationStub = (Boolean) header.getOrDefault("_gen", false);
+        final var enableGenerationStub = (Boolean) header.getOrDefault("@gen_", false);
         final String functionName = requestMessage.getBodyTarget();
         final Map<String, Object> argument = requestMessage.getBodyPayload();
 

@@ -28,15 +28,16 @@ export function parseField(
     isHeader: boolean,
     ctx: ParseContext,
 ): TFieldDeclaration {
-    const headerRegexString = '^(@[a-z][a-zA-Z0-9_]*)$';
+    const headerRegexString = '^@[a-z][a-zA-Z0-9_]*$';
     const regexString = '^([a-z][a-zA-Z0-9_]*)(!)?$';
-    const regex = new RegExp(isHeader ? headerRegexString : regexString);
+    const regexToUse = isHeader ? headerRegexString : regexString;
+    const regex = new RegExp(regexToUse);
 
     const matcher = fieldDeclaration.match(regex);
     if (!matcher) {
         const finalPath = [...path, fieldDeclaration];
         throw new TelepactSchemaParseError(
-            [new SchemaParseFailure(ctx.documentName, finalPath, 'KeyRegexMatchFailed', { regex: regexString })],
+            [new SchemaParseFailure(ctx.documentName, finalPath, 'KeyRegexMatchFailed', { regex: regexToUse })],
             ctx.telepactSchemaDocumentNamesToJson,
         );
     }

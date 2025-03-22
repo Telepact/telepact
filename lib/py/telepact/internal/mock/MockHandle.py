@@ -37,7 +37,7 @@ async def mock_handle(request_message: 'Message', stubs: list['MockStub'], invoc
 
     header: dict[str, object] = request_message.headers
 
-    enable_generation_stub = header.get("_gen", False)
+    enable_generation_stub = header.get("@gen_", False)
     function_name = request_message.get_body_target()
     argument = request_message.get_body_payload()
 

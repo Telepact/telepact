@@ -31,16 +31,17 @@ def parse_field(path: list[object], field_declaration: str, type_declaration_val
     from ...internal.schema.GetTypeUnexpectedParseFailure import get_type_unexpected_parse_failure
     from ...internal.schema.ParseTypeDeclaration import parse_type_declaration
 
-    header_regex_string = r"^(@[a-z][a-zA-Z0-9_]*)$"
+    header_regex_string = r"^@[a-z][a-zA-Z0-9_]*$"
     regex_string = r"^([a-z][a-zA-Z0-9_]*)(!)?$"
-    regex = re.compile(header_regex_string if is_header else regex_string)
+    regex_to_use = header_regex_string if is_header else regex_string
+    regex = re.compile(regex_to_use)
 
     matcher = regex.match(field_declaration)
     if not matcher:
         final_path = path + [field_declaration]
         raise TelepactSchemaParseError([SchemaParseFailure(ctx.document_name, final_path,
                                                           "KeyRegexMatchFailed",
-                                                          {"regex": regex_string})], ctx.telepact_schema_document_names_to_json)
+                                                          {"regex": regex_to_use})], ctx.telepact_schema_document_names_to_json)
 
     field_name = matcher.group(0)
     optional = True if is_header else bool(matcher.group(2))

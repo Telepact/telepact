@@ -125,7 +125,7 @@ public class Main {
                 if (useCodeGen && "fn.test".equals(functionName)) {
                     var outputMessage = generatedClient.test(requestHeaders, new test.Input(requestBody));
                     var responseHeaders = outputMessage.headers;
-                    responseHeaders.put("_codegenc", true);
+                    responseHeaders.put("@codegenc_", true);
                     response = new Message(responseHeaders, outputMessage.body.pseudoJson);
                 } else {
 
@@ -312,7 +312,7 @@ public class Main {
                 if (useCodeGen) {
                     System.out.println("     :H %s".formatted(objectMapper.writeValueAsString(requestPseudoJson)));
                     message = codeGenHandler.handler(requestMessage);
-                    message.headers.put("_codegens", true);
+                    message.headers.put("@codegens_", true);
                 } else {
                     System.out.println("    <-s %s".formatted(new String(requestBytes)));
                     System.out.flush();

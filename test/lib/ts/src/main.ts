@@ -146,7 +146,7 @@ function startClientTestServer(
             try {
                 if (useCodegen && functionName === "fn.test") {
                     const [responseHeaders, outputBody] = await genClient.test(requestHeaders, new test.Input(requestBody));
-                    responseHeaders["_codegenc"] = true;
+                    responseHeaders["@codegenc_"] = true;
                     response = new Message(responseHeaders, outputBody.pseudoJson);
                 } else {
                     response = await client.request(request);
@@ -343,7 +343,7 @@ function startTestServer(
         if (useCodegen) {
             console.log(`     :H ${new TextDecoder().decode(requestBytes)}`);
             message = await codeGenHandler.handler(requestMessage);
-            message.headers["_codegens"] = true;
+            message.headers["@codegens_"] = true;
         } else {
             console.log(`    <-s ${new TextDecoder().decode(requestBytes)}`);
             const natsResponseMessage = await connection.request(backdoorTopic, requestBytes, { timeout: 5000 });

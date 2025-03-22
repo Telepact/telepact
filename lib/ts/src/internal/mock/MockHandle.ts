@@ -39,7 +39,7 @@ export async function mockHandle(
 ): Promise<Message> {
     const header: Record<string, any> = requestMessage.headers;
 
-    const enableGenerationStub = header._gen || false;
+    const enableGenerationStub = header['@gen_'] || false;
     const functionName = requestMessage.getBodyTarget();
     const argument = requestMessage.getBodyPayload();
 
