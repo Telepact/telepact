@@ -1,5 +1,6 @@
 High:
 - Double check git urls in java pom
+- Get a build bot configured that on every PR, version bumps, commits machine parsable notes about what changed
 
 Medium:
 - Replace VType with TType (and related)
