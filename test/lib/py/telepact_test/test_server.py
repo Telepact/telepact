@@ -48,12 +48,12 @@ def on_err(e):
 
 
 def on_request_err(m):
-    if m.headers.get("_onRequestError", False):
+    if m.headers.get("@onRequestError_", False):
         raise RuntimeError()
 
 
 def on_response_err(m):
-    if m.headers.get("_onResponseError", False):
+    if m.headers.get("@onResponseError_", False):
         raise RuntimeError()
 
 

@@ -30,7 +30,7 @@ export function clientBinaryEncode(
     const forceSendJson = headers["_forceSendJson"];
     delete headers["_forceSendJson"];
 
-    headers["bin_"] = binaryChecksumStrategy.getCurrentChecksums();
+    headers["@bin_"] = binaryChecksumStrategy.getCurrentChecksums();
 
     if (forceSendJson === true) {
         throw new BinaryEncoderUnavailableError();
@@ -49,7 +49,7 @@ export function clientBinaryEncode(
     const encodedMessageBody = encodeBody(messageBody, binaryEncoder);
 
     let finalEncodedMessageBody: Map<any, any>;
-    if (headers["pac_"] === true) {
+    if (headers["@pac_"] === true) {
         finalEncodedMessageBody = packBody(encodedMessageBody);
     } else {
         finalEncodedMessageBody = encodedMessageBody;

@@ -51,10 +51,10 @@ export function minifyJson(json: string, redactAuthHeader = false) {
 	let pseudoJson = JSON.parse(json);
 
 	if (redactAuthHeader) {
-		let authHeader = pseudoJson[0]['auth_'];
+		let authHeader = pseudoJson[0]['@auth_'];
 
 		if (authHeader !== undefined) {
-			pseudoJson[0]['auth_'] = '{{redacted}}';
+			pseudoJson[0]['@auth_'] = '{{redacted}}';
 			authHeaderStore.set(authHeader);
 		}
 	}
@@ -69,14 +69,14 @@ export function unMinifyJson(json: string | null, authManaged: boolean = false) 
 	let pseudoJson = JSON.parse(json);
 
 	if (authManaged) {
-		pseudoJson[0]['auth_'] = '{{managed}}';
+		pseudoJson[0]['@auth_'] = '{{managed}}';
 	}
 
-	let authHeader = pseudoJson[0]['auth_'];
+	let authHeader = pseudoJson[0]['@auth_'];
 	if (authHeader === '{{redacted}}') {
 		authHeaderStore.subscribe((authHeader) => {
 			if (authHeader !== null) {
-				pseudoJson[0]['auth_'] = authHeader;
+				pseudoJson[0]['@auth_'] = authHeader;
 			}
 		})();
 		authHeaderStore.set(null);

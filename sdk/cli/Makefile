@@ -37,7 +37,7 @@ clean:
 	rm -rf dist
 	rm -rf telepact_cli/telepact
 	rm -rf tmp
-	rm telepact_cli/LICENSE telepact_cli/NOTICE
+	rm -f telepact_cli/LICENSE telepact_cli/NOTICE
 	poetry env remove --all
 
 test:

@@ -27,7 +27,7 @@ public class ServerBinaryDecode {
     static List<Object> serverBinaryDecode(List<Object> message, BinaryEncoding binaryEncoder) {
         final var headers = (Map<String, Object>) message.get(0);
         final var encodedMessageBody = (Map<Object, Object>) message.get(1);
-        final var clientKnownBinaryChecksums = (List<Integer>) headers.get("bin_");
+        final var clientKnownBinaryChecksums = (List<Integer>) headers.get("@bin_");
         final var binaryChecksumUsedByClientOnThisMessage = clientKnownBinaryChecksums.get(0);
 
         if (!Objects.equals(binaryChecksumUsedByClientOnThisMessage, binaryEncoder.checksum)) {
@@ -35,7 +35,7 @@ public class ServerBinaryDecode {
         }
 
         final Map<Object, Object> finalEncodedMessageBody;
-        if (Objects.equals(true, headers.get("pac_"))) {
+        if (Objects.equals(true, headers.get("@pac_"))) {
             finalEncodedMessageBody = unpackBody(encodedMessageBody);
         } else {
             finalEncodedMessageBody = encodedMessageBody;

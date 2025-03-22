@@ -37,7 +37,7 @@ public class CreateTelepactSchemaFromFileJsonMap {
             var regex = Pattern.compile("\"struct\\.Auth_\"\\s*:");
             var matcher = regex.matcher(json);
             if (matcher.find()) {
-                finalJsonDocuments.put("auth_", getAuthTelepactJson());
+                finalJsonDocuments.put("@auth_", getAuthTelepactJson());
                 break;
             }
         }

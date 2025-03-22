@@ -57,16 +57,16 @@ def handler(request):
     target = next(iter(body))
     payload = body[target]
 
-    response_header = header.get('responseHeader', {})
+    response_header = header.get('@responseHeader', {})
 
-    if '_onResponseError' in header:
-        response_header['_onResponseError'] = header['_onResponseError']
+    if '@onResponseError_' in header:
+        response_header['@onResponseError_'] = header['@onResponseError_']
 
-    if 'Ok_' in header:
-        return [response_header, {'Ok_': header['Ok_']}]
-    elif 'result' in header:
-        return [response_header, header['result']]
-    elif 'throw' in header:
+    if '@ok_' in header:
+        return [response_header, {'Ok_': header['@ok_']}]
+    elif '@result' in header:
+        return [response_header, header['@result']]
+    elif '@throw' in header:
         return None
     else:
         return [response_header, {'Ok_': {}}]
@@ -237,7 +237,7 @@ def convert_lists_to_sets(a):
 
 async def verify_server_case(nats_client, request, expected_response, frontdoor_topic, backdoor_topic, just_send=False):
     assert_rules = {} if not expected_response or type(
-        expected_response) == bytes else expected_response[0].pop('_assert', {})
+        expected_response) == bytes else expected_response[0].pop('@assert_', {})
 
     backdoor_handling_task = asyncio.create_task(
         backdoor_handler(nats_client, backdoor_topic))
@@ -258,7 +258,7 @@ async def verify_server_case(nats_client, request, expected_response, frontdoor_
 
 async def verify_flat_case(nats_client, request, expected_response, frontdoor_topic):
     assert_rules = {} if not expected_response else expected_response[0].pop(
-        '_assert', {})
+        '@assert_', {})
 
     response = await send_case(nats_client, request, expected_response, frontdoor_topic)
 
@@ -272,7 +272,7 @@ async def verify_flat_case(nats_client, request, expected_response, frontdoor_to
 
 async def verify_client_case(nats_client, request, expected_response, client_frontdoor_topic, client_backdoor_topic, frontdoor_topic, backdoor_topic, assert_binary=False):
     assert_rules = {} if not expected_response else expected_response[0].pop(
-        '_assert', {})
+        '@assert_', {})
 
     client_times = 1
     if assert_rules.get('expectTwoRequests', False):
@@ -298,11 +298,11 @@ async def verify_client_case(nats_client, request, expected_response, client_fro
 
     if assert_binary:
         if 'Error' not in next(iter(response[1])):
-            assert 'bin_' in response[0]
+            assert '@bin_' in response[0]
 
-    response[0].pop('bin_', None)
-    response[0].pop('enc_', None)
-    response[0].pop('pac_', None)
+    response[0].pop('@bin_', None)
+    response[0].pop('@enc_', None)
+    response[0].pop('@pac_', None)
 
     response_was_success = 'Ok_' in response[1]
 
@@ -364,7 +364,7 @@ async def send_case(nats_client: nats.aio.client.Client, request, expected_respo
     if 'numberTooBig' in response[0]:
         pytest.skip('Cannot use big numbers with msgpack')
 
-    warnings = response[0].pop('warn_', [])
+    warnings = response[0].pop('@warn_', [])
     if warnings:
         warning_reasons = [next(iter(e['reason'])) for e in warnings]
         if 'NumberTruncated' in warning_reasons:

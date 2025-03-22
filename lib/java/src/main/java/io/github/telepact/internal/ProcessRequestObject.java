@@ -34,8 +34,8 @@ public class ProcessRequestObject {
         final Map<String, Object> header = requestMessage.headers;
 
         try {
-            if (!header.containsKey("time_")) {
-                header.put("time_", timeoutMsDefault);
+            if (!header.containsKey("@time_")) {
+                header.put("@time_", timeoutMsDefault);
             }
 
             if (useBinaryDefault) {
@@ -46,7 +46,7 @@ public class ProcessRequestObject {
                 header.put("_forceSendJson", true);
             }
 
-            final var timeoutMs = ((Number) header.get("time_")).longValue();
+            final var timeoutMs = ((Number) header.get("@time_")).longValue();
 
             final var responseMessage = adapter.apply(requestMessage, serializer).get(timeoutMs, TimeUnit.MILLISECONDS);
 

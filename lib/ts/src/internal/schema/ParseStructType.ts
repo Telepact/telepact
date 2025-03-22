@@ -60,7 +60,8 @@ export function parseStructType(
         throw new TelepactSchemaParseError(parseFailures, ctx.telepactSchemaDocumentNamesToJson);
     }
 
-    const fields = parseStructFields(thisPath, definition, ctx);
+    const isHeader = false;
+    const fields = parseStructFields(thisPath, definition, isHeader, ctx);
 
     return new TStruct(schemaKey, fields);
 }

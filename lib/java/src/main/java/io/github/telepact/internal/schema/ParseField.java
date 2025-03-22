@@ -34,9 +34,11 @@ public class ParseField {
             List<Object> path,
             String fieldDeclaration,
             Object typeDeclarationValue,
+            boolean isHeader,
             ParseContext ctx) {
+        final var headerRegexString = "^@[a-z][a-zA-Z0-9_]*$";
         final var regexString = "^([a-z][a-zA-Z0-9_]*)(!)?$";
-        final var regex = Pattern.compile(regexString);
+        final var regex = Pattern.compile(isHeader ? headerRegexString : regexString);
 
         final var matcher = regex.matcher(fieldDeclaration);
         if (!matcher.find()) {
@@ -48,7 +50,7 @@ public class ParseField {
         }
 
         final var fieldName = matcher.group(0);
-        final var optional = matcher.group(2) != null;
+        final var optional = isHeader ? true : matcher.group(2) != null;
 
         final List<Object> thisPath = new ArrayList<>(path);
         thisPath.add(fieldName);

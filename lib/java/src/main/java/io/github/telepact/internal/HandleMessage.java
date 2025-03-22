@@ -62,9 +62,9 @@ public class HandleMessage {
         final var functionType = (TFn) parsedTelepactSchema.get(requestTarget);
         final var resultUnionType = functionType.result;
 
-        final var callId = requestHeaders.get("id_");
+        final var callId = requestHeaders.get("@id_");
         if (callId != null) {
-            responseHeaders.put("id_", callId);
+            responseHeaders.put("@id_", callId);
         }
 
         if (requestHeaders.containsKey("_parseFailures")) {
@@ -85,18 +85,18 @@ public class HandleMessage {
                     responseHeaders);
         }
 
-        if (requestHeaders.containsKey("bin_")) {
-            final List<Object> clientKnownBinaryChecksums = (List<Object>) requestHeaders.get("bin_");
+        if (requestHeaders.containsKey("@bin_")) {
+            final List<Object> clientKnownBinaryChecksums = (List<Object>) requestHeaders.get("@bin_");
 
             responseHeaders.put("_binary", true);
             responseHeaders.put("_clientKnownBinaryChecksums", clientKnownBinaryChecksums);
 
-            if (requestHeaders.containsKey("pac_")) {
-                responseHeaders.put("pac_", requestHeaders.get("pac_"));
+            if (requestHeaders.containsKey("@pac_")) {
+                responseHeaders.put("@pac_", requestHeaders.get("@pac_"));
             }
         }
 
-        final Map<String, Object> selectStructFieldsHeader = (Map<String, Object>) requestHeaders.get("select_");
+        final Map<String, Object> selectStructFieldsHeader = (Map<String, Object>) requestHeaders.get("@select_");
 
         if (unknownTarget != null) {
             final Map<String, Object> newErrorResult = Map.of("ErrorInvalidRequestBody_",
@@ -117,7 +117,7 @@ public class HandleMessage {
                     responseHeaders);
         }
 
-        final var unsafeResponseEnabled = Objects.equals(true, requestHeaders.get("unsafe_"));
+        final var unsafeResponseEnabled = Objects.equals(true, requestHeaders.get("@unsafe_"));
 
         final var callMessage = new Message(requestHeaders, Map.of(requestTarget, requestPayload));
 

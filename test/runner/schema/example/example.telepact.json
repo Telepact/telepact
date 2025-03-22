@@ -154,10 +154,10 @@
     },
     {
         "headers.ExampleHeaders": {
-            "in": ["boolean"]
+            "@in": ["boolean"]
         },
         "->": {
-            "out": ["boolean"]
+            "@out": ["boolean"]
         }
     }
 ]

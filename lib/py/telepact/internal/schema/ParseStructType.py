@@ -61,6 +61,6 @@ def parse_struct_type(path: list[object], struct_definition_as_pseudo_json: dict
         raise TelepactSchemaParseError(
             parse_failures, ctx.telepact_schema_document_names_to_json)
 
-    fields = parse_struct_fields(this_path, definition, ctx)
+    fields = parse_struct_fields(this_path, definition, False, ctx)
 
     return TStruct(schema_key, fields)

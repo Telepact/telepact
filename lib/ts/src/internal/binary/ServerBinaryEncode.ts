@@ -32,14 +32,14 @@ export function serverBinaryEncode(message: any[], binaryEncoder: BinaryEncoding
     }
 
     if (clientKnownBinaryChecksums === undefined || !clientKnownBinaryChecksums.includes(binaryEncoder.checksum)) {
-        headers['enc_'] = binaryEncoder.encodeMap;
+        headers['@enc_'] = binaryEncoder.encodeMap;
     }
 
-    headers['bin_'] = [binaryEncoder.checksum];
+    headers['@bin_'] = [binaryEncoder.checksum];
     const encodedMessageBody = encodeBody(messageBody, binaryEncoder);
 
     let finalEncodedMessageBody: { [key: string]: any };
-    if (headers['pac_'] === true) {
+    if (headers['@pac_'] === true) {
         finalEncodedMessageBody = packBody(encodedMessageBody);
     } else {
         finalEncodedMessageBody = encodedMessageBody;

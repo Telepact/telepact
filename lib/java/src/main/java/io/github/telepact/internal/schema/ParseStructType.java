@@ -72,7 +72,8 @@ public class ParseStructType {
             throw new TelepactSchemaParseError(parseFailures, ctx.telepactSchemaDocumentNamesToJson);
         }
 
-        final var fields = parseStructFields(thisPath, definition, ctx);
+        final var isHeader = false;
+        final var fields = parseStructFields(thisPath, definition, isHeader, ctx);
 
         return new TStruct(schemaKey, fields);
     }

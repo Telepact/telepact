@@ -29,7 +29,8 @@ import io.github.telepact.internal.types.TFieldDeclaration;
 public class ParseStructFields {
     static Map<String, TFieldDeclaration> parseStructFields(
             List<Object> path,
-            Map<String, Object> referenceStruct, ParseContext ctx) {
+            Map<String, Object> referenceStruct, 
+            boolean isHeader, ParseContext ctx) {
         final var parseFailures = new ArrayList<SchemaParseFailure>();
         final var fields = new HashMap<String, TFieldDeclaration>();
 
@@ -62,7 +63,7 @@ public class ParseStructFields {
             final TFieldDeclaration parsedField;
             try {
                 parsedField = parseField(path, fieldDeclaration,
-                        typeDeclarationValue, ctx);
+                        typeDeclarationValue, isHeader, ctx);
                 final String fieldName = parsedField.fieldName;
 
                 fields.put(fieldName, parsedField);

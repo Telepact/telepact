@@ -49,7 +49,7 @@ def parse_headers_type(path: list[object], headers_definition_as_parsed_json: di
     else:
         try:
             request_fields = parse_struct_fields(
-                this_path, request_headers_def, ctx)
+                this_path, request_headers_def, True, ctx)
 
             # All headers are optional
             for field in request_fields:
@@ -84,7 +84,7 @@ def parse_headers_type(path: list[object], headers_definition_as_parsed_json: di
     else:
         try:
             response_fields = parse_struct_fields(
-                response_path, response_headers_def, ctx)
+                response_path, response_headers_def, True, ctx)
 
             # All headers are optional
             for field in response_fields:

@@ -89,7 +89,7 @@ export const load: LayoutLoad = async ({ url, params, route, fetch }) => {
 		let client = new Client(async (m: Message, s: Serializer) => {
 			if (getAuthHeader !== undefined) {
 				let authHeader = await getAuthHeader();
-				m.headers['auth_'] = authHeader;
+				m.headers['@auth_'] = authHeader;
 			}
 
 			let req = s.serialize(m);

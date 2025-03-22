@@ -165,7 +165,8 @@ public class ParseUnionType {
 
             final Map<String, TFieldDeclaration> fields;
             try {
-                fields = parseStructFields(unionKeyPath, unionTagStruct, ctx);
+                final var isHeader = false;
+                fields = parseStructFields(unionKeyPath, unionTagStruct, isHeader, ctx);
             } catch (TelepactSchemaParseError e) {
                 parseFailures.addAll(e.schemaParseFailures);
                 continue;

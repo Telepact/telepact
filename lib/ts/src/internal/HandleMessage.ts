@@ -56,9 +56,9 @@ export async function handleMessage(
     const functionType = parsedTelepactSchema[requestTarget] as TFn;
     const resultUnionType: TUnion = functionType.result;
 
-    const callId = requestHeaders['id_'];
+    const callId = requestHeaders['@id_'];
     if (callId !== undefined) {
-        responseHeaders['id_'] = callId;
+        responseHeaders['@id_'] = callId;
     }
 
     if ('_parseFailures' in requestHeaders) {
@@ -86,18 +86,18 @@ export async function handleMessage(
         );
     }
 
-    if ('bin_' in requestHeaders) {
-        const clientKnownBinaryChecksums = requestHeaders['bin_'] as any[];
+    if ('@bin_' in requestHeaders) {
+        const clientKnownBinaryChecksums = requestHeaders['@bin_'] as any[];
 
         responseHeaders['_binary'] = true;
         responseHeaders['_clientKnownBinaryChecksums'] = clientKnownBinaryChecksums;
 
-        if ('pac_' in requestHeaders) {
-            responseHeaders['pac_'] = requestHeaders['pac_'];
+        if ('@pac_' in requestHeaders) {
+            responseHeaders['@pac_'] = requestHeaders['@pac_'];
         }
     }
 
-    const selectStructFieldsHeader: Record<string, any> | null = requestHeaders['select_'] || null;
+    const selectStructFieldsHeader: Record<string, any> | null = requestHeaders['@select_'] || null;
 
     if (unknownTarget !== null) {
         const newErrorResult: Record<string, any> = {
@@ -131,9 +131,9 @@ export async function handleMessage(
         .filter(filterOutWarnings);
     if (callValidationFailures.length > 0) {
         if (warnings.length > 0) {
-            const existingWarnings = responseHeaders['warn_'] || [];
+            const existingWarnings = responseHeaders['@warn_'] || [];
             const moreWarnings = mapValidationFailuresToInvalidFieldCases(warnings);
-            responseHeaders['warn_'] = existingWarnings.concat(moreWarnings);
+            responseHeaders['@warn_'] = existingWarnings.concat(moreWarnings);
         }
 
         return getInvalidErrorMessage(
@@ -144,7 +144,7 @@ export async function handleMessage(
         );
     }
 
-    const unsafeResponseEnabled = requestHeaders['unsafe_'] || false;
+    const unsafeResponseEnabled = requestHeaders['@unsafe_'] || false;
 
     const callMessage: Message = new Message(requestHeaders, { [requestTarget]: requestPayload });
 
@@ -178,9 +178,9 @@ export async function handleMessage(
             .filter(filterOutWarnings);
 
         if (warnings.length > 0) {
-            const existingWarnings = responseHeaders['warn_'] || [];
+            const existingWarnings = responseHeaders['@warn_'] || [];
             const moreWarnings = mapValidationFailuresToInvalidFieldCases(warnings);
-            responseHeaders['warn_'] = existingWarnings.concat(moreWarnings);
+            responseHeaders['@warn_'] = existingWarnings.concat(moreWarnings);
         }
 
         if (resultValidationFailures.length > 0) {

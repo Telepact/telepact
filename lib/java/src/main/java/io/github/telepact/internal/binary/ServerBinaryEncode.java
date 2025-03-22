@@ -37,14 +37,14 @@ public class ServerBinaryEncode {
         }
 
         if (clientKnownBinaryChecksums == null || !clientKnownBinaryChecksums.contains(binaryEncoder.checksum)) {
-            headers.put("enc_", binaryEncoder.encodeMap);
+            headers.put("@enc_", binaryEncoder.encodeMap);
         }
 
-        headers.put("bin_", List.of(binaryEncoder.checksum));
+        headers.put("@bin_", List.of(binaryEncoder.checksum));
         final var encodedMessageBody = encodeBody(messageBody, binaryEncoder);
 
         final Map<Object, Object> finalEncodedMessageBody;
-        if (Objects.equals(true, headers.get("pac_"))) {
+        if (Objects.equals(true, headers.get("@pac_"))) {
             finalEncodedMessageBody = packBody(encodedMessageBody);
         } else {
             finalEncodedMessageBody = encodedMessageBody;

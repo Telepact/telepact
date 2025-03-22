@@ -361,12 +361,12 @@ public class Main {
             }
         };
         options.onRequest = m -> {
-            if ((Boolean) m.headers.getOrDefault("_onRequestError", false)) {
+            if ((Boolean) m.headers.getOrDefault("@onRequestError_", false)) {
                 throw new RuntimeException();
             }
         };
         options.onResponse = m -> {
-            if ((Boolean) m.headers.getOrDefault("_onResponseError", false)) {
+            if ((Boolean) m.headers.getOrDefault("@onResponseError_", false)) {
                 throw new RuntimeException();
             }
         };

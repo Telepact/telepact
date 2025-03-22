@@ -50,7 +50,7 @@ def auth_server_proc(loop, nats_client, dispatcher_server):
 
     loop.run_until_complete(t2())
 
-    print('auth_server_proc stopped')
+    print('@auth_server_proc stopped')
 
 
 def test_auth_case(loop, auth_server_proc, nats_client, name, req, res):

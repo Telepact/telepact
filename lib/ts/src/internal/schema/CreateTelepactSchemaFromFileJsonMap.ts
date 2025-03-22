@@ -27,7 +27,7 @@ export function createTelepactSchemaFromFileJsonMap(jsonDocuments: Record<string
     for (const json of Object.values(jsonDocuments)) {
         const regex = /"struct\.Auth_"\s*:/;
         if (regex.test(json)) {
-            finalJsonDocuments['auth_'] = getAuthTelepactJson();
+            finalJsonDocuments['@auth_'] = getAuthTelepactJson();
             break;
         }
     }

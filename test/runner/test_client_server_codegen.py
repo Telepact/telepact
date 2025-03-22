@@ -65,7 +65,7 @@ def test_client_server_codegen_case(loop, client_server_codegen_proc, nats_clien
     topics = client_server_codegen_proc
 
     async def t():
-        if 'good_' not in req[0]:
+        if '@good_' not in req[0]:
             pytest.skip('Only test good cases for codegen')
 
         expected_response = dc(res)

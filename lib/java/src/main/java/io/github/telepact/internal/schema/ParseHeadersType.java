@@ -53,8 +53,9 @@ public class ParseHeadersType {
             parseFailures.addAll(branchParseFailures);
         } else {
             try {
+                final var isHeader = true;
                 Map<String, TFieldDeclaration> requestFields = parseStructFields(thisPath,
-                        (Map<String, Object>) requestHeadersDef, ctx);
+                        (Map<String, Object>) requestHeadersDef, isHeader, ctx);
 
                 // All headers are optional
                 final var finalRequestFields = requestFields.entrySet().stream()
@@ -88,8 +89,9 @@ public class ParseHeadersType {
             parseFailures.addAll(branchParseFailures);
         } else {
             try {
+                final var isHeader = true;
                 Map<String, TFieldDeclaration> responseFields = ParseStructFields.parseStructFields(responsePath,
-                        (Map<String, Object>) responseHeadersDef, ctx);
+                        (Map<String, Object>) responseHeadersDef, isHeader, ctx);
 
                 // All headers are optional
                 final var finalResponseFields = responseFields.entrySet().stream()

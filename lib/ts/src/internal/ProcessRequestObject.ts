@@ -38,8 +38,8 @@ export async function processRequestObject(
     const header: Record<string, any> = requestMessage.headers;
 
     try {
-        if (!header.hasOwnProperty('time_')) {
-            header['time_'] = timeoutMsDefault;
+        if (!header.hasOwnProperty('@time_')) {
+            header['@time_'] = timeoutMsDefault;
         }
 
         if (useBinaryDefault) {
@@ -50,7 +50,7 @@ export async function processRequestObject(
             header['_forceSendJson'] = true;
         }
 
-        const timeoutMs = header['time_'] as number;
+        const timeoutMs = header['@time_'] as number;
 
         const responseMessage = await Promise.race([adapter(requestMessage, serializer), timeoutPromise(timeoutMs)]);
 

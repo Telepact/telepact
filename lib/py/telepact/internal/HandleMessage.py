@@ -63,9 +63,9 @@ async def handle_message(
     function_type = cast(TFn, parsed_telepact_schema[request_target])
     result_union_type: TUnion = function_type.result
 
-    call_id = request_headers.get("id_")
+    call_id = request_headers.get("@id_")
     if call_id is not None:
-        response_headers["id_"] = call_id
+        response_headers["@id_"] = call_id
 
     if "_parseFailures" in request_headers:
         parse_failures = cast(list[object], request_headers["_parseFailures"])
@@ -88,18 +88,18 @@ async def handle_message(
             response_headers,
         )
 
-    if "bin_" in request_headers:
+    if "@bin_" in request_headers:
         client_known_binary_checksums = cast(
-            list[object], request_headers["bin_"])
+            list[object], request_headers["@bin_"])
 
         response_headers["_binary"] = True
         response_headers["_clientKnownBinaryChecksums"] = client_known_binary_checksums
 
-        if "pac_" in request_headers:
-            response_headers["pac_"] = request_headers["pac_"]
+        if "@pac_" in request_headers:
+            response_headers["@pac_"] = request_headers["@pac_"]
 
     select_struct_fields_header: dict[str, object] | None = cast(dict[str, object] | None, request_headers.get(
-        "select_"
+        "@select_"
     ))
 
     if unknown_target is not None:
@@ -130,7 +130,7 @@ async def handle_message(
             response_headers,
         )
 
-    unsafe_response_enabled = cast(bool, request_headers.get("unsafe_", False))
+    unsafe_response_enabled = cast(bool, request_headers.get("@unsafe_", False))
 
     call_message: Message = Message(
         request_headers, {request_target: request_payload})

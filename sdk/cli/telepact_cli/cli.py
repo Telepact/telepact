@@ -182,7 +182,7 @@ def _generate_internal(schema_data: list[dict[str, object]], target: str, output
         schema_entries: list[dict[str, object]] = []
         for schema_entry in schema_data:
             schema_key = _find_schema_key(schema_entry)
-            if schema_key.startswith('info') or schema_key.startswith('requestHeader') or schema_key.startswith('responseHeader'):
+            if schema_key.startswith('info'):
                 continue
 
             if schema_key.startswith("fn"):
@@ -227,7 +227,7 @@ def _generate_internal(schema_data: list[dict[str, object]], target: str, output
         ts_schema_entries: list[dict[str, object]] = []
         for schema_entry in schema_data:
             schema_key = _find_schema_key(schema_entry)
-            if schema_key.startswith('info') or schema_key.startswith('requestHeader') or schema_key.startswith('responseHeader'):
+            if schema_key.startswith('info'):
                 continue
 
             if schema_key.startswith("fn"):

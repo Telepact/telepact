@@ -144,7 +144,8 @@ export function parseUnionType(
         const unionTagStruct = entry[1];
 
         try {
-            const fields = parseStructFields(unionKeyPath, unionTagStruct, ctx);
+            const isHeader = false;
+            const fields = parseStructFields(unionKeyPath, unionTagStruct, isHeader, ctx);
             const unionStruct = new TStruct(`${schemaKey}.${unionTag}`, fields);
             tags[unionTag] = unionStruct;
             tagIndices[unionTag] = i;

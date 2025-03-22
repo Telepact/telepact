@@ -27,7 +27,7 @@ def server_binary_decode(message: list[object], binary_encoder: 'BinaryEncoding'
 
     headers = cast(dict[str, object], message[0])
     encoded_message_body = cast(dict[object, object], message[1])
-    client_known_binary_checksums = cast(list[int], headers.get("bin_", []))
+    client_known_binary_checksums = cast(list[int], headers.get("@bin_", []))
     binary_checksum_used_by_client_on_this_message = cast(
         int, client_known_binary_checksums[0])
 
@@ -35,7 +35,7 @@ def server_binary_decode(message: list[object], binary_encoder: 'BinaryEncoding'
         raise BinaryEncoderUnavailableError()
 
     final_encoded_message_body: dict[object, object]
-    if headers.get("pac_") is True:
+    if headers.get("@pac_") is True:
         final_encoded_message_body = unpack_body(encoded_message_body)
     else:
         final_encoded_message_body = encoded_message_body

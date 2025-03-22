@@ -25,13 +25,15 @@ if TYPE_CHECKING:
 
 
 def parse_field(path: list[object], field_declaration: str, type_declaration_value: object,
+                is_header: bool,
                 ctx: 'ParseContext') -> 'TFieldDeclaration':
     from ...TelepactSchemaParseError import TelepactSchemaParseError
     from ...internal.schema.GetTypeUnexpectedParseFailure import get_type_unexpected_parse_failure
     from ...internal.schema.ParseTypeDeclaration import parse_type_declaration
 
+    header_regex_string = r"^(@[a-z][a-zA-Z0-9_]*)$"
     regex_string = r"^([a-z][a-zA-Z0-9_]*)(!)?$"
-    regex = re.compile(regex_string)
+    regex = re.compile(header_regex_string if is_header else regex_string)
 
     matcher = regex.match(field_declaration)
     if not matcher:
@@ -41,7 +43,7 @@ def parse_field(path: list[object], field_declaration: str, type_declaration_val
                                                           {"regex": regex_string})], ctx.telepact_schema_document_names_to_json)
 
     field_name = matcher.group(0)
-    optional = bool(matcher.group(2))
+    optional = True if is_header else bool(matcher.group(2))
 
     this_path = path + [field_name]
 

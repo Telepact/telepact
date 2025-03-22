@@ -23,7 +23,7 @@ import { convertMapsToObjects } from "./ConvertMapsToObjects";
 export function serverBinaryDecode(message: any[], binaryEncoder: BinaryEncoding): any[] {
     const headers = message[0] as Map<string, any>;
     const encodedMessageBody = message[1] as Map<any, any>;
-    const clientKnownBinaryChecksums = headers.get("bin_") as number[];
+    const clientKnownBinaryChecksums = headers.get("@bin_") as number[];
     const binaryChecksumUsedByClientOnThisMessage = clientKnownBinaryChecksums[0];
 
     if (binaryChecksumUsedByClientOnThisMessage !== binaryEncoder.checksum) {
@@ -31,7 +31,7 @@ export function serverBinaryDecode(message: any[], binaryEncoder: BinaryEncoding
     }
 
     let finalEncodedMessageBody: Map<any, any>;
-    if (headers.get("pac_") === true) {
+    if (headers.get("@pac_") === true) {
         finalEncodedMessageBody = unpackBody(encodedMessageBody);
     } else {
         finalEncodedMessageBody = encodedMessageBody;

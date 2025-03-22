@@ -23,6 +23,8 @@ import java.util.Map;
 public class GetPathDocumentCoordinatesPseudoJson {
 
     public static Map<String, Object> getPathDocumentCoordinatesPseudoJson(List<Object> path, String document) {
+        System.out.println("getPathDocumentCoordinatesPseudoJson: path=" + path + ", document=" + document);
+
         Iterator<CharacterPosition> reader = stringReader(document);
         return findCoordinates(path, reader, null, null);
     }

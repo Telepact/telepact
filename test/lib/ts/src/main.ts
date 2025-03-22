@@ -377,12 +377,12 @@ function startTestServer(
         }
     };
     options.onRequest = (m: Message) => {
-        if (m.headers["_onRequestError"] === true) {
+        if (m.headers["@onRequestError_"] === true) {
             throw new Error();
         }
     };
     options.onResponse = (m: Message) => {
-        if (m.headers["_onResponseError"] === true) {
+        if (m.headers["@onResponseError_"] === true) {
             throw new Error();
         }
     };

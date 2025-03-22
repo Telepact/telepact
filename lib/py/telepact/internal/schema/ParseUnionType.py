@@ -124,7 +124,7 @@ def parse_union_type(path: list[object], union_definition_as_pseudo_json: dict[s
 
         try:
             fields = parse_struct_fields(union_key_path,
-                                         union_tag_struct, ctx)
+                                         union_tag_struct, False, ctx)
         except TelepactSchemaParseError as e:
             parse_failures.extend(e.schema_parse_failures)
             continue

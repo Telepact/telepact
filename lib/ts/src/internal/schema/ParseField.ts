@@ -25,10 +25,12 @@ export function parseField(
     path: any[],
     fieldDeclaration: string,
     typeDeclarationValue: any,
+    isHeader: boolean,
     ctx: ParseContext,
 ): TFieldDeclaration {
+    const headerRegexString = '^(@[a-z][a-zA-Z0-9_]*)$';
     const regexString = '^([a-z][a-zA-Z0-9_]*)(!)?$';
-    const regex = new RegExp(regexString);
+    const regex = new RegExp(isHeader ? headerRegexString : regexString);
 
     const matcher = fieldDeclaration.match(regex);
     if (!matcher) {
@@ -40,7 +42,7 @@ export function parseField(
     }
 
     const fieldName = matcher[0];
-    const optional = Boolean(matcher[2]);
+    const optional = isHeader ? true : Boolean(matcher[2]);
 
     const thisPath = [...path, fieldName];
 

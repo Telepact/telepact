@@ -24,6 +24,7 @@ import { getPathDocumentCoordinatesPseudoJson } from '../../internal/schema/GetP
 export function parseStructFields(
     path: any[],
     referenceStruct: { [key: string]: any },
+    isHeader: boolean,
     ctx: ParseContext,
 ): { [key: string]: TFieldDeclaration } {
     const parseFailures: SchemaParseFailure[] = [];
@@ -49,7 +50,7 @@ export function parseStructFields(
         }
 
         try {
-            const parsedField = parseField(path, fieldDeclaration, referenceStruct[fieldDeclaration], ctx);
+            const parsedField = parseField(path, fieldDeclaration, referenceStruct[fieldDeclaration], isHeader, ctx);
             const fieldName = parsedField.fieldName;
             fields[fieldName] = parsedField;
         } catch (e) {
