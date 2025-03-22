@@ -11,8 +11,6 @@ Medium:
 - Add websocket support for mock docker
 
 Low:
-- Remove unnecessary installation of pipx in github actions, apparently it might already be installed
-- @msgpack/msgpack might be an unused dependency in lib/ts
 - Replace info. with telepact. and don't show type in console
 - For the random string generation, use random words rather than random chars
 - Improve consistency around simluation naming. Still have lingering
