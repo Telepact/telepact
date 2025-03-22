@@ -1,33 +1,32 @@
-
 # Motivation
 
 | Capability                                        | OpenAPI | gRPC | GraphQL | Telepact |
-| ------------------------------------------------- | ------- | ---- | ------- | ---- |
-| No transport restrictions                         | ❌      | ❌   | ❌      | ✅   |
-| No transport details leaked into API              | ❌      | ✅   | ✅      | ✅   |
-| No string parsing/splicing                        | ❌      | ✅   | ✅      | ✅   |
-| Low development burden for servers                | ✅      | ✅   | ❌      | ✅   |
-| No required libraries for clients                 | ✅      | ❌   | ❌      | ✅   |
-| Type-safe generated code                          | 🤔      | ✅   | ✅      | ✅   |
-| Human-readable wire-format                        | ✅      | ❌   | 🤔      | ✅   |
-| Built-in binary data serialization protocol       | ❌      | ✅   | ❌      | ✅   |
-| Built-in dynamic response shaping                 | ❌      | ❌   | ✅      | ✅   |
-| No required ABI                                   | ✅      | ❌   | ✅      | ✅   |
-| Expressive distinction between null and undefined | ❌      | ❌   | ❌      | ✅   |
-| Built-in API documentation distribution           | ❌      | ❌   | ❌      | ✅   |
-| Built-in mocking for tests                        | ❌      | ❌   | ❌      | ✅   |
+| ------------------------------------------------- | ------- | ---- | ------- | -------- |
+| No transport restrictions                         | ❌      | ❌   | ❌      | ✅       |
+| No transport details leaked into API              | ❌      | ✅   | ✅      | ✅       |
+| No string parsing/splicing                        | ❌      | ✅   | ✅      | ✅       |
+| Low development burden for servers                | ✅      | ✅   | ❌      | ✅       |
+| No required libraries for clients                 | ✅      | ❌   | ❌      | ✅       |
+| Type-safe generated code                          | 🤔      | ✅   | ✅      | ✅       |
+| Human-readable wire-format                        | ✅      | ❌   | 🤔      | ✅       |
+| Built-in binary data serialization protocol       | ❌      | ✅   | ❌      | ✅       |
+| Built-in dynamic response shaping                 | ❌      | ❌   | ✅      | ✅       |
+| No required ABI                                   | ✅      | ❌   | ✅      | ✅       |
+| Expressive distinction between null and undefined | ❌      | ❌   | ❌      | ✅       |
+| Built-in API documentation distribution           | ❌      | ❌   | ❌      | ✅       |
+| Built-in mocking for tests                        | ❌      | ❌   | ❌      | ✅       |
 
 ## Why not RESTful APIs?
 
 RESTful APIs are familiar to many developers and are highly accessible due to
-reliance on ubiquitous tooling like HTTP and JSON. However, RESTful APIs by
-definition rely on HTTP and cannot be used across other IPC boundaries, limiting
-their use. RESTful APIs also tend to leak transport details into the API
-definition itself, which often leads to design inefficiencies where API design
-is stalled to answer HTTP-specific questions, such as determining the right url
-structure, query parameters, HTTP method, HTTP status code, etc. Type-safe code
-generation for RESTful APIs is in development with OAS and is generally
-available with limitations.
+reliance on ubiquitous tooling like HTTP and JSON. However, RESTful APIs rely on
+HTTP and cannot be used across other IPC boundaries, limiting their use. RESTful
+APIs also tend to leak transport details into the API definition itself, which
+often leads to design inefficiencies where API design is stalled to answer
+HTTP-specific questions, such as determining the right url structure, query
+parameters, HTTP method, HTTP status code, etc. Type-safe code generation for
+RESTful APIs is in development with OAS and is generally available with
+limitations.
 
 ## Why not gRPC?
 
@@ -74,6 +73,6 @@ optionally using:
 -   A built-in binary serialization protocol for optimized efficiency
 -   A built-in mechanism to omit fields from responses for optimized efficiency
 
-These client features are built-in via the Telepact library used by the server, such
-that all of these features are available to the client automatically, without
-any configuration by the server.
+These client features are built-in via the Telepact library used by the server,
+such that all of these features are available to the client automatically,
+without any configuration by the server.
