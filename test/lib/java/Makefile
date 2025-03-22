@@ -14,20 +14,25 @@
 #|  limitations under the License.
 #|
 
-target: dep
-	rm -rf target
-	mkdir -p target
+LIB_JAR := target/telepact.jar
+TARGET_JAR := target/telepacttest-1.0-SNAPSHOT.jar
 
-	cp $(shell find ../../../lib/java/target -name "*.jar" -not -name "*javadoc.jar" -not -name "*sources.jar") target/telepact.jar
-	mvn -q install:install-file -Dfile=target/telepact.jar -DgroupId=io.github.telepact -DartifactId=telepact -Dversion=1.0 -Dpackaging=jar
+$(TARGET_JAR): codegen $(LIB_JAR)
+	mvn install:install-file -Dfile=target/dep/telepact.jar -DgroupId=io.github.telepact -DartifactId=telepact -Dversion=1.0 -Dpackaging=jar -s settings.xml | grep -v "from central"
+	mvn package -DskipTests -s settings.xml | grep -v "from central"
 
-	telepact codegen --schema-dir ../../runner/schema/example --lang java --out src/gen/java/telepacttest --package telepacttest
+$(LIB_JAR): dep
+	mkdir -p target/dep
+	cp $(shell find ../../../lib/java/target -name "*.jar" -not -name "*javadoc.jar" -not -name "*sources.jar") target/dep/telepact.jar
 
 dep:
 	cd ../../../lib/java && make
 
+codegen:
+	telepact codegen --schema-dir ../../runner/schema/example --lang java --out src/gen/java/telepacttest --package telepacttest
+
 test-server:
-	mvn verify
+	mvn verify -s settings.xml | grep -v "from central"
 
 clean:
 	rm -rf target

@@ -14,13 +14,15 @@
 #|  limitations under the License.
 #|
 
-all: dep
-	telepact codegen --schema-dir ../../runner/schema/example --lang ts --out src/gen
+all: dep codegen
 	npm install
 	npm run build
 
 dep:
 	cd ../../../lib/ts && make
+
+codegen:
+	telepact codegen --schema-dir ../../runner/schema/example --lang ts --out src/gen
 
 test-server:
 	npm start

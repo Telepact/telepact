@@ -15,14 +15,14 @@
 #|
 
 SRC_FILES := $(shell find src -type f)
+JAR_FILES := target/*.jar
 
-target: $(SRC_FILES)
+$(JAR_FILES): $(SRC_FILES)
 	mkdir -p src/main/resources
 	cp ../../common/*.json src/main/resources
 	cp ../../LICENSE ../../NOTICE src/main/resources
-	mvn install -s settings.xml
+	mvn install -s settings.xml | grep -v "from central"
 
-.PHONY: clean
 clean:
 	rm -rf src/main/resources
 	rm -rf target

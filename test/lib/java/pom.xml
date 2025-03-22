@@ -102,7 +102,7 @@
             <goals>
               <goal>exec</goal>
             </goals>
-            <phase>test</phase>
+            <phase>verify</phase>
             <configuration>
               <executable>java</executable>
               <arguments>
