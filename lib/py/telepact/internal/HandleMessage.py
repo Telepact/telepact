@@ -17,12 +17,12 @@
 from typing import Callable, TYPE_CHECKING, cast, Awaitable
 
 from ..Message import Message
-from .types.VTypeDeclaration import VTypeDeclaration
+from .types.TTypeDeclaration import TTypeDeclaration
 
 if TYPE_CHECKING:
-    from .types.VUnion import VUnion
+    from .types.TUnion import TUnion
     from ..internal.validation.ValidationFailure import ValidationFailure
-    from .types.VType import VType
+    from .types.TType import TType
     from ..TelepactSchema import TelepactSchema
 
 
@@ -36,7 +36,7 @@ async def handle_message(
     from ..internal.validation.GetInvalidErrorMessage import get_invalid_error_message
     from ..internal.validation.ValidateHeaders import validate_headers
     from ..internal.validation.ValidateResult import validate_result
-    from .types.VFn import VFn
+    from .types.TFn import TFn
     from ..internal.validation.ValidateContext import ValidateContext
 
     print("Handling message")
@@ -44,7 +44,7 @@ async def handle_message(
     response_headers: dict[str, object] = {}
     request_headers: dict[str, object] = request_message.headers
     request_body: dict[str, object] = request_message.body
-    parsed_telepact_schema: dict[str, VType] = telepact_schema.parsed
+    parsed_telepact_schema: dict[str, TType] = telepact_schema.parsed
     request_entry: tuple[str, object] = next(iter(request_body.items()))
 
     request_target_init = request_entry[0]
@@ -60,8 +60,8 @@ async def handle_message(
         unknown_target = None
         request_target = request_target_init
 
-    function_type = cast(VFn, parsed_telepact_schema[request_target])
-    result_union_type: VUnion = function_type.result
+    function_type = cast(TFn, parsed_telepact_schema[request_target])
+    result_union_type: TUnion = function_type.result
 
     call_id = request_headers.get("id_")
     if call_id is not None:
@@ -117,7 +117,7 @@ async def handle_message(
         validate_result(result_union_type, new_error_result)
         return Message(response_headers, new_error_result)
 
-    function_type_call: VUnion = function_type.call
+    function_type_call: TUnion = function_type.call
 
     call_validation_failures: list[ValidationFailure] = function_type_call.validate(
         request_body, [], ValidateContext(None, None)
@@ -185,7 +185,7 @@ async def handle_message(
     final_result_union: dict[str, object]
     if select_struct_fields_header is not None:
         final_result_union = cast(dict[str, object], select_struct_fields(
-            VTypeDeclaration(result_union_type, False, []),
+            TTypeDeclaration(result_union_type, False, []),
             result_union,
             select_struct_fields_header,
         ))

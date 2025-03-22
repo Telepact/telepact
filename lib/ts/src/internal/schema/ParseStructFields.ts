@@ -14,7 +14,7 @@
 //|  limitations under the License.
 //|
 
-import { VFieldDeclaration } from '../types/VFieldDeclaration';
+import { TFieldDeclaration } from '../types/TFieldDeclaration';
 import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
 import { TelepactSchemaParseError } from '../../TelepactSchemaParseError';
 import { parseField } from '../../internal/schema/ParseField';
@@ -25,9 +25,9 @@ export function parseStructFields(
     path: any[],
     referenceStruct: { [key: string]: any },
     ctx: ParseContext,
-): { [key: string]: VFieldDeclaration } {
+): { [key: string]: TFieldDeclaration } {
     const parseFailures: SchemaParseFailure[] = [];
-    const fields: { [key: string]: VFieldDeclaration } = {};
+    const fields: { [key: string]: TFieldDeclaration } = {};
 
     for (const fieldDeclaration in referenceStruct) {
         for (const existingField in fields) {

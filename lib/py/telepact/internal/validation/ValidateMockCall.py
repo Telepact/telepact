@@ -20,13 +20,13 @@ import re
 
 if TYPE_CHECKING:
     from ...internal.validation.ValidateContext import ValidateContext
-    from ..types.VTypeDeclaration import VTypeDeclaration
-    from ..types.VType import VType
+    from ..types.TTypeDeclaration import TTypeDeclaration
+    from ..types.TType import TType
 
 
-def validate_mock_call(given_obj: object, types: dict[str, 'VType'], ctx: 'ValidateContext') -> list['ValidationFailure']:
+def validate_mock_call(given_obj: object, types: dict[str, 'TType'], ctx: 'ValidateContext') -> list['ValidationFailure']:
     from ...internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
-    from ..types.VFn import VFn
+    from ..types.TFn import TFn
 
     if not isinstance(given_obj, dict):
         return get_type_unexpected_validation_failure([], given_obj, "Object")
@@ -43,7 +43,7 @@ def validate_mock_call(given_obj: object, types: dict[str, 'VType'], ctx: 'Valid
                                   {"regex": regex_string, "actual": len(matches), "expected": 1, "keys": keys})]
 
     function_name = matches[0]
-    function_def = cast(VFn, types[function_name])
+    function_def = cast(TFn, types[function_name])
     input = given_map[function_name]
 
     function_def_call = function_def.call

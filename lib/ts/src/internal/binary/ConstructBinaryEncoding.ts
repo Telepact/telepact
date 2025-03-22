@@ -17,30 +17,30 @@
 import { TelepactSchema } from '../../TelepactSchema';
 import { BinaryEncoding } from '../../internal/binary/BinaryEncoding';
 import { createChecksum } from '../../internal/binary/CreateChecksum';
-import { VUnion } from '../types/VUnion';
-import { VStruct } from '../types/VStruct';
-import { VFn } from '../types/VFn';
-import { VArray } from '../types/VArray';
-import { VObject } from '../types/VObject';
-import { VTypeDeclaration } from '../types/VTypeDeclaration';
+import { TUnion } from '../types/TUnion';
+import { TStruct } from '../types/TStruct';
+import { TFn } from '../types/TFn';
+import { TArray } from '../types/TArray';
+import { TObject } from '../types/TObject';
+import { TTypeDeclaration } from '../types/TTypeDeclaration';
 
-function traceType(typeDeclaration: VTypeDeclaration): string[] {
+function traceType(typeDeclaration: TTypeDeclaration): string[] {
     const thisAllKeys: string[] = [];
 
-    if (typeDeclaration.type instanceof VArray) {
+    if (typeDeclaration.type instanceof TArray) {
         const theseKeys2 = traceType(typeDeclaration.typeParameters[0]);
         thisAllKeys.push(...theseKeys2);
-    } else if (typeDeclaration.type instanceof VObject) {
+    } else if (typeDeclaration.type instanceof TObject) {
         const theseKeys2 = traceType(typeDeclaration.typeParameters[0]);
         thisAllKeys.push(...theseKeys2);
-    } else if (typeDeclaration.type instanceof VStruct) {
+    } else if (typeDeclaration.type instanceof TStruct) {
         const structFields = typeDeclaration.type.fields;
         for (const [structFieldKey, structField] of Object.entries(structFields)) {
             thisAllKeys.push(structFieldKey);
             const moreKeys = traceType(structField.typeDeclaration);
             thisAllKeys.push(...moreKeys);
         }
-    } else if (typeDeclaration.type instanceof VUnion) {
+    } else if (typeDeclaration.type instanceof TUnion) {
         const unionTags = typeDeclaration.type.tags;
         for (const [tagKey, tagValue] of Object.entries(unionTags)) {
             thisAllKeys.push(tagKey);
@@ -59,10 +59,10 @@ function traceType(typeDeclaration: VTypeDeclaration): string[] {
 export function constructBinaryEncoding(telepactSchema: TelepactSchema): BinaryEncoding {
     const allKeys: Set<string> = new Set();
 
-    const functions: [string, VFn][] = [];
+    const functions: [string, TFn][] = [];
 
     for (const [key, value] of Object.entries(telepactSchema.parsed)) {
-        if (value instanceof VFn) {
+        if (value instanceof TFn) {
             functions.push([key, value]);
         }
     }

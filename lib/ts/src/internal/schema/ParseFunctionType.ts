@@ -14,8 +14,8 @@
 //|  limitations under the License.
 //|
 
-import { VFn } from '../types/VFn';
-import { VUnion } from '../types/VUnion';
+import { TFn } from '../types/TFn';
+import { TUnion } from '../types/TUnion';
 import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
 import { getTypeUnexpectedParseFailure } from '../../internal/schema/GetTypeUnexpectedParseFailure';
 import { parseStructType } from '../../internal/schema/ParseStructType';
@@ -24,20 +24,20 @@ import { TelepactSchemaParseError } from '../../TelepactSchemaParseError';
 import { ParseContext } from '../../internal/schema/ParseContext';
 import { getOrParseType } from './GetOrParseType';
 import { derivePossibleSelect } from './DerivePossibleSelect';
-import { VSelect } from '../types/VSelect';
+import { TSelect } from '../types/TSelect';
 
 export function parseFunctionType(
     path: any[],
     functionDefinitionAsParsedJson: { [key: string]: any },
     schemaKey: string,
     ctx: ParseContext,
-): VFn {
+): TFn {
     const parseFailures: SchemaParseFailure[] = [];
 
-    let callType: VUnion | null = null;
+    let callType: TUnion | null = null;
     try {
         const argType = parseStructType(path, functionDefinitionAsParsedJson, schemaKey, ['->', '_errors'], ctx);
-        callType = new VUnion(schemaKey, { [schemaKey]: argType }, { [schemaKey]: 0 });
+        callType = new TUnion(schemaKey, { [schemaKey]: argType }, { [schemaKey]: 0 });
     } catch (e) {
         if (e instanceof TelepactSchemaParseError) {
             parseFailures.push(...e.schemaParseFailures);
@@ -48,7 +48,7 @@ export function parseFunctionType(
 
     const resultSchemaKey = '->';
 
-    let resultType: VUnion | null = null;
+    let resultType: TUnion | null = null;
     if (!(resultSchemaKey in functionDefinitionAsParsedJson)) {
         parseFailures.push(
             new SchemaParseFailure(ctx.documentName, path, 'RequiredObjectKeyMissing', { key: resultSchemaKey }),
@@ -102,9 +102,9 @@ export function parseFunctionType(
         throw new TelepactSchemaParseError(parseFailures, ctx.telepactSchemaDocumentNamesToJson);
     }
 
-    const fnSelectType = derivePossibleSelect(schemaKey, resultType as VUnion);
-    const selectType = getOrParseType([], '_ext.Select_', ctx) as VSelect;
+    const fnSelectType = derivePossibleSelect(schemaKey, resultType as TUnion);
+    const selectType = getOrParseType([], '_ext.Select_', ctx) as TSelect;
     selectType.possibleSelects[schemaKey] = fnSelectType;
 
-    return new VFn(schemaKey, callType as VUnion, resultType as VUnion, errorsRegex as string);
+    return new TFn(schemaKey, callType as TUnion, resultType as TUnion, errorsRegex as string);
 }

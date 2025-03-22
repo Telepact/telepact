@@ -22,8 +22,8 @@ import static io.github.telepact.internal.schema.GetSchemaFileMap.getSchemaFileM
 import java.util.List;
 import java.util.Map;
 
-import io.github.telepact.internal.types.VFieldDeclaration;
-import io.github.telepact.internal.types.VType;
+import io.github.telepact.internal.types.TFieldDeclaration;
+import io.github.telepact.internal.types.TType;
 
 /**
  * A parsed telepact schema.
@@ -31,14 +31,14 @@ import io.github.telepact.internal.types.VType;
 public class TelepactSchema {
 
     public final List<Object> original;
-    public final Map<String, VType> parsed;
-    public final Map<String, VFieldDeclaration> parsedRequestHeaders;
-    public final Map<String, VFieldDeclaration> parsedResponseHeaders;
+    public final Map<String, TType> parsed;
+    public final Map<String, TFieldDeclaration> parsedRequestHeaders;
+    public final Map<String, TFieldDeclaration> parsedResponseHeaders;
 
     public TelepactSchema(List<Object> original,
-            Map<String, VType> parsed,
-            Map<String, VFieldDeclaration> parsedRequestHeaders,
-            Map<String, VFieldDeclaration> parsedResponseHeaders) {
+            Map<String, TType> parsed,
+            Map<String, TFieldDeclaration> parsedRequestHeaders,
+            Map<String, TFieldDeclaration> parsedResponseHeaders) {
         this.original = original;
         this.parsed = parsed;
         this.parsedRequestHeaders = parsedRequestHeaders;

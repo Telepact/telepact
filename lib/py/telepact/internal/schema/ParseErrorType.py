@@ -16,7 +16,7 @@
 
 from typing import TYPE_CHECKING, cast
 from ...internal.schema.SchemaParseFailure import SchemaParseFailure
-from ..types.VError import VError
+from ..types.TError import TError
 
 if TYPE_CHECKING:
     from ...internal.schema.ParseContext import ParseContext
@@ -24,7 +24,7 @@ if TYPE_CHECKING:
 
 def parse_error_type(path: list[object], error_definition_as_parsed_json: dict[str, object],
                      schema_key: str,
-                     ctx: 'ParseContext') -> 'VError':
+                     ctx: 'ParseContext') -> 'TError':
     from ...TelepactSchemaParseError import TelepactSchemaParseError
     from ...internal.schema.ParseUnionType import parse_union_type
 
@@ -47,4 +47,4 @@ def parse_error_type(path: list[object], error_definition_as_parsed_json: dict[s
     error = parse_union_type(path, error_definition_as_parsed_json, schema_key, [], [],
                              ctx)
 
-    return VError(schema_key, error)
+    return TError(schema_key, error)

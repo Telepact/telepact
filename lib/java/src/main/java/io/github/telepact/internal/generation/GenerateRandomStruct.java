@@ -22,13 +22,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
-import io.github.telepact.internal.types.VFieldDeclaration;
-import io.github.telepact.internal.types.VTypeDeclaration;
+import io.github.telepact.internal.types.TFieldDeclaration;
+import io.github.telepact.internal.types.TTypeDeclaration;
 
 public class GenerateRandomStruct {
     public static Object generateRandomStruct(
             Object blueprintValue, boolean useBlueprintValue,
-            Map<String, VFieldDeclaration> referenceStruct,
+            Map<String, TFieldDeclaration> referenceStruct,
             GenerateContext ctx) {
         final var startingStruct = useBlueprintValue ? (Map<String, Object>) blueprintValue : new HashMap<>();
 
@@ -41,7 +41,7 @@ public class GenerateRandomStruct {
             final var fieldDeclaration = field.getValue();
             final var thisBlueprintValue = startingStruct.get(fieldName);
             final var thisUseBlueprintValue = startingStruct.containsKey(fieldName);
-            final VTypeDeclaration typeDeclaration = fieldDeclaration.typeDeclaration;
+            final TTypeDeclaration typeDeclaration = fieldDeclaration.typeDeclaration;
 
             final Object value;
             if (thisUseBlueprintValue) {

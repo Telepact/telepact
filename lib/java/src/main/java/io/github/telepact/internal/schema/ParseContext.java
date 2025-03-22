@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import io.github.telepact.internal.types.VType;
+import io.github.telepact.internal.types.TType;
 
 public class ParseContext {
 
@@ -29,7 +29,7 @@ public class ParseContext {
     public final Map<String, String> telepactSchemaDocumentNamesToJson;
     public final Map<String, String> schemaKeysToDocumentName;
     public final Map<String, Integer> schemaKeysToIndex;
-    public final Map<String, VType> parsedTypes;
+    public final Map<String, TType> parsedTypes;
     public final List<SchemaParseFailure> allParseFailures;
     public final Set<String> failedTypes;
 
@@ -37,7 +37,7 @@ public class ParseContext {
             Map<String, List<Object>> telepactSchemaDocumentsToPseudoJson,
             Map<String, String> telepactSchemaDocumentNamesToJson,
             Map<String, String> schemaKeysToDocumentName, Map<String, Integer> schemaKeysToIndex,
-            Map<String, VType> parsedTypes,
+            Map<String, TType> parsedTypes,
             List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
         this.documentName = documentName;
         this.telepactSchemaDocumentsToPseudoJson = telepactSchemaDocumentsToPseudoJson;

@@ -25,10 +25,10 @@ import java.util.List;
 import java.util.Map;
 
 import io.github.telepact.TelepactSchemaParseError;
-import io.github.telepact.internal.types.VStruct;
+import io.github.telepact.internal.types.TStruct;
 
 public class ParseStructType {
-    static VStruct parseStructType(
+    static TStruct parseStructType(
             List<Object> path,
             Map<String, Object> structDefinitionAsPseudoJson,
             String schemaKey, List<String> ignoreKeys,
@@ -74,6 +74,6 @@ public class ParseStructType {
 
         final var fields = parseStructFields(thisPath, definition, ctx);
 
-        return new VStruct(schemaKey, fields);
+        return new TStruct(schemaKey, fields);
     }
 }

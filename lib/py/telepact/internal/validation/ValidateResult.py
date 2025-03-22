@@ -18,10 +18,10 @@ from typing import TYPE_CHECKING
 from ...TelepactError import TelepactError
 
 if TYPE_CHECKING:
-    from ..types.VUnion import VUnion
+    from ..types.TUnion import TUnion
 
 
-def validate_result(result_union_type: 'VUnion', error_result: object) -> None:
+def validate_result(result_union_type: 'TUnion', error_result: object) -> None:
     from ...internal.validation.MapValidationFailuresToInvalidFieldCases import map_validation_failures_to_invalid_field_cases
     from ...internal.validation.ValidateContext import ValidateContext
 

@@ -28,20 +28,20 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import io.github.telepact.TelepactSchemaParseError;
-import io.github.telepact.internal.types.VAny;
-import io.github.telepact.internal.types.VArray;
-import io.github.telepact.internal.types.VBoolean;
-import io.github.telepact.internal.types.VInteger;
-import io.github.telepact.internal.types.VMockCall;
-import io.github.telepact.internal.types.VMockStub;
-import io.github.telepact.internal.types.VNumber;
-import io.github.telepact.internal.types.VObject;
-import io.github.telepact.internal.types.VSelect;
-import io.github.telepact.internal.types.VString;
-import io.github.telepact.internal.types.VType;
+import io.github.telepact.internal.types.TAny;
+import io.github.telepact.internal.types.TArray;
+import io.github.telepact.internal.types.TBoolean;
+import io.github.telepact.internal.types.TInteger;
+import io.github.telepact.internal.types.TMockCall;
+import io.github.telepact.internal.types.TMockStub;
+import io.github.telepact.internal.types.TNumber;
+import io.github.telepact.internal.types.TObject;
+import io.github.telepact.internal.types.TSelect;
+import io.github.telepact.internal.types.TString;
+import io.github.telepact.internal.types.TType;
 
 public class GetOrParseType {
-    static VType getOrParseType(
+    static TType getOrParseType(
             List<Object> path,
             String typeName,
             ParseContext ctx) {
@@ -67,13 +67,13 @@ public class GetOrParseType {
         final var standardTypeName = matcher.group(1);
         if (standardTypeName != null) {
             return switch (standardTypeName) {
-                case "boolean" -> new VBoolean();
-                case "integer" -> new VInteger();
-                case "number" -> new VNumber();
-                case "string" -> new VString();
-                case "array" -> new VArray();
-                case "object" -> new VObject();
-                default -> new VAny();
+                case "boolean" -> new TBoolean();
+                case "integer" -> new TInteger();
+                case "number" -> new TNumber();
+                case "string" -> new TString();
+                case "array" -> new TArray();
+                case "object" -> new TObject();
+                default -> new TAny();
             };
         }
 
@@ -89,7 +89,7 @@ public class GetOrParseType {
 
         try {
             final List<Object> thisPath = List.of(thisIndex);
-            final VType type;
+            final TType type;
             if (customTypeName.startsWith("struct")) {
                 type = parseStructType(thisPath, definition, customTypeName, List.of(),
                         ctx.copyWithNewDocumentName(thisDocumentName));
@@ -101,16 +101,16 @@ public class GetOrParseType {
                 type = parseFunctionType(thisPath, definition, customTypeName,
                         ctx.copyWithNewDocumentName(thisDocumentName));
             } else {
-                VType possibleTypeExtension;
+                TType possibleTypeExtension;
                 switch (customTypeName) {
                     case "_ext.Select_":
-                        possibleTypeExtension = new VSelect();
+                        possibleTypeExtension = new TSelect();
                         break;
                     case "_ext.Call_":
-                        possibleTypeExtension = new VMockCall(ctx.parsedTypes);
+                        possibleTypeExtension = new TMockCall(ctx.parsedTypes);
                         break;
                     case "_ext.Stub_":
-                        possibleTypeExtension = new VMockStub(ctx.parsedTypes);
+                        possibleTypeExtension = new TMockStub(ctx.parsedTypes);
                         break;
                     default:
                         possibleTypeExtension = null;

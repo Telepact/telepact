@@ -23,15 +23,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import io.github.telepact.internal.types.VFn;
-import io.github.telepact.internal.types.VStruct;
-import io.github.telepact.internal.types.VType;
-import io.github.telepact.internal.types.VTypeDeclaration;
-import io.github.telepact.internal.types.VUnion;
+import io.github.telepact.internal.types.TFn;
+import io.github.telepact.internal.types.TStruct;
+import io.github.telepact.internal.types.TType;
+import io.github.telepact.internal.types.TTypeDeclaration;
+import io.github.telepact.internal.types.TUnion;
 
 public class ValidateMockStub {
     public static List<ValidationFailure> validateMockStub(Object givenObj,
-            List<VTypeDeclaration> typeParameters, Map<String, VType> types, ValidateContext ctx) {
+            List<TTypeDeclaration> typeParameters, Map<String, TType> types, ValidateContext ctx) {
         final var validationFailures = new ArrayList<ValidationFailure>();
 
         if (!(givenObj instanceof Map)) {
@@ -54,12 +54,12 @@ public class ValidateMockStub {
         }
 
         final var functionName = matches.get(0);
-        final var functionDef = (VFn) types.get(functionName);
+        final var functionDef = (TFn) types.get(functionName);
         final var input = givenMap.get(functionName);
 
-        final VUnion functionDefCall = functionDef.call;
+        final TUnion functionDefCall = functionDef.call;
         final String functionDefName = functionDef.name;
-        final Map<String, VStruct> functionDefCallTags = functionDefCall.tags;
+        final Map<String, TStruct> functionDefCallTags = functionDefCall.tags;
         final var inputFailures = functionDefCallTags.get(functionDefName).validate(input, List.of(), ctx);
 
         final var inputFailuresWithPath = new ArrayList<ValidationFailure>();

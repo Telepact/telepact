@@ -17,15 +17,15 @@
 import re
 from typing import TYPE_CHECKING
 from ...internal.schema.SchemaParseFailure import SchemaParseFailure
-from ..types.VTypeDeclaration import VTypeDeclaration
+from ..types.TTypeDeclaration import TTypeDeclaration
 
 if TYPE_CHECKING:
-    from ..types.VType import VType
+    from ..types.TType import TType
     from ...internal.schema.ParseContext import ParseContext
 
 
 def parse_type_declaration(path: list[object], type_declaration_array: list[object],
-                           ctx: 'ParseContext') -> 'VTypeDeclaration':
+                           ctx: 'ParseContext') -> 'TTypeDeclaration':
     from ...TelepactSchemaParseError import TelepactSchemaParseError
     from ...internal.schema.GetOrParseType import get_or_parse_type
     from ...internal.schema.GetTypeUnexpectedParseFailure import get_type_unexpected_parse_failure
@@ -89,4 +89,4 @@ def parse_type_declaration(path: list[object], type_declaration_array: list[obje
         raise TelepactSchemaParseError(
             parse_failures, ctx.telepact_schema_document_names_to_json)
 
-    return VTypeDeclaration(type_, nullable, type_parameters)
+    return TTypeDeclaration(type_, nullable, type_parameters)

@@ -15,14 +15,14 @@
 //|
 
 import { ValidationFailure } from '../../internal/validation/ValidationFailure';
-import { VTypeDeclaration } from '../types/VTypeDeclaration';
+import { TTypeDeclaration } from '../types/TTypeDeclaration';
 import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure';
-import { objectName } from '../types/VObject';
+import { objectName } from '../types/TObject';
 import { ValidateContext } from './ValidateContext';
 
 export function validateObject(
     value: any,
-    typeParameters: VTypeDeclaration[],
+    typeParameters: TTypeDeclaration[],
     ctx: ValidateContext,
 ): ValidationFailure[] {
     if (typeof value === 'object' && !Array.isArray(value)) {

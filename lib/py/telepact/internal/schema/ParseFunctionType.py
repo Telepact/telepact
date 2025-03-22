@@ -18,24 +18,24 @@ from typing import TYPE_CHECKING, cast
 from ...internal.schema.DerivePossibleSelects import derive_possible_select
 from ...internal.schema.GetOrParseType import get_or_parse_type
 from ...internal.schema.SchemaParseFailure import SchemaParseFailure
-from ..types.VSelect import VSelect
-from ..types.VFn import VFn
+from ..types.TSelect import TSelect
+from ..types.TFn import TFn
 
 if TYPE_CHECKING:
     from ...internal.schema.ParseContext import ParseContext
-    from ..types.VType import VType
+    from ..types.TType import TType
 
 
 def parse_function_type(path: list[object], function_definition_as_parsed_json: dict[str, object],
                         schema_key: str,
-                        ctx: 'ParseContext') -> 'VFn':
+                        ctx: 'ParseContext') -> 'TFn':
     from ...internal.schema.GetTypeUnexpectedParseFailure import get_type_unexpected_parse_failure
     from ...internal.schema.ParseStructType import parse_struct_type
     from ...internal.schema.ParseUnionType import parse_union_type
     from ...internal.schema.ParseUnionType import parse_union_type
     from ...TelepactSchemaParseError import TelepactSchemaParseError
     from ...internal.schema.SchemaParseFailure import SchemaParseFailure
-    from ..types.VUnion import VUnion
+    from ..types.TUnion import TUnion
 
     parse_failures = []
 
@@ -44,7 +44,7 @@ def parse_function_type(path: list[object], function_definition_as_parsed_json: 
         arg_type = parse_struct_type(path, function_definition_as_parsed_json,
                                      schema_key, ["->", "_errors"],
                                      ctx)
-        call_type = VUnion(schema_key, {schema_key: arg_type}, {
+        call_type = TUnion(schema_key, {schema_key: arg_type}, {
                            schema_key: 0})
     except TelepactSchemaParseError as e:
         parse_failures.extend(e.schema_parse_failures)
@@ -88,8 +88,8 @@ def parse_function_type(path: list[object], function_definition_as_parsed_json: 
             parse_failures, ctx.telepact_schema_document_names_to_json)
 
     fn_select_type = derive_possible_select(
-        schema_key, cast(VUnion, result_type))
-    select_type = cast(VSelect, get_or_parse_type([], '_ext.Select_', ctx))
+        schema_key, cast(TUnion, result_type))
+    select_type = cast(TSelect, get_or_parse_type([], '_ext.Select_', ctx))
     select_type.possible_selects[schema_key] = fn_select_type
 
-    return VFn(schema_key, cast(VUnion, call_type), cast(VUnion, result_type), cast(str, errors_regex))
+    return TFn(schema_key, cast(TUnion, call_type), cast(TUnion, result_type), cast(str, errors_regex))

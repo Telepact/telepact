@@ -23,7 +23,7 @@ import { isSubMap } from '../../internal/mock/IsSubMap';
 import { verify } from '../../internal/mock/Verify';
 import { verifyNoMoreInteractions } from '../../internal/mock/VerifyNoMoreInteractions';
 import { TelepactError } from '../../TelepactError';
-import { VFn } from '../types/VFn';
+import { TFn } from '../types/TFn';
 import { objectsAreEqual } from '../../internal/ObjectsAreEqual';
 import { GenerateContext } from '../generation/GenerateContext';
 
@@ -83,7 +83,7 @@ export async function mockHandle(
     } else {
         invocations.push(new MockInvocation(functionName, argument));
 
-        const definition = telepactSchema.parsed[functionName] as VFn;
+        const definition = telepactSchema.parsed[functionName] as TFn;
 
         for (const stub of stubs) {
             if (stub.count === 0) {

@@ -14,7 +14,7 @@
 #|  limitations under the License.
 #|
 
-from ..types.VNumber import _NUMBER_NAME
+from ..types.TNumber import _NUMBER_NAME
 from ...internal.validation.ValidationFailure import ValidationFailure
 
 

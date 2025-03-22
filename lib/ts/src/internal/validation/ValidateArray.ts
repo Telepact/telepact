@@ -14,15 +14,15 @@
 //|  limitations under the License.
 //|
 
-import { VTypeDeclaration } from '../types/VTypeDeclaration';
+import { TTypeDeclaration } from '../types/TTypeDeclaration';
 import { ValidationFailure } from '../../internal/validation/ValidationFailure';
 import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure';
-import { arrayName } from '../types/VArray';
+import { arrayName } from '../types/TArray';
 import { ValidateContext } from './ValidateContext';
 
 export function validateArray(
     value: any,
-    typeParameters: VTypeDeclaration[],
+    typeParameters: TTypeDeclaration[],
     ctx: ValidateContext,
 ): ValidationFailure[] {
     if (Array.isArray(value)) {

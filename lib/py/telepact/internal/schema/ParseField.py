@@ -17,15 +17,15 @@
 import re
 from typing import TYPE_CHECKING
 from ...internal.schema.SchemaParseFailure import SchemaParseFailure
-from ..types.VFieldDeclaration import VFieldDeclaration
+from ..types.TFieldDeclaration import TFieldDeclaration
 
 if TYPE_CHECKING:
-    from ..types.VType import VType
+    from ..types.TType import TType
     from ...internal.schema.ParseContext import ParseContext
 
 
 def parse_field(path: list[object], field_declaration: str, type_declaration_value: object,
-                ctx: 'ParseContext') -> 'VFieldDeclaration':
+                ctx: 'ParseContext') -> 'TFieldDeclaration':
     from ...TelepactSchemaParseError import TelepactSchemaParseError
     from ...internal.schema.GetTypeUnexpectedParseFailure import get_type_unexpected_parse_failure
     from ...internal.schema.ParseTypeDeclaration import parse_type_declaration
@@ -56,4 +56,4 @@ def parse_field(path: list[object], field_declaration: str, type_declaration_val
     type_declaration = parse_type_declaration(this_path,
                                               type_declaration_array, ctx)
 
-    return VFieldDeclaration(field_name, type_declaration, optional)
+    return TFieldDeclaration(field_name, type_declaration, optional)

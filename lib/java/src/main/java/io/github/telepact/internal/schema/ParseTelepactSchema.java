@@ -34,10 +34,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.github.telepact.TelepactSchema;
 import io.github.telepact.TelepactSchemaParseError;
-import io.github.telepact.internal.types.VError;
-import io.github.telepact.internal.types.VFieldDeclaration;
-import io.github.telepact.internal.types.VHeaders;
-import io.github.telepact.internal.types.VType;
+import io.github.telepact.internal.types.TError;
+import io.github.telepact.internal.types.TFieldDeclaration;
+import io.github.telepact.internal.types.THeaders;
+import io.github.telepact.internal.types.TType;
 
 public class ParseTelepactSchema {
 
@@ -53,7 +53,7 @@ public class ParseTelepactSchema {
                 return k1.compareTo(k2);
             }
         });
-        final var parsedTypes = new HashMap<String, VType>();
+        final var parsedTypes = new HashMap<String, TType>();
         final var parseFailures = new ArrayList<SchemaParseFailure>();
         final var failedTypes = new HashSet<String>();
         final var schemaKeysToIndex = new HashMap<String, Integer>();
@@ -185,7 +185,7 @@ public class ParseTelepactSchema {
             throw new TelepactSchemaParseError(parseFailures, telepactSchemaNameToJson);
         }
 
-        var errors = new ArrayList<VError>();
+        var errors = new ArrayList<TError>();
 
         for (String thisKey : errorKeys) {
             var thisIndex = schemaKeysToIndex.get(thisKey);
@@ -237,10 +237,10 @@ public class ParseTelepactSchema {
             }
         }
 
-        var headers = new ArrayList<VHeaders>();
+        var headers = new ArrayList<THeaders>();
 
-        var requestHeaders = new HashMap<String, VFieldDeclaration>();
-        var responseHeaders = new HashMap<String, VFieldDeclaration>();
+        var requestHeaders = new HashMap<String, TFieldDeclaration>();
+        var responseHeaders = new HashMap<String, TFieldDeclaration>();
 
         for (String headerKey : headerKeys) {
             var thisIndex = schemaKeysToIndex.get(headerKey);

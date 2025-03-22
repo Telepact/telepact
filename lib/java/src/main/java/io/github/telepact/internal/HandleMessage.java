@@ -30,10 +30,10 @@ import java.util.function.Function;
 
 import io.github.telepact.Message;
 import io.github.telepact.TelepactSchema;
-import io.github.telepact.internal.types.VFn;
-import io.github.telepact.internal.types.VType;
-import io.github.telepact.internal.types.VTypeDeclaration;
-import io.github.telepact.internal.types.VUnion;
+import io.github.telepact.internal.types.TFn;
+import io.github.telepact.internal.types.TType;
+import io.github.telepact.internal.types.TTypeDeclaration;
+import io.github.telepact.internal.types.TUnion;
 import io.github.telepact.internal.validation.ValidateContext;
 import io.github.telepact.internal.validation.ValidationFailure;
 
@@ -43,7 +43,7 @@ public class HandleMessage {
         final var responseHeaders = (Map<String, Object>) new HashMap<String, Object>();
         final Map<String, Object> requestHeaders = requestMessage.headers;
         final Map<String, Object> requestBody = requestMessage.body;
-        final Map<String, VType> parsedTelepactSchema = telepactSchema.parsed;
+        final Map<String, TType> parsedTelepactSchema = telepactSchema.parsed;
         final Map.Entry<String, Object> requestEntry = requestBody.entrySet().stream().findAny().get();
 
         final String requestTargetInit = requestEntry.getKey();
@@ -59,7 +59,7 @@ public class HandleMessage {
             requestTarget = requestTargetInit;
         }
 
-        final var functionType = (VFn) parsedTelepactSchema.get(requestTarget);
+        final var functionType = (TFn) parsedTelepactSchema.get(requestTarget);
         final var resultUnionType = functionType.result;
 
         final var callId = requestHeaders.get("id_");
@@ -108,7 +108,7 @@ public class HandleMessage {
             return new Message(responseHeaders, newErrorResult);
         }
 
-        final VUnion functionTypeCall = functionType.call;
+        final TUnion functionTypeCall = functionType.call;
 
         final var callValidationFailures = functionTypeCall.validate(requestBody, List.of(),
                 new ValidateContext(null, null));
@@ -164,7 +164,7 @@ public class HandleMessage {
         final Map<String, Object> finalResultUnion;
         if (selectStructFieldsHeader != null) {
             finalResultUnion = (Map<String, Object>) selectStructFields(
-                    new VTypeDeclaration(resultUnionType, false, List.of()),
+                    new TTypeDeclaration(resultUnionType, false, List.of()),
                     resultUnion,
                     selectStructFieldsHeader);
         } else {

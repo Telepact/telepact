@@ -17,18 +17,18 @@
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from ..types.VUnion import VUnion
-    from ..types.VStruct import VStruct
-    from ..types.VType import VType
-    from ..types.VFieldDeclaration import VFieldDeclaration
+    from ..types.TUnion import TUnion
+    from ..types.TStruct import TStruct
+    from ..types.TType import TType
+    from ..types.TFieldDeclaration import TFieldDeclaration
 
 
-def derive_possible_select(fn_name: str, result: 'VUnion') -> dict[str, object]:
-    from ..types.VUnion import VUnion
-    from ..types.VStruct import VStruct
+def derive_possible_select(fn_name: str, result: 'TUnion') -> dict[str, object]:
+    from ..types.TUnion import TUnion
+    from ..types.TStruct import TStruct
 
-    nested_types: dict[str, VType] = {}
-    ok_fields: dict[str, VFieldDeclaration] = result.tags['Ok_'].fields
+    nested_types: dict[str, TType] = {}
+    ok_fields: dict[str, TFieldDeclaration] = result.tags['Ok_'].fields
 
     ok_field_names = sorted(ok_fields.keys())
 
@@ -43,7 +43,7 @@ def derive_possible_select(fn_name: str, result: 'VUnion') -> dict[str, object]:
     sorted_type_keys = sorted(nested_types.keys())
     for k in sorted_type_keys:
         v = nested_types[k]
-        if isinstance(v, VUnion):
+        if isinstance(v, TUnion):
             union_select: dict[str, list[str]] = {}
             sorted_tag_keys = sorted(v.tags.keys())
             for c in sorted_tag_keys:
@@ -52,23 +52,23 @@ def derive_possible_select(fn_name: str, result: 'VUnion') -> dict[str, object]:
                 union_select[c] = selected_field_names
 
             possible_select[k] = union_select
-        elif isinstance(v, VStruct):
+        elif isinstance(v, TStruct):
             struct_select: list[str] = sorted(v.fields.keys())
             possible_select[k] = struct_select
 
     return possible_select
 
 
-def find_nested_types(fields: dict[str, 'VFieldDeclaration'], nested_types: dict[str, 'VType']) -> None:
-    from ..types.VUnion import VUnion
-    from ..types.VStruct import VStruct
+def find_nested_types(fields: dict[str, 'TFieldDeclaration'], nested_types: dict[str, 'TType']) -> None:
+    from ..types.TUnion import TUnion
+    from ..types.TStruct import TStruct
 
     for field in fields.values():
         typ = field.type_declaration.type
-        if isinstance(typ, VUnion):
+        if isinstance(typ, TUnion):
             nested_types[typ.name] = typ
             for c in typ.tags.values():
                 find_nested_types(c.fields, nested_types)
-        elif isinstance(typ, VStruct):
+        elif isinstance(typ, TStruct):
             nested_types[typ.name] = typ
             find_nested_types(typ.fields, nested_types)

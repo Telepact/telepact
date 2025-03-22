@@ -15,7 +15,7 @@
 //|
 
 import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
-import { VError } from '../types/VError';
+import { TError } from '../types/TError';
 import { TelepactSchemaParseError } from '../../TelepactSchemaParseError';
 import { parseUnionType } from '../../internal/schema/ParseUnionType';
 import { ParseContext } from '../../internal/schema/ParseContext';
@@ -25,7 +25,7 @@ export function parseErrorType(
     errorDefinitionAsParsedJson: { [key: string]: any },
     schemaKey: string,
     ctx: ParseContext,
-): VError {
+): TError {
     const parseFailures: SchemaParseFailure[] = [];
 
     const otherKeys = Object.keys(errorDefinitionAsParsedJson).filter((key) => key !== schemaKey && key !== '///');
@@ -43,5 +43,5 @@ export function parseErrorType(
 
     const error = parseUnionType(path, errorDefinitionAsParsedJson, schemaKey, [], [], ctx);
 
-    return new VError(schemaKey, error);
+    return new TError(schemaKey, error);
 }

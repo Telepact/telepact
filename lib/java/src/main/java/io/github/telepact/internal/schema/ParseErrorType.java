@@ -26,11 +26,11 @@ import java.util.Map;
 import java.util.Set;
 
 import io.github.telepact.TelepactSchemaParseError;
-import io.github.telepact.internal.types.VError;
-import io.github.telepact.internal.types.VUnion;
+import io.github.telepact.internal.types.TError;
+import io.github.telepact.internal.types.TUnion;
 
 public class ParseErrorType {
-    public static VError parseErrorType(
+    public static TError parseErrorType(
             List<Object> path,
             Map<String, Object> errorDefinitionAsParsedJson,
             String schemaKey,
@@ -58,10 +58,10 @@ public class ParseErrorType {
 
         // Assuming parseUnionType is adapted to Java and returns UError or its
 
-        VUnion error = parseUnionType(path, errorDefinitionAsParsedJson, schemaKey,
+        TUnion error = parseUnionType(path, errorDefinitionAsParsedJson, schemaKey,
                 new ArrayList<>(),
                 new ArrayList<>(), ctx);
 
-        return new VError(schemaKey, error);
+        return new TError(schemaKey, error);
     }
 }

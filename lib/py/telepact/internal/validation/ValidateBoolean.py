@@ -15,7 +15,7 @@
 #|
 
 from typing import TYPE_CHECKING
-from ..types.VBoolean import _BOOLEAN_NAME
+from ..types.TBoolean import _BOOLEAN_NAME
 
 if TYPE_CHECKING:
     from ...internal.validation.ValidationFailure import ValidationFailure

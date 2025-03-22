@@ -32,9 +32,9 @@ export * from './fileSystem';
 export { default as jsonSchema } from '../inc/json-schema.json';
 
 import { GenerateContext } from './internal/generation/GenerateContext';
-import { VFn } from './internal/types/VFn';
+import { TFn } from './internal/types/TFn';
 
 export const _internal = {
     GenerateContext,
-    VFn: VFn,
+    TFn: TFn,
 };

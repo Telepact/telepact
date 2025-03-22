@@ -20,13 +20,13 @@ import static io.github.telepact.internal.validation.GetTypeUnexpectedValidation
 
 import java.util.List;
 
-import io.github.telepact.internal.types.VType;
-import io.github.telepact.internal.types.VTypeDeclaration;
+import io.github.telepact.internal.types.TType;
+import io.github.telepact.internal.types.TTypeDeclaration;
 
 public class ValidateValueOfType {
 
     public static List<ValidationFailure> validateValueOfType(Object value,
-            VType thisType, boolean nullable, List<VTypeDeclaration> typeParameters, ValidateContext ctx) {
+            TType thisType, boolean nullable, List<TTypeDeclaration> typeParameters, ValidateContext ctx) {
         if (value == null) {
 
             if (!nullable) {

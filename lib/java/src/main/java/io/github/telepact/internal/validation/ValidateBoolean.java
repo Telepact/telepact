@@ -16,7 +16,7 @@
 
 package io.github.telepact.internal.validation;
 
-import static io.github.telepact.internal.types.VBoolean._BOOLEAN_NAME;
+import static io.github.telepact.internal.types.TBoolean._BOOLEAN_NAME;
 import static io.github.telepact.internal.validation.GetTypeUnexpectedValidationFailure.getTypeUnexpectedValidationFailure;
 
 import java.util.List;

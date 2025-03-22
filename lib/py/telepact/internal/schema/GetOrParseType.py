@@ -21,22 +21,22 @@ from ...internal.schema.SchemaParseFailure import SchemaParseFailure
 
 if TYPE_CHECKING:
     from ...internal.schema.ParseContext import ParseContext
-    from ..types.VType import VType
+    from ..types.TType import TType
 
 
-def get_or_parse_type(path: list[object], type_name: str, ctx: 'ParseContext') -> 'VType':
+def get_or_parse_type(path: list[object], type_name: str, ctx: 'ParseContext') -> 'TType':
     from ...TelepactSchemaParseError import TelepactSchemaParseError
-    from ..types.VObject import VObject
-    from ..types.VArray import VArray
-    from ..types.VBoolean import VBoolean
-    from ..types.VInteger import VInteger
-    from ..types.VNumber import VNumber
-    from ..types.VObject import VObject
-    from ..types.VString import VString
-    from ..types.VMockCall import VMockCall
-    from ..types.VMockStub import VMockStub
-    from ..types.VSelect import VSelect
-    from ..types.VAny import VAny
+    from ..types.TObject import TObject
+    from ..types.TArray import TArray
+    from ..types.TBoolean import TBoolean
+    from ..types.TInteger import TInteger
+    from ..types.TNumber import TNumber
+    from ..types.TObject import TObject
+    from ..types.TString import TString
+    from ..types.TMockCall import TMockCall
+    from ..types.TMockStub import TMockStub
+    from ..types.TSelect import TSelect
+    from ..types.TAny import TAny
     from ...internal.schema.ParseFunctionType import parse_function_type
     from ...internal.schema.ParseStructType import parse_struct_type
     from ...internal.schema.ParseUnionType import parse_union_type
@@ -62,13 +62,13 @@ def get_or_parse_type(path: list[object], type_name: str, ctx: 'ParseContext') -
     standard_type_name = matcher.group(1)
     if standard_type_name is not None:
         return {
-            "boolean": VBoolean(),
-            "integer": VInteger(),
-            "number": VNumber(),
-            "string": VString(),
-            "array": VArray(),
-            "object": VObject()
-        }.get(standard_type_name, VAny())
+            "boolean": TBoolean(),
+            "integer": TInteger(),
+            "number": TNumber(),
+            "string": TString(),
+            "array": TArray(),
+            "object": TObject()
+        }.get(standard_type_name, TAny())
 
     custom_type_name = matcher.group(2)
     this_index = ctx.schema_keys_to_index.get(custom_type_name)
@@ -85,7 +85,7 @@ def get_or_parse_type(path: list[object], type_name: str, ctx: 'ParseContext') -
     definition = cast(
         dict[str, object], telepact_schema_pseudo_json[this_index])
 
-    type: 'VType'
+    type: 'TType'
     try:
         this_path: list[object] = [this_index]
         if custom_type_name.startswith("struct"):
@@ -99,9 +99,9 @@ def get_or_parse_type(path: list[object], type_name: str, ctx: 'ParseContext') -
                                        ctx.copy(document_name=this_document_name))
         else:
             possible_type_extension = {
-                '_ext.Select_': VSelect(),
-                '_ext.Call_': VMockCall(ctx.parsed_types),
-                '_ext.Stub_': VMockStub(ctx.parsed_types),
+                '_ext.Select_': TSelect(),
+                '_ext.Call_': TMockCall(ctx.parsed_types),
+                '_ext.Stub_': TMockStub(ctx.parsed_types),
             }.get(custom_type_name)
 
             if not possible_type_extension:

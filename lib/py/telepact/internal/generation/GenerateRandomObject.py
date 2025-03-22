@@ -18,11 +18,11 @@ from typing import TYPE_CHECKING, cast
 
 if TYPE_CHECKING:
     from ...RandomGenerator import RandomGenerator
-    from ..types.VTypeDeclaration import VTypeDeclaration
+    from ..types.TTypeDeclaration import TTypeDeclaration
     from ...internal.generation.GenerateContext import GenerateContext
 
 
-def generate_random_object(blueprint_value: object, use_blueprint_value: bool, type_parameters: list['VTypeDeclaration'], ctx: 'GenerateContext') -> object:
+def generate_random_object(blueprint_value: object, use_blueprint_value: bool, type_parameters: list['TTypeDeclaration'], ctx: 'GenerateContext') -> object:
     nested_type_declaration = type_parameters[0]
 
     if use_blueprint_value:

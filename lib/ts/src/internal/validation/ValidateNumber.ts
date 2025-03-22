@@ -16,7 +16,7 @@
 
 import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure';
 import { ValidationFailure } from '../../internal/validation/ValidationFailure';
-import { numberName } from '../types/VNumber';
+import { numberName } from '../types/TNumber';
 
 export function validateNumber(value: any): Array<ValidationFailure> {
     if (typeof value === 'number') {

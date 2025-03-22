@@ -27,25 +27,25 @@ import java.util.Map;
 import java.util.TreeSet;
 
 import io.github.telepact.TelepactSchema;
-import io.github.telepact.internal.types.VArray;
-import io.github.telepact.internal.types.VFn;
-import io.github.telepact.internal.types.VObject;
-import io.github.telepact.internal.types.VStruct;
-import io.github.telepact.internal.types.VTypeDeclaration;
-import io.github.telepact.internal.types.VUnion;
+import io.github.telepact.internal.types.TArray;
+import io.github.telepact.internal.types.TFn;
+import io.github.telepact.internal.types.TObject;
+import io.github.telepact.internal.types.TStruct;
+import io.github.telepact.internal.types.TTypeDeclaration;
+import io.github.telepact.internal.types.TUnion;
 
 public class ConstructBinaryEncoding {
 
-    private static List<String> traceType(VTypeDeclaration typeDeclaration) {
+    private static List<String> traceType(TTypeDeclaration typeDeclaration) {
         final var thisAllKeys = new ArrayList<String>();
 
-        if (typeDeclaration.type instanceof VArray) {
+        if (typeDeclaration.type instanceof TArray) {
             final var theseKeys2 = traceType(typeDeclaration.typeParameters.get(0));
             thisAllKeys.addAll(theseKeys2);
-        } else if (typeDeclaration.type instanceof VObject) {
+        } else if (typeDeclaration.type instanceof TObject) {
             final var theseKeys2 = traceType(typeDeclaration.typeParameters.get(0));
             thisAllKeys.addAll(theseKeys2);
-        } else if (typeDeclaration.type instanceof VStruct s) {
+        } else if (typeDeclaration.type instanceof TStruct s) {
             final var structFields = s.fields;
             for (final var entry : structFields.entrySet()) {
                 final var structFieldKey = entry.getKey();
@@ -54,7 +54,7 @@ public class ConstructBinaryEncoding {
                 final var moreKeys = traceType(structField.typeDeclaration);
                 thisAllKeys.addAll(moreKeys);
             }
-        } else if (typeDeclaration.type instanceof VUnion u) {
+        } else if (typeDeclaration.type instanceof TUnion u) {
             final var unionTags = u.tags;
             for (final var entry : unionTags.entrySet()) {
                 final var tagKey = entry.getKey();
@@ -76,13 +76,13 @@ public class ConstructBinaryEncoding {
 
     public static BinaryEncoding constructBinaryEncoding(TelepactSchema telepactSchema) {
         final var allKeys = new TreeSet<String>();
-        final var functions = new ArrayList<Map.Entry<String, VFn>>();
+        final var functions = new ArrayList<Map.Entry<String, TFn>>();
 
         for (final var entry : telepactSchema.parsed.entrySet()) {
             final var key = entry.getKey();
             final var value = entry.getValue();
-            if (value instanceof VFn) {
-                functions.add(Map.entry(key, (VFn) value));
+            if (value instanceof TFn) {
+                functions.add(Map.entry(key, (TFn) value));
             }
         }
 

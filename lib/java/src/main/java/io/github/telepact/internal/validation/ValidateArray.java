@@ -16,17 +16,17 @@
 
 package io.github.telepact.internal.validation;
 
-import static io.github.telepact.internal.types.VArray._ARRAY_NAME;
+import static io.github.telepact.internal.types.TArray._ARRAY_NAME;
 import static io.github.telepact.internal.validation.GetTypeUnexpectedValidationFailure.getTypeUnexpectedValidationFailure;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import io.github.telepact.internal.types.VTypeDeclaration;
+import io.github.telepact.internal.types.TTypeDeclaration;
 
 public class ValidateArray {
-    public static List<ValidationFailure> validateArray(Object value, List<VTypeDeclaration> typeParameters,
+    public static List<ValidationFailure> validateArray(Object value, List<TTypeDeclaration> typeParameters,
             ValidateContext ctx) {
         if (value instanceof final List l) {
             final var nestedTypeDeclaration = typeParameters.get(0);

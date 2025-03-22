@@ -14,15 +14,15 @@
 //|  limitations under the License.
 //|
 
-import { VFieldDeclaration } from '../types/VFieldDeclaration';
-import { VFn } from '../types/VFn';
+import { TFieldDeclaration } from '../types/TFieldDeclaration';
+import { TFn } from '../types/TFn';
 import { ValidationFailure } from '../../internal/validation/ValidationFailure';
 import { ValidateContext } from './ValidateContext';
 
 export function validateHeaders(
     headers: Record<string, any>,
-    parsedRequestHeaders: Record<string, VFieldDeclaration>,
-    functionType: VFn,
+    parsedRequestHeaders: Record<string, TFieldDeclaration>,
+    functionType: TFn,
 ): ValidationFailure[] {
     const validationFailures: ValidationFailure[] = [];
 

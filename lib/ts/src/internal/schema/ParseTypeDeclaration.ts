@@ -15,13 +15,13 @@
 //|
 
 import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
-import { VTypeDeclaration } from '../types/VTypeDeclaration';
+import { TTypeDeclaration } from '../types/TTypeDeclaration';
 import { TelepactSchemaParseError } from '../../TelepactSchemaParseError';
 import { getOrParseType } from '../../internal/schema/GetOrParseType';
 import { getTypeUnexpectedParseFailure } from '../../internal/schema/GetTypeUnexpectedParseFailure';
 import { ParseContext } from '../../internal/schema/ParseContext';
 
-export function parseTypeDeclaration(path: any[], typeDeclarationArray: any[], ctx: ParseContext): VTypeDeclaration {
+export function parseTypeDeclaration(path: any[], typeDeclarationArray: any[], ctx: ParseContext): TTypeDeclaration {
     if (!typeDeclarationArray.length) {
         throw new TelepactSchemaParseError(
             [new SchemaParseFailure(ctx.documentName, path, 'EmptyArrayDisallowed', {})],
@@ -73,7 +73,7 @@ export function parseTypeDeclaration(path: any[], typeDeclarationArray: any[], c
     }
 
     const parseFailures: SchemaParseFailure[] = [];
-    const typeParameters: VTypeDeclaration[] = [];
+    const typeParameters: TTypeDeclaration[] = [];
     const givenTypeParameters = typeDeclarationArray.slice(1);
 
     for (let index = 1; index <= givenTypeParameters.length; index++) {
@@ -99,5 +99,5 @@ export function parseTypeDeclaration(path: any[], typeDeclarationArray: any[], c
         throw new TelepactSchemaParseError(parseFailures, ctx.telepactSchemaDocumentNamesToJson);
     }
 
-    return new VTypeDeclaration(type_, nullable, typeParameters);
+    return new TTypeDeclaration(type_, nullable, typeParameters);
 }

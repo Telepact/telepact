@@ -15,7 +15,7 @@
 //|
 
 import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
-import { VFieldDeclaration } from '../types/VFieldDeclaration';
+import { TFieldDeclaration } from '../types/TFieldDeclaration';
 import { TelepactSchemaParseError } from '../../TelepactSchemaParseError';
 import { getTypeUnexpectedParseFailure } from '../../internal/schema/GetTypeUnexpectedParseFailure';
 import { ParseContext } from '../../internal/schema/ParseContext';
@@ -26,7 +26,7 @@ export function parseField(
     fieldDeclaration: string,
     typeDeclarationValue: any,
     ctx: ParseContext,
-): VFieldDeclaration {
+): TFieldDeclaration {
     const regexString = '^([a-z][a-zA-Z0-9_]*)(!)?$';
     const regex = new RegExp(regexString);
 
@@ -54,5 +54,5 @@ export function parseField(
 
     const typeDeclaration = parseTypeDeclaration(thisPath, typeDeclarationArray, ctx);
 
-    return new VFieldDeclaration(fieldName, typeDeclaration, optional);
+    return new TFieldDeclaration(fieldName, typeDeclaration, optional);
 }

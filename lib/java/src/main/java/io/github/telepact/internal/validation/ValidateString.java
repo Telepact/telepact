@@ -16,7 +16,7 @@
 
 package io.github.telepact.internal.validation;
 
-import static io.github.telepact.internal.types.VString._STRING_NAME;
+import static io.github.telepact.internal.types.TString._STRING_NAME;
 import static io.github.telepact.internal.validation.GetTypeUnexpectedValidationFailure.getTypeUnexpectedValidationFailure;
 
 import java.util.List;

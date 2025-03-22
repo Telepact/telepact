@@ -19,11 +19,11 @@ from ...internal.validation.ValidationFailure import ValidationFailure
 
 if TYPE_CHECKING:
     from ...internal.validation.ValidateContext import ValidateContext
-    from ..types.VStruct import VStruct
-    from ..types.VTypeDeclaration import VTypeDeclaration
+    from ..types.TStruct import TStruct
+    from ..types.TTypeDeclaration import TTypeDeclaration
 
 
-def validate_union_tags(reference_tags: dict[str, 'VStruct'], selected_tags: dict[str, object],
+def validate_union_tags(reference_tags: dict[str, 'TStruct'], selected_tags: dict[str, object],
                         actual: dict[object, object], ctx: 'ValidateContext') -> list['ValidationFailure']:
     from ...internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
     from ...internal.validation.ValidateUnionStruct import validate_union_struct

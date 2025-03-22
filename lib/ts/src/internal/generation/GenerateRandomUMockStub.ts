@@ -15,15 +15,15 @@
 //|
 
 import { GenerateContext } from './GenerateContext';
-import { VFn } from '../types/VFn';
-import { VType } from '../types/VType';
+import { TFn } from '../types/TFn';
+import { TType } from '../types/TType';
 import { generateRandomStruct } from './GenerateRandomStruct';
 
-export function generateRandomUMockStub(types: { [key: string]: VType }, ctx: GenerateContext): object {
-    const functions: Array<VFn> = Object.entries(types)
-        .filter(([key, value]) => value instanceof VFn)
+export function generateRandomUMockStub(types: { [key: string]: TType }, ctx: GenerateContext): object {
+    const functions: Array<TFn> = Object.entries(types)
+        .filter(([key, value]) => value instanceof TFn)
         .filter(([key, value]) => !key.endsWith('_'))
-        .map(([key, value]) => value as VFn);
+        .map(([key, value]) => value as TFn);
 
     functions.sort((fn1, fn2) => fn1.name.localeCompare(fn2.name));
 

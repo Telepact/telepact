@@ -14,16 +14,16 @@
 //|  limitations under the License.
 //|
 
-import { VType } from '../types/VType';
-import { VTypeDeclaration } from '../types/VTypeDeclaration';
+import { TType } from '../types/TType';
+import { TTypeDeclaration } from '../types/TTypeDeclaration';
 import { GenerateContext } from '../../internal/generation/GenerateContext';
 
 export function generateRandomValueOfType(
     blueprintValue: any,
     useBlueprintValue: boolean,
-    thisType: VType,
+    thisType: TType,
     nullable: boolean,
-    typeParameters: VTypeDeclaration[],
+    typeParameters: TTypeDeclaration[],
     ctx: GenerateContext,
 ): any {
     if (nullable && !useBlueprintValue && ctx.randomGenerator.nextBoolean()) {

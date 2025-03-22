@@ -21,24 +21,24 @@ import static io.github.telepact.internal.generation.GenerateRandomStruct.genera
 import java.util.*;
 import java.util.stream.Collectors;
 
-import io.github.telepact.internal.types.VFn;
-import io.github.telepact.internal.types.VType;
+import io.github.telepact.internal.types.TFn;
+import io.github.telepact.internal.types.TType;
 
 public class GenerateRandomUMockStub {
 
-        public static Map<String, Object> generateRandomUMockStub(Map<String, VType> types, GenerateContext ctx) {
-                List<VFn> functions = types.entrySet().stream()
-                                .filter(entry -> entry.getValue() instanceof VFn)
+        public static Map<String, Object> generateRandomUMockStub(Map<String, TType> types, GenerateContext ctx) {
+                List<TFn> functions = types.entrySet().stream()
+                                .filter(entry -> entry.getValue() instanceof TFn)
                                 .filter(entry -> !entry.getKey().endsWith("_"))
-                                .map(entry -> (VFn) entry.getValue())
-                                .sorted(Comparator.comparing(VFn::getName))
+                                .map(entry -> (TFn) entry.getValue())
+                                .sorted(Comparator.comparing(TFn::getName))
                                 .collect(Collectors.toList());
 
                 int index = ctx.randomGenerator.nextIntWithCeiling(functions.size());
 
                 System.out.println("index: " + index);
 
-                VFn selectedFn = functions.get(index);
+                TFn selectedFn = functions.get(index);
 
                 System.out.println("selectedFn: " + selectedFn.name);
 

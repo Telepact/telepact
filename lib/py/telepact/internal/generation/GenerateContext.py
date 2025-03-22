@@ -17,7 +17,7 @@
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from ..types.VTypeDeclaration import VTypeDeclaration
+    from ..types.TTypeDeclaration import TTypeDeclaration
     from ...RandomGenerator import RandomGenerator
 
 

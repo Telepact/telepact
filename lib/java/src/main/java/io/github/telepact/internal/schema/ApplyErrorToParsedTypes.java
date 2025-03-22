@@ -22,13 +22,13 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import io.github.telepact.TelepactSchemaParseError;
-import io.github.telepact.internal.types.VError;
-import io.github.telepact.internal.types.VFn;
-import io.github.telepact.internal.types.VType;
+import io.github.telepact.internal.types.TError;
+import io.github.telepact.internal.types.TFn;
+import io.github.telepact.internal.types.TType;
 
 public class ApplyErrorToParsedTypes {
-    public static void applyErrorToParsedTypes(VError error,
-            Map<String, VType> parsedTypes, Map<String, String> schemaKeysToDocumentNames,
+    public static void applyErrorToParsedTypes(TError error,
+            Map<String, TType> parsedTypes, Map<String, String> schemaKeysToDocumentNames,
             Map<String, Integer> schemaKeysToIndex, Map<String, String> documentNamesToJson) {
         var parseFailures = new ArrayList<SchemaParseFailure>();
 
@@ -40,11 +40,11 @@ public class ApplyErrorToParsedTypes {
             var parsedTypeName = entry.getKey();
             var parsedType = entry.getValue();
 
-            if (!(parsedType instanceof VFn)) {
+            if (!(parsedType instanceof TFn)) {
                 continue;
             }
 
-            var f = (VFn) parsedType;
+            var f = (TFn) parsedType;
             var fnName = f.name;
             var regex = Pattern.compile(f.errorsRegex);
             var fnResult = f.result;

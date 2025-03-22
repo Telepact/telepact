@@ -19,16 +19,16 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from ...internal.schema.ParseContext import ParseContext
-    from ..types.VHeaders import VHeaders
+    from ..types.THeaders import THeaders
 
 
-def parse_headers_type(path: list[object], headers_definition_as_parsed_json: dict[str, object], schema_key: str, ctx: 'ParseContext') -> 'VHeaders':
+def parse_headers_type(path: list[object], headers_definition_as_parsed_json: dict[str, object], schema_key: str, ctx: 'ParseContext') -> 'THeaders':
     from ...TelepactSchemaParseError import TelepactSchemaParseError
     from ...internal.schema.GetTypeUnexpectedParseFailure import get_type_unexpected_parse_failure
-    from ..types.VFieldDeclaration import VFieldDeclaration
+    from ..types.TFieldDeclaration import TFieldDeclaration
     from ...internal.schema.ParseStructFields import parse_struct_fields
     from ...internal.schema.SchemaParseFailure import SchemaParseFailure
-    from ..types.VHeaders import VHeaders
+    from ..types.THeaders import THeaders
 
     parse_failures = []
     request_headers = {}
@@ -100,4 +100,4 @@ def parse_headers_type(path: list[object], headers_definition_as_parsed_json: di
         raise TelepactSchemaParseError(
             parse_failures, ctx.telepact_schema_document_names_to_json)
 
-    return VHeaders(schema_key, request_headers, response_headers)
+    return THeaders(schema_key, request_headers, response_headers)

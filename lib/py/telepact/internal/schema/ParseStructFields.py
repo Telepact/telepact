@@ -20,16 +20,16 @@ from ...internal.schema.SchemaParseFailure import SchemaParseFailure
 
 if TYPE_CHECKING:
     from ...internal.schema.ParseContext import ParseContext
-    from ..types.VFieldDeclaration import VFieldDeclaration
+    from ..types.TFieldDeclaration import TFieldDeclaration
 
 
-def parse_struct_fields(path: list[object], reference_struct: dict[str, object], ctx: 'ParseContext') -> dict[str, 'VFieldDeclaration']:
+def parse_struct_fields(path: list[object], reference_struct: dict[str, object], ctx: 'ParseContext') -> dict[str, 'TFieldDeclaration']:
     from ...TelepactSchemaParseError import TelepactSchemaParseError
     from ...internal.schema.ParseField import parse_field
     from ...internal.schema.GetPathDocumentCoordinatesPseudoJson import get_path_document_coordinates_pseudo_json
 
     parse_failures = []
-    fields: dict[str, 'VFieldDeclaration'] = {}
+    fields: dict[str, 'TFieldDeclaration'] = {}
 
     for field_declaration, type_declaration_value in reference_struct.items():
         for existing_field in fields.keys():

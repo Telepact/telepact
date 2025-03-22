@@ -19,11 +19,11 @@ package io.github.telepact.internal.generation;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.github.telepact.internal.types.VTypeDeclaration;
+import io.github.telepact.internal.types.TTypeDeclaration;
 
 public class GenerateRandomArray {
     public static Object generateRandomArray(Object blueprintValue, boolean useBlueprintValue,
-            List<VTypeDeclaration> typeParameters, GenerateContext ctx) {
+            List<TTypeDeclaration> typeParameters, GenerateContext ctx) {
         final var nestedTypeDeclaration = typeParameters.get(0);
 
         if (useBlueprintValue) {

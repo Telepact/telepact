@@ -26,12 +26,12 @@ import java.util.List;
 import java.util.Map;
 
 import io.github.telepact.TelepactSchemaParseError;
-import io.github.telepact.internal.types.VFieldDeclaration;
-import io.github.telepact.internal.types.VStruct;
-import io.github.telepact.internal.types.VUnion;
+import io.github.telepact.internal.types.TFieldDeclaration;
+import io.github.telepact.internal.types.TStruct;
+import io.github.telepact.internal.types.TUnion;
 
 public class ParseUnionType {
-    static VUnion parseUnionType(
+    static TUnion parseUnionType(
             List<Object> path,
             Map<String, Object> unionDefinitionAsPseudoJson, String schemaKey,
             List<String> ignoreKeys, List<String> requiredKeys,
@@ -116,7 +116,7 @@ public class ParseUnionType {
             }
         }
 
-        final var tags = new HashMap<String, VStruct>();
+        final var tags = new HashMap<String, TStruct>();
         final var tagIndices = new HashMap<String, Integer>();
 
         for (int i = 0; i < definition.size(); i++) {
@@ -163,7 +163,7 @@ public class ParseUnionType {
             }
             final Map<String, Object> unionTagStruct = (Map<String, Object>) entry.getValue();
 
-            final Map<String, VFieldDeclaration> fields;
+            final Map<String, TFieldDeclaration> fields;
             try {
                 fields = parseStructFields(unionKeyPath, unionTagStruct, ctx);
             } catch (TelepactSchemaParseError e) {
@@ -171,7 +171,7 @@ public class ParseUnionType {
                 continue;
             }
 
-            final var unionStruct = new VStruct("%s.%s".formatted(schemaKey, unionTag), fields);
+            final var unionStruct = new TStruct("%s.%s".formatted(schemaKey, unionTag), fields);
 
             tags.put(unionTag, unionStruct);
             tagIndices.put(unionTag, i);
@@ -181,6 +181,6 @@ public class ParseUnionType {
             throw new TelepactSchemaParseError(parseFailures, ctx.telepactSchemaDocumentNamesToJson);
         }
 
-        return new VUnion(schemaKey, tags, tagIndices);
+        return new TUnion(schemaKey, tags, tagIndices);
     }
 }

@@ -14,7 +14,7 @@
 #|  limitations under the License.
 #|
 
-from ..types.VInteger import _INTEGER_NAME
+from ..types.TInteger import _INTEGER_NAME
 from ...internal.validation.ValidationFailure import ValidationFailure
 
 

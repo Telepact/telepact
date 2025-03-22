@@ -16,16 +16,16 @@
 
 from typing import TYPE_CHECKING
 
-from ..types.VObject import _OBJECT_NAME
+from ..types.TObject import _OBJECT_NAME
 from ...internal.validation.ValidationFailure import ValidationFailure
 
 if TYPE_CHECKING:
     from ...internal.validation.ValidateContext import ValidateContext
-    from ..types.VTypeDeclaration import VTypeDeclaration
+    from ..types.TTypeDeclaration import TTypeDeclaration
 
 
 def validate_object(value: object,
-                    type_parameters: list['VTypeDeclaration'], ctx: 'ValidateContext') -> list['ValidationFailure']:
+                    type_parameters: list['TTypeDeclaration'], ctx: 'ValidateContext') -> list['ValidationFailure']:
     from ...internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
 
     if isinstance(value, dict):

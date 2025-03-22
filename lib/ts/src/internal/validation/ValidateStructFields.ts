@@ -15,11 +15,11 @@
 //|
 
 import { ValidationFailure } from '../../internal/validation/ValidationFailure';
-import { VFieldDeclaration } from '../types/VFieldDeclaration';
+import { TFieldDeclaration } from '../types/TFieldDeclaration';
 import { ValidateContext } from './ValidateContext';
 
 export function validateStructFields(
-    fields: Record<string, VFieldDeclaration>,
+    fields: Record<string, TFieldDeclaration>,
     selectedFields: string[] | null,
     actualStruct: Record<string, any>,
     ctx: ValidateContext,

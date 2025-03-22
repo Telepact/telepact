@@ -19,13 +19,13 @@ from typing import TYPE_CHECKING, cast
 
 if TYPE_CHECKING:
     from ...RandomGenerator import RandomGenerator
-    from ..types.VFieldDeclaration import VFieldDeclaration
-    from ..types.VTypeDeclaration import VTypeDeclaration
+    from ..types.TFieldDeclaration import TFieldDeclaration
+    from ..types.TTypeDeclaration import TTypeDeclaration
     from ...internal.generation.GenerateContext import GenerateContext
 
 
 def generate_random_struct(blueprint_value: object, use_blueprint_value: bool,
-                           reference_struct: dict[str, 'VFieldDeclaration'], ctx: 'GenerateContext') -> object:
+                           reference_struct: dict[str, 'TFieldDeclaration'], ctx: 'GenerateContext') -> object:
     sorted_reference_struct = sorted(
         reference_struct.items(), key=lambda x: x[0])
 

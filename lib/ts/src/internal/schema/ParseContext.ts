@@ -15,7 +15,7 @@
 //|
 
 import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
-import { VType } from '../types/VType';
+import { TType } from '../types/TType';
 
 export class ParseContext {
     public readonly documentName: string;
@@ -23,7 +23,7 @@ export class ParseContext {
     public readonly telepactSchemaDocumentNamesToJson: { [key: string]: string };
     public readonly schemaKeysToDocumentName: { [key: string]: string };
     public readonly schemaKeysToIndex: { [key: string]: number };
-    public readonly parsedTypes: { [key: string]: VType };
+    public readonly parsedTypes: { [key: string]: TType };
     public readonly allParseFailures: SchemaParseFailure[];
     public readonly failedTypes: Set<string>;
 
@@ -33,7 +33,7 @@ export class ParseContext {
         telepactSchemaDocumentNamesToJson: { [key: string]: string },
         schemaKeysToDocumentName: { [key: string]: string },
         schemaKeysToIndex: { [key: string]: number },
-        parsedTypes: { [key: string]: VType },
+        parsedTypes: { [key: string]: TType },
         allParseFailures: SchemaParseFailure[],
         failedTypes: Set<string>,
     ) {

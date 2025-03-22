@@ -16,21 +16,21 @@
 
 import { TelepactSchemaParseError } from '../../TelepactSchemaParseError';
 import { getTypeUnexpectedParseFailure } from '../../internal/schema/GetTypeUnexpectedParseFailure';
-import { VFieldDeclaration } from '../types/VFieldDeclaration';
+import { TFieldDeclaration } from '../types/TFieldDeclaration';
 import { ParseContext } from '../../internal/schema/ParseContext';
 import { parseStructFields } from './ParseStructFields';
 import { SchemaParseFailure } from './SchemaParseFailure';
-import { VHeaders } from '../types/VHeaders';
+import { THeaders } from '../types/THeaders';
 
 export function parseHeadersType(
     path: any[],
     headersDefinitionAsParsedJson: { [key: string]: any },
     schemaKey: string,
     ctx: ParseContext,
-): VHeaders {
+): THeaders {
     const parseFailures: SchemaParseFailure[] = [];
-    const requestHeaders: { [key: string]: VFieldDeclaration } = {};
-    const responseHeaders: { [key: string]: VFieldDeclaration } = {};
+    const requestHeaders: { [key: string]: TFieldDeclaration } = {};
+    const responseHeaders: { [key: string]: TFieldDeclaration } = {};
 
     const requestHeadersDef = headersDefinitionAsParsedJson[schemaKey];
 
@@ -117,5 +117,5 @@ export function parseHeadersType(
         throw new TelepactSchemaParseError(parseFailures, ctx.telepactSchemaDocumentNamesToJson);
     }
 
-    return new VHeaders(schemaKey, requestHeaders, responseHeaders);
+    return new THeaders(schemaKey, requestHeaders, responseHeaders);
 }

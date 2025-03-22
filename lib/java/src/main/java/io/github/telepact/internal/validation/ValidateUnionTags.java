@@ -24,11 +24,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import io.github.telepact.internal.types.VStruct;
+import io.github.telepact.internal.types.TStruct;
 
 public class ValidateUnionTags {
     static List<ValidationFailure> validateUnionTags(
-            Map<String, VStruct> referenceTags, Map<String, Object> selectedTags,
+            Map<String, TStruct> referenceTags, Map<String, Object> selectedTags,
             Map<?, ?> actual, ValidateContext ctx) {
         if (actual.size() != 1) {
             return List.of(

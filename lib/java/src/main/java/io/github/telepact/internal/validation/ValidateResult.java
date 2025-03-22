@@ -21,10 +21,10 @@ import static io.github.telepact.internal.validation.MapValidationFailuresToInva
 import java.util.List;
 
 import io.github.telepact.TelepactError;
-import io.github.telepact.internal.types.VUnion;
+import io.github.telepact.internal.types.TUnion;
 
 public class ValidateResult {
-    public static void validateResult(VUnion resultUnionType, Object errorResult) {
+    public static void validateResult(TUnion resultUnionType, Object errorResult) {
         final var newErrorResultValidationFailures = resultUnionType.validate(
                 errorResult, List.of(), new ValidateContext(null, null));
         if (!newErrorResultValidationFailures.isEmpty()) {

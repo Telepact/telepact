@@ -14,8 +14,8 @@
 //|  limitations under the License.
 //|
 
-import { VFieldDeclaration } from './internal/types/VFieldDeclaration';
-import { VType } from './internal/types/VType';
+import { TFieldDeclaration } from './internal/types/TFieldDeclaration';
+import { TType } from './internal/types/TType';
 import { createMockTelepactSchemaFromFileJsonMap } from './internal/schema/CreateMockTelepactSchemaFromFileJsonMap';
 import { getSchemaFileMap } from './internal/schema/GetSchemaFileMap';
 import { FsModule, PathModule } from './fileSystem';
@@ -27,16 +27,16 @@ export class MockTelepactSchema {
 
     original: any[];
     full: any[];
-    parsed: Record<string, VType>;
-    parsedRequestHeaders: Record<string, VFieldDeclaration>;
-    parsedResponseHeaders: Record<string, VFieldDeclaration>;
+    parsed: Record<string, TType>;
+    parsedRequestHeaders: Record<string, TFieldDeclaration>;
+    parsedResponseHeaders: Record<string, TFieldDeclaration>;
 
     constructor(
         original: any[],
         full: any[],
-        parsed: Record<string, VType>,
-        parsedRequestHeaders: Record<string, VFieldDeclaration>,
-        parsedResponseHeaders: Record<string, VFieldDeclaration>,
+        parsed: Record<string, TType>,
+        parsedRequestHeaders: Record<string, TFieldDeclaration>,
+        parsedResponseHeaders: Record<string, TFieldDeclaration>,
     ) {
         this.original = original;
         this.full = full;

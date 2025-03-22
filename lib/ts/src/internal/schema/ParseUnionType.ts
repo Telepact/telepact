@@ -15,11 +15,11 @@
 //|
 
 import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
-import { VUnion } from '../types/VUnion';
+import { TUnion } from '../types/TUnion';
 import { TelepactSchemaParseError } from '../../TelepactSchemaParseError';
 import { getTypeUnexpectedParseFailure } from '../../internal/schema/GetTypeUnexpectedParseFailure';
 import { parseStructFields } from '../../internal/schema/ParseStructFields';
-import { VStruct } from '../types/VStruct';
+import { TStruct } from '../types/TStruct';
 import { ParseContext } from '../../internal/schema/ParseContext';
 
 export function parseUnionType(
@@ -29,7 +29,7 @@ export function parseUnionType(
     ignoreKeys: string[],
     requiredKeys: string[],
     ctx: ParseContext,
-): VUnion {
+): TUnion {
     const parseFailures: SchemaParseFailure[] = [];
 
     const otherKeys = new Set(Object.keys(unionDefinitionAsPseudoJson));
@@ -96,7 +96,7 @@ export function parseUnionType(
         }
     }
 
-    const tags: { [key: string]: VStruct } = {};
+    const tags: { [key: string]: TStruct } = {};
     const tagIndices: { [key: string]: number } = {};
 
     for (let i = 0; i < definition.length; i++) {
@@ -145,7 +145,7 @@ export function parseUnionType(
 
         try {
             const fields = parseStructFields(unionKeyPath, unionTagStruct, ctx);
-            const unionStruct = new VStruct(`${schemaKey}.${unionTag}`, fields);
+            const unionStruct = new TStruct(`${schemaKey}.${unionTag}`, fields);
             tags[unionTag] = unionStruct;
             tagIndices[unionTag] = i;
         } catch (e) {
@@ -161,5 +161,5 @@ export function parseUnionType(
         throw new TelepactSchemaParseError(parseFailures, ctx.telepactSchemaDocumentNamesToJson);
     }
 
-    return new VUnion(schemaKey, tags, tagIndices);
+    return new TUnion(schemaKey, tags, tagIndices);
 }

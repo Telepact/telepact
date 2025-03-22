@@ -15,13 +15,13 @@
 //|
 
 import { ValidationFailure } from '../../internal/validation/ValidationFailure';
-import { VStruct } from '../types/VStruct';
+import { TStruct } from '../types/TStruct';
 import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure';
 import { validateUnionStruct } from '../../internal/validation/ValidateUnionStruct';
 import { ValidateContext } from './ValidateContext';
 
 export function validateUnionTags(
-    referenceTags: Record<string, VStruct>,
+    referenceTags: Record<string, TStruct>,
     selectedTags: Record<string, any>,
     actual: Record<any, any>,
     ctx: ValidateContext,

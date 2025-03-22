@@ -20,11 +20,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import io.github.telepact.internal.types.VTypeDeclaration;
+import io.github.telepact.internal.types.TTypeDeclaration;
 
 public class GenerateRandomObject {
     public static Object generateRandomObject(Object blueprintValue, boolean useBlueprintValue,
-            List<VTypeDeclaration> typeParameters, GenerateContext ctx) {
+            List<TTypeDeclaration> typeParameters, GenerateContext ctx) {
         final var nestedTypeDeclaration = typeParameters.get(0);
 
         if (useBlueprintValue) {

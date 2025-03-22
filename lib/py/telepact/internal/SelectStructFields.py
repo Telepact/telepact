@@ -16,22 +16,22 @@
 
 from typing import TYPE_CHECKING, cast
 
-from .types.VArray import VArray
-from .types.VFn import VFn
-from .types.VObject import VObject
-from .types.VStruct import VStruct
-from .types.VUnion import VUnion
+from .types.TArray import TArray
+from .types.TFn import TFn
+from .types.TObject import TObject
+from .types.TStruct import TStruct
+from .types.TUnion import TUnion
 
 if TYPE_CHECKING:
-    from .types.VTypeDeclaration import VTypeDeclaration
+    from .types.TTypeDeclaration import TTypeDeclaration
 
 
-def select_struct_fields(type_declaration: 'VTypeDeclaration', value: object,
+def select_struct_fields(type_declaration: 'TTypeDeclaration', value: object,
                          selected_struct_fields: dict[str, object]) -> object:
     type_declaration_type = type_declaration.type
     type_declaration_type_params = type_declaration.type_parameters
 
-    if isinstance(type_declaration_type, VStruct):
+    if isinstance(type_declaration_type, TStruct):
         fields = type_declaration_type.fields
         struct_name = type_declaration_type.name
         selected_fields = cast(
@@ -49,7 +49,7 @@ def select_struct_fields(type_declaration: 'VTypeDeclaration', value: object,
                 final_map[field_name] = value_with_selected_fields
 
         return final_map
-    elif isinstance(type_declaration_type, VFn):
+    elif isinstance(type_declaration_type, TFn):
         value_as_map = cast(dict[str, object], value)
         union_tag, union_data = cast(
             tuple[str, dict[str, object]], next(iter(value_as_map.items())))
@@ -72,7 +72,7 @@ def select_struct_fields(type_declaration: 'VTypeDeclaration', value: object,
                 final_map[field_name] = value_with_selected_fields
 
         return {union_tag: final_map}
-    elif isinstance(type_declaration_type, VUnion):
+    elif isinstance(type_declaration_type, TUnion):
         value_as_map = cast(dict[str, object], value)
         union_tag, union_data = cast(
             tuple[str, dict[str, object]], next(iter(value_as_map.items())))
@@ -103,7 +103,7 @@ def select_struct_fields(type_declaration: 'VTypeDeclaration', value: object,
                 final_map[field_name] = value_with_selected_fields
 
         return {union_tag: final_map}
-    elif isinstance(type_declaration_type, VObject):
+    elif isinstance(type_declaration_type, TObject):
         nested_type_declaration = type_declaration_type_params[0]
         value_as_map = cast(dict[str, object], value)
 
@@ -115,7 +115,7 @@ def select_struct_fields(type_declaration: 'VTypeDeclaration', value: object,
             final_map[key] = value_with_selected_fields
 
         return final_map
-    elif isinstance(type_declaration_type, VArray):
+    elif isinstance(type_declaration_type, TArray):
         nested_type = type_declaration_type_params[0]
         value_as_list = cast(list[str], value)
 

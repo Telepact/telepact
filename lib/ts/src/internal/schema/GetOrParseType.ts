@@ -16,23 +16,23 @@
 
 import { TelepactSchemaParseError } from '../../TelepactSchemaParseError';
 import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
-import { VType } from '../types/VType';
-import { VObject } from '../types/VObject';
-import { VArray } from '../types/VArray';
-import { VBoolean } from '../types/VBoolean';
-import { VInteger } from '../types/VInteger';
-import { VNumber } from '../types/VNumber';
-import { VString } from '../types/VString';
-import { VAny } from '../types/VAny';
+import { TType } from '../types/TType';
+import { TObject } from '../types/TObject';
+import { TArray } from '../types/TArray';
+import { TBoolean } from '../types/TBoolean';
+import { TInteger } from '../types/TInteger';
+import { TNumber } from '../types/TNumber';
+import { TString } from '../types/TString';
+import { TAny } from '../types/TAny';
 import { parseFunctionType } from '../../internal/schema/ParseFunctionType';
 import { parseStructType } from '../../internal/schema/ParseStructType';
 import { parseUnionType } from '../../internal/schema/ParseUnionType';
-import { VSelect } from '../types/VSelect';
-import { VMockCall } from '../types/VMockCall';
-import { VMockStub } from '../types/VMockStub';
+import { TSelect } from '../types/TSelect';
+import { TMockCall } from '../types/TMockCall';
+import { TMockStub } from '../types/TMockStub';
 import { ParseContext } from '../../internal/schema/ParseContext';
 
-export function getOrParseType(path: any[], typeName: string, ctx: ParseContext): VType {
+export function getOrParseType(path: any[], typeName: string, ctx: ParseContext): TType {
     if (ctx.failedTypes.has(typeName)) {
         throw new TelepactSchemaParseError([], ctx.telepactSchemaDocumentNamesToJson);
     }
@@ -57,13 +57,13 @@ export function getOrParseType(path: any[], typeName: string, ctx: ParseContext)
     if (standardTypeName) {
         return (
             {
-                boolean: new VBoolean(),
-                integer: new VInteger(),
-                number: new VNumber(),
-                string: new VString(),
-                array: new VArray(),
-                object: new VObject(),
-            }[standardTypeName] || new VAny()
+                boolean: new TBoolean(),
+                integer: new TInteger(),
+                number: new TNumber(),
+                string: new TString(),
+                array: new TArray(),
+                object: new TObject(),
+            }[standardTypeName] || new TAny()
         );
     }
 
@@ -80,7 +80,7 @@ export function getOrParseType(path: any[], typeName: string, ctx: ParseContext)
         [key: string]: object;
     };
 
-    let type: VType;
+    let type: TType;
     try {
         if (customTypeName.startsWith('struct')) {
             type = parseStructType(
@@ -108,9 +108,9 @@ export function getOrParseType(path: any[], typeName: string, ctx: ParseContext)
             );
         } else {
             const possibleTypeExtension = {
-                '_ext.Select_': new VSelect(),
-                '_ext.Call_': new VMockCall(ctx.parsedTypes),
-                '_ext.Stub_': new VMockStub(ctx.parsedTypes),
+                '_ext.Select_': new TSelect(),
+                '_ext.Call_': new TMockCall(ctx.parsedTypes),
+                '_ext.Stub_': new TMockStub(ctx.parsedTypes),
             }[customTypeName];
             if (!possibleTypeExtension) {
                 throw new TelepactSchemaParseError(

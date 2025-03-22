@@ -14,17 +14,17 @@
 //|  limitations under the License.
 //|
 
-import { VStruct } from '../types/VStruct';
+import { TStruct } from '../types/TStruct';
 import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure';
 import { validateUnionTags } from '../../internal/validation/ValidateUnionTags';
 import { ValidationFailure } from '../../internal/validation/ValidationFailure';
-import { unionName } from '../types/VUnion';
+import { unionName } from '../types/TUnion';
 import { ValidateContext } from './ValidateContext';
 
 export function validateUnion(
     value: any,
     name: string,
-    tags: Record<string, VStruct>,
+    tags: Record<string, TStruct>,
     ctx: ValidateContext,
 ): ValidationFailure[] {
     if (typeof value === 'object' && !Array.isArray(value)) {

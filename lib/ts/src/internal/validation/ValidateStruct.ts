@@ -14,17 +14,17 @@
 //|  limitations under the License.
 //|
 
-import { VFieldDeclaration } from '../types/VFieldDeclaration';
+import { TFieldDeclaration } from '../types/TFieldDeclaration';
 import { ValidationFailure } from '../../internal/validation/ValidationFailure';
 import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure';
 import { validateStructFields } from '../../internal/validation/ValidateStructFields';
-import { structName } from '../types/VStruct';
+import { structName } from '../types/TStruct';
 import { ValidateContext } from './ValidateContext';
 
 export function validateStruct(
     value: any,
     name: string,
-    fields: Record<string, VFieldDeclaration>,
+    fields: Record<string, TFieldDeclaration>,
     ctx: ValidateContext,
 ): ValidationFailure[] {
     if (typeof value === 'object' && !Array.isArray(value)) {

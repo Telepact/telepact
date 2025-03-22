@@ -15,17 +15,17 @@
 #|
 
 from typing import TYPE_CHECKING, cast
-from ..types.VStruct import _STRUCT_NAME
+from ..types.TStruct import _STRUCT_NAME
 
 if TYPE_CHECKING:
     from ...internal.validation.ValidateContext import ValidateContext
-    from ..types.VFieldDeclaration import VFieldDeclaration
-    from ..types.VTypeDeclaration import VTypeDeclaration
+    from ..types.TFieldDeclaration import TFieldDeclaration
+    from ..types.TTypeDeclaration import TTypeDeclaration
     from ...internal.validation.ValidationFailure import ValidationFailure
 
 
 def validate_struct(value: object,
-                    name: str, fields: dict[str, 'VFieldDeclaration'], ctx: 'ValidateContext') -> list['ValidationFailure']:
+                    name: str, fields: dict[str, 'TFieldDeclaration'], ctx: 'ValidateContext') -> list['ValidationFailure']:
     from ...internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
     from ...internal.validation.ValidateStructFields import validate_struct_fields
 

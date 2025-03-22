@@ -19,17 +19,17 @@ from typing import TYPE_CHECKING
 
 
 if TYPE_CHECKING:
-    from ..types.VError import VError
-    from ..types.VStruct import VStruct
-    from ..types.VType import VType
-    from ..types.VUnion import VUnion
+    from ..types.TError import TError
+    from ..types.TStruct import TStruct
+    from ..types.TType import TType
+    from ..types.TUnion import TUnion
 
 
-def apply_error_to_parsed_types(error: 'VError', parsed_types: dict[str, 'VType'], schema_keys_to_document_names: dict[str, str], schema_keys_to_index: dict[str, int], document_names_to_json: dict[str, str]) -> None:
+def apply_error_to_parsed_types(error: 'TError', parsed_types: dict[str, 'TType'], schema_keys_to_document_names: dict[str, str], schema_keys_to_index: dict[str, int], document_names_to_json: dict[str, str]) -> None:
     from ...internal.schema.SchemaParseFailure import SchemaParseFailure
     from ...TelepactSchemaParseError import TelepactSchemaParseError
     from ...internal.schema.GetPathDocumentCoordinatesPseudoJson import get_path_document_coordinates_pseudo_json
-    from ..types.VFn import VFn
+    from ..types.TFn import TFn
 
     parse_failures = []
 
@@ -38,7 +38,7 @@ def apply_error_to_parsed_types(error: 'VError', parsed_types: dict[str, 'VType'
     document_name = schema_keys_to_document_names[error_key]
 
     for parsed_type_name, parsed_type in parsed_types.items():
-        if not isinstance(parsed_type, VFn):
+        if not isinstance(parsed_type, TFn):
             continue
         f = parsed_type
 

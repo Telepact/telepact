@@ -16,16 +16,16 @@
 
 from typing import TYPE_CHECKING, cast
 from ...internal.schema.SchemaParseFailure import SchemaParseFailure
-from ..types.VStruct import VStruct
+from ..types.TStruct import TStruct
 
 if TYPE_CHECKING:
     from ...internal.schema.ParseContext import ParseContext
-    from ..types.VType import VType
+    from ..types.TType import TType
 
 
 def parse_struct_type(path: list[object], struct_definition_as_pseudo_json: dict[str, object],
                       schema_key: str, ignore_keys: list[str],
-                      ctx: 'ParseContext') -> 'VStruct':
+                      ctx: 'ParseContext') -> 'TStruct':
     from ...internal.schema.GetTypeUnexpectedParseFailure import get_type_unexpected_parse_failure
     from ...internal.schema.ParseStructFields import parse_struct_fields
     from ...TelepactSchemaParseError import TelepactSchemaParseError
@@ -63,4 +63,4 @@ def parse_struct_type(path: list[object], struct_definition_as_pseudo_json: dict
 
     fields = parse_struct_fields(this_path, definition, ctx)
 
-    return VStruct(schema_key, fields)
+    return TStruct(schema_key, fields)

@@ -16,8 +16,8 @@
 
 import { TelepactSchema } from '../../TelepactSchema';
 import { SchemaParseFailure } from './SchemaParseFailure';
-import { VType } from '../types/VType';
-import { VFieldDeclaration } from '../types/VFieldDeclaration';
+import { TType } from '../types/TType';
+import { TFieldDeclaration } from '../types/TFieldDeclaration';
 import { TelepactSchemaParseError } from '../../TelepactSchemaParseError';
 import { applyErrorToParsedTypes } from './ApplyErrorToParsedTypes';
 import { catchErrorCollisions } from './CatchErrorCollisions';
@@ -27,16 +27,16 @@ import { getOrParseType } from './GetOrParseType';
 import { getTypeUnexpectedParseFailure } from './GetTypeUnexpectedParseFailure';
 import { parseErrorType } from './ParseErrorType';
 import { parseHeadersType } from './ParseHeadersType';
-import { VError } from '../types/VError';
+import { TError } from '../types/TError';
 import { ParseContext } from './ParseContext';
 import { getPathDocumentCoordinatesPseudoJson } from './GetPathDocumentCoordinatesPseudoJson';
-import { VHeaders } from '../types/VHeaders';
+import { THeaders } from '../types/THeaders';
 import { catchHeaderCollisions } from './CatchHeaderCollisions';
 
 export function parseTelepactSchema(telepactSchemaDocumentNamesToJson: Record<string, string>): TelepactSchema {
     const originalSchema: { [key: string]: Record<string, object> } = {};
     const fullSchema: { [key: string]: Record<string, object> } = {};
-    const parsedTypes: { [key: string]: VType } = {};
+    const parsedTypes: { [key: string]: TType } = {};
     const parseFailures: SchemaParseFailure[] = [];
     const failedTypes: Set<string> = new Set();
     const schemaKeysToIndex: { [key: string]: number } = {};
@@ -183,7 +183,7 @@ export function parseTelepactSchema(telepactSchemaDocumentNamesToJson: Record<st
         throw new TelepactSchemaParseError(parseFailures, telepactSchemaDocumentNamesToJson);
     }
 
-    const errors: VError[] = [];
+    const errors: TError[] = [];
 
     try {
         for (const thisKey of errorKeys) {
@@ -267,7 +267,7 @@ export function parseTelepactSchema(telepactSchemaDocumentNamesToJson: Record<st
         }
     }
 
-    const headers: VHeaders[] = [];
+    const headers: THeaders[] = [];
 
     for (const headerKey of headerKeys) {
         const thisIndex = schemaKeysToIndex[headerKey];
@@ -325,8 +325,8 @@ export function parseTelepactSchema(telepactSchemaDocumentNamesToJson: Record<st
         throw new TelepactSchemaParseError(parseFailures, telepactSchemaDocumentNamesToJson);
     }
 
-    const requestHeaders: { [key: string]: VFieldDeclaration } = {};
-    const responseHeaders: { [key: string]: VFieldDeclaration } = {};
+    const requestHeaders: { [key: string]: TFieldDeclaration } = {};
+    const responseHeaders: { [key: string]: TFieldDeclaration } = {};
 
     for (const header of headers) {
         Object.assign(requestHeaders, header.requestHeaders);

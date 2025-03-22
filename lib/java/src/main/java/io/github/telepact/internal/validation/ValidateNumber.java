@@ -16,7 +16,7 @@
 
 package io.github.telepact.internal.validation;
 
-import static io.github.telepact.internal.types.VNumber._NUMBER_NAME;
+import static io.github.telepact.internal.types.TNumber._NUMBER_NAME;
 import static io.github.telepact.internal.validation.GetTypeUnexpectedValidationFailure.getTypeUnexpectedValidationFailure;
 
 import java.math.BigDecimal;

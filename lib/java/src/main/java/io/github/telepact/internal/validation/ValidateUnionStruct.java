@@ -21,11 +21,11 @@ import static io.github.telepact.internal.validation.ValidateStructFields.valida
 import java.util.List;
 import java.util.Map;
 
-import io.github.telepact.internal.types.VStruct;
+import io.github.telepact.internal.types.TStruct;
 
 public class ValidateUnionStruct {
     static List<ValidationFailure> validateUnionStruct(
-            VStruct unionStruct,
+            TStruct unionStruct,
             String unionTag,
             Map<String, Object> actual, Map<String, Object> selectedTags, ValidateContext ctx) {
         final var selectedFields = selectedTags == null ? null : (List<String>) selectedTags.get(unionTag);

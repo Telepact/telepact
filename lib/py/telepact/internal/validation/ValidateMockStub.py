@@ -21,16 +21,16 @@ import re
 
 if TYPE_CHECKING:
     from ...internal.validation.ValidateContext import ValidateContext
-    from ..types.VStruct import VStruct
-    from ..types.VType import VType
-    from ..types.VTypeDeclaration import VTypeDeclaration
-    from ..types.VUnion import VUnion
+    from ..types.TStruct import TStruct
+    from ..types.TType import TType
+    from ..types.TTypeDeclaration import TTypeDeclaration
+    from ..types.TUnion import TUnion
 
 
 def validate_mock_stub(given_obj: object,
-                       types: dict[str, 'VType'], ctx: 'ValidateContext') -> list['ValidationFailure']:
+                       types: dict[str, 'TType'], ctx: 'ValidateContext') -> list['ValidationFailure']:
     from ...internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
-    from ..types.VFn import VFn
+    from ..types.TFn import TFn
 
     validation_failures: list[ValidationFailure] = []
 
@@ -51,12 +51,12 @@ def validate_mock_stub(given_obj: object,
         ]
 
     function_name = matches[0]
-    function_def = cast(VFn, types[function_name])
+    function_def = cast(TFn, types[function_name])
     input = given_map[function_name]
 
-    function_def_call: VUnion = function_def.call
+    function_def_call: TUnion = function_def.call
     function_def_name: str = function_def.name
-    function_def_call_tags: dict[str, VStruct] = function_def_call.tags
+    function_def_call_tags: dict[str, TStruct] = function_def_call.tags
     input_failures = function_def_call_tags[function_def_name].validate(
         input, [], ctx)
 

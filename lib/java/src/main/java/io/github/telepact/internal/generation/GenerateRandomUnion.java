@@ -23,12 +23,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import io.github.telepact.internal.types.VStruct;
-import io.github.telepact.internal.types.VTypeDeclaration;
+import io.github.telepact.internal.types.TStruct;
+import io.github.telepact.internal.types.TTypeDeclaration;
 
 public class GenerateRandomUnion {
     public static Object generateRandomUnion(Object blueprintValue,
-            boolean useBlueprintValue, Map<String, VStruct> unionTagsReference,
+            boolean useBlueprintValue, Map<String, TStruct> unionTagsReference,
             GenerateContext ctx) {
         if (useBlueprintValue) {
             final var startingUnion = (Map<String, Object>) blueprintValue;

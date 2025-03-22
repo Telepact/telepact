@@ -18,11 +18,11 @@ from typing import TYPE_CHECKING
 from ...internal.validation.ValidationFailure import ValidationFailure
 
 if TYPE_CHECKING:
-    from ..types.VFieldDeclaration import VFieldDeclaration
-    from ..types.VFn import VFn
+    from ..types.TFieldDeclaration import TFieldDeclaration
+    from ..types.TFn import TFn
 
 
-def validate_headers(headers: dict[str, object], parsed_request_headers: dict[str, 'VFieldDeclaration'], function_type: 'VFn') -> list['ValidationFailure']:
+def validate_headers(headers: dict[str, object], parsed_request_headers: dict[str, 'TFieldDeclaration'], function_type: 'TFn') -> list['ValidationFailure']:
     from ...internal.validation.ValidateContext import ValidateContext
 
     validation_failures = []

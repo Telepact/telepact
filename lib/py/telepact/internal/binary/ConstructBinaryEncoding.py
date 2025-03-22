@@ -23,30 +23,30 @@ from ...internal.binary.CreateChecksum import create_checksum
 
 if TYPE_CHECKING:
     from ...TelepactSchema import TelepactSchema
-    from ..types.VTypeDeclaration import VTypeDeclaration
+    from ..types.TTypeDeclaration import TTypeDeclaration
 
 
-def trace_type(type_declaration: 'VTypeDeclaration') -> list[str]:
-    from ..types.VArray import VArray
-    from ..types.VObject import VObject
-    from ..types.VStruct import VStruct
-    from ..types.VUnion import VUnion
+def trace_type(type_declaration: 'TTypeDeclaration') -> list[str]:
+    from ..types.TArray import TArray
+    from ..types.TObject import TObject
+    from ..types.TStruct import TStruct
+    from ..types.TUnion import TUnion
 
     this_all_keys: list[str] = []
 
-    if isinstance(type_declaration.type, VArray):
+    if isinstance(type_declaration.type, TArray):
         these_keys2 = trace_type(type_declaration.type_parameters[0])
         this_all_keys.extend(these_keys2)
-    elif isinstance(type_declaration.type, VObject):
+    elif isinstance(type_declaration.type, TObject):
         these_keys2 = trace_type(type_declaration.type_parameters[0])
         this_all_keys.extend(these_keys2)
-    elif isinstance(type_declaration.type, VStruct):
+    elif isinstance(type_declaration.type, TStruct):
         struct_fields = type_declaration.type.fields
         for struct_field_key, struct_field in struct_fields.items():
             this_all_keys.append(struct_field_key)
             more_keys = trace_type(struct_field.type_declaration)
             this_all_keys.extend(more_keys)
-    elif isinstance(type_declaration.type, VUnion):
+    elif isinstance(type_declaration.type, TUnion):
         union_tags = type_declaration.type.tags
         for tag_key, tag_value in union_tags.items():
             this_all_keys.append(tag_key)
@@ -60,15 +60,15 @@ def trace_type(type_declaration: 'VTypeDeclaration') -> list[str]:
 
 
 def construct_binary_encoding(telepact_schema: 'TelepactSchema') -> 'BinaryEncoding':
-    from ..types.VTypeDeclaration import VTypeDeclaration
-    from ..types.VFn import VFn
+    from ..types.TTypeDeclaration import TTypeDeclaration
+    from ..types.TFn import TFn
 
     all_keys: set[str] = set()
 
-    functions: list[Tuple[str, VFn]] = []
+    functions: list[Tuple[str, TFn]] = []
 
     for key, value in telepact_schema.parsed.items():
-        if isinstance(value, VFn):
+        if isinstance(value, TFn):
             functions.append((key, value))
 
     for key, value in functions:

@@ -15,14 +15,14 @@
 //|
 
 import { ValidationFailure } from '../../internal/validation/ValidationFailure';
-import { VType } from '../types/VType';
+import { TType } from '../types/TType';
 import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure';
-import { VFn } from '../types/VFn';
+import { TFn } from '../types/TFn';
 import { ValidateContext } from './ValidateContext';
 
 export function validateMockCall(
     givenObj: any,
-    types: Record<string, VType>,
+    types: Record<string, TType>,
     ctx: ValidateContext,
 ): ValidationFailure[] {
     if (!(typeof givenObj === 'object' && !Array.isArray(givenObj))) {
@@ -48,7 +48,7 @@ export function validateMockCall(
     }
 
     const functionName = matches[0];
-    const functionDef = types[functionName] as VFn;
+    const functionDef = types[functionName] as TFn;
     const input = givenMap[functionName];
 
     const functionDefCall = functionDef.call;

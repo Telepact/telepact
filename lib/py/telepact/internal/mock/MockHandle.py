@@ -32,7 +32,7 @@ async def mock_handle(request_message: 'Message', stubs: list['MockStub'], invoc
     from ...internal.mock.Verify import verify
     from ...internal.mock.VerifyNoMoreInteractions import verify_no_more_interactions
     from ...TelepactError import TelepactError
-    from ..types.VFn import VFn
+    from ..types.TFn import TFn
     from ...internal.generation.GenerateContext import GenerateContext
 
     header: dict[str, object] = request_message.headers
@@ -89,7 +89,7 @@ async def mock_handle(request_message: 'Message', stubs: list['MockStub'], invoc
     else:
         invocations.append(MockInvocation(function_name, dict(argument)))
 
-        definition = cast(VFn, telepact_schema.parsed.get(function_name))
+        definition = cast(TFn, telepact_schema.parsed.get(function_name))
 
         for stub in stubs:
             if stub.count == 0:

@@ -14,16 +14,16 @@
 //|  limitations under the License.
 //|
 
-import { VError } from '../types/VError';
-import { VType } from '../types/VType';
+import { TError } from '../types/TError';
+import { TType } from '../types/TType';
 import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
 import { TelepactSchemaParseError } from '../../TelepactSchemaParseError';
-import { VFn } from '../types/VFn';
+import { TFn } from '../types/TFn';
 import { getPathDocumentCoordinatesPseudoJson } from '../../internal/schema/GetPathDocumentCoordinatesPseudoJson';
 
 export function applyErrorToParsedTypes(
-    error: VError,
-    parsedTypes: { [key: string]: VType },
+    error: TError,
+    parsedTypes: { [key: string]: TType },
     schemaKeysToDocumentNames: { [key: string]: string },
     schemaKeysToIndex: { [key: string]: number },
     documentNamesToJson: { [key: string]: string },
@@ -37,7 +37,7 @@ export function applyErrorToParsedTypes(
     for (const parsedTypeName in parsedTypes) {
         const parsedType = parsedTypes[parsedTypeName];
 
-        if (!(parsedType instanceof VFn)) {
+        if (!(parsedType instanceof TFn)) {
             continue;
         }
 

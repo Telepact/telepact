@@ -20,12 +20,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import io.github.telepact.internal.types.VFieldDeclaration;
-import io.github.telepact.internal.types.VTypeDeclaration;
+import io.github.telepact.internal.types.TFieldDeclaration;
+import io.github.telepact.internal.types.TTypeDeclaration;
 
 public class ValidateStructFields {
     static List<ValidationFailure> validateStructFields(
-            Map<String, VFieldDeclaration> fields,
+            Map<String, TFieldDeclaration> fields,
             List<String> selectedFields,
             Map<String, Object> actualStruct, ValidateContext ctx) {
         final var validationFailures = new ArrayList<ValidationFailure>();
@@ -62,7 +62,7 @@ public class ValidateStructFields {
                 continue;
             }
 
-            final VTypeDeclaration refFieldTypeDeclaration = referenceField.typeDeclaration;
+            final TTypeDeclaration refFieldTypeDeclaration = referenceField.typeDeclaration;
 
             final var nestedValidationFailures = refFieldTypeDeclaration.validate(fieldValue, ctx);
 

@@ -15,7 +15,7 @@
 //|
 
 import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
-import { VStruct } from '../types/VStruct';
+import { TStruct } from '../types/TStruct';
 import { getTypeUnexpectedParseFailure } from '../../internal/schema/GetTypeUnexpectedParseFailure';
 import { parseStructFields } from '../../internal/schema/ParseStructFields';
 import { TelepactSchemaParseError } from '../../TelepactSchemaParseError';
@@ -27,7 +27,7 @@ export function parseStructType(
     schemaKey: string,
     ignoreKeys: string[],
     ctx: ParseContext,
-): VStruct {
+): TStruct {
     const parseFailures: SchemaParseFailure[] = [];
     const otherKeys = new Set(Object.keys(structDefinitionAsPseudoJson));
 
@@ -62,5 +62,5 @@ export function parseStructType(
 
     const fields = parseStructFields(thisPath, definition, ctx);
 
-    return new VStruct(schemaKey, fields);
+    return new TStruct(schemaKey, fields);
 }

@@ -21,23 +21,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.github.telepact.internal.types.VArray;
-import io.github.telepact.internal.types.VFieldDeclaration;
-import io.github.telepact.internal.types.VFn;
-import io.github.telepact.internal.types.VObject;
-import io.github.telepact.internal.types.VStruct;
-import io.github.telepact.internal.types.VType;
-import io.github.telepact.internal.types.VTypeDeclaration;
-import io.github.telepact.internal.types.VUnion;
+import io.github.telepact.internal.types.TArray;
+import io.github.telepact.internal.types.TFieldDeclaration;
+import io.github.telepact.internal.types.TFn;
+import io.github.telepact.internal.types.TObject;
+import io.github.telepact.internal.types.TStruct;
+import io.github.telepact.internal.types.TType;
+import io.github.telepact.internal.types.TTypeDeclaration;
+import io.github.telepact.internal.types.TUnion;
 
 public class SelectStructFields {
-    static Object selectStructFields(VTypeDeclaration typeDeclaration, Object value,
+    static Object selectStructFields(TTypeDeclaration typeDeclaration, Object value,
             Map<String, Object> selectedStructFields) {
-        final VType typeDeclarationType = typeDeclaration.type;
-        final List<VTypeDeclaration> typeDeclarationTypeParams = typeDeclaration.typeParameters;
+        final TType typeDeclarationType = typeDeclaration.type;
+        final List<TTypeDeclaration> typeDeclarationTypeParams = typeDeclaration.typeParameters;
 
-        if (typeDeclarationType instanceof final VStruct s) {
-            final Map<String, VFieldDeclaration> fields = s.fields;
+        if (typeDeclarationType instanceof final TStruct s) {
+            final Map<String, TFieldDeclaration> fields = s.fields;
             final String structName = s.name;
             final var selectedFields = (List<String>) selectedStructFields.get(structName);
             final var valueAsMap = (Map<String, Object>) value;
@@ -47,7 +47,7 @@ public class SelectStructFields {
                 final var fieldName = entry.getKey();
                 if (selectedFields == null || selectedFields.contains(fieldName)) {
                     final var field = fields.get(fieldName);
-                    final VTypeDeclaration fieldTypeDeclaration = field.typeDeclaration;
+                    final TTypeDeclaration fieldTypeDeclaration = field.typeDeclaration;
                     final var valueWithSelectedFields = selectStructFields(fieldTypeDeclaration, entry.getValue(),
                             selectedStructFields);
 
@@ -56,15 +56,15 @@ public class SelectStructFields {
             }
 
             return finalMap;
-        } else if (typeDeclarationType instanceof final VFn f) {
+        } else if (typeDeclarationType instanceof final TFn f) {
             final var valueAsMap = (Map<String, Object>) value;
             final Map.Entry<String, Object> uEntry = valueAsMap.entrySet().stream().findAny().get();
             final var unionTag = uEntry.getKey();
             final var unionData = (Map<String, Object>) uEntry.getValue();
 
             final String fnName = f.name;
-            final VUnion fnCall = f.call;
-            final Map<String, VStruct> fnCallTags = fnCall.tags;
+            final TUnion fnCall = f.call;
+            final Map<String, TStruct> fnCallTags = fnCall.tags;
 
             final var argStructReference = fnCallTags.get(unionTag);
             final var selectedFields = (List<String>) selectedStructFields.get(fnName);
@@ -82,13 +82,13 @@ public class SelectStructFields {
             }
 
             return Map.of(uEntry.getKey(), finalMap);
-        } else if (typeDeclarationType instanceof final VUnion u) {
+        } else if (typeDeclarationType instanceof final TUnion u) {
             final var valueAsMap = (Map<String, Object>) value;
             final var uEntry = valueAsMap.entrySet().stream().findAny().get();
             final var unionTag = uEntry.getKey();
             final var unionData = (Map<String, Object>) uEntry.getValue();
 
-            final Map<String, VStruct> unionTags = u.tags;
+            final Map<String, TStruct> unionTags = u.tags;
             final var unionStructReference = unionTags.get(unionTag);
             final var unionStructRefFields = unionStructReference.fields;
             final var defaultTagsToFields = new HashMap<String, List<String>>();
@@ -118,7 +118,7 @@ public class SelectStructFields {
             }
 
             return Map.of(uEntry.getKey(), finalMap);
-        } else if (typeDeclarationType instanceof final VObject o) {
+        } else if (typeDeclarationType instanceof final TObject o) {
             final var nestedTypeDeclaration = typeDeclarationTypeParams.get(0);
             final var valueAsMap = (Map<String, Object>) value;
 
@@ -130,7 +130,7 @@ public class SelectStructFields {
             }
 
             return finalMap;
-        } else if (typeDeclarationType instanceof final VArray a) {
+        } else if (typeDeclarationType instanceof final TArray a) {
             final var nestedType = typeDeclarationTypeParams.get(0);
             final var valueAsList = (List<Object>) value;
 

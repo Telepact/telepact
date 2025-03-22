@@ -15,16 +15,16 @@
 //|
 
 import { Message } from '../Message';
-import { VTypeDeclaration } from './types/VTypeDeclaration';
-import { VUnion } from './types/VUnion';
+import { TTypeDeclaration } from './types/TTypeDeclaration';
+import { TUnion } from './types/TUnion';
 import { ValidationFailure } from '../internal/validation/ValidationFailure';
-import { VType } from './types/VType';
+import { TType } from './types/TType';
 import { TelepactSchema } from '../TelepactSchema';
 import { selectStructFields } from '../internal/SelectStructFields';
 import { getInvalidErrorMessage } from '../internal/validation/GetInvalidErrorMessage';
 import { validateHeaders } from '../internal/validation/ValidateHeaders';
 import { validateResult } from '../internal/validation/ValidateResult';
-import { VFn } from './types/VFn';
+import { TFn } from './types/TFn';
 import { mapValidationFailuresToInvalidFieldCases } from './validation/MapValidationFailuresToInvalidFieldCases';
 import { ValidateContext } from './validation/ValidateContext';
 
@@ -37,7 +37,7 @@ export async function handleMessage(
     const responseHeaders: Record<string, any> = {};
     const requestHeaders: Record<string, any> = requestMessage.headers;
     const requestBody: Record<string, any> = requestMessage.body;
-    const parsedTelepactSchema: Record<string, VType> = telepactSchema.parsed;
+    const parsedTelepactSchema: Record<string, TType> = telepactSchema.parsed;
     const requestEntry: [string, any] = Object.entries(requestBody)[0];
 
     const requestTargetInit = requestEntry[0];
@@ -53,8 +53,8 @@ export async function handleMessage(
         requestTarget = requestTargetInit;
     }
 
-    const functionType = parsedTelepactSchema[requestTarget] as VFn;
-    const resultUnionType: VUnion = functionType.result;
+    const functionType = parsedTelepactSchema[requestTarget] as TFn;
+    const resultUnionType: TUnion = functionType.result;
 
     const callId = requestHeaders['id_'];
     if (callId !== undefined) {
@@ -115,7 +115,7 @@ export async function handleMessage(
         return new Message(responseHeaders, newErrorResult);
     }
 
-    const functionTypeCall: VUnion = functionType.call;
+    const functionTypeCall: TUnion = functionType.call;
 
     const warnings: ValidationFailure[] = [];
     const filterOutWarnings = (e: ValidationFailure) => {
@@ -209,7 +209,7 @@ export async function handleMessage(
     let finalResultUnion: Record<string, any>;
     if (selectStructFieldsHeader !== null) {
         finalResultUnion = selectStructFields(
-            new VTypeDeclaration(resultUnionType, false, []),
+            new TTypeDeclaration(resultUnionType, false, []),
             resultUnion,
             selectStructFieldsHeader,
         ) as Record<string, any>;

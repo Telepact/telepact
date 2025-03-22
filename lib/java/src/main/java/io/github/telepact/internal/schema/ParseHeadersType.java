@@ -25,19 +25,19 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import io.github.telepact.TelepactSchemaParseError;
-import io.github.telepact.internal.types.VFieldDeclaration;
-import io.github.telepact.internal.types.VHeaders;
+import io.github.telepact.internal.types.TFieldDeclaration;
+import io.github.telepact.internal.types.THeaders;
 
 public class ParseHeadersType {
 
-    public static VHeaders parseHeadersType(
+    public static THeaders parseHeadersType(
             List<Object> path,
             Map<String, Object> headersDefinitionAsParsedJson,
             String schemaKey,
             ParseContext ctx) throws TelepactSchemaParseError {
         List<SchemaParseFailure> parseFailures = new ArrayList<>();
-        Map<String, VFieldDeclaration> requestHeaders = new HashMap<>();
-        Map<String, VFieldDeclaration> responseHeaders = new HashMap<>();
+        Map<String, TFieldDeclaration> requestHeaders = new HashMap<>();
+        Map<String, TFieldDeclaration> responseHeaders = new HashMap<>();
 
         Object requestHeadersDef = headersDefinitionAsParsedJson.get(schemaKey);
 
@@ -53,12 +53,12 @@ public class ParseHeadersType {
             parseFailures.addAll(branchParseFailures);
         } else {
             try {
-                Map<String, VFieldDeclaration> requestFields = parseStructFields(thisPath,
+                Map<String, TFieldDeclaration> requestFields = parseStructFields(thisPath,
                         (Map<String, Object>) requestHeadersDef, ctx);
 
                 // All headers are optional
                 final var finalRequestFields = requestFields.entrySet().stream()
-                        .collect(Collectors.toMap(e -> e.getKey(), e -> new VFieldDeclaration(e.getValue().fieldName,
+                        .collect(Collectors.toMap(e -> e.getKey(), e -> new TFieldDeclaration(e.getValue().fieldName,
                                 e.getValue().typeDeclaration, true)));
 
                 requestHeaders.putAll(finalRequestFields);
@@ -88,12 +88,12 @@ public class ParseHeadersType {
             parseFailures.addAll(branchParseFailures);
         } else {
             try {
-                Map<String, VFieldDeclaration> responseFields = ParseStructFields.parseStructFields(responsePath,
+                Map<String, TFieldDeclaration> responseFields = ParseStructFields.parseStructFields(responsePath,
                         (Map<String, Object>) responseHeadersDef, ctx);
 
                 // All headers are optional
                 final var finalResponseFields = responseFields.entrySet().stream()
-                        .collect(Collectors.toMap(e -> e.getKey(), e -> new VFieldDeclaration(e.getValue().fieldName,
+                        .collect(Collectors.toMap(e -> e.getKey(), e -> new TFieldDeclaration(e.getValue().fieldName,
                                 e.getValue().typeDeclaration, true)));
 
                 responseHeaders.putAll(finalResponseFields);
@@ -106,6 +106,6 @@ public class ParseHeadersType {
             throw new TelepactSchemaParseError(parseFailures, ctx.telepactSchemaDocumentNamesToJson);
         }
 
-        return new VHeaders(schemaKey, requestHeaders, responseHeaders);
+        return new THeaders(schemaKey, requestHeaders, responseHeaders);
     }
 }

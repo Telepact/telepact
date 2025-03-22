@@ -16,18 +16,18 @@
 
 package io.github.telepact.internal.validation;
 
-import static io.github.telepact.internal.types.VObject._OBJECT_NAME;
+import static io.github.telepact.internal.types.TObject._OBJECT_NAME;
 import static io.github.telepact.internal.validation.GetTypeUnexpectedValidationFailure.getTypeUnexpectedValidationFailure;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import io.github.telepact.internal.types.VTypeDeclaration;
+import io.github.telepact.internal.types.TTypeDeclaration;
 
 public class ValidateObject {
 
-    public static List<ValidationFailure> validateObject(Object value, List<VTypeDeclaration> typeParameters,
+    public static List<ValidationFailure> validateObject(Object value, List<TTypeDeclaration> typeParameters,
             ValidateContext ctx) {
         if (value instanceof final Map<?, ?> m) {
             final var nestedTypeDeclaration = typeParameters.get(0);

@@ -15,7 +15,7 @@
 //|
 
 import { RandomGenerator } from '../../RandomGenerator';
-import { VTypeDeclaration } from '../types/VTypeDeclaration';
+import { TTypeDeclaration } from '../types/TTypeDeclaration';
 
 export class GenerateContext {
     includeOptionalFields: boolean;
@@ -43,7 +43,7 @@ export class GenerateContext {
     }: {
         blueprintValue?: any;
         useBlueprintValue?: boolean;
-        typeParameters?: VTypeDeclaration[];
+        typeParameters?: TTypeDeclaration[];
         alwaysIncludeRequiredFields?: boolean;
     }): GenerateContext {
         return new GenerateContext(

@@ -14,13 +14,13 @@
 //|  limitations under the License.
 //|
 
-import { VFieldDeclaration } from '../types/VFieldDeclaration';
+import { TFieldDeclaration } from '../types/TFieldDeclaration';
 import { GenerateContext } from '../../internal/generation/GenerateContext';
 
 export function generateRandomStruct(
     blueprintValue: any,
     useBlueprintValue: boolean,
-    referenceStruct: { [key: string]: VFieldDeclaration },
+    referenceStruct: { [key: string]: TFieldDeclaration },
     ctx: GenerateContext,
 ): any {
     const startingStruct = useBlueprintValue ? blueprintValue : {};

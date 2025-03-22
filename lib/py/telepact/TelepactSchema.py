@@ -17,8 +17,8 @@
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from .internal.types.VFieldDeclaration import VFieldDeclaration
-    from .internal.types.VType import VType
+    from .internal.types.TFieldDeclaration import TFieldDeclaration
+    from .internal.types.TType import TType
 
 
 class TelepactSchema:
@@ -26,8 +26,8 @@ class TelepactSchema:
     A parsed telepact schema.
     """
 
-    def __init__(self, original: list[object], parsed: dict[str, 'VType'], parsed_request_headers: dict[str, 'VFieldDeclaration'],
-                 parsed_response_headers: dict[str, 'VFieldDeclaration']):
+    def __init__(self, original: list[object], parsed: dict[str, 'TType'], parsed_request_headers: dict[str, 'TFieldDeclaration'],
+                 parsed_response_headers: dict[str, 'TFieldDeclaration']):
         self.original = original
         self.parsed = parsed
         self.parsed_request_headers = parsed_request_headers

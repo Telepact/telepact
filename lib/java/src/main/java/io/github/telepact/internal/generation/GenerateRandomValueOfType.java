@@ -18,13 +18,13 @@ package io.github.telepact.internal.generation;
 
 import java.util.List;
 
-import io.github.telepact.internal.types.VType;
-import io.github.telepact.internal.types.VTypeDeclaration;
+import io.github.telepact.internal.types.TType;
+import io.github.telepact.internal.types.TTypeDeclaration;
 
 public class GenerateRandomValueOfType {
-    public static Object generateRandomValueOfType(Object blueprintValue, boolean useBlueprintValue, VType thisType,
+    public static Object generateRandomValueOfType(Object blueprintValue, boolean useBlueprintValue, TType thisType,
             boolean nullable,
-            List<VTypeDeclaration> typeParameters, GenerateContext ctx) {
+            List<TTypeDeclaration> typeParameters, GenerateContext ctx) {
         if (nullable && !useBlueprintValue && ctx.randomGenerator.nextBoolean()) {
             return null;
         } else {

@@ -31,8 +31,8 @@ import io.github.telepact.TelepactError;
 import io.github.telepact.TelepactSchema;
 import io.github.telepact.RandomGenerator;
 import io.github.telepact.internal.generation.GenerateContext;
-import io.github.telepact.internal.types.VFn;
-import io.github.telepact.internal.types.VUnion;
+import io.github.telepact.internal.types.TFn;
+import io.github.telepact.internal.types.TUnion;
 
 public class MockHandle {
     public static Message mockHandle(Message requestMessage, List<MockStub> stubs, List<MockInvocation> invocations,
@@ -99,7 +99,7 @@ public class MockHandle {
             default -> {
                 invocations.add(new MockInvocation(functionName, new TreeMap<>(argument)));
 
-                final var definition = (VFn) telepactSchema.parsed.get(functionName);
+                final var definition = (TFn) telepactSchema.parsed.get(functionName);
 
                 for (final var stub : stubs) {
                     if (stub.count == 0) {
@@ -147,7 +147,7 @@ public class MockHandle {
                 }
 
                 if (definition != null) {
-                    final var resultUnion = (VUnion) definition.result;
+                    final var resultUnion = (TUnion) definition.result;
                     final var okStructRef = resultUnion.tags.get("Ok_");
                     final var useBlueprintValue = true;
                     final var includeOptionalFields = true;

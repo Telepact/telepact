@@ -20,11 +20,11 @@ from ...internal.validation.ValidationFailure import ValidationFailure
 
 if TYPE_CHECKING:
     from ...internal.validation.ValidateContext import ValidateContext
-    from ..types.VFieldDeclaration import VFieldDeclaration
-    from ..types.VTypeDeclaration import VTypeDeclaration
+    from ..types.TFieldDeclaration import TFieldDeclaration
+    from ..types.TTypeDeclaration import TTypeDeclaration
 
 
-def validate_struct_fields(fields: dict[str, 'VFieldDeclaration'],
+def validate_struct_fields(fields: dict[str, 'TFieldDeclaration'],
                            selected_fields: list[str] | None,
                            actual_struct: dict[str, object],
                            ctx: 'ValidateContext') -> list['ValidationFailure']:

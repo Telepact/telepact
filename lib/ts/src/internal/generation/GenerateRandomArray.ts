@@ -15,12 +15,12 @@
 //|
 
 import { GenerateContext } from '../../internal/generation/GenerateContext';
-import { VTypeDeclaration } from '../types/VTypeDeclaration';
+import { TTypeDeclaration } from '../types/TTypeDeclaration';
 
 export function generateRandomArray(
     blueprintValue: any,
     useBlueprintValue: boolean,
-    typeParameters: VTypeDeclaration[],
+    typeParameters: TTypeDeclaration[],
     ctx: GenerateContext,
 ): any[] {
     const nestedTypeDeclaration = typeParameters[0];

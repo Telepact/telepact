@@ -27,25 +27,25 @@ import java.util.List;
 import java.util.Map;
 
 import io.github.telepact.TelepactSchemaParseError;
-import io.github.telepact.internal.types.VFn;
-import io.github.telepact.internal.types.VSelect;
-import io.github.telepact.internal.types.VStruct;
-import io.github.telepact.internal.types.VUnion;
+import io.github.telepact.internal.types.TFn;
+import io.github.telepact.internal.types.TSelect;
+import io.github.telepact.internal.types.TStruct;
+import io.github.telepact.internal.types.TUnion;
 
 public class ParseFunctionType {
 
-    static VFn parseFunctionType(
+    static TFn parseFunctionType(
             List<Object> path,
             Map<String, Object> functionDefinitionAsParsedJson,
             String schemaKey,
             ParseContext ctx) {
         final var parseFailures = new ArrayList<SchemaParseFailure>();
 
-        VUnion callType = null;
+        TUnion callType = null;
         try {
-            final VStruct argType = parseStructType(path, functionDefinitionAsParsedJson,
+            final TStruct argType = parseStructType(path, functionDefinitionAsParsedJson,
                     schemaKey, List.of("->", "_errors"), ctx);
-            callType = new VUnion(schemaKey, Map.of(schemaKey, argType), Map.of(schemaKey, 0));
+            callType = new TUnion(schemaKey, Map.of(schemaKey, argType), Map.of(schemaKey, 0));
         } catch (TelepactSchemaParseError e) {
             parseFailures.addAll(e.schemaParseFailures);
         }
@@ -54,7 +54,7 @@ public class ParseFunctionType {
 
         final List<Object> resPath = new ArrayList<>(path);
 
-        VUnion resultType = null;
+        TUnion resultType = null;
         if (!functionDefinitionAsParsedJson.containsKey(resultSchemaKey)) {
             parseFailures.add(new SchemaParseFailure(ctx.documentName, resPath, "RequiredObjectKeyMissing",
                     Map.of("key", resultSchemaKey)));
@@ -96,10 +96,10 @@ public class ParseFunctionType {
         }
 
         var fnSelectType = derivePossibleSelect(schemaKey, resultType);
-        var selectType = (VSelect) getOrParseType(path, "_ext.Select_", ctx);
+        var selectType = (TSelect) getOrParseType(path, "_ext.Select_", ctx);
         selectType.possibleSelects.put(schemaKey, fnSelectType);
 
-        return new VFn(schemaKey, callType, resultType, errorsRegex);
+        return new TFn(schemaKey, callType, resultType, errorsRegex);
     }
 
 }

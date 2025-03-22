@@ -24,14 +24,14 @@ import java.util.List;
 import java.util.Map;
 
 import io.github.telepact.TelepactSchemaParseError;
-import io.github.telepact.internal.types.VFieldDeclaration;
+import io.github.telepact.internal.types.TFieldDeclaration;
 
 public class ParseStructFields {
-    static Map<String, VFieldDeclaration> parseStructFields(
+    static Map<String, TFieldDeclaration> parseStructFields(
             List<Object> path,
             Map<String, Object> referenceStruct, ParseContext ctx) {
         final var parseFailures = new ArrayList<SchemaParseFailure>();
-        final var fields = new HashMap<String, VFieldDeclaration>();
+        final var fields = new HashMap<String, TFieldDeclaration>();
 
         for (final var structEntry : referenceStruct.entrySet()) {
             final var fieldDeclaration = structEntry.getKey();
@@ -59,7 +59,7 @@ public class ParseStructFields {
 
             final var typeDeclarationValue = structEntry.getValue();
 
-            final VFieldDeclaration parsedField;
+            final TFieldDeclaration parsedField;
             try {
                 parsedField = parseField(path, fieldDeclaration,
                         typeDeclarationValue, ctx);

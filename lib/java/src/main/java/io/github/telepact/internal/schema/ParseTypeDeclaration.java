@@ -26,11 +26,11 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import io.github.telepact.TelepactSchemaParseError;
-import io.github.telepact.internal.types.VType;
-import io.github.telepact.internal.types.VTypeDeclaration;
+import io.github.telepact.internal.types.TType;
+import io.github.telepact.internal.types.TTypeDeclaration;
 
 public class ParseTypeDeclaration {
-    static VTypeDeclaration parseTypeDeclaration(
+    static TTypeDeclaration parseTypeDeclaration(
             List<Object> path,
             List<Object> typeDeclarationArray,
             ParseContext ctx) {
@@ -63,7 +63,7 @@ public class ParseTypeDeclaration {
         final var typeName = matcher.group(1);
         final var nullable = matcher.group(2) != null;
 
-        final VType type = getOrParseType(basePath, typeName, ctx);
+        final TType type = getOrParseType(basePath, typeName, ctx);
 
         final var givenTypeParameterCount = typeDeclarationArray.size() - 1;
         if (type.getTypeParameterCount() != givenTypeParameterCount) {
@@ -74,7 +74,7 @@ public class ParseTypeDeclaration {
         }
 
         final var parseFailures = new ArrayList<SchemaParseFailure>();
-        final var typeParameters = new ArrayList<VTypeDeclaration>();
+        final var typeParameters = new ArrayList<TTypeDeclaration>();
         final var givenTypeParameters = typeDeclarationArray.subList(1, typeDeclarationArray.size());
 
         var index = 0;
@@ -94,7 +94,7 @@ public class ParseTypeDeclaration {
                 continue;
             }
 
-            final VTypeDeclaration typeParameterTypeDeclaration;
+            final TTypeDeclaration typeParameterTypeDeclaration;
             try {
                 typeParameterTypeDeclaration = parseTypeDeclaration(loopPath, (List<Object>) e, ctx);
 
@@ -108,6 +108,6 @@ public class ParseTypeDeclaration {
             throw new TelepactSchemaParseError(parseFailures, ctx.telepactSchemaDocumentNamesToJson);
         }
 
-        return new VTypeDeclaration(type, nullable, typeParameters);
+        return new TTypeDeclaration(type, nullable, typeParameters);
     }
 }

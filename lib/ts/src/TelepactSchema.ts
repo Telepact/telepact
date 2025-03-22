@@ -16,8 +16,8 @@
 
 import { createTelepactSchemaFromFileJsonMap } from './internal/schema/CreateTelepactSchemaFromFileJsonMap';
 import { getSchemaFileMap } from './internal/schema/GetSchemaFileMap';
-import { VFieldDeclaration } from './internal/types/VFieldDeclaration';
-import { VType } from './internal/types/VType';
+import { TFieldDeclaration } from './internal/types/TFieldDeclaration';
+import { TType } from './internal/types/TType';
 import { FsModule, PathModule } from './fileSystem';
 
 export class TelepactSchema {
@@ -27,16 +27,16 @@ export class TelepactSchema {
 
     original: any[];
     full: any[];
-    parsed: Record<string, VType>;
-    parsedRequestHeaders: Record<string, VFieldDeclaration>;
-    parsedResponseHeaders: Record<string, VFieldDeclaration>;
+    parsed: Record<string, TType>;
+    parsedRequestHeaders: Record<string, TFieldDeclaration>;
+    parsedResponseHeaders: Record<string, TFieldDeclaration>;
 
     constructor(
         original: any[],
         full: any[],
-        parsed: Record<string, VType>,
-        parsedRequestHeaders: Record<string, VFieldDeclaration>,
-        parsedResponseHeaders: Record<string, VFieldDeclaration>,
+        parsed: Record<string, TType>,
+        parsedRequestHeaders: Record<string, TFieldDeclaration>,
+        parsedResponseHeaders: Record<string, TFieldDeclaration>,
     ) {
         this.original = original;
         this.full = full;

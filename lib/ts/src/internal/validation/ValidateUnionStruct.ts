@@ -14,13 +14,13 @@
 //|  limitations under the License.
 //|
 
-import { VStruct } from '../types/VStruct';
+import { TStruct } from '../types/TStruct';
 import { ValidationFailure } from '../../internal/validation/ValidationFailure';
 import { validateStructFields } from '../../internal/validation/ValidateStructFields';
 import { ValidateContext } from './ValidateContext';
 
 export function validateUnionStruct(
-    unionStruct: VStruct,
+    unionStruct: TStruct,
     unionTag: string,
     actual: Record<string, any>,
     selectedTags: Record<string, any>,

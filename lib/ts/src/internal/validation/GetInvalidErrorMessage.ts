@@ -14,7 +14,7 @@
 //|  limitations under the License.
 //|
 
-import { VUnion } from '../types/VUnion';
+import { TUnion } from '../types/TUnion';
 import { ValidationFailure } from '../../internal/validation/ValidationFailure';
 import { mapValidationFailuresToInvalidFieldCases } from '../../internal/validation/MapValidationFailuresToInvalidFieldCases';
 import { validateResult } from '../../internal/validation/ValidateResult';
@@ -23,7 +23,7 @@ import { Message } from '../../Message';
 export function getInvalidErrorMessage(
     error: string,
     validationFailures: ValidationFailure[],
-    resultUnionType: VUnion,
+    resultUnionType: TUnion,
     responseHeaders: { [key: string]: any },
 ): Message {
     const validationFailureCases = mapValidationFailuresToInvalidFieldCases(validationFailures);

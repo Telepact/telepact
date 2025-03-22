@@ -15,16 +15,16 @@
 //|
 
 import { ValidationFailure } from '../../internal/validation/ValidationFailure';
-import { VType } from '../types/VType';
-import { VTypeDeclaration } from '../types/VTypeDeclaration';
+import { TType } from '../types/TType';
+import { TTypeDeclaration } from '../types/TTypeDeclaration';
 import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure';
 import { ValidateContext } from './ValidateContext';
 
 export function validateValueOfType(
     value: any,
-    thisType: VType,
+    thisType: TType,
     nullable: boolean,
-    typeParameters: VTypeDeclaration[],
+    typeParameters: TTypeDeclaration[],
     ctx: ValidateContext,
 ): ValidationFailure[] {
     if (value === null) {

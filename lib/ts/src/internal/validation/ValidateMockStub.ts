@@ -16,15 +16,15 @@
 
 import { ValidationFailure } from '../../internal/validation/ValidationFailure';
 import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure';
-import { VStruct } from '../types/VStruct';
-import { VType } from '../types/VType';
-import { VUnion } from '../types/VUnion';
-import { VFn } from '../types/VFn';
+import { TStruct } from '../types/TStruct';
+import { TType } from '../types/TType';
+import { TUnion } from '../types/TUnion';
+import { TFn } from '../types/TFn';
 import { ValidateContext } from './ValidateContext';
 
 export function validateMockStub(
     givenObj: any,
-    types: { [key: string]: VType },
+    types: { [key: string]: TType },
     ctx: ValidateContext,
 ): ValidationFailure[] {
     const validationFailures: ValidationFailure[] = [];
@@ -52,12 +52,12 @@ export function validateMockStub(
     }
 
     const functionName = matches[0];
-    const functionDef = types[functionName] as VFn;
+    const functionDef = types[functionName] as TFn;
     const input = givenMap[functionName];
 
-    const functionDefCall: VUnion = functionDef.call;
+    const functionDefCall: TUnion = functionDef.call;
     const functionDefName: string = functionDef.name;
-    const functionDefCallTags: { [key: string]: VStruct } = functionDefCall.tags;
+    const functionDefCallTags: { [key: string]: TStruct } = functionDefCall.tags;
     const inputFailures = functionDefCallTags[functionDefName].validate(input, [], ctx);
 
     const inputFailuresWithPath: ValidationFailure[] = [];

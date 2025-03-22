@@ -15,17 +15,17 @@
 #|
 
 from typing import TYPE_CHECKING, cast
-from ..types.VUnion import _UNION_NAME
+from ..types.TUnion import _UNION_NAME
 from ...internal.validation.ValidationFailure import ValidationFailure
 
 if TYPE_CHECKING:
     from ...internal.validation.ValidateContext import ValidateContext
-    from ..types.VStruct import VStruct
-    from ..types.VTypeDeclaration import VTypeDeclaration
+    from ..types.TStruct import TStruct
+    from ..types.TTypeDeclaration import TTypeDeclaration
 
 
 def validate_union(value: object,
-                   name: str, tags: dict[str, 'VStruct'], ctx: 'ValidateContext') -> list['ValidationFailure']:
+                   name: str, tags: dict[str, 'TStruct'], ctx: 'ValidateContext') -> list['ValidationFailure']:
     from ...internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
     from ...internal.validation.ValidateUnionTags import validate_union_tags
 

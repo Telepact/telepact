@@ -14,13 +14,13 @@
 //|  limitations under the License.
 //|
 
-import { VTypeDeclaration } from '../types/VTypeDeclaration';
+import { TTypeDeclaration } from '../types/TTypeDeclaration';
 import { GenerateContext } from './GenerateContext';
 
 export function generateRandomObject(
     blueprintValue: any,
     useBlueprintValue: boolean,
-    typeParameters: VTypeDeclaration[],
+    typeParameters: TTypeDeclaration[],
     ctx: GenerateContext,
 ): any {
     const nestedTypeDeclaration = typeParameters[0];

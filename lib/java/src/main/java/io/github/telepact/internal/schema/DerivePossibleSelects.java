@@ -18,15 +18,15 @@ package io.github.telepact.internal.schema;
 
 import java.util.*;
 
-import io.github.telepact.internal.types.VFieldDeclaration;
-import io.github.telepact.internal.types.VStruct;
-import io.github.telepact.internal.types.VType;
-import io.github.telepact.internal.types.VUnion;
+import io.github.telepact.internal.types.TFieldDeclaration;
+import io.github.telepact.internal.types.TStruct;
+import io.github.telepact.internal.types.TType;
+import io.github.telepact.internal.types.TUnion;
 
 public class DerivePossibleSelects {
 
-    public static Map<String, Object> derivePossibleSelect(String fnName, VUnion result) {
-        final var nestedTypes = new HashMap<String, VType>();
+    public static Map<String, Object> derivePossibleSelect(String fnName, TUnion result) {
+        final var nestedTypes = new HashMap<String, TType>();
         final var okFields = result.tags.get("Ok_").fields;
 
         final var okFieldNames = new ArrayList<>(okFields.keySet());
@@ -43,7 +43,7 @@ public class DerivePossibleSelects {
         for (final var k : sortedTypeKeys) {
             System.out.println("k: " + k);
             final var v = nestedTypes.get(k);
-            if (v instanceof VUnion u) {
+            if (v instanceof TUnion u) {
                 final var unionSelect = new HashMap<String, List<String>>();
                 final var sortedTagKeys = new ArrayList<>(u.tags.keySet());
                 Collections.sort(sortedTagKeys);
@@ -58,7 +58,7 @@ public class DerivePossibleSelects {
                 }
 
                 possibleSelect.put(k, unionSelect);
-            } else if (v instanceof VStruct s) {
+            } else if (v instanceof TStruct s) {
                 final var structSelect = new ArrayList<String>();
                 final var sortedFieldNames = new ArrayList<>(s.fields.keySet());
                 Collections.sort(sortedFieldNames);
@@ -71,15 +71,15 @@ public class DerivePossibleSelects {
         return possibleSelect;
     }
 
-    private static void findNestedTypes(Map<String, VFieldDeclaration> fields, Map<String, VType> nestedTypes) {
+    private static void findNestedTypes(Map<String, TFieldDeclaration> fields, Map<String, TType> nestedTypes) {
         for (final var field : fields.values()) {
             final var typ = field.typeDeclaration.type;
-            if (typ instanceof VUnion u) {
+            if (typ instanceof TUnion u) {
                 nestedTypes.put(u.name, typ);
                 for (final var c : u.tags.values()) {
                     findNestedTypes(c.fields, nestedTypes);
                 }
-            } else if (typ instanceof VStruct s) {
+            } else if (typ instanceof TStruct s) {
                 nestedTypes.put(s.name, typ);
                 findNestedTypes(s.fields, nestedTypes);
             }

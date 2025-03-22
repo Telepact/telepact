@@ -16,7 +16,7 @@
 
 import { ValidationFailure } from '../../internal/validation/ValidationFailure';
 import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure';
-import { integerName } from '../types/VInteger';
+import { integerName } from '../types/TInteger';
 
 export function validateInteger(value: any): ValidationFailure[] {
     if (typeof value === 'number' && Number.isInteger(value)) {

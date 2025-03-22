@@ -19,12 +19,12 @@ from ...internal.validation.ValidationFailure import ValidationFailure
 
 if TYPE_CHECKING:
     from ...internal.validation.ValidateContext import ValidateContext
-    from ..types.VStruct import VStruct
-    from ..types.VTypeDeclaration import VTypeDeclaration
+    from ..types.TStruct import TStruct
+    from ..types.TTypeDeclaration import TTypeDeclaration
 
 
 def validate_union_struct(
-    union_struct: 'VStruct',
+    union_struct: 'TStruct',
     union_tag: str,
     actual: dict[str, object],
     selected_tags: dict[str, object],

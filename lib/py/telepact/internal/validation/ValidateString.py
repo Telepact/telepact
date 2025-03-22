@@ -14,7 +14,7 @@
 #|  limitations under the License.
 #|
 
-from ..types.VString import _STRING_NAME
+from ..types.TString import _STRING_NAME
 from ...internal.validation.ValidationFailure import ValidationFailure
 
 

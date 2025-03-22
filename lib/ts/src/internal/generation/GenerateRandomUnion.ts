@@ -14,14 +14,14 @@
 //|  limitations under the License.
 //|
 
-import { VStruct } from '../types/VStruct';
+import { TStruct } from '../types/TStruct';
 import { GenerateContext } from '../../internal/generation/GenerateContext';
 import { generateRandomStruct } from '../../internal/generation/GenerateRandomStruct';
 
 export function generateRandomUnion(
     blueprintValue: any,
     useBlueprintValue: boolean,
-    unionTagsReference: { [key: string]: VStruct },
+    unionTagsReference: { [key: string]: TStruct },
     ctx: GenerateContext,
 ): any {
     if (!useBlueprintValue) {

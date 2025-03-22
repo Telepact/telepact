@@ -23,8 +23,8 @@ import json
 
 
 if TYPE_CHECKING:
-    from ..types.VType import VType
-    from ..types.VFieldDeclaration import VFieldDeclaration
+    from ..types.TType import TType
+    from ..types.TFieldDeclaration import TFieldDeclaration
 
 
 def parse_vers_api_schema(
@@ -41,13 +41,13 @@ def parse_vers_api_schema(
     from .ParseHeadersType import parse_headers_type
     from .ParseContext import ParseContext
     from .GetPathDocumentCoordinatesPseudoJson import get_path_document_coordinates_pseudo_json
-    from ..types.VError import VError
+    from ..types.TError import TError
     from collections import OrderedDict
-    from ..types.VHeaders import VHeaders
+    from ..types.THeaders import THeaders
     from .CatchHeaderCollisions import catch_header_collisions
 
     original_schema: dict[str, object] = {}
-    parsed_types: dict[str, VType] = {}
+    parsed_types: dict[str, TType] = {}
     parse_failures: list[SchemaParseFailure] = []
     failed_types: set[str] = set()
     schema_keys_to_document_names: dict[str, str] = {}
@@ -169,7 +169,7 @@ def parse_vers_api_schema(
         raise TelepactSchemaParseError(
             parse_failures, telepact_schema_document_names_to_json)
 
-    errors: list[VError] = []
+    errors: list[TError] = []
 
     for this_key in error_keys:
         this_index = schema_keys_to_index[this_key]
@@ -220,7 +220,7 @@ def parse_vers_api_schema(
         except TelepactSchemaParseError as e:
             parse_failures.extend(e.schema_parse_failures)
 
-    headers: list[VHeaders] = []
+    headers: list[THeaders] = []
 
     for header_key in header_keys:
         this_index = schema_keys_to_index[header_key]
@@ -263,8 +263,8 @@ def parse_vers_api_schema(
         raise TelepactSchemaParseError(
             parse_failures, telepact_schema_document_names_to_json)
 
-    request_headers: dict[str, VFieldDeclaration] = {}
-    response_headers: dict[str, VFieldDeclaration] = {}
+    request_headers: dict[str, TFieldDeclaration] = {}
+    response_headers: dict[str, TFieldDeclaration] = {}
 
     for header in headers:
         request_headers.update(header.request_headers)

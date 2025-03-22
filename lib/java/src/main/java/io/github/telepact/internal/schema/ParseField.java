@@ -26,11 +26,11 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import io.github.telepact.TelepactSchemaParseError;
-import io.github.telepact.internal.types.VFieldDeclaration;
-import io.github.telepact.internal.types.VType;
+import io.github.telepact.internal.types.TFieldDeclaration;
+import io.github.telepact.internal.types.TType;
 
 public class ParseField {
-    static VFieldDeclaration parseField(
+    static TFieldDeclaration parseField(
             List<Object> path,
             String fieldDeclaration,
             Object typeDeclarationValue,
@@ -65,6 +65,6 @@ public class ParseField {
                 typeDeclarationArray,
                 ctx);
 
-        return new VFieldDeclaration(fieldName, typeDeclaration, optional);
+        return new TFieldDeclaration(fieldName, typeDeclaration, optional);
     }
 }

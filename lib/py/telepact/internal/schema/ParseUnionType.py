@@ -17,20 +17,20 @@
 import re
 from typing import TYPE_CHECKING
 from ...internal.schema.SchemaParseFailure import SchemaParseFailure
-from ..types.VUnion import VUnion
+from ..types.TUnion import TUnion
 
 if TYPE_CHECKING:
     from ...internal.schema.ParseContext import ParseContext
-    from ..types.VType import VType
+    from ..types.TType import TType
 
 
 def parse_union_type(path: list[object], union_definition_as_pseudo_json: dict[str, object], schema_key: str,
                      ignore_keys: list[str], required_keys: list[str],
-                     ctx: 'ParseContext') -> 'VUnion':
+                     ctx: 'ParseContext') -> 'TUnion':
     from ...TelepactSchemaParseError import TelepactSchemaParseError
     from ...internal.schema.GetTypeUnexpectedParseFailure import get_type_unexpected_parse_failure
     from ...internal.schema.ParseStructFields import parse_struct_fields
-    from ..types.VStruct import VStruct
+    from ..types.TStruct import TStruct
 
     parse_failures = []
 
@@ -129,7 +129,7 @@ def parse_union_type(path: list[object], union_definition_as_pseudo_json: dict[s
             parse_failures.extend(e.schema_parse_failures)
             continue
 
-        union_struct = VStruct(
+        union_struct = TStruct(
             f"{schema_key}.{union_tag}", fields)
 
         tags[union_tag] = union_struct
@@ -139,4 +139,4 @@ def parse_union_type(path: list[object], union_definition_as_pseudo_json: dict[s
         raise TelepactSchemaParseError(
             parse_failures, ctx.telepact_schema_document_names_to_json)
 
-    return VUnion(schema_key, tags, tag_indices)
+    return TUnion(schema_key, tags, tag_indices)
