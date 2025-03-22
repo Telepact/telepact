@@ -92,8 +92,8 @@ async def handle_message(
         client_known_binary_checksums = cast(
             list[object], request_headers["@bin_"])
 
-        response_headers["_binary"] = True
-        response_headers["_clientKnownBinaryChecksums"] = client_known_binary_checksums
+        response_headers["@binary_"] = True
+        response_headers["@clientKnownBinaryChecksums_"] = client_known_binary_checksums
 
         if "@pac_" in request_headers:
             response_headers["@pac_"] = request_headers["@pac_"]

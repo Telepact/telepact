@@ -337,7 +337,7 @@ async def send_case(nats_client: nats.aio.client.Client, request, expected_respo
 
     request_is_msgpack = False
     if not just_send:
-        request_is_msgpack = request[0].get('msgpack', False)
+        request_is_msgpack = request[0].get('@msgpack', False)
 
     if request_is_msgpack:
         request_bytes = msgpack.dumps(request)

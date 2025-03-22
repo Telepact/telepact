@@ -28,7 +28,7 @@ public class ServerBinaryEncode {
     static List<Object> serverBinaryEncode(List<Object> message, BinaryEncoding binaryEncoder) {
         final var headers = (Map<String, Object>) message.get(0);
         final var messageBody = (Map<String, Object>) message.get(1);
-        final var clientKnownBinaryChecksums = (List<Integer>) headers.remove("_clientKnownBinaryChecksums");
+        final var clientKnownBinaryChecksums = (List<Integer>) headers.remove("@clientKnownBinaryChecksums_");
 
         final var resultTag = new ArrayList<>(messageBody.keySet()).get(0);
 

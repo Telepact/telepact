@@ -358,11 +358,11 @@ function startTestServer(
             message = new Message(responseHeaders, responseBody);
         }
 
-        if (requestHeaders["_toggleAlternateServer"] === true) {
+        if (requestHeaders["@toggleAlternateServer_"] === true) {
             serveAlternateServer.value = !serveAlternateServer.value;
         }
 
-        if (requestHeaders["_throwError"] === true) {
+        if (requestHeaders["@throwError_"] === true) {
             throw new ThisError();
         }
 

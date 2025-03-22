@@ -89,8 +89,8 @@ export async function handleMessage(
     if ('@bin_' in requestHeaders) {
         const clientKnownBinaryChecksums = requestHeaders['@bin_'] as any[];
 
-        responseHeaders['_binary'] = true;
-        responseHeaders['_clientKnownBinaryChecksums'] = clientKnownBinaryChecksums;
+        responseHeaders['@binary_'] = true;
+        responseHeaders['@clientKnownBinaryChecksums_'] = clientKnownBinaryChecksums;
 
         if ('@pac_' in requestHeaders) {
             responseHeaders['@pac_'] = requestHeaders['@pac_'];

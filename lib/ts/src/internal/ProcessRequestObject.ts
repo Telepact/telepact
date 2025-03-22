@@ -43,10 +43,10 @@ export async function processRequestObject(
         }
 
         if (useBinaryDefault) {
-            header['_binary'] = true;
+            header['@binary_'] = true;
         }
 
-        if (header['_binary'] && alwaysSendJson) {
+        if (header['@binary_'] && alwaysSendJson) {
             header['_forceSendJson'] = true;
         }
 
@@ -59,7 +59,7 @@ export async function processRequestObject(
                 ErrorParseFailure_: { reasons: [{ IncompatibleBinaryEncoding: {} }] },
             })
         ) {
-            header['_binary'] = true;
+            header['@binary_'] = true;
             header['_forceSendJson'] = true;
 
             return await Promise.race([adapter(requestMessage, serializer), timeoutPromise(timeoutMs)]);

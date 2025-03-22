@@ -88,8 +88,8 @@ public class HandleMessage {
         if (requestHeaders.containsKey("@bin_")) {
             final List<Object> clientKnownBinaryChecksums = (List<Object>) requestHeaders.get("@bin_");
 
-            responseHeaders.put("_binary", true);
-            responseHeaders.put("_clientKnownBinaryChecksums", clientKnownBinaryChecksums);
+            responseHeaders.put("@binary_", true);
+            responseHeaders.put("@clientKnownBinaryChecksums_", clientKnownBinaryChecksums);
 
             if (requestHeaders.containsKey("@pac_")) {
                 responseHeaders.put("@pac_", requestHeaders.get("@pac_"));

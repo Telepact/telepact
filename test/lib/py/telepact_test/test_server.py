@@ -294,11 +294,11 @@ async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, 
             message = Message(response_headers, response_body)
 
         toggle_alternate_server = request_headers.get(
-            "_toggleAlternateServer")
+            "@toggleAlternateServer_")
         if toggle_alternate_server == True:
             serve_alternate_server = not serve_alternate_server
 
-        throw_error = request_headers.get("_throwError")
+        throw_error = request_headers.get("@throwError_")
         if throw_error == True:
             raise ThisError()
 

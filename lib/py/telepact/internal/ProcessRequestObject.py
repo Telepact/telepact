@@ -37,9 +37,9 @@ async def process_request_object(request_message: 'Message',
             header["@time_"] = timeout_ms_default
 
         if use_binary_default:
-            header["_binary"] = True
+            header["@binary_"] = True
 
-        if header.get('_binary', False) and always_send_json:
+        if header.get('@binary_', False) and always_send_json:
             header["_forceSendJson"] = True
 
         timeout_ms = cast(int, header.get("@time_"))
@@ -48,7 +48,7 @@ async def process_request_object(request_message: 'Message',
             response_message = await adapter(request_message, serializer)
 
         if response_message.body == {"ErrorParseFailure_": {"reasons": [{"IncompatibleBinaryEncoding": {}}]}}:
-            header["_binary"] = True
+            header["@binary_"] = True
             header["_forceSendJson"] = True
 
             async with asyncio.timeout(timeout_ms / 1000):

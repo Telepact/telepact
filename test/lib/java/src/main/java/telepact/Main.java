@@ -336,12 +336,12 @@ public class Main {
 
                 }
 
-                var toggleAlternateServer = requestHeaders.get("_toggleAlternateServer");
+                var toggleAlternateServer = requestHeaders.get("@toggleAlternateServer_");
                 if (Objects.equals(true, toggleAlternateServer)) {
                     serveAlternateServer.set(!serveAlternateServer.get());
                 }
 
-                var throwError = requestHeaders.get("_throwError");
+                var throwError = requestHeaders.get("@throwError_");
                 if (Objects.equals(true, throwError)) {
                     throw new ThisError();
                 }

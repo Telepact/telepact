@@ -30,8 +30,8 @@ def serialize_internal(message: 'Message', binary_encoder: 'BinaryEncoder',
     headers: dict[str, object] = message.headers
 
     serialize_as_binary: bool
-    if "_binary" in headers:
-        serialize_as_binary = headers.pop("_binary") is True
+    if "@binary_" in headers:
+        serialize_as_binary = headers.pop("@binary_") is True
     else:
         serialize_as_binary = False
 

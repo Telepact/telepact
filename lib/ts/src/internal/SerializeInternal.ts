@@ -27,9 +27,9 @@ export function serializeInternal(
     const headers: Record<string, any> = message.headers;
 
     let serializeAsBinary: boolean;
-    if ('_binary' in headers) {
-        serializeAsBinary = headers['_binary'] === true;
-        delete headers['_binary'];
+    if ('@binary_' in headers) {
+        serializeAsBinary = headers['@binary_'] === true;
+        delete headers['@binary_'];
     } else {
         serializeAsBinary = false;
     }

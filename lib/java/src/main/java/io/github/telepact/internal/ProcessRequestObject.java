@@ -39,10 +39,10 @@ public class ProcessRequestObject {
             }
 
             if (useBinaryDefault) {
-                header.put("_binary", true);
+                header.put("@binary_", true);
             }
 
-            if (Objects.equals(header.get("_binary"), true) && alwaysSendJson) {
+            if (Objects.equals(header.get("@binary_"), true) && alwaysSendJson) {
                 header.put("_forceSendJson", true);
             }
 
@@ -54,7 +54,7 @@ public class ProcessRequestObject {
                     Map.of("ErrorParseFailure_",
                             Map.of("reasons", List.of(Map.of("IncompatibleBinaryEncoding", Map.of())))))) {
                 // Try again, but as json
-                header.put("_binary", true);
+                header.put("@binary_", true);
                 header.put("_forceSendJson", true);
 
                 return adapter.apply(requestMessage, serializer).get(timeoutMs,

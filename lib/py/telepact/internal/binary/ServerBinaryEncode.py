@@ -28,7 +28,7 @@ def server_binary_encode(message: list[object], binary_encoder: 'BinaryEncoding'
     headers = cast(dict[str, object], message[0])
     message_body = cast(dict[str, object], message[1])
     client_known_binary_checksums = cast(list[int], headers.pop(
-        "_clientKnownBinaryChecksums", None))
+        "@clientKnownBinaryChecksums_", None))
 
     result_tag = list(message_body.keys())[0]
 

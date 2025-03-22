@@ -22,8 +22,8 @@ import { BinaryEncoderUnavailableError } from '../../internal/binary/BinaryEncod
 export function serverBinaryEncode(message: any[], binaryEncoder: BinaryEncoding): any[] {
     const headers: { [key: string]: any } = message[0];
     const messageBody: { [key: string]: any } = message[1];
-    const clientKnownBinaryChecksums: number[] | undefined = headers['_clientKnownBinaryChecksums'];
-    delete headers['_clientKnownBinaryChecksums'];
+    const clientKnownBinaryChecksums: number[] | undefined = headers['@clientKnownBinaryChecksums_'];
+    delete headers['@clientKnownBinaryChecksums_'];
 
     const resultTag = Object.keys(messageBody)[0];
 
