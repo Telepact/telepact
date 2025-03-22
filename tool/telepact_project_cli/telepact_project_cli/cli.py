@@ -232,16 +232,19 @@ def license_header(license_header_path):
 
         original_content = ''.join(lines)
 
-        first_non_header_index = None
+        new_lines = []
+        start_copying = False
 
-        for i, line in enumerate(lines):
-            if line.startswith(f"{start_comment_syntax}"):
-                first_non_header_index = i
+        for line in lines:
+            if start_copying:
+                new_lines.append(line)
                 continue
-            break
-
-        if first_non_header_index is not None:
-            lines = lines[(first_non_header_index + 1) + 1:]
+            if line.startswith(start_comment_syntax):
+                continue
+            if line.strip() == '':
+                continue
+            new_lines.append(line)
+            start_copying = True
 
         max_length = max(len(line.strip()) for line in license_header) + 2
         license_text = ''.join([f"{start_comment_syntax}  {line.strip().ljust(max_length)}{end_comment_syntax}".strip() + "\n" for line in license_header])
@@ -251,7 +254,7 @@ def license_header(license_header_path):
         new_banner += f"{license_text.strip()}\n"
         new_banner += f"{start_comment_syntax}  {''.ljust(max_length)}{end_comment_syntax}".strip() + "\n\n"
 
-        new_content = new_banner + ''.join(lines)
+        new_content = new_banner + ''.join(new_lines)
 
         if new_content == original_content:
             print(f"Up-to-date: {file_path}")
