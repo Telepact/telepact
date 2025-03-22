@@ -138,4 +138,4 @@ version:
 	cd sdk/console && telepact-project set-version ${VERSION}
 
 license-header:
-	telepact-project license-header LICENSE_HEADER.txt
+	telepact-project license-header NOTICE

@@ -224,7 +224,19 @@ def license_header(license_header_path):
 
     def read_license_header(file_path):
         with open(file_path, 'r') as file:
-            return file.readlines()
+            lines = file.readlines()
+
+        header_lines = []
+        for line in lines:
+            if '-------------------' in line.strip():
+                break
+            header_lines.append(line)  # Remove trailing newlines
+
+        # Remove final lines that are just empty strings
+        while header_lines and not header_lines[-1].strip():
+            header_lines.pop()
+
+        return header_lines
 
     def update_file(file_path, license_header, start_comment_syntax, end_comment_syntax):
         with open(file_path, 'r') as file:
