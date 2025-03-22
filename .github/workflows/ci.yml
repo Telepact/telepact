@@ -20,7 +20,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-telepact-ts:
+  build-ts:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -37,11 +37,11 @@ jobs:
       - name: Upload ts build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: build-telepact-ts
+          name: build-ts
           path: lib/ts/dist
           retention-days: 1
 
-  build-telepact-java:
+  build-java:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -59,11 +59,11 @@ jobs:
       - name: Upload java build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: build-telepact-java
+          name: build-java
           path: lib/java/target
           retention-days: 1
 
-  build-telepact-py:
+  build-py:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -83,13 +83,13 @@ jobs:
       - name: Upload py build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: build-telepact-py
+          name: build-py
           path: lib/py/dist
           retention-days: 1
 
-  build-telepact-cli:
+  build-cli:
     runs-on: ubuntu-latest
-    needs: [build-telepact-py]
+    needs: [build-py]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -105,20 +105,20 @@ jobs:
       - name: Download py build artifacts
         uses: actions/download-artifact@v4
         with:
-          name: build-telepact-py
+          name: build-py
           path: lib/py/dist
 
       - name: Build cli
         run: make cli
 
-      - name: Upload telepact-cli build artifacts
+      - name: Upload cli build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: build-telepact-cli
+          name: build-cli
           path: sdk/cli/dist
           retention-days: 1
 
-  build-telepact-project-cli:
+  build-project-cli:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -135,16 +135,16 @@ jobs:
       - name: Build project-cli
         run: make project-cli
 
-      - name: Upload telepact-project-cli build artifacts
+      - name: Upload project-cli build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: build-telepact-project-cli
+          name: build-project-cli
           path: tool/telepact_project_cli/dist
           retention-days: 1
 
-  build-telepact-dart:
+  build-dart:
     runs-on: ubuntu-latest
-    needs: [build-telepact-ts]
+    needs: [build-ts]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -162,7 +162,7 @@ jobs:
       - name: Download ts build artifacts
         uses: actions/download-artifact@v4
         with:
-          name: build-telepact-ts
+          name: build-ts
           path: lib/ts/dist
 
       - name: Build dart
@@ -171,7 +171,7 @@ jobs:
       - name: Run tests
         run: make test-dart
 
-  build-telepact-prettier:
+  build-prettier:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -183,13 +183,13 @@ jobs:
       - name: Upload prettier build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: build-telepact-prettier
+          name: build-prettier
           path: sdk/prettier-plugin-telepact/dist
           retention-days: 1
 
-  build-telepact-console:
+  build-console:
     runs-on: ubuntu-latest
-    needs: [build-telepact-ts, build-telepact-cli, build-telepact-prettier]
+    needs: [build-ts, build-cli, build-prettier]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -197,19 +197,19 @@ jobs:
       - name: Download ts build artifacts
         uses: actions/download-artifact@v4
         with:
-          name: build-telepact-ts
+          name: build-ts
           path: lib/ts/dist
 
-      - name: Download telepact-cli build artifacts
+      - name: Download cli build artifacts
         uses: actions/download-artifact@v4
         with:
-          name: build-telepact-cli
+          name: build-cli
           path: sdk/cli/dist
 
       - name: Download prettier build artifacts
         uses: actions/download-artifact@v4
         with:
-          name: build-telepact-prettier
+          name: build-prettier
           path: sdk/prettier-plugin-telepact/dist
       
       - name: Install CLI
@@ -224,17 +224,17 @@ jobs:
       - name: Run tests
         run: DEBUG=pw:api make test-console
 
-  build-telepact-docker:
+  build-docker:
     runs-on: ubuntu-latest
-    needs: [build-telepact-cli]
+    needs: [build-cli]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Download telepact-cli build artifacts
+      - name: Download cli build artifacts
         uses: actions/download-artifact@v4
         with:
-          name: build-telepact-cli
+          name: build-cli
           path: sdk/cli/dist
 
       - name: Build Docker image
@@ -245,15 +245,15 @@ jobs:
 
   check-license-header:
     runs-on: ubuntu-latest
-    needs: [build-telepact-project-cli]
+    needs: [build-project-cli]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Download telepact-project-cli build artifacts
+      - name: Download project-cli build artifacts
         uses: actions/download-artifact@v4
         with:
-          name: build-telepact-project-cli
+          name: build-project-cli
           path: tool/telepact_project_cli/dist
 
       - name: Install Project CLI
@@ -273,15 +273,15 @@ jobs:
 
   check-version:
     runs-on: ubuntu-latest
-    needs: [build-telepact-project-cli]
+    needs: [build-project-cli]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Download telepact-project-cli build artifacts
+      - name: Download project-cli build artifacts
         uses: actions/download-artifact@v4
         with:
-          name: build-telepact-project-cli
+          name: build-project-cli
           path: tool/telepact_project_cli/dist
 
       - name: Install Project CLI
@@ -301,7 +301,7 @@ jobs:
 
   run-tests:
     runs-on: ubuntu-latest
-    needs: [build-telepact-ts, build-telepact-java, build-telepact-py, build-telepact-cli]
+    needs: [build-ts, build-java, build-py, build-cli]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -328,25 +328,25 @@ jobs:
       - name: Download ts build artifacts
         uses: actions/download-artifact@v4
         with:
-          name: build-telepact-ts
+          name: build-ts
           path: lib/ts/dist
 
       - name: Download java build artifacts
         uses: actions/download-artifact@v4
         with:
-          name: build-telepact-java
+          name: build-java
           path: lib/java/target
 
       - name: Download py build artifacts
         uses: actions/download-artifact@v4
         with:
-          name: build-telepact-py
+          name: build-py
           path: lib/py/dist
 
-      - name: Download telepact-cli build artifacts
+      - name: Download cli build artifacts
         uses: actions/download-artifact@v4
         with:
-          name: build-telepact-cli
+          name: build-cli
           path: sdk/cli/dist
 
       - name: Install CLI
