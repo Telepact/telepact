@@ -9,35 +9,42 @@
     },
     {
         "///": " The number of times a function is allowed to be called. ",
-        "union.CallCountCriteria_": [{
-            "Exact": {
-                "times": ["integer"]
+        "union.CallCountCriteria_": [
+            {
+                "Exact": {
+                    "times": ["integer"]
+                }
+            },
+            {
+                "AtMost": {
+                    "times": ["integer"]
+                }
+            },
+            {
+                "AtLeast": {
+                    "times": ["integer"]
+                }
             }
-        }, {
-            "AtMost": {
-                "times": ["integer"]
-            }
-        }, {
-            "AtLeast": {
-                "times": ["integer"]
-            }
-        }]
+        ]
     },
     {
         "///": " Possible causes for a mock verification to fail. ",
-        "union.VerificationFailure_": [{
-            "TooFewMatchingCalls": {
-                "wanted": ["union.CallCountCriteria_"],
-                "found": ["integer"],
-                "allCalls": ["array", ["_ext.Call_"]]
+        "union.VerificationFailure_": [
+            {
+                "TooFewMatchingCalls": {
+                    "wanted": ["union.CallCountCriteria_"],
+                    "found": ["integer"],
+                    "allCalls": ["array", ["_ext.Call_"]]
+                }
+            },
+            {
+                "TooManyMatchingCalls": {
+                    "wanted": ["union.CallCountCriteria_"],
+                    "found": ["integer"],
+                    "allCalls": ["array", ["_ext.Call_"]]
+                }
             }
-        }, {
-            "TooManyMatchingCalls": {
-                "wanted": ["union.CallCountCriteria_"],
-                "found": ["integer"],
-                "allCalls": ["array", ["_ext.Call_"]]
-            }
-        }]
+        ]
     },
     {
         "///": [
@@ -58,9 +65,11 @@
             "strictMatch!": ["boolean"],
             "count!": ["integer"]
         },
-        "->": [{
-            "Ok_": {}
-        }],
+        "->": [
+            {
+                "Ok_": {}
+            }
+        ],
         "_errors": "^errors\\.Validation_$"
     },
     {
@@ -75,13 +84,16 @@
             "strictMatch!": ["boolean"],
             "count!": ["union.CallCountCriteria_"]
         },
-        "->": [{
-            "Ok_": {}
-        }, {
-            "ErrorVerificationFailure": {
-                "reason": ["union.VerificationFailure_"]
+        "->": [
+            {
+                "Ok_": {}
+            },
+            {
+                "ErrorVerificationFailure": {
+                    "reason": ["union.VerificationFailure_"]
+                }
             }
-        }],
+        ],
         "_errors": "^errors\\.Validation_$"
     },
     {
@@ -90,29 +102,36 @@
             " interactions have been verified.                                                "
         ],
         "fn.verifyNoMoreInteractions_": {},
-        "->": [{
-            "Ok_": {}
-        }, {
-            "ErrorVerificationFailure": {
-                "additionalUnverifiedCalls": ["array", ["_ext.Call_"]]
+        "->": [
+            {
+                "Ok_": {}
+            },
+            {
+                "ErrorVerificationFailure": {
+                    "additionalUnverifiedCalls": ["array", ["_ext.Call_"]]
+                }
             }
-        }],
+        ],
         "_errors": "^errors\\.Validation_$"
     },
     {
         "///": " Clear all stub conditions. ",
         "fn.clearStubs_": {},
-        "->": [{
-            "Ok_": {}
-        }],
+        "->": [
+            {
+                "Ok_": {}
+            }
+        ],
         "_errors": "^errors\\.Validation_$"
     },
     {
         "///": " Clear all call data. ",
         "fn.clearCalls_": {},
-        "->": [{
-            "Ok_": {}
-        }],
+        "->": [
+            {
+                "Ok_": {}
+            }
+        ],
         "_errors": "^errors\\.Validation_$"
     },
     {
@@ -120,15 +139,19 @@
         "fn.setRandomSeed_": {
             "seed": ["integer"]
         },
-        "->": [{
-            "Ok_": {}
-        }],
+        "->": [
+            {
+                "Ok_": {}
+            }
+        ],
         "_errors": "^errors\\.Validation_$"
     },
     {
-        "errors.Mock_": [{
-            "///": " The mock could not return a result due to no matching stub being available. ",
-            "ErrorNoMatchingStub_": {}
-        }]
+        "errors.Mock_": [
+            {
+                "///": " The mock could not return a result due to no matching stub being available. ",
+                "ErrorNoMatchingStub_": {}
+            }
+        ]
     }
 ]

@@ -1,8 +1,8 @@
 [
     {
         "///": [
-            " The `@auth_` header is the conventional location for sending credentials to the  ",
-            " server for the purpose of authentication and authorization.                     "
+            " The `@auth_` header is the conventional location for sending credentials to     ",
+            " the server for the purpose of authentication and authorization.                 "
         ],
         "headers.Auth_": {
             "@auth_": ["struct.Auth_"]

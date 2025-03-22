@@ -33,9 +33,9 @@
     },
     {
         "///": [
-            " If `@unsafe_` is set to `true`, response validation by the server will be        ",
-            " disabled. The server will the client-provided the value of `@unsafe_` header in  ",
-            " the response.                                                                   "
+            " If `@unsafe_` is set to `true`, response validation by the server will be       ",
+            " disabled. The server will the client-provided the value of `@unsafe_` header    ",
+            " in the response.                                                                "
         ],
         "headers.Unsafe_": {
             "@unsafe_": ["boolean"]
@@ -53,17 +53,17 @@
     },
     {
         "///": [
-            " The `@bin_` header indicates the valid checksums of binary encodings negotiated  ",
-            " between the client and server. If the client sends a `@bin_` header with any     ",
-            " value, the server will respond with a `@bin_` header with an array containing    ",
-            " the currently supported binary encoding checksum. If the client's provided      ",
-            " checksum does not match the server's checksum, the server will also send an     ",
-            " `@enc_` header containing the binary encoding, which is a map of field names to  ",
-            " field ids. The response body may also be encoded in binary.                     ",
+            " The `@bin_` header indicates the valid checksums of binary encodings            ",
+            " negotiated between the client and server. If the client sends a `@bin_` header  ",
+            " with any value, the server will respond with a `@bin_` header with an array     ",
+            " containing the currently supported binary encoding checksum. If te client's     ",
+            " provided checksum does not match the server's checksum, the server will also    ",
+            " send an `@enc_` header containing the binary encoding, which is a map of field  ",
+            " names to field ids. The response body may also be encoded in binary.            ",
             "                                                                                 ",
-            " The `@pac_` header can also be used to indicate usage of 'packed' binary         ",
-            " encoding strategy. If the client submits a `@pac_` header with a `true` value,   ",
-            " the server will respond with a `@pac_` header with a `true` value.               "
+            " The `@pac_` header can also be used to indicate usage of 'packed' binary        ",
+            " encoding strategy. If the client submits a `@pac_` header with a `true` value,  ",
+            " the server will respond with a `@pac_` header with a `true` value.              "
         ],
         "headers.Binary_": {
             "@bin_": ["array", ["integer"]],
@@ -84,8 +84,8 @@
     },
     {
         "///": [
-            " The `@id_` header is used to correlate requests and responses. The server will   ",
-            " reflect the client-provided `@id_` header as-is.                                 "
+            " The `@id_` header is used to correlate requests and responses. The server will  ",
+            " reflect the client-provided `@id_` header as-is.                                "
         ],
         "headers.Id_": {
             "@id_": ["any"]
@@ -139,8 +139,7 @@
                 "NullDisallowed": {}
             },
             {
-                "ObjectKeyDisallowed": {
-                }
+                "ObjectKeyDisallowed": {}
             },
             {
                 "RequiredObjectKeyPrefixMissing": {

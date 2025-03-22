@@ -8,6 +8,6 @@
         "prettier-plugin-telepact": "workspace:*"
     },
     "workspaces": [
-        "tool/prettier-plugin-telepact"
+        "sdk/prettier-plugin-telepact"
     ]
 }
