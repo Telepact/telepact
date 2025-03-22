@@ -14,16 +14,18 @@
 #|  limitations under the License.
 #|
 
-.PHONY: all dep
+.PHONY: all
 
 all: dep
 	rm -rf target
 	mkdir -p target
 
-	cp $(shell find ../../../lib/java/target -name "*.jar" -not -name "*javadoc.jar" -not -name "*sources.jar") target/telepact.jar
-	mvn install:install-file -Dfile=target/telepact.jar -DgroupId=io.github.telepact -DartifactId=telepact -Dversion=1.0 -Dpackaging=jar
+	cp  target/telepact.jar
+	mvn -q install:install-file -Dfile=target/telepact.jar -DgroupId=io.github.telepact -DartifactId=telepact -Dversion=1.0 -Dpackaging=jar
 
 	telepact codegen --schema-dir ../../runner/schema/example --lang java --out src/gen/java/telepacttest --package telepacttest
 
+	mvn -q package
+
 dep:
-	cd ../../../lib/java && make
+	cd ../../lib/java && make

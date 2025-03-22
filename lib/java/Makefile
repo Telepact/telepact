@@ -20,7 +20,7 @@ all:
 	mkdir -p src/main/resources
 	cp ../../common/*.json src/main/resources
 	cp ../../LICENSE ../../NOTICE src/main/resources
-	mvn install
+	mvn -q install
 
 clean:
 	mvn clean
