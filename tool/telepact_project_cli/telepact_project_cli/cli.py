@@ -299,8 +299,13 @@ def bump(version_file: str, project_files: list) -> None:
             if 'sdk/prettier' in path:
                 release_targets.add('prettier')
 
+        if release_targets:
+            release_string = "Release targets:\n" + "\n".join(release_targets)
+        else:
+            release_string = "No release targets"
+
         # Create the new commit message
-        new_commit_msg = f"Bump version to {new_version}\n\nRelease targets:\n" + "\n".join(release_targets)
+        new_commit_msg = f"Bump version to {new_version}\n\n" + release_string
 
         # Add and commit the changes
         subprocess.run(['git', 'add'] + edited_files)
