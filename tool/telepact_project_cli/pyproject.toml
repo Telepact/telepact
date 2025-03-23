@@ -15,6 +15,7 @@ toml = "^0.10.2"
 lxml = "^5.3.1"
 pyyaml = "^6.0.2"
 "ruamel.yaml" = "0.18.10"
+pygithub = "*"
 
 [tool.poetry.scripts]
 telepact-project = "telepact_project_cli.cli:main"

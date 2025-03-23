@@ -26,42 +26,51 @@ on:
       - main
 
 jobs:
+  build-project-cli:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Poetry
+        run: pipx install poetry
+
+      - name: Build project-cli
+        run: make project-cli
+
+      - name: Upload project-cli build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-project-cli
+          path: tool/telepact_project_cli/dist
+          retention-days: 1
+
   add-tags:
     runs-on: ubuntu-latest
+    needs: [build-project-cli]
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Install GitHub CLI
-        run: sudo apt-get install -y gh
+      - name: Download project-cli build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-project-cli
+          path: tool/telepact_project_cli/dist
 
-      - name: Get list of modified files
-        id: files
-        run: |
-          BASE_BRANCH=${{ github.event.pull_request.base.ref }}
-          git fetch origin $BASE_BRANCH
-          FILES=$(git diff --name-only origin/$BASE_BRANCH ${{ github.sha }} | tr '\n' ' ')
-          echo "FILES=$FILES" >> $GITHUB_ENV
+      - name: Install Project CLI
+        run: make install-project-cli
 
-      - name: Determine tags to add
-        id: tags
-        run: |
-          TAGS=""
-          if [[ "$FILES" == *"lib/java"* ]]; then TAGS="$TAGS java"; fi
-          if [[ "$FILES" == *"lib/py"* ]]; then TAGS="$TAGS py"; fi
-          if [[ "$FILES" == *"lib/ts"* ]]; then TAGS="$TAGS ts"; fi
-          if [[ "$FILES" == *"bind/dart"* ]]; then TAGS="$TAGS dart"; fi
-          if [[ "$FILES" == *"sdk/cli"* ]]; then TAGS="$TAGS cli"; fi
-          if [[ "$FILES" == *"sdk/console"* ]]; then TAGS="$TAGS console"; fi
-          if [[ "$FILES" == *"sdk/docker"* ]]; then TAGS="$TAGS docker"; fi
-          if [[ "$FILES" == *"sdk/prettier"* ]]; then TAGS="$TAGS prettier"; fi
-          echo "TAGS=$TAGS" >> $GITHUB_ENV
-
-      - name: Add tags to PR
-        run: |
-          IFS=' ' read -r -a TAG_ARRAY <<< "$TAGS"
-          for TAG in "${TAG_ARRAY[@]}"; do
-            gh pr edit ${{ github.event.pull_request.number }} --add-label "$TAG"
-          done
+      - name: Determine and update tags
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          BASE_BRANCH: ${{ github.event.pull_request.base.ref }}
+          HEAD_SHA: ${{ github.sha }}
+        run: python3 .github/scripts/update_tags.py

@@ -22,6 +22,7 @@ import json
 import toml
 from ruamel.yaml import YAML
 import subprocess
+from github import Github
 
 yaml = YAML()
 
@@ -196,7 +197,7 @@ def set_version(version: str) -> None:
         updated = True
 
     if os.path.exists("pubspec.yaml"):
-        with open("pubspec.yaml", "r") as f:
+        with open("pubspec.yaml", "r") as f):
             data = yaml.load(f)
         data["version"] = version
         with open("pubspec.yaml", "w") as f:
@@ -394,12 +395,88 @@ def license_header(license_header_path):
         else:
             print(f"ERROR: {file_path} - Unsupported file extension {file_extension}")
 
+@click.command()
+def github_labels() -> None:
+    # Directories and their corresponding tags
+    DIRECTORY_TAG_MAP = {
+        "lib/java": "java",
+        "lib/py": "py",
+        "lib/ts": "ts",
+        "bind/dart": "dart",
+        "sdk/cli": "cli",
+        "sdk/console": "console",
+        "sdk/docker": "docker",
+        "sdk/prettier": "prettier"
+    }
+
+    def get_modified_files(base_branch, head_sha):
+        try:
+            subprocess.run(["git", "fetch", "origin", base_branch], check=True)
+            result = subprocess.run(["git", "diff", "--name-only", f"origin/{base_branch}", head_sha], check=True, stdout=subprocess.PIPE)
+            files = result.stdout.decode('utf-8').strip()
+            return files
+        except subprocess.CalledProcessError as e:
+            print(f"Error fetching or diffing: {e}")
+            return ""
+
+    def get_modified_tags(files):
+        tags = set()
+        for file in files.split():
+            for directory, tag in DIRECTORY_TAG_MAP.items():
+                if file.startswith(directory):
+                    tags.add(tag)
+        return tags
+
+
+    # Get environment variables
+    token = os.getenv('GITHUB_TOKEN')
+    repository = os.getenv('GITHUB_REPOSITORY')
+    pr_number = int(os.getenv('PR_NUMBER'))
+    base_branch = os.getenv('BASE_BRANCH')
+    head_sha = os.getenv('HEAD_SHA')
+
+    # Get modified files
+    files = get_modified_files(base_branch, head_sha)
+    print(f"Modified files: {files}")
+
+    # Initialize GitHub client
+    g = Github(token)
+    repo = g.get_repo(repository)
+    pr = repo.get_pull(pr_number)
+
+    # Get current labels on the PR
+    current_labels = {label.name for label in pr.get_labels()}
+
+    # Determine tags to add
+    new_tags = get_modified_tags(files)
+    print(f"Tags to be added: {new_tags}")
+
+    # Update PR labels
+    added_tags = []
+    removed_tags = []
+
+    # Add new labels
+    for tag in new_tags:
+        if tag not in current_labels:
+            pr.add_to_labels(tag)
+            added_tags.append(tag)
+
+    # Remove old labels
+    for label in current_labels:
+        if label not in new_tags and label in DIRECTORY_TAG_MAP.values():
+            pr.remove_from_labels(label)
+            removed_tags.append(label)
+
+    # Print summary
+    print(f"Summary:\n  Added tags: {', '.join(added_tags) if added_tags else 'None'}\n  Removed tags: {', '.join(removed_tags) if removed_tags else 'None'}")
+
 main.add_command(old_bump)
 main.add_command(depset)
 main.add_command(get)
 main.add_command(set_version)
 main.add_command(bump)
 main.add_command(license_header)
+main.add_command(github_labels)
 
 if __name__ == "__main__":
     main()
