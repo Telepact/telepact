@@ -75,6 +75,14 @@ jobs:
       - name: Install Project CLI
         run: make install-project-cli
 
+      - name: Configure git identity
+        run: |
+          git config --global user.name "Telepact Bot"
+          git config --global user.email "telepact-bot@users.noreply.github.com"
+
+      - name: git status
+        run: git status
+
       - name: Bump version
         run: make bump-version
 
