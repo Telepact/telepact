@@ -274,9 +274,15 @@ def bump(version_file: str, project_files: list) -> None:
             click.echo(f"Project file {project_file} does not exist.")
 
     if edited_files:
+        # Get the previous commit hash by going back 1 commit
+        prev_commit_hash = subprocess.run(
+            ['git', 'log', '--pretty=format:%H', '-1'],
+            stdout=subprocess.PIPE, text=True
+        ).stdout.strip()
+
         # Get the paths from the previous commit
         prev_commit_paths = subprocess.run(
-            ['git', 'diff-tree', '--no-commit-id', '--name-only', '-r', 'HEAD~1'],
+            ['git', 'diff-tree', '--no-commit-id', '--name-only', '-r', prev_commit_hash],
             stdout=subprocess.PIPE, text=True
         ).stdout.strip().split('\n')
 
