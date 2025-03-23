@@ -54,8 +54,17 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build-project-cli]
     steps:
+      - name: Generate GitHub App token
+        id: generate-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ vars.TELEPACT_BOT_APP_ID }}
+          private-key: ${{ secrets.TELEPACT_BOT_PRIVATE_KEY }}
+
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          token: ${{ steps.app-token.outputs.token }}
 
       - name: Download project-cli build artifacts
         uses: actions/download-artifact@v4
@@ -66,25 +75,11 @@ jobs:
       - name: Install Project CLI
         run: make install-project-cli
 
-      - name: Configure git bot
-        run: |
-          git config --global user.name "Telepact Bot"
-          git config --global user.email "telepact-bot@users.noreply.github.com"
-
       - name: Bump version
         run: make bump-version
 
       - name: git log
         run: git log -n 1
 
-      - name: Generate GitHub App token
-        id: generate-token
-        uses: actions/create-github-app-token@v1
-        with:
-          app-id: ${{ vars.TELEPACT_BOT_APP_ID }}
-          private-key: ${{ secrets.TELEPACT_BOT_PRIVATE_KEY }}
-
       - name: Push changes
-        env:
-          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
         run: git push origin HEAD
