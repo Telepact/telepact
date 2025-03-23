@@ -25,7 +25,7 @@ all:
 
 	rm -rf src/lib/prettier-plugin-telepact
 	mkdir -p src/lib/prettier-plugin-telepact
-	cp -r ../../sdk/prettier-plugin-telepact/dist/* src/lib/prettier-plugin-telepact
+	cp -r ../../sdk/prettier/dist/* src/lib/prettier-plugin-telepact
 	
 	npm install	
 
