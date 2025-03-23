@@ -310,6 +310,8 @@ jobs:
   add-labels:
     runs-on: ubuntu-latest
     needs: [build-project-cli]
+    permissions:
+      pull-requests: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
