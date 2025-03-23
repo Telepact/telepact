@@ -143,6 +143,7 @@ bump-version:
 		lib/py/pyproject.toml \
 		lib/ts/package.json \
 		bind/dart/pubspec.yaml \
+		bind/dart/package.json \
 		sdk/cli/pyproject.toml \
 		sdk/prettier-plugin-telepact/package.json \
 		sdk/console/package.json
