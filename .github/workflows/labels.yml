@@ -1,0 +1,67 @@
+#|
+#|  Copyright The Telepact Authors
+#|
+#|  Licensed under the Apache License, Version 2.0 (the "License");
+#|  you may not use this file except in compliance with the License.
+#|  You may obtain a copy of the License at
+#|
+#|  https://www.apache.org/licenses/LICENSE-2.0
+#|
+#|  Unless required by applicable law or agreed to in writing, software
+#|  distributed under the License is distributed on an "AS IS" BASIS,
+#|  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#|  See the License for the specific language governing permissions and
+#|  limitations under the License.
+#|
+
+name: Labels
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+    branches:
+      - main
+
+jobs:
+  add-tags:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install GitHub CLI
+        run: sudo apt-get install -y gh
+
+      - name: Get list of modified files
+        id: files
+        run: |
+          BASE_BRANCH=${{ github.event.pull_request.base.ref }}
+          git fetch origin $BASE_BRANCH
+          FILES=$(git diff --name-only origin/$BASE_BRANCH ${{ github.sha }} | tr '\n' ' ')
+          echo "FILES=$FILES" >> $GITHUB_ENV
+
+      - name: Determine tags to add
+        id: tags
+        run: |
+          TAGS=""
+          if [[ "$FILES" == *"lib/java"* ]]; then TAGS="$TAGS java"; fi
+          if [[ "$FILES" == *"lib/py"* ]]; then TAGS="$TAGS py"; fi
+          if [[ "$FILES" == *"lib/ts"* ]]; then TAGS="$TAGS ts"; fi
+          if [[ "$FILES" == *"bind/dart"* ]]; then TAGS="$TAGS dart"; fi
+          if [[ "$FILES" == *"sdk/cli"* ]]; then TAGS="$TAGS cli"; fi
+          if [[ "$FILES" == *"sdk/console"* ]]; then TAGS="$TAGS console"; fi
+          if [[ "$FILES" == *"sdk/docker"* ]]; then TAGS="$TAGS docker"; fi
+          if [[ "$FILES" == *"sdk/prettier"* ]]; then TAGS="$TAGS prettier"; fi
+          echo "TAGS=$TAGS" >> $GITHUB_ENV
+
+      - name: Add tags to PR
+        run: |
+          IFS=' ' read -r -a TAG_ARRAY <<< "$TAGS"
+          for TAG in "${TAG_ARRAY[@]}"; do
+            gh pr edit ${{ github.event.pull_request.number }} --add-label "$TAG"
+          done
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
