@@ -273,15 +273,34 @@ def bump(version_file: str, project_files: list) -> None:
             click.echo(f"Project file {project_file} does not exist.")
 
     if edited_files:
-        # Get the directories from the previous commit
-        prev_commit_dirs = subprocess.run(
+        # Get the paths from the previous commit
+        prev_commit_paths = subprocess.run(
             ['git', 'diff-tree', '--no-commit-id', '--name-only', '-r', 'HEAD~1'],
             stdout=subprocess.PIPE, text=True
         ).stdout.strip().split('\n')
-        prev_commit_dirs = {os.path.dirname(file) for file in prev_commit_dirs}
+
+        # Determine release targets based on the paths
+        release_targets = set()
+        for path in prev_commit_paths:
+            if 'lib/java' in path:
+                release_targets.add('java')
+            if 'lib/py' in path:
+                release_targets.add('py')
+            if 'lib/ts' in path:
+                release_targets.add('ts')
+            if 'bind/dart' in path:
+                release_targets.add('dart')
+            if 'sdk/cli' in path:
+                release_targets.add('cli')
+            if 'sdk/console' in path:
+                release_targets.add('console')
+            if 'sdk/docker' in path:
+                release_targets.add('docker')
+            if 'sdk/prettier' in path:
+                release_targets.add('prettier')
 
         # Create the new commit message
-        new_commit_msg = f"Updated version to {new_version} in:\n" + "\n".join(prev_commit_dirs)
+        new_commit_msg = f"Bump version to {new_version}\n\nRelease targets:\n" + "\n".join(release_targets)
 
         # Add and commit the changes
         subprocess.run(['git', 'add'] + edited_files)

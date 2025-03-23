@@ -139,13 +139,13 @@ version:
 
 bump-version:
 	telepact-project bump VERSION.txt \
-		lib/java/pom.xml  
-		lib/py/setup.py \
+		lib/java/pom.xml \
+		lib/py/pyproject.toml \
 		lib/ts/package.json \
 		bind/dart/pubspec.yaml \
-		sdk/cli/setup.py \
+		sdk/cli/pyproject.toml \
 		sdk/prettier-plugin-telepact/package.json \
-		sdk/console/setup.py
+		sdk/console/package.json
 
 license-header:
 	telepact-project license-header NOTICE
