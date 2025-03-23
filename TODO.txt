@@ -13,8 +13,7 @@ Medium:
 Low:
 - Maybe: replace info. with telepact. and don't show type in console
 - For the random string generation, use random words rather than random chars
-- console: Improve consistency around simluation naming. Still have lingering
-  ideas around mock and example.
+- console: Improve consistency around simluation naming. Still have lingering ideas around mock and example.
 - Expose mock server options as command-line args in the cli
 - Console light mode and listen to os setting
 - Remove no-op output from `make license-header` and `make version`

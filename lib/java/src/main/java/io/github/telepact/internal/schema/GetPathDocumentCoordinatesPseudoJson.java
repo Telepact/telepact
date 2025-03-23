@@ -195,7 +195,6 @@ public class GetPathDocumentCoordinatesPseudoJson {
     }
 
     private static void findArray(Iterator<CharacterPosition> reader) {
-        System.out.println("findArray");
         if (findValue(reader)) {
             return;
         }
