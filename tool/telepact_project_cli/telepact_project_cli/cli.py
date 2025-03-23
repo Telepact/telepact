@@ -197,7 +197,7 @@ def set_version(version: str) -> None:
         updated = True
 
     if os.path.exists("pubspec.yaml"):
-        with open("pubspec.yaml", "r") as f):
+        with open("pubspec.yaml", "r") as f:
             data = yaml.load(f)
         data["version"] = version
         with open("pubspec.yaml", "w") as f:
