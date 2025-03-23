@@ -66,13 +66,6 @@ jobs:
       - name: Install Project CLI
         run: make install-project-cli
 
-      - name: Generate GitHub App token
-        id: generate-token
-        uses: actions/create-github-app-token@v1
-        with:
-          app-id: ${{ secrets.TELEPACT_BOT_APP_ID }}
-          private-key: ${{ secrets.TELEPACT_BOT_PRIVATE_KEY }}
-
       - name: Configure git bot
         run: |
           git config --global user.name "telepact-bot[bot]"
@@ -83,6 +76,13 @@ jobs:
 
       - name: git log
         run: git log -n 1
+
+      - name: Generate GitHub App token
+        id: generate-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.TELEPACT_BOT_APP_ID }}
+          private-key: ${{ secrets.TELEPACT_BOT_PRIVATE_KEY }}
 
       - name: Push changes
         env:
