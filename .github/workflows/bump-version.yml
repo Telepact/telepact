@@ -68,8 +68,8 @@ jobs:
 
       - name: Configure git bot
         run: |
-          git config --global user.name "telepact-bot[bot]"
-          git config --global user.email "telepact-bot[bot]@users.noreply.github.com"
+          git config --global user.name "Telepact Bot"
+          git config --global user.email "telepact-bot@users.noreply.github.com"
 
       - name: Bump version
         run: make bump-version
