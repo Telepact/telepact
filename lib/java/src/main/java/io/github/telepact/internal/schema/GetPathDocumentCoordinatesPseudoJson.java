@@ -119,7 +119,6 @@ public class GetPathDocumentCoordinatesPseudoJson {
     }
 
     private static Map<String, Object> findCoordinatesArray(List<Object> path, Iterator<CharacterPosition> reader) {
-        System.out.println("findCoordinatesArray: path=" + path);
         int workingIndex = 0;
 
         if (workingIndex == (int) path.get(0)) {
@@ -136,7 +135,6 @@ public class GetPathDocumentCoordinatesPseudoJson {
 
             System.out.println("findCoordinatesArray: char=" + c + ", row=" + row + ", col=" + col);
             workingIndex++;
-            System.out.println("findCoordinatesArray: workingIndex=" + workingIndex);
             if (workingIndex == (int) path.get(0)) {
                 return findCoordinates(path.subList(1, path.size()), reader, null, null);
             } else {
