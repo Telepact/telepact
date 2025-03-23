@@ -87,10 +87,10 @@ uninstall-cli:
 	pipx uninstall telepact-cli
 
 prettier:
-	cd sdk/prettier-plugin-telepact && make
+	cd sdk/prettier && make
 
 clean-prettier:
-	cd sdk/prettier-plugin-telepact && make clean
+	cd sdk/prettier && make clean
 
 console:
 	cd sdk/console && make
@@ -134,7 +134,7 @@ version:
 	cd lib/ts && telepact-project set-version ${VERSION}
 	cd bind/dart && telepact-project set-version ${VERSION}
 	cd sdk/cli && telepact-project set-version ${VERSION}
-	cd sdk/prettier-plugin-telepact && telepact-project set-version ${VERSION}
+	cd sdk/prettier && telepact-project set-version ${VERSION}
 	cd sdk/console && telepact-project set-version ${VERSION}
 
 bump-version:
@@ -145,7 +145,7 @@ bump-version:
 		bind/dart/pubspec.yaml \
 		bind/dart/package.json \
 		sdk/cli/pyproject.toml \
-		sdk/prettier-plugin-telepact/package.json \
+		sdk/prettier/package.json \
 		sdk/console/package.json
 
 license-header:

@@ -192,7 +192,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: build-prettier
-          path: sdk/prettier-plugin-telepact/dist
+          path: sdk/prettier/dist
           retention-days: 1
 
   build-console:
@@ -218,7 +218,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: build-prettier
-          path: sdk/prettier-plugin-telepact/dist
+          path: sdk/prettier/dist
       
       - name: Install CLI
         run: make install-cli
