@@ -69,7 +69,6 @@ public class GetPathDocumentCoordinatesPseudoJson {
                         "col", ovCol != null ? ovCol : col);
             }
 
-            System.out.println("findCoordinates: char=" + c + ", row=" + row + ", col=" + col);
             if (c == '{') {
                 Map<String, Object> result = findCoordinatesObject(path, reader);
                 if (result != null) {
