@@ -3,24 +3,16 @@
 Telepact is an API ecosystem for bridging programs across inter-process
 communication boundaries.
 
-It follows 4 principles:
-1. **Accessibility** - Whether you're bringing sophisticated toolchains or a
-   minimialist setup, you can easily participate in Telepact with the
-   complexity-level you need, from plain json to generated code with efficient
-   binary serialization.
-2. **Portability** - Telepact definitions take the form of currency in the
-   Telepact ecosystem, unlocking powerful "based on" features such as
-   documentation rendering, code completion, mocking, and code generation.
-3. **Trust** - Features are governed not by server implementations, but rather
-   by the Telepact ecosystem itself; consequently, clients can confidently
-   integrate with all Telepact servers with robust expectations.
-4. **Stability** - Telepact's interface description language offers a powerful
-   but carefully curated list of paradigms to ensure API designs don't fall
-   victim to common API evolution pitfalls.
-
 For further reading, see [Motivation](./doc/motivation.md).
 
 For explanations of various design decisions, see [the FAQ](./doc/faq.md).
+
+## At a glance
+
+```
+<< [{},{"fn.add": {"x": 1,"y": 2}}]
+>> [{},{"Ok_": {"result": 3}}]
+```
 
 # Development
 
