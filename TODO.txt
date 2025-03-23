@@ -1,4 +1,5 @@
 High:
+- Rename prettier-plugin-telepact directory to prettier
 - Clean up dangling print statements
 - Double check git urls in java pom
 - Get a build bot configured that on every PR, version bumps, commits machine parsable notes about what changed
@@ -6,9 +7,11 @@ High:
 Medium:
 - Add backwards compatibility check to cli
 - Add http url as a Telepact source for code generation
+- Move self-hosted console to example directory instead of tool directory
 - Add websocket support in doc ui
 - Add websocket support in cli
 - Add websocket support for mock docker
+- Add docker to release targets
 
 Low:
 - Maybe: replace info. with telepact. and don't show type in console

@@ -37,7 +37,7 @@ def main() -> None:
 
 
 @click.command()
-def bump() -> None:
+def old_bump() -> None:
     if os.path.exists("pom.xml"):
         parser = ET.XMLParser(remove_blank_text=True)
         tree = ET.parse("pom.xml", parser)
@@ -207,6 +207,111 @@ def set_version(version: str) -> None:
     if not updated:
         click.echo("No supported project file found.")
 
+
+@click.command()
+@click.argument('version_file')
+@click.argument('project_files', nargs=-1)
+def bump(version_file: str, project_files: list) -> None:
+    def bump_version2(version: str) -> str:
+        parts = version.split('.')
+        parts[-1] = str(int(parts[-1]) + 1)
+        return '.'.join(parts)
+
+    if not os.path.exists(version_file):
+        click.echo(f"Version file {version_file} does not exist.")
+        return
+
+    with open(version_file, 'r') as f:
+        version = f.read().strip()
+
+    new_version = bump_version2(version)
+
+    with open(version_file, 'w') as f:
+        f.write(new_version)
+
+    click.echo(f"Updated version file {version_file} to version {new_version}")
+
+    edited_files = [version_file]
+
+    for project_file in project_files:
+        if os.path.exists(project_file):
+            if project_file.endswith("pom.xml"):
+                parser = ET.XMLParser(remove_blank_text=True)
+                tree = ET.parse(project_file, parser)
+                root = tree.getroot()
+                root.find("{http://maven.apache.org/POM/4.0.0}version").text = new_version
+                tree.write(project_file, xml_declaration=True, encoding='utf-8', pretty_print=True)
+                click.echo(f"Updated {project_file} to version {new_version}")
+                edited_files.append(project_file)
+            elif project_file.endswith("package.json"):
+                with open(project_file, 'r') as f:
+                    data = json.load(f)
+                data["version"] = new_version
+                with open(project_file, 'w') as f:
+                    json.dump(data, f, indent=2)
+                click.echo(f"Updated {project_file} to version {new_version}")
+                edited_files.append(project_file)
+            elif project_file.endswith("pyproject.toml"):
+                with open(project_file, 'r') as f:
+                    data = toml.load(f)
+                data["project"]["version"] = new_version
+                with open(project_file, 'w') as f:
+                    toml.dump(data, f)
+                click.echo(f"Updated {project_file} to version {new_version}")
+                edited_files.append(project_file)
+            elif project_file.endswith("pubspec.yaml"):
+                with open(project_file, 'r') as f:
+                    data = yaml.load(f)
+                data["version"] = new_version
+                with open(project_file, 'w') as f:
+                    yaml.dump(data, f)
+                click.echo(f"Updated {project_file} to version {new_version}")
+                edited_files.append(project_file)
+            else:
+                click.echo(f"Unsupported project file type: {project_file}")
+        else:
+            click.echo(f"Project file {project_file} does not exist.")
+
+    if edited_files:
+        # Get the paths from the previous commit
+        prev_commit_paths = subprocess.run(
+            ['git', 'diff-tree', '--no-commit-id', '--name-only', '-r', 'HEAD~1'],
+            stdout=subprocess.PIPE, text=True
+        ).stdout.strip().split('\n')
+
+        # Determine release targets based on the paths
+        release_targets = set()
+        for path in prev_commit_paths:
+            if 'lib/java' in path:
+                release_targets.add('java')
+            if 'lib/py' in path:
+                release_targets.add('py')
+            if 'lib/ts' in path:
+                release_targets.add('ts')
+            if 'bind/dart' in path:
+                release_targets.add('dart')
+            if 'sdk/cli' in path:
+                release_targets.add('cli')
+            if 'sdk/console' in path:
+                release_targets.add('console')
+            if 'sdk/docker' in path:
+                release_targets.add('docker')
+            if 'sdk/prettier' in path:
+                release_targets.add('prettier')
+
+        if release_targets:
+            release_string = "Release targets:\n" + "\n".join(release_targets)
+        else:
+            release_string = "No release targets"
+
+        # Create the new commit message
+        new_commit_msg = f"Bump version to {new_version}\n\n" + release_string
+
+        # Add and commit the changes
+        subprocess.run(['git', 'add'] + edited_files)
+        subprocess.run(['git', 'commit', '-m', new_commit_msg])
+
+
 @click.command()
 @click.argument('license_header_path')
 def license_header(license_header_path):
@@ -289,10 +394,11 @@ def license_header(license_header_path):
         else:
             print(f"ERROR: {file_path} - Unsupported file extension {file_extension}")
 
-main.add_command(bump)
+main.add_command(old_bump)
 main.add_command(depset)
 main.add_command(get)
 main.add_command(set_version)
+main.add_command(bump)
 main.add_command(license_header)
 
 if __name__ == "__main__":

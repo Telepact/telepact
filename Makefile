@@ -137,5 +137,16 @@ version:
 	cd sdk/prettier-plugin-telepact && telepact-project set-version ${VERSION}
 	cd sdk/console && telepact-project set-version ${VERSION}
 
+bump-version:
+	telepact-project bump VERSION.txt \
+		lib/java/pom.xml \
+		lib/py/pyproject.toml \
+		lib/ts/package.json \
+		bind/dart/pubspec.yaml \
+		bind/dart/package.json \
+		sdk/cli/pyproject.toml \
+		sdk/prettier-plugin-telepact/package.json \
+		sdk/console/package.json
+
 license-header:
 	telepact-project license-header NOTICE
