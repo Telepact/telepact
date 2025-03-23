@@ -1,0 +1,34 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/lib/ts"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "maven"
+    directory: "/lib/java"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "pip"
+    directory: "/lib/py"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "pub"
+    directory: "/bind/dart"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "cli"
+    directory: "/sdk/cli"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "npm"
+    directory: "/sdk/console"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "npm"
+    directory: "/sdk/prettier"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "docker"
+    directory: "/sdk/docker"
+    schedule:
+      interval: "weekly"
