@@ -81,7 +81,7 @@ jobs:
         id: generate-token
         uses: actions/create-github-app-token@v1
         with:
-          app-id: ${{ secrets.TELEPACT_BOT_APP_ID }}
+          app-id: ${{ vars.TELEPACT_BOT_APP_ID }}
           private-key: ${{ secrets.TELEPACT_BOT_PRIVATE_KEY }}
 
       - name: Push changes
