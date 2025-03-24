@@ -61,6 +61,14 @@ jobs:
           java-version: "21"
           distribution: "corretto"
 
+      - name: Cache Maven packages
+        uses: actions/cache@v2
+        with:
+          path: lib/java/.m2
+          key: ${{ runner.os }}-lib-maven-${{ hashFiles('lib/java/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-lib-maven-
+
       - name: Build java
         run: make java
 
@@ -309,6 +317,14 @@ jobs:
         with:
           java-version: "21"
           distribution: "corretto"
+
+      - name: Cache Maven packages
+        uses: actions/cache@v2
+        with:
+          path: test/lib/java/.m2
+          key: ${{ runner.os }}-test-maven-${{ hashFiles('test/lib/java/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-test-maven-
 
       - name: Install nats-server
         run: |
