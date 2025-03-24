@@ -52,7 +52,7 @@ jobs:
         run: git status
 
       - name: Bump version
-        run: make bump-version
+        run: telepact-project bump
 
       - name: git log
         run: git log -n 1
