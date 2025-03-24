@@ -43,6 +43,11 @@ jobs:
         with:
           token: ${{ steps.generate-token.outputs.token }}
 
+      - name: Set up Dart
+        uses: dart-lang/setup-dart@v1
+        with:
+          sdk: 3.6
+
       - name: Install Poetry
         run: pipx install poetry
 
