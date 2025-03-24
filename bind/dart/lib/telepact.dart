@@ -48,10 +48,10 @@ extension type DefaultClientBinaryStrategy._(JSObject _) implements JSObject {
 }
 
 extension type Message._(JSObject _) implements JSObject {
-  external JSObject get headers;
-  external JSObject get body;
+  external JSAny? get headers;
+  external JSAny? get body;
 
-  external factory Message(JSObject headers, JSObject body);
+  external factory Message(JSAny? headers, JSAny? body);
 }
 
 extension type DefaultSerialization._(JSObject _) implements JSObject {
@@ -71,7 +71,7 @@ extension type Serializer._(JSObject _) implements JSObject {
 
 extension type Client._(JSObject _) implements JSObject {
   external factory Client(
-      JSExportedDartFunction adapter, ClientOptions options);
+      JSFunction adapter, ClientOptions options);
   external JSPromise<Message> request(Message requestMessage);
 }
 
