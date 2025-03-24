@@ -62,7 +62,7 @@ jobs:
           distribution: "corretto"
 
       - name: Cache Maven packages
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: lib/java/.m2
           key: ${{ runner.os }}-lib-maven-${{ hashFiles('lib/java/pom.xml') }}
@@ -319,7 +319,7 @@ jobs:
           distribution: "corretto"
 
       - name: Cache Maven packages
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: test/lib/java/.m2
           key: ${{ runner.os }}-test-maven-${{ hashFiles('test/lib/java/pom.xml') }}
