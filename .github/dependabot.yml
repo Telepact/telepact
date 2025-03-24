@@ -32,7 +32,7 @@ updates:
     directory: "/bind/dart"
     schedule:
       interval: "weekly"
-  - package-ecosystem: "cli"
+  - package-ecosystem: "pip"
     directory: "/sdk/cli"
     schedule:
       interval: "weekly"
