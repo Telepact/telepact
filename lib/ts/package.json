@@ -24,7 +24,7 @@
     "@rollup/plugin-node-resolve": "^16.0.0",
     "@rollup/plugin-typescript": "12.1.2",
     "@types/node": "^20.11.16",
-    "@typescript-eslint/eslint-plugin": "^7.4.0",
+    "@typescript-eslint/eslint-plugin": "^8.27.0",
     "@typescript-eslint/parser": "^7.4.0",
     "eslint": "^8.57.0",
     "rollup": "4.34.6",
