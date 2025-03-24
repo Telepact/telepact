@@ -43,6 +43,9 @@ jobs:
         with:
           token: ${{ steps.generate-token.outputs.token }}
 
+      - name: Install Poetry
+        run: pipx install poetry
+
       - name: Install Project CLI
         run: make install-project-cli
 
