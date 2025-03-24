@@ -214,14 +214,14 @@ def bump() -> None:
     version_file = 'VERSION.txt'
 
     project_files = [
-		'lib/java/pom.xml',
-		'lib/py/pyproject.toml',
-		'lib/ts/package.json',
-		'bind/dart/pubspec.yaml',
-		'bind/dart/package.json',
-		'sdk/cli/pyproject.toml',
-		'sdk/prettier/package.json',
-		'sdk/console/package.json',
+        'lib/java/pom.xml',
+        'lib/py/pyproject.toml',
+        'lib/ts/package.json',
+        'bind/dart/pubspec.yaml',
+        'bind/dart/package.json',
+        'sdk/cli/pyproject.toml',
+        'sdk/prettier/package.json',
+        'sdk/console/package.json',
     ]
 
     pr_number = int(os.getenv('PR_NUMBER'))
@@ -285,6 +285,23 @@ def bump() -> None:
                 click.echo(f"Unsupported project file type: {project_file}")
         else:
             click.echo(f"Project file {project_file} does not exist.")
+
+    # Update lock files
+    for project_file in project_files:
+        if project_file.endswith("package.json") and os.path.exists(os.path.join(os.path.dirname(project_file), "package-lock.json")):
+            subprocess.run(["npm", "install"], cwd=os.path.dirname(project_file), check=True)
+            edited_files.append(os.path.join(os.path.dirname(project_file), "package-lock.json"))
+            click.echo(f"Updated package-lock.json in {os.path.dirname(project_file)}")
+
+        if project_file.endswith("pyproject.toml") and os.path.exists(os.path.join(os.path.dirname(project_file), "poetry.lock")):
+            subprocess.run(["poetry", "lock"], cwd=os.path.dirname(project_file), check=True)
+            edited_files.append(os.path.join(os.path.dirname(project_file), "poetry.lock"))
+            click.echo(f"Updated poetry.lock in {os.path.dirname(project_file)}")
+
+        if project_file.endswith("pubspec.yaml") and os.path.exists(os.path.join(os.path.dirname(project_file), "pubspec.lock")):
+            subprocess.run(["dart", "pub", "get"], cwd=os.path.dirname(project_file), check=True)
+            edited_files.append(os.path.join(os.path.dirname(project_file), "pubspec.lock"))
+            click.echo(f"Updated pubspec.lock in {os.path.dirname(project_file)}")
 
     # Get the previous commit hash by going back 1 commit
     prev_commit_hash = subprocess.run(
