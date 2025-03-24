@@ -20,31 +20,39 @@ updates:
     directory: "/lib/ts"
     schedule:
       interval: "weekly"
+    open-pull-requests-limit: 1
   - package-ecosystem: "maven"
     directory: "/lib/java"
     schedule:
       interval: "weekly"
+    open-pull-requests-limit: 1
   - package-ecosystem: "pip"
     directory: "/lib/py"
     schedule:
       interval: "weekly"
+    open-pull-requests-limit: 1
   - package-ecosystem: "pub"
     directory: "/bind/dart"
     schedule:
       interval: "weekly"
+    open-pull-requests-limit: 1
   - package-ecosystem: "pip"
     directory: "/sdk/cli"
     schedule:
       interval: "weekly"
+    open-pull-requests-limit: 1
   - package-ecosystem: "npm"
     directory: "/sdk/console"
     schedule:
       interval: "weekly"
+    open-pull-requests-limit: 1
   - package-ecosystem: "npm"
     directory: "/sdk/prettier"
     schedule:
       interval: "weekly"
+    open-pull-requests-limit: 1
   - package-ecosystem: "docker"
     directory: "/sdk/docker"
     schedule:
       interval: "weekly"
+    open-pull-requests-limit: 1
