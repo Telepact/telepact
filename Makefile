@@ -123,7 +123,7 @@ clean-project-cli:
 	cd tool/telepact_project_cli && make clean
 
 install-project-cli:
-	pipx install $(wildcard tool/telepact_project_cli/dist/telepact_project_cli-*.tar.gz)
+	pipx install tool/telepact_project_cli
 
 uninstall-project-cli:
 	pipx uninstall telepact-project-cli
@@ -136,17 +136,6 @@ version:
 	cd sdk/cli && telepact-project set-version ${VERSION}
 	cd sdk/prettier && telepact-project set-version ${VERSION}
 	cd sdk/console && telepact-project set-version ${VERSION}
-
-bump-version:
-	telepact-project bump VERSION.txt \
-		lib/java/pom.xml \
-		lib/py/pyproject.toml \
-		lib/ts/package.json \
-		bind/dart/pubspec.yaml \
-		bind/dart/package.json \
-		sdk/cli/pyproject.toml \
-		sdk/prettier/package.json \
-		sdk/console/package.json
 
 license-header:
 	telepact-project license-header NOTICE

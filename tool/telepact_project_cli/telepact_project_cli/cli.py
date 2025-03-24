@@ -210,9 +210,22 @@ def set_version(version: str) -> None:
 
 
 @click.command()
-@click.argument('version_file')
-@click.argument('project_files', nargs=-1)
-def bump(version_file: str, project_files: list) -> None:
+def bump() -> None:
+    version_file = 'VERSION.txt'
+
+    project_files = [
+		'lib/java/pom.xml',
+		'lib/py/pyproject.toml',
+		'lib/ts/package.json',
+		'bind/dart/pubspec.yaml',
+		'bind/dart/package.json',
+		'sdk/cli/pyproject.toml',
+		'sdk/prettier/package.json',
+		'sdk/console/package.json',
+    ]
+
+    pr_number = int(os.getenv('PR_NUMBER'))
+
     def bump_version2(version: str) -> str:
         parts = version.split('.')
         parts[-1] = str(int(parts[-1]) + 1)
@@ -273,50 +286,49 @@ def bump(version_file: str, project_files: list) -> None:
         else:
             click.echo(f"Project file {project_file} does not exist.")
 
-    if edited_files:
-        # Get the previous commit hash by going back 1 commit
-        prev_commit_hash = subprocess.run(
-            ['git', 'log', '--pretty=format:%H', '-1'],
-            stdout=subprocess.PIPE, text=True
-        ).stdout.strip()
+    # Get the previous commit hash by going back 1 commit
+    prev_commit_hash = subprocess.run(
+        ['git', 'log', '--pretty=format:%H', '-1'],
+        stdout=subprocess.PIPE, text=True
+    ).stdout.strip()
 
-        # Get the paths from the previous commit
-        prev_commit_paths = subprocess.run(
-            ['git', 'diff-tree', '--no-commit-id', '--name-only', '-r', prev_commit_hash],
-            stdout=subprocess.PIPE, text=True
-        ).stdout.strip().split('\n')
+    # Get the paths from the previous commit
+    prev_commit_paths = subprocess.run(
+        ['git', 'diff-tree', '--no-commit-id', '--name-only', '-r', prev_commit_hash],
+        stdout=subprocess.PIPE, text=True
+    ).stdout.strip().split('\n')
 
-        # Determine release targets based on the paths
-        release_targets = set()
-        for path in prev_commit_paths:
-            if 'lib/java' in path:
-                release_targets.add('java')
-            if 'lib/py' in path:
-                release_targets.add('py')
-            if 'lib/ts' in path:
-                release_targets.add('ts')
-            if 'bind/dart' in path:
-                release_targets.add('dart')
-            if 'sdk/cli' in path:
-                release_targets.add('cli')
-            if 'sdk/console' in path:
-                release_targets.add('console')
-            if 'sdk/docker' in path:
-                release_targets.add('docker')
-            if 'sdk/prettier' in path:
-                release_targets.add('prettier')
+    # Determine release targets based on the paths
+    release_targets = set()
+    for path in prev_commit_paths:
+        if 'lib/java' in path:
+            release_targets.add('java')
+        if 'lib/py' in path:
+            release_targets.add('py')
+        if 'lib/ts' in path:
+            release_targets.add('ts')
+        if 'bind/dart' in path:
+            release_targets.add('dart')
+        if 'sdk/cli' in path:
+            release_targets.add('cli')
+        if 'sdk/console' in path:
+            release_targets.add('console')
+        if 'sdk/docker' in path:
+            release_targets.add('docker')
+        if 'sdk/prettier' in path:
+            release_targets.add('prettier')
 
-        if release_targets:
-            release_string = "Release targets:\n" + "\n".join(release_targets)
-        else:
-            release_string = "No release targets"
+    if release_targets:
+        release_string = "Release targets:\n" + "\n".join(release_targets)
+    else:
+        release_string = "No release targets"
 
-        # Create the new commit message
-        new_commit_msg = f"Bump version to {new_version}\n\n" + release_string
+    # Create the new commit message
+    new_commit_msg = f"Bump version to {new_version} (#{pr_number})\n\n" + release_string
 
-        # Add and commit the changes
-        subprocess.run(['git', 'add'] + edited_files)
-        subprocess.run(['git', 'commit', '-m', new_commit_msg])
+    # Add and commit the changes
+    subprocess.run(['git', 'add'] + edited_files)
+    subprocess.run(['git', 'commit', '-m', new_commit_msg])
 
 
 @click.command()
