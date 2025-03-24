@@ -126,30 +126,6 @@ jobs:
           path: sdk/cli/dist
           retention-days: 1
 
-  build-project-cli:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: Install Poetry
-        run: pipx install poetry
-
-      - name: Build project-cli
-        run: make project-cli
-
-      - name: Upload project-cli build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-project-cli
-          path: tool/telepact_project_cli/dist
-          retention-days: 1
-
   build-dart:
     runs-on: ubuntu-latest
     needs: [build-ts]
@@ -253,16 +229,9 @@ jobs:
 
   check-license-header:
     runs-on: ubuntu-latest
-    needs: [build-project-cli]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Download project-cli build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: build-project-cli
-          path: tool/telepact_project_cli/dist
 
       - name: Install Project CLI
         run: make install-project-cli
@@ -281,16 +250,9 @@ jobs:
 
   check-version:
     runs-on: ubuntu-latest
-    needs: [build-project-cli]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Download project-cli build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: build-project-cli
-          path: tool/telepact_project_cli/dist
 
       - name: Install Project CLI
         run: make install-project-cli
@@ -309,18 +271,11 @@ jobs:
 
   add-labels:
     runs-on: ubuntu-latest
-    needs: [build-project-cli]
     permissions:
       pull-requests: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-
-      - name: Download project-cli build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: build-project-cli
-          path: tool/telepact_project_cli/dist
 
       - name: Install Project CLI
         run: make install-project-cli

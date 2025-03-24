@@ -24,35 +24,9 @@ on:
       - main
 
 jobs:
-  build-project-cli:
-    if: github.event.pull_request.merged == true
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: Install Poetry
-        run: pipx install poetry
-
-      - name: Build project-cli
-        run: make project-cli
-
-      - name: Upload project-cli build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-project-cli
-          path: tool/telepact_project_cli/dist
-          retention-days: 1
-
   bump-version:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
-    needs: [build-project-cli]
     steps:
       - name: Generate GitHub App token
         id: generate-token
@@ -66,25 +40,19 @@ jobs:
         with:
           token: ${{ steps.generate-token.outputs.token }}
 
-      - name: Download project-cli build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: build-project-cli
-          path: tool/telepact_project_cli/dist
-
       - name: Install Project CLI
         run: make install-project-cli
 
       - name: Configure git identity
         run: |
-          git config --global user.name "telepact-bot"
-          git config --global user.email "telepact-bot@users.noreply.github.com"
+          git config --global user.name "telepact-notary[bot]"
+          git config --global user.email "telepact-notary[bot]@users.noreply.github.com"
 
       - name: git status
         run: git status
 
       - name: Bump version
-        run: make bump-version
+        run: telepact-project bump
 
       - name: git log
         run: git log -n 1
