@@ -43,9 +43,11 @@ void main() {
       final telepactSchema = TelepactSchema.fromJson(telepactJson);
       print('TelepactSchema created: $telepactSchema');
 
+   
+
       JSPromise handler(Message requestMessage) {
         print('Handler called with requestMessage: $requestMessage');
-        return Future.value(Message(JSObject(), JSObject())).toJS;
+        return Future.value(Message(JSObject(), JSObject.fromInteropObject({'Ok_': {}}))).toJS;
       }
 
       print('Creating ServerOptions');
@@ -59,29 +61,54 @@ void main() {
       final requestMessageBytes = Uint8List.fromList([1, 2, 3]);
       print('Request message bytes: $requestMessageBytes');
 
-      dynamic request = [
-        {},
-        {"fn.ping_": {}}
-      ];
-      dynamic requestJson = jsonEncode(request);
-      print('Request bytes: $requestJson');
+      JSPromise adapter(Message m, Serializer s) {
+            final requestBytes = s.serialize(m);
+            final responseBytes = server.process(requestBytes).toDart;
+            return responseBytes.then((value) {
+              final response = s.deserialize(value);
+              return response.jsify();
+            }).toJS;
+      }
 
-      final requestBytes = Uint8List.fromList(utf8.encode(requestJson));
+      final clientOptions = ClientOptions();
+      final client = Client(adapter.toJS, clientOptions);
 
-      print('Processing request');
-      final responseBytes = await server.process(requestBytes.toJS).toDart;
-      print('Response bytes: $responseBytes');
+      // dynamic request = [
+      //   {},
+      //   {"fn.ping_": {}}
+      // ];
+      // dynamic requestJson = jsonEncode(request);
+      // print('Request bytes: $requestJson');
 
-      dynamic response = jsonDecode(utf8.decode(responseBytes.toDart));
-      print('Response: $response');
+      final request = Message(
+        {}.jsify(),
+        {'fn.ping_': {}}.jsify()
+      );
 
-      dynamic expectedResponse = [
-        {},
-        {"Ok_": {}}
-      ];
+      var response = await client.request(request).toDart;
+
+      // final requestBytes = Uint8List.fromList(utf8.encode(requestJson));
+
+      // print('Processing request');
+      // final responseBytes = await server.process(requestBytes.toJS).toDart;
+      // print('Response bytes: $responseBytes');
+
+      // dynamic response = jsonDecode(utf8.decode(responseBytes.toDart));
+      // print('Response: $response');
+
+      Message expectedResponse = Message(
+        {}.jsify(),
+        {"Ok_": {}}.jsify()
+      );
       print('Expected response: $expectedResponse');
 
-      expect(response, equals(expectedResponse));
+      expect(response.headers.dartify(), equals(expectedResponse.headers.dartify()));
+      expect(response.body.dartify(), equals(expectedResponse.body.dartify()));
+
+      // Print contents and type
+      print(response.body.dartify());
+      print(response.body.dartify().runtimeType);
+
       print('Test completed');
     });
   });
