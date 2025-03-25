@@ -3,4 +3,4 @@ metrics/
 bin/
 src/gen
 .built
-telepactcodegen.tar.gz
+telepact.tgz

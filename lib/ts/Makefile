@@ -33,5 +33,6 @@ $(DIST_IIFE): $(SRC_FILES)
 clean:
 	rm -rf inc
 	rm -rf dist
+	rm -rf dist-test
 	rm -rf node_modules
 	rm -f dist/LICENSE dist/NOTICE
