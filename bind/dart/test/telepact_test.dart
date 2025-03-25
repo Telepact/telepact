@@ -32,9 +32,17 @@ void main() {
 
       final telepactPseudoJson = [
         {
-          "struct.Data": {
-            "field": ["boolean"]
-          }
+          "fn.add": {
+            "x": ["integer"],
+            "y": ["integer"]
+          },
+          "->": [
+            {
+              "Ok_": {
+                "result": ["integer"]
+              }
+            }
+          ]
         }
       ];
       print("Encoding json");
@@ -46,8 +54,15 @@ void main() {
    
 
       JSPromise handler(Message requestMessage) {
-        print('Handler called with requestMessage: $requestMessage');
-        return Future.value(Message(JSObject(), JSObject.fromInteropObject({'Ok_': {}}))).toJS;
+        final body = requestMessage.body.dartify() as Map<String, Object>;
+        final x = body['x'] as int;
+        final y = body['y'] as int;
+        final result = x + y;
+        final response = Message(
+          {}.jsify(),
+          {"Ok_": {"result": result}}.jsify()
+        );
+        return Future.value(response).toJS;
       }
 
       print('Creating ServerOptions');
@@ -62,15 +77,15 @@ void main() {
       print('Request message bytes: $requestMessageBytes');
 
       JSPromise adapter(Message m, Serializer s) {
-            final requestBytes = s.serialize(m);
-            final responseBytes = server.process(requestBytes).toDart;
-            return responseBytes.then((value) {
-              final response = s.deserialize(value);
-              return response.jsify();
-            }).toJS;
+        final requestBytes = s.serialize(m);
+        final responseBytes = server.process(requestBytes).toDart;
+        return responseBytes.then((value) {
+          final response = s.deserialize(value);
+          return response.jsify();
+        }).toJS;
       }
 
-      final clientOptions = ClientOptions();
+      final clientOptions = ClientOptions()..useBinary = true;
       final client = Client(adapter.toJS, clientOptions);
 
       // dynamic request = [
@@ -97,17 +112,29 @@ void main() {
       // print('Response: $response');
 
       Message expectedResponse = Message(
-        {}.jsify(),
+        {
+          '@enc_': {
+            'Ok_': 0,
+            'api': 1,
+            'fn.add': 2,
+            'fn.api_': 3,
+            'fn.ping_': 4,
+            'result': 5,
+            'x': 6,
+            'y': 7
+          },
+          '@bin_': [-2064039486]
+        }.jsify(),
         {"Ok_": {}}.jsify()
       );
       print('Expected response: $expectedResponse');
 
-      expect(response.headers.dartify(), equals(expectedResponse.headers.dartify()));
-      expect(response.body.dartify(), equals(expectedResponse.body.dartify()));
-
       // Print contents and type
       print(response.body.dartify());
       print(response.body.dartify().runtimeType);
+
+      expect(response.headers.dartify(), equals(expectedResponse.headers.dartify()));
+      expect(response.body.dartify(), equals(expectedResponse.body.dartify()));
 
       print('Test completed');
     });

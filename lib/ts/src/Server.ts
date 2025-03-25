@@ -21,6 +21,7 @@ import { Message } from './Message';
 import { TelepactSchema } from './TelepactSchema';
 import { constructBinaryEncoding } from './internal/binary/ConstructBinaryEncoding';
 import { processBytes } from './internal/ProcessBytes';
+import { Serialization } from './Serialization';
 
 export class Server {
     handler: (message: Message) => Promise<Message>;
@@ -67,7 +68,7 @@ export class ServerOptions {
     onRequest: (message: Message) => void;
     onResponse: (message: Message) => void;
     authRequired: boolean;
-    serialization: DefaultSerialization;
+    serialization: Serialization;
 
     constructor() {
         this.onError = (e: any) => {};

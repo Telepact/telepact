@@ -31,31 +31,14 @@ extension type RandomGenerator._(JSObject _) implements JSObject {
   external int nextCollectionLength();
 }
 
-extension type Checksum._(JSObject _) implements JSObject {
-  external String value;
-  external int expiration;
-
-  external Checksum(String value, int expiration);
-}
-
-extension type DefaultClientBinaryStrategy._(JSObject _) implements JSObject {
-  external Checksum get primary;
-  external Checksum get secondary;
-
-  external factory DefaultClientBinaryStrategy();
-  external void updateChecksum(String newChecksum);
-  external JSArray<JSNumber> getCurrentChecksums();
-}
-
 extension type Message._(JSObject _) implements JSObject {
-  external JSAny? get headers;
-  external JSAny? get body;
+  external JSAny get headers;
+  external JSAny get body;
 
   external factory Message(JSAny? headers, JSAny? body);
 }
 
-extension type DefaultSerialization._(JSObject _) implements JSObject {
-  external factory DefaultSerialization();
+extension type Serialization._(JSObject _) implements JSObject {
   external JSUint8Array toJson(JSAny telepactMessage);
   external JSUint8Array toMsgpack(JSAny telepactMessage);
   external JSAny fromJson(JSUint8Array bytes);
@@ -64,7 +47,7 @@ extension type DefaultSerialization._(JSObject _) implements JSObject {
 
 extension type Serializer._(JSObject _) implements JSObject {
   external factory Serializer(
-      DefaultSerialization serializationImpl, JSAny binaryEncoder);
+      Serialization serializationImpl, JSAny binaryEncoder);
   external JSUint8Array serialize(Message message);
   external Message deserialize(JSUint8Array messageBytes);
 }
@@ -79,8 +62,13 @@ extension type ClientOptions._(JSObject _) implements JSObject {
   external bool get useBinary;
   external bool get alwaysSendJson;
   external int get timeoutMsDefault;
-  external DefaultSerialization get serializationImpl;
-  external DefaultClientBinaryStrategy get binaryStrategy;
+  external Serialization get serializationImpl;
+  external ClientBinaryStrategy get binaryStrategy;
+  external void set useBinary(bool value);
+  external void set alwaysSendJson(bool value);
+  external void set timeoutMsDefault(int value);
+  external void set serializationImpl(Serialization value);
+  external void set binaryStrategy(ClientBinaryStrategy value);
 
   external factory ClientOptions();
 }
@@ -97,7 +85,7 @@ extension type ServerOptions._(JSObject _) implements JSObject {
   external JSFunction get onResponse;
   external bool get authRequired;
   external void set authRequired(bool value);
-  external DefaultSerialization get serialization;
+  external Serialization get serialization;
 
   external factory ServerOptions();
 }
@@ -128,12 +116,18 @@ extension type MockServer._(JSObject _) implements JSObject {
 
 extension type MockServerOptions._(JSObject _) implements JSObject {
   external factory MockServerOptions();
-  external void setOnError(JSFunction onError);
-  external void setEnableMessageResponseGeneration(bool enable);
-  external void setEnableOptionalFieldGeneration(bool enable);
-  external void setRandomizeOptionalFieldGeneration(bool enable);
-  external void setGeneratedCollectionLengthMin(int min);
-  external void setGeneratedCollectionLengthMax(int max);
+  external JSFunction get onError;
+  external bool get enableMessageResponseGeneration;
+  external bool get enableOptionalFieldGeneration;
+  external bool get randomizeOptionalFieldGeneration;
+  external int get generatedCollectionLengthMin;
+  external int get generatedCollectionLengthMax;
+  external void set onError(JSFunction onError);
+  external void set enableMessageResponseGeneration(bool enable);
+  external void set enableOptionalFieldGeneration(bool enable);
+  external void set randomizeOptionalFieldGeneration(bool enable);
+  external void set generatedCollectionLengthMin(int min);
+  external void set generatedCollectionLengthMax(int max);
 }
 
 extension type MockTelepactSchema._(JSObject _) implements JSObject {
