@@ -14,6 +14,8 @@
 #|  limitations under the License.
 #|
 
+SHELL := /bin/bash
+
 ORIG_LIB_JAR := ../../../lib/java/target/telepact-$(shell cat ../../../VERSION.txt).jar
 LIB_JAR := target/telepact.jar
 TARGET_JAR := target/telepacttest-1.0-SNAPSHOT.jar

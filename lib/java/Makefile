@@ -14,6 +14,8 @@
 #|  limitations under the License.
 #|
 
+SHELL := /bin/bash
+
 SRC_FILES := $(shell find src -type f)
 JAR_FILE := target/telepact-$(shell cat ../../VERSION.txt).jar
 
