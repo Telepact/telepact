@@ -18,7 +18,8 @@ ORIG_LIB_JAR := ../../../lib/java/target/telepact-$(shell cat ../../../VERSION.t
 LIB_JAR := target/telepact.jar
 TARGET_JAR := target/telepacttest-1.0-SNAPSHOT.jar
 
-$(TARGET_JAR): codegen $(LIB_JAR)
+all: codegen $(LIB_JAR)
+	rm -rf .m2/repository/io/github/telepact
 	mvn install:install-file -Dfile=target/dep/telepact.jar -DgroupId=io.github.telepact -DartifactId=telepact -Dversion=1.0 -Dpackaging=jar -s settings.xml | grep -v "from central"
 	mvn package -DskipTests -s settings.xml | grep -v "from central"
 

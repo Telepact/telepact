@@ -16,7 +16,10 @@
 
 .PHONY: all clean
 
-all:
+SRC_FILES := $(shell find telepact -type f)
+TAR_GZ := dist/*.tar.gz
+
+$(TAR_GZ): $(SRC_FILES)
 	mkdir -p telepact/json
 	cp ../../common/*.json telepact/json
 	cp ../../LICENSE ../../NOTICE telepact/
