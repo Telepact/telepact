@@ -132,13 +132,13 @@ uninstall-project-cli:
 	pipx uninstall telepact-project-cli
 
 version:
-	$(MAKE) -C lib/java version
-	$(MAKE) -C lib/py version
-	$(MAKE) -C lib/ts version
-	$(MAKE) -C bind/dart version
-	$(MAKE) -C sdk/cli version
-	$(MAKE) -C sdk/prettier version
-	$(MAKE) -C sdk/console version
+	cd lib/java && telepact-project set-version ${VERSION}
+	cd lib/py && telepact-project set-version ${VERSION}
+	cd lib/ts && telepact-project set-version ${VERSION}
+	cd bind/dart && telepact-project set-version ${VERSION}
+	cd sdk/cli && telepact-project set-version ${VERSION}
+	cd sdk/prettier && telepact-project set-version ${VERSION}
+	cd sdk/console && telepact-project set-version ${VERSION}
 
 license-header:
 	telepact-project license-header NOTICE
