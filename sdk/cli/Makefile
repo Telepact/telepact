@@ -31,7 +31,7 @@ all: dep
 	poetry build
 
 dep:
-	cd ../../lib/py && make
+	$(MAKE) -C ../../lib/py
 
 clean:
 	rm -rf dist

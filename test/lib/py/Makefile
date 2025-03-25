@@ -28,7 +28,7 @@ $(TAR_GZ): dep
 	cp $(LIB_TAR_GZ) telepact.tar.gz
 
 dep:
-	cd ../../../lib/py && make
+	$(MAKE) -C ../../../lib/py
 
 codegen:
 	telepact codegen --schema-dir ../../runner/schema/example --lang py --out telepact_test/gen

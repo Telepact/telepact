@@ -29,7 +29,7 @@ $(LIB_JAR): dep
 
 dep:
 	ls ../../../lib/java/target
-	cd ../../../lib/java && make
+	$(MAKE) -C ../../../lib/java
 
 codegen:
 	telepact codegen --schema-dir ../../runner/schema/example --lang java --out src/gen/java/telepacttest/gen --package telepacttest.gen

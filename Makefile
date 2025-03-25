@@ -20,68 +20,68 @@ noop:
 	@echo "No-op. Specify a target."
 
 java:
-	cd lib/java && make
+	$(MAKE) -C lib/java
 
 clean-java:
-	cd lib/java && make clean
+	$(MAKE) -C lib/java clean
 
 test-java:
-	cd test/runner && make test-java
+	$(MAKE) -C test/runner test-java
 
 test-trace-java:
-	cd test/runner && make test-trace-java
+	$(MAKE) -C test/runner test-trace-java
 
 py:
-	cd lib/py && make
+	$(MAKE) -C lib/py
 
 clean-py:
-	cd lib/py && make clean
+	$(MAKE) -C lib/py clean
 
 test-py:
-	cd test/runner && make test-py
+	$(MAKE) -C test/runner test-py
 
 test-trace-py:
-	cd test/runner && make test-trace-py
+	$(MAKE) -C test/runner test-trace-py
 
 ts:
-	cd lib/ts && make
+	$(MAKE) -C lib/ts
 
 ts-ci:
-	cd lib/ts && make NPM_INSTALL=ci
+	$(MAKE) -C lib/ts NPM_INSTALL=ci
 
 clean-ts:
-	cd lib/ts && make clean
+	$(MAKE) -C lib/ts clean
 
 test-ts:
-	cd test/runner && make test-ts
+	$(MAKE) -C test/runner test-ts
 
 test-trace-ts:
-	cd test/runner && make test-trace-ts
+	$(MAKE) -C test/runner test-trace-ts
 
 .PHONY: test
 test:
-	cd test/runner && make test
+	$(MAKE) -C test/runner test
 
 clean-test:
-	cd test/runner && make clean
-	cd test/lib/java && make clean
-	cd test/lib/py && make clean
-	cd test/lib/ts && make clean
+	$(MAKE) -C test/runner clean
+	$(MAKE) -C test/lib/java clean
+	$(MAKE) -C test/lib/py clean
+	$(MAKE) -C test/lib/ts clean
 
 dart:
-	cd bind/dart && make
+	$(MAKE) -C bind/dart
 
 clean-dart:
-	cd bind/dart && make clean
+	$(MAKE) -C bind/dart clean
 
 test-dart:
-	cd bind/dart && make test
+	$(MAKE) -C bind/dart test
 
 cli:
-	cd sdk/cli && make
+	$(MAKE) -C sdk/cli
 
 clean-cli:
-	cd sdk/cli && make clean
+	$(MAKE) -C sdk/cli clean
 
 install-cli:
 	pipx install $(wildcard sdk/cli/dist/telepact_cli-*.tar.gz)
@@ -90,40 +90,40 @@ uninstall-cli:
 	pipx uninstall telepact-cli
 
 prettier:
-	cd sdk/prettier && make
+	$(MAKE) -C sdk/prettier
 
 clean-prettier:
-	cd sdk/prettier && make clean
+	$(MAKE) -C sdk/prettier clean
 
 console:
-	cd sdk/console && make
+	$(MAKE) -C sdk/console
 
 dev-console:
-	cd sdk/console && make dev
+	$(MAKE) -C sdk/console dev
 
 clean-console:
-	cd sdk/console && make clean
+	$(MAKE) -C sdk/console clean
 
 test-console:
-	cd sdk/console && make test
+	$(MAKE) -C sdk/console test
 
 docker:
-	cd sdk/docker && make
+	$(MAKE) -C sdk/docker
 
 dev-docker:
-	cd sdk/docker && make dev
+	$(MAKE) -C sdk/docker dev
 
 test-docker:
-	cd sdk/docker && make test
+	$(MAKE) -C sdk/docker test
 
 clean-docker:
-	cd sdk/docker && make clean
+	$(MAKE) -C sdk/docker clean
 
 project-cli:
-	cd tool/telepact_project_cli && make
+	$(MAKE) -C tool/telepact_project_cli
 
 clean-project-cli:
-	cd tool/telepact_project_cli && make clean
+	$(MAKE) -C tool/telepact_project_cli clean
 
 install-project-cli:
 	pipx install tool/telepact_project_cli
@@ -132,13 +132,13 @@ uninstall-project-cli:
 	pipx uninstall telepact-project-cli
 
 version:
-	cd lib/java && telepact-project set-version ${VERSION}
-	cd lib/py && telepact-project set-version ${VERSION}
-	cd lib/ts && telepact-project set-version ${VERSION}
-	cd bind/dart && telepact-project set-version ${VERSION}
-	cd sdk/cli && telepact-project set-version ${VERSION}
-	cd sdk/prettier && telepact-project set-version ${VERSION}
-	cd sdk/console && telepact-project set-version ${VERSION}
+	$(MAKE) -C lib/java version
+	$(MAKE) -C lib/py version
+	$(MAKE) -C lib/ts version
+	$(MAKE) -C bind/dart version
+	$(MAKE) -C sdk/cli version
+	$(MAKE) -C sdk/prettier version
+	$(MAKE) -C sdk/console version
 
 license-header:
 	telepact-project license-header NOTICE

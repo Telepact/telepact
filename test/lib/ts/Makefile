@@ -19,7 +19,7 @@ all: dep codegen
 	npm run build
 
 dep:
-	cd ../../../lib/ts && make
+	$(MAKE) -C ../../../lib/ts
 
 codegen:
 	telepact codegen --schema-dir ../../runner/schema/example --lang ts --out src/gen
@@ -32,4 +32,4 @@ clean:
 	rm -rf dist
 	rm -rf node_modules
 	rm -f package-lock.json
-	cd ../../../lib/ts && make clean
+	$(MAKE) -C ../../../lib/ts clean
