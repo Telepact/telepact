@@ -28,6 +28,7 @@ $(LIB_JAR): dep
 	cp ${ORIG_LIB_JAR} target/dep/telepact.jar
 
 dep:
+	ls ../../../lib/java/target
 	cd ../../../lib/java && make
 
 codegen:
