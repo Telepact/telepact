@@ -13,13 +13,10 @@
   "dependencies": {
     "nats": "^2.19.0",
     "simple-statistics": "^7.8.3",
-    "telepact": "workspace:*"
+    "telepact": "file:telepact.tgz"
   },
   "devDependencies": {
     "@types/node": "^20.11.17",
     "typescript": "^5.3.3"
-  },
-  "workspaces": [
-    "../../../lib/ts"
-  ]
+  }
 }

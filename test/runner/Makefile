@@ -39,13 +39,13 @@ setup:
 	poetry install
 
 java:
-	cd ../lib/java && make
+	$(MAKE) -C ../lib/java
 
 py:
-	cd ../lib/py && make
+	$(MAKE) -C ../lib/py
 
 ts:
-	cd ../lib/ts && make
+	$(MAKE) -C ../lib/ts
 
 clean:
 	rm -rf .pytest_cache

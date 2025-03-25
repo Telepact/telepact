@@ -14,17 +14,21 @@
 #|  limitations under the License.
 #|
 
-all: dep codegen
-	cp ../../../lib/py/dist/*.tar.gz telepact.tar.gz
+LIB_TAR_GZ := ../../../lib/py/dist/*.tar.gz
+TAR_GZ := telepact.tar.gz
 
+all: codegen $(TAR_GZ)
 	poetry lock
 	poetry remove telepact || echo "no-op"
 	poetry add ./telepact.tar.gz
 
 	poetry install
 
+$(TAR_GZ): dep
+	cp $(LIB_TAR_GZ) telepact.tar.gz
+
 dep:
-	cd ../../../lib/py && make
+	$(MAKE) -C ../../../lib/py
 
 codegen:
 	telepact codegen --schema-dir ../../runner/schema/example --lang py --out telepact_test/gen
