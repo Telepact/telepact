@@ -22,7 +22,9 @@ TARGET_JAR := target/telepacttest-1.0-SNAPSHOT.jar
 
 all: codegen $(LIB_JAR)
 	rm -rf .m2/repository/io/github/telepact
+
 	mvn install:install-file -Dfile=target/dep/telepact.jar -DgroupId=io.github.telepact -DartifactId=telepact -Dversion=1.0 -Dpackaging=jar -s settings.xml | grep -v "from central"
+	@if [ $${PIPESTATUS[0]} -ne 0 ]; then exit 1; fi
 
 	mvn package -DskipTests -s settings.xml | grep -v "from central"
 	@if [ $${PIPESTATUS[0]} -ne 0 ]; then exit 1; fi	
