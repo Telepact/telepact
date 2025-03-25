@@ -14,20 +14,29 @@
 #|  limitations under the License.
 #|
 
-.PHONY: all clean
+NPM_INSTALL ?= install
+SRC_FILES := $(shell find src -type f)
+TAR_GZ := dist-test/*.tgz
 
-all:
+.PHONY: clean
+
+$(TAR_GZ): $(SRC_FILES)
 	rm -rf inc
 	mkdir -p inc
 	cp ../../common/*.json inc
+
 	rm -rf dist
 	mkdir -p dist
 	cp ../../LICENSE ../../NOTICE dist
-	npm install
+
+	mkdir -p dist-test
+
+	npm $(NPM_INSTALL)
 	npm run build
 
 clean:
 	rm -rf inc
 	rm -rf dist
+	rm -rf dist-test
 	rm -rf node_modules
 	rm -f dist/LICENSE dist/NOTICE

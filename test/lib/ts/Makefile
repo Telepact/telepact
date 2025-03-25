@@ -14,12 +14,20 @@
 #|  limitations under the License.
 #|
 
-all: dep codegen
+LIB_TAR_GZ := ../../../lib/ts/dist-test/*.tgz
+TAR_GZ := telepact.tgz
+
+all: codegen $(TAR_GZ)
+	npm uninstall telepact || echo "no-op"
+	npm install ./telepact.tgz
 	npm install
 	npm run build
 
+$(TAR_GZ): dep
+	cp $(LIB_TAR_GZ) telepact.tgz
+
 dep:
-	cd ../../../lib/ts && make
+	$(MAKE) -C ../../../lib/ts
 
 codegen:
 	telepact codegen --schema-dir ../../runner/schema/example --lang ts --out src/gen
@@ -28,8 +36,9 @@ test-server:
 	npm start
 
 clean:
+	rm -f telepact.tgz
 	rm -rf src/gen
 	rm -rf dist
 	rm -rf node_modules
 	rm -f package-lock.json
-	cd ../../../lib/ts && make clean
+	$(MAKE) -C ../../../lib/ts clean

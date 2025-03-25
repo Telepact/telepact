@@ -1,6 +1,6 @@
 {
   "name": "telepact",
-  "version": "1.0.0-alpha.12",
+  "version": "1.0.0-alpha.13",
   "description": "",
   "type": "module",
   "license": "Apache-2.0",
@@ -16,7 +16,7 @@
     }
   },
   "scripts": {
-    "build": "tsc && rollup -c"
+    "build": "tsc && rollup -c && npm pack --pack-destination ./dist-test"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^28.0.2",

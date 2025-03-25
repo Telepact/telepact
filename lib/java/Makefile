@@ -14,14 +14,18 @@
 #|  limitations under the License.
 #|
 
-SRC_FILES := $(shell find src -type f)
-JAR_FILES := target/*.jar
+SHELL := /bin/bash
 
-$(JAR_FILES): $(SRC_FILES)
+SRC_FILES := $(shell find src -type f)
+JAR_FILE := target/telepact-$(shell cat ../../VERSION.txt).jar
+
+$(JAR_FILE): $(SRC_FILES)
 	mkdir -p src/main/resources
 	cp ../../common/*.json src/main/resources
 	cp ../../LICENSE ../../NOTICE src/main/resources
+	
 	mvn install -s settings.xml | grep -v "from central"
+	@if [ $${PIPESTATUS[0]} -ne 0 ]; then exit 1; fi	
 
 clean:
 	rm -rf src/main/resources
