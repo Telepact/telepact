@@ -137,6 +137,81 @@ void main() {
       expect(response.body.dartify(), equals(expectedResponse.body.dartify()));
 
       print('Test completed');
+    }, skip: true);
+
+    test('should work e2e from client to server', () async {
+      final telepactPseudoJson = [
+        {
+          "fn.add": {
+            "x": ["integer"],
+            "y": ["integer"]
+          },
+          "->": [
+            {
+              "Ok_": {
+                "result": ["integer"]
+              }
+            }
+          ]
+        }
+      ];
+      final telepactJson = jsonEncode(telepactPseudoJson);
+      final telepactSchema = TelepactSchema.fromJson(telepactJson);
+
+      JSPromise handler(Message requestMessage) {
+        final body = requestMessage.body.dartify() as Map<String, Object>;
+        final x = body['x'] as int;
+        final y = body['y'] as int;
+        final result = x + y;
+        final response = Message(
+          {}.jsify(),
+          {"Ok_": {"result": result}}.jsify()
+        );
+        return Future.value(response).toJS;
+      }
+
+      final serverOptions = ServerOptions()..authRequired = false;
+      final server = Server(telepactSchema, handler.toJS, serverOptions);
+
+      JSPromise adapter(Message m, Serializer s) {
+        final requestBytes = s.serialize(m);
+        final responseBytes = server.process(requestBytes).toDart;
+        return responseBytes.then((value) {
+          final response = s.deserialize(value);
+          return response.jsify();
+        }).toJS;
+      }
+
+      final clientOptions = ClientOptions()..useBinary = true;
+      final client = Client(adapter.toJS, clientOptions);
+
+      final request = Message(
+        {}.jsify(),
+        {'fn.ping_': {}}.jsify()
+      );
+
+      var response = await client.request(request).toDart;
+
+      Message expectedResponse = Message(
+        {
+          '@enc_': {
+            'Ok_': 0,
+            'api': 1,
+            'fn.add': 2,
+            'fn.api_': 3,
+            'fn.ping_': 4,
+            'result': 5,
+            'x': 6,
+            'y': 7
+          },
+          '@bin_': [-2064039486]
+        }.jsify(),
+        {"Ok_": {}}.jsify()
+      );
+
+      expect(response.headers.dartify(), equals(expectedResponse.headers.dartify()));
+      expect(response.body.dartify(), equals(expectedResponse.body.dartify()));
     });
+
   });
 }
