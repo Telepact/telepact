@@ -16,17 +16,21 @@
 
 NPM_INSTALL ?= install
 SRC_FILES := $(shell find src -type f)
-DIST_IIFE := dist/index.iife.js
+TAR_GZ := dist-test/*.tgz
 
 .PHONY: clean
 
-$(DIST_IIFE): $(SRC_FILES)
+$(TAR_GZ): $(SRC_FILES)
 	rm -rf inc
 	mkdir -p inc
 	cp ../../common/*.json inc
+
 	rm -rf dist
 	mkdir -p dist
 	cp ../../LICENSE ../../NOTICE dist
+
+	mkdir -p dist-test
+
 	npm $(NPM_INSTALL)
 	npm run build
 
