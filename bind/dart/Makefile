@@ -41,4 +41,4 @@ clean:
 
 .PHONY: test
 test:
-	dart test -p chrome
+	dart test -p chrome --chain-stack-traces

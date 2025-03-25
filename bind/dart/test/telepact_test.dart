@@ -19,8 +19,9 @@
 import 'dart:convert';
 import 'dart:js_interop';
 
+import 'package:telepact/interfaces.dart';
 import 'package:test/test.dart';
-import 'package:telepact/telepact.dart';
+import 'package:telepact/bindings.dart';
 import 'dart:typed_data';
 
 extension type Window(JSObject _) implements JSObject {}
@@ -212,6 +213,78 @@ void main() {
       expect(response.headers.dartify(), equals(expectedResponse.headers.dartify()));
       expect(response.body.dartify(), equals(expectedResponse.body.dartify()));
     });
+
+    test('cleaner: should work e2e from client to server', () async {
+      final telepactPseudoJson = [
+        {
+          "fn.add": {
+            "x": ["integer"],
+            "y": ["integer"]
+          },
+          "->": [
+            {
+              "Ok_": {
+                "result": ["integer"]
+              }
+            }
+          ]
+        }
+      ];
+      final telepactJson = jsonEncode(telepactPseudoJson);
+      final telepactSchema = TelepactSchema.fromJson(telepactJson);
+
+      Future<DartMessage> handler(DartMessage requestMessage) async {
+        final body = requestMessage.body;
+        final x = body['x'] as int;
+        final y = body['y'] as int;
+        final result = x + y;
+        final response = DartMessage(
+          {},
+          {"Ok_": {"result": result}}
+        );
+        return Future.value(response);
+      }
+
+      final serverOptions = DartServerOptions()..authRequired = false;
+      final server = DartServer(telepactSchema, handler, serverOptions);
+
+      Future<DartMessage> adapter(DartMessage m, DartSerializer s) async {
+        final requestBytes = s.serialize(m);
+        final responseBytes = await server.process(requestBytes);
+        final response = s.deserialize(responseBytes);
+        return response;
+      }
+
+      final clientOptions = DartClientOptions()..useBinary = true;
+      final client = DartClient(adapter, clientOptions);
+
+      final request = DartMessage(
+        {},
+        {'fn.ping_': {}}
+      );
+
+      var response = await client.request(request);
+
+      DartMessage expectedResponse = DartMessage(
+        {
+          '@enc_': {
+            'Ok_': 0,
+            'api': 1,
+            'fn.add': 2,
+            'fn.api_': 3,
+            'fn.ping_': 4,
+            'result': 5,
+            'x': 6,
+            'y': 7
+          },
+          '@bin_': [-2064039486]
+        },
+        {"Ok_": {}}
+      );
+
+      expect(response.headers, equals(expectedResponse.headers));
+      expect(response.body, equals(expectedResponse.body));
+    });    
 
   });
 }
