@@ -24,7 +24,7 @@ all: codegen $(TAR_GZ)
 	npm run build
 
 $(TAR_GZ): dep
-	cp $(LIB_TAR_GZ) telepact.tar.gz
+	cp $(LIB_TAR_GZ) telepact.tgz
 
 dep:
 	$(MAKE) -C ../../../lib/ts

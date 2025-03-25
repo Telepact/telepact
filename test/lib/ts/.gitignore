@@ -4,3 +4,4 @@ bin/
 src/gen
 .built
 telepact.tgz
+package-lock.json
