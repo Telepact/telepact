@@ -15,9 +15,9 @@
 #|
 
 SRC_FILES := $(shell find src -type f)
-JAR_FILES := target/*.jar
+JAR_FILE := target/telepact-$(shell cat ../../VERSION.txt).jar
 
-$(JAR_FILES): $(SRC_FILES)
+$(JAR_FILE): $(SRC_FILES)
 	mkdir -p src/main/resources
 	cp ../../common/*.json src/main/resources
 	cp ../../LICENSE ../../NOTICE src/main/resources

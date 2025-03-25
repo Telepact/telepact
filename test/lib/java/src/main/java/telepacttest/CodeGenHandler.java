@@ -26,15 +26,15 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import telepacttest.ExStruct;
-import telepacttest.ExUnion;
-import telepacttest.ServerHandler_;
-import telepacttest.TypedMessage_;
-import telepacttest.Value;
-import telepacttest.example;
-import telepacttest.test;
-import telepacttest.example.Input;
-import telepacttest.example.Output;
+import telepacttest.gen.ExStruct;
+import telepacttest.gen.ExUnion;
+import telepacttest.gen.ServerHandler_;
+import telepacttest.gen.TypedMessage_;
+import telepacttest.gen.Value;
+import telepacttest.gen.example;
+import telepacttest.gen.test;
+import telepacttest.gen.example.Input;
+import telepacttest.gen.example.Output;
 
 public class CodeGenHandler extends ServerHandler_ {
 
@@ -45,7 +45,7 @@ public class CodeGenHandler extends ServerHandler_ {
     }
 
     @Override
-    public TypedMessage_<telepacttest.test.Output> test(Map<String, Object> headers, telepacttest.test.Input input) {
+    public TypedMessage_<telepacttest.gen.test.Output> test(Map<String, Object> headers, telepacttest.gen.test.Input input) {
         try {
             System.out.println("input: " + new ObjectMapper().writeValueAsString(input.pseudoJson));
         } catch (JsonProcessingException e) {
@@ -303,8 +303,8 @@ public class CodeGenHandler extends ServerHandler_ {
     }
 
     @Override
-    public TypedMessage_<telepacttest.getBigList.Output> getBigList(Map<String, Object> headers,
-            telepacttest.getBigList.Input input) {
+    public TypedMessage_<telepacttest.gen.getBigList.Output> getBigList(Map<String, Object> headers,
+            telepacttest.gen.getBigList.Input input) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getBigList'");
     }

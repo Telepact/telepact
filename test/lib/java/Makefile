@@ -14,6 +14,7 @@
 #|  limitations under the License.
 #|
 
+ORIG_LIB_JAR := ../../../lib/java/target/telepact-$(shell cat ../../../VERSION.txt).jar
 LIB_JAR := target/telepact.jar
 TARGET_JAR := target/telepacttest-1.0-SNAPSHOT.jar
 
@@ -23,13 +24,13 @@ $(TARGET_JAR): codegen $(LIB_JAR)
 
 $(LIB_JAR): dep
 	mkdir -p target/dep
-	cp $(shell find ../../../lib/java/target -name "*.jar" -not -name "*javadoc.jar" -not -name "*sources.jar") target/dep/telepact.jar
+	cp ${ORIG_LIB_JAR} target/dep/telepact.jar
 
 dep:
 	cd ../../../lib/java && make
 
 codegen:
-	telepact codegen --schema-dir ../../runner/schema/example --lang java --out src/gen/java/telepacttest --package telepacttest
+	telepact codegen --schema-dir ../../runner/schema/example --lang java --out src/gen/java/telepacttest/gen --package telepacttest.gen
 
 test-server:
 	mvn verify -s settings.xml | grep -v "from central"
