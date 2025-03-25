@@ -20,6 +20,8 @@ import { Serializer } from './Serializer';
 import { ClientBinaryEncoder } from './internal/binary/ClientBinaryEncoder';
 import { Message } from './Message';
 import { processRequestObject } from './internal/ProcessRequestObject';
+import { Serialization } from './Serialization';
+import { ClientBinaryStrategy } from './ClientBinaryStrategy';
 
 export class Client {
     private adapter: (message: Message, serializer: Serializer) => Promise<Message>;
@@ -52,8 +54,8 @@ export class ClientOptions {
     useBinary: boolean;
     alwaysSendJson: boolean;
     timeoutMsDefault: number;
-    serializationImpl: DefaultSerialization;
-    binaryStrategy: DefaultClientBinaryStrategy;
+    serializationImpl: Serialization;
+    binaryStrategy: ClientBinaryStrategy;
 
     constructor() {
         this.useBinary = false;
