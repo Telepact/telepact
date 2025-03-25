@@ -14,16 +14,20 @@
 #|  limitations under the License.
 #|
 
-.PHONY: all clean
+NPM_INSTALL ?= install
+SRC_FILES := $(shell find src -type f)
+DIST_IIFE := dist/index.iife.js
 
-all:
+.PHONY: clean
+
+$(DIST_IIFE): $(SRC_FILES)
 	rm -rf inc
 	mkdir -p inc
 	cp ../../common/*.json inc
 	rm -rf dist
 	mkdir -p dist
 	cp ../../LICENSE ../../NOTICE dist
-	npm install
+	npm $(NPM_INSTALL)
 	npm run build
 
 clean:

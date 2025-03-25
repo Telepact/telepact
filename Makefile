@@ -46,6 +46,9 @@ test-trace-py:
 ts:
 	cd lib/ts && make
 
+ts-ci:
+	cd lib/ts && make NPM_INSTALL=ci
+
 clean-ts:
 	cd lib/ts && make clean
 
