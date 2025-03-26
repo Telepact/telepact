@@ -33,8 +33,12 @@ def validate_object(value: object,
 
         validation_failures = []
         for k, v in value.items():
+            ctx.path.append("*")
+
             nested_validation_failures = nested_type_declaration.validate(
                 v, ctx)
+            
+            ctx.path.pop()
 
             nested_validation_failures_with_path = []
             for f in nested_validation_failures:

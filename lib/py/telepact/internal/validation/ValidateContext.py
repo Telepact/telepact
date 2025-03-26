@@ -15,9 +15,18 @@
 #|
 
 class ValidateContext:
+    path: list[str]
     select: dict[str, object] | None
     fn: str | None
+    coerce_base64: bool | None
+    binary: bool | None
+    new_value: object | None
+    coercions: dict[str, object]
 
-    def __init__(self, select: dict[str, object] | None = None, fn: str | None = None):
+    def __init__(self, select: dict[str, object] | None = None, fn: str | None = None, binary: bool = False, coerce_base64: bool = False):
         self.select = select
         self.fn = fn
+        self.binary = binary
+        self.coerce_base64 = coerce_base64
+        self.new_value = None
+        self.coercions = {}

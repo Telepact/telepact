@@ -26,3 +26,7 @@ class BinaryEncoder(metaclass=ABCMeta):
     @abstractmethod
     def decode(self, message: list[object]) -> list[object]:
         pass
+
+    @abstractmethod
+    def base64_decode(self, message: list[object]) -> list[object]:
+        pass

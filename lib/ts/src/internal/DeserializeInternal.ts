@@ -30,7 +30,6 @@ export function deserializeInternal(
 
     try {
         if (messageBytes[0] === 0x92) {
-            // MsgPack
             isMsgPack = true;
             messageAsPseudoJson = serializer.fromMsgpack(messageBytes);
         } else {

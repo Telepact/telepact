@@ -32,9 +32,13 @@ def validate_array(value: object,
 
         validation_failures = []
         for i, element in enumerate(value):
+            ctx.path.append("*")
+
             nested_validation_failures = nested_type_declaration.validate(
                 element, ctx)
             index = i
+
+            ctx.path.pop()
 
             nested_validation_failures_with_path = []
             for f in nested_validation_failures:

@@ -157,10 +157,9 @@ async def handle_message(
 
     skip_result_validation: bool = unsafe_response_enabled
     if not skip_result_validation:
+        ctx = ValidateContext(select_struct_fields_header, function_type.name)
         result_validation_failures: list[ValidationFailure] = result_union_type.validate(
-            result_union, [], ValidateContext(
-                select_struct_fields_header, function_type.name)
-        )
+            result_union, [], ctx)
         if result_validation_failures:
             res = get_invalid_error_message(
                 "ErrorInvalidResponseBody_",
@@ -181,6 +180,8 @@ async def handle_message(
                 result_union_type,
                 response_headers,
             )
+        if ctx.coercions:
+            response_headers["@base64_"] = ctx.coercions
 
     final_result_union: dict[str, object]
     if select_struct_fields_header is not None:
