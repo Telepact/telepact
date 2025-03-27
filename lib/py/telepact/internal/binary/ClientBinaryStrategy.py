@@ -18,9 +18,7 @@ from datetime import datetime
 import threading
 from threading import Lock
 
-
-from .ClientBinaryStrategy import ClientBinaryStrategy
-
+from ...BinaryEncodingCache import BinaryEncodingCache
 
 class Checksum:
     def __init__(self, value: int, expiration: int) -> None:
@@ -28,9 +26,10 @@ class Checksum:
         self.expiration = expiration
 
 
-class DefaultClientBinaryStrategy(ClientBinaryStrategy):
+class ClientBinaryStrategy:
 
-    def __init__(self) -> None:
+    def __init__(self, binary_encoding_cache: 'BinaryEncodingCache') -> None:
+        self.binary_encoding_cache = binary_encoding_cache
         self.primary: Checksum | None = None
         self.secondary: Checksum | None = None
         self.last_update = datetime.now()
@@ -43,9 +42,14 @@ class DefaultClientBinaryStrategy(ClientBinaryStrategy):
                 return
 
             if self.primary.value != new_checksum:
+                expired_checksum = self.secondary
                 self.secondary = self.primary
                 self.primary = Checksum(new_checksum, 0)
                 self.secondary.expiration += 1
+
+                if expired_checksum:
+                    self.binary_encoding_cache.remove(expired_checksum.value)
+
                 return
 
             self.last_update = datetime.now()

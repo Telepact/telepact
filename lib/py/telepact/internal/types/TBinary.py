@@ -37,7 +37,7 @@ class TBinary(TType):
     def validate(self, value: object,
                  type_parameters: list['TTypeDeclaration'], ctx: 'ValidateContext') -> list['ValidationFailure']:
         from ..validation.ValidateBinary import validate_binary
-        return validate_binary(value)
+        return validate_binary(value, ctx)
 
     def generate_random_value(self, blueprint_value: object, use_blueprint_value: bool, type_parameters: list['TTypeDeclaration'], ctx: 'GenerateContext') -> object:
         from ..generation.GenerateRandomBoolean import generate_random_boolean

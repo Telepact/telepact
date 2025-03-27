@@ -20,7 +20,7 @@ from .Server import Server
 from .MockServer import MockServer
 from .Message import Message
 from .Serializer import Serializer
-from .DefaultClientBinaryStrategy import DefaultClientBinaryStrategy
+from .DefaultClientBinaryStrategy import ClientBinaryStrategy
 from .ClientBinaryStrategy import ClientBinaryStrategy
 from .SerializationError import SerializationError
 from .Serialization import Serialization
@@ -36,7 +36,7 @@ __all__ = [
     "MockServer",
     "Message",
     "Serializer",
-    "DefaultClientBinaryStrategy",
+    "ClientBinaryStrategy",
     "ClientBinaryStrategy",
     "SerializationError",
     "Serialization",
