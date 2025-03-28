@@ -44,7 +44,7 @@ public class ClientBinaryEncode {
             throw new BinaryEncoderUnavailableError();
         }
 
-        final Optional<BinaryEncoding> binaryEncodingOpt = binaryEncodingCache.get(checksums.get(0));
+        final Optional<BinaryEncoding> binaryEncodingOpt = checksums.size() > 0 ? binaryEncodingCache.get(checksums.get(0)) : Optional.empty();
         if (!binaryEncodingOpt.isPresent()) {
             throw new BinaryEncoderUnavailableError();
         }

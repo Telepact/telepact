@@ -28,8 +28,6 @@ import io.github.telepact.internal.validation.ValidationFailure;
 
 public class TBytes implements TType {
 
-    public static final String _BOOLEAN_NAME = "Boolean";
-
     public static String getBytesName(ValidateContext ctx) {
         if (ctx.expectBytes) {
             return "Bytes";
@@ -56,7 +54,7 @@ public class TBytes implements TType {
 
     @Override
     public String getName(ValidateContext ctx) {
-        return _BOOLEAN_NAME;
+        return getBytesName(ctx);
     }
 
 }
