@@ -19,6 +19,7 @@ package telepacttest;
 import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,8 +33,12 @@ import java.util.function.Function;
 
 import com.codahale.metrics.CsvReporter;
 import com.codahale.metrics.MetricRegistry;
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 
 import io.github.telepact.Client;
 import io.github.telepact.Message;
@@ -52,11 +57,24 @@ import io.nats.client.Nats;
 import io.nats.client.Options;
 
 public class Main {
+    public static class CustomByteArraySerializer extends JsonSerializer<byte[]> {
+        @Override
+        public void serialize(byte[] value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+            System.out.println("Using custom serializer for byte array");
+            String base64 = Base64.getEncoder().encodeToString(value);
+            gen.writeString(base64);
+        }
+    }
+
     public static Dispatcher startClientTestServer(io.nats.client.Connection connection, MetricRegistry metrics,
             String clientFrontdoorTopic,
             String clientBackdoorTopic, boolean defaultBinary, boolean useCodeGen)
             throws IOException, InterruptedException {
         var objectMapper = new ObjectMapper();
+
+        SimpleModule module = new SimpleModule();
+        module.addSerializer(byte[].class, new CustomByteArraySerializer());
+        objectMapper.registerModule(module);
 
         var timers = metrics.timer(clientFrontdoorTopic);
 
@@ -135,6 +153,18 @@ public class Main {
                 }
 
                 var responsePseudoJson = List.of(response.headers, response.body);
+
+                System.out.println("   <-C  %s".formatted(responsePseudoJson));
+                try {
+                    var body = (Map<String, Object>) responsePseudoJson.get(1);
+                    var ok = (Map<String, Object>) body.get("Ok_");
+                    var value = (Map<String, Object>) ok.get("value!");
+                    var bytes = value.get("bytes!");
+                    System.out.println("bytes: %s".formatted(bytes));
+                    System.out.println("bytes class: " + bytes.getClass());
+                } catch (Exception e) {
+                    // ignore
+                }
 
                 var responseBytes = objectMapper.writeValueAsBytes(responsePseudoJson);
 
@@ -292,6 +322,10 @@ public class Main {
 
         var objectMapper = new ObjectMapper();
 
+        SimpleModule module = new SimpleModule();
+        module.addSerializer(byte[].class, new CustomByteArraySerializer());
+        objectMapper.registerModule(module);
+
         var timers = metrics.timer(frontdoorTopic);
 
         var serveAlternateServer = new AtomicBoolean();
@@ -306,6 +340,7 @@ public class Main {
                 var requestHeaders = requestMessage.headers;
                 var requestBody = requestMessage.body;
                 var requestPseudoJson = List.of(requestHeaders, requestBody);
+
                 var requestBytes = objectMapper.writeValueAsBytes(requestPseudoJson);
 
                 Message message;

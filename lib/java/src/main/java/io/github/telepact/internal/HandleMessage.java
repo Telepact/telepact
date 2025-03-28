@@ -157,7 +157,7 @@ public class HandleMessage {
 
         final var skipResultValidation = unsafeResponseEnabled;
 
-        final var coerceBase64 = Objects.equals(false, requestHeaders.get("@binary_"));
+        final var coerceBase64 = !Objects.equals(true, requestHeaders.get("@binary_"));
         final var resultValidateCtx = new ValidateContext(selectStructFieldsHeader, requestTarget, coerceBase64);
         
         final var resultValidationFailures = resultUnionType.validate(resultUnion, List.of(), resultValidateCtx);
