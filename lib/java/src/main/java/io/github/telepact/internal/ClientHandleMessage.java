@@ -27,8 +27,8 @@ import io.github.telepact.Message;
 import io.github.telepact.TelepactError;
 import io.github.telepact.Serializer;
 
-public class ProcessRequestObject {
-    public static Message processRequestObject(Message requestMessage,
+public class ClientHandleMessage {
+    public static Message clientHandleMessage(Message requestMessage,
             BiFunction<Message, Serializer, Future<Message>> adapter, Serializer serializer, long timeoutMsDefault,
             boolean useBinaryDefault, boolean alwaysSendJson) {
         final Map<String, Object> header = requestMessage.headers;

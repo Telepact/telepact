@@ -22,11 +22,13 @@ import java.util.Objects;
 import io.github.telepact.Message;
 import io.github.telepact.Serialization;
 import io.github.telepact.SerializationError;
+import io.github.telepact.internal.binary.Base64Encoder;
 import io.github.telepact.internal.binary.BinaryEncoder;
 import io.github.telepact.internal.binary.BinaryEncoderUnavailableError;
 
 public class SerializeInternal {
     public static byte[] serializeInternal(Message message, BinaryEncoder binaryEncoder,
+            Base64Encoder base64Encoder,
             Serialization serializer) {
         final var headers = message.headers;
 
@@ -46,10 +48,12 @@ public class SerializeInternal {
                     return serializer.toMsgPack(encodedMessage);
                 } catch (BinaryEncoderUnavailableError e) {
                     // We can still submit as json
-                    return serializer.toJson(messageAsPseudoJson);
+                    final var base64EncodedMessage = base64Encoder.encode(messageAsPseudoJson);
+                    return serializer.toJson(base64EncodedMessage);
                 }
             } else {
-                return serializer.toJson(messageAsPseudoJson);
+                final var base64EncodedMessage = base64Encoder.encode(messageAsPseudoJson);
+                return serializer.toJson(base64EncodedMessage);
             }
         } catch (Throwable e) {
             throw new SerializationError(e);

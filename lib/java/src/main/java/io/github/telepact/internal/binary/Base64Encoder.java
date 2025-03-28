@@ -18,7 +18,7 @@ package io.github.telepact.internal.binary;
 
 import java.util.List;
 
-public interface BinaryEncoder {
+public interface Base64Encoder {
     List<Object> encode(List<Object> message);
 
     List<Object> decode(List<Object> message);

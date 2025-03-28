@@ -28,13 +28,7 @@ import io.github.telepact.internal.validation.ValidationFailure;
 
 public class TBytes implements TType {
 
-    public static String getBytesName(ValidateContext ctx) {
-        if (ctx.expectBytes) {
-            return "Bytes";
-        } else {
-            return "Base64String";
-        }
-    }
+    public static final String _BYTES_NAME = "Bytes";
 
     @Override
     public int getTypeParameterCount() {
@@ -54,7 +48,7 @@ public class TBytes implements TType {
 
     @Override
     public String getName(ValidateContext ctx) {
-        return getBytesName(ctx);
+        return _BYTES_NAME;
     }
 
 }

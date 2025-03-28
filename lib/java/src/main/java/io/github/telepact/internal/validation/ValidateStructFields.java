@@ -50,8 +50,6 @@ public class ValidateStructFields {
             validationFailures.add(validationFailure);
         }
 
-        final var newValues = new HashMap<String, Object>();
-
         for (final var entry : actualStruct.entrySet()) {
             final var fieldName = entry.getKey();
             final var fieldValue = entry.getValue();
@@ -73,11 +71,6 @@ public class ValidateStructFields {
 
             ctx.path.pop();
 
-            if (ctx.newValue != null) {
-                newValues.put(fieldName, ctx.newValue);
-                ctx.newValue = null;
-            }
-
             final var nestedValidationFailuresWithPath = new ArrayList<ValidationFailure>();
             for (final var f : nestedValidationFailures) {
                 final List<Object> thisPath = new ArrayList<>(f.path);
@@ -88,8 +81,6 @@ public class ValidateStructFields {
 
             validationFailures.addAll(nestedValidationFailuresWithPath);
         }
-
-        newValues.putAll(actualStruct);
 
         return validationFailures;
     }

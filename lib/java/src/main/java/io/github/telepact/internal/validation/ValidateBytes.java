@@ -1,7 +1,6 @@
 package io.github.telepact.internal.validation;
 
-import static io.github.telepact.internal.validation.GetTypeUnexpectedValidationFailure.getTypeUnexpectedValidationFailure;
-import static io.github.telepact.internal.types.TBytes.getBytesName;
+import static io.github.telepact.internal.types.TBytes._BYTES_NAME;
 
 import java.util.Base64;
 import java.util.List;
@@ -10,48 +9,32 @@ import java.util.Map;
 public class ValidateBytes {
 
     public static List<ValidationFailure> validateBytes(Object value, ValidateContext ctx) {
-        String expectedType = getBytesName(ctx);
-
-        System.out.println("validating bytes: " + value);
-        System.out.println("type: " + value.getClass());
-        System.out.println("Is " + value.getClass() + " == bytes? " + (value instanceof byte[]));
-
-        if (ctx.useBytes) {
-            if (value instanceof byte[]) {
-                return List.of();
-            } else if (value instanceof String) {
-                try {
-                    byte[] newBytesValue = Base64.getDecoder().decode((String) value);
-                    ctx.newValue = newBytesValue;
-                    return List.of();
-                } catch (Exception e) {
-                    return getTypeUnexpectedValidationFailure(List.of(), value, expectedType);
+        if (value instanceof byte[]) {
+            if (ctx.coerceBase64) {
+                setCoercedPath(ctx.path, ctx.base64Coercions);
+            }
+            return List.of();
+        } else if (value instanceof String) {
+            try {
+                Base64.getDecoder().decode((String) value);
+                if (!ctx.coerceBase64) {
+                    setCoercedPath(ctx.path, ctx.bytesCoercions);
                 }
-            } else {
-                return getTypeUnexpectedValidationFailure(List.of(), value, expectedType);
+                return List.of();
+            } catch (IllegalArgumentException e) {
+                return GetTypeUnexpectedValidationFailure.getTypeUnexpectedValidationFailure(
+                    List.of(), value, "Base64String"
+                );
             }
         } else {
-            if (value instanceof String) {
-                try {
-                    Base64.getDecoder().decode((String) value);
-                    return List.of();
-                } catch (Exception e) {
-                    return getTypeUnexpectedValidationFailure(List.of(), value, expectedType);
-                }
-            } else if (value instanceof byte[]) {
-                String newB64Value = Base64.getEncoder().encodeToString((byte[]) value);
-                ctx.newValue = newB64Value;
-
-                setCoercedPath(ctx.path, ctx.coercions);
-
-                return List.of();
-            } else {
-                return getTypeUnexpectedValidationFailure(List.of(), value, expectedType);
-            }
+            return GetTypeUnexpectedValidationFailure.getTypeUnexpectedValidationFailure(
+                List.of(), value, _BYTES_NAME
+            );
         }
     }
 
     private static void setCoercedPath(List<String> path, Map<String, Object> coercedPath) {
+        System.out.println("Setting coerced path: " + path);
         String part = path.get(0);
 
         if (path.size() > 1) {

@@ -34,8 +34,6 @@ public class ValidateObject {
             final var map = (Map<String, Object>) m;
             final var nestedTypeDeclaration = typeParameters.get(0);
 
-            final var newValues = new HashMap<String, Object>();
-
             final var validationFailures = new ArrayList<ValidationFailure>();
             for (Map.Entry<String, Object> entry : map.entrySet()) {
                 final var k = (String) entry.getKey();
@@ -47,11 +45,6 @@ public class ValidateObject {
 
                 ctx.path.pop();
 
-                if (ctx.newValue != null) {
-                    newValues.put(k, ctx.newValue);
-                    ctx.newValue = null;
-                }
-
                 final var nestedValidationFailuresWithPath = new ArrayList<ValidationFailure>();
                 for (var f : nestedValidationFailures) {
                     final List<Object> thisPath = new ArrayList<>(f.path);
@@ -61,10 +54,6 @@ public class ValidateObject {
                 }
 
                 validationFailures.addAll(nestedValidationFailuresWithPath);
-            }
-
-            for (var entry2 : newValues.entrySet()) {
-                map.put(entry2.getKey(), entry2.getValue());
             }
 
             return validationFailures;

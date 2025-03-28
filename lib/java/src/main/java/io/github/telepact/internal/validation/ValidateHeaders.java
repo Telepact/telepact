@@ -39,7 +39,7 @@ public class ValidateHeaders {
             final var field = parsedRequestHeaders.get(header);
             if (field != null) {
                 final var thisValidationFailures = field.typeDeclaration.validate(headerValue,
-                        new ValidateContext(null, functionType.name, false, false));
+                        new ValidateContext(null, functionType.name,  false));
                 final var thisValidationFailuresPath = thisValidationFailures.stream()
                         .map(e -> {
                             final var path = new ArrayList<>(e.path);

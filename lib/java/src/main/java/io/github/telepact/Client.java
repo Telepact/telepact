@@ -16,11 +16,12 @@
 
 package io.github.telepact;
 
-import static io.github.telepact.internal.ProcessRequestObject.processRequestObject;
+import static io.github.telepact.internal.ClientHandleMessage.clientHandleMessage;
 
 import java.util.concurrent.Future;
 import java.util.function.BiFunction;
 
+import io.github.telepact.internal.binary.ClientBase64Encoder;
 import io.github.telepact.internal.binary.ClientBinaryEncoder;
 import io.github.telepact.internal.binary.DefaultBinaryEncodingCache;
 
@@ -89,10 +90,11 @@ public class Client {
         this.alwaysSendJson = options.alwaysSendJson;
         this.timeoutMsDefault = options.timeoutMsDefault;
 
-        final var binary_encoding_cache = new DefaultBinaryEncodingCache();
-        final var binary_encoder = new ClientBinaryEncoder(binary_encoding_cache);
+        final var binaryEncodingCache = new DefaultBinaryEncodingCache();
+        final var binaryEncoder = new ClientBinaryEncoder(binaryEncodingCache);
+        final var base64Encoder = new ClientBase64Encoder();
 
-        this.serializer = new Serializer(options.serializationImpl, binary_encoder);
+        this.serializer = new Serializer(options.serializationImpl, binaryEncoder, base64Encoder);
     }
 
     /**
@@ -102,7 +104,7 @@ public class Client {
      * @return The response message received.
      */
     public Message request(Message requestMessage) {
-        return processRequestObject(requestMessage, this.adapter, this.serializer,
+        return clientHandleMessage(requestMessage, this.adapter, this.serializer,
                 this.timeoutMsDefault, this.useBinaryDefault, this.alwaysSendJson);
     }
 

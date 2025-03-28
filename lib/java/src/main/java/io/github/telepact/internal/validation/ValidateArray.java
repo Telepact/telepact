@@ -32,8 +32,6 @@ public class ValidateArray {
         if (value instanceof final List l) {
             final var nestedTypeDeclaration = typeParameters.get(0);
 
-            final var newValues = new HashMap<Integer, Object>();
-
             final var validationFailures = new ArrayList<ValidationFailure>();
             for (var i = 0; i < l.size(); i += 1) {
                 final var element = l.get(i);
@@ -44,11 +42,6 @@ public class ValidateArray {
 
                 ctx.path.pop();
 
-                if (ctx.newValue != null) {
-                    newValues.put(i, ctx.newValue);
-                    ctx.newValue = null;
-                }
-                
                 final var index = i;
 
                 final var nestedValidationFailuresWithPath = new ArrayList<ValidationFailure>();
@@ -61,10 +54,6 @@ public class ValidateArray {
                 }
 
                 validationFailures.addAll(nestedValidationFailuresWithPath);
-            }
-
-            for (var entry : newValues.entrySet()) {
-                l.set(entry.getKey(), entry.getValue());
             }
 
             return validationFailures;

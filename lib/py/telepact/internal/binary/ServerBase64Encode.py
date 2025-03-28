@@ -19,7 +19,7 @@ import base64
 
 def server_base64_encode(message: list[object]) -> None:
     headers = cast(dict[str, object], message[0])
-    body = cast(list[object], message[1])
+    body = cast(dict[str, object], message[1])
 
     base64_paths = cast(dict[str, object], headers.get("@base64_", {}))
 

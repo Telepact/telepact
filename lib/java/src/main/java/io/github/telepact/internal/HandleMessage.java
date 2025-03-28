@@ -20,6 +20,7 @@ import static io.github.telepact.internal.SelectStructFields.selectStructFields;
 import static io.github.telepact.internal.validation.GetInvalidErrorMessage.getInvalidErrorMessage;
 import static io.github.telepact.internal.validation.ValidateHeaders.validateHeaders;
 import static io.github.telepact.internal.validation.ValidateResult.validateResult;
+import static io.github.telepact.internal.binary.ServerBase64Decode.serverBase64Decode;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -114,11 +115,17 @@ public class HandleMessage {
         final var knownChecksums = (List<Object>) requestHeaders.getOrDefault("@clientKnownBinaryChecksums_", new ArrayList<>());
         final var expectBytes = knownChecksums.size() > 0;
 
+        final var callValidateCtx = new ValidateContext(null, null, false);
+
         final var callValidationFailures = functionTypeCall.validate(requestBody, List.of(),
-                new ValidateContext(null, null, expectBytes, true));
+                callValidateCtx);
         if (!callValidationFailures.isEmpty()) {
             return getInvalidErrorMessage("ErrorInvalidRequestBody_", callValidationFailures, resultUnionType,
                     responseHeaders);
+        }
+
+        if (callValidateCtx.bytesCoercions.size() > 0) {
+            serverBase64Decode(requestBody, callValidateCtx.bytesCoercions);
         }
 
         final var unsafeResponseEnabled = Objects.equals(true, requestHeaders.get("@unsafe_"));
@@ -149,24 +156,30 @@ public class HandleMessage {
         final Map<String, Object> finalResponseHeaders = resultMessage.headers;
 
         final var skipResultValidation = unsafeResponseEnabled;
-        if (!skipResultValidation) {
-            final var useBytes = Objects.equals(true, requestHeaders.get("@binary_"));
-            final var ctx = new ValidateContext(selectStructFieldsHeader, requestTarget, true, useBytes);
-            final var resultValidationFailures = resultUnionType.validate(resultUnion, List.of(), ctx);
-            if (!resultValidationFailures.isEmpty()) {
-                return getInvalidErrorMessage("ErrorInvalidResponseBody_", resultValidationFailures, resultUnionType,
-                        responseHeaders);
-            }
-            final List<ValidationFailure> responseHeaderValidationFailures = validateHeaders(finalResponseHeaders,
-                    telepactSchema.parsedResponseHeaders, functionType);
-            if (!responseHeaderValidationFailures.isEmpty()) {
-                return getInvalidErrorMessage("ErrorInvalidResponseHeaders_", responseHeaderValidationFailures,
-                        resultUnionType,
-                        responseHeaders);
-            }
-            if (!ctx.coercions.isEmpty()) {
-                responseHeaders.putAll(ctx.coercions);
-            }
+
+        final var coerceBase64 = Objects.equals(false, requestHeaders.get("@binary_"));
+        final var resultValidateCtx = new ValidateContext(selectStructFieldsHeader, requestTarget, coerceBase64);
+        
+        final var resultValidationFailures = resultUnionType.validate(resultUnion, List.of(), resultValidateCtx);
+        if (!resultValidationFailures.isEmpty() && !skipResultValidation) {
+            return getInvalidErrorMessage("ErrorInvalidResponseBody_", resultValidationFailures, resultUnionType,
+                    finalResponseHeaders);
+        }
+        
+        if (!resultValidateCtx.base64Coercions.isEmpty()) {
+            finalResponseHeaders.put("@base64_", resultValidateCtx.base64Coercions);
+        }
+
+        if (resultValidateCtx.bytesCoercions.size() > 0) {
+            serverBase64Decode(resultUnion, resultValidateCtx.bytesCoercions);
+        }
+        
+        final List<ValidationFailure> responseHeaderValidationFailures = validateHeaders(finalResponseHeaders,
+                telepactSchema.parsedResponseHeaders, functionType);
+        if (!responseHeaderValidationFailures.isEmpty()) {
+            return getInvalidErrorMessage("ErrorInvalidResponseHeaders_", responseHeaderValidationFailures,
+                    resultUnionType,
+                    responseHeaders);
         }
 
         final Map<String, Object> finalResultUnion;

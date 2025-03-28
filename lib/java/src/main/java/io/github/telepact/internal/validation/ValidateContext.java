@@ -24,19 +24,19 @@ public class ValidateContext {
     public final Stack<String> path;
     public final Map<String, Object> select;
     public final String fn;
-    public final boolean expectBytes;
-    public final boolean useBytes;
-    public Object newValue;
-    public final Map<String, Object> coercions;
+    public final boolean coerceBase64;
+    public final Map<String, Object> base64Coercions;
+    public final Map<String, Object> bytesCoercions;
 
-    public ValidateContext(Map<String, Object> select, String fn, boolean expectBytes, boolean useBytes) {
+
+    public ValidateContext(Map<String, Object> select, String fn, boolean coerceBase64) {
         this.path = new Stack<>();
         this.select = select;
         this.fn = fn;
-        this.expectBytes = expectBytes;
-        this.useBytes = useBytes;
-        this.newValue = null;
-        this.coercions = new HashMap<>();
+        this.coerceBase64 = coerceBase64;
+        this.base64Coercions = new HashMap<>();
+        this.bytesCoercions = new HashMap<>();
+
     }
 
 }

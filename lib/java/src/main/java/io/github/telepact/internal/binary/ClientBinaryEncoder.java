@@ -18,14 +18,8 @@ package io.github.telepact.internal.binary;
 
 import static io.github.telepact.internal.binary.ClientBinaryDecode.clientBinaryDecode;
 import static io.github.telepact.internal.binary.ClientBinaryEncode.clientBinaryEncode;
-import static io.github.telepact.internal.binary.ClientBase64Decode.clientBase64Decode;
 
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import io.github.telepact.Client;
-import io.github.telepact.internal.binary.ClientBinaryStrategy;
 
 public class ClientBinaryEncoder implements BinaryEncoder {
 
@@ -47,11 +41,4 @@ public class ClientBinaryEncoder implements BinaryEncoder {
     public List<Object> decode(List<Object> message) throws BinaryEncoderUnavailableError {
         return clientBinaryDecode(message, this.binaryEncodingCache, this.binaryChecksumStrategy);
     }
-
-    @Override
-    public List<Object> decodeBase64(List<Object> message) {
-        clientBase64Decode(message);
-        return message;
-    }
-
 }

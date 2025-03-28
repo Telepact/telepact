@@ -48,7 +48,10 @@ public class TFn implements TType {
 
     @Override
     public List<ValidationFailure> validate(Object value, List<TTypeDeclaration> typeParameters, ValidateContext ctx) {
-        return this.call.validate(value, typeParameters, ctx);
+        ctx.path.push(this.name);
+        var result = this.call.validate(value, typeParameters, ctx);
+        ctx.path.pop();
+        return result;
     }
 
     @Override

@@ -38,10 +38,4 @@ public class ServerBinaryEncoder implements BinaryEncoder {
     public List<Object> decode(List<Object> message) {
         return serverBinaryDecode(message, binaryEncoder);
     }
-
-    @Override
-    public List<Object> decodeBase64(List<Object> message) {
-        return message;
-    }
-
 }
