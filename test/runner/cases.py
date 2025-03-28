@@ -41,7 +41,7 @@ def get_type(the_type, use_int=True) -> str:
     elif the_type == Any:
         return 'Any'
     elif the_type == Base64String:
-        return 'Base64String'
+        return 'Bytes'
 
 
 def type_unexp(incorrect_value, the_type):

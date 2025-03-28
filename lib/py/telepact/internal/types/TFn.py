@@ -42,7 +42,10 @@ class TFn(TType):
 
     def validate(self, value: object,
                  type_parameters: list['TTypeDeclaration'], ctx: 'ValidateContext') -> list['ValidationFailure']:
-        return self.call.validate(value, type_parameters, ctx)
+        ctx.path.append(self.name)
+        ret = self.call.validate(value, type_parameters, ctx)
+        ctx.path.pop()
+        return ret
 
     def generate_random_value(self, blueprint_value: object, use_blueprint_value: bool, type_parameters: list['TTypeDeclaration'], ctx: 'GenerateContext') -> object:
         from ..generation.GenerateRandomUnion import generate_random_union

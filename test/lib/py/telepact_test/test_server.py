@@ -276,7 +276,13 @@ async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, 
         request_headers = request_message.headers
         request_body = request_message.body
         request_pseudo_json = [request_headers, request_body]
-        request_bytes = json.dumps(request_pseudo_json).encode('utf-8')
+
+        def default_serializer(obj):
+            if isinstance(obj, bytes):
+                return base64.b64encode(obj).decode('utf-8')
+            raise TypeError(f"Object of type {type(obj)} is not JSON serializable")
+
+        request_bytes = json.dumps(request_pseudo_json, default=default_serializer).encode('utf-8')
 
         if use_codegen:
             print(f"     :H {request_bytes}")

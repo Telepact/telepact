@@ -21,6 +21,7 @@ from .internal.binary.DefaultBinaryEncodingCache import DefaultBinaryEncodingCac
 from .DefaultSerialization import DefaultSerialization
 from .Serializer import Serializer
 from .internal.binary.ClientBinaryEncoder import ClientBinaryEncoder
+from .internal.binary.ClientBase64Encoder import ClientBase64Encoder
 
 if TYPE_CHECKING:
     from .Message import Message
@@ -42,9 +43,10 @@ class Client:
 
         binary_encoding_cache = DefaultBinaryEncodingCache()
         binary_encoder = ClientBinaryEncoder(binary_encoding_cache)
+        base64_encoder = ClientBase64Encoder()
 
-        self.serializer = Serializer(options.serialization_impl, binary_encoder)
+        self.serializer = Serializer(options.serialization_impl, binary_encoder, base64_encoder)
 
     async def request(self, request_message: 'Message') -> 'Message':
-        from .internal.ProcessRequestObject import process_request_object
-        return await process_request_object(request_message, self.adapter, self.serializer, self.timeout_ms_default, self.use_binary_default, self.always_send_json)
+        from .internal.ClientHandleMessage import client_handle_message
+        return await client_handle_message(request_message, self.adapter, self.serializer, self.timeout_ms_default, self.use_binary_default, self.always_send_json)

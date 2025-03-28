@@ -23,10 +23,12 @@ from ..internal.validation.InvalidMessageBody import InvalidMessageBody
 if TYPE_CHECKING:
     from ..Serialization import Serialization
     from ..internal.binary.BinaryEncoder import BinaryEncoder
+    from ..internal.binary.Base64Encoder import Base64Encoder
 
 
 def deserialize_internal(message_bytes: bytes, serializer: 'Serialization',
-                         binary_encoder: 'BinaryEncoder') -> 'Message':
+                         binary_encoder: 'BinaryEncoder',
+                         base64_encoder: 'Base64Encoder') -> 'Message':
     message_as_pseudo_json: object
     is_msg_pack: bool
 
@@ -53,7 +55,7 @@ def deserialize_internal(message_bytes: bytes, serializer: 'Serialization',
         final_message_as_pseudo_json_list = binary_encoder.decode(
             message_as_pseudo_json_list)
     else:
-        final_message_as_pseudo_json_list = message_as_pseudo_json_list
+        final_message_as_pseudo_json_list = base64_encoder.decode(message_as_pseudo_json_list)
 
     if not isinstance(final_message_as_pseudo_json_list[0], dict):
         raise InvalidMessage()

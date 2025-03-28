@@ -14,15 +14,21 @@
 #|  limitations under the License.
 #|
 
-from abc import ABCMeta, abstractmethod
+from typing import TYPE_CHECKING
 
+from ...internal.binary.Base64Encoder import Base64Encoder
 
-class BinaryEncoder(metaclass=ABCMeta):
+if TYPE_CHECKING:
+    from .BinaryEncodingCache import BinaryEncodingCache
 
-    @abstractmethod
-    def encode(self, message: list[object]) -> list[object]:
-        pass
+class ClientBase64Encoder(Base64Encoder):
 
-    @abstractmethod
     def decode(self, message: list[object]) -> list[object]:
-        pass
+        from ...internal.binary.ClientBase64Decode import client_base64_decode
+        client_base64_decode(message)
+        return message
+    
+    def encode(self, message: list[object]) -> list[object]:
+        from ...internal.binary.ClientBase64Encode import client_base64_encode
+        client_base64_encode(message)
+        return message

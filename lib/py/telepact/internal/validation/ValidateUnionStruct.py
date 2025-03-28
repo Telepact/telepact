@@ -34,9 +34,15 @@ def validate_union_struct(
         union_tag)) if selected_tags else None
     from ...internal.validation.ValidateStructFields import validate_struct_fields
 
-    return validate_struct_fields(
+    ctx.path.append(union_tag)
+
+    result = validate_struct_fields(
         union_struct.fields,
         selected_fields,
         actual,
         ctx
     )
+
+    ctx.path.pop()
+
+    return result

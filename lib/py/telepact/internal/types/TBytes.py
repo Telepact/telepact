@@ -26,9 +26,7 @@ if TYPE_CHECKING:
 
 from .TType import TType
 
-def get_bytes_name(ctx: 'ValidateContext') -> str:
-    return 'Bytes' if ctx.expect_bytes else 'Base64String'
-
+_BYTES_NAME: str = "Bytes"
 
 class TBytes(TType):
 
@@ -45,4 +43,4 @@ class TBytes(TType):
         return generate_random_bytes(blueprint_value, use_blueprint_value, ctx)
 
     def get_name(self, ctx: 'ValidateContext') -> str:
-        return get_bytes_name(ctx)
+        return _BYTES_NAME

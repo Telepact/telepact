@@ -40,3 +40,6 @@ class ClientBinaryEncoder(BinaryEncoder):
         from ...internal.binary.ClientBase64Decode import client_base64_decode
         client_base64_decode(message)
         return message
+    
+    def base64_encode(self, message: list[object]) -> list[object]:
+        return message

@@ -14,22 +14,20 @@
 #|  limitations under the License.
 #|
 
-class ValidateContext:
-    path: list[str]
-    select: dict[str, object] | None
-    fn: str | None
-    coerce_base64: bool
-    base64_coercions: dict[str, object]
-    bytes_coercions: dict[str, object]
+from typing import TYPE_CHECKING
 
-    def __init__(self, 
-                 select: dict[str, object] | None = None, 
-                 fn: str | None = None, 
-                 coerce_base64: bool = False):
-        self.path = []
-        self.select = select
-        self.fn = fn
-        self.coerce_base64 = coerce_base64
-        self.base64_coercions = {}
-        self.bytes_coercions = {}
-        
+from ...internal.binary.Base64Encoder import Base64Encoder
+
+if TYPE_CHECKING:
+    from .BinaryEncodingCache import BinaryEncodingCache
+
+class ServerBase64Encoder(Base64Encoder):
+
+    def decode(self, message: list[object]) -> list[object]:
+        # Server manaully runs it decode logic after validation
+        return message
+    
+    def encode(self, message: list[object]) -> list[object]:
+        from ...internal.binary.ServerBase64Encode import server_base64_encode
+        server_base64_encode(message)
+        return message

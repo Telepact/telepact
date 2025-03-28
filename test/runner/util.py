@@ -303,6 +303,7 @@ async def verify_client_case(nats_client, request, expected_response, client_fro
     response[0].pop('@bin_', None)
     response[0].pop('@enc_', None)
     response[0].pop('@pac_', None)
+    response[0].pop('@base64_', None)
 
     response_was_success = 'Ok_' in response[1]
 

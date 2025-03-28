@@ -16,6 +16,8 @@
 
 from typing import Callable, TYPE_CHECKING, cast, Awaitable
 
+from telepact.internal.binary.ServerBase64Decode import server_base64_decode
+
 from ..Message import Message
 from .types.TTypeDeclaration import TTypeDeclaration
 
@@ -119,12 +121,10 @@ async def handle_message(
 
     function_type_call: TUnion = function_type.call
 
-    known_checksums = cast(list[int], response_headers.get("@clientKnownBinaryChecksums_", []))
-    expect_binary = len(known_checksums) > 0
+    call_validate_ctx = ValidateContext(None, None, coerce_base64=False)
 
     call_validation_failures: list[ValidationFailure] = function_type_call.validate(
-        request_body, [], ValidateContext(None, None, expect_bytes=expect_binary, use_bytes=True)
-    )
+        request_body, [], call_validate_ctx)
     if call_validation_failures:
         return get_invalid_error_message(
             "ErrorInvalidRequestBody_",
@@ -132,6 +132,10 @@ async def handle_message(
             result_union_type,
             response_headers,
         )
+    
+    print(f'call_validate_ctx.bytes_coercions: {call_validate_ctx.bytes_coercions}')
+    if len(call_validate_ctx.bytes_coercions) > 0:
+        server_base64_decode(request_body, call_validate_ctx.bytes_coercions)
 
     unsafe_response_enabled = cast(bool, request_headers.get("@unsafe_", False))
 
@@ -159,33 +163,43 @@ async def handle_message(
     final_response_headers: dict[str, object] = result_message.headers
 
     skip_result_validation: bool = unsafe_response_enabled
-    if not skip_result_validation:
-        use_binary = response_headers.get("@binary_", False) == True
-        ctx = ValidateContext(select_struct_fields_header, function_type.name, expect_bytes=True, use_bytes=use_binary)
-        result_validation_failures: list[ValidationFailure] = result_union_type.validate(
-            result_union, [], ctx)
-        if result_validation_failures:
-            res = get_invalid_error_message(
-                "ErrorInvalidResponseBody_",
-                result_validation_failures,
-                result_union_type,
-                response_headers,
-            )
-            on_error(Exception(
-                f"Response validation failed: {result_validation_failures}. Actual response: {result_union}"))
-            return res
-        response_header_validation_failures: list[ValidationFailure] = validate_headers(
-            final_response_headers, telepact_schema.parsed_response_headers, function_type
+
+    coerce_base64 = final_response_headers.get("@binary_", False) == False
+    result_validate_ctx = ValidateContext(select_struct_fields_header, function_type.name, coerce_base64=coerce_base64)
+    result_validation_failures: list[ValidationFailure] = result_union_type.validate(
+        result_union, [], result_validate_ctx)
+    
+    print(f'result_validate_ctx.base64_coercions: {result_validate_ctx.base64_coercions}')
+
+    if result_validation_failures and not skip_result_validation:
+        res = get_invalid_error_message(
+            "ErrorInvalidResponseBody_",
+            result_validation_failures,
+            result_union_type,
+            final_response_headers,
         )
-        if response_header_validation_failures:
-            return get_invalid_error_message(
-                "ErrorInvalidResponseHeaders_",
-                response_header_validation_failures,
-                result_union_type,
-                response_headers,
-            )
-        if ctx.coercions:
-            response_headers["@base64_"] = ctx.coercions
+        on_error(Exception(
+            f"Response validation failed: {result_validation_failures}. Actual response: {result_union}"))
+        return res
+    
+    if result_validate_ctx.base64_coercions:
+        print('Adding base64 coercions to response headers')
+        final_response_headers["@base64_"] = result_validate_ctx.base64_coercions
+
+    print(f'result_validate_ctx.bytes_coercions: {result_validate_ctx.bytes_coercions}')
+    if result_validate_ctx.bytes_coercions:
+        server_base64_decode(result_union, result_validate_ctx.bytes_coercions)
+    
+    response_header_validation_failures: list[ValidationFailure] = validate_headers(
+        final_response_headers, telepact_schema.parsed_response_headers, function_type
+    )
+    if response_header_validation_failures:
+        return get_invalid_error_message(
+            "ErrorInvalidResponseHeaders_",
+            response_header_validation_failures,
+            result_union_type,
+            response_headers,
+        )
 
     final_result_union: dict[str, object]
     if select_struct_fields_header is not None:

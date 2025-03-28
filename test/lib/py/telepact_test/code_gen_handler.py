@@ -15,6 +15,7 @@
 #|
 
 import json
+import base64
 from typing import Any, Dict, List, Optional, TypeVar, Callable, Tuple
 from telepact_test.gen.all_ import test, Value, ServerHandler_, example as fnexample, getBigList, Undefined, ExUnion, ExStruct
 
@@ -28,7 +29,12 @@ class CodeGenHandler(ServerHandler_):
         ok: test.Output.Ok_ = None
 
         try:
-            print("input: " + json.dumps(input.pseudo_json))
+            def default_serializer(obj):
+                if isinstance(obj, bytes):
+                    return base64.b64encode(obj).decode('utf-8')
+                raise TypeError(f"Object of type {type(obj)} is not JSON serializable")
+
+            print("input: " + json.dumps(input.pseudo_json, default=default_serializer))
         except json.JSONDecodeError as e:
             print(e)
 

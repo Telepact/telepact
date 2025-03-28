@@ -34,6 +34,3 @@ class ServerBinaryEncoder(BinaryEncoder):
     def decode(self, message: list[object]) -> list[object]:
         from ...internal.binary.ServerBinaryDecode import server_binary_decode
         return server_binary_decode(message, self.binary_encoder)
-
-    def base64_decode(self, message: list[object]) -> list[object]:
-        return message

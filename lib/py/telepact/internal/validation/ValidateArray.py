@@ -30,8 +30,6 @@ def validate_array(value: object,
     if isinstance(value, list):
         nested_type_declaration = type_parameters[0]
 
-        new_values: dict[int, object] = {}
-
         validation_failures = []
         for i, element in enumerate(value):
             ctx.path.append("*")
@@ -42,10 +40,6 @@ def validate_array(value: object,
 
             ctx.path.pop()
 
-            if ctx.new_value is not None:
-                new_values[i] = ctx.new_value
-                ctx.new_value = None            
-
             nested_validation_failures_with_path = []
             for f in nested_validation_failures:
                 final_path = [index] + f.path
@@ -54,9 +48,6 @@ def validate_array(value: object,
                     ValidationFailure(final_path, f.reason, f.data))
 
             validation_failures.extend(nested_validation_failures_with_path)
-
-        for i, new_value in new_values.items():
-            value[i] = new_value
 
         return validation_failures
     else:
