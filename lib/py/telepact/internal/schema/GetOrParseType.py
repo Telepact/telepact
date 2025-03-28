@@ -33,6 +33,7 @@ def get_or_parse_type(path: list[object], type_name: str, ctx: 'ParseContext') -
     from ..types.TNumber import TNumber
     from ..types.TObject import TObject
     from ..types.TString import TString
+    from ..types.TBytes import TBytes
     from ..types.TMockCall import TMockCall
     from ..types.TMockStub import TMockStub
     from ..types.TSelect import TSelect
@@ -49,7 +50,7 @@ def get_or_parse_type(path: list[object], type_name: str, ctx: 'ParseContext') -
     if existing_type is not None:
         return existing_type
 
-    regex_string = r"^(boolean|integer|number|string|any|array|object)|((fn|(union|struct|_ext))\.([a-zA-Z_]\w*))$"
+    regex_string = r"^(boolean|integer|number|string|any|bytes|array|object)|((fn|(union|struct|_ext))\.([a-zA-Z_]\w*))$"
     regex = re.compile(regex_string)
 
     matcher = regex.match(type_name)
@@ -66,6 +67,7 @@ def get_or_parse_type(path: list[object], type_name: str, ctx: 'ParseContext') -
             "integer": TInteger(),
             "number": TNumber(),
             "string": TString(),
+            "bytes": TBytes(),
             "array": TArray(),
             "object": TObject()
         }.get(standard_type_name, TAny())

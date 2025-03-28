@@ -43,5 +43,5 @@ class TBoolean(TType):
         from ..generation.GenerateRandomBoolean import generate_random_boolean
         return generate_random_boolean(blueprint_value, use_blueprint_value, ctx)
 
-    def get_name(self) -> str:
+    def get_name(self, ctx: 'ValidateContext') -> str:
         return _BOOLEAN_NAME

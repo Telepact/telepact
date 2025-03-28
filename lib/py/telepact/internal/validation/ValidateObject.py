@@ -31,6 +31,8 @@ def validate_object(value: object,
     if isinstance(value, dict):
         nested_type_declaration = type_parameters[0]
 
+        new_values: dict[str, object] = {}
+
         validation_failures = []
         for k, v in value.items():
             ctx.path.append("*")
@@ -40,6 +42,10 @@ def validate_object(value: object,
             
             ctx.path.pop()
 
+            if ctx.new_value is not None:
+                new_values[k] = ctx.new_value
+                ctx.new_value = None      
+
             nested_validation_failures_with_path = []
             for f in nested_validation_failures:
                 this_path = [k] + f.path
@@ -48,6 +54,9 @@ def validate_object(value: object,
                     ValidationFailure(this_path, f.reason, f.data))
 
             validation_failures.extend(nested_validation_failures_with_path)
+
+        for k, new_value in new_values.items():
+            value[k] = new_value
 
         return validation_failures
     else:

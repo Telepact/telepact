@@ -19,12 +19,12 @@ from typing import TYPE_CHECKING
 from ...internal.binary.BinaryEncoder import BinaryEncoder
 
 if TYPE_CHECKING:
-    from ...BinaryEncodingCache import BinaryEncodingCache
+    from .BinaryEncodingCache import BinaryEncodingCache
 
 class ClientBinaryEncoder(BinaryEncoder):
 
     def __init__(self, binary_encoding_cache: 'BinaryEncodingCache') -> None:
-        from ...DefaultClientBinaryStrategy import ClientBinaryStrategy
+        from .ClientBinaryStrategy import ClientBinaryStrategy
         self.binary_encoding_cache = binary_encoding_cache
         self.binaryChecksumStrategy = ClientBinaryStrategy(binary_encoding_cache)
 

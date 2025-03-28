@@ -43,7 +43,7 @@ def validate_struct_fields(fields: dict[str, 'TFieldDeclaration'],
 
         validation_failures.append(validation_failure)
 
-    # new_values = {}
+    new_values = {}
 
     for field_name, field_value in actual_struct.items():
         reference_field = fields.get(field_name)
@@ -63,9 +63,9 @@ def validate_struct_fields(fields: dict[str, 'TFieldDeclaration'],
         
         ctx.path.pop()
         
-        # if ctx.new_value is not None:
-        #     new_values[field_name] = ctx.new_value
-        #     ctx.new_value = None
+        if ctx.new_value is not None:
+            new_values[field_name] = ctx.new_value
+            ctx.new_value = None
 
         nested_validation_failures_with_path = []
         for failure in nested_validation_failures:
@@ -76,6 +76,6 @@ def validate_struct_fields(fields: dict[str, 'TFieldDeclaration'],
 
         validation_failures.extend(nested_validation_failures_with_path)
 
-    # actual_struct.update(new_values)
+    actual_struct.update(new_values)
 
     return validation_failures

@@ -120,7 +120,7 @@ async def handle_message(
     function_type_call: TUnion = function_type.call
 
     call_validation_failures: list[ValidationFailure] = function_type_call.validate(
-        request_body, [], ValidateContext(None, None)
+        request_body, [], ValidateContext(None, None, use_bytes=False)
     )
     if call_validation_failures:
         return get_invalid_error_message(
@@ -157,7 +157,8 @@ async def handle_message(
 
     skip_result_validation: bool = unsafe_response_enabled
     if not skip_result_validation:
-        ctx = ValidateContext(select_struct_fields_header, function_type.name)
+        use_binary = cast(bool, response_headers.get("@binary_", False))
+        ctx = ValidateContext(select_struct_fields_header, function_type.name, use_bytes=use_binary)
         result_validation_failures: list[ValidationFailure] = result_union_type.validate(
             result_union, [], ctx)
         if result_validation_failures:

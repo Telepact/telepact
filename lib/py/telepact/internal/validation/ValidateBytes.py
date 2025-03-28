@@ -17,29 +17,23 @@
 from typing import TYPE_CHECKING, cast
 import base64
 
+from ...internal.types.TBytes import get_bytes_name
+
 if TYPE_CHECKING:
-    from ...internal.validation.ValidationFailure import ValidationFailure
-    from ...internal.validation.ValidateContext import ValidateContext
+    from .ValidationFailure import ValidationFailure
+    from .ValidateContext import ValidateContext
 
 
-def validate_binary(value: object, ctx: 'ValidateContext') -> list['ValidationFailure']:
-    from ...internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
+def validate_bytes(value: object, ctx: 'ValidateContext') -> list['ValidationFailure']:
+    from .GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
 
-    expected_type = 'Bytes' if ctx.binary else 'Base64String'
+    expected_type = get_bytes_name(ctx)
 
-    if ctx.coerce_base64:
-        if isinstance(value, str):
-            return []
-        elif isinstance(value, bytes):
-            new_b64_value: str = base64.b64encode(value).decode("utf-8")
-            ctx.new_value = new_b64_value
+    print(f'validating bytes: {value}')
+    print(f'type: {type(value)}')
+    print(f'Is {type(value)} == bytes? {isinstance(value, bytes)}')
 
-            set_coerced_path(ctx.path, ctx.coercions)
-
-            return []
-        else:
-            return get_type_unexpected_validation_failure([], value, expected_type)
-    else:
+    if ctx.use_bytes:
         if isinstance(value, bytes):
             return []
         elif isinstance(value, str):
@@ -49,6 +43,23 @@ def validate_binary(value: object, ctx: 'ValidateContext') -> list['ValidationFa
                 return []
             except Exception:
                 return get_type_unexpected_validation_failure([], value, expected_type)
+        else:
+            return get_type_unexpected_validation_failure([], value, expected_type)
+
+    else:
+        if isinstance(value, str):
+            try:
+                base64.b64decode(value)
+                return []
+            except Exception:
+                return get_type_unexpected_validation_failure([], value, expected_type)
+        elif isinstance(value, bytes):
+            new_b64_value: str = base64.b64encode(value).decode("utf-8")
+            ctx.new_value = new_b64_value
+
+            set_coerced_path(ctx.path, ctx.coercions)
+
+            return []
         else:
             return get_type_unexpected_validation_failure([], value, expected_type)
         

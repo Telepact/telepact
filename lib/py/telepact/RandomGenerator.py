@@ -56,11 +56,14 @@ class RandomGenerator:
 
     def next_boolean(self) -> bool:
         return self.next_int_with_ceiling(31) > 15
+    
+    def next_bytes(self) -> bytes:
+        import struct
+        return struct.pack(">i", self.next_int())
 
     def next_string(self) -> str:
         import base64
-        import struct
-        bytes_data = struct.pack(">i", self.next_int())
+        bytes_data = self.next_bytes()
         return base64.b64encode(bytes_data).decode().rstrip("=")
 
     def next_double(self) -> float:

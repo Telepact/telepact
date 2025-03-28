@@ -17,8 +17,8 @@
 from typing import cast, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from ...DefaultClientBinaryStrategy import ClientBinaryStrategy
-    from ...BinaryEncodingCache import BinaryEncodingCache
+    from .ClientBinaryStrategy import ClientBinaryStrategy
+    from .BinaryEncodingCache import BinaryEncodingCache
 
 
 def client_binary_decode(message: list[object], binary_encoding_cache: 'BinaryEncodingCache',

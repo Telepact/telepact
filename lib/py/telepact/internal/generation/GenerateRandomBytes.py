@@ -14,20 +14,15 @@
 #|  limitations under the License.
 #|
 
-class ValidateContext:
-    path: list[str]
-    select: dict[str, object] | None
-    fn: str | None
-    use_bytes: bool
-    binary: bool | None
-    new_value: object | None
-    coercions: dict[str, object]
+from typing import TYPE_CHECKING
 
-    def __init__(self, select: dict[str, object] | None = None, fn: str | None = None, binary: bool = False, use_bytes: bool = False):
-        self.path = []
-        self.select = select
-        self.fn = fn
-        self.binary = binary
-        self.use_bytes = use_bytes
-        self.new_value = None
-        self.coercions = {}
+
+if TYPE_CHECKING:
+    from ...internal.generation.GenerateContext import GenerateContext
+
+
+def generate_random_bytes(blueprint_value: object, use_blueprint_value: bool, ctx: 'GenerateContext') -> object:
+    if use_blueprint_value:
+        return blueprint_value
+    else:
+        return ctx.random_generator.next_bytes()

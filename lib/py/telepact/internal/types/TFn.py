@@ -48,5 +48,5 @@ class TFn(TType):
         from ..generation.GenerateRandomUnion import generate_random_union
         return generate_random_union(blueprint_value, use_blueprint_value, self.call.tags, ctx)
 
-    def get_name(self) -> str:
+    def get_name(self, ctx: 'ValidateContext') -> str:
         return _FN_NAME

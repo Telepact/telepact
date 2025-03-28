@@ -32,7 +32,7 @@ def validate_value_of_type(value: object,
 
     if value is None:
         if not nullable:
-            return get_type_unexpected_validation_failure([], value, this_type.get_name())
+            return get_type_unexpected_validation_failure([], value, this_type.get_name(ctx))
         else:
             return []
 

@@ -44,5 +44,5 @@ class TNumber(TType):
         from ..generation.GenerateRandomNumber import generate_random_number
         return generate_random_number(blueprint_value, use_blueprint_value, ctx)
 
-    def get_name(self) -> str:
+    def get_name(self, ctx: 'ValidateContext') -> str:
         return _NUMBER_NAME

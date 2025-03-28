@@ -26,22 +26,23 @@ if TYPE_CHECKING:
 
 from .TType import TType
 
-_BOOLEAN_NAME: str = "Boolean"
+def get_bytes_name(ctx: 'ValidateContext') -> str:
+    return 'Bytes' if ctx.binary else 'Base64String'
 
 
-class TBinary(TType):
+class TBytes(TType):
 
     def get_type_parameter_count(self) -> int:
         return 0
 
     def validate(self, value: object,
                  type_parameters: list['TTypeDeclaration'], ctx: 'ValidateContext') -> list['ValidationFailure']:
-        from ..validation.ValidateBinary import validate_binary
-        return validate_binary(value, ctx)
+        from ..validation.ValidateBytes import validate_bytes
+        return validate_bytes(value, ctx)
 
     def generate_random_value(self, blueprint_value: object, use_blueprint_value: bool, type_parameters: list['TTypeDeclaration'], ctx: 'GenerateContext') -> object:
-        from ..generation.GenerateRandomBoolean import generate_random_boolean
-        return generate_random_boolean(blueprint_value, use_blueprint_value, ctx)
+        from ..generation.GenerateRandomBytes import generate_random_bytes
+        return generate_random_bytes(blueprint_value, use_blueprint_value, ctx)
 
-    def get_name(self) -> str:
-        return _BOOLEAN_NAME
+    def get_name(self, ctx: 'ValidateContext') -> str:
+        return get_bytes_name(ctx)

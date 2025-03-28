@@ -41,5 +41,5 @@ class TType(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def get_name(self) -> str:
+    def get_name(self, ctx: 'ValidateContext') -> str:
         pass

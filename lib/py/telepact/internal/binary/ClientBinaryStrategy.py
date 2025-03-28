@@ -18,7 +18,7 @@ from datetime import datetime
 import threading
 from threading import Lock
 
-from ...BinaryEncodingCache import BinaryEncodingCache
+from .BinaryEncodingCache import BinaryEncodingCache
 
 class Checksum:
     def __init__(self, value: int, expiration: int) -> None:
