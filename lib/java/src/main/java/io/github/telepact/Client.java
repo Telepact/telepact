@@ -22,6 +22,7 @@ import java.util.concurrent.Future;
 import java.util.function.BiFunction;
 
 import io.github.telepact.internal.binary.ClientBinaryEncoder;
+import io.github.telepact.internal.binary.DefaultBinaryEncodingCache;
 
 /**
  * A telepact client.
@@ -55,12 +56,6 @@ public class Client {
          * deserialize messages.
          */
         public Serialization serializationImpl = new DefaultSerialization();
-
-        /**
-         * The client binary strategy that should be used to maintain binary
-         * compatibility with the server.
-         */
-        public ClientBinaryStrategy binaryStrategy = new DefaultClientBinaryStrategy();
     }
 
     private final BiFunction<Message, Serializer, Future<Message>> adapter;
@@ -93,8 +88,11 @@ public class Client {
         this.useBinaryDefault = options.useBinary;
         this.alwaysSendJson = options.alwaysSendJson;
         this.timeoutMsDefault = options.timeoutMsDefault;
-        this.serializer = new Serializer(options.serializationImpl,
-                new ClientBinaryEncoder(options.binaryStrategy));
+
+        final var binary_encoding_cache = new DefaultBinaryEncodingCache();
+        final var binary_encoder = new ClientBinaryEncoder(binary_encoding_cache);
+
+        this.serializer = new Serializer(options.serializationImpl, binary_encoder);
     }
 
     /**

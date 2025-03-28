@@ -39,4 +39,9 @@ public class ServerBinaryEncoder implements BinaryEncoder {
         return serverBinaryDecode(message, binaryEncoder);
     }
 
+    @Override
+    public List<Object> decodeBase64(List<Object> message) {
+        return message;
+    }
+
 }

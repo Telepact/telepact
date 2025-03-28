@@ -45,7 +45,7 @@ public class TInteger implements TType {
     }
 
     @Override
-    public String getName() {
+    public String getName(ValidateContext ctx) {
         return _INTEGER_NAME;
     }
 }

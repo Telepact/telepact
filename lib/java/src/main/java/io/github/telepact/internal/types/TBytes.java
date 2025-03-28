@@ -16,8 +16,9 @@
 
 package io.github.telepact.internal.types;
 
-import static io.github.telepact.internal.generation.GenerateRandomString.generateRandomString;
-import static io.github.telepact.internal.validation.ValidateString.validateString;
+import static io.github.telepact.internal.generation.GenerateRandomBytes.generateRandomBytes;
+import static io.github.telepact.internal.validation.ValidateBytes.validateBytes;
+
 
 import java.util.List;
 
@@ -25,8 +26,17 @@ import io.github.telepact.internal.generation.GenerateContext;
 import io.github.telepact.internal.validation.ValidateContext;
 import io.github.telepact.internal.validation.ValidationFailure;
 
-public class TString implements TType {
-    public static final String _STRING_NAME = "String";
+public class TBytes implements TType {
+
+    public static final String _BOOLEAN_NAME = "Boolean";
+
+    public static String getBytesName(ValidateContext ctx) {
+        if (ctx.expectBytes) {
+            return "Bytes";
+        } else {
+            return "Base64String";
+        }
+    }
 
     @Override
     public int getTypeParameterCount() {
@@ -35,17 +45,18 @@ public class TString implements TType {
 
     @Override
     public List<ValidationFailure> validate(Object value, List<TTypeDeclaration> typeParameters, ValidateContext ctx) {
-        return validateString(value);
+        return validateBytes(value, ctx);
     }
 
     @Override
     public Object generateRandomValue(Object blueprintValue, boolean useBlueprintValue,
             List<TTypeDeclaration> typeParameters, GenerateContext ctx) {
-        return generateRandomString(blueprintValue, useBlueprintValue, ctx);
+        return generateRandomBytes(blueprintValue, useBlueprintValue, ctx);
     }
 
     @Override
     public String getName(ValidateContext ctx) {
-        return _STRING_NAME;
+        return _BOOLEAN_NAME;
     }
+
 }

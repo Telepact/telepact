@@ -23,10 +23,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import io.github.telepact.ClientBinaryStrategy;
-
 public class ClientBinaryDecode {
-    static List<Object> clientBinaryDecode(List<Object> message, Map<Integer, BinaryEncoding> recentBinaryEncoders,
+    static List<Object> clientBinaryDecode(List<Object> message, BinaryEncodingCache binaryEncodingCache,
             ClientBinaryStrategy binaryChecksumStrategy)
             throws BinaryEncoderUnavailableError {
         final var headers = (Map<String, Object>) message.get(0);
@@ -37,16 +35,14 @@ public class ClientBinaryDecode {
         // If there is a binary encoding included on this message, cache it
         if (headers.containsKey("@enc_")) {
             final var binaryEncoding = (Map<String, Integer>) headers.get("@enc_");
-            final var newBinaryEncoder = new BinaryEncoding(binaryEncoding, binaryChecksum);
 
-            recentBinaryEncoders.put(binaryChecksum, newBinaryEncoder);
+            binaryEncodingCache.add(binaryChecksum, binaryEncoding);
         }
 
         binaryChecksumStrategy.updateChecksum(binaryChecksum);
         final var newCurrentChecksumStrategy = binaryChecksumStrategy.getCurrentChecksums();
 
-        recentBinaryEncoders.entrySet().removeIf(e -> !newCurrentChecksumStrategy.contains(e.getKey()));
-        final var binaryEncoder = recentBinaryEncoders.get(binaryChecksum);
+        final var binaryEncoder = binaryEncodingCache.get(newCurrentChecksumStrategy.get(0)).get();
 
         final Map<Object, Object> finalEncodedMessageBody;
         if (Objects.equals(true, headers.get("@pac_"))) {

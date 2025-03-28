@@ -21,6 +21,7 @@ import static io.github.telepact.internal.validation.GetInvalidErrorMessage.getI
 import static io.github.telepact.internal.validation.ValidateHeaders.validateHeaders;
 import static io.github.telepact.internal.validation.ValidateResult.validateResult;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -110,8 +111,11 @@ public class HandleMessage {
 
         final TUnion functionTypeCall = functionType.call;
 
+        final var knownChecksums = (List<Object>) requestHeaders.getOrDefault("@clientKnownBinaryChecksums_", new ArrayList<>());
+        final var expectBytes = knownChecksums.size() > 0;
+
         final var callValidationFailures = functionTypeCall.validate(requestBody, List.of(),
-                new ValidateContext(null, null));
+                new ValidateContext(null, null, expectBytes, true));
         if (!callValidationFailures.isEmpty()) {
             return getInvalidErrorMessage("ErrorInvalidRequestBody_", callValidationFailures, resultUnionType,
                     responseHeaders);
@@ -146,8 +150,9 @@ public class HandleMessage {
 
         final var skipResultValidation = unsafeResponseEnabled;
         if (!skipResultValidation) {
-            final var resultValidationFailures = resultUnionType.validate(
-                    resultUnion, List.of(), new ValidateContext(selectStructFieldsHeader, null));
+            final var useBytes = Objects.equals(true, requestHeaders.get("@binary_"));
+            final var ctx = new ValidateContext(selectStructFieldsHeader, requestTarget, true, useBytes);
+            final var resultValidationFailures = resultUnionType.validate(resultUnion, List.of(), ctx);
             if (!resultValidationFailures.isEmpty()) {
                 return getInvalidErrorMessage("ErrorInvalidResponseBody_", resultValidationFailures, resultUnionType,
                         responseHeaders);
@@ -158,6 +163,9 @@ public class HandleMessage {
                 return getInvalidErrorMessage("ErrorInvalidResponseHeaders_", responseHeaderValidationFailures,
                         resultUnionType,
                         responseHeaders);
+            }
+            if (!ctx.coercions.isEmpty()) {
+                responseHeaders.putAll(ctx.coercions);
             }
         }
 

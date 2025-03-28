@@ -23,14 +23,14 @@ import java.util.stream.Collectors;
 import io.github.telepact.internal.types.TFn;
 import io.github.telepact.internal.types.TType;
 
-public class GenerateRandomUMockCall {
+public class GenerateRandomMockCall {
 
-    public static Object generateRandomUMockCall(Map<String, TType> types, GenerateContext ctx) {
+    public static Object generateRandomMockCall(Map<String, TType> types, GenerateContext ctx) {
         List<TFn> functions = types.entrySet().stream()
                 .filter(entry -> entry.getValue() instanceof TFn)
                 .filter(entry -> !entry.getKey().endsWith("_"))
                 .map(entry -> (TFn) entry.getValue())
-                .sorted((fn1, fn2) -> fn1.getName().compareTo(fn2.getName()))
+                .sorted((fn1, fn2) -> fn1.name.compareTo(fn2.name))
                 .collect(Collectors.toList());
 
         TFn selectedFn = functions.get(ctx.randomGenerator.nextIntWithCeiling(functions.size()));

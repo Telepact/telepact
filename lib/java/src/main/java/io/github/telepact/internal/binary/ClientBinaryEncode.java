@@ -24,33 +24,33 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import io.github.telepact.ClientBinaryStrategy;
-
 public class ClientBinaryEncode {
-    static List<Object> clientBinaryEncode(List<Object> message, Map<Integer, BinaryEncoding> recentBinaryEncoders,
+    static List<Object> clientBinaryEncode(List<Object> message, BinaryEncodingCache binaryEncodingCache,
             ClientBinaryStrategy binaryChecksumStrategy)
             throws BinaryEncoderUnavailableError {
         final var headers = (Map<String, Object>) message.get(0);
         final var messageBody = (Map<String, Object>) message.get(1);
         final var forceSendJson = headers.remove("_forceSendJson");
 
-        headers.put("@bin_", binaryChecksumStrategy.getCurrentChecksums());
+        final var checksums = binaryChecksumStrategy.getCurrentChecksums();
+        headers.put("@bin_", checksums);
+
 
         if (Objects.equals(forceSendJson, true)) {
             throw new BinaryEncoderUnavailableError();
         }
 
-        if (recentBinaryEncoders.size() > 1) {
+        if (checksums.size() > 1) {
             throw new BinaryEncoderUnavailableError();
         }
 
-        final Optional<BinaryEncoding> binaryEncoderOptional = recentBinaryEncoders.values().stream().findAny();
-        if (!binaryEncoderOptional.isPresent()) {
+        final Optional<BinaryEncoding> binaryEncodingOpt = binaryEncodingCache.get(checksums.get(0));
+        if (!binaryEncodingOpt.isPresent()) {
             throw new BinaryEncoderUnavailableError();
         }
-        final BinaryEncoding binaryEncoder = binaryEncoderOptional.get();
+        final BinaryEncoding binaryEncoding = binaryEncodingOpt.get();
 
-        final var encodedMessageBody = encodeBody(messageBody, binaryEncoder);
+        final var encodedMessageBody = encodeBody(messageBody, binaryEncoding);
 
         final Map<Object, Object> finalEncodedMessageBody;
         if (Objects.equals(true, headers.get("@pac_"))) {

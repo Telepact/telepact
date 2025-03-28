@@ -19,15 +19,15 @@ class ValidateContext:
     select: dict[str, object] | None
     fn: str | None
     use_bytes: bool
-    binary: bool | None
+    expect_bytes: bool | None
     new_value: object | None
     coercions: dict[str, object]
 
-    def __init__(self, select: dict[str, object] | None = None, fn: str | None = None, binary: bool = False, use_bytes: bool = False):
+    def __init__(self, select: dict[str, object] | None = None, fn: str | None = None, expect_bytes: bool = False, use_bytes: bool = False):
         self.path = []
         self.select = select
         self.fn = fn
-        self.binary = binary
+        self.expect_bytes = expect_bytes
         self.use_bytes = use_bytes
         self.new_value = None
         self.coercions = {}

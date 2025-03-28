@@ -20,7 +20,7 @@ ORIG_LIB_JAR := ../../../lib/java/target/telepact-$(shell cat ../../../VERSION.t
 LIB_JAR := target/telepact.jar
 TARGET_JAR := target/telepacttest-1.0-SNAPSHOT.jar
 
-all: codegen $(LIB_JAR)
+all: $(LIB_JAR) codegen
 	rm -rf .m2/repository/io/github/telepact
 
 	mvn install:install-file -Dfile=target/dep/telepact.jar -DgroupId=io.github.telepact -DartifactId=telepact -Dversion=1.0 -Dpackaging=jar -s settings.xml | grep -v "from central"
@@ -35,7 +35,6 @@ $(LIB_JAR): dep
 	cp ${ORIG_LIB_JAR} target/dep/telepact.jar
 
 dep:
-	ls ../../../lib/java/target
 	$(MAKE) -C ../../../lib/java
 
 codegen:
@@ -47,3 +46,4 @@ test-server:
 clean:
 	rm -rf target
 	rm -rf .m2
+	rm -rf src/gen

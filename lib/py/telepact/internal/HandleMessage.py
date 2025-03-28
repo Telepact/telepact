@@ -119,8 +119,11 @@ async def handle_message(
 
     function_type_call: TUnion = function_type.call
 
+    known_checksums = cast(list[int], response_headers.get("@clientKnownBinaryChecksums_", []))
+    expect_binary = len(known_checksums) > 0
+
     call_validation_failures: list[ValidationFailure] = function_type_call.validate(
-        request_body, [], ValidateContext(None, None, use_bytes=False)
+        request_body, [], ValidateContext(None, None, expect_bytes=expect_binary, use_bytes=True)
     )
     if call_validation_failures:
         return get_invalid_error_message(
@@ -157,8 +160,8 @@ async def handle_message(
 
     skip_result_validation: bool = unsafe_response_enabled
     if not skip_result_validation:
-        use_binary = cast(bool, response_headers.get("@binary_", False))
-        ctx = ValidateContext(select_struct_fields_header, function_type.name, use_bytes=use_binary)
+        use_binary = response_headers.get("@binary_", False) == True
+        ctx = ValidateContext(select_struct_fields_header, function_type.name, expect_bytes=True, use_bytes=use_binary)
         result_validation_failures: list[ValidationFailure] = result_union_type.validate(
             result_union, [], ctx)
         if result_validation_failures:

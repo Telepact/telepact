@@ -183,6 +183,24 @@ public class CodeGenHandler extends ServerHandler_ {
             top.objNullAny().ifPresent(v -> {
                 value.set(new Value.Builder().objNullAny(v));
             });
+            top.bytes().ifPresent(v -> {
+                value.set(new Value.Builder().bytes(v));
+            });
+            top.nullBytes().ifPresent(v -> {
+                value.set(new Value.Builder().nullBytes(v));
+            });
+            top.arrBytes().ifPresent(v -> {
+                value.set(new Value.Builder().arrBytes(v));
+            });
+            top.arrNullBytes().ifPresent(v -> {
+                value.set(new Value.Builder().arrNullBytes(v));
+            });
+            top.objBytes().ifPresent(v -> {
+                value.set(new Value.Builder().objBytes(v));
+            });
+            top.objNullBytes().ifPresent(v -> {
+                value.set(new Value.Builder().objNullBytes(v));
+            });
 
             top.struct().ifPresent(v -> {
                 value.set(new Value.Builder().struct(mapStruct(v)));

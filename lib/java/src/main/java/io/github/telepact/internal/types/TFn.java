@@ -58,7 +58,7 @@ public class TFn implements TType {
     }
 
     @Override
-    public String getName() {
+    public String getName(ValidateContext ctx) {
         return _FN_NAME;
     }
 }

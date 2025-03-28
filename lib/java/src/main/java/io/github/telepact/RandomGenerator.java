@@ -72,11 +72,16 @@ public class RandomGenerator {
     public boolean nextBoolean() {
         return nextIntWithCeiling(31) > 15;
     }
-
-    public String nextString() {
+    
+    public byte[] nextBytes() {
         var bytes = ByteBuffer.allocate(Integer.BYTES);
         bytes.putInt(nextInt());
-        return Base64.getEncoder().withoutPadding().encodeToString(bytes.array());
+        return bytes.array();
+    }
+
+    public String nextString() {
+        var bytes = nextBytes();
+        return Base64.getEncoder().withoutPadding().encodeToString(bytes);
     }
 
     public double nextDouble() {

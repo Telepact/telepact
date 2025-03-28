@@ -22,4 +22,6 @@ public interface BinaryEncoder {
     List<Object> encode(List<Object> message);
 
     List<Object> decode(List<Object> message);
+
+    List<Object> decodeBase64(List<Object> message);
 }

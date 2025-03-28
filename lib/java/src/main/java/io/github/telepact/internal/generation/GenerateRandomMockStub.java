@@ -24,14 +24,14 @@ import java.util.stream.Collectors;
 import io.github.telepact.internal.types.TFn;
 import io.github.telepact.internal.types.TType;
 
-public class GenerateRandomUMockStub {
+public class GenerateRandomMockStub {
 
-        public static Map<String, Object> generateRandomUMockStub(Map<String, TType> types, GenerateContext ctx) {
+        public static Map<String, Object> generateRandomMockStub(Map<String, TType> types, GenerateContext ctx) {
                 List<TFn> functions = types.entrySet().stream()
                                 .filter(entry -> entry.getValue() instanceof TFn)
                                 .filter(entry -> !entry.getKey().endsWith("_"))
                                 .map(entry -> (TFn) entry.getValue())
-                                .sorted(Comparator.comparing(TFn::getName))
+                                .sorted((fn1, fn2) -> fn1.name.compareTo(fn2.name))
                                 .collect(Collectors.toList());
 
                 int index = ctx.randomGenerator.nextIntWithCeiling(functions.size());

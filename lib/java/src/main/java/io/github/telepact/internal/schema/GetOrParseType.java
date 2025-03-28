@@ -54,7 +54,7 @@ public class GetOrParseType {
             return existingType;
         }
 
-        final var regexString = "^(boolean|integer|number|string|any|array|object)|((fn|(union|struct|_ext))\\.([a-zA-Z_]\\w*))$";
+        final var regexString = "^(boolean|integer|number|string|any|bytes|array|object)|((fn|(union|struct|_ext))\\.([a-zA-Z_]\\w*))$";
 
         final var regex = Pattern.compile(regexString);
 

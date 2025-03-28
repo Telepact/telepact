@@ -31,7 +31,7 @@ public class ValidateValueOfType {
 
             if (!nullable) {
                 return getTypeUnexpectedValidationFailure(List.of(), value,
-                        thisType.getName());
+                        thisType.getName(ctx));
             } else {
                 return List.of();
             }

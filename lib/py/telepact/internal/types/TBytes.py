@@ -27,7 +27,7 @@ if TYPE_CHECKING:
 from .TType import TType
 
 def get_bytes_name(ctx: 'ValidateContext') -> str:
-    return 'Bytes' if ctx.binary else 'Base64String'
+    return 'Bytes' if ctx.expect_bytes else 'Base64String'
 
 
 class TBytes(TType):

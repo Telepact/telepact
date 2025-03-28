@@ -46,7 +46,7 @@ public class TObject implements TType {
     }
 
     @Override
-    public String getName() {
+    public String getName(ValidateContext ctx) {
         return _OBJECT_NAME;
     }
 

@@ -18,32 +18,40 @@ package io.github.telepact.internal.binary;
 
 import static io.github.telepact.internal.binary.ClientBinaryDecode.clientBinaryDecode;
 import static io.github.telepact.internal.binary.ClientBinaryEncode.clientBinaryEncode;
+import static io.github.telepact.internal.binary.ClientBase64Decode.clientBase64Decode;
 
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import io.github.telepact.ClientBinaryStrategy;
+import io.github.telepact.Client;
+import io.github.telepact.internal.binary.ClientBinaryStrategy;
 
 public class ClientBinaryEncoder implements BinaryEncoder {
 
-    private final Map<Integer, BinaryEncoding> recentBinaryEncoders;
+    private final BinaryEncodingCache binaryEncodingCache;
     private final ClientBinaryStrategy binaryChecksumStrategy;
 
-    public ClientBinaryEncoder(ClientBinaryStrategy binaryChecksumStrategy) {
-        this.recentBinaryEncoders = new ConcurrentHashMap<>();
-        this.binaryChecksumStrategy = binaryChecksumStrategy;
+    public ClientBinaryEncoder(BinaryEncodingCache binaryEncodingCache) {
+        this.binaryEncodingCache = binaryEncodingCache;
+        this.binaryChecksumStrategy = new ClientBinaryStrategy(binaryEncodingCache);
     }
 
     @Override
     public List<Object> encode(List<Object> message) throws BinaryEncoderUnavailableError {
-        return clientBinaryEncode(message, this.recentBinaryEncoders,
+        return clientBinaryEncode(message, this.binaryEncodingCache,
                 this.binaryChecksumStrategy);
     }
 
     @Override
     public List<Object> decode(List<Object> message) throws BinaryEncoderUnavailableError {
-        return clientBinaryDecode(message, this.recentBinaryEncoders, this.binaryChecksumStrategy);
+        return clientBinaryDecode(message, this.binaryEncodingCache, this.binaryChecksumStrategy);
+    }
+
+    @Override
+    public List<Object> decodeBase64(List<Object> message) {
+        clientBase64Decode(message);
+        return message;
     }
 
 }

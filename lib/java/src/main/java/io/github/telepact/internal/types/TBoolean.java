@@ -46,7 +46,7 @@ public class TBoolean implements TType {
     }
 
     @Override
-    public String getName() {
+    public String getName(ValidateContext ctx) {
         return _BOOLEAN_NAME;
     }
 

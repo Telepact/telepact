@@ -16,15 +16,27 @@
 
 package io.github.telepact.internal.validation;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Stack;
 
 public class ValidateContext {
+    public final Stack<String> path;
     public final Map<String, Object> select;
     public final String fn;
+    public final boolean expectBytes;
+    public final boolean useBytes;
+    public Object newValue;
+    public final Map<String, Object> coercions;
 
-    public ValidateContext(Map<String, Object> select, String fn) {
+    public ValidateContext(Map<String, Object> select, String fn, boolean expectBytes, boolean useBytes) {
+        this.path = new Stack<>();
         this.select = select;
         this.fn = fn;
+        this.expectBytes = expectBytes;
+        this.useBytes = useBytes;
+        this.newValue = null;
+        this.coercions = new HashMap<>();
     }
 
 }
