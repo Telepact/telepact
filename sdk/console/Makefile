@@ -16,7 +16,7 @@
 
 .PHONY: all
 
-all:
+all: dep
 	cp ../../LICENSE ../../NOTICE ./
 	
 	rm -rf src/lib/telepact
@@ -26,8 +26,15 @@ all:
 	rm -rf src/lib/prettier-plugin-telepact
 	mkdir -p src/lib/prettier-plugin-telepact
 	cp -r ../../sdk/prettier/dist/* src/lib/prettier-plugin-telepact
-	
-	npm install	
+
+	mkdir -p dist
+
+	npm install
+	npm run build
+
+dep:
+	$(MAKE) -C ../../lib/ts
+	$(MAKE) -C ../../sdk/prettier
 
 dev:
 	npm run dev
@@ -36,6 +43,7 @@ clean:
 	rm -rf src/lib/telepact
 	rm -rf src/lib/prettier-plugin-telepact
 	rm -rf node_modules
+	rm -rf dist
 	rm -rf LICENSE
 	rm -rf NOTICE
 

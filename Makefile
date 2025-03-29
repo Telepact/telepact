@@ -46,9 +46,6 @@ test-trace-py:
 ts:
 	$(MAKE) -C lib/ts
 
-ts-ci:
-	$(MAKE) -C lib/ts NPM_INSTALL=ci
-
 clean-ts:
 	$(MAKE) -C lib/ts clean
 

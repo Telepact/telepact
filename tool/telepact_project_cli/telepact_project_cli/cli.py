@@ -504,6 +504,102 @@ def github_labels() -> None:
     # Print summary
     print(f"Summary:\n  Added tags: {', '.join(added_tags) if added_tags else 'None'}\n  Removed tags: {', '.join(removed_tags) if removed_tags else 'None'}")
 
+@click.command()
+def release() -> None:
+    """
+    Create a GitHub release and upload assets for the specified release targets.
+    """
+
+    RELEASE_TARGET_ASSET_DIRECTORY_MAP = {
+        "java": "lib/java/target/central-publishing",
+        "py": "lib/py/dist",
+        "ts": "lib/ts/dist-tgz",
+        "dart": "bind/dart/dist",
+        "cli": "sdk/cli/dist",
+        "console": "sdk/console/dist",
+        "docker": "sdk/docker/dist",
+        "prettier": "sdk/prettier/dist-tgz"
+    }
+
+    MAX_ASSETS = 10  # Maximum number of assets to upload
+
+    token = os.getenv('GITHUB_TOKEN')
+    repository = os.getenv('GITHUB_REPOSITORY')
+
+    if not token or not repository:
+        click.echo("GITHUB_TOKEN and GITHUB_REPOSITORY environment variables must be set.")
+        return
+
+    # Extract version string and release targets from the last git commit message
+    commit_message = subprocess.run(
+        ['git', 'show', '-s', '--format=%s%n%b', 'HEAD'],
+        stdout=subprocess.PIPE, text=True, check=True
+    ).stdout.strip()
+
+    head_commit = subprocess.run(
+        ['git', 'rev-parse', 'HEAD'],
+        stdout=subprocess.PIPE, text=True, check=True
+    ).stdout.strip()
+
+    print(f'commit_message: {commit_message}')
+    print(f'head_commit: {head_commit}')
+
+    lines = commit_message.splitlines()
+    if not lines[0].startswith("Bump version to"):
+        click.echo("The last commit message does not match the expected format.")
+        return
+    version = lines[0].split(" ")[3]
+
+    if len(lines) > 2 and lines[2] == 'Release targets:':
+        release_targets = lines[3:]
+    else:
+        release_targets = []
+
+    print(f'release_targets: {release_targets}')
+
+    tag_name = version
+    release_name = version
+    final_release_body = f"### Release Targets:\n\n{release_targets}".strip()
+
+    g = Github(token)
+    repo = g.get_repo(repository)
+
+    try:
+        release = repo.create_git_release(
+            tag=tag_name,
+            name=release_name,
+            message=final_release_body,
+            draft=True,
+            prerelease=True,
+            target_commitish=head_commit
+        )
+        click.echo(f"Release created: {release.html_url}")
+
+        # Upload assets for each release target
+        asset_count = 0
+        for target in release_targets:
+            asset_directory = RELEASE_TARGET_ASSET_DIRECTORY_MAP.get(target)
+            if asset_directory and os.path.exists(asset_directory):
+                for file_name in os.listdir(asset_directory):
+                    if asset_count >= MAX_ASSETS:
+                        click.echo("Maximum asset upload limit reached. Aborting.")
+                        return
+                    file_path = os.path.join(asset_directory, file_name)
+                    if os.path.isfile(file_path):
+                        with open(file_path, 'rb') as asset_file:
+                            release.upload_asset(
+                                path=file_path,
+                                name=file_name,
+                                label=f"{target} - {file_name}"
+                            )
+                            asset_count += 1
+                            click.echo(f"Uploaded asset: {file_name} for target: {target}")
+            else:
+                click.echo(f"No assets found for target: {target} in directory: {asset_directory}")
+
+    except Exception as e:
+        click.echo(f"Failed to create release or upload assets: {e}")
+
 main.add_command(old_bump)
 main.add_command(depset)
 main.add_command(get)
@@ -511,6 +607,7 @@ main.add_command(set_version)
 main.add_command(bump)
 main.add_command(license_header)
 main.add_command(github_labels)
+main.add_command(release)
 
 if __name__ == "__main__":
     main()

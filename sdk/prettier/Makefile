@@ -20,9 +20,13 @@ all:
 	rm -rf dist
 	mkdir -p dist
 	cp ../../LICENSE ../../NOTICE dist
+
+	mkdir -p dist-tgz
+	
 	npm install
 	npm run build
 
 clean:
 	rm -rf dist
+	rm -rf dist-tgz
 	rm -rf node_modules

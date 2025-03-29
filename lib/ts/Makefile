@@ -16,7 +16,7 @@
 
 NPM_INSTALL ?= install
 SRC_FILES := $(shell find src -type f)
-TAR_GZ := dist-test/*.tgz
+TAR_GZ := dist-tgz/*.tgz
 
 .PHONY: clean
 
@@ -29,7 +29,7 @@ $(TAR_GZ): $(SRC_FILES)
 	mkdir -p dist
 	cp ../../LICENSE ../../NOTICE dist
 
-	mkdir -p dist-test
+	mkdir -p dist-tgz
 
 	npm $(NPM_INSTALL)
 	npm run build
@@ -37,6 +37,6 @@ $(TAR_GZ): $(SRC_FILES)
 clean:
 	rm -rf inc
 	rm -rf dist
-	rm -rf dist-test
+	rm -rf dist-tgz
 	rm -rf node_modules
 	rm -f dist/LICENSE dist/NOTICE

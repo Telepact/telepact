@@ -27,7 +27,7 @@ const license = fs
 export default {
     input: "node_modules/msgpackr/index.js", // Entry point for the dependency
     output: {
-        file: "dist/msgpackr.iife.js",
+        file: "rollup/msgpackr.iife.js",
         format: "iife",
         name: "msgpackr",
         sourcemap: true,

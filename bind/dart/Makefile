@@ -25,16 +25,23 @@ all:
 
 	mkdir -p lib/js
 	cp ../../lib/ts/dist/index.iife.js lib/js/telepact.js
-	cp dist/crc32.iife.js lib/js/crc32.js
-	cp dist/msgpackr.iife.js lib/js/msgpackr.js	
+	cp rollup/crc32.iife.js lib/js/crc32.js
+	cp rollup/msgpackr.iife.js lib/js/msgpackr.js	
 
 	dart pub get
 
 	dart analyze
 
+	mkdir -p dist
+	tar -czvf dist/telepact-dart.tar.gz lib pubspec.yaml pubspec.lock README.md LICENSE NOTICE
+
+dep:
+	$(MAKE) -C ../../lib/ts
+
 clean:
 	rm -rf lib/js
 	rm -rf dist
+	rm -rf rollup
 	rm -rf node_modules
 	rm -f LICENSE NOTICE
 	rm -rf .dart_tool
