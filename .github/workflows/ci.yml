@@ -86,7 +86,10 @@ jobs:
       - name: Configure GPG
         env:
           MVN_GPG_PRIVATE_KEY: ${{ secrets.MVN_GPG_PRIVATE_KEY }}
-        run: echo $MVN_GPG_PRIVATE_KEY | gpg --batch --import --yes
+        run: |
+          echo "First line of MVN_GPG_PRIVATE_KEY:"
+          echo "$MVN_GPG_PRIVATE_KEY" | head -n 1
+          echo $MVN_GPG_PRIVATE_KEY | gpg --batch --import --yes
 
       - name: Build java
         env:
