@@ -172,7 +172,7 @@ jobs:
 
   build-console:
     runs-on: ubuntu-latest
-    timeout-minutes: 1
+    timeout-minutes: 2
     needs: [build-ts, build-cli, build-prettier]
     steps:
       - name: Checkout code
