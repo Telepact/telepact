@@ -541,10 +541,10 @@ def release() -> None:
         return
     version = lines[0].split(" ")[3]
 
-    if len(lines) < 3 or lines[2] == 'No release targets':
-        release_targets = []
-    elif lines[2] == 'Release targets:':
+    if len(lines) > 2 and lines[2] == 'Release targets:':
         release_targets = lines[3:]
+    else:
+        release_targets = []
 
     tag_name = version
     release_name = version
