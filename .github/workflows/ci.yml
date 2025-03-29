@@ -21,8 +21,7 @@ on:
     inputs:
       release:
         required: false
-        default: false
-        type: boolean
+        default: 'false'
 
   pull_request:
     types:
@@ -435,7 +434,7 @@ jobs:
       - run-tests
     steps:
       - name: Trigger Release
-        if: github.event.inputs.release == true
+        if: github.event.inputs.release == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh workflow run release.yml --ref main -f artifacts_run_id=${{ github.run_id }}
