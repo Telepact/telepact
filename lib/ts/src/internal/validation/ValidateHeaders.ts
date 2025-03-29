@@ -37,7 +37,7 @@ export function validateHeaders(
         if (field) {
             const thisValidationFailures = field.typeDeclaration.validate(
                 headerValue,
-                new ValidateContext(null, functionType.name),
+                new ValidateContext(null, functionType.name, false),
             );
             const thisValidationFailuresPath = thisValidationFailures.map(
                 (e) => new ValidationFailure([header, ...e.path], e.reason, e.data),

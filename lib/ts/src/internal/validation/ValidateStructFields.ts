@@ -54,7 +54,11 @@ export function validateStructFields(
 
         const refFieldTypeDeclaration = referenceField.typeDeclaration;
 
+        ctx.path.push(fieldName);
+
         const nestedValidationFailures = refFieldTypeDeclaration.validate(fieldValue, ctx);
+
+        ctx.path.pop();
 
         const nestedValidationFailuresWithPath: ValidationFailure[] = [];
         for (const failure of nestedValidationFailures) {

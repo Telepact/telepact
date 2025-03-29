@@ -14,15 +14,15 @@
 //|  limitations under the License.
 //|
 
-import { BinaryEncoding } from "../../internal/binary/BinaryEncoding";
-import { ClientBinaryStrategy } from "../../ClientBinaryStrategy";
 import { decodeBody } from "../../internal/binary/DecodeBody";
 import { unpackBody } from "../../internal/binary/UnpackBody";
 import { convertMapsToObjects } from "./ConvertMapsToObjects";
+import { BinaryEncodingCache } from "./BinaryEncodingCache";
+import { ClientBinaryStrategy } from "./ClientBinaryStrategy";
 
 export function clientBinaryDecode(
     message: any[],
-    recentBinaryEncoders: Map<number, BinaryEncoding>,
+    binaryEncodingCache: BinaryEncodingCache,
     binaryChecksumStrategy: ClientBinaryStrategy,
 ): any[] {
     const headers = message[0] as Map<string, any>;
@@ -32,20 +32,13 @@ export function clientBinaryDecode(
 
     if (headers.has("@enc_")) {
         const binaryEncoding = headers.get("@enc_") as Map<string, number>;
-        const newBinaryEncoder = new BinaryEncoding(binaryEncoding, binaryChecksum);
-        recentBinaryEncoders.set(binaryChecksum, newBinaryEncoder);
+        binaryEncodingCache.add(binaryChecksum, binaryEncoding);
     }
 
     binaryChecksumStrategy.updateChecksum(binaryChecksum);
     const newCurrentChecksumStrategy = binaryChecksumStrategy.getCurrentChecksums();
 
-    for (const [key, value] of recentBinaryEncoders) {
-        if (!newCurrentChecksumStrategy.includes(key)) {
-            recentBinaryEncoders.delete(key);
-        }
-    }
-
-    const binaryEncoder = recentBinaryEncoders.get(binaryChecksum)!;
+    const binaryEncoder = binaryEncodingCache.get(newCurrentChecksumStrategy[0]);
 
     let finalEncodedMessageBody: Map<any, any>;
     if (headers.get("@pac_") === true) {

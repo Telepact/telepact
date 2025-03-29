@@ -80,6 +80,13 @@ class Registry {
     }
 }
 
+function uint8ArrayToBase64Replacer(key: string, value: object) {
+    if (value instanceof Uint8Array) {
+      return btoa(String.fromCharCode(...value));
+    }
+    return value;
+  }
+
 function startClientTestServer(
     connection: NatsConnection,
     registry: Registry,
@@ -157,7 +164,7 @@ function startClientTestServer(
 
             const responsePseudoJson = [response.headers, response.body];
 
-            const responseJson = JSON.stringify(responsePseudoJson);
+            const responseJson = JSON.stringify(responsePseudoJson, uint8ArrayToBase64Replacer);
 
             const responseBytes = new TextEncoder().encode(responseJson);
 
@@ -336,7 +343,7 @@ function startTestServer(
         const requestHeaders = requestMessage.headers;
         const requestBody = requestMessage.body;
         const requestPseudoJson = [requestHeaders, requestBody];
-        const requestJson = JSON.stringify(requestPseudoJson);
+        const requestJson = JSON.stringify(requestPseudoJson, uint8ArrayToBase64Replacer);
         const requestBytes = new TextEncoder().encode(requestJson);
 
         let message: Message;

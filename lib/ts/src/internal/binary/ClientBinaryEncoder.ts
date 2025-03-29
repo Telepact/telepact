@@ -14,26 +14,27 @@
 //|  limitations under the License.
 //|
 
-import { ClientBinaryStrategy } from '../../ClientBinaryStrategy';
+import { ClientBinaryStrategy } from './ClientBinaryStrategy';
 import { clientBinaryEncode } from '../../internal/binary/ClientBinaryEncode';
 import { clientBinaryDecode } from '../../internal/binary/ClientBinaryDecode';
 import { BinaryEncoder } from './BinaryEncoder';
 import { BinaryEncoding } from './BinaryEncoding';
+import { BinaryEncodingCache } from './BinaryEncodingCache';
 
 export class ClientBinaryEncoder implements BinaryEncoder {
-    private readonly recentBinaryEncoders: Map<number, BinaryEncoding>;
+    private readonly binaryEncodingCache: BinaryEncodingCache;
     private readonly binaryChecksumStrategy: ClientBinaryStrategy;
 
-    constructor(binaryChecksumStrategy: ClientBinaryStrategy) {
-        this.recentBinaryEncoders = new Map<number, BinaryEncoding>();
-        this.binaryChecksumStrategy = binaryChecksumStrategy;
+    constructor(binaryEncodingCache: BinaryEncodingCache) {
+        this.binaryEncodingCache = binaryEncodingCache;
+        this.binaryChecksumStrategy = new ClientBinaryStrategy(binaryEncodingCache);
     }
 
     encode(message: any[]): any[] {
-        return clientBinaryEncode(message, this.recentBinaryEncoders, this.binaryChecksumStrategy);
+        return clientBinaryEncode(message, this.binaryEncodingCache, this.binaryChecksumStrategy);
     }
 
     decode(message: any[]): any[] {
-        return clientBinaryDecode(message, this.recentBinaryEncoders, this.binaryChecksumStrategy);
+        return clientBinaryDecode(message, this.binaryEncodingCache, this.binaryChecksumStrategy);
     }
 }

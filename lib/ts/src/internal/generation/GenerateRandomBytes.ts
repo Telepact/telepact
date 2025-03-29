@@ -14,24 +14,12 @@
 //|  limitations under the License.
 //|
 
-export class ValidateContext {
-    path: string[];
-    select: { [key: string]: any } | null;
-    fn: string | null;
-    coerceBase64: boolean;
-    base64Coercions: Record<string, object>;
-    bytesCoercions: Record<string, object>;
+import { GenerateContext } from '../../internal/generation/GenerateContext';
 
-    constructor(
-        select: { [key: string]: any } | null, 
-        fn: string | null, 
-        coerceBase64: boolean,
-    ) {
-        this.path = [];
-        this.select = select;
-        this.fn = fn;
-        this.coerceBase64 = coerceBase64;
-        this.base64Coercions = {};
-        this.bytesCoercions = {};
+export function generateRandomBytes(blueprintValue: any, useBlueprintValue: boolean, ctx: GenerateContext): any {
+    if (useBlueprintValue) {
+        return blueprintValue;
+    } else {
+        return ctx.randomGenerator.nextBytes();
     }
 }

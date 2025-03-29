@@ -19,11 +19,13 @@ import { BinaryEncoder } from '../internal/binary/BinaryEncoder';
 import { Message } from '../Message';
 import { InvalidMessage } from '../internal/validation/InvalidMessage';
 import { InvalidMessageBody } from '../internal/validation/InvalidMessageBody';
+import { Base64Encoder } from './binary/Base64Encoder';
 
 export function deserializeInternal(
     messageBytes: Uint8Array,
     serializer: Serialization,
     binaryEncoder: BinaryEncoder,
+    base64Encoder: Base64Encoder
 ): Message {
     let messageAsPseudoJson: any;
     let isMsgPack: boolean;
@@ -54,7 +56,7 @@ export function deserializeInternal(
     if (isMsgPack) {
         finalMessageAsPseudoJsonList = binaryEncoder.decode(messageAsPseudoJsonList);
     } else {
-        finalMessageAsPseudoJsonList = messageAsPseudoJsonList;
+        finalMessageAsPseudoJsonList = base64Encoder.decode(messageAsPseudoJsonList);
     }
 
     if (typeof finalMessageAsPseudoJsonList[0] !== 'object' || Array.isArray(finalMessageAsPseudoJsonList[0])) {

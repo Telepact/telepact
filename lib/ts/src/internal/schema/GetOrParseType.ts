@@ -24,6 +24,7 @@ import { TInteger } from '../types/TInteger';
 import { TNumber } from '../types/TNumber';
 import { TString } from '../types/TString';
 import { TAny } from '../types/TAny';
+import { TBytes } from '../types/TBytes';
 import { parseFunctionType } from '../../internal/schema/ParseFunctionType';
 import { parseStructType } from '../../internal/schema/ParseStructType';
 import { parseUnionType } from '../../internal/schema/ParseUnionType';
@@ -42,7 +43,7 @@ export function getOrParseType(path: any[], typeName: string, ctx: ParseContext)
         return existingType;
     }
 
-    const regexString = `^(boolean|integer|number|string|any|array|object)|((fn|(union|struct|_ext))\\.([a-zA-Z_]\\w*))$`;
+    const regexString = `^(boolean|integer|number|string|any|bytes|array|object)|((fn|(union|struct|_ext))\\.([a-zA-Z_]\\w*))$`;
     const regex = new RegExp(regexString);
 
     const matcher = typeName.match(regex);
@@ -61,6 +62,7 @@ export function getOrParseType(path: any[], typeName: string, ctx: ParseContext)
                 integer: new TInteger(),
                 number: new TNumber(),
                 string: new TString(),
+                bytes: new TBytes(),
                 array: new TArray(),
                 object: new TObject(),
             }[standardTypeName] || new TAny()

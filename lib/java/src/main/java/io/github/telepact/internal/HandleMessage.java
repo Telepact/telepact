@@ -112,9 +112,6 @@ public class HandleMessage {
 
         final TUnion functionTypeCall = functionType.call;
 
-        final var knownChecksums = (List<Object>) requestHeaders.getOrDefault("@clientKnownBinaryChecksums_", new ArrayList<>());
-        final var expectBytes = knownChecksums.size() > 0;
-
         final var callValidateCtx = new ValidateContext(null, null, false);
 
         final var callValidationFailures = functionTypeCall.validate(requestBody, List.of(),

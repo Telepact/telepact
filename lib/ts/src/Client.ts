@@ -14,14 +14,14 @@
 //|  limitations under the License.
 //|
 
-import { DefaultClientBinaryStrategy } from './DefaultClientBinaryStrategy';
 import { DefaultSerialization } from './DefaultSerialization';
 import { Serializer } from './Serializer';
 import { ClientBinaryEncoder } from './internal/binary/ClientBinaryEncoder';
 import { Message } from './Message';
-import { processRequestObject } from './internal/ProcessRequestObject';
+import { clientHandleMessage } from './internal/ClientHandleMessage';
 import { Serialization } from './Serialization';
-import { ClientBinaryStrategy } from './ClientBinaryStrategy';
+import { DefaultBinaryEncodingCache } from './internal/binary/DefaultBinaryEncodingCache';
+import { ClientBase64Encoder } from './internal/binary/ClientBase64Encoder';
 
 export class Client {
     private adapter: (message: Message, serializer: Serializer) => Promise<Message>;
@@ -35,11 +35,16 @@ export class Client {
         this.useBinaryDefault = options.useBinary;
         this.alwaysSendJson = options.alwaysSendJson;
         this.timeoutMsDefault = options.timeoutMsDefault;
-        this.serializer = new Serializer(options.serializationImpl, new ClientBinaryEncoder(options.binaryStrategy));
+
+        const binaryEncodingCache = new DefaultBinaryEncodingCache();
+        const binaryEncoder = new ClientBinaryEncoder(binaryEncodingCache);
+        const base64Encoder = new ClientBase64Encoder();
+
+        this.serializer = new Serializer(options.serializationImpl, binaryEncoder, base64Encoder);
     }
 
     async request(requestMessage: Message): Promise<Message> {
-        return await processRequestObject(
+        return await clientHandleMessage(
             requestMessage,
             this.adapter,
             this.serializer,
@@ -55,13 +60,11 @@ export class ClientOptions {
     alwaysSendJson: boolean;
     timeoutMsDefault: number;
     serializationImpl: Serialization;
-    binaryStrategy: ClientBinaryStrategy;
 
     constructor() {
         this.useBinary = false;
         this.alwaysSendJson = true;
         this.timeoutMsDefault = 5000;
         this.serializationImpl = new DefaultSerialization();
-        this.binaryStrategy = new DefaultClientBinaryStrategy();
     }
 }

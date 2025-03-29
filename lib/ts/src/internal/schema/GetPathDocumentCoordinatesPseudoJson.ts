@@ -41,19 +41,19 @@ class StringReader {
         } else {
             this.col += 1;
         }
-        console.log(`reader: char=${c}, row=${this.row}, col=${this.col}`);
+        //console.log(`reader: char=${c}, row=${this.row}, col=${this.col}`);
         return [c, this.row, this.col];
     }
 }
 
 export function getPathDocumentCoordinatesPseudoJson(path: Path, document: string): Coordinates {
-    console.log(`getPathDocumentCoordinatesPseudoJson: path=${path}, document=${document}`);
+    //console.log(`getPathDocumentCoordinatesPseudoJson: path=${path}, document=${document}`);
     const reader = new StringReader(document);
     return findCoordinates(path, reader);
 }
 
 function findCoordinates(path: Path, reader: StringReader, ovRow?: number, ovCol?: number): Coordinates {
-    console.log(`findCoordinates: path=${path}`);
+    //console.log(`findCoordinates: path=${path}`);
 
     let result;
     while ((result = reader.next()) !== null) {
@@ -65,7 +65,7 @@ function findCoordinates(path: Path, reader: StringReader, ovRow?: number, ovCol
             };
         }
 
-        console.log(`findCoordinates: char=${c}, row=${row}, col=${col}`);
+        //console.log(`findCoordinates: char=${c}, row=${row}, col=${col}`);
         if (c === '{') {
             const result = findCoordinatesObject(path, reader);
             if (result) {
@@ -84,7 +84,7 @@ function findCoordinates(path: Path, reader: StringReader, ovRow?: number, ovCol
 }
 
 function findCoordinatesObject(path: Path, reader: StringReader): Coordinates | null {
-    console.log(`findCoordinatesObject: path=${path}`);
+    //console.log(`findCoordinatesObject: path=${path}`);
     let workingKeyRowStart: number | null = null;
     let workingKeyColStart: number | null = null;
     let workingKey: string | undefined;
@@ -92,7 +92,7 @@ function findCoordinatesObject(path: Path, reader: StringReader): Coordinates | 
     let result;
     while ((result = reader.next()) !== null) {
         const [c, row, col] = result;
-        console.log(`findCoordinatesObject: char=${c}, row=${row}, col=${col}`);
+        //console.log(`findCoordinatesObject: char=${c}, row=${row}, col=${col}`);
         if (c === '}') {
             return null;
         } else if (c === '"') {
@@ -112,7 +112,7 @@ function findCoordinatesObject(path: Path, reader: StringReader): Coordinates | 
 }
 
 function findCoordinatesArray(path: Path, reader: StringReader): Coordinates | null {
-    console.log(`findCoordinatesArray: path=${path}`);
+    //console.log(`findCoordinatesArray: path=${path}`);
     let workingIndex = 0;
 
     if (workingIndex === path[0]) {
@@ -124,9 +124,9 @@ function findCoordinatesArray(path: Path, reader: StringReader): Coordinates | n
     let result;
     while ((result = reader.next()) !== null) {
         const [c, row, col] = result;
-        console.log(`findCoordinatesArray: char=${c}, row=${row}, col=${col}`);
+        //console.log(`findCoordinatesArray: char=${c}, row=${row}, col=${col}`);
         workingIndex += 1;
-        console.log(`findCoordinatesArray: workingIndex=${workingIndex}`);
+        //console.log(`findCoordinatesArray: workingIndex=${workingIndex}`);
         if (workingIndex === path[0]) {
             return findCoordinates(path.slice(1), reader);
         } else {
@@ -141,7 +141,7 @@ function findValue(reader: StringReader): boolean {
     let result;
     while ((result = reader.next()) !== null) {
         const [c, row, col] = result;
-        console.log(`findValue: char=${c}, row=${row}, col=${col}`);
+        //console.log(`findValue: char=${c}, row=${row}, col=${col}`);
         if (c === '{') {
             findObject(reader);
             return false;
@@ -166,7 +166,7 @@ function findObject(reader: StringReader): void {
     let result;
     while ((result = reader.next()) !== null) {
         const [c, row, col] = result;
-        console.log(`findObject: char=${c}, row=${row}, col=${col}`);
+        //console.log(`findObject: char=${c}, row=${row}, col=${col}`);
         if (c === '}') {
             return;
         } else if (c === '"') {
@@ -180,7 +180,7 @@ function findObject(reader: StringReader): void {
 }
 
 function findArray(reader: StringReader): void {
-    console.log('findArray');
+    //console.log('findArray');
     if (findValue(reader)) {
         return;
     }
@@ -189,7 +189,7 @@ function findArray(reader: StringReader): void {
     let result;
     while ((result = reader.next()) !== null) {
         const [c, row, col] = result;
-        console.log(`findArray: char=${c}, row=${row}, col=${col}`);
+        //console.log(`findArray: char=${c}, row=${row}, col=${col}`);
         if (c === ']') {
             return;
         }
@@ -205,7 +205,7 @@ function findString(reader: StringReader): string {
     let result;
     while ((result = reader.next()) !== null) {
         const [c, row, col] = result;
-        console.log(`findString: char=${c}`);
+        //console.log(`findString: char=${c}`);
         if (c === '"') {
             return workingString;
         } else {

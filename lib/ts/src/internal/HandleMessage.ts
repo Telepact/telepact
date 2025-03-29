@@ -27,6 +27,7 @@ import { validateResult } from '../internal/validation/ValidateResult';
 import { TFn } from './types/TFn';
 import { mapValidationFailuresToInvalidFieldCases } from './validation/MapValidationFailuresToInvalidFieldCases';
 import { ValidateContext } from './validation/ValidateContext';
+import { serverBase64Decode } from './binary/ServerBase64Decode';
 
 export async function handleMessage(
     requestMessage: Message,
@@ -126,8 +127,10 @@ export async function handleMessage(
         return !r;
     };
 
+    const callValidateCtx = new ValidateContext(null, functionType.name, false)
+
     const callValidationFailures: ValidationFailure[] = functionTypeCall
-        .validate(requestBody, [], new ValidateContext(null, functionType.name))
+        .validate(requestBody, [], callValidateCtx)
         .filter(filterOutWarnings);
     if (callValidationFailures.length > 0) {
         if (warnings.length > 0) {
@@ -142,6 +145,10 @@ export async function handleMessage(
             resultUnionType,
             responseHeaders,
         );
+    }
+
+    if (Object.keys(callValidateCtx.bytesCoercions).length > 0) {
+        serverBase64Decode(requestBody, callValidateCtx.bytesCoercions);
     }
 
     const unsafeResponseEnabled = requestHeaders['@unsafe_'] || false;
@@ -172,38 +179,48 @@ export async function handleMessage(
     const finalResponseHeaders: Record<string, any> = resultMessage.headers;
 
     const skipResultValidation: boolean = unsafeResponseEnabled;
-    if (!skipResultValidation) {
-        const resultValidationFailures: ValidationFailure[] = resultUnionType
-            .validate(resultUnion, [], new ValidateContext(selectStructFieldsHeader, functionType.name))
-            .filter(filterOutWarnings);
 
-        if (warnings.length > 0) {
-            const existingWarnings = responseHeaders['@warn_'] || [];
-            const moreWarnings = mapValidationFailuresToInvalidFieldCases(warnings);
-            responseHeaders['@warn_'] = existingWarnings.concat(moreWarnings);
-        }
+    const coerceBase64 = requestHeaders["@binary_"] != true
+    const resultValidateCtx = new ValidateContext(selectStructFieldsHeader, functionType.name, coerceBase64);
+    const resultValidationFailures: ValidationFailure[] = resultUnionType
+        .validate(resultUnion, [], resultValidateCtx)
+        .filter(filterOutWarnings);
 
-        if (resultValidationFailures.length > 0) {
-            return getInvalidErrorMessage(
-                'ErrorInvalidResponseBody_',
-                resultValidationFailures,
-                resultUnionType,
-                responseHeaders,
-            );
-        }
-        const responseHeaderValidationFailures: ValidationFailure[] = validateHeaders(
-            finalResponseHeaders,
-            telepactSchema.parsedResponseHeaders,
-            functionType,
+    if (warnings.length > 0) {
+        const existingWarnings = responseHeaders['@warn_'] || [];
+        const moreWarnings = mapValidationFailuresToInvalidFieldCases(warnings);
+        responseHeaders['@warn_'] = existingWarnings.concat(moreWarnings);
+    }
+
+    if (resultValidationFailures.length > 0 && !skipResultValidation) {
+        return getInvalidErrorMessage(
+            'ErrorInvalidResponseBody_',
+            resultValidationFailures,
+            resultUnionType,
+            responseHeaders,
         );
-        if (responseHeaderValidationFailures.length > 0) {
-            return getInvalidErrorMessage(
-                'ErrorInvalidResponseHeaders_',
-                responseHeaderValidationFailures,
-                resultUnionType,
-                responseHeaders,
-            );
-        }
+    }
+
+    if (Object.keys(resultValidateCtx.base64Coercions).length > 0) {
+        finalResponseHeaders['@base64_'] = resultValidateCtx.base64Coercions;
+    }
+
+    if (Object.keys(resultValidateCtx.bytesCoercions).length > 0) {
+        serverBase64Decode(resultUnion, resultValidateCtx.bytesCoercions);
+    }
+
+    const responseHeaderValidationFailures: ValidationFailure[] = validateHeaders(
+        finalResponseHeaders,
+        telepactSchema.parsedResponseHeaders,
+        functionType,
+    );
+    if (responseHeaderValidationFailures.length > 0) {
+        return getInvalidErrorMessage(
+            'ErrorInvalidResponseHeaders_',
+            responseHeaderValidationFailures,
+            resultUnionType,
+            responseHeaders,
+        );
     }
 
     let finalResultUnion: Record<string, any>;

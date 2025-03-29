@@ -31,7 +31,13 @@ export function validateArray(
         const validationFailures: ValidationFailure[] = [];
         for (let i = 0; i < value.length; i++) {
             const element = value[i];
+
+            ctx.path.push("*");
+
             const nestedValidationFailures = nestedTypeDeclaration.validate(element, ctx);
+
+            ctx.path.pop();
+
             const index = i;
 
             const nestedValidationFailuresWithPath: ValidationFailure[] = [];

@@ -14,40 +14,23 @@
 //|  limitations under the License.
 //|
 
-import { TTypeDeclaration } from './TTypeDeclaration';
-import { TUnion } from './TUnion';
 import { ValidationFailure } from '../validation/ValidationFailure';
+import { TTypeDeclaration } from './TTypeDeclaration';
 import { TType } from './TType';
+import { validateBytes } from '../validation/ValidateBytes';
+import { generateRandomBytes } from '../generation/GenerateRandomBytes';
 import { GenerateContext } from '../generation/GenerateContext';
-import { generateRandomUnion } from '../generation/GenerateRandomUnion';
 import { ValidateContext } from '../validation/ValidateContext';
 
-const FN_NAME = 'Object';
+export const bytesName: string = 'Bytes';
 
-export class TFn extends TType {
-    name: string;
-    call: TUnion;
-    result: TUnion;
-    errorsRegex: string;
-    inheritedErrors: string[] = [];
-
-    constructor(name: string, call: TUnion, output: TUnion, errorsRegex: string) {
-        super();
-        this.name = name;
-        this.call = call;
-        this.result = output;
-        this.errorsRegex = errorsRegex;
-    }
-
+export class TBytes extends TType {
     getTypeParameterCount(): number {
         return 0;
     }
 
     validate(value: any, typeParameters: TTypeDeclaration[], ctx: ValidateContext): ValidationFailure[] {
-        ctx.path.push(this.name);
-        let result = this.call.validate(value, [], ctx);
-        ctx.path.pop();
-        return result;
+        return validateBytes(value, ctx);
     }
 
     generateRandomValue(
@@ -56,10 +39,10 @@ export class TFn extends TType {
         typeParameters: TTypeDeclaration[],
         ctx: GenerateContext,
     ): any {
-        return generateRandomUnion(blueprintValue, useBlueprintValue, this.call.tags, ctx);
+        return generateRandomBytes(blueprintValue, useBlueprintValue, ctx);
     }
 
     getName(): string {
-        return FN_NAME;
+        return bytesName;
     }
 }
