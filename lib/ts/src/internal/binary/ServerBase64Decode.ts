@@ -1,4 +1,4 @@
-import { Buffer } from "buffer";
+import { decodeBase64 } from "./Base64Util";
 
 export function serverBase64Decode(body: Record<string, any>, bytesPaths: Record<string, any>): void {
     travelBase64Decode(body, bytesPaths);
@@ -45,7 +45,7 @@ function travelBase64Decode(value: any, bytesPaths: any): any {
         if (value === null) {
             return null;
         }
-        const decodedValue = Buffer.from(value, "base64");
+        const decodedValue = decodeBase64(value as string);
         return decodedValue;
     } else {
         throw new Error(`Invalid bytes path: ${bytesPaths} for value: ${value} of type ${typeof value}`);

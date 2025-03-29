@@ -1,3 +1,5 @@
+import { decodeBase64 } from "./Base64Util";
+
 export function clientBase64Decode(message: object[]): void {
     const headers = message[0] as Record<string, unknown>;
     const body = message[1] as Record<string, unknown>;
@@ -49,7 +51,7 @@ function travelBase64Decode(value: unknown, base64Paths: unknown): unknown {
         if (value === null) {
             return null;
         }
-        const result = new Uint8Array(Buffer.from(value as string, "base64"))
+        const result = decodeBase64(value as string)
         return result;
     } else {
         throw new Error(`Invalid base64 path: ${base64Paths} for value: ${value}`);

@@ -2,6 +2,7 @@ import { bytesName } from '../../internal/types/TBytes';
 import { ValidationFailure } from './ValidationFailure';
 import { ValidateContext } from './ValidateContext';
 import { getTypeUnexpectedValidationFailure } from './GetTypeUnexpectedValidationFailure';
+import { decodeBase64, encodeBase64 } from '../binary/Base64Util';
 
 export function validateBytes(value: unknown, ctx: ValidateContext): ValidationFailure[] {
     if (value instanceof Uint8Array) {
@@ -15,8 +16,8 @@ export function validateBytes(value: unknown, ctx: ValidateContext): ValidationF
     if (typeof value === 'string') {
         console.log(`Value is of type 'string': ${value}. Attempting base64 decoding.`);
         try {
-            const decoded = Buffer.from(value, 'base64').toString('binary'); // Decodes a base64-encoded string
-            const reEncoded = Buffer.from(decoded, 'binary').toString('base64');
+            const decoded = decodeBase64(value);
+            const reEncoded = encodeBase64(decoded);
             if (reEncoded !== value) {
                 throw Error('Invalid base64')
             }

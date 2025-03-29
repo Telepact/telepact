@@ -39,8 +39,6 @@ extension type TelepactSchema._(JSObject _) implements JSObject {
       String directory, JSAny fs, JSAny path);
 }
 
-/*
-
 extension type RandomGenerator._(JSObject _) implements JSObject {
   external factory RandomGenerator(
       int collectionLengthMin, int collectionLengthMax);
@@ -159,4 +157,3 @@ extension type SerializationError._(JSObject _) implements JSObject {}
 
 extension type TelepactError._(JSObject _) implements JSObject {}
 
-*/

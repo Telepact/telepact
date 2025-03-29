@@ -1,4 +1,4 @@
-import { Buffer } from "buffer";
+import { encodeBase64 } from "./Base64Util";
 
 export function serverBase64Encode(message: object[]): void {
     const headers = message[0] as Record<string, any>;
@@ -47,7 +47,7 @@ function travelBase64Encode(value: any, base64Paths: any): any {
         if (value === null) {
             return null;
         }
-        return Buffer.from(value).toString("base64");
+        return encodeBase64(value);
     } else {
         throw new Error(`Invalid base64 path: ${base64Paths} for value: ${value}`);
     }

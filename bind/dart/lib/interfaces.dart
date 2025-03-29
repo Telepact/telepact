@@ -19,7 +19,6 @@ import 'dart:typed_data';
 
 import 'bindings.dart';
 
-/*
 class DartRandomGenerator {
   final RandomGenerator _randomGenerator;
 
@@ -149,4 +148,3 @@ class DartServerOptions {
 
   set serialization(Serialization value) => _options.serialization = value;
 }
-*/
