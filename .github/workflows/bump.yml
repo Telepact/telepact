@@ -45,10 +45,15 @@ jobs:
           fetch-depth: 2
           token: ${{ steps.generate-token.outputs.token }}
 
+      # Required for bumping lock files
       - name: Set up Dart
         uses: dart-lang/setup-dart@v1
         with:
           sdk: 3.6
+
+      # Required for bumping lock files
+      - name: Install Poetry
+        run: pipx install poetry
 
       - name: Install Project CLI
         run: make install-project-cli
