@@ -16,11 +16,15 @@
 
 .PHONY: all dep clean
 
-all: dep
+SRC_FILES := $(shell find telepact_cli -type f)
+TAR_GZ := dist/*.tar.gz
+DEP_TAR_GZ := ../../lib/py/dist/*.tar.gz
+
+$(TAR_GZ): $(DEP_TAR_GZ)
 	cp ../../LICENSE ../../NOTICE telepact_cli
 	rm -rf tmp
 	mkdir -p tmp
-	tar -xzvf ../../lib/py/dist/*.tar.gz -C tmp
+	tar -xzvf $(DEP_TAR_GZ) -C tmp
 	rm -rf telepact_cli/telepact
 	mv tmp/*/telepact telepact_cli/telepact
 	rm -rf tmp
@@ -30,7 +34,7 @@ all: dep
 	poetry install
 	poetry build
 
-dep:
+$(DEP_TAR_GZ):
 	$(MAKE) -C ../../lib/py
 
 clean:
