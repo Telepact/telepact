@@ -59,11 +59,12 @@ function travelBase64Encode(value: any, base64Paths: any): any {
             }
         }
         return null;
-    } else if (base64Paths === true && (Buffer.isBuffer(value) || value === null)) {
+    } else if (base64Paths === true && (value instanceof Uint8Array || value === null)) {
         if (value === null) {
             return null;
         }
-        return encodeBase64(value);
+        const encodedValue = encodeBase64(value);
+        return encodedValue;
     } else {
         throw new Error(`Invalid base64 path: ${base64Paths} for value: ${value}`);
     }
