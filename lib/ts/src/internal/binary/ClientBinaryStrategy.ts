@@ -31,6 +31,19 @@ export class ClientBinaryStrategy {
 
     constructor(binaryEncodingCache: BinaryEncodingCache) {
         this.binaryEncodingCache = binaryEncodingCache;
+
+        const initialChecksums = binaryEncodingCache.getChecksums();
+
+        const randomPrimary = initialChecksums[0];
+        const randomSecondary = initialChecksums[1];
+
+        if (randomPrimary) {
+            this.primary = new Checksum(randomPrimary, 0);
+        }
+
+        if (randomSecondary) {
+            this.secondary = new Checksum(randomSecondary, 0);
+        }
     }
 
     updateChecksum(newChecksum: number): void {

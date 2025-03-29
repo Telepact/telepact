@@ -3,28 +3,35 @@ import { BinaryEncoding } from "./BinaryEncoding";
 
 export class LocalStorageBackedBinaryEncodingCache extends BinaryEncodingCache {
     private recentBinaryEncoders: Map<number, BinaryEncoding>;
+    private recentBinaryEncodersJson: Record<string, Record<string, number>>;
     private namespace: string;
 
     constructor(namespace: string) {
         super();
 
-        this.namespace = namespace;
+        this.namespace = 'telepact-api-encoding:' + namespace
 
-        // Load initial state of recentBinaryEncoders from local storage
-        const storedData = localStorage.getItem(this.namespace + '-telepact-encoding');
-        if (storedData) {
-            const parsedData = JSON.parse(storedData);
-            this.recentBinaryEncoders = this.mapFromJSON(parsedData);
-        } else {
-            this.recentBinaryEncoders = new Map<number, BinaryEncoding>();
-        }
+        // Load initial state of recentBinaryEncodersJson from local storage
+        const storedJson = localStorage.getItem(this.namespace);
+
+        console.log(`Binary Encoding loaded for ${this.namespace}: ${storedJson}`);
+
+        let jsonFromLocalStorage: Record<string, Record<string, number>> = storedJson 
+            ? JSON.parse(storedJson) 
+            : {};
+
+        this.recentBinaryEncodersJson = jsonFromLocalStorage;
+        this.recentBinaryEncoders = this.mapJsonToObject(jsonFromLocalStorage);
     }
 
     add(checksum: number, binaryEncodingMap: Map<string, number>): void {
-        const binaryEncoding = new BinaryEncoding(binaryEncodingMap, checksum);
-        this.recentBinaryEncoders.set(checksum, binaryEncoding);
+        const binaryEncodingJson = Object.fromEntries(binaryEncodingMap);
+        this.recentBinaryEncodersJson[`${checksum}`] = binaryEncodingJson;
 
-        this.saveToLocalStorage();
+        this.recentBinaryEncoders = this.mapJsonToObject(this.recentBinaryEncodersJson);
+
+        // Save recentBinaryEncodersJson to local storage
+        localStorage.setItem(this.namespace, JSON.stringify(this.recentBinaryEncodersJson));
     }
 
     get(checksum: number): BinaryEncoding | undefined {
@@ -32,32 +39,29 @@ export class LocalStorageBackedBinaryEncodingCache extends BinaryEncodingCache {
     }
 
     remove(checksum: number): void {
-        this.recentBinaryEncoders.delete(checksum);
+        delete this.recentBinaryEncodersJson[checksum];
 
-        // Rewrite recentBinaryEncoders to local storage
-        this.saveToLocalStorage();
+        this.recentBinaryEncoders = this.mapJsonToObject(this.recentBinaryEncodersJson);
+
+        // Save recentBinaryEncodersJson to local storage
+        localStorage.setItem(this.namespace, JSON.stringify(this.recentBinaryEncodersJson));
     }
 
-    private saveToLocalStorage(): void {
-        const serializedData = this.mapToJSON(this.recentBinaryEncoders);
-        localStorage.setItem(this.namespace + '-telepact-encoding', JSON.stringify(serializedData));
+    getChecksums(): number[] {
+        return this.recentBinaryEncoders.keys().toArray();
     }
 
-    private mapToJSON(map: Map<number, BinaryEncoding>): Record<string, any> {
-        return Object.fromEntries(
-            Array.from(map.entries()).map(([key, value]) => [
-                key,
-                { binaryEncodingMap: Array.from(value.encodeMap.entries()), checksum: value.checksum },
-            ])
-        );
-    }
+    private mapJsonToObject(json: Record<string, Record<string, number>>): Map<number, BinaryEncoding> {
+        let newMap = new Map<number, BinaryEncoding>();
 
-    private mapFromJSON(json: Record<string, any>): Map<number, BinaryEncoding> {
-        return new Map<number, BinaryEncoding>(
-            Object.entries(json).map(([key, value]) => [
-                Number(key),
-                new BinaryEncoding(new Map(value.binaryEncodingMap), value.checksum),
-            ])
-        );
+        for (var [k, v] of Object.entries(json)) {
+            let checksum = parseInt(k);
+            let binaryEncodingRecord = v as Record<string, number>;
+            let binaryEncodingMap = new Map(Object.entries(binaryEncodingRecord));
+            let binaryEncoding = new BinaryEncoding(binaryEncodingMap, checksum);
+            newMap.set(checksum, binaryEncoding);
+        }
+
+        return newMap;
     }
 }

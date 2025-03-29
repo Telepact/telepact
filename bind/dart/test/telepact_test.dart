@@ -288,9 +288,10 @@ void main() {
 
 
       // Put some data into the local storage to see if it loads in
-      final exampleLocalStorageData = {"-1337":{"binaryEncodingMap":{"lol": 1, "notreal": 2},"checksum":-1337}};
+      //final exampleLocalStorageData = {"-1337":{"lol": 1, "notreal": 2}};
+      final exampleLocalStorageData = {"-2064039486":{"Ok_":0,"api":1,"fn.add":2,"fn.api_":3,"fn.ping_":4,"result":5,"x":6,"y":7}};
       web.window.localStorage.setItem(
-        'test-telepact-encoding',
+        'telepact-api-encoding:test',
         jsonEncode(exampleLocalStorageData)
       );
 
@@ -311,16 +312,6 @@ void main() {
 
         DartMessage expectedResponse = DartMessage(
           {
-            '@enc_': {
-              'Ok_': 0,
-              'api': 1,
-              'fn.add': 2,
-              'fn.api_': 3,
-              'fn.ping_': 4,
-              'result': 5,
-              'x': 6,
-              'y': 7
-            },
             '@bin_': [-2064039486]
           },
           {"Ok_": {}}
@@ -346,7 +337,7 @@ void main() {
 
         print('response: ${response.body}');
 
-        var data = web.window.localStorage.getItem('test-telepact-encoding');
+        var data = web.window.localStorage.getItem('telepact-api-encoding:test');
 
         print('local-storage: ${data}');
       }

@@ -21,4 +21,8 @@ export class DefaultBinaryEncodingCache extends BinaryEncodingCache {
     remove(checksum: number): void {
         this.recentBinaryEncoders.delete(checksum);
     }
+
+    getChecksums(): number[] {
+        return this.recentBinaryEncoders.keys().toArray();;
+    }
 }
