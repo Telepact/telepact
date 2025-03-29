@@ -38,5 +38,6 @@ test:
 
 clean:
 	rm -f telepact_cli.tar.gz
+	rm -rf dist
 	docker-compose rm -f
 	docker rmi telepact-mock
