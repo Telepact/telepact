@@ -318,7 +318,7 @@ def bump() -> None:
     ).stdout.strip().split('\n')
 
     print('prev_commit_paths:')
-    print(prev_commit_hash)
+    print(prev_commit_paths)
 
     # Determine release targets based on the paths
     release_targets = set()
