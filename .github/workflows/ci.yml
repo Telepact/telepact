@@ -89,7 +89,7 @@ jobs:
       - name: Build java
         env:
           GPG_PASSPHRASE: ${{ secrets.MVN_GPG_PASSPHRASE }}
-          MVN_BUILD: deploy
+          MVN_BUILD: deploy -P credentialed
         run: make java
 
       - name: Upload java build artifacts
