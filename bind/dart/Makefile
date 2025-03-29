@@ -14,6 +14,8 @@
 #|  limitations under the License.
 #|
 
+VERSION := $(shell cat ../../VERSION.txt)
+
 .PHONY: all
 
 all:
@@ -33,7 +35,7 @@ all:
 	dart analyze
 
 	mkdir -p dist
-	tar -czvf dist/telepact.tar.gz lib pubspec.yaml pubspec.lock README.md LICENSE NOTICE
+	tar -czvf dist/telepact-${VERSION}.tar.gz lib pubspec.yaml pubspec.lock README.md LICENSE NOTICE
 
 dep:
 	$(MAKE) -C ../../lib/ts

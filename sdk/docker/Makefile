@@ -25,7 +25,7 @@ all: dep
 
 	mkdir -p dist
 
-	docker save telepact-mock:${VERSION} | gzip > dist/telepact-mock-image-${VERSION}.tar.gz
+	docker save telepact-mock:${VERSION} | gzip > dist/docker-image-telepact-mock-${VERSION}.tar.gz
 
 dep:
 	$(MAKE) -C ../cli
