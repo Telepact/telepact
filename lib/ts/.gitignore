@@ -3,4 +3,4 @@ lib/
 inc/
 *.tgz
 dist/
-dist-test/
+dist-tgz/

@@ -14,7 +14,7 @@
 #|  limitations under the License.
 #|
 
-LIB_TAR_GZ := ../../../lib/ts/dist-test/*.tgz
+LIB_TAR_GZ := ../../../lib/ts/dist-tgz/*.tgz
 TAR_GZ := telepact.tgz
 
 all: codegen $(TAR_GZ)

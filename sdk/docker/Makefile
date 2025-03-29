@@ -16,10 +16,17 @@
 
 .PHONY: all
 
-all:
+all: dep
 	cp ../cli/dist/telepact_cli-*.tar.gz telepact_cli.tar.gz
 	
 	docker build --progress=plain --no-cache -f Dockerfile -t telepact-mock:latest .
+
+	mkdir -p dist
+
+	docker save telepact-mock:latest | gzip > dist/docker-image-telepact-mock-latest.tar.gz
+
+dep:
+	$(MAKE) -C ../cli
 
 dev:
 	docker-compose up --build

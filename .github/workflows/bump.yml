@@ -50,9 +50,6 @@ jobs:
         with:
           sdk: 3.6
 
-      - name: Install Poetry
-        run: pipx install poetry
-
       - name: Install Project CLI
         run: make install-project-cli
 
@@ -78,5 +75,5 @@ jobs:
       - name: Trigger Build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh workflow run ci.yml --ref main
+        run: gh workflow run ci.yml --ref main -f release=true
           
