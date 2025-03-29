@@ -548,22 +548,37 @@ def release() -> None:
     if not lines[0].startswith("Bump version to"):
         click.echo("The last commit message does not match the expected format.")
         return
-    version = lines[0].split(" ")[3]
+    line_tokens = lines[0].split(" ")
+    version = line_tokens[3]
+    pr_string_in_paran = line_tokens[4]
+    pr_string = pr_string_in_paran[1:-1]
+    pr_number = int(pr_string)
 
-    if len(lines) > 2 and lines[2] == 'Release targets:':
-        release_targets = lines[3:]
+    if len(lines) > 1 and lines[1] == 'Release targets:':
+        release_targets = lines[2:]
     else:
         release_targets = []
 
     print(f'release_targets: {release_targets}')
     print(f'version: {version}')
+    print(f'pr_number: {pr_number}')
 
     tag_name = version
     release_name = version
-    final_release_body = f"### Release Targets:\n\n{release_targets}".strip()
 
     g = Github(token)
     repo = g.get_repo(repository)
+    pr = repo.get_pull(pr_number)
+
+    # Create the final release body
+    pr_title = pr.title
+    pr_url = pr.html_url
+    final_release_body = (
+        f"### Change\n"
+        f"#### {pr_title} [(#{pr_number})]({pr_url})\n\n"
+        f"### Updated Projects\n"
+        f"{''.join(f'- {target}\n' for target in release_targets)}"
+    ).strip()
 
     try:
         release = repo.create_git_release(
