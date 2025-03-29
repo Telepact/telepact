@@ -64,7 +64,7 @@ export class LocalStorageBackedBinaryEncodingCache extends BinaryEncodingCache {
     }
 
     getChecksums(): number[] {
-        return this.recentBinaryEncoders.keys().toArray();
+        return Array.from(this.recentBinaryEncoders.keys());
     }
 
     private mapJsonToObject(json: Record<string, Record<string, number>>): Map<number, BinaryEncoding> {

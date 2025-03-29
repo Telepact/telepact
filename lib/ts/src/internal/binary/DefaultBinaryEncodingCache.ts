@@ -39,6 +39,6 @@ export class DefaultBinaryEncodingCache extends BinaryEncodingCache {
     }
 
     getChecksums(): number[] {
-        return this.recentBinaryEncoders.keys().toArray();;
+        return Array.from(this.recentBinaryEncoders.keys());
     }
 }
