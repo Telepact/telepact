@@ -245,20 +245,27 @@ void main() {
       final telepactSchema = TelepactSchema.fromJson(telepactJson);
 
       Future<DartMessage> handler(DartMessage requestMessage) async {
-        print('Handler received requestMessage: ${requestMessage.body}');
-        final body = requestMessage.body;
-        print('Parsed body: $body');
-        final x = body['x'] as int;
-        final y = body['y'] as int;
-        print('Extracted x: $x, y: $y');
-        final result = x + y;
-        print('Computed result: $result');
-        final response = DartMessage(
-          {},
-          {"Ok_": {"result": result}}
-        );
-        print('Created response: ${response.body}');
-        return Future.value(response);
+        try {
+          print('Handler received requestMessage: ${requestMessage.body}');
+          final body = requestMessage.body;
+          print('Parsed body: $body');
+          final fn = body['fn.add'] as Map<Object?, Object?>;
+          final x = fn['x'] as int;
+          final y = fn['y'] as int;
+          print('Extracted x: $x, y: $y');
+          final result = x + y;
+          print('Computed result: $result');
+          final response = DartMessage(
+            {},
+            {"Ok_": {"result": result}}
+          );
+          print('Created response: ${response.body}');
+          return Future.value(response);
+        } catch (e) {
+          print('Error in handler:');
+          print(e);
+          return Future.value(DartMessage({}, {}));
+        }
       }
 
       print('Creating DartServerOptions');
@@ -288,8 +295,8 @@ void main() {
 
 
       // Put some data into the local storage to see if it loads in
-      //final exampleLocalStorageData = {"-1337":{"lol": 1, "notreal": 2}};
-      final exampleLocalStorageData = {"-2064039486":{"Ok_":0,"api":1,"fn.add":2,"fn.api_":3,"fn.ping_":4,"result":5,"x":6,"y":7}};
+      final exampleLocalStorageData = {"-1337":{"lol": 1, "notreal": 2}};
+      //final exampleLocalStorageData = {"-2064039486":{"Ok_":0,"api":1,"fn.add":2,"fn.api_":3,"fn.ping_":4,"result":5,"x":6,"y":7}};
       web.window.localStorage.setItem(
         'telepact-api-encoding:test',
         jsonEncode(exampleLocalStorageData)
@@ -312,6 +319,16 @@ void main() {
 
         DartMessage expectedResponse = DartMessage(
           {
+            '@enc_': {
+                'Ok_': 0,
+                'api': 1,
+                'fn.add': 2,
+                'fn.api_': 3,
+                'fn.ping_': 4,
+                'result': 5,
+                'x': 6,
+                'y': 7
+              },            
             '@bin_': [-2064039486]
           },
           {"Ok_": {}}
@@ -339,6 +356,16 @@ void main() {
 
         var data = web.window.localStorage.getItem('telepact-api-encoding:test');
 
+        DartMessage expectedResponse = DartMessage(
+          {
+            '@bin_': [-2064039486]
+          },
+          {"Ok_": {'result': 3}}
+        );
+
+        expect(response.headers, equals(expectedResponse.headers));
+        expect(response.body, equals(expectedResponse.body));
+        
         print('local-storage: ${data}');
       }
     });    
