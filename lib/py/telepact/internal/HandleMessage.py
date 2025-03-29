@@ -16,7 +16,7 @@
 
 from typing import Callable, TYPE_CHECKING, cast, Awaitable
 
-from telepact.internal.binary.ServerBase64Decode import server_base64_decode
+from ..internal.binary.ServerBase64Decode import server_base64_decode
 
 from ..Message import Message
 from .types.TTypeDeclaration import TTypeDeclaration
