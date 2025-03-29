@@ -22,6 +22,7 @@ on:
       release:
         required: false
         default: 'false'
+        type: boolean
 
   pull_request:
     types:
@@ -280,7 +281,7 @@ jobs:
   add-labels:
     runs-on: ubuntu-latest
     timeout-minutes: 1
-    if: github.event_name == 'pull_request'
+    if: ${{ github.event_name == 'pull_request' }}
     permissions:
       pull-requests: write
     steps:
@@ -361,7 +362,7 @@ jobs:
           make test
 
   release:
-    if: github.event.inputs.release == true
+    if: ${{ github.event.inputs.release == true }}
     runs-on: ubuntu-latest
     timeout-minutes: 1
     needs:
