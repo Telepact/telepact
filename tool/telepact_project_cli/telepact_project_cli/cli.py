@@ -574,9 +574,8 @@ def release() -> None:
     pr_title = pr.title
     pr_url = pr.html_url
     final_release_body = (
-        f"### Change\n"
-        f"#### {pr_title} [(#{pr_number})]({pr_url})\n\n"
-        f"### Updated Projects\n"
+        f"# {pr_title} [(#{pr_number})]({pr_url})\n\n"
+        f"### Released Projects\n"
         f"{''.join(f'- {target}\n' for target in release_targets)}"
     ).strip()
 
@@ -606,7 +605,7 @@ def release() -> None:
                             release.upload_asset(
                                 path=file_path,
                                 name=file_name,
-                                label=f"{target} - {file_name}"
+                                label=f"{target}-{file_name}"
                             )
                             asset_count += 1
                             click.echo(f"Uploaded asset: {file_name} for target: {target}")
