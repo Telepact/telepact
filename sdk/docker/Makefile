@@ -14,16 +14,18 @@
 #|  limitations under the License.
 #|
 
+VERSION := $(shell cat ../../VERSION.txt)
+
 .PHONY: all
 
 all: dep
 	cp ../cli/dist/telepact_cli-*.tar.gz telepact_cli.tar.gz
 	
-	docker build --progress=plain --no-cache -f Dockerfile -t telepact-mock:latest .
+	docker build --progress=plain --no-cache -f Dockerfile -t telepact-mock:${VERSION} .
 
 	mkdir -p dist
 
-	docker save telepact-mock:latest | gzip > dist/docker-image-telepact-mock-latest.tar.gz
+	docker save telepact-mock:${VERSION} | gzip > dist/docker-image-telepact-mock-${VERSION}.tar.gz
 
 dep:
 	$(MAKE) -C ../cli
@@ -36,5 +38,6 @@ test:
 
 clean:
 	rm -f telepact_cli.tar.gz
+	rm -rf dist
 	docker-compose rm -f
 	docker rmi telepact-mock

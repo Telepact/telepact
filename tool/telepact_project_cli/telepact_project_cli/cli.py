@@ -332,10 +332,12 @@ def bump() -> None:
         if 'sdk/prettier' in path:
             release_targets.add('prettier')
 
-    print(f'release_targets: {release_targets}')
+    sorted_release_targets = sorted(release_targets)
 
-    if release_targets:
-        release_string = "Release targets:\n" + "\n".join(release_targets)
+    print(f'release_targets: {sorted_release_targets}')
+
+    if sorted_release_targets:
+        release_string = "Release targets:\n" + "\n".join(sorted_release_targets)
     else:
         release_string = "No release targets"
 
@@ -584,7 +586,7 @@ def release() -> None:
             tag=tag_name,
             name=release_name,
             message=final_release_body,
-            draft=True,
+            draft=False,
             prerelease=True,
             target_commitish=head_commit
         )
@@ -605,7 +607,7 @@ def release() -> None:
                             release.upload_asset(
                                 path=file_path,
                                 name=file_name,
-                                label=f"{target}-{file_name}"
+                                label=f" [{target}]: {file_name}"
                             )
                             asset_count += 1
                             click.echo(f"Uploaded asset: {file_name} for target: {target}")
