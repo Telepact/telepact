@@ -30,6 +30,7 @@ on:
 jobs:
   build-ts:
     runs-on: ubuntu-latest
+    timeout-minutes: 1
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -46,6 +47,7 @@ jobs:
 
   build-java:
     runs-on: ubuntu-latest
+    timeout-minutes: 1
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -76,6 +78,7 @@ jobs:
 
   build-py:
     runs-on: ubuntu-latest
+    timeout-minutes: 1
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -95,6 +98,7 @@ jobs:
 
   build-cli:
     runs-on: ubuntu-latest
+    timeout-minutes: 1
     needs: [build-py]
     steps:
       - name: Checkout code
@@ -121,6 +125,7 @@ jobs:
 
   build-dart:
     runs-on: ubuntu-latest
+    timeout-minutes: 1
     needs: [build-ts]
     steps:
       - name: Checkout code
@@ -150,6 +155,7 @@ jobs:
 
   build-prettier:
     runs-on: ubuntu-latest
+    timeout-minutes: 1
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -166,6 +172,7 @@ jobs:
 
   build-console:
     runs-on: ubuntu-latest
+    timeout-minutes: 1
     needs: [build-ts, build-cli, build-prettier]
     steps:
       - name: Checkout code
@@ -203,6 +210,7 @@ jobs:
 
   build-docker:
     runs-on: ubuntu-latest
+    timeout-minutes: 1
     needs: [build-cli]
     steps:
       - name: Checkout code
@@ -222,6 +230,7 @@ jobs:
 
   check-license-header:
     runs-on: ubuntu-latest
+    timeout-minutes: 1
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -243,6 +252,7 @@ jobs:
 
   check-version:
     runs-on: ubuntu-latest
+    timeout-minutes: 1
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -264,6 +274,7 @@ jobs:
 
   add-labels:
     runs-on: ubuntu-latest
+    timeout-minutes: 1
     if: github.event_name == 'pull_request'
     permissions:
       pull-requests: write
@@ -285,6 +296,7 @@ jobs:
 
   run-tests:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     needs: [build-ts, build-java, build-py, build-cli]
     steps:
       - name: Checkout code

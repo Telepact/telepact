@@ -22,6 +22,7 @@ import { clientHandleMessage } from './internal/ClientHandleMessage';
 import { Serialization } from './Serialization';
 import { DefaultBinaryEncodingCache } from './internal/binary/DefaultBinaryEncodingCache';
 import { ClientBase64Encoder } from './internal/binary/ClientBase64Encoder';
+import { LocalStorageBackedBinaryEncodingCache } from './internal/binary/LocalStorageBackedBinaryEncodingCache';
 
 export class Client {
     private adapter: (message: Message, serializer: Serializer) => Promise<Message>;
@@ -36,7 +37,9 @@ export class Client {
         this.alwaysSendJson = options.alwaysSendJson;
         this.timeoutMsDefault = options.timeoutMsDefault;
 
-        const binaryEncodingCache = new DefaultBinaryEncodingCache();
+        const binaryEncodingCache = options.localStorageCacheNamespace
+            ? new LocalStorageBackedBinaryEncodingCache(options.localStorageCacheNamespace)
+            : new DefaultBinaryEncodingCache();
         const binaryEncoder = new ClientBinaryEncoder(binaryEncodingCache);
         const base64Encoder = new ClientBase64Encoder();
 
@@ -60,11 +63,13 @@ export class ClientOptions {
     alwaysSendJson: boolean;
     timeoutMsDefault: number;
     serializationImpl: Serialization;
+    localStorageCacheNamespace: string
 
     constructor() {
         this.useBinary = false;
         this.alwaysSendJson = true;
         this.timeoutMsDefault = 5000;
         this.serializationImpl = new DefaultSerialization();
+        this.localStorageCacheNamespace = ''
     }
 }

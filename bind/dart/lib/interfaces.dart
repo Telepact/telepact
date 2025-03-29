@@ -19,6 +19,7 @@ import 'dart:typed_data';
 
 import 'bindings.dart';
 
+/*
 class DartRandomGenerator {
   final RandomGenerator _randomGenerator;
 
@@ -107,7 +108,7 @@ class DartClientOptions {
 
   set timeoutMsDefault(int value) => _options.timeoutMsDefault = value;
 
-  set binaryStrategy(DartClientBinaryStrategy value) => _options.binaryStrategy = value.toJS();
+  set localStorageCacheNamespace(String value) => _options.localStorageCacheNamespace = value;
 }
 
 class DartServer {
@@ -148,20 +149,4 @@ class DartServerOptions {
 
   set serialization(Serialization value) => _options.serialization = value;
 }
-
-
-abstract class DartClientBinaryStrategy {
-  void updateChecksum(int checksum);
-  List<int> getCurrentChecksums();
-
-  toJS() {
-    JSArray outer() {
-      final list = getCurrentChecksums();
-      return list.jsify() as JSArray;
-    }
-    return ClientBinaryStrategy(
-      updateChecksum: updateChecksum.toJS,
-      getCurrentChecksums: outer.toJS
-    );
-  }
-}
+*/

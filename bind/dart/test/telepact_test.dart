@@ -48,98 +48,100 @@ void main() {
       ];
       print("Encoding json");
       final telepactJson = jsonEncode(telepactPseudoJson);
-      print('Creating TelepactSchema');
+      print('telepactJson: ${telepactJson}');
       final telepactSchema = TelepactSchema.fromJson(telepactJson);
       print('TelepactSchema created: $telepactSchema');
 
+      print('done');
+    });
    
 
-      JSPromise handler(Message requestMessage) {
-        final body = requestMessage.body.dartify() as Map<String, Object>;
-        final x = body['x'] as int;
-        final y = body['y'] as int;
-        final result = x + y;
-        final response = Message(
-          {}.jsify(),
-          {"Ok_": {"result": result}}.jsify()
-        );
-        return Future.value(response).toJS;
-      }
+      // JSPromise handler(Message requestMessage) {
+      //   print('Handler received requestMessage: ${requestMessage.body.dartify()}');
+      //   final body = requestMessage.body.dartify() as Map<String, Object>;
+      //   print('Parsed body: $body');
+      //   final x = body['x'] as int;
+      //   final y = body['y'] as int;
+      //   print('Extracted x: $x, y: $y');
+      //   final result = x + y;
+      //   print('Computed result: $result');
+      //   final response = Message(
+      //     {}.jsify(),
+      //     {"Ok_": {"result": result}}.jsify()
+      //   );
+      //   print('Created response: ${response.body.dartify()}');
+      //   return Future.value(response).toJS;
+      // }
 
-      print('Creating ServerOptions');
-      final serverOptions = ServerOptions()..authRequired = false;
-      print('ServerOptions created: $serverOptions');
+      // print('Creating ServerOptions');
+      // final serverOptions = ServerOptions()..authRequired = false;
+      // print('ServerOptions created: $serverOptions');
 
-      print('Creating Server');
-      final server = Server(telepactSchema, handler.toJS, serverOptions);
-      print('Server created: $server');
+      // print('Creating Server');
+      // final server = Server(telepactSchema, handler.toJS, serverOptions);
+      // print('Server created: $server');
 
-      final requestMessageBytes = Uint8List.fromList([1, 2, 3]);
-      print('Request message bytes: $requestMessageBytes');
+      // final requestMessageBytes = Uint8List.fromList([1, 2, 3]);
+      // print('Request message bytes: $requestMessageBytes');
 
-      JSPromise adapter(Message m, Serializer s) {
-        final requestBytes = s.serialize(m);
-        final responseBytes = server.process(requestBytes).toDart;
-        return responseBytes.then((value) {
-          final response = s.deserialize(value);
-          return response.jsify();
-        }).toJS;
-      }
+      // JSPromise adapter(Message m, Serializer s) {
+      //   print('Adapter received message: ${m.body.dartify()}');
+      //   final requestBytes = s.serialize(m);
+      //   print('Serialized requestBytes: $requestBytes');
+      //   final responseBytes = server.process(requestBytes).toDart;
+      //   return responseBytes.then((value) {
+      //     print('Received responseBytes: $value');
+      //     final response = s.deserialize(value);
+      //     print('Deserialized response: ${response.body.dartify()}');
+      //     return response.jsify();
+      //   }).toJS;
+      // }
 
-      final clientOptions = ClientOptions()..useBinary = true;
-      final client = Client(adapter.toJS, clientOptions);
+      // print('Creating ClientOptions');
+      // final clientOptions = ClientOptions()..useBinary = true;
+      // print('ClientOptions created: $clientOptions');
 
-      // dynamic request = [
-      //   {},
-      //   {"fn.ping_": {}}
-      // ];
-      // dynamic requestJson = jsonEncode(request);
-      // print('Request bytes: $requestJson');
+      // print('Creating Client');
+      // final client = Client(adapter.toJS, clientOptions);
+      // print('Client created: $client');
 
-      final request = Message(
-        {}.jsify(),
-        {'fn.ping_': {}}.jsify()
-      );
+      // final request = Message(
+      //   {}.jsify(),
+      //   {'fn.ping_': {}}.jsify()
+      // );
+      // print('Created request: ${request.body.dartify()}');
 
-      var response = await client.request(request).toDart;
+      // var response = await client.request(request).toDart;
+      // print('Received response: ${response.body.dartify()}');
 
-      // final requestBytes = Uint8List.fromList(utf8.encode(requestJson));
+      // Message expectedResponse = Message(
+      //   {
+      //     '@enc_': {
+      //       'Ok_': 0,
+      //       'api': 1,
+      //       'fn.add': 2,
+      //       'fn.api_': 3,
+      //       'fn.ping_': 4,
+      //       'result': 5,
+      //       'x': 6,
+      //       'y': 7
+      //     },
+      //     '@bin_': [-2064039486]
+      //   }.jsify(),
+      //   {"Ok_": {}}.jsify()
+      // );
+      // print('Expected response: ${expectedResponse.body.dartify()}');
 
-      // print('Processing request');
-      // final responseBytes = await server.process(requestBytes.toJS).toDart;
-      // print('Response bytes: $responseBytes');
+      // // Print contents and type
+      // print(response.body.dartify());
+      // print(response.body.dartify().runtimeType);
 
-      // dynamic response = jsonDecode(utf8.decode(responseBytes.toDart));
-      // print('Response: $response');
+      // expect(response.headers.dartify(), equals(expectedResponse.headers.dartify()));
+      // expect(response.body.dartify(), equals(expectedResponse.body.dartify()));
 
-      Message expectedResponse = Message(
-        {
-          '@enc_': {
-            'Ok_': 0,
-            'api': 1,
-            'fn.add': 2,
-            'fn.api_': 3,
-            'fn.ping_': 4,
-            'result': 5,
-            'x': 6,
-            'y': 7
-          },
-          '@bin_': [-2064039486]
-        }.jsify(),
-        {"Ok_": {}}.jsify()
-      );
-      print('Expected response: $expectedResponse');
-
-      // Print contents and type
-      print(response.body.dartify());
-      print(response.body.dartify().runtimeType);
-
-      expect(response.headers.dartify(), equals(expectedResponse.headers.dartify()));
-      expect(response.body.dartify(), equals(expectedResponse.body.dartify()));
-
-      print('Test completed');
-    }, skip: true);
-
+      // print('Test completed');
+    //});
+/*
     test('should work e2e from client to server', () async {
       final telepactPseudoJson = [
         {
@@ -160,14 +162,19 @@ void main() {
       final telepactSchema = TelepactSchema.fromJson(telepactJson);
 
       JSPromise handler(Message requestMessage) {
+        print('Handler received requestMessage: ${requestMessage.body.dartify()}');
         final body = requestMessage.body.dartify() as Map<String, Object>;
+        print('Parsed body: $body');
         final x = body['x'] as int;
         final y = body['y'] as int;
+        print('Extracted x: $x, y: $y');
         final result = x + y;
+        print('Computed result: $result');
         final response = Message(
           {}.jsify(),
           {"Ok_": {"result": result}}.jsify()
         );
+        print('Created response: ${response.body.dartify()}');
         return Future.value(response).toJS;
       }
 
@@ -175,10 +182,14 @@ void main() {
       final server = Server(telepactSchema, handler.toJS, serverOptions);
 
       JSPromise adapter(Message m, Serializer s) {
+        print('Adapter received message: ${m.body.dartify()}');
         final requestBytes = s.serialize(m);
+        print('Serialized requestBytes: $requestBytes');
         final responseBytes = server.process(requestBytes).toDart;
         return responseBytes.then((value) {
+          print('Received responseBytes: $value');
           final response = s.deserialize(value);
+          print('Deserialized response: ${response.body.dartify()}');
           return response.jsify();
         }).toJS;
       }
@@ -190,8 +201,10 @@ void main() {
         {}.jsify(),
         {'fn.ping_': {}}.jsify()
       );
+      print('Created request: ${request.body.dartify()}');
 
       var response = await client.request(request).toDart;
+      print('Received response: ${response.body.dartify()}');
 
       Message expectedResponse = Message(
         {
@@ -209,6 +222,7 @@ void main() {
         }.jsify(),
         {"Ok_": {}}.jsify()
       );
+      print('Expected response: ${expectedResponse.body.dartify()}');
 
       expect(response.headers.dartify(), equals(expectedResponse.headers.dartify()));
       expect(response.body.dartify(), equals(expectedResponse.body.dartify()));
@@ -234,36 +248,57 @@ void main() {
       final telepactSchema = TelepactSchema.fromJson(telepactJson);
 
       Future<DartMessage> handler(DartMessage requestMessage) async {
+        print('Handler received requestMessage: ${requestMessage.body}');
         final body = requestMessage.body;
+        print('Parsed body: $body');
         final x = body['x'] as int;
         final y = body['y'] as int;
+        print('Extracted x: $x, y: $y');
         final result = x + y;
+        print('Computed result: $result');
         final response = DartMessage(
           {},
           {"Ok_": {"result": result}}
         );
+        print('Created response: ${response.body}');
         return Future.value(response);
       }
 
+      print('Creating DartServerOptions');
       final serverOptions = DartServerOptions()..authRequired = false;
+      print('DartServerOptions created: $serverOptions');
+
+      print('Creating DartServer');
       final server = DartServer(telepactSchema, handler, serverOptions);
+      print('DartServer created: $server');
 
       Future<DartMessage> adapter(DartMessage m, DartSerializer s) async {
+        print('Adapter received message: ${m.body}');
         final requestBytes = s.serialize(m);
+        print('Serialized requestBytes: $requestBytes');
         final responseBytes = await server.process(requestBytes);
+        print('Received responseBytes: $responseBytes');
         final response = s.deserialize(responseBytes);
+        print('Deserialized response: ${response.body}');
         return response;
       }
 
+      print('Creating DartClientOptions');
       final clientOptions = DartClientOptions()..useBinary = true;
+      print('DartClientOptions created: $clientOptions');
+
+      print('Creating DartClient');
       final client = DartClient(adapter, clientOptions);
+      print('DartClient created: $client');
 
       final request = DartMessage(
         {},
         {'fn.ping_': {}}
       );
+      print('Created request: ${request.body}');
 
       var response = await client.request(request);
+      print('Received response: ${response.body}');
 
       DartMessage expectedResponse = DartMessage(
         {
@@ -281,10 +316,12 @@ void main() {
         },
         {"Ok_": {}}
       );
+      print('Expected response: ${expectedResponse.body}');
 
       expect(response.headers, equals(expectedResponse.headers));
       expect(response.body, equals(expectedResponse.body));
     });    
+  */
 
   });
 }

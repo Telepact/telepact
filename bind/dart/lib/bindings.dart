@@ -19,6 +19,28 @@ library;
 
 import 'dart:js_interop';
 
+
+extension type TelepactSchema._(JSObject _) implements JSObject {
+  external JSArray get original;
+  external JSArray get full;
+  external JSObject get parsed;
+  external JSObject get parsedRequestHeaders;
+  external JSObject get parsedResponseHeaders;
+
+  external factory TelepactSchema(
+      JSArray original,
+      JSArray full,
+      JSObject parsed,
+      JSObject parsedRequestHeaders,
+      JSObject parsedResponseHeaders);
+  external static TelepactSchema fromJson(String json);
+  external static TelepactSchema fromFileJsonMap(JSObject fileJsonMap);
+  external static TelepactSchema fromDirectory(
+      String directory, JSAny fs, JSAny path);
+}
+
+/*
+
 extension type RandomGenerator._(JSObject _) implements JSObject {
   external factory RandomGenerator(
       int collectionLengthMin, int collectionLengthMax);
@@ -63,12 +85,13 @@ extension type ClientOptions._(JSObject _) implements JSObject {
   external bool get alwaysSendJson;
   external int get timeoutMsDefault;
   external Serialization get serializationImpl;
-  external ClientBinaryStrategy get binaryStrategy;
+  external String get localStorageCacheNamespace;
+  
   external void set useBinary(bool value);
   external void set alwaysSendJson(bool value);
   external void set timeoutMsDefault(int value);
   external void set serializationImpl(Serialization value);
-  external void set binaryStrategy(ClientBinaryStrategy value);
+  external void set localStorageCacheNamespace(String value);
 
   external factory ClientOptions();
 }
@@ -96,24 +119,6 @@ extension type ServerOptions._(JSObject _) implements JSObject {
   external factory ServerOptions();
 }
 
-extension type TelepactSchema._(JSObject _) implements JSObject {
-  external JSArray get original;
-  external JSArray get full;
-  external JSObject get parsed;
-  external JSObject get parsedRequestHeaders;
-  external JSObject get parsedResponseHeaders;
-
-  external factory TelepactSchema(
-      JSArray original,
-      JSArray full,
-      JSObject parsed,
-      JSObject parsedRequestHeaders,
-      JSObject parsedResponseHeaders);
-  external static TelepactSchema fromJson(String json);
-  external static TelepactSchema fromFileJsonMap(JSObject fileJsonMap);
-  external static TelepactSchema fromDirectory(
-      String directory, JSAny fs, JSAny path);
-}
 
 extension type MockServer._(JSObject _) implements JSObject {
   external factory MockServer(JSAny mockTelepactSchema, JSAny options);
@@ -145,22 +150,6 @@ extension type MockTelepactSchema._(JSObject _) implements JSObject {
       String directory, JSAny fs, JSAny path);
 }
 
-extension type ClientBinaryStrategy._(JSObject _) implements JSObject {
-  external factory ClientBinaryStrategy({
-    JSFunction updateChecksum,
-    JSFunction getCurrentChecksums,
-  });
-
-  external void updateChecksum(int checksum);
-  external JSArray getCurrentChecksums();
-}
-
-extension type TelepactSchemaFiles._(JSObject _) implements JSObject {
-  external JSObject get filenamesToJson;
-
-  external factory TelepactSchemaFiles(String directory, JSAny fs, JSAny path);
-}
-
 extension type TelepactSchemaParseError._(JSObject _) implements JSObject {
   external JSArray get schemaParseFailures;
   external JSAny get schemaParseFailuresPseudoJson;
@@ -169,3 +158,5 @@ extension type TelepactSchemaParseError._(JSObject _) implements JSObject {
 extension type SerializationError._(JSObject _) implements JSObject {}
 
 extension type TelepactError._(JSObject _) implements JSObject {}
+
+*/
