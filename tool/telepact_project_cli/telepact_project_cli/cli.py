@@ -197,7 +197,7 @@ def set_version(version: str) -> None:
         updated = True
 
     if os.path.exists("pubspec.yaml"):
-        with open("pubspec.yaml", "r") as f):
+        with open("pubspec.yaml", "r") as f:
             data = yaml.load(f)
         data["version"] = version
         with open("pubspec.yaml", "w") as f:
@@ -505,16 +505,24 @@ def github_labels() -> None:
     print(f"Summary:\n  Added tags: {', '.join(added_tags) if added_tags else 'None'}\n  Removed tags: {', '.join(removed_tags) if removed_tags else 'None'}")
 
 @click.command()
-@click.argument('release_body', required=False)
-@click.option('--draft', is_flag=True, default=False, help="Create a draft release.")
-@click.option('--prerelease', is_flag=True, default=False, help="Mark the release as a prerelease.")
-def release(release_body: str, draft: bool, prerelease: bool) -> None:
+def release() -> None:
     """
-    Create a GitHub release.
+    Create a GitHub release and upload assets for the specified release targets.
+    """
 
-    Arguments:
-    release_body -- The description/body of the release (optional).
-    """
+    RELEASE_TARGET_ASSET_DIRECTORY_MAP = {
+        "java": "lib/java/target/central-publishing",
+        "py": "lib/py/dist",
+        "ts": "lib/ts/dist-tgz",
+        "dart": "bind/dart/dist",
+        "cli": "sdk/cli/dist",
+        "console": "sdk/console/dist",
+        "docker": "sdk/docker/dist",
+        "prettier": "sdk/prettier/dist-tgz"
+    }
+
+    MAX_ASSETS = 10  # Maximum number of assets to upload
+
     token = os.getenv('GITHUB_TOKEN')
     repository = os.getenv('GITHUB_REPOSITORY')
 
@@ -540,7 +548,7 @@ def release(release_body: str, draft: bool, prerelease: bool) -> None:
 
     tag_name = version
     release_name = version
-    release_body = f"{release_body or ''}\n\n{release_targets}".strip()
+    final_release_body = f"### Release Targets:\n\n{release_targets}".strip()
 
     g = Github(token)
     repo = g.get_repo(repository)
@@ -549,13 +557,36 @@ def release(release_body: str, draft: bool, prerelease: bool) -> None:
         release = repo.create_git_release(
             tag=tag_name,
             name=release_name,
-            message=release_body,
+            message=final_release_body,
             draft=True,
             prerelease=True
         )
         click.echo(f"Release created: {release.html_url}")
+
+        # Upload assets for each release target
+        asset_count = 0
+        for target in release_targets:
+            asset_directory = RELEASE_TARGET_ASSET_DIRECTORY_MAP.get(target)
+            if asset_directory and os.path.exists(asset_directory):
+                for file_name in os.listdir(asset_directory):
+                    if asset_count >= MAX_ASSETS:
+                        click.echo("Maximum asset upload limit reached. Aborting.")
+                        return
+                    file_path = os.path.join(asset_directory, file_name)
+                    if os.path.isfile(file_path):
+                        with open(file_path, 'rb') as asset_file:
+                            release.upload_asset(
+                                path=file_path,
+                                name=file_name,
+                                label=f"{target} - {file_name}"
+                            )
+                            asset_count += 1
+                            click.echo(f"Uploaded asset: {file_name} for target: {target}")
+            else:
+                click.echo(f"No assets found for target: {target} in directory: {asset_directory}")
+
     except Exception as e:
-        click.echo(f"Failed to create release: {e}")
+        click.echo(f"Failed to create release or upload assets: {e}")
 
 main.add_command(old_bump)
 main.add_command(depset)

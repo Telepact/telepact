@@ -5,7 +5,6 @@ on:
     inputs:
       artifacts_run_id:
         required: true
-        default: 0
         type: number
 
 jobs:
@@ -81,3 +80,9 @@ jobs:
           path: sdk/console/dist
           github-token: ${{ secrets.GITHUB_TOKEN }}
           run-id: ${{ github.event.inputs.artifacts_run_id }}
+
+      - name: Install Project CLI
+        run: make install-project-cli
+
+      - name: Cut release
+        run: telepact-project release

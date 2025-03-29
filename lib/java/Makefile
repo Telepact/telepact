@@ -16,6 +16,7 @@
 
 SHELL := /bin/bash
 
+MVN_BUILD ?= install
 SRC_FILES := $(shell find src -type f)
 JAR_FILE := target/telepact-$(shell cat ../../VERSION.txt).jar
 
@@ -24,7 +25,7 @@ $(JAR_FILE): $(SRC_FILES)
 	cp ../../common/*.json src/main/resources
 	cp ../../LICENSE ../../NOTICE src/main/resources
 	
-	mvn install -s settings.xml | grep -v "from central"
+	mvn $(MVN_BUILD) -s settings.xml | grep -v "from central"
 	@if [ $${PIPESTATUS[0]} -ne 0 ]; then exit 1; fi	
 
 clean:

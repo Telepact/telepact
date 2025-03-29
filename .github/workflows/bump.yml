@@ -50,9 +50,6 @@ jobs:
         with:
           sdk: 3.6
 
-      - name: Install Poetry
-        run: pipx install poetry
-
       - name: Install Project CLI
         run: make install-project-cli
 
