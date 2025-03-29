@@ -536,7 +536,13 @@ def release() -> None:
         stdout=subprocess.PIPE, text=True, check=True
     ).stdout.strip()
 
+    head_commit = subprocess.run(
+        ['git', 'rev-parse', 'HEAD'],
+        stdout=subprocess.PIPE, text=True, check=True
+    ).stdout.strip()
+
     print(f'commit_message: {commit_message}')
+    print(f'head_commit: {head_commit}')
 
     lines = commit_message.splitlines()
     if not lines[0].startswith("Bump version to"):
@@ -564,7 +570,8 @@ def release() -> None:
             name=release_name,
             message=final_release_body,
             draft=True,
-            prerelease=True
+            prerelease=True,
+            target_commitish=head_commit
         )
         click.echo(f"Release created: {release.html_url}")
 
