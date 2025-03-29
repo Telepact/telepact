@@ -571,7 +571,8 @@ def release() -> None:
             name=release_name,
             message=final_release_body,
             draft=True,
-            prerelease=True
+            prerelease=True,
+            target_commitish=head_commit
         )
         click.echo(f"Release created: {release.html_url}")
 
