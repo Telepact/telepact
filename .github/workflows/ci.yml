@@ -433,6 +433,9 @@ jobs:
       - check-version
       - run-tests
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Trigger Release
         if: github.event.inputs.release == 'true'
         env:

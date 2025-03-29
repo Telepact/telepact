@@ -26,7 +26,7 @@ on:
 jobs:
   create-release:
     runs-on: ubuntu-latest
-    timeout-minutes: 1
+    timeout-minutes: 2
     steps:
       - name: Generate GitHub App token
         id: generate-token
