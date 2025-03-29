@@ -334,11 +334,10 @@ def bump() -> None:
 
     print(f'release_targets: {release_targets}')
 
-    # if release_targets:
-    #     release_string = "Release targets:\n" + "\n".join(release_targets)
-    # else:
-    #     release_string = "No release targets"
-    release_string = ''
+    if release_targets:
+        release_string = "Release targets:\n" + "\n".join(release_targets)
+    else:
+        release_string = "No release targets"
 
     # Create the new commit message
     new_commit_msg = f"Bump version to {new_version} (#{pr_number})\n\n" + release_string
