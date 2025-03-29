@@ -1,11 +1,3 @@
-## Instructions
+## Telepact
 
-To build:
-```
-npm install
-```
-
-To run tests:
-```
-dart test -p chrome
-```
+For usage examples, [see the tests](https://github.com/Telepact/telepact/blob/main/bind/dart/test/telepact_test.dart).
