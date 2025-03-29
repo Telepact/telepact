@@ -556,6 +556,7 @@ def release() -> None:
         release_targets = []
 
     print(f'release_targets: {release_targets}')
+    print(f'version: {version}')
 
     tag_name = version
     release_name = version
