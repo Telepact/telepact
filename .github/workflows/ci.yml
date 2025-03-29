@@ -52,6 +52,13 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: build-ts
+          path: lib/ts/dist
+          retention-days: 1
+
+      - name: Upload ts-tgz build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-ts-tgz
           path: lib/ts/dist-tgz
           retention-days: 1
 
