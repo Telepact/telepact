@@ -34,6 +34,7 @@ all: dep
 
 dep:
 	$(MAKE) -C ../../lib/ts
+	$(MAKE) -C ../../sdk/prettier
 
 dev:
 	npm run dev

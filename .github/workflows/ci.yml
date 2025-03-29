@@ -197,6 +197,13 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: build-prettier
+          path: sdk/prettier/dist
+          retention-days: 1
+
+      - name: Upload prettier-tgz build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-prettier-tgz
           path: sdk/prettier/dist-tgz
           retention-days: 1
 
@@ -213,6 +220,12 @@ jobs:
         with:
           name: build-ts
           path: lib/ts/dist
+
+      - name: Download prettier build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-prettier
+          path: sdk/prettier/dist
 
       - name: Download cli build artifacts
         uses: actions/download-artifact@v4
