@@ -84,9 +84,7 @@ jobs:
             ${{ runner.os }}-lib-maven-
 
       - name: Configure GPG
-        env:
-          MVN_GPG_PRIVATE_KEY: ${{ secrets.MVN_GPG_PRIVATE_KEY }}
-        run: echo $MVN_GPG_PRIVATE_KEY | gpg --batch --import --yes
+        run: echo "${{ secrets.MVN_GPG_PRIVATE_KEY }}" | gpg --batch --import --yes
 
       - name: Build java
         env:
