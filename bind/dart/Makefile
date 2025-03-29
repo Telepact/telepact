@@ -33,7 +33,7 @@ all:
 	dart analyze
 
 	mkdir -p dist
-	tar -czvf dist/telepact-dart.tar.gz lib pubspec.yaml pubspec.lock README.md LICENSE NOTICE
+	tar -czvf dist/telepact.tar.gz lib pubspec.yaml pubspec.lock README.md LICENSE NOTICE
 
 dep:
 	$(MAKE) -C ../../lib/ts
