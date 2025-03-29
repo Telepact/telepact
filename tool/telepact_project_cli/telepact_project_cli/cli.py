@@ -551,7 +551,7 @@ def release() -> None:
     line_tokens = lines[0].split(" ")
     version = line_tokens[3]
     pr_string_in_paran = line_tokens[4]
-    pr_string = pr_string_in_paran[1:-1]
+    pr_string = pr_string_in_paran[2:-1]
     pr_number = int(pr_string)
 
     if len(lines) > 1 and lines[1] == 'Release targets:':
