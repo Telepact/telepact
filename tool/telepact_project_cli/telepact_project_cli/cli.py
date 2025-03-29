@@ -226,6 +226,15 @@ def bump() -> None:
 
     pr_number = int(os.getenv('PR_NUMBER'))
 
+    # Get the paths from the previous commit
+    prev_commit_paths = subprocess.run(
+        ['git', 'show', '--name-only', '--pretty=format:', 'HEAD'],
+        stdout=subprocess.PIPE, text=True
+    ).stdout.strip().split('\n')
+
+    print('prev_commit_paths:')
+    print(prev_commit_paths)
+
     def bump_version2(version: str) -> str:
         parts = version.split('.')
         parts[-1] = str(int(parts[-1]) + 1)
@@ -303,23 +312,6 @@ def bump() -> None:
             edited_files.append(os.path.join(os.path.dirname(project_file), "pubspec.lock"))
             click.echo(f"Updated pubspec.lock in {os.path.dirname(project_file)}")
 
-    # Get the previous commit hash by going back 1 commit
-    prev_commit_hash = subprocess.run(
-        ['git', 'log', '--pretty=format:%H', '-1'],
-        stdout=subprocess.PIPE, text=True
-    ).stdout.strip()
-
-    print(f'prev_commit_hash: {prev_commit_hash}')
-
-    # Get the paths from the previous commit
-    prev_commit_paths = subprocess.run(
-        ['git', 'show', '--name-only', '--pretty=format:', '-1'],
-        stdout=subprocess.PIPE, text=True
-    ).stdout.strip().split('\n')
-
-    print('prev_commit_paths:')
-    print(prev_commit_paths)
-
     # Determine release targets based on the paths
     release_targets = set()
     for path in prev_commit_paths:
@@ -340,10 +332,13 @@ def bump() -> None:
         if 'sdk/prettier' in path:
             release_targets.add('prettier')
 
-    if release_targets:
-        release_string = "Release targets:\n" + "\n".join(release_targets)
-    else:
-        release_string = "No release targets"
+    print(f'release_targets: {release_string}')
+
+    # if release_targets:
+    #     release_string = "Release targets:\n" + "\n".join(release_targets)
+    # else:
+    #     release_string = "No release targets"
+    release_string = ''
 
     # Create the new commit message
     new_commit_msg = f"Bump version to {new_version} (#{pr_number})\n\n" + release_string
