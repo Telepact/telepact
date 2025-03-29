@@ -18,6 +18,11 @@ name: CI
 
 on:
   workflow_dispatch:
+    inputs:
+      release:
+        required: false
+        default: 'false'
+
   pull_request:
     types:
       - opened
@@ -354,3 +359,29 @@ jobs:
       - name: Run tests
         run: |
           make test
+
+  release:
+    if: github.event.inputs.release == true
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    needs:
+      - build-ts
+      - build-java
+      - build-py
+      - build-cli
+      - build-dart
+      - build-prettier
+      - build-console
+      - build-docker
+      - check-license-header
+      - check-version
+      - run-tests
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Project CLI
+        run: make install-project-cli
+
+      - name: Hello world
+        run: echo 'Hello world'
