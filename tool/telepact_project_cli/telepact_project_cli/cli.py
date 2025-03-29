@@ -313,7 +313,7 @@ def bump() -> None:
 
     # Get the paths from the previous commit
     prev_commit_paths = subprocess.run(
-        ['git', 'diff-tree', '--no-commit-id', '--name-only', '-r', prev_commit_hash],
+        ['git', 'show', '--name-only', '--pretty=format:', '-1'],
         stdout=subprocess.PIPE, text=True
     ).stdout.strip().split('\n')
 
