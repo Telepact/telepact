@@ -28,5 +28,11 @@ export function validateUnionStruct(
 ): ValidationFailure[] {
     const selectedFields = (selectedTags?.[unionTag] as string[] | undefined) ?? null;
 
-    return validateStructFields(unionStruct.fields, selectedFields, actual, ctx);
+    ctx.path.push(unionTag);
+
+    const result = validateStructFields(unionStruct.fields, selectedFields, actual, ctx);
+
+    ctx.path.pop();
+
+    return result;
 }

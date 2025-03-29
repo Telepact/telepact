@@ -48,5 +48,5 @@ class TStruct(TType):
         from ..generation.GenerateRandomStruct import generate_random_struct
         return generate_random_struct(blueprint_value, use_blueprint_value, self.fields, ctx)
 
-    def get_name(self) -> str:
+    def get_name(self, ctx: 'ValidateContext') -> str:
         return _STRUCT_NAME

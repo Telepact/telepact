@@ -22,6 +22,7 @@ import static io.github.telepact.internal.binary.ConstructBinaryEncoding.constru
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import io.github.telepact.internal.binary.ServerBase64Encoder;
 import io.github.telepact.internal.binary.ServerBinaryEncoder;
 
 /**
@@ -87,7 +88,9 @@ public class Server {
 
         final var binaryEncoding = constructBinaryEncoding(this.telepactSchema);
         final var binaryEncoder = new ServerBinaryEncoder(binaryEncoding);
-        this.serializer = new Serializer(options.serialization, binaryEncoder);
+        final var base64Encoder = new ServerBase64Encoder();
+
+        this.serializer = new Serializer(options.serialization, binaryEncoder, base64Encoder);
 
         if (!this.telepactSchema.parsed.containsKey("struct.Auth_") && options.authRequired) {
             throw new RuntimeException(

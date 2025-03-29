@@ -17,7 +17,7 @@
 import { Message } from '../Message';
 import { Serializer } from '../Serializer';
 import { TelepactError } from '../TelepactError';
-import { objectsAreEqual } from '../internal/ObjectsAreEqual';
+import { objectsAreEqual } from './ObjectsAreEqual';
 
 function timeoutPromise(timeoutMs: number): Promise<never> {
     return new Promise((_resolve, reject) => {
@@ -27,7 +27,7 @@ function timeoutPromise(timeoutMs: number): Promise<never> {
     });
 }
 
-export async function processRequestObject(
+export async function clientHandleMessage(
     requestMessage: Message,
     adapter: (message: Message, serializer: Serializer) => Promise<Message>,
     serializer: Serializer,

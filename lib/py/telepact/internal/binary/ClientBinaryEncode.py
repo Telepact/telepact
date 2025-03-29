@@ -19,10 +19,11 @@ from ...internal.binary.BinaryEncoding import BinaryEncoding
 from ...internal.binary.BinaryEncoderUnavailableError import BinaryEncoderUnavailableError
 
 if TYPE_CHECKING:
-    from ...ClientBinaryStrategy import ClientBinaryStrategy
+    from .BinaryEncodingCache import BinaryEncodingCache
+    from .ClientBinaryStrategy import ClientBinaryStrategy
 
 
-def client_binary_encode(message: list[object], recent_binary_encoders: dict[int, 'BinaryEncoding'],
+def client_binary_encode(message: list[object], binary_encoding_cache: 'BinaryEncodingCache',
                          binary_checksum_strategy: 'ClientBinaryStrategy') -> list[object]:
     from ...internal.binary.EncodeBody import encode_body
     from ...internal.binary.PackBody import pack_body
@@ -31,20 +32,21 @@ def client_binary_encode(message: list[object], recent_binary_encoders: dict[int
     message_body = cast(dict[str, object], message[1])
     force_send_json = headers.pop("_forceSendJson", None)
 
-    headers["@bin_"] = binary_checksum_strategy.get_current_checksums()
+    checksums = binary_checksum_strategy.get_current_checksums()
+    headers["@bin_"] = checksums
 
     if force_send_json == True:
         raise BinaryEncoderUnavailableError()
+    
+    if len(checksums) > 1:
+        raise BinaryEncoderUnavailableError()
+    
+    binary_encoding = binary_encoding_cache.get(checksums[0]) if checksums else None
 
-    if len(recent_binary_encoders) > 1:
+    if not binary_encoding:
         raise BinaryEncoderUnavailableError()
 
-    binary_encoder_optional = next(iter(recent_binary_encoders.values()), None)
-    if not binary_encoder_optional:
-        raise BinaryEncoderUnavailableError()
-    binary_encoder = binary_encoder_optional
-
-    encoded_message_body = encode_body(message_body, binary_encoder)
+    encoded_message_body = encode_body(message_body, binary_encoding)
 
     final_encoded_message_body = pack_body(encoded_message_body) if headers.get(
         "@pac_") == True else encoded_message_body

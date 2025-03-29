@@ -31,5 +31,5 @@ public interface TType {
         public Object generateRandomValue(Object blueprintValue, boolean useBlueprintValue,
                         List<TTypeDeclaration> typeParameters, GenerateContext ctx);
 
-        public String getName();
+        public String getName(ValidateContext ctx);
 }

@@ -16,7 +16,7 @@
 
 package io.github.telepact.internal.types;
 
-import static io.github.telepact.internal.generation.GenerateRandomUMockCall.generateRandomUMockCall;
+import static io.github.telepact.internal.generation.GenerateRandomMockCall.generateRandomMockCall;
 import static io.github.telepact.internal.validation.ValidateMockCall.validateMockCall;
 
 import java.util.List;
@@ -50,11 +50,11 @@ public class TMockCall implements TType {
     @Override
     public Object generateRandomValue(Object blueprintValue, boolean useBlueprintValue,
             List<TTypeDeclaration> typeParameters, GenerateContext ctx) {
-        return generateRandomUMockCall(this.types, ctx);
+        return generateRandomMockCall(this.types, ctx);
     }
 
     @Override
-    public String getName() {
+    public String getName(ValidateContext ctx) {
         return _MOCK_CALL_NAME;
     }
 

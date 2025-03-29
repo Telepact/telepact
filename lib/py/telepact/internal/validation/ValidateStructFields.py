@@ -54,9 +54,13 @@ def validate_struct_fields(fields: dict[str, 'TFieldDeclaration'],
 
         ref_field_type_declaration = reference_field.type_declaration
 
+        ctx.path.append(field_name)
+
         nested_validation_failures = ref_field_type_declaration.validate(
             field_value, ctx)
-
+        
+        ctx.path.pop()
+        
         nested_validation_failures_with_path = []
         for failure in nested_validation_failures:
             this_path = [field_name] + failure.path

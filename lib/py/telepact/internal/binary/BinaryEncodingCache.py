@@ -15,32 +15,42 @@
 #|
 
 from abc import ABCMeta, abstractmethod
+from typing import Any
 
+from .BinaryEncoding import BinaryEncoding
 
-class ClientBinaryStrategy(metaclass=ABCMeta):
-    """
-    The strategy used by the client to maintain binary encodings compatible with
-    the server.
-    """
+class BinaryEncodingCache(metaclass=ABCMeta):
 
     @abstractmethod
-    def update_checksum(self, checksum: int) -> None:
+    def add(self, checksum: int, binary_encoding_map: dict[str, int]) -> None:
         """
-        Update the strategy according to a recent binary encoding checksum returned
-        by the server.
+        Set a binary encoding in the cache.
 
         Args:
-            checksum: The checksum returned by the server.
+            binary_encoding: The binary encoding.
+            checksum: The checksum of the binary encoding.
         """
         pass
 
     @abstractmethod
-    def get_current_checksums(self) -> list[int]:
+    def get(self, checksum: int) -> 'BinaryEncoding':
         """
-        Get the current binary encoding strategy as a list of binary encoding
-        checksums that should be sent to the server.
+        Get a binary encoding from the cache.
+
+        Args:
+            checksum: The checksum of the binary encoding.
 
         Returns:
-            A list of checksums.
+            The binary encoding.
+        """
+        pass
+
+    @abstractmethod
+    def remove(self, checksum: int) -> None:
+        """
+        Delete a binary encoding from the cache.
+
+        Args:
+            checksum: The checksum of the binary encoding.
         """
         pass

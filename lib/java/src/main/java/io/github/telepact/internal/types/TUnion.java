@@ -57,7 +57,7 @@ public class TUnion implements TType {
     }
 
     @Override
-    public String getName() {
+    public String getName(ValidateContext ctx) {
         return _UNION_NAME;
     }
 }

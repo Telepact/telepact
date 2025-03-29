@@ -22,7 +22,7 @@ if TYPE_CHECKING:
     from ..Serializer import Serializer
 
 
-async def process_request_object(request_message: 'Message',
+async def client_handle_message(request_message: 'Message',
                                  adapter: Callable[['Message', 'Serializer'], Awaitable['Message']],
                                  serializer: 'Serializer',
                                  timeout_ms_default: int,

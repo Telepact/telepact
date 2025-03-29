@@ -20,7 +20,7 @@ import { mapValidationFailuresToInvalidFieldCases } from '../../internal/validat
 import { ValidateContext } from './ValidateContext';
 
 export function validateResult(resultUnionType: TUnion, errorResult: any): void {
-    const newErrorResultValidationFailures = resultUnionType.validate(errorResult, [], new ValidateContext(null, null));
+    const newErrorResultValidationFailures = resultUnionType.validate(errorResult, [], new ValidateContext(null, null, false));
     if (newErrorResultValidationFailures.length !== 0) {
         throw new TelepactError(
             `Failed internal telepact validation: ${JSON.stringify(mapValidationFailuresToInvalidFieldCases(newErrorResultValidationFailures))}`,

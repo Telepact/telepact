@@ -14,13 +14,13 @@
 //|  limitations under the License.
 //|
 
-package io.github.telepact;
+package io.github.telepact.internal.binary;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
-class DefaultClientBinaryStrategy implements ClientBinaryStrategy {
+class ClientBinaryStrategy {
 
     private static class Checksum {
         public final int value;
@@ -36,8 +36,12 @@ class DefaultClientBinaryStrategy implements ClientBinaryStrategy {
     private Checksum secondary = null;
     private Instant lastUpdate = Instant.now();
     private final ReentrantLock lock = new ReentrantLock();
+    private final BinaryEncodingCache binaryEncodingCache;
 
-    @Override
+    public ClientBinaryStrategy(BinaryEncodingCache binaryEncodingCache) {
+        this.binaryEncodingCache = binaryEncodingCache;
+    }
+
     public void updateChecksum(Integer newChecksum) {
         try {
             lock.lock();
@@ -48,9 +52,15 @@ class DefaultClientBinaryStrategy implements ClientBinaryStrategy {
             }
 
             if (this.primary.value != newChecksum) {
+                final var expiredChecksum = this.secondary;
                 this.secondary = this.primary;
                 this.primary = new Checksum(newChecksum, 0);
                 this.secondary.expiration += 1;
+
+                if (expiredChecksum != null) {
+                    this.binaryEncodingCache.remove(expiredChecksum.value);
+                }
+
                 return;
             }
 
@@ -60,7 +70,6 @@ class DefaultClientBinaryStrategy implements ClientBinaryStrategy {
         }
     }
 
-    @Override
     public List<Integer> getCurrentChecksums() {
         try {
             lock.lock();

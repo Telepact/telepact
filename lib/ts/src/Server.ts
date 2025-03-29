@@ -22,6 +22,7 @@ import { TelepactSchema } from './TelepactSchema';
 import { constructBinaryEncoding } from './internal/binary/ConstructBinaryEncoding';
 import { processBytes } from './internal/ProcessBytes';
 import { Serialization } from './Serialization';
+import { ServerBase64Encoder } from './internal/binary/ServerBase64Encoder';
 
 export class Server {
     handler: (message: Message) => Promise<Message>;
@@ -41,7 +42,9 @@ export class Server {
 
         const binaryEncoding = constructBinaryEncoding(this.telepactSchema);
         const binaryEncoder = new ServerBinaryEncoder(binaryEncoding);
-        this.serializer = new Serializer(options.serialization, binaryEncoder);
+        const base64Encoder = new ServerBase64Encoder();
+
+        this.serializer = new Serializer(options.serialization, binaryEncoder, base64Encoder);
 
         if (!('struct.Auth_' in this.telepactSchema.parsed) && options.authRequired) {
             throw new Error(

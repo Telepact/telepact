@@ -15,8 +15,13 @@
 #|
 
 from typing import Any
+import base64
 
 default_values = [False, 0, 0.1, '', [], {}]
+
+class Base64String:
+    pass
+
 
 def get_type(the_type, use_int=True) -> str:
     if the_type == bool:
@@ -35,6 +40,8 @@ def get_type(the_type, use_int=True) -> str:
         return 'Null'
     elif the_type == Any:
         return 'Any'
+    elif the_type == Base64String:
+        return 'Bytes'
 
 
 def type_unexp(incorrect_value, the_type):
@@ -43,9 +50,11 @@ def type_unexp(incorrect_value, the_type):
 def cap(s: str):
     return s[:1].upper() + s[1:]
 
+def b64(b: bytes):
+    return base64.b64encode(b).decode('utf-8')
 
 def get_values(given_field: str, the_type, given_correct_values, additional_incorrect_values):
-    default_incorrect_values = list(filter(lambda n: type(n) not in (int, float) if the_type == float else False if the_type == Any else type(n) != the_type, default_values))
+    default_incorrect_values = list(filter(lambda n: type(n) not in (int, float) if the_type == float else type(n) not in (Base64String, str) if the_type == Base64String else False if the_type == Any else type(n) != the_type, default_values))
     given_incorrect_values = [(v, [(type_unexp(v, the_type), [])]) for v in default_incorrect_values] + additional_incorrect_values
     given_incorrect_values_w_null = [(v, [(type_unexp(v, the_type), [])]) for v in [None] + default_incorrect_values] + additional_incorrect_values
     abc = 'abcdefghijklmnopqrstuvwxyz'
@@ -149,6 +158,9 @@ additional_number_cases = [
     (9223372036854775808, [({'NumberOutOfRange': {}}, [])]),
     (-9223372036854775809, [({'NumberOutOfRange': {}}, [])])
 ]
+additional_bytes_case = [
+    ('@not_base64', [({'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Base64String': {}}}}, [])]),
+]
 additional_struct_cases = [
     ({}, [({'RequiredObjectKeyMissing': {'key': 'required'}}, [])]),
     ({'required': False, 'a': False}, [({'ObjectKeyDisallowed': {}}, ['a'])])
@@ -208,6 +220,7 @@ cases = {
     'array': [v for v in generate_basic_cases('arr!', list, [[], [False, 0, 0.1, '']])],
     'object': [v for v in generate_basic_cases('obj!', dict, [{}, {'a': False, 'b': 0, 'c': 0.1, 'd': ''}])],
     'any': [v for v in generate_basic_cases('any!', Any, [False, 0, 0.1, '', [], {}])],
+    'bytes': [v for v in generate_basic_cases('bytes!', Base64String, [b64(b''), b64(b'abc'), b64(b'\x00\x01\x02')], additional_bytes_case)],
     'struct' : [v for v in generate_basic_cases('struct!', dict, [{'required': True}, {'optional!': False, 'required': True}, {'optional2!': 0, 'required': True}, {'optional!': False, 'optional2!': 0, 'required': True}], additional_struct_cases)],
     'union' : [v for v in generate_basic_cases('union!', dict, [{'One': {}}, {'Two':{'required': True}}, {'Two':{'optional!': False, 'required': True}}], additional_union_cases)],
     'fn' : [v for v in generate_basic_cases('fn!', dict, [{'fn.example':{'required': True}}, {'fn.example':{'optional!': False, 'required': True}}], additional_fn_cases)],
@@ -301,7 +314,7 @@ cases = {
         [[{}, {'fn.test': {'value!': {'struct!': {'optional!': 'wrong', 'a': False}}}}], [{'@assert_': {'setCompare': True}}, {'ErrorInvalidRequestBody_': {'cases': [{'path': ['fn.test', 'value!', 'struct!', 'optional!'], 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}, {'path': ['fn.test', 'value!', 'struct!'], 'reason': {'RequiredObjectKeyMissing': {'key': 'required'}}}, {'path': ['fn.test', 'value!', 'struct!', 'a'], 'reason': {'ObjectKeyDisallowed': {}}}]}}]],
     ],
     'api': [
-        [[{}, {'fn.api_': {}}], [{}, {'Ok_': {'api': [{'///': [' This is the example schema. It is focussed on outlining type edge cases for     ', ' use in tests.                                                                   ', '                                                                                 ', ' As a reminder:                                                                  ', '                                                                                 ', ' - ! means optional field                                                        ', ' - ? means nullable type                                                         '], 'info.Example': {}}, {'///': ' An example function. ', 'fn.example': {'required': ['boolean'], 'optional!': ['boolean']}, '->': [{'Ok_': {'required': ['boolean'], 'optional!': ['boolean']}}]}, {'fn.getBigList': {}, '->': [{'Ok_': {'items': ['array', ['struct.Big']]}}]}, {'fn.test': {'value!': ['struct.Value']}, '->': [{'Ok_': {'value!': ['struct.Value']}}, {'ErrorExample': {'property': ['string']}}]}, {'headers.ExampleHeaders': {'@in': ['boolean']}, '->': {'@out': ['boolean']}}, {'struct.Big': {'aF': ['boolean'], 'cF': ['boolean'], 'bF': ['boolean'], 'dF': ['boolean']}}, {'///': [' The main struct example.                                                        ', '                                                                                 ', ' The [required] field must be supplied. The optional field does not need to be   ', ' supplied.                                                                       '], 'struct.ExStruct': {'required': ['boolean'], 'optional!': ['boolean'], 'optional2!': ['integer']}}, {'///': ' A struct value demonstrating all common type permutations. ', 'struct.Value': {'bool!': ['boolean'], 'nullBool!': ['boolean?'], 'arrBool!': ['array', ['boolean']], 'arrNullBool!': ['array', ['boolean?']], 'objBool!': ['object', ['boolean']], 'objNullBool!': ['object', ['boolean?']], 'int!': ['integer'], 'nullInt!': ['integer?'], 'arrInt!': ['array', ['integer']], 'arrNullInt!': ['array', ['integer?']], 'objInt!': ['object', ['integer']], 'objNullInt!': ['object', ['integer?']], 'num!': ['number'], 'nullNum!': ['number?'], 'arrNum!': ['array', ['number']], 'arrNullNum!': ['array', ['number?']], 'objNum!': ['object', ['number']], 'objNullNum!': ['object', ['number?']], 'str!': ['string'], 'nullStr!': ['string?'], 'arrStr!': ['array', ['string']], 'arrNullStr!': ['array', ['string?']], 'objStr!': ['object', ['string']], 'objNullStr!': ['object', ['string?']], 'arr!': ['array', ['any']], 'nullArr!': ['array?', ['any']], 'arrArr!': ['array', ['array', ['any']]], 'arrNullArr!': ['array', ['array?', ['any']]], 'objArr!': ['object', ['array', ['any']]], 'objNullArr!': ['object', ['array?', ['any']]], 'obj!': ['object', ['any']], 'nullObj!': ['object?', ['any']], 'arrObj!': ['array', ['object', ['any']]], 'arrNullObj!': ['array', ['object?', ['any']]], 'objObj!': ['object', ['object', ['any']]], 'objNullObj!': ['object', ['object?', ['any']]], 'any!': ['any'], 'nullAny!': ['any?'], 'arrAny!': ['array', ['any']], 'arrNullAny!': ['array', ['any?']], 'objAny!': ['object', ['any']], 'objNullAny!': ['object', ['any?']], 'struct!': ['struct.ExStruct'], 'nullStruct!': ['struct.ExStruct?'], 'arrStruct!': ['array', ['struct.ExStruct']], 'arrNullStruct!': ['array', ['struct.ExStruct?']], 'objStruct!': ['object', ['struct.ExStruct']], 'objNullStruct!': ['object', ['struct.ExStruct?']], 'union!': ['union.ExUnion'], 'nullUnion!': ['union.ExUnion?'], 'arrUnion!': ['array', ['union.ExUnion']], 'arrNullUnion!': ['array', ['union.ExUnion?']], 'objUnion!': ['object', ['union.ExUnion']], 'objNullUnion!': ['object', ['union.ExUnion?']], 'fn!': ['fn.example'], 'nullFn!': ['fn.example?'], 'arrFn!': ['array', ['fn.example']], 'arrNullFn!': ['array', ['fn.example?']], 'objFn!': ['object', ['fn.example']], 'objNullFn!': ['object', ['fn.example?']]}}, {'union.ExUnion': [{'One': {}}, {'Two': {'required': ['boolean'], 'optional!': ['boolean']}}]}]}}]],
+        [[{}, {'fn.api_': {}}], [{}, {'Ok_': {'api': [{'///': [' This is the example schema. It is focussed on outlining type edge cases for     ', ' use in tests.                                                                   ', '                                                                                 ', ' As a reminder:                                                                  ', '                                                                                 ', ' - ! means optional field                                                        ', ' - ? means nullable type                                                         '], 'info.Example': {}}, {'///': ' An example function. ', 'fn.example': {'required': ['boolean'], 'optional!': ['boolean']}, '->': [{'Ok_': {'required': ['boolean'], 'optional!': ['boolean']}}]}, {'fn.getBigList': {}, '->': [{'Ok_': {'items': ['array', ['struct.Big']]}}]}, {'fn.test': {'value!': ['struct.Value']}, '->': [{'Ok_': {'value!': ['struct.Value']}}, {'ErrorExample': {'property': ['string']}}]}, {'headers.ExampleHeaders': {'@in': ['boolean']}, '->': {'@out': ['boolean']}}, {'struct.Big': {'aF': ['boolean'], 'cF': ['boolean'], 'bF': ['boolean'], 'dF': ['boolean']}}, {'///': [' The main struct example.                                                        ', '                                                                                 ', ' The [required] field must be supplied. The optional field does not need to be   ', ' supplied.                                                                       '], 'struct.ExStruct': {'required': ['boolean'], 'optional!': ['boolean'], 'optional2!': ['integer']}}, {'///': ' A struct value demonstrating all common type permutations. ', 'struct.Value': {'bool!': ['boolean'], 'nullBool!': ['boolean?'], 'arrBool!': ['array', ['boolean']], 'arrNullBool!': ['array', ['boolean?']], 'objBool!': ['object', ['boolean']], 'objNullBool!': ['object', ['boolean?']], 'int!': ['integer'], 'nullInt!': ['integer?'], 'arrInt!': ['array', ['integer']], 'arrNullInt!': ['array', ['integer?']], 'objInt!': ['object', ['integer']], 'objNullInt!': ['object', ['integer?']], 'num!': ['number'], 'nullNum!': ['number?'], 'arrNum!': ['array', ['number']], 'arrNullNum!': ['array', ['number?']], 'objNum!': ['object', ['number']], 'objNullNum!': ['object', ['number?']], 'str!': ['string'], 'nullStr!': ['string?'], 'arrStr!': ['array', ['string']], 'arrNullStr!': ['array', ['string?']], 'objStr!': ['object', ['string']], 'objNullStr!': ['object', ['string?']], 'any!': ['any'], 'nullAny!': ['any?'], 'arrAny!': ['array', ['any']], 'arrNullAny!': ['array', ['any?']], 'objAny!': ['object', ['any']], 'objNullAny!': ['object', ['any?']], 'bytes!': ['bytes'], 'nullBytes!': ['bytes?'], 'arrBytes!': ['array', ['bytes']], 'arrNullBytes!': ['array', ['bytes?']], 'objBytes!': ['object', ['bytes']], 'objNullBytes!': ['object', ['bytes?']], 'arr!': ['array', ['any']], 'nullArr!': ['array?', ['any']], 'arrArr!': ['array', ['array', ['any']]], 'arrNullArr!': ['array', ['array?', ['any']]], 'objArr!': ['object', ['array', ['any']]], 'objNullArr!': ['object', ['array?', ['any']]], 'obj!': ['object', ['any']], 'nullObj!': ['object?', ['any']], 'arrObj!': ['array', ['object', ['any']]], 'arrNullObj!': ['array', ['object?', ['any']]], 'objObj!': ['object', ['object', ['any']]], 'objNullObj!': ['object', ['object?', ['any']]], 'struct!': ['struct.ExStruct'], 'nullStruct!': ['struct.ExStruct?'], 'arrStruct!': ['array', ['struct.ExStruct']], 'arrNullStruct!': ['array', ['struct.ExStruct?']], 'objStruct!': ['object', ['struct.ExStruct']], 'objNullStruct!': ['object', ['struct.ExStruct?']], 'union!': ['union.ExUnion'], 'nullUnion!': ['union.ExUnion?'], 'arrUnion!': ['array', ['union.ExUnion']], 'arrNullUnion!': ['array', ['union.ExUnion?']], 'objUnion!': ['object', ['union.ExUnion']], 'objNullUnion!': ['object', ['union.ExUnion?']], 'fn!': ['fn.example'], 'nullFn!': ['fn.example?'], 'arrFn!': ['array', ['fn.example']], 'arrNullFn!': ['array', ['fn.example?']], 'objFn!': ['object', ['fn.example']], 'objNullFn!': ['object', ['fn.example?']]}}, {'union.ExUnion': [{'One': {}}, {'Two': {'required': ['boolean'], 'optional!': ['boolean']}}]}]}}]],
     ],
     'serverHooks': [
         [[{'@ok_': {}, '@onRequestError_': True}, {'fn.test': {}}], [{}, {'Ok_': {}}]],

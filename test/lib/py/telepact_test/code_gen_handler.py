@@ -15,6 +15,7 @@
 #|
 
 import json
+import base64
 from typing import Any, Dict, List, Optional, TypeVar, Callable, Tuple
 from telepact_test.gen.all_ import test, Value, ServerHandler_, example as fnexample, getBigList, Undefined, ExUnion, ExStruct
 
@@ -28,7 +29,12 @@ class CodeGenHandler(ServerHandler_):
         ok: test.Output.Ok_ = None
 
         try:
-            print("input: " + json.dumps(input.pseudo_json))
+            def default_serializer(obj):
+                if isinstance(obj, bytes):
+                    return base64.b64encode(obj).decode('utf-8')
+                raise TypeError(f"Object of type {type(obj)} is not JSON serializable")
+
+            print("input: " + json.dumps(input.pseudo_json, default=default_serializer))
         except json.JSONDecodeError as e:
             print(e)
 
@@ -161,6 +167,24 @@ class CodeGenHandler(ServerHandler_):
             if top.objNullAny() != Undefined.Inst:
                 ok = test.Output.Ok_.from_typed(
                     value=Value.from_typed(objNullAny=top.objNullAny()))
+            if top.bytes_() != Undefined.Inst:
+                ok = test.Output.Ok_.from_typed(
+                    value=Value.from_typed(bytes_=top.bytes_()))
+            if top.nullBytes() != Undefined.Inst:
+                ok = test.Output.Ok_.from_typed(
+                    value=Value.from_typed(nullBytes=top.nullBytes()))
+            if top.arrBytes() != Undefined.Inst:
+                ok = test.Output.Ok_.from_typed(
+                    value=Value.from_typed(arrBytes=top.arrBytes()))
+            if top.arrNullBytes() != Undefined.Inst:
+                ok = test.Output.Ok_.from_typed(
+                    value=Value.from_typed(arrNullBytes=top.arrNullBytes()))
+            if top.objBytes() != Undefined.Inst:
+                ok = test.Output.Ok_.from_typed(
+                    value=Value.from_typed(objBytes=top.objBytes()))
+            if top.objNullBytes() != Undefined.Inst:
+                ok = test.Output.Ok_.from_typed(
+                    value=Value.from_typed(objNullBytes=top.objNullBytes()))
             if top.struct() != Undefined.Inst:
                 ok = test.Output.Ok_.from_typed(
                     value=Value.from_typed(struct=self.map_struct(top.struct())))

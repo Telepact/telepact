@@ -245,7 +245,7 @@
                 "prefixItems": [
                     {
                         "type": "string",
-                        "pattern": "^((boolean|integer|number|string|any)|(fn|union|struct)\\.([a-zA-Z_]\\w*))(\\?)?$"
+                        "pattern": "^((boolean|integer|number|string|any|bytes)|(fn|union|struct)\\.([a-zA-Z_]\\w*))(\\?)?$"
                     }
                 ]
             },
@@ -253,7 +253,7 @@
                 "prefixItems": [
                     {
                         "type": "string",
-                        "pattern": "^((boolean|integer|number|string|any)|(fn|union|struct)\\.([a-zA-Z_]\\w*))(\\?)?$"
+                        "pattern": "^((boolean|integer|number|string|any|bytes)|(fn|union|struct)\\.([a-zA-Z_]\\w*))(\\?)?$"
                     }
                 ],
                 "items": false,

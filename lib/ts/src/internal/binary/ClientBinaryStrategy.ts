@@ -14,7 +14,7 @@
 //|  limitations under the License.
 //|
 
-import { ClientBinaryStrategy } from './ClientBinaryStrategy';
+import { BinaryEncodingCache } from "./BinaryEncodingCache";
 
 export class Checksum {
     constructor(
@@ -23,10 +23,28 @@ export class Checksum {
     ) {}
 }
 
-export class DefaultClientBinaryStrategy implements ClientBinaryStrategy {
+export class ClientBinaryStrategy {
     private primary: Checksum | null = null;
     private secondary: Checksum | null = null;
     private lastUpdate: Date = new Date();
+    private binaryEncodingCache: BinaryEncodingCache;
+
+    constructor(binaryEncodingCache: BinaryEncodingCache) {
+        this.binaryEncodingCache = binaryEncodingCache;
+
+        const initialChecksums = binaryEncodingCache.getChecksums();
+
+        const randomPrimary = initialChecksums[0];
+        const randomSecondary = initialChecksums[1];
+
+        if (randomPrimary) {
+            this.primary = new Checksum(randomPrimary, 0);
+        }
+
+        if (randomSecondary) {
+            this.secondary = new Checksum(randomSecondary, 0);
+        }
+    }
 
     updateChecksum(newChecksum: number): void {
         if (!this.primary) {
@@ -35,11 +53,17 @@ export class DefaultClientBinaryStrategy implements ClientBinaryStrategy {
         }
 
         if (this.primary.value !== newChecksum) {
+            let expiredChecksum = this.secondary;
             this.secondary = this.primary;
             this.primary = new Checksum(newChecksum, 0);
             if (this.secondary) {
                 this.secondary.expiration += 1;
             }
+
+            if (expiredChecksum) {
+                this.binaryEncodingCache.remove(expiredChecksum.value);
+            }
+
             return;
         }
 

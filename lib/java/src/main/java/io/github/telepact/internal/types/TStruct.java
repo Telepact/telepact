@@ -55,7 +55,7 @@ public class TStruct implements TType {
     }
 
     @Override
-    public String getName() {
+    public String getName(ValidateContext ctx) {
         return _STRUCT_NAME;
     }
 }

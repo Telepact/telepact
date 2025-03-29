@@ -19,6 +19,7 @@ from typing import Callable, TYPE_CHECKING, Awaitable
 from .DefaultSerialization import DefaultSerialization
 from .Serializer import Serializer
 from .internal.binary.ServerBinaryEncoder import ServerBinaryEncoder
+from .internal.binary.ServerBase64Encoder import ServerBase64Encoder
 
 if TYPE_CHECKING:
     from .Message import Message
@@ -56,7 +57,8 @@ class Server:
 
         binary_encoding = construct_binary_encoding(self.telepact_schema)
         binary_encoder = ServerBinaryEncoder(binary_encoding)
-        self.serializer = Serializer(options.serialization, binary_encoder)
+        base64_encoder = ServerBase64Encoder()
+        self.serializer = Serializer(options.serialization, binary_encoder, base64_encoder)
 
         if "struct.Auth_" not in self.telepact_schema.parsed and options.auth_required:
             raise RuntimeError(

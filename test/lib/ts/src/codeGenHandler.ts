@@ -159,6 +159,24 @@ export class CodeGenHandler extends ServerHandler_ {
             if (top.objNullAny() !== undefined) {
                 value = Value.fromTyped({ objNullAny: top.objNullAny() });
             }
+            if (top.bytes() !== undefined) {
+                value = Value.fromTyped({ bytes: top.bytes() });
+            }
+            if (top.nullBytes() !== undefined) {
+                value = Value.fromTyped({ nullBytes: top.nullBytes() });
+            }
+            if (top.arrBytes() !== undefined) {
+                value = Value.fromTyped({ arrBytes: top.arrBytes() });
+            }
+            if (top.arrNullBytes() !== undefined) {
+                value = Value.fromTyped({ arrNullBytes: top.arrNullBytes() });
+            }
+            if (top.objBytes() !== undefined) {
+                value = Value.fromTyped({ objBytes: top.objBytes() });
+            }
+            if (top.objNullBytes() !== undefined) {
+                value = Value.fromTyped({ objNullBytes: top.objNullBytes() });
+            }            
             if (top.struct() !== undefined) {
                 value = Value.fromTyped({ struct: mapStruct(top.struct()!) });
             }

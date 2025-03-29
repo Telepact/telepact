@@ -44,7 +44,10 @@ export class TFn extends TType {
     }
 
     validate(value: any, typeParameters: TTypeDeclaration[], ctx: ValidateContext): ValidationFailure[] {
-        return this.call.validate(value, [], ctx);
+        ctx.path.push(this.name);
+        let result = this.call.validate(value, [], ctx);
+        ctx.path.pop();
+        return result;
     }
 
     generateRandomValue(

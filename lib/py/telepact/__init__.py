@@ -20,8 +20,6 @@ from .Server import Server
 from .MockServer import MockServer
 from .Message import Message
 from .Serializer import Serializer
-from .DefaultClientBinaryStrategy import DefaultClientBinaryStrategy
-from .ClientBinaryStrategy import ClientBinaryStrategy
 from .SerializationError import SerializationError
 from .Serialization import Serialization
 from .TelepactSchema import TelepactSchema
@@ -36,8 +34,6 @@ __all__ = [
     "MockServer",
     "Message",
     "Serializer",
-    "DefaultClientBinaryStrategy",
-    "ClientBinaryStrategy",
     "SerializationError",
     "Serialization",
     "TelepactSchema",

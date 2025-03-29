@@ -14,15 +14,15 @@
 //|  limitations under the License.
 //|
 
-import { BinaryEncoding } from "../../internal/binary/BinaryEncoding";
 import { BinaryEncoderUnavailableError } from "../../internal/binary/BinaryEncoderUnavailableError";
-import { ClientBinaryStrategy } from "../../ClientBinaryStrategy";
 import { encodeBody } from "../../internal/binary/EncodeBody";
 import { packBody } from "../../internal/binary/PackBody";
+import { BinaryEncodingCache } from "./BinaryEncodingCache";
+import { ClientBinaryStrategy } from "./ClientBinaryStrategy";
 
 export function clientBinaryEncode(
     message: any[],
-    recentBinaryEncoders: Map<number, BinaryEncoding>,
+    binaryEncodingCache: BinaryEncodingCache,
     binaryChecksumStrategy: ClientBinaryStrategy,
 ): any[] {
     const headers = message[0] as Record<string, any>;
@@ -30,23 +30,24 @@ export function clientBinaryEncode(
     const forceSendJson = headers["_forceSendJson"];
     delete headers["_forceSendJson"];
 
-    headers["@bin_"] = binaryChecksumStrategy.getCurrentChecksums();
+    const checksums = binaryChecksumStrategy.getCurrentChecksums()
+    headers["@bin_"] = checksums;
 
     if (forceSendJson === true) {
         throw new BinaryEncoderUnavailableError();
     }
 
-    if (recentBinaryEncoders.size > 1) {
+    if (checksums.length > 1) {
         throw new BinaryEncoderUnavailableError();
     }
 
-    const binaryEncoder = [...recentBinaryEncoders.values()][0];
+    const binaryEncoding = checksums.length > 0 ? binaryEncodingCache.get(checksums[0]) : undefined;
 
-    if (!binaryEncoder) {
+    if (!binaryEncoding) {
         throw new BinaryEncoderUnavailableError();
     }
 
-    const encodedMessageBody = encodeBody(messageBody, binaryEncoder);
+    const encodedMessageBody = encodeBody(messageBody, binaryEncoding);
 
     let finalEncodedMessageBody: Map<any, any>;
     if (headers["@pac_"] === true) {

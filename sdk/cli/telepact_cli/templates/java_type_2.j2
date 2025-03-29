@@ -22,6 +22,8 @@ import java.util.HashMap;
         String
     {%- elif typ == 'any' -%}
         Object
+    {%- elif typ == 'bytes' -%}
+        byte[]
     {%- elif typ.startswith('fn.') -%}
         {{- typ | regex_replace('^.*\\.', '') -}}.Input
     {%- else -%}

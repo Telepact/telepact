@@ -45,5 +45,5 @@ class TMockCall(TType):
         from ..generation.GenerateRandomUMockCall import generate_random_u_mock_call
         return generate_random_u_mock_call(self.types, ctx)
 
-    def get_name(self) -> str:
+    def get_name(self, ctx: 'ValidateContext') -> str:
         return self._MOCK_CALL_NAME

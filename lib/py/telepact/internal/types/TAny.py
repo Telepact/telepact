@@ -42,5 +42,5 @@ class TAny(TType):
         from ..generation.GenerateRandomAny import generate_random_any
         return generate_random_any(ctx)
 
-    def get_name(self) -> str:
+    def get_name(self, ctx: 'ValidateContext') -> str:
         return _ANY_NAME

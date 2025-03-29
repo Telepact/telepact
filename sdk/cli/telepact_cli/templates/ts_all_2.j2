@@ -35,6 +35,8 @@ export class UntypedTaggedValue_ {
         string
     {%- elif typ == 'any' -%}
         any
+    {%- elif typ == 'bytes' -%}
+        Uint8Array
     {%- elif typ.startswith('fn.') -%}
         {{ typ | regex_replace('^.*\\.', '') }}.Input
     {%- else -%}

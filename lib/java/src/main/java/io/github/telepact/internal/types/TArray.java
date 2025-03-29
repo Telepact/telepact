@@ -46,7 +46,7 @@ public class TArray implements TType {
     }
 
     @Override
-    public String getName() {
+    public String getName(ValidateContext ctx) {
         return _ARRAY_NAME;
     }
 }

@@ -1,9 +1,10 @@
 High:
 - Clean up dangling print statements
 - Double check git urls in java pom
-- Get a build bot configured that on every PR, version bumps, commits machine parsable notes about what changed
+- Make sure bytes type always returns as bytes from client lib interface
 
 Medium:
+- Write tests that verify each type within a "link" function
 - Add backwards compatibility check to cli
 - Add http url as a Telepact source for code generation
 - Move self-hosted console to example directory instead of tool directory

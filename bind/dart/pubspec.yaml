@@ -6,6 +6,7 @@ environment:
 
 dependencies:
   node_interop: ^2.1.0
+  web: any
 
 dev_dependencies:
   test: ^1.25.15

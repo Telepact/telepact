@@ -22,6 +22,7 @@ import static io.github.telepact.internal.validation.GetTypeUnexpectedValidation
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 
 import io.github.telepact.internal.types.TTypeDeclaration;
 
@@ -34,7 +35,13 @@ public class ValidateArray {
             final var validationFailures = new ArrayList<ValidationFailure>();
             for (var i = 0; i < l.size(); i += 1) {
                 final var element = l.get(i);
+
+                ctx.path.push("*");
+
                 final var nestedValidationFailures = nestedTypeDeclaration.validate(element, ctx);
+
+                ctx.path.pop();
+
                 final var index = i;
 
                 final var nestedValidationFailuresWithPath = new ArrayList<ValidationFailure>();

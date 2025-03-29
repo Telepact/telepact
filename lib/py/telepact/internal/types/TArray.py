@@ -43,5 +43,5 @@ class TArray(TType):
         from ..generation.GenerateRandomArray import generate_random_array
         return generate_random_array(blueprint_value, use_blueprint_value, type_parameters, ctx)
 
-    def get_name(self) -> str:
+    def get_name(self, ctx: 'ValidateContext') -> str:
         return _ARRAY_NAME

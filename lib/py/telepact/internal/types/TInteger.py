@@ -43,5 +43,5 @@ class TInteger(TType):
         from ..generation.GenerateRandomInteger import generate_random_integer
         return generate_random_integer(blueprint_value, use_blueprint_value, ctx)
 
-    def get_name(self) -> str:
+    def get_name(self, ctx: 'ValidateContext') -> str:
         return _INTEGER_NAME

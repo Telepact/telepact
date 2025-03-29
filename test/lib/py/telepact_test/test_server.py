@@ -41,6 +41,7 @@ import sys
 from concurrent.futures import ThreadPoolExecutor
 from telepact_test.code_gen_handler import CodeGenHandler
 from telepact_test.gen.all_ import ClientInterface_, test as fntest
+import base64
 
 
 def on_err(e):
@@ -123,7 +124,12 @@ async def start_client_test_server(connection: NatsClient, metrics: CollectorReg
 
         response_pseudo_json = [response.headers, response.body]
 
-        response_bytes = json.dumps(response_pseudo_json).encode()
+        def custom_converter(obj):
+            if isinstance(obj, bytes):
+                return base64.b64encode(obj).decode('utf-8')
+            raise TypeError('Object of type {obj.__class__.__name__} is not JSON serializable')
+
+        response_bytes = json.dumps(response_pseudo_json, default=custom_converter).encode()
 
         print(f"   <-C  {response_bytes}")
         await connection.publish(msg.reply, response_bytes)
@@ -270,7 +276,13 @@ async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, 
         request_headers = request_message.headers
         request_body = request_message.body
         request_pseudo_json = [request_headers, request_body]
-        request_bytes = json.dumps(request_pseudo_json).encode('utf-8')
+
+        def default_serializer(obj):
+            if isinstance(obj, bytes):
+                return base64.b64encode(obj).decode('utf-8')
+            raise TypeError(f"Object of type {type(obj)} is not JSON serializable")
+
+        request_bytes = json.dumps(request_pseudo_json, default=default_serializer).encode('utf-8')
 
         if use_codegen:
             print(f"     :H {request_bytes}")

@@ -122,6 +122,12 @@
                 "Any": {}
             },
             {
+                "Base64String": {}
+            },
+            {
+                "Bytes": {}
+            },
+            {
                 "Unknown": {}
             }
         ]

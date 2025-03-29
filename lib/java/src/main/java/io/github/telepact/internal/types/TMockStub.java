@@ -16,7 +16,7 @@
 
 package io.github.telepact.internal.types;
 
-import static io.github.telepact.internal.generation.GenerateRandomUMockStub.generateRandomUMockStub;
+import static io.github.telepact.internal.generation.GenerateRandomMockStub.generateRandomMockStub;
 import static io.github.telepact.internal.validation.ValidateMockStub.validateMockStub;
 
 import java.util.List;
@@ -50,11 +50,11 @@ public class TMockStub implements TType {
     @Override
     public Object generateRandomValue(Object blueprintValue, boolean useBlueprintValue,
             List<TTypeDeclaration> typeParameters, GenerateContext ctx) {
-        return generateRandomUMockStub(this.types, ctx);
+        return generateRandomMockStub(this.types, ctx);
     }
 
     @Override
-    public String getName() {
+    public String getName(ValidateContext ctx) {
         return _MOCK_STUB_NAME;
     }
 

@@ -29,6 +29,13 @@ public class ValidateUnionStruct {
             String unionTag,
             Map<String, Object> actual, Map<String, Object> selectedTags, ValidateContext ctx) {
         final var selectedFields = selectedTags == null ? null : (List<String>) selectedTags.get(unionTag);
-        return validateStructFields(unionStruct.fields, selectedFields, actual, ctx);
+
+        ctx.path.push(unionTag);
+
+        final var result = validateStructFields(unionStruct.fields, selectedFields, actual, ctx);
+
+        ctx.path.pop();
+
+        return result;
     }
 }

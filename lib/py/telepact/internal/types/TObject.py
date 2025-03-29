@@ -43,5 +43,5 @@ class TObject(TType):
         from ..generation.GenerateRandomObject import generate_random_object
         return generate_random_object(blueprint_value, use_blueprint_value, type_parameters, ctx)
 
-    def get_name(self) -> str:
+    def get_name(self, ctx: 'ValidateContext') -> str:
         return _OBJECT_NAME

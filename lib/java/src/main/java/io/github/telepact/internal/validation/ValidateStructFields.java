@@ -17,6 +17,7 @@
 package io.github.telepact.internal.validation;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -64,7 +65,11 @@ public class ValidateStructFields {
 
             final TTypeDeclaration refFieldTypeDeclaration = referenceField.typeDeclaration;
 
+            ctx.path.push(fieldName);
+
             final var nestedValidationFailures = refFieldTypeDeclaration.validate(fieldValue, ctx);
+
+            ctx.path.pop();
 
             final var nestedValidationFailuresWithPath = new ArrayList<ValidationFailure>();
             for (final var f : nestedValidationFailures) {

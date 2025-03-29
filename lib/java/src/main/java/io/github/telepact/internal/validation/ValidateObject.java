@@ -20,6 +20,7 @@ import static io.github.telepact.internal.types.TObject._OBJECT_NAME;
 import static io.github.telepact.internal.validation.GetTypeUnexpectedValidationFailure.getTypeUnexpectedValidationFailure;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,13 +31,19 @@ public class ValidateObject {
     public static List<ValidationFailure> validateObject(Object value, List<TTypeDeclaration> typeParameters,
             ValidateContext ctx) {
         if (value instanceof final Map<?, ?> m) {
+            final var map = (Map<String, Object>) m;
             final var nestedTypeDeclaration = typeParameters.get(0);
 
             final var validationFailures = new ArrayList<ValidationFailure>();
-            for (Map.Entry<?, ?> entry : m.entrySet()) {
+            for (Map.Entry<String, Object> entry : map.entrySet()) {
                 final var k = (String) entry.getKey();
                 final var v = entry.getValue();
+                
+                ctx.path.push("*");
+                
                 final var nestedValidationFailures = nestedTypeDeclaration.validate(v, ctx);
+
+                ctx.path.pop();
 
                 final var nestedValidationFailuresWithPath = new ArrayList<ValidationFailure>();
                 for (var f : nestedValidationFailures) {

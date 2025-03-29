@@ -18,10 +18,12 @@ import { SerializationError } from '../SerializationError';
 import { Serialization } from '../Serialization';
 import { Message } from '../Message';
 import { BinaryEncoder } from '../internal/binary/BinaryEncoder';
+import { Base64Encoder } from './binary/Base64Encoder';
 
 export function serializeInternal(
     message: Message,
     binaryEncoder: BinaryEncoder,
+    base64Encoder: Base64Encoder,
     serializer: Serialization,
 ): Uint8Array {
     const headers: Record<string, any> = message.headers;
@@ -43,10 +45,12 @@ export function serializeInternal(
                 return serializer.toMsgpack(encodedMessage);
             } catch (error) {
                 // We can still submit as JSON
-                return serializer.toJson(messageAsPseudoJson);
+                const base64EncodedMessage = base64Encoder.encode(messageAsPseudoJson);
+                return serializer.toJson(base64EncodedMessage);
             }
         } else {
-            return serializer.toJson(messageAsPseudoJson);
+            const base64EncodedMessage = base64Encoder.encode(messageAsPseudoJson);
+            return serializer.toJson(base64EncodedMessage);
         }
     } catch (error) {
         throw new SerializationError(error as Error);

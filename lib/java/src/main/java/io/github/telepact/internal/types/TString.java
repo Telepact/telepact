@@ -45,7 +45,7 @@ public class TString implements TType {
     }
 
     @Override
-    public String getName() {
+    public String getName(ValidateContext ctx) {
         return _STRING_NAME;
     }
 }

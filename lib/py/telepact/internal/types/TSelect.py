@@ -45,5 +45,5 @@ class TSelect(TType):
         from ..generation.GenerateRandomSelect import generate_random_select
         return generate_random_select(self.possible_selects, ctx)
 
-    def get_name(self) -> str:
+    def get_name(self, ctx: 'ValidateContext') -> str:
         return _SELECT

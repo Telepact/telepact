@@ -21,6 +21,7 @@ import java.util.Map;
 
 import io.github.telepact.Message;
 import io.github.telepact.Serialization;
+import io.github.telepact.internal.binary.Base64Encoder;
 import io.github.telepact.internal.binary.BinaryEncoder;
 import io.github.telepact.internal.validation.InvalidMessage;
 import io.github.telepact.internal.validation.InvalidMessageBody;
@@ -28,7 +29,7 @@ import io.github.telepact.internal.validation.InvalidMessageBody;
 public class DeserializeInternal {
 
     public static Message deserializeInternal(byte[] messageBytes, Serialization serialization,
-            BinaryEncoder binaryEncoder) {
+            BinaryEncoder binaryEncoder, Base64Encoder base64Encoder) {
         final Object messageAsPseudoJson;
         final boolean isMsgPack;
 
@@ -57,7 +58,7 @@ public class DeserializeInternal {
         if (isMsgPack) {
             finalMessageAsPseudoJsonList = binaryEncoder.decode(messageAsPseudoJsonList);
         } else {
-            finalMessageAsPseudoJsonList = messageAsPseudoJsonList;
+            finalMessageAsPseudoJsonList = base64Encoder.decode(messageAsPseudoJsonList);
         }
 
         if (!(finalMessageAsPseudoJsonList.get(0) instanceof Map)) {

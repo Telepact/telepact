@@ -43,5 +43,5 @@ class TString(TType):
         from ..generation.GenerateRandomString import generate_random_string
         return generate_random_string(blueprint_value, use_blueprint_value, ctx)
 
-    def get_name(self) -> str:
+    def get_name(self, ctx: 'ValidateContext') -> str:
         return _STRING_NAME

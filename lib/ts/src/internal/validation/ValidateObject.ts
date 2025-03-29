@@ -30,7 +30,11 @@ export function validateObject(
 
         const validationFailures: ValidationFailure[] = [];
         for (const [k, v] of Object.entries(value)) {
+            ctx.path.push("*");
+
             const nestedValidationFailures = nestedTypeDeclaration.validate(v, ctx);
+
+            ctx.path.pop();
 
             const nestedValidationFailuresWithPath: ValidationFailure[] = [];
             for (const f of nestedValidationFailures) {

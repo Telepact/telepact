@@ -23,7 +23,7 @@ import java.util.Map;
 public class GetPathDocumentCoordinatesPseudoJson {
 
     public static Map<String, Object> getPathDocumentCoordinatesPseudoJson(List<Object> path, String document) {
-        System.out.println("getPathDocumentCoordinatesPseudoJson: path=" + path + ", document=" + document);
+        //System.out.println("getPathDocumentCoordinatesPseudoJson: path=" + path + ", document=" + document);
 
         Iterator<CharacterPosition> reader = stringReader(document);
         return findCoordinates(path, reader, null, null);
@@ -97,7 +97,7 @@ public class GetPathDocumentCoordinatesPseudoJson {
             int row = cp.row;
             int col = cp.col;
 
-            System.out.println("findCoordinatesObject: char=" + c + ", row=" + row + ", col=" + col);
+            //System.out.println("findCoordinatesObject: char=" + c + ", row=" + row + ", col=" + col);
             if (c == '}') {
                 return null;
             } else if (c == '"') {
@@ -151,7 +151,7 @@ public class GetPathDocumentCoordinatesPseudoJson {
             int row = cp.row;
             int col = cp.col;
 
-            System.out.println("findValue: char=" + c + ", row=" + row + ", col=" + col);
+            //System.out.println("findValue: char=" + c + ", row=" + row + ", col=" + col);
             if (c == '{') {
                 findObject(reader);
                 return false;
@@ -180,7 +180,7 @@ public class GetPathDocumentCoordinatesPseudoJson {
             int row = cp.row;
             int col = cp.col;
 
-            System.out.println("findObject: char=" + c + ", row=" + row + ", col=" + col);
+            //System.out.println("findObject: char=" + c + ", row=" + row + ", col=" + col);
             if (c == '}') {
                 return;
             } else if (c == '"') {
@@ -205,7 +205,7 @@ public class GetPathDocumentCoordinatesPseudoJson {
             int row = cp.row;
             int col = cp.col;
 
-            System.out.println("findArray: char=" + c + ", row=" + row + ", col=" + col);
+            //System.out.println("findArray: char=" + c + ", row=" + row + ", col=" + col);
             if (c == ']') {
                 return;
             }
@@ -222,7 +222,7 @@ public class GetPathDocumentCoordinatesPseudoJson {
             CharacterPosition cp = reader.next();
             char c = cp.character;
 
-            System.out.println("findString: char=" + c);
+            //System.out.println("findString: char=" + c);
             if (c == '"') {
                 return workingString.toString();
             } else {

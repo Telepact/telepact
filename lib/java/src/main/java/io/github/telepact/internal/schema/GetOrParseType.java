@@ -31,6 +31,7 @@ import io.github.telepact.TelepactSchemaParseError;
 import io.github.telepact.internal.types.TAny;
 import io.github.telepact.internal.types.TArray;
 import io.github.telepact.internal.types.TBoolean;
+import io.github.telepact.internal.types.TBytes;
 import io.github.telepact.internal.types.TInteger;
 import io.github.telepact.internal.types.TMockCall;
 import io.github.telepact.internal.types.TMockStub;
@@ -54,7 +55,7 @@ public class GetOrParseType {
             return existingType;
         }
 
-        final var regexString = "^(boolean|integer|number|string|any|array|object)|((fn|(union|struct|_ext))\\.([a-zA-Z_]\\w*))$";
+        final var regexString = "^(boolean|integer|number|string|any|bytes|array|object)|((fn|(union|struct|_ext))\\.([a-zA-Z_]\\w*))$";
 
         final var regex = Pattern.compile(regexString);
 
@@ -73,6 +74,7 @@ public class GetOrParseType {
                 case "string" -> new TString();
                 case "array" -> new TArray();
                 case "object" -> new TObject();
+                case "bytes" -> new TBytes();
                 default -> new TAny();
             };
         }
