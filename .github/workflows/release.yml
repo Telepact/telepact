@@ -65,6 +65,14 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           run-id: ${{ github.event.inputs.artifacts_run_id }}
 
+      - name: Download dart artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-dart
+          path: bind/dart/dist
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.inputs.artifacts_run_id }}
+
       - name: Download cli artifacts
         uses: actions/download-artifact@v4
         with:
@@ -89,11 +97,11 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           run-id: ${{ github.event.inputs.artifacts_run_id }}
 
-      - name: Download console artifacts
+      - name: Download docker artifacts
         uses: actions/download-artifact@v4
         with:
-          name: build-console
-          path: sdk/console/dist
+          name: build-docker
+          path: sdk/docker/dist
           github-token: ${{ secrets.GITHUB_TOKEN }}
           run-id: ${{ github.event.inputs.artifacts_run_id }}
 
