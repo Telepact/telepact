@@ -332,7 +332,7 @@ def bump() -> None:
         if 'sdk/prettier' in path:
             release_targets.add('prettier')
 
-    print(f'release_targets: {release_string}')
+    print(f'release_targets: {release_targets}')
 
     # if release_targets:
     #     release_string = "Release targets:\n" + "\n".join(release_targets)
