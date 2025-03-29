@@ -197,7 +197,7 @@ def set_version(version: str) -> None:
         updated = True
 
     if os.path.exists("pubspec.yaml"):
-        with open("pubspec.yaml", "r") as f:
+        with open("pubspec.yaml", "r") as f):
             data = yaml.load(f)
         data["version"] = version
         with open("pubspec.yaml", "w") as f:
@@ -504,6 +504,59 @@ def github_labels() -> None:
     # Print summary
     print(f"Summary:\n  Added tags: {', '.join(added_tags) if added_tags else 'None'}\n  Removed tags: {', '.join(removed_tags) if removed_tags else 'None'}")
 
+@click.command()
+@click.argument('release_body', required=False)
+@click.option('--draft', is_flag=True, default=False, help="Create a draft release.")
+@click.option('--prerelease', is_flag=True, default=False, help="Mark the release as a prerelease.")
+def release(release_body: str, draft: bool, prerelease: bool) -> None:
+    """
+    Create a GitHub release.
+
+    Arguments:
+    release_body -- The description/body of the release (optional).
+    """
+    token = os.getenv('GITHUB_TOKEN')
+    repository = os.getenv('GITHUB_REPOSITORY')
+
+    if not token or not repository:
+        click.echo("GITHUB_TOKEN and GITHUB_REPOSITORY environment variables must be set.")
+        return
+
+    # Extract version string and release targets from the last git commit message
+    commit_message = subprocess.run(
+        ['git', 'show', '-s', '--format=%s%n%b', 'HEAD'],
+        stdout=subprocess.PIPE, text=True, check=True
+    ).stdout.strip()
+    lines = commit_message.splitlines()
+    if not lines[0].startswith("Bump version to"):
+        click.echo("The last commit message does not match the expected format.")
+        return
+    version = lines[0].split(" ")[3]
+
+    if len(lines) < 3 or lines[2] == 'No release targets':
+        release_targets = []
+    elif lines[2] == 'Release targets:':
+        release_targets = lines[3:]
+
+    tag_name = version
+    release_name = version
+    release_body = f"{release_body or ''}\n\n{release_targets}".strip()
+
+    g = Github(token)
+    repo = g.get_repo(repository)
+
+    try:
+        release = repo.create_git_release(
+            tag=tag_name,
+            name=release_name,
+            message=release_body,
+            draft=True,
+            prerelease=True
+        )
+        click.echo(f"Release created: {release.html_url}")
+    except Exception as e:
+        click.echo(f"Failed to create release: {e}")
+
 main.add_command(old_bump)
 main.add_command(depset)
 main.add_command(get)
@@ -511,6 +564,7 @@ main.add_command(set_version)
 main.add_command(bump)
 main.add_command(license_header)
 main.add_command(github_labels)
+main.add_command(release)
 
 if __name__ == "__main__":
     main()

@@ -1,0 +1,83 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      artifacts_run_id:
+        required: true
+        default: 0
+        type: number
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    steps:
+      - name: Generate GitHub App token
+        id: generate-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ vars.TELEPACT_BOT_APP_ID }}
+          private-key: ${{ secrets.TELEPACT_BOT_PRIVATE_KEY }}
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          token: ${{ steps.generate-token.outputs.token }}
+
+      - name: Download ts artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-ts
+          path: lib/ts/dist-tgz
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.inputs.artifacts_run_id }}
+
+      - name: Download java artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-java
+          path: lib/java/target
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.inputs.artifacts_run_id }}
+
+      - name: Download py artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-py
+          path: lib/py/dist
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.inputs.artifacts_run_id }}
+
+      - name: Download cli artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-cli
+          path: sdk/cli/dist
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.inputs.artifacts_run_id }}
+
+      - name: Download prettier artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-prettier
+          path: sdk/prettier/dist-tgz
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.inputs.artifacts_run_id }}
+
+      - name: Download console artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-console
+          path: sdk/console/dist
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.inputs.artifacts_run_id }}
+
+      - name: Download console artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-console
+          path: sdk/console/dist
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.inputs.artifacts_run_id }}

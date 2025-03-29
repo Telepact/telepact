@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "vite dev --force",
     "dev:test": "vite dev --port 3001 --force",
-    "build": "vite build",
+    "build": "vite build && npm pack --pack-destination ./dist",
     "preview": "vite preview",
     "test": "playwright test",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
@@ -44,7 +44,6 @@
     "prettier": "^3.4.2"
   },
   "files": [
-    "src",
     "build"
   ]
 }
