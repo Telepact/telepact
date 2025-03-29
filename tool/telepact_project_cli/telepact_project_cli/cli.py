@@ -309,11 +309,16 @@ def bump() -> None:
         stdout=subprocess.PIPE, text=True
     ).stdout.strip()
 
+    print(f'prev_commit_hash: {prev_commit_hash}')
+
     # Get the paths from the previous commit
     prev_commit_paths = subprocess.run(
         ['git', 'diff-tree', '--no-commit-id', '--name-only', '-r', prev_commit_hash],
         stdout=subprocess.PIPE, text=True
     ).stdout.strip().split('\n')
+
+    print('prev_commit_paths:')
+    print(prev_commit_hash)
 
     # Determine release targets based on the paths
     release_targets = set()

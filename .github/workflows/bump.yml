@@ -30,6 +30,7 @@ jobs:
   bump-version:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
+    timeout-minutes: 1
     steps:
       - name: Generate GitHub App token
         id: generate-token
