@@ -19,6 +19,7 @@ import 'dart:typed_data';
 
 import 'bindings.dart';
 
+
 class DartRandomGenerator {
   final RandomGenerator _randomGenerator;
 
