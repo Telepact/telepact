@@ -1,2 +1,3 @@
 # Telepact CLI
-TODO
+
+Install with `pipx`. See help text with `telepact --help`.
