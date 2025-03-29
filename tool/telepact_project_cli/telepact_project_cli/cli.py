@@ -535,6 +535,9 @@ def release() -> None:
         ['git', 'show', '-s', '--format=%s%n%b', 'HEAD'],
         stdout=subprocess.PIPE, text=True, check=True
     ).stdout.strip()
+
+    print(f'commit_message: {commit_message}')
+
     lines = commit_message.splitlines()
     if not lines[0].startswith("Bump version to"):
         click.echo("The last commit message does not match the expected format.")
@@ -545,6 +548,8 @@ def release() -> None:
         release_targets = lines[3:]
     else:
         release_targets = []
+
+    print(f'release_targets: {release_targets}')
 
     tag_name = version
     release_name = version
