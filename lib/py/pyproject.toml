@@ -1,6 +1,6 @@
 [project]
 name = "telepact"
-version = "1.0.0-alpha.19"
+version = "1.0.0-alpha.20"
 description = "Telepact"
 requires-python = ">=3.11"
 classifiers = [ "Programming Language :: Python :: 3", "Operating System :: OS Independent",]
