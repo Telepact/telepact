@@ -3,3 +3,6 @@
 node_modules/
 !LICENSE
 !NOTICE
+NOTICE_DART
+rollup
+dist
