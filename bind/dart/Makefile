@@ -20,8 +20,7 @@ VERSION := $(shell cat ../../VERSION.txt)
 
 all:
 	cp ../../LICENSE ../../NOTICE ./
-	echo '\n' >> NOTICE
-	cat NOTICE_SUB_PROJECT >> NOTICE
+	cat LICENSE_SUB_PROJECT >> LICENSE
 
 	npm install
 	
