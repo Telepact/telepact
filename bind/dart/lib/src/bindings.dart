@@ -39,18 +39,6 @@ extension type TelepactSchema._(JSObject _) implements JSObject {
       String directory, JSAny fs, JSAny path);
 }
 
-extension type RandomGenerator._(JSObject _) implements JSObject {
-  external factory RandomGenerator(
-      int collectionLengthMin, int collectionLengthMax);
-  external void setSeed(int seed);
-  external int nextInt();
-  external int nextIntWithCeiling(int ceiling);
-  external bool nextBoolean();
-  external String nextString();
-  external double nextDouble();
-  external int nextCollectionLength();
-}
-
 extension type Message._(JSObject _) implements JSObject {
   external JSAny get headers;
   external JSAny get body;
