@@ -19,7 +19,6 @@ library;
 
 import 'dart:js_interop';
 
-
 extension type TelepactSchema._(JSObject _) implements JSObject {
   external JSArray get original;
   external JSArray get full;
@@ -58,8 +57,7 @@ extension type Serializer._(JSObject _) implements JSObject {
 }
 
 extension type Client._(JSObject _) implements JSObject {
-  external factory Client(
-      JSFunction adapter, ClientOptions options);
+  external factory Client(JSFunction adapter, ClientOptions options);
   external JSPromise<Message> request(Message requestMessage);
 }
 
@@ -69,7 +67,7 @@ extension type ClientOptions._(JSObject _) implements JSObject {
   external int get timeoutMsDefault;
   external Serialization get serializationImpl;
   external String get localStorageCacheNamespace;
-  
+
   external void set useBinary(bool value);
   external void set alwaysSendJson(bool value);
   external void set timeoutMsDefault(int value);
@@ -97,11 +95,9 @@ extension type ServerOptions._(JSObject _) implements JSObject {
   external void set onResponse(JSFunction onResponse);
   external void set authRequired(bool authRequired);
   external void set serialization(Serialization serialization);
-  
 
   external factory ServerOptions();
 }
-
 
 extension type MockServer._(JSObject _) implements JSObject {
   external factory MockServer(JSAny mockTelepactSchema, JSAny options);
@@ -138,4 +134,3 @@ extension type TelepactSchemaParseError._(JSObject _) implements JSObject {
 extension type SerializationError._(JSObject _) implements JSObject {}
 
 extension type TelepactError._(JSObject _) implements JSObject {}
-
