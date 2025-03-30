@@ -40,7 +40,7 @@ export default {
 */
 
 /*
-    This file is a Rollup redistribution of the original \`crc-32\` npm package.
+    This file is an IIFE bundle of the npm package \`crc-32\`.
 */
 `,
     },

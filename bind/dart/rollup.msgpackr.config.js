@@ -37,7 +37,7 @@ ${license}
 */
 
 /*
-    This file is a Rollup redistribution of the original \`msgpackr\` npm package.
+    This file is an IIFE bundle of the npm package \`msgpackr\`.
 */
 `,
     },
