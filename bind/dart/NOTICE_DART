@@ -1,13 +1,13 @@
-This library redistributes the npm package 'crc-32' in a single Rollup file.
+This Telepact library redistributes the npm package 'crc-32' in a single Rollup file.
 
 License: https://github.com/SheetJS/js-crc32/blob/6a752a8568e37e824e85da3abf45ff883ae2f651/LICENSE
-Project Page: https://github.com/SheetJS/js-crc32
-Location in Telepact Dart: lib/js/crc32.js
+Project page: https://github.com/SheetJS/js-crc32
+Telepact library location: lib/js/crc32.js
 
 ---
 
-This library redistributes the npm package 'msgpackr' in a single Rollup file.
+This Telepact library redistributes the npm package 'msgpackr' in a single Rollup file.
 
 License: https://github.com/kriszyp/msgpackr/blob/50bcdb8e312b45d9fcbd911c961d5ad31ef24019/LICENSE
-Project Page: https://github.com/kriszyp/msgpackr
-Location in Telepact Dart: lib/js/msgpackr.js
+Project page: https://github.com/kriszyp/msgpackr
+Telepact library location: lib/js/msgpackr.js
