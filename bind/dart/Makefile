@@ -20,6 +20,9 @@ VERSION := $(shell cat ../../VERSION.txt)
 
 all:
 	cp ../../LICENSE ../../NOTICE ./
+	echo '\n' >> NOTICE
+	cat NOTICE_DART >> NOTICE
+
 	npm install
 	
 	npx rollup -c rollup.crc32.config.js
