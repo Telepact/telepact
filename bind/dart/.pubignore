@@ -9,3 +9,5 @@ dist
 rollup.crc32.config.js
 rollup.msgpackr.config.js
 Makefile
+package.json
+package-lock.json
