@@ -6,13 +6,8 @@ environment:
 
 dependencies:
   node_interop: ^2.1.0
-  web: any
 
 dev_dependencies:
   test: ^1.25.15
-
-license: Apache-2.0
-
-include:
-- LICENSE
-- NOTICE
+  web: ^1.1.1
+  
