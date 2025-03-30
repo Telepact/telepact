@@ -76,9 +76,4 @@ jobs:
 
       - name: Push changes
         run: git push origin HEAD
-
-      - name: Trigger Build
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh workflow run ci.yml --ref main -f release=true
           
