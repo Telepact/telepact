@@ -15,5 +15,3 @@
 //|
 
 library telepact;
-
-

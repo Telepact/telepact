@@ -24,7 +24,6 @@ import 'package:web/web.dart' as web;
 
 void main() {
   group('Server', () {
-
     test('cleaner: should work e2e from client to server', () async {
       final telepactPseudoJson = [
         {
@@ -55,10 +54,9 @@ void main() {
           print('Extracted x: $x, y: $y');
           final result = x + y;
           print('Computed result: $result');
-          final response = Message(
-            {},
-            {"Ok_": {"result": result}}
-          );
+          final response = Message({}, {
+            "Ok_": {"result": result}
+          });
           print('Created response: ${response.body}');
           return Future.value(response);
         } catch (e) {
@@ -90,49 +88,43 @@ void main() {
       print('Creating DartClientOptions');
       final clientOptions = ClientOptions()
         ..useBinary = true
-        ..localStorageCacheNamespace="test";
+        ..localStorageCacheNamespace = "test";
       print('DartClientOptions created: $clientOptions');
 
-
       // Put some data into the local storage to see if it loads in
-      final exampleLocalStorageData = {"-1337":{"lol": 1, "notreal": 2}};
+      final exampleLocalStorageData = {
+        "-1337": {"lol": 1, "notreal": 2}
+      };
       //final exampleLocalStorageData = {"-2064039486":{"Ok_":0,"api":1,"fn.add":2,"fn.api_":3,"fn.ping_":4,"result":5,"x":6,"y":7}};
       web.window.localStorage.setItem(
-        'telepact-api-encoding:test',
-        jsonEncode(exampleLocalStorageData)
-      );
+          'telepact-api-encoding:test', jsonEncode(exampleLocalStorageData));
 
       print('Creating DartClient');
       final client = Client(adapter, clientOptions);
       print('DartClient created: $client');
 
-
       {
-        final request = Message(
-          {},
-          {'fn.ping_': {}}
-        );
+        final request = Message({}, {'fn.ping_': {}});
         print('Created request: ${request.body}');
 
         var response = await client.request(request);
         print('Received response: ${response.body}');
 
-        Message expectedResponse = Message(
-          {
-            '@enc_': {
-                'Ok_': 0,
-                'api': 1,
-                'fn.add': 2,
-                'fn.api_': 3,
-                'fn.ping_': 4,
-                'result': 5,
-                'x': 6,
-                'y': 7
-              },            
-            '@bin_': [-2064039486]
+        Message expectedResponse = Message({
+          '@enc_': {
+            'Ok_': 0,
+            'api': 1,
+            'fn.add': 2,
+            'fn.api_': 3,
+            'fn.ping_': 4,
+            'result': 5,
+            'x': 6,
+            'y': 7
           },
-          {"Ok_": {}}
-        );
+          '@bin_': [-2064039486]
+        }, {
+          "Ok_": {}
+        });
         print('Expected response: ${expectedResponse.body}');
 
         expect(response.headers, equals(expectedResponse.headers));
@@ -140,35 +132,62 @@ void main() {
       }
 
       {
-        final request = Message(
-          {},
-          {
-            'fn.add': {
-              'x': 1,
-              'y': 2
-            }
-          }
-        );
+        final request = Message({}, {
+          'fn.add': {'x': 1, 'y': 2}
+        });
 
         var response = await client.request(request);
 
         print('response: ${response.body}');
 
-        var data = web.window.localStorage.getItem('telepact-api-encoding:test');
-
-        Message expectedResponse = Message(
-          {
-            '@bin_': [-2064039486]
-          },
-          {"Ok_": {'result': 3}}
-        );
+        Message expectedResponse = Message({
+          '@bin_': [-2064039486]
+        }, {
+          "Ok_": {'result': 3}
+        });
 
         expect(response.headers, equals(expectedResponse.headers));
         expect(response.body, equals(expectedResponse.body));
-        
+
+        var data =
+            web.window.localStorage.getItem('telepact-api-encoding:test');
         print('local-storage: ${data}');
       }
-    });    
 
+      final mockTelepactSchema = MockTelepactSchema.fromJson(telepactJson);
+      final mockServerOptions = MockServerOptions();
+      final mockServer = MockServer(mockTelepactSchema, mockServerOptions);
+
+      Future<Message> mockAdapter(Message m, Serializer s) async {
+        print('Mock: Adapter received message: ${m.body}');
+        final requestBytes = s.serialize(m);
+        print(
+            'Mock: Serialized requestBytes: ${String.fromCharCodes(requestBytes)}');
+        final responseBytes = await mockServer.process(requestBytes);
+        print(
+            'Mock: Received responseBytes: ${String.fromCharCodes(responseBytes)}');
+        final response = s.deserialize(responseBytes);
+        print('Mock: Deserialized response: ${response.body}');
+        return response;
+      }
+
+      final mockClient = Client(mockAdapter, clientOptions);
+
+      {
+        final request = Message({}, {
+          'fn.add': {'x': 1, 'y': 2}
+        });
+
+        var response = await mockClient.request(request);
+
+        print('response: ${response.body}');
+
+        var expectedResponseBody = {
+          "Ok_": {'result': 2163713}
+        };
+
+        expect(response.body, equals(expectedResponseBody));
+      }
+    });
   });
 }

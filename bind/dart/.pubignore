@@ -3,6 +3,11 @@
 node_modules/
 !LICENSE
 !NOTICE
-NOTICE_DART
+NOTICE_SUB_PROJECT
 rollup
 dist
+rollup.crc32.config.js
+rollup.msgpackr.config.js
+Makefile
+package.json
+package-lock.json

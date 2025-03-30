@@ -19,7 +19,6 @@ library;
 
 import 'dart:js_interop';
 
-
 extension type TelepactSchema._(JSObject _) implements JSObject {
   external JSArray get original;
   external JSArray get full;
@@ -34,21 +33,6 @@ extension type TelepactSchema._(JSObject _) implements JSObject {
       JSObject parsedRequestHeaders,
       JSObject parsedResponseHeaders);
   external static TelepactSchema fromJson(String json);
-  external static TelepactSchema fromFileJsonMap(JSObject fileJsonMap);
-  external static TelepactSchema fromDirectory(
-      String directory, JSAny fs, JSAny path);
-}
-
-extension type RandomGenerator._(JSObject _) implements JSObject {
-  external factory RandomGenerator(
-      int collectionLengthMin, int collectionLengthMax);
-  external void setSeed(int seed);
-  external int nextInt();
-  external int nextIntWithCeiling(int ceiling);
-  external bool nextBoolean();
-  external String nextString();
-  external double nextDouble();
-  external int nextCollectionLength();
 }
 
 extension type Message._(JSObject _) implements JSObject {
@@ -73,8 +57,7 @@ extension type Serializer._(JSObject _) implements JSObject {
 }
 
 extension type Client._(JSObject _) implements JSObject {
-  external factory Client(
-      JSFunction adapter, ClientOptions options);
+  external factory Client(JSFunction adapter, ClientOptions options);
   external JSPromise<Message> request(Message requestMessage);
 }
 
@@ -84,7 +67,7 @@ extension type ClientOptions._(JSObject _) implements JSObject {
   external int get timeoutMsDefault;
   external Serialization get serializationImpl;
   external String get localStorageCacheNamespace;
-  
+
   external void set useBinary(bool value);
   external void set alwaysSendJson(bool value);
   external void set timeoutMsDefault(int value);
@@ -112,11 +95,9 @@ extension type ServerOptions._(JSObject _) implements JSObject {
   external void set onResponse(JSFunction onResponse);
   external void set authRequired(bool authRequired);
   external void set serialization(Serialization serialization);
-  
 
   external factory ServerOptions();
 }
-
 
 extension type MockServer._(JSObject _) implements JSObject {
   external factory MockServer(JSAny mockTelepactSchema, JSAny options);
@@ -143,9 +124,6 @@ extension type MockTelepactSchema._(JSObject _) implements JSObject {
   external factory MockTelepactSchema(JSAny original, JSAny full, JSAny parsed,
       JSAny parsedRequestHeaders, JSAny parsedResponseHeaders);
   external static MockTelepactSchema fromJson(String json);
-  external static MockTelepactSchema fromFileJsonMap(JSObject fileJsonMap);
-  external static MockTelepactSchema fromDirectory(
-      String directory, JSAny fs, JSAny path);
 }
 
 extension type TelepactSchemaParseError._(JSObject _) implements JSObject {
@@ -156,4 +134,3 @@ extension type TelepactSchemaParseError._(JSObject _) implements JSObject {
 extension type SerializationError._(JSObject _) implements JSObject {}
 
 extension type TelepactError._(JSObject _) implements JSObject {}
-

@@ -21,7 +21,7 @@ VERSION := $(shell cat ../../VERSION.txt)
 all:
 	cp ../../LICENSE ../../NOTICE ./
 	echo '\n' >> NOTICE
-	cat NOTICE_DART >> NOTICE
+	cat NOTICE_SUB_PROJECT >> NOTICE
 
 	npm install
 	
@@ -38,7 +38,7 @@ all:
 	dart analyze
 
 	mkdir -p dist
-	tar -czvf dist/telepact-${VERSION}.tar.gz lib pubspec.yaml pubspec.lock README.md LICENSE NOTICE
+	tar -czvf dist/telepact-${VERSION}.tar.gz lib test pubspec.yaml README.md LICENSE NOTICE
 
 dep:
 	$(MAKE) -C ../../lib/ts
