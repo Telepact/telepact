@@ -1,0 +1,15 @@
+
+
+-----------------------------------------------------------------------------
+
+This product bundles the npm package `crc-32`, which is licensed under
+the Apache License, Version 2.0; See lib/js/crc32.js
+
+Project Link: https://github.com/SheetJS/js-crc32
+
+---
+
+This product bundles the npm package `msgpackr`, which is licensed under
+the MIT License; See lib/js/msgpackr.js
+
+Project Link: https://github.com/kriszyp/msgpackr
