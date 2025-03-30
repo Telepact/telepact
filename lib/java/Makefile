@@ -32,3 +32,6 @@ clean:
 	rm -rf src/main/resources
 	rm -rf target
 	rm -rf .m2
+
+deploy:
+	export $(cat .env) && mvn -P credentialed deploy -Ddeploy.skipUpload=false

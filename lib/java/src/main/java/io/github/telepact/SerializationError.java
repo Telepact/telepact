@@ -20,6 +20,11 @@ package io.github.telepact;
  * Indicates failure to serialize a telepact Message.
  */
 public class SerializationError extends RuntimeException {
+    /**
+     * Constructs a SerializationError with the specified cause.
+     *
+     * @param cause the underlying cause of the error
+     */
     public SerializationError(Throwable cause) {
         super(cause);
     }

@@ -19,18 +19,32 @@ package io.github.telepact;
 import java.nio.ByteBuffer;
 import java.util.Base64;
 
+/**
+ * A utility class for generating random values.
+ */
 public class RandomGenerator {
     int seed = 0;
     private int collectionLengthMin;
     private int collectionLengthMax;
     private int count = 0;
 
+    /**
+     * Constructs a RandomGenerator with specified collection length bounds.
+     *
+     * @param collectionLengthMin the minimum collection length
+     * @param collectionLengthMax the maximum collection length
+     */
     public RandomGenerator(int collectionLengthMin, int collectionLengthMax) {
         this.setSeed(0);
         this.collectionLengthMin = collectionLengthMin;
         this.collectionLengthMax = collectionLengthMax;
     }
 
+    /**
+     * Sets the seed for the random generator.
+     *
+     * @param seed the seed value
+     */
     public void setSeed(int seed) {
         this.seed = seed == 0 ? 1 : seed;
     }
@@ -50,6 +64,11 @@ public class RandomGenerator {
         throw new RuntimeException();
     }
 
+    /**
+     * Generates a random integer.
+     *
+     * @return a random integer
+     */
     public int nextInt() {
         var x = this.seed;
         x ^= x << 16;
@@ -62,6 +81,12 @@ public class RandomGenerator {
         return result & 0x7fffffff;
     }
 
+    /**
+     * Generates a random integer with an upper ceiling.
+     *
+     * @param ceiling the upper limit (exclusive)
+     * @return a random integer
+     */
     public int nextIntWithCeiling(int ceiling) {
         if (ceiling == 0) {
             return 0;
@@ -69,25 +94,50 @@ public class RandomGenerator {
         return (int) nextInt() % ceiling;
     }
 
+    /**
+     * Generates a random double.
+     *
+     * @return a random double
+     */
+    public double nextDouble() {
+        return ((double) (nextInt() & 0x7fffffff) / ((double) 0x7fffffff));
+    }
+
+    /**
+     * Generates a random boolean.
+     *
+     * @return a random boolean
+     */
     public boolean nextBoolean() {
         return nextIntWithCeiling(31) > 15;
     }
     
+    /**
+     * Generates a random byte array.
+     *
+     * @return a random byte array
+     */
     public byte[] nextBytes() {
         var bytes = ByteBuffer.allocate(Integer.BYTES);
         bytes.putInt(nextInt());
         return bytes.array();
     }
 
+    /**
+     * Generates a random string.
+     *
+     * @return a random string
+     */
     public String nextString() {
         var bytes = nextBytes();
         return Base64.getEncoder().withoutPadding().encodeToString(bytes);
     }
 
-    public double nextDouble() {
-        return ((double) (nextInt() & 0x7fffffff) / ((double) 0x7fffffff));
-    }
-
+    /**
+     * Generates a random collection length within the specified bounds.
+     *
+     * @return a random collection length
+     */
     public int nextCollectionLength() {
         return nextIntWithCeiling(this.collectionLengthMax - this.collectionLengthMin) + this.collectionLengthMin;
     }

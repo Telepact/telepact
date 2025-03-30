@@ -31,9 +31,16 @@ import io.github.telepact.internal.binary.ServerBinaryEncoder;
 public class Server {
 
     /**
-     * Options for the Server.
+     * Options for configuring the Server.
      */
     public static class Options {
+
+        /**
+         * Default constructor for Options.
+         * Initializes the configuration options with default values.
+         */
+        public Options() {
+        }
 
         /**
          * Handler for errors thrown during message processing.
