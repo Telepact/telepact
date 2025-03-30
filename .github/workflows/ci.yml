@@ -256,6 +256,26 @@ jobs:
           name: build-console
           path: sdk/console/dist
           retention-days: 1
+  
+  test-console-self-host:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    needs: [build-console]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Download console build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-console
+          path: sdk/console/dist
+
+      - name: Build test environment
+        run: make console-self-hosted
+
+      - name: Run test
+        run: make test-console-self-hosted
 
   build-docker:
     runs-on: ubuntu-latest

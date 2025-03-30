@@ -104,6 +104,15 @@ clean-console:
 test-console:
 	$(MAKE) -C sdk/console test
 
+console-self-hosted:
+	$(MAKE) -C test/console-self-hosted
+
+clean-console-self-hosted:
+	$(MAKE) -C test/console-self-hosted clean
+
+test-console-self-hosted:
+	$(MAKE) -C test/console-self-hosted test
+
 docker:
 	$(MAKE) -C sdk/docker
 
