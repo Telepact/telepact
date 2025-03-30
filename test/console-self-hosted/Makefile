@@ -27,6 +27,7 @@ $(TAR_GZ):
 clean:
 	rm -rf dist
 	rm -rf node_modules
+	rm -f package-lock.json
 	rm $(TAR_GZ)
 
 test:
