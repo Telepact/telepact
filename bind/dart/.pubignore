@@ -6,3 +6,6 @@ node_modules/
 NOTICE_DART
 rollup
 dist
+rollup.crc32.config.js
+rollup.msgpackr.config.js
+Makefile
