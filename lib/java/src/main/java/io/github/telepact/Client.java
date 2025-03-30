@@ -31,9 +31,17 @@ import io.github.telepact.internal.binary.DefaultBinaryEncodingCache;
 public class Client {
 
     /**
-     * Options for the Client.
+     * Options for configuring the Client.
      */
     public static class Options {
+
+        /**
+         * Default constructor for Options.
+         * Initializes the client options with default values.
+         */
+        public Options() {
+            // Default constructor
+        }
 
         /**
          * Indicates if the client should use binary payloads instead of JSON.

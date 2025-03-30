@@ -40,8 +40,8 @@ public class Serializer {
     /**
      * Serialize a Message into a byte array.
      * 
-     * @param message
-     * @return
+     * @param message the object to be serialized
+     * @return the serialized byte array
      */
     public byte[] serialize(Message message) {
         return serializeInternal(message, this.binaryEncoder, this.base64Encoder, this.serializationImpl);
@@ -50,8 +50,8 @@ public class Serializer {
     /**
      * Deserialize a Message from a byte array.
      * 
-     * @param messageBytes
-     * @return
+     * @param messageBytes the byte array to be deserialized
+     * @return the deserialized object
      */
     public Message deserialize(byte[] messageBytes) {
         return deserializeInternal(messageBytes, this.serializationImpl, this.binaryEncoder, this.base64Encoder);

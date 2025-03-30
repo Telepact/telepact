@@ -28,9 +28,22 @@ import io.github.telepact.internal.schema.SchemaParseFailure;
  */
 public class TelepactSchemaParseError extends RuntimeException {
 
+    /**
+     * The list of schema parse failures.
+     */
     public final List<SchemaParseFailure> schemaParseFailures;
+
+    /**
+     * The pseudo-JSON representation of schema parse failures.
+     */
     public final List<Object> schemaParseFailuresPseudoJson;
 
+    /**
+     * Constructs a new TelepactSchemaParseError with the specified parameters.
+     *
+     * @param schemaParseFailures the list of schema parse failures
+     * @param documentNamesToJson the pseudo-JSON representation of schema parse failures
+     */
     public TelepactSchemaParseError(List<SchemaParseFailure> schemaParseFailures,
             Map<String, String> documentNamesToJson) {
         super(String.valueOf(mapSchemaParseFailuresToPseudoJson(schemaParseFailures, documentNamesToJson)));
@@ -39,6 +52,13 @@ public class TelepactSchemaParseError extends RuntimeException {
                 documentNamesToJson);
     }
 
+    /**
+     * Constructs a new TelepactSchemaParseError with the specified parameters and cause.
+     *
+     * @param schemaParseFailures the list of schema parse failures
+     * @param documentNamesToJson the pseudo-JSON representation of schema parse failures
+     * @param cause the cause of the error
+     */
     public TelepactSchemaParseError(List<SchemaParseFailure> schemaParseFailures,
             Map<String, String> documentNamesToJson,
             Throwable cause) {

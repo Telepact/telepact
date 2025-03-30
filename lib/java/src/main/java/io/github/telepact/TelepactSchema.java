@@ -30,11 +30,34 @@ import io.github.telepact.internal.types.TType;
  */
 public class TelepactSchema {
 
+    /**
+     * The original schema objects.
+     */
     public final List<Object> original;
+
+    /**
+     * The parsed schema types.
+     */
     public final Map<String, TType> parsed;
+
+    /**
+     * The parsed request headers.
+     */
     public final Map<String, TFieldDeclaration> parsedRequestHeaders;
+
+    /**
+     * The parsed response headers.
+     */
     public final Map<String, TFieldDeclaration> parsedResponseHeaders;
 
+    /**
+     * Constructs a new TelepactSchema with the specified parameters.
+     *
+     * @param original the original schema objects
+     * @param parsed the parsed schema types
+     * @param parsedRequestHeaders the parsed request headers
+     * @param parsedResponseHeaders the parsed response headers
+     */
     public TelepactSchema(List<Object> original,
             Map<String, TType> parsed,
             Map<String, TFieldDeclaration> parsedRequestHeaders,
@@ -45,14 +68,32 @@ public class TelepactSchema {
         this.parsedResponseHeaders = parsedResponseHeaders;
     }
 
+    /**
+     * Creates a TelepactSchema from a JSON string.
+     *
+     * @param json the JSON string
+     * @return the created TelepactSchema
+     */
     public static TelepactSchema fromJson(String json) {
         return createTelepactSchemaFromFileJsonMap(Map.of("auto_", json));
     }
 
+    /**
+     * Creates a TelepactSchema from a map of file names to JSON strings.
+     *
+     * @param fileJsonMap the map of file names to JSON strings
+     * @return the created TelepactSchema
+     */
     public static TelepactSchema fromFileJsonMap(Map<String, String> fileJsonMap) {
         return createTelepactSchemaFromFileJsonMap(fileJsonMap);
     }
 
+    /**
+     * Creates a TelepactSchema from a directory.
+     *
+     * @param directory the directory path
+     * @return the created TelepactSchema
+     */
     public static TelepactSchema fromDirectory(String directory) {
         final var map = getSchemaFileMap(directory);
         return createTelepactSchemaFromFileJsonMap(map);

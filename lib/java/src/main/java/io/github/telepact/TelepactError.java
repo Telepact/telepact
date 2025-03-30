@@ -21,10 +21,20 @@ package io.github.telepact;
  */
 public class TelepactError extends RuntimeException {
 
+    /**
+     * Constructs a new TelepactError with the specified detail message.
+     *
+     * @param message the detail message
+     */
     public TelepactError(String message) {
         super(message);
     }
 
+    /**
+     * Constructs a new TelepactError with the specified cause.
+     *
+     * @param cause the cause of the error
+     */
     public TelepactError(Throwable cause) {
         super(cause);
     }

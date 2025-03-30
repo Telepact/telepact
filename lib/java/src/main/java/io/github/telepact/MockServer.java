@@ -31,9 +31,15 @@ import io.github.telepact.internal.mock.MockStub;
 public class MockServer {
 
     /**
-     * Options for the MockServer.
+     * Options for configuring the MockServer.
      */
     public static class Options {
+
+        /**
+         * Creates a new instance of Options with default values.
+         */
+        public Options() {
+        }
 
         /**
          * Handler for errors thrown during message processing.
