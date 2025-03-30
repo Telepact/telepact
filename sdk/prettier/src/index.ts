@@ -139,8 +139,6 @@ function printJsonAst(path: any, options: any, print: any): any {
         return group([path.call(print, "key"), ": ", path.call(print, "value")]);
     }
 
-    console.log(`Node type not handled: ${node.type}`);
-
     return "";
 }
 
@@ -155,10 +153,8 @@ const { parse } = jsonParser;
 const jsonExtendedParser: Parser = {
     ...jsonParser,
     parse: async (text: string, options: ParserOptions) => {
-        console.log("Before parsing...");
         const preprocessedText = await preprocess(text);
         const ast = parse(preprocessedText, options);
-        console.log("After parsing...");
         return ast;
     },
     astFormat: "telepact-ast",

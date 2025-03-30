@@ -27,16 +27,9 @@ export function generateRandomUMockStub(types: { [key: string]: TType }, ctx: Ge
 
     functions.sort((fn1, fn2) => fn1.name.localeCompare(fn2.name));
 
-    console.log(`randomSeed: ${ctx.randomGenerator.seed}`);
-    console.log(`functions: ${JSON.stringify(functions.map((fn) => fn.name))}`);
-
     const index = ctx.randomGenerator.nextIntWithCeiling(functions.length);
 
-    console.log(`index: ${index}`);
-
     const selectedFn = functions[index];
-
-    console.log(`selectedFn: ${selectedFn.name}`);
 
     const argFields = selectedFn.call.tags[selectedFn.name].fields;
     const okFields = selectedFn.result.tags['Ok_'].fields;

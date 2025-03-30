@@ -36,11 +36,7 @@ public class GenerateRandomMockStub {
 
                 int index = ctx.randomGenerator.nextIntWithCeiling(functions.size());
 
-                System.out.println("index: " + index);
-
                 TFn selectedFn = functions.get(index);
-
-                System.out.println("selectedFn: " + selectedFn.name);
 
                 var argFields = selectedFn.call.tags.get(selectedFn.name).fields;
                 var okFields = selectedFn.result.tags.get("Ok_").fields;

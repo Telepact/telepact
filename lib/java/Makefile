@@ -34,4 +34,4 @@ clean:
 	rm -rf .m2
 
 deploy:
-	export $(cat .env) && mvn -P credentialed deploy -Ddeploy.skipUpload=false
+	mvn -P credentialed deploy -Ddeploy.skipUpload=false
