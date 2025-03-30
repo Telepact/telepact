@@ -17,14 +17,24 @@
 import 'dart:js_interop';
 import 'dart:typed_data';
 
-import 'bindings.dart';
+import 'src/bindings.dart' as b;
 
+class TelepactSchema {
+  final b.TelepactSchema telepactSchema;
 
-class DartRandomGenerator {
-  final RandomGenerator _randomGenerator;
+  TelepactSchema(b.TelepactSchema schema): telepactSchema = schema;
 
-  DartRandomGenerator(int collectionLengthMin, int collectionLengthMax)
-      : _randomGenerator = RandomGenerator(collectionLengthMin, collectionLengthMax);
+  static TelepactSchema fromJson(String json) {
+    final schema = b.TelepactSchema.fromJson(json);
+    return TelepactSchema(schema);
+  }
+}
+
+class RandomGenerator {
+  final b.RandomGenerator _randomGenerator;
+
+  RandomGenerator(int collectionLengthMin, int collectionLengthMax)
+      : _randomGenerator = b.RandomGenerator(collectionLengthMin, collectionLengthMax);
 
   void setSeed(int seed) => _randomGenerator.setSeed(seed);
   int nextInt() => _randomGenerator.nextInt();
@@ -35,15 +45,15 @@ class DartRandomGenerator {
   int nextCollectionLength() => _randomGenerator.nextCollectionLength();
 }
 
-class DartMessage {
+class Message {
   Map<String, Object> _headers;
   Map<String, Object> _body;
 
-  DartMessage(Map<String, Object> headers, Map<String, Object> body)
+  Message(Map<String, Object> headers, Map<String, Object> body)
       : _headers = headers,
         _body = body;
 
-  DartMessage.fromJS(Message message)
+  Message.fromJS(b.Message message)
       : _headers = mapJsHeaders(message.headers),
         _body = mapJsBody(message.body);
 
@@ -57,50 +67,50 @@ class DartMessage {
     return b.cast<String, Object>();
   }
 
-  Message get _message => Message(_headers.jsify(), _body.jsify());
+  b.Message get _message => b.Message(_headers.jsify(), _body.jsify());
 
   Map<String, Object> get headers => _headers;
   Map<String, Object> get body => _body;
 }
 
-class DartSerializer {
-  final Serializer _serializer;
+class Serializer {
+  final b.Serializer _serializer;
 
-  DartSerializer.fromJS(Serializer serializer)
+  Serializer.fromJS(b.Serializer serializer)
       : _serializer = serializer;
 
-  Uint8List serialize(DartMessage message) => _serializer.serialize(message._message).toDart;
-  DartMessage deserialize(Uint8List messageBytes) => DartMessage.fromJS(_serializer.deserialize(messageBytes.toJS));
+  Uint8List serialize(Message message) => _serializer.serialize(message._message).toDart;
+  Message deserialize(Uint8List messageBytes) => Message.fromJS(_serializer.deserialize(messageBytes.toJS));
 }
 
-class DartClient {
-  final Client _client;
+class Client {
+  final b.Client _client;
 
-  DartClient(Future<DartMessage> Function(DartMessage m, DartSerializer s) adapter, DartClientOptions options)
+  Client(Future<Message> Function(Message m, Serializer s) adapter, ClientOptions options)
       : _client = initClient(adapter, options);
 
-  static Client initClient(Future<DartMessage> Function(DartMessage im, DartSerializer iis) adapter, DartClientOptions options) {
-      JSPromise outerAdapter(Message om, Serializer os) {
-        final m = DartMessage.fromJS(om);
-        final s = DartSerializer.fromJS(os);
+  static b.Client initClient(Future<Message> Function(Message im, Serializer iis) adapter, ClientOptions options) {
+      JSPromise outerAdapter(b.Message om, b.Serializer os) {
+        final m = Message.fromJS(om);
+        final s = Serializer.fromJS(os);
         return adapter(m, s).then((response) {
           return response._message;
         }).toJS;
       }
-      return Client(outerAdapter.toJS, options._options);
+      return b.Client(outerAdapter.toJS, options._options);
   }
 
-  Future<DartMessage> request(DartMessage requestMessage) async {
+  Future<Message> request(Message requestMessage) async {
     final response = await _client.request(requestMessage._message).toDart;
-    return DartMessage.fromJS(response);
+    return Message.fromJS(response);
   }
 }
 
-class DartClientOptions {
-  final ClientOptions _options;
+class ClientOptions {
+  final b.ClientOptions _options;
 
-  DartClientOptions()
-      : _options = ClientOptions();
+  ClientOptions()
+      : _options = b.ClientOptions();
 
   set useBinary(bool value) => _options.useBinary = value;
 
@@ -111,20 +121,20 @@ class DartClientOptions {
   set localStorageCacheNamespace(String value) => _options.localStorageCacheNamespace = value;
 }
 
-class DartServer {
-  final Server _server;
+class Server {
+  final b.Server _server;
 
-  DartServer(TelepactSchema schema, Future<DartMessage> Function(DartMessage m) handler, DartServerOptions options)
-      : _server = initServer(schema, handler, options);
+  Server(TelepactSchema schema, Future<Message> Function(Message m) handler, ServerOptions options)
+      : _server = initServer(schema.telepactSchema, handler, options);
 
-  static Server initServer(TelepactSchema schema, Future<DartMessage> Function(DartMessage im) handler, DartServerOptions options) {
-      JSPromise outerHandler(Message om) {
-        final m = DartMessage.fromJS(om);
+  static b.Server initServer(b.TelepactSchema schema, Future<Message> Function(Message im) handler, ServerOptions options) {
+      JSPromise outerHandler(b.Message om) {
+        final m = Message.fromJS(om);
         return handler(m).then((response) {
           return response._message;
         }).toJS;
       }
-      return Server(schema, outerHandler.toJS, options._options);
+      return b.Server(schema, outerHandler.toJS, options._options);
   }
 
   Future<Uint8List> process(Uint8List requestMessageBytes) async {
@@ -133,11 +143,11 @@ class DartServer {
   }
 }
 
-class DartServerOptions {
-  final ServerOptions _options;
+class ServerOptions {
+  final b.ServerOptions _options;
 
-  DartServerOptions()
-      : _options = ServerOptions();
+  ServerOptions()
+      : _options = b.ServerOptions();
 
   set onError(void Function(JSObject e) value) => _options.onError = value.toJS;
 
@@ -147,5 +157,5 @@ class DartServerOptions {
 
   set authRequired(bool value) => _options.authRequired = value;
 
-  set serialization(Serialization value) => _options.serialization = value;
+  set serialization(b.Serialization value) => _options.serialization = value;
 }
