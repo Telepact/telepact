@@ -34,9 +34,6 @@ extension type TelepactSchema._(JSObject _) implements JSObject {
       JSObject parsedRequestHeaders,
       JSObject parsedResponseHeaders);
   external static TelepactSchema fromJson(String json);
-  external static TelepactSchema fromFileJsonMap(JSObject fileJsonMap);
-  external static TelepactSchema fromDirectory(
-      String directory, JSAny fs, JSAny path);
 }
 
 extension type Message._(JSObject _) implements JSObject {
@@ -131,9 +128,6 @@ extension type MockTelepactSchema._(JSObject _) implements JSObject {
   external factory MockTelepactSchema(JSAny original, JSAny full, JSAny parsed,
       JSAny parsedRequestHeaders, JSAny parsedResponseHeaders);
   external static MockTelepactSchema fromJson(String json);
-  external static MockTelepactSchema fromFileJsonMap(JSObject fileJsonMap);
-  external static MockTelepactSchema fromDirectory(
-      String directory, JSAny fs, JSAny path);
 }
 
 extension type TelepactSchemaParseError._(JSObject _) implements JSObject {
