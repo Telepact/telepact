@@ -1,3 +1,3 @@
 # Telepact Console
 
-To use, see [self-hosting example](https://github.com/Telepact/telepact/blob/main/example/console-self-hosted/).
+To use, see [self-hosting example](https://github.com/Telepact/telepact/blob/main/test/console-self-hosted/).

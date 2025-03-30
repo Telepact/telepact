@@ -14,10 +14,7 @@
 		"file-loader": "^6.0.0"		
 	},
 	"dependencies": {
-		"telepact-console": "workspace:*"
+		"telepact-console": "https://github.com/Telepact/telepact/releases/download/1.0.0-alpha.1/telepact-console-1.0.0-alpha.1.tgz"
 	},
-	"type": "module",
-	"workspaces": [
-		"../../sdk/console"
-	]
+	"type": "module"
 }
