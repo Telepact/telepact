@@ -41,8 +41,6 @@ async def handle_message(
     from .types.TFn import TFn
     from ..internal.validation.ValidateContext import ValidateContext
 
-    print("Handling message")
-
     response_headers: dict[str, object] = {}
     request_headers: dict[str, object] = request_message.headers
     request_body: dict[str, object] = request_message.body
@@ -133,7 +131,6 @@ async def handle_message(
             response_headers,
         )
     
-    print(f'call_validate_ctx.bytes_coercions: {call_validate_ctx.bytes_coercions}')
     if len(call_validate_ctx.bytes_coercions) > 0:
         server_base64_decode(request_body, call_validate_ctx.bytes_coercions)
 
@@ -169,8 +166,6 @@ async def handle_message(
     result_validation_failures: list[ValidationFailure] = result_union_type.validate(
         result_union, [], result_validate_ctx)
     
-    print(f'result_validate_ctx.base64_coercions: {result_validate_ctx.base64_coercions}')
-
     if result_validation_failures and not skip_result_validation:
         res = get_invalid_error_message(
             "ErrorInvalidResponseBody_",
@@ -183,10 +178,8 @@ async def handle_message(
         return res
     
     if result_validate_ctx.base64_coercions:
-        print('Adding base64 coercions to response headers')
         final_response_headers["@base64_"] = result_validate_ctx.base64_coercions
 
-    print(f'result_validate_ctx.bytes_coercions: {result_validate_ctx.bytes_coercions}')
     if result_validate_ctx.bytes_coercions:
         server_base64_decode(result_union, result_validate_ctx.bytes_coercions)
     

@@ -33,9 +33,6 @@ export function validateSelect(
 }
 
 function isSubSelect(path: any[], givenObj: any, possibleSelectSection: any): ValidationFailure[] {
-    console.log(
-        `validating ${path.join('.')} with givenObject: ${JSON.stringify(givenObj)} and possibleSelectSection: ${JSON.stringify(possibleSelectSection)}`,
-    );
     if (Array.isArray(possibleSelectSection)) {
         if (!Array.isArray(givenObj)) {
             return getTypeUnexpectedValidationFailure(path, givenObj, 'Array');

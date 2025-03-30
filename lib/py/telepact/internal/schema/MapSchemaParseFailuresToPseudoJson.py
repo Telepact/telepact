@@ -23,8 +23,6 @@ def map_schema_parse_failures_to_pseudo_json(schema_parse_failures: list['Schema
     from ...internal.schema.GetPathDocumentCoordinatesPseudoJson import get_path_document_coordinates_pseudo_json
     pseudo_json_list = []
     for f in schema_parse_failures:
-        print(
-            f'telepact_document_name_to_json.keys(): {telepact_document_name_to_json.keys()}')
         location = get_path_document_coordinates_pseudo_json(
             f.path, telepact_document_name_to_json[f.document_name])
         pseudo_json: dict[str, object] = {}

@@ -26,16 +26,9 @@ def generate_random_u_mock_stub(types: dict[str, TType], ctx: GenerateContext) -
 
     functions.sort(key=lambda fn: fn.name)
 
-    print(f"randomSeed: {ctx.random_generator.seed}")
-    print(f"functions: {[fn.name for fn in functions]}")
-
     index = ctx.random_generator.next_int_with_ceiling(len(functions))
 
-    print(f"index: {index}")
-
     selected_fn = functions[index]
-
-    print(f"selectedFn: {selected_fn.name}")
 
     arg_fields = selected_fn.call.tags[selected_fn.name].fields
     ok_fields = selected_fn.result.tags['Ok_'].fields

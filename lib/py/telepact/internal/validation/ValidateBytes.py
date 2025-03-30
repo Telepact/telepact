@@ -28,37 +28,26 @@ def validate_bytes(value: object, ctx: 'ValidateContext') -> list['ValidationFai
     from .GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
 
     if isinstance(value, bytes):
-        print("Value is of type 'bytes'.")
         if ctx.coerce_base64:
-            print("Coercion to base64 is enabled.")
             set_coerced_path(ctx.path, ctx.base64_coercions)
         return []
     if isinstance(value, str):
-        print("Value is of type 'str'. Attempting base64 decoding.")
         try:
             base64.b64decode(value)
-            print("Base64 decoding successful.")
             if not ctx.coerce_base64:
-                print("Coercion to bytes is enabled.")
                 set_coerced_path(ctx.path, ctx.bytes_coercions)
             return []
         except Exception as e:
-            print(f"Base64 decoding failed: {e}")
             return get_type_unexpected_validation_failure([], value, 'Base64String')
     else:
-        print(f"Value is of unexpected type: {type(value)}")
         return get_type_unexpected_validation_failure([], value, _BYTES_NAME)
         
 
 def set_coerced_path(path: list[str], coerced_path: dict[str, object]):
-    print(f'Setting coerced path: {path}')
     part = path[0]
-    print(f'Current part: {part}')
 
     if len(path) > 1:
-        print(f'Path has more parts: {path[1:]}')
         coerced_path[part] = coerced_path.get(part, {})
         set_coerced_path(path[1:], cast(dict[str, object], coerced_path[part]))
     else:
-        print(f'Final part reached. Setting {part} to True.')
         coerced_path[part] = True

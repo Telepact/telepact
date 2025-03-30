@@ -41,7 +41,6 @@ public class DerivePossibleSelects {
         final var sortedTypeKeys = new ArrayList<>(nestedTypes.keySet());
         Collections.sort(sortedTypeKeys);
         for (final var k : sortedTypeKeys) {
-            System.out.println("k: " + k);
             final var v = nestedTypes.get(k);
             if (v instanceof TUnion u) {
                 final var unionSelect = new HashMap<String, List<String>>();

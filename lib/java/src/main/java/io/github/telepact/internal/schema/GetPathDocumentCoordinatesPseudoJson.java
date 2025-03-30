@@ -132,7 +132,7 @@ public class GetPathDocumentCoordinatesPseudoJson {
             int row = cp.row;
             int col = cp.col;
 
-            System.out.println("findCoordinatesArray: char=" + c + ", row=" + row + ", col=" + col);
+            //System.out.println("findCoordinatesArray: char=" + c + ", row=" + row + ", col=" + col);
             workingIndex++;
             if (workingIndex == (int) path.get(0)) {
                 return findCoordinates(path.subList(1, path.size()), reader, null, null);

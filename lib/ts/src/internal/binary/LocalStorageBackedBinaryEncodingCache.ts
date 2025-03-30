@@ -30,7 +30,7 @@ export class LocalStorageBackedBinaryEncodingCache extends BinaryEncodingCache {
         // Load initial state of recentBinaryEncodersJson from local storage
         const storedJson = localStorage.getItem(this.namespace);
 
-        console.log(`Binary Encoding loaded for ${this.namespace}: ${storedJson}`);
+        console.log(`Binary Encoding loaded from local storage for ${this.namespace}: ${storedJson}`);
 
         let jsonFromLocalStorage: Record<string, Record<string, number>> = storedJson 
             ? JSON.parse(storedJson) 
