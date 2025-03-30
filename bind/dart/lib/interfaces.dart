@@ -33,36 +33,6 @@ class TelepactSchema {
   }
 }
 
-/// A random generator utility for generating various random values.
-class RandomGenerator {
-  final b.RandomGenerator _randomGenerator;
-
-  /// Constructs a [RandomGenerator] with minimum and maximum collection lengths.
-  RandomGenerator(int collectionLengthMin, int collectionLengthMax)
-      : _randomGenerator = b.RandomGenerator(collectionLengthMin, collectionLengthMax);
-
-  /// Sets the seed for the random generator.
-  void setSeed(int seed) => _randomGenerator.setSeed(seed);
-
-  /// Generates the next random integer.
-  int nextInt() => _randomGenerator.nextInt();
-
-  /// Generates the next random integer with a specified ceiling.
-  int nextIntWithCeiling(int ceiling) => _randomGenerator.nextIntWithCeiling(ceiling);
-
-  /// Generates the next random boolean value.
-  bool nextBoolean() => _randomGenerator.nextBoolean();
-
-  /// Generates the next random string.
-  String nextString() => _randomGenerator.nextString();
-
-  /// Generates the next random double value.
-  double nextDouble() => _randomGenerator.nextDouble();
-
-  /// Generates the next random collection length.
-  int nextCollectionLength() => _randomGenerator.nextCollectionLength();
-}
-
 /// Represents a message with headers and body.
 class Message {
   Map<String, Object> _headers;
