@@ -576,9 +576,9 @@ def release() -> None:
     pr_title = pr.title
     pr_url = pr.html_url
     final_release_body = (
-        f"# {pr_title} [(#{pr_number})]({pr_url})\n\n"
+        f"## {pr_title} [(#{pr_number})]({pr_url})\n\n"
         f"### Released Projects\n"
-        f"{''.join(f'- {target}\n' for target in release_targets)}"
+        f"{''.join(f'- {target}\n' for target in release_targets) if release_targets else '(None)'}"
     ).strip()
 
     try:
