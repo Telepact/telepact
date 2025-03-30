@@ -452,6 +452,7 @@ jobs:
       - check-license-header
       - check-version
       - run-tests
+      - test-console-self-host
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
