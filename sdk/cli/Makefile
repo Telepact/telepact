@@ -20,7 +20,7 @@ SRC_FILES := $(shell find telepact_cli -type f)
 TAR_GZ := dist/*.tar.gz
 DEP_TAR_GZ := ../../lib/py/dist/*.tar.gz
 
-$(TAR_GZ): $(DEP_TAR_GZ)
+$(TAR_GZ): $(DEP_TAR_GZ) $(SRC_FILES)
 	cp ../../LICENSE ../../NOTICE telepact_cli
 	rm -rf tmp
 	mkdir -p tmp

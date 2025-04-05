@@ -197,16 +197,14 @@ export namespace {{ type_display }} {
 }
 {%- endmacro -%}
 
-{%- macro function(type_display, data, schema_key) %}
+{%- macro function(type_display, data, schema_key, fn_selects) %}
 export namespace {{ type_display }} {
     {{ struct('Input', data['///'], data[schema_key], type_display + '.', schema_key) | indent }}
     {{ union('Output', data['///'], data['->'], type_display + '.') | indent }}
 
-{# Select ideas:
-
     export class Select_ {
 
-        selects: Record<string, any> = {};
+        pseudoJson: Record<string, any> = {};
 
         {%- for key in fn_selects -%}
             {%- if key.startswith('struct') -%}
@@ -216,11 +214,11 @@ export namespace {{ type_display }} {
                 {%- for field in fields -%}
         
         {{ name }}{{ field }}(): Select_ {
-            const theseFields = this.selects["{{ key }}"] ?? [];
+            const theseFields = this.pseudoJson["{{ key }}"] ?? [];
             if (!('{{field}}'' in theseFields)) {
-                theseFields.push({{field}});
+                theseFields.push('{{field}}');
             }
-            this.selects["{{ key }}"] = theseFields;
+            this.pseudoJson["{{ key }}"] = theseFields;
 
             return this;
         }
@@ -236,15 +234,15 @@ export namespace {{ type_display }} {
                     {%- for field in fields %}
         
         {{ name }}{{ tag }}{{ field }}(): Select_ {
-            const theseTags = this.selects["{{ key }}"] ?? {};
+            const theseTags = this.pseudoJson["{{ key }}"] ?? {};
             if (!('{{tag}}' in theseTags)) {
                 const theseFields = theseTags["{{ tag }}"] ?? [];
                 if (!('{{field}}' in theseFields)) {
-                    theseFields.push({{field}});
+                    theseFields.push('{{field}}');
                 }
                 theseTags["{{ tag }}"] = theseFields;
             }
-            this.selects["{{ key }}"] = theseTags;
+            this.pseudoJson["{{ key }}"] = theseTags;
 
             return this;
         }
@@ -257,16 +255,16 @@ export namespace {{ type_display }} {
                 {%- for okField in okFields %}
             
         ok{{ okField }}(): Select_ {
-            const resultUnion = this.selects["->"] ?? {};
+            const resultUnion = this.pseudoJson["->"] ?? {};
 
             if (!('Ok_' in resultUnion)) {
                 const theseFields = resultUnion["Ok_"] ?? [];
                 if (!('{{okField}}' in theseFields)) {
-                    theseFields.push({{okField}});
+                    theseFields.push('{{okField}}');
                 }
                 resultUnion["Ok_"] = theseFields;
             }
-            this.selects["->"] = resultUnion;
+            this.pseudoJson["->"] = resultUnion;
             return this;
         }
 
@@ -275,10 +273,30 @@ export namespace {{ type_display }} {
 
         {%- endfor -%}
     }
-#}
 
 }
 {%- endmacro -%}
+
+{%- macro select(possible_fn_selects) %} 
+
+export class Select_ {
+    pseudoJson: Record<string, any> = {};
+
+    constructor(pseudoJson: Record<string, any>) {
+        this.pseudoJson = pseudoJson;
+    }
+
+    {%- for fn in possible_fn_selects -%}
+        {%- set fn_name = fn | regex_replace('^.*\\.', '') -%}
+
+    static for_{{fn_name}}(select: {{fn_name}}.Select_): Select_ {
+        return new Select_(select.pseudoJson);
+    }
+
+    {%- endfor -%}
+}
+
+{%- endmacro %}
 
 {%- for schema_entry in input %}
     {%- set schema_key = schema_entry | find_schema_key %}
@@ -288,9 +306,12 @@ export namespace {{ type_display }} {
     {%- elif schema_key.startswith('union') %}
         {{ union(ts_name, schema_entry['///'], schema_entry[schema_key], '') }}
     {%- elif schema_key.startswith('fn') %}
-        {{ function(ts_name, schema_entry, schema_key) }}
+        {%- set fn_selects = possible_fn_selects[schema_key] %}
+        {{ function(ts_name, schema_entry, schema_key, fn_selects) }}
     {%- endif %}
 {% endfor %}
+
+{{ select(possible_fn_selects) }}
 
 export class ClientInterface_ {
     client: Client;

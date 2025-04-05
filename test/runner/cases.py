@@ -187,29 +187,34 @@ additional_fn_cases = [
     ({'fn.example': ''}, [({'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}, ['fn.example'])]),
     ({'fn.example': []}, [({'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}, ['fn.example'])]),
 ]
-additional_p2Str_cases = [
-    ({'wrap': 0, 'nest': [0]}, [({'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}, ['wrap'])]),
-    ({'wrap': 0.1, 'nest': [0]}, [({'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}, ['wrap'])]),
-    ({'wrap': '', 'nest': [0]}, [({'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}, ['wrap'])]),
-    ({'wrap': [], 'nest': [0]}, [({'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}, ['wrap'])]),
-    ({'wrap': {}, 'nest': [0]}, [({'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}, ['wrap'])]),
-    ({'wrap': False, 'nest': [0, False]}, [({'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}, ['nest', 1])]),
-    ({'wrap': False, 'nest': [0, 0.1]}, [({'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}, ['nest', 1])]),
-    ({'wrap': False, 'nest': [0, '']}, [({'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}, ['nest', 1])]),
-    ({'wrap': False, 'nest': [0, []]}, [({'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}, ['nest', 1])]),
-    ({'wrap': False, 'nest': [0, {}]}, [({'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}, ['nest', 1])]),
+sel_cases = [
+    {'struct.ExStruct': ['optional!']},
+    {'struct.ExStruct': ['optional!']},
+    {'struct.ExStruct': ['optional!']},
+    {'struct.ExStruct': ['optional!', 'required']},
+    {'struct.ExStruct': ['optional!', 'required']},
+    {'struct.ExStruct': []},
+    {'struct.ExStruct': []},
+    {'union.ExUnion': {}},
+    {'union.ExUnion': {'Two': ['optional!']}},
+    {'union.ExUnion': {'Two': ['optional!']}},
+    {'union.ExUnion': {'Two': ['optional!']}},
+    {'union.ExUnion': {'Two': ['optional!', 'required']}},
+    {'union.ExUnion': {'Two': ['optional!', 'required']}},
+    {'union.ExUnion': {'Two': []}},
+    {'union.ExUnion': {'Two': []}},
+    {'->': {'Ok_': []}},
+    {'->': {'Ok_': []}},
+    {'->': {'Ok_': ['optional!']}},
+    {'->': {'Ok_': ['optional!']}},
+    {'->': {'Ok_': ['optional!']}},
+    {'->': {'Ok_': ['optional!', 'required']}},
+    {'->': {'Ok_': ['optional!', 'required']}},
+    {'struct.ExStruct': ['optional!']},
+    {'struct.ExStruct': ['optional!']},
 ]
-additional_p2Union_cases = [
-    ({'Two': {'ewrap': 0, 'enest': [0]}}, [({'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}, ['Two', 'ewrap'])]),
-    ({'Two': {'ewrap': 0.1, 'enest': [0]}}, [({'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}, ['Two', 'ewrap'])]),
-    ({'Two': {'ewrap': '', 'enest': [0]}}, [({'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}, ['Two', 'ewrap'])]),
-    ({'Two': {'ewrap': [], 'enest': [0]}}, [({'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}, ['Two', 'ewrap'])]),
-    ({'Two': {'ewrap': {}, 'enest': [0]}}, [({'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}, ['Two', 'ewrap'])]),
-    ({'Two': {'ewrap': False, 'enest': [0, False]}}, [({'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}, ['Two', 'enest', 1])]),
-    ({'Two': {'ewrap': False, 'enest': [0, 0.1]}}, [({'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}, ['Two', 'enest', 1])]),
-    ({'Two': {'ewrap': False, 'enest': [0, '']}}, [({'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}, ['Two', 'enest', 1])]),
-    ({'Two': {'ewrap': False, 'enest': [0, []]}}, [({'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}, ['Two', 'enest', 1])]),
-    ({'Two': {'ewrap': False, 'enest': [0, {}]}}, [({'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}, ['Two', 'enest', 1])]),
+additional_sel_cases = [
+
 ]
 
 cases = {
@@ -224,6 +229,7 @@ cases = {
     'struct' : [v for v in generate_basic_cases('struct!', dict, [{'required': True}, {'optional!': False, 'required': True}, {'optional2!': 0, 'required': True}, {'optional!': False, 'optional2!': 0, 'required': True}], additional_struct_cases)],
     'union' : [v for v in generate_basic_cases('union!', dict, [{'One': {}}, {'Two':{'required': True}}, {'Two':{'optional!': False, 'required': True}}], additional_union_cases)],
     'fn' : [v for v in generate_basic_cases('fn!', dict, [{'fn.example':{'required': True}}, {'fn.example':{'optional!': False, 'required': True}}], additional_fn_cases)],
+    'sel' : [v for v in generate_basic_cases('sel!', dict, [], [])],
     'testPing': [
         [[{}, {'fn.ping_': {}}], [{}, {'Ok_': {}}]],
     ],

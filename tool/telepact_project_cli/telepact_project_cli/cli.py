@@ -335,14 +335,11 @@ def bump() -> None:
     # Also respect project dependencies
     if 'py' in release_targets:
         release_targets.add('cli')
-
     if 'ts' in release_targets:
         release_targets.add('dart')
         release_targets.add('console')
-
     if 'cli' in release_targets:
         release_targets.add('docker')
-
     if 'prettier' in release_targets:
         release_targets.add('console')
 

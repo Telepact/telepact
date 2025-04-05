@@ -79,7 +79,13 @@
             "arrFn!": ["array", ["fn.example"]],
             "arrNullFn!": ["array", ["fn.example?"]],
             "objFn!": ["object", ["fn.example"]],
-            "objNullFn!": ["object", ["fn.example?"]]
+            "objNullFn!": ["object", ["fn.example?"]],
+            "sel!": ["_ext.Select_"],
+            "nullSel!": ["_ext.Select_?"],
+            "arrSel!": ["array", ["_ext.Select_"]],
+            "arrNullSel!": ["array", ["_ext.Select_?"]],
+            "objSel!": ["object", ["_ext.Select_"]],
+            "objNullSel!": ["object", ["_ext.Select_?"]]
         }
     },
     {

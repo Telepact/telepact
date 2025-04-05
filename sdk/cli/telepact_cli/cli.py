@@ -80,9 +80,14 @@ def codegen(schema_dir: str, lang: str, out: str, package: str) -> None:
 
     schema_data: list[dict[str, object]] = cast(
         list[dict[str, object]], telepact_schema.original)
+    
+    select = telepact_schema.parsed['_ext.Select_']
+    possible_fn_selects = select.possible_selects
+    possible_fn_selects.pop('fn.ping_', None)
+    possible_fn_selects.pop('fn.api_', None)
 
     # Call the generate function
-    _generate_internal(schema_data, target, output_directory, package)
+    _generate_internal(schema_data, possible_fn_selects, target, output_directory, package)
 
 
 # Define the custom filter
@@ -109,7 +114,7 @@ def _raise_error(message: str) -> None:
     raise Exception(message)
 
 
-def _generate_internal(schema_data: list[dict[str, object]], target: str, output_dir: str, java_package: str) -> None:
+def _generate_internal(schema_data: list[dict[str, object]], possible_fn_selects: dict[str, object], target: str, output_dir: str, java_package: str) -> None:
 
     # Load jinja template from file
     # Adjust the path to your template directory if necessary
@@ -240,7 +245,8 @@ def _generate_internal(schema_data: list[dict[str, object]], target: str, output
 
         output = ts_type_template.render({
             'input': ts_schema_entries,
-            'functions': functions
+            'functions': functions,
+            'possible_fn_selects': possible_fn_selects
         })
 
         # Write the output to a file
