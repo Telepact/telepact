@@ -201,6 +201,82 @@ export namespace {{ type_display }} {
 export namespace {{ type_display }} {
     {{ struct('Input', data['///'], data[schema_key], type_display + '.', schema_key) | indent }}
     {{ union('Output', data['///'], data['->'], type_display + '.') | indent }}
+
+{# Select ideas:
+
+    export class Select_ {
+
+        selects: Record<string, any> = {};
+
+        {%- for key in fn_selects -%}
+            {%- if key.startswith('struct') -%}
+                {%- set name = key | regex_replace('^.*\\.', '') %}
+                {%- set fields = fn_selects[key] -%}
+
+                {%- for field in fields -%}
+        
+        {{ name }}{{ field }}(): Select_ {
+            const theseFields = this.selects["{{ key }}"] ?? [];
+            if (!('{{field}}'' in theseFields)) {
+                theseFields.push({{field}});
+            }
+            this.selects["{{ key }}"] = theseFields;
+
+            return this;
+        }
+                {%- endfor %}
+
+            {%- elif key.startswith('union') -%}
+                {%- set name = key | regex_replace('^.*\\.', '') %}
+                {%- set tags = fn_selects[key] -%}
+
+                {%- for tag in tags -%}
+                    {%- set fields = tags[tag] %}
+
+                    {%- for field in fields %}
+        
+        {{ name }}{{ tag }}{{ field }}(): Select_ {
+            const theseTags = this.selects["{{ key }}"] ?? {};
+            if (!('{{tag}}' in theseTags)) {
+                const theseFields = theseTags["{{ tag }}"] ?? [];
+                if (!('{{field}}' in theseFields)) {
+                    theseFields.push({{field}});
+                }
+                theseTags["{{ tag }}"] = theseFields;
+            }
+            this.selects["{{ key }}"] = theseTags;
+
+            return this;
+        }
+
+                    {%- endfor -%}
+                {%- endfor -%}
+            
+            {%- elif key == '->' -%}
+                {%- set okFields = fn_selects['->']['Ok_'] %}
+                {%- for okField in okFields %}
+            
+        ok{{ okField }}(): Select_ {
+            const resultUnion = this.selects["->"] ?? {};
+
+            if (!('Ok_' in resultUnion)) {
+                const theseFields = resultUnion["Ok_"] ?? [];
+                if (!('{{okField}}' in theseFields)) {
+                    theseFields.push({{okField}});
+                }
+                resultUnion["Ok_"] = theseFields;
+            }
+            this.selects["->"] = resultUnion;
+            return this;
+        }
+
+                {%- endfor %}
+            {%- endif -%}
+
+        {%- endfor -%}
+    }
+#}
+
 }
 {%- endmacro -%}
 
