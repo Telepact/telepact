@@ -17,7 +17,7 @@
 from typing import Any
 
 from cases import get_values
-from cases import additional_union_cases, additional_fn_cases, additional_integer_cases, additional_number_cases, additional_p2Union_cases, additional_p2Str_cases, additional_struct_cases
+from cases import additional_union_cases, additional_fn_cases, additional_integer_cases, additional_number_cases, additional_struct_cases
 
 
 def generate_mock_cases(given_field: str, the_type, correct_values, additional_incorrect_values = []):
@@ -48,6 +48,7 @@ invalid_cases = {
     'struct': [v for v in generate_mock_cases('struct!', dict, [{'required': False}, {'optional!': False, 'required': False}], additional_struct_cases)],
     'union': [v for v in generate_mock_cases('union!', dict, [{'One': {}}, {'Two':{'required': False}}, {'Two':{'optional!': False, 'required': False}}], additional_union_cases)],
     'fn': [v for v in generate_mock_cases('fn!', dict, [{'fn.example': {'required': False}}, {'fn.example': {'optional!': False, 'required': False}}], additional_fn_cases)],
+    'sel' : [v for v in generate_mock_cases('sel!', dict, [{}])],
     'stub': [
         [[{}, {'fn.createStub_': {'stub': False}}], [{}, {'ErrorInvalidRequestBody_': {'cases': [{'path': ['fn.createStub_', 'stub'], 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]],
         [[{}, {'fn.createStub_': {'stub': 0}}], [{}, {'ErrorInvalidRequestBody_': {'cases': [{'path': ['fn.createStub_', 'stub'], 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]],

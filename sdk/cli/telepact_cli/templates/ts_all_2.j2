@@ -213,16 +213,16 @@ export namespace {{ type_display }} {
 
                 {%- for field in fields -%}
         
-        {{ name }}{{ field }}(): Select_ {
+        {{ name }}{{ field | replace('!', '') }}(): Select_ {
             const theseFields = this.pseudoJson["{{ key }}"] ?? [];
-            if (!('{{field}}'' in theseFields)) {
+            if (!('{{field}}' in theseFields)) {
                 theseFields.push('{{field}}');
             }
             this.pseudoJson["{{ key }}"] = theseFields;
 
             return this;
         }
-                {%- endfor %}
+                {% endfor %}
 
             {%- elif key.startswith('union') -%}
                 {%- set name = key | regex_replace('^.*\\.', '') %}
@@ -233,7 +233,7 @@ export namespace {{ type_display }} {
 
                     {%- for field in fields %}
         
-        {{ name }}{{ tag }}{{ field }}(): Select_ {
+        {{ name }}{{ tag }}{{ field | replace('!', '') }}(): Select_ {
             const theseTags = this.pseudoJson["{{ key }}"] ?? {};
             if (!('{{tag}}' in theseTags)) {
                 const theseFields = theseTags["{{ tag }}"] ?? [];
@@ -254,7 +254,7 @@ export namespace {{ type_display }} {
                 {%- set okFields = fn_selects['->']['Ok_'] %}
                 {%- for okField in okFields %}
             
-        ok{{ okField }}(): Select_ {
+        ok{{ okField | replace('!', '') }}(): Select_ {
             const resultUnion = this.pseudoJson["->"] ?? {};
 
             if (!('Ok_' in resultUnion)) {

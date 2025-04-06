@@ -229,7 +229,7 @@ cases = {
     'struct' : [v for v in generate_basic_cases('struct!', dict, [{'required': True}, {'optional!': False, 'required': True}, {'optional2!': 0, 'required': True}, {'optional!': False, 'optional2!': 0, 'required': True}], additional_struct_cases)],
     'union' : [v for v in generate_basic_cases('union!', dict, [{'One': {}}, {'Two':{'required': True}}, {'Two':{'optional!': False, 'required': True}}], additional_union_cases)],
     'fn' : [v for v in generate_basic_cases('fn!', dict, [{'fn.example':{'required': True}}, {'fn.example':{'optional!': False, 'required': True}}], additional_fn_cases)],
-    'sel' : [v for v in generate_basic_cases('sel!', dict, [], [])],
+    'sel' : [v for v in generate_basic_cases('sel!', dict, [{}])],
     'testPing': [
         [[{}, {'fn.ping_': {}}], [{}, {'Ok_': {}}]],
     ],
