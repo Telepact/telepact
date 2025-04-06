@@ -276,10 +276,10 @@ def demo_server() -> None:
 
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"],  # Any origin
+        allow_origins=["*"],
         allow_credentials=True,
-        allow_methods=["*"],  # Allow all methods (GET, POST, etc.)
-        allow_headers=["*"],  # Allow all headers
+        allow_methods=["*"],
+        allow_headers=["*"],
     )
 
     async def handler(message: Message) -> Message:
@@ -401,10 +401,10 @@ def mock(http_url: str, dir: str, generated_collection_length_min: int, generate
 
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"],  # Any origin
+        allow_origins=["*"],
         allow_credentials=True,
-        allow_methods=["*"],  # Allow all methods (GET, POST, etc.)
-        allow_headers=["*"],  # Allow all headers
+        allow_methods=["*"],
+        allow_headers=["*"],
     )
 
     if http_url:
