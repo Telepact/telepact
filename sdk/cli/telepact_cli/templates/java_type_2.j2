@@ -238,7 +238,7 @@ public final class {{ display_name }} {
         public Select_ {{ name }}{{ tag }}{{ field | replace('!', '') }}() {
             final var theseTags = this.pseudoJson.getOrDefault("{{ key }}", new HashMap<>());
             if (!theseTags.contains("{{tag}}")) {
-                const theseFields = theseTags.getOrDefault("{{ tag }}", new ArrayList<>());
+                final var theseFields = theseTags.getOrDefault("{{ tag }}", new ArrayList<>());
                 if (!theseFields.contains("{{field}}")) {
                     theseFields.add("{{field}}");
                 }
@@ -260,8 +260,8 @@ public final class {{ display_name }} {
             final var resultUnion = this.pseudoJson.getOrDefault("->", new HashMap<>());
 
             if (!resultUnion.contains("Ok_")) {
-                const theseFields = resultUnion.getOrDefault("Ok_", new ArrayList<>());
-                if (!("{{okField}}" in theseFields)) {
+                final var theseFields = resultUnion.getOrDefault("Ok_", new ArrayList<>());
+                if (!theseFields.contains("{{okField}}")) {
                     theseFields.add("{{okField}}");
                 }
                 resultUnion.put("Ok_", theseFields);
@@ -273,7 +273,7 @@ public final class {{ display_name }} {
                 {%- endfor %}
             {%- endif -%}
 
-        {%- endfor -%}
+        {%- endfor %}
     }
 }
 {%- endmacro %}
@@ -287,6 +287,7 @@ public final class {{ display_name }} {
 {%- elif schema_key.startswith('union') %}
     {{ union(java_name, data['///'], data[schema_key]) }}
 {%- elif schema_key.startswith('fn') %}
-    {{ function(java_name, data, schema_key) }}
+    {%- set fn_selects = possible_fn_selects[schema_key] -%}
+    {{ function(java_name, data, schema_key, fn_selects) }}
 {%- endif %}
 

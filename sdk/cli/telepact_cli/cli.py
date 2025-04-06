@@ -163,13 +163,13 @@ def _generate_internal(schema_data: list[dict[str, object]], possible_fn_selects
                 functions.append(schema_key)
 
             _write_java_file('java_type_2.j2', {
-                'package': java_package, 'data': schema_entry}, f"{schema_key.split('.')[1]}.java")
+                'package': java_package, 'data': schema_entry, 'possible_fn_selects': possible_fn_selects}, f"{schema_key.split('.')[1]}.java")
 
         _write_java_file('java_server.j2', {
-                         'package': java_package, 'functions': functions}, f"ServerHandler_.java")
+                         'package': java_package, 'functions': functions, 'possible_fn_selects': possible_fn_selects}, f"ServerHandler_.java")
 
         _write_java_file('java_client.j2', {
-                         'package': java_package, 'functions': functions}, f"ClientInterface_.java")
+                         'package': java_package, 'functions': functions, 'possible_fn_selects': possible_fn_selects}, f"ClientInterface_.java")
 
         _write_java_file('java_optional.j2', {
                          'package': java_package}, f"Optional_.java")
@@ -179,6 +179,8 @@ def _generate_internal(schema_data: list[dict[str, object]], possible_fn_selects
 
         _write_java_file('typed_message.j2', {
                          'package': java_package}, f"TypedMessage_.java")
+        
+        _write_java_file('java_select.j2', {'possible_fn_selects': possible_fn_selects}, f"Select_.java")
 
     elif target == 'py':
 

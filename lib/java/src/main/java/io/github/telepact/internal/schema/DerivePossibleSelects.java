@@ -18,9 +18,11 @@ package io.github.telepact.internal.schema;
 
 import java.util.*;
 
-import io.github.telepact.internal.types.TFieldDeclaration;
+import io.github.telepact.internal.types.TArray;
+import io.github.telepact.internal.types.TObject;
 import io.github.telepact.internal.types.TStruct;
 import io.github.telepact.internal.types.TType;
+import io.github.telepact.internal.types.TTypeDeclaration;
 import io.github.telepact.internal.types.TUnion;
 
 public class DerivePossibleSelects {
@@ -32,7 +34,9 @@ public class DerivePossibleSelects {
         final var okFieldNames = new ArrayList<>(okFields.keySet());
         Collections.sort(okFieldNames);
 
-        findNestedTypes(okFields, nestedTypes);
+        for (final var fieldDecl : okFields.values()) {
+            findNestedTypes(fieldDecl.typeDeclaration, nestedTypes);
+        }
 
         final var possibleSelect = new HashMap<String, Object>();
 
@@ -53,7 +57,10 @@ public class DerivePossibleSelects {
                     Collections.sort(sortedFieldNames);
                     selectedFieldNames.addAll(sortedFieldNames);
 
-                    unionSelect.put(c, selectedFieldNames);
+                    if (!selectedFieldNames.isEmpty()) {
+                        unionSelect.put(c, selectedFieldNames);
+                    }
+                        
                 }
 
                 possibleSelect.put(k, unionSelect);
@@ -63,25 +70,31 @@ public class DerivePossibleSelects {
                 Collections.sort(sortedFieldNames);
                 structSelect.addAll(sortedFieldNames);
 
-                possibleSelect.put(k, structSelect);
+                if (!structSelect.isEmpty()) {
+                    possibleSelect.put(k, structSelect);
+                }
             }
         }
 
         return possibleSelect;
     }
 
-    private static void findNestedTypes(Map<String, TFieldDeclaration> fields, Map<String, TType> nestedTypes) {
-        for (final var field : fields.values()) {
-            final var typ = field.typeDeclaration.type;
-            if (typ instanceof TUnion u) {
-                nestedTypes.put(u.name, typ);
-                for (final var c : u.tags.values()) {
-                    findNestedTypes(c.fields, nestedTypes);
+    private static void findNestedTypes(TTypeDeclaration typeDeclaration, Map<String, TType> nestedTypes) {
+        final var typ = typeDeclaration.type;
+        if (typ instanceof TUnion u) {
+            nestedTypes.put(u.name, typ);
+            for (final var tag : u.tags.values()) {
+                for (final var fieldDecl : tag.fields.values()) {
+                    findNestedTypes(fieldDecl.typeDeclaration, nestedTypes);
                 }
-            } else if (typ instanceof TStruct s) {
-                nestedTypes.put(s.name, typ);
-                findNestedTypes(s.fields, nestedTypes);
             }
+        } else if (typ instanceof TStruct s) {
+            nestedTypes.put(s.name, typ);
+            for (final var fieldDecl : s.fields.values()) {
+                findNestedTypes(fieldDecl.typeDeclaration, nestedTypes);
+            }
+        } else if (typ instanceof TArray || typ instanceof TObject) {
+            findNestedTypes(typeDeclaration.typeParameters.get(0), nestedTypes);
         }
     }
 }
