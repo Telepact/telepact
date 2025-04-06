@@ -52,7 +52,7 @@ export class UntypedTaggedValue_ {
         ((d{{ depth }}: {{ to_ts_type(t) }}) => {% if nullable %}d{{ depth }} === null ? null : {% endif %}d{{ depth }}.map((e{{ depth }}) => {% call marshall_ts_type(t[1:][0], depth + 1) %}e{{ depth }}{% endcall %}))({{ caller() }})
     {%- elif typ == 'object' -%}
         ((d{{ depth }}: {{ to_ts_type(t) }}) => {% if nullable %}d{{ depth }} === null ? null : {% endif %}Object.fromEntries(Object.entries(d{{ depth }}).map(([k{{ depth }}, v{{ depth }}]) => [k{{ depth }}, {% call marshall_ts_type(t[1:][0], depth + 1) %}v{{ depth }}{% endcall %}])))({{ caller() }})
-    {%- elif typ.startswith('struct') or typ.startswith('fn') -%}
+    {%- elif typ.startswith('struct') or typ.startswith('fn') or typ == '_ext.Select_' -%}
         ((d{{ depth }}: any) => {% if nullable %}d{{ depth }} === null ? null : {% endif %}new {{ to_ts_type(t, False) }}(d{{ depth }}))({{ caller() }})
     {%- elif typ.startswith('union') -%}
         ((d{{ depth }}: any) => {% if nullable %}d{{ depth }} === null ? null : {% endif %}new {{ to_ts_type(t, False) }}(d{{ depth }}))({{ caller() }})
@@ -68,7 +68,7 @@ export class UntypedTaggedValue_ {
         ((d{{ depth }}) => {% if nullable %}d{{ depth }} === null ? null : {% endif %}d{{ depth }}.map((e{{ depth }}) => {% call unmarshall_ts_type(t[1:][0], depth + 1) %}e{{ depth }}{% endcall %}))({{ caller() }})
     {%- elif typ == 'object' -%}
         ((d{{ depth }}) => {% if nullable %}d{{ depth }} === null ? null : {% endif %}Object.fromEntries(Object.entries(d{{ depth }}).map(([k{{ depth }}, v{{ depth }}]) => [k{{ depth }}, {% call unmarshall_ts_type(t[1:][0], depth + 1) %}v{{ depth }}{% endcall %}])))({{ caller() }})
-    {%- elif typ.startswith('struct') or typ.startswith('fn') or typ.startswith('union') -%}
+    {%- elif typ.startswith('struct') or typ.startswith('fn') or typ.startswith('union') or typ == '_ext.Select_' -%}
         ((d{{ depth }}) => {% if nullable %}d{{ depth }} === null ? null : {% endif %}d{{ depth }}.pseudoJson)({{ caller() }})
     {%- else -%}
         {{ caller() }}

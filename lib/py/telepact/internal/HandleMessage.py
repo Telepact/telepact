@@ -119,7 +119,7 @@ async def handle_message(
 
     function_type_call: TUnion = function_type.call
 
-    call_validate_ctx = ValidateContext(None, None, coerce_base64=False)
+    call_validate_ctx = ValidateContext(None, function_type.name, coerce_base64=False)
 
     call_validation_failures: list[ValidationFailure] = function_type_call.validate(
         request_body, [], call_validate_ctx)

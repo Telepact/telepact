@@ -40,7 +40,7 @@ import java.util.ArrayList;
         Utility_.let({{ caller() }}, d{{depth}} -> d{{depth}} == null ? null : (({{ to_java_type(t, True) }}) d{{depth}}).entrySet().stream().map(e{{ depth }} -> new AbstractMap.SimpleEntry<>(e{{ depth }}.getKey(), {% call marshall_java_type(t[1:][0], depth + 1) %}e{{ depth }}.getValue(){% endcall %})).collect(() -> { {{ to_java_type(t)}} m = new HashMap<>(); return m; }, (m, e) -> m.put(e.getKey(), ({{ to_java_type(t[1]) }}) e.getValue()), Map::putAll))
     {%- elif typ == 'integer' -%}
         Utility_.let({{ caller() }}, d{{depth}} -> d{{depth}} == null ? null : d{{depth}} instanceof Integer ? ((Integer) d{{depth}}).longValue() : (Long) d{{depth}})
-    {%- elif typ.startswith('struct') or typ.startswith('fn') -%}
+    {%- elif typ.startswith('struct') or typ.startswith('fn') or typ == '_ext.Select_' -%}
         Utility_.let({{ caller() }}, d{{ depth }} -> d{{ depth }} == null ? null : new {{ to_java_type(t) }}((Map<String, Object>) d{{ depth }}))
     {%- elif typ.startswith('union') -%}
         Utility_.let({{ caller() }}, d{{depth}} -> d{{depth}} == null ? null : new {{ to_java_type(t) }}((Map<String, Object>) d{{depth}}))
@@ -55,7 +55,7 @@ import java.util.ArrayList;
         Utility_.let({{ caller() }}, d{{depth}} -> d{{depth}} == null ? null : d{{depth}}.stream().map(e{{ depth }} -> {% call unmarshall_java_type(t[1:][0], depth + 1) %}e{{ depth }}{% endcall %}).toList())
     {%- elif typ == 'object' -%}
         Utility_.let({{ caller() }}, d{{depth}} -> d{{depth}} == null ? null : d{{depth}}.entrySet().stream().map(e{{ depth }} -> new AbstractMap.SimpleEntry<>(e{{ depth }}.getKey(), {% call unmarshall_java_type(t[1:][0], depth + 1) %}e{{ depth }}.getValue(){% endcall %})).collect(HashMap::new, (m, e) -> m.put(e.getKey(), e.getValue()), Map::putAll))
-    {%- elif typ.startswith('struct') or typ.startswith('fn') or typ.startswith('union') -%}
+    {%- elif typ.startswith('struct') or typ.startswith('fn') or typ.startswith('union') or typ == '_ext.Select_' -%}
         Utility_.let({{ caller() }}, d{{depth}} -> d{{depth}} == null ? null : d{{depth}}.pseudoJson)
     {%- else -%}
         {{ caller() }}

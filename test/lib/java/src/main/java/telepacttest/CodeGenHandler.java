@@ -256,6 +256,24 @@ public class CodeGenHandler extends ServerHandler_ {
             top.objNullFn().ifPresent(v -> {
                 value.set(new Value.Builder().objNullFn(mapObj(v, f -> mapFn(f))));
             });
+            top.sel().ifPresent(v -> {
+                value.set(new Value.Builder().sel(v));
+            });
+            top.nullSel().ifPresent(v -> {
+                value.set(new Value.Builder().nullSel(v));
+            });
+            top.arrSel().ifPresent(v -> {
+                value.set(new Value.Builder().arrSel(v));
+            });
+            top.arrNullSel().ifPresent(v -> {
+                value.set(new Value.Builder().arrNullSel(v));
+            });
+            top.objSel().ifPresent(v -> {
+                value.set(new Value.Builder().objSel(v));
+            });
+            top.objNullSel().ifPresent(v -> {
+                value.set(new Value.Builder().objNullSel(v));
+            });
         });
 
         var ok = new test.Output.Ok_.Builder().value(value.get().build());
