@@ -199,10 +199,82 @@ public {% if modifier %}{{ modifier }} {% endif %} class {{ display_name }} {
 }
 {%- endmacro %}
 
-{%- macro function(display_name, data, schema_key) %}
+{%- macro function(display_name, data, schema_key, fn_selects) %}
 public final class {{ display_name }} {
     {{ struct('Input', data['///'], data[schema_key], None, schema_key, 'static', schema_key) | indent }}
     {{ union ('Output', data['///'], data['->'], 'static') | indent }}
+
+    public static class Select_ {
+
+        public final Map<String, Object> pseudoJson = new HashMap<>();
+
+        {%- for key in fn_selects -%}
+            {%- if key.startswith('struct') -%}
+                {%- set name = key | regex_replace('^.*\\.', '') %}
+                {%- set fields = fn_selects[key] -%}
+
+                {%- for field in fields -%}
+
+        public Select_ {{ name }}{{ field | replace('!', '') }}() {
+            final var theseFields = this.pseudoJson.getOrDefault("{{ key }}", new ArrayList<>());
+            if (!theseFields.contains("{{field}}")) {
+                theseFields.add("{{field}}");
+            }
+            this.pseudoJson.put("{{ key }}", theseFields);
+
+            return this;
+        }
+                {% endfor %}
+
+            {%- elif key.startswith('union') -%}
+                {%- set name = key | regex_replace('^.*\\.', '') %}
+                {%- set tags = fn_selects[key] -%}
+
+                {%- for tag in tags -%}
+                    {%- set fields = tags[tag] %}
+
+                    {%- for field in fields %}
+
+        public Select_ {{ name }}{{ tag }}{{ field | replace('!', '') }}() {
+            final var theseTags = this.pseudoJson.getOrDefault("{{ key }}", new HashMap<>());
+            if (!theseTags.contains("{{tag}}")) {
+                const theseFields = theseTags.getOrDefault("{{ tag }}", new ArrayList<>());
+                if (!theseFields.contains("{{field}}")) {
+                    theseFields.add("{{field}}");
+                }
+                theseTags.put("{{ tag }}", theseFields);
+            }
+            this.pseudoJson.put("{{ key }}", theseTags);
+
+            return this;
+        }
+
+                    {%- endfor -%}
+                {%- endfor -%}
+
+            {%- elif key == '->' -%}
+                {%- set okFields = fn_selects['->']['Ok_'] %}
+                {%- for okField in okFields %}
+
+        public Select_ ok{{ okField | replace('!', '') }}() {
+            final var resultUnion = this.pseudoJson.getOrDefault("->", new HashMap<>());
+
+            if (!resultUnion.contains("Ok_")) {
+                const theseFields = resultUnion.getOrDefault("Ok_", new ArrayList<>());
+                if (!("{{okField}}" in theseFields)) {
+                    theseFields.add("{{okField}}");
+                }
+                resultUnion.put("Ok_", theseFields);
+            }
+            this.pseudoJson.put("->", resultUnion);
+            return this;
+        }
+
+                {%- endfor %}
+            {%- endif -%}
+
+        {%- endfor -%}
+    }
 }
 {%- endmacro %}
 
