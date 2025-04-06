@@ -204,11 +204,101 @@ class {{ type_display }}:
 {%- endfor %}
 {%- endmacro %}
 
-{%- macro function(type_display, data, schema_key) %}
+{%- macro function(type_display, data, schema_key, fn_selects) %}
 class {{ type_display }}:
     {{- struct('Input', data['///'], data[schema_key], type_display + '.', schema_key) | indent }}
     {{- union ('Output', data['///'], data['->'], type_display + '.') | indent }}
+
+    class Select_:
+        pseudo_json: dict[str, object]
+
+
+        {%- for key in fn_selects -%}
+            {%- if key.startswith('struct') -%}
+                {%- set name = key | regex_replace('^.*\\.', '') %}
+                {%- set fields = fn_selects[key] -%}
+
+                {%- for field in fields -%}
+
+        def {{ name }}_{{ field | replace('!', '') }}(self) -> '{{type_display}}.Select_':
+            these_fields = cast(list[object], self.pseudo_json.get("{{ key }}", []))
+            if '{{field}}' not in these_fields:
+                these_fields.append('{{field}}');
+
+            self.pseudo_json["{{ key }}"] = these_fields
+
+            return self
+
+                {% endfor %}
+
+            {%- elif key.startswith('union') -%}
+                {%- set name = key | regex_replace('^.*\\.', '') %}
+                {%- set tags = fn_selects[key] -%}
+
+                {%- for tag in tags -%}
+                    {%- set fields = tags[tag] %}
+
+                    {%- for field in fields %}
+
+        def {{ name }}_{{ tag }}_{{ field | replace('!', '') }}(self) -> '{{type_display}}.Select_':
+            these_tags = cast(dict[str, object], self.pseudo_json.get("{{ key }}", {}))
+            if '{{tag}}' not in these_tags:
+                these_fields = cast(list[object], these_tags.get("{{ tag }}", []))
+                if '{{field}}' not in these_fields:
+                    these_fields.append('{{field}}')
+
+                these_tags["{{ tag }}"] = these_fields
+
+            self.pseudo_json["{{ key }}"] = these_tags
+
+            return self
+
+                    {%- endfor -%}
+                {%- endfor -%}
+
+            {%- elif key == '->' -%}
+                {%- set okFields = fn_selects['->']['Ok_'] %}
+                {%- for okField in okFields %}
+
+        def ok_{{ okField | replace('!', '') }}(self) -> '{{type_display}}.Select_':
+            result_union = cast(dict[str, object], self.pseudo_json.get("->", {}))
+
+            if 'Ok_' not in result_union:
+                these_fields = cast(list[object], result_union.get("Ok_", []))
+                if '{{okField}}' not in these_fields:
+                    these_fields.append('{{okField}}')
+
+                result_union["Ok_"] = these_fields
+
+            self.pseudo_json["->"] = result_union
+            return self
+
+
+                {%- endfor %}
+            {%- endif -%}
+
+        {%- endfor -%}
+
 {%- endmacro %}
+
+{%- macro select(possible_fn_seelcts) -%}
+
+class Select_:
+    pseudo_json: dict[str, object] = {}
+
+    def __init__(self, pseudo_json: dict[str, object]) -> None:
+        self.pseudo_json = pseudo_json
+
+    {%- for fn in possible_fn_seelcts -%}
+        {%- set fn_name = fn | regex_replace('^.*\\.', '') %}
+
+    @staticmethod
+    def {{ fn_name }}(self, select: '{{ fn_name }}.Select_') -> 'Select_':
+        return Select_(select.pseudo_json)
+
+    {%- endfor -%}
+
+{%- endmacro -%}
 
 {%- for schema_entry in input %}
     {%- set schema_key = schema_entry | find_schema_key %}
@@ -219,9 +309,13 @@ class {{ type_display }}:
     {%- elif schema_key.startswith('union') %}
         {{- union(py_name, schema_entry['///'], schema_entry[schema_key], '') }}
     {%- elif schema_key.startswith('fn') %}
-        {{- function(py_name, schema_entry,schema_key) }}
+        {%- set fn_selects = possible_fn_selects[schema_key]%}
+        {{- function(py_name, schema_entry, schema_key, fn_selects) }}
     {%- endif %}
 {% endfor %}
+
+{{ select(possible_fn_selects) }}
+
 class ClientInterface_:
 
     client: telepact.Client

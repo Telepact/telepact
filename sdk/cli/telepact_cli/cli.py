@@ -202,7 +202,8 @@ def _generate_internal(schema_data: list[dict[str, object]], possible_fn_selects
 
         output = type_template.render({
             'input': schema_entries,
-            'functions': functions
+            'functions': functions,
+            'possible_fn_selects': possible_fn_selects
         })
 
         # Write the output to a file
