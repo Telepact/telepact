@@ -36,7 +36,10 @@ def sub_select(possible_select_section: object, ctx: 'GenerateContext') -> objec
     elif isinstance(possible_select_section, dict):
         selected_section: dict[str, object] = {}
 
-        for key, value in possible_select_section.items():
+        keys = sorted(possible_select_section.keys())
+
+        for key in keys:
+            value = possible_select_section[key]
             if ctx.random_generator.next_boolean():
                 result = sub_select(value, ctx)
                 if isinstance(result, dict) and not result:
