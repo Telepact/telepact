@@ -4,6 +4,7 @@ import java.util.AbstractMap;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.ArrayList;
 
 
 {%- macro to_java_type(t, wildcard) %}
@@ -216,7 +217,7 @@ public final class {{ display_name }} {
                 {%- for field in fields -%}
 
         public Select_ {{ name }}{{ field | replace('!', '') }}() {
-            final var theseFields = this.pseudoJson.getOrDefault("{{ key }}", new ArrayList<>());
+            final var theseFields = (List<Object>) this.pseudoJson.getOrDefault("{{ key }}", new ArrayList<>());
             if (!theseFields.contains("{{field}}")) {
                 theseFields.add("{{field}}");
             }
@@ -236,9 +237,9 @@ public final class {{ display_name }} {
                     {%- for field in fields %}
 
         public Select_ {{ name }}{{ tag }}{{ field | replace('!', '') }}() {
-            final var theseTags = this.pseudoJson.getOrDefault("{{ key }}", new HashMap<>());
-            if (!theseTags.contains("{{tag}}")) {
-                final var theseFields = theseTags.getOrDefault("{{ tag }}", new ArrayList<>());
+            final var theseTags = (Map<String, Object>) this.pseudoJson.getOrDefault("{{ key }}", new HashMap<>());
+            if (!theseTags.containsKey("{{tag}}")) {
+                final var theseFields = (List<Object>) theseTags.getOrDefault("{{ tag }}", new ArrayList<>());
                 if (!theseFields.contains("{{field}}")) {
                     theseFields.add("{{field}}");
                 }
@@ -257,10 +258,10 @@ public final class {{ display_name }} {
                 {%- for okField in okFields %}
 
         public Select_ ok{{ okField | replace('!', '') }}() {
-            final var resultUnion = this.pseudoJson.getOrDefault("->", new HashMap<>());
+            final var resultUnion = (Map<String, Object>) this.pseudoJson.getOrDefault("->", new HashMap<>());
 
-            if (!resultUnion.contains("Ok_")) {
-                final var theseFields = resultUnion.getOrDefault("Ok_", new ArrayList<>());
+            if (!resultUnion.containsKey("Ok_")) {
+                final var theseFields = (List<Object>) resultUnion.getOrDefault("Ok_", new ArrayList<>());
                 if (!theseFields.contains("{{okField}}")) {
                     theseFields.add("{{okField}}");
                 }

@@ -1,3 +1,8 @@
+package {{ package }};
+
+import java.util.HashMap;
+import java.util.Map;
+
 {%- macro select(possible_fn_selects) -%}
 public class Select_ {
     public final Map<String, Object> pseudoJson = new HashMap<>();

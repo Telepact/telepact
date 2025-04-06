@@ -180,7 +180,7 @@ def _generate_internal(schema_data: list[dict[str, object]], possible_fn_selects
         _write_java_file('typed_message.j2', {
                          'package': java_package}, f"TypedMessage_.java")
         
-        _write_java_file('java_select.j2', {'possible_fn_selects': possible_fn_selects}, f"Select_.java")
+        _write_java_file('java_select.j2', {'package': java_package, 'possible_fn_selects': possible_fn_selects}, f"Select_.java")
 
     elif target == 'py':
 

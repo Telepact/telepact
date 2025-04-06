@@ -35,7 +35,7 @@ public class GenerateRandomSelect {
                 }
             }
 
-            return selectedFieldNames;
+            return selectedFieldNames.stream().sorted().toList();
         } else if (possibleSelectSection instanceof Map) {
             Map<String, Object> selectedSection = new HashMap<>();
 

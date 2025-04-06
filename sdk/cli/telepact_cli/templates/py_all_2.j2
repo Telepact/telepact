@@ -218,7 +218,7 @@ class {{ type_display }}:
                 {%- set name = key | regex_replace('^.*\\.', '') %}
                 {%- set fields = fn_selects[key] -%}
 
-                {%- for field in fields -%}
+                {%- for field in fields %}
 
         def {{ name }}_{{ field | replace('!', '') }}(self) -> '{{type_display}}.Select_':
             these_fields = cast(list[object], self.pseudo_json.get("{{ key }}", []))

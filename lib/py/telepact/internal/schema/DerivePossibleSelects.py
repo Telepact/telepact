@@ -51,10 +51,11 @@ def derive_possible_select(fn_name: str, result: 'TUnion') -> dict[str, object]:
             for c in sorted_tag_keys:
                 typ = v.tags[c]
                 selected_field_names: list[str] = sorted(typ.fields.keys())
-                union_select[c] = selected_field_names
 
-            if len(union_select) > 0:
-                possible_select[k] = union_select
+                if len(selected_field_names) > 0:
+                    union_select[c] = selected_field_names
+
+            possible_select[k] = union_select
         elif isinstance(v, TStruct):
             struct_select: list[str] = sorted(v.fields.keys())
 

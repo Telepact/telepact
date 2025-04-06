@@ -31,7 +31,7 @@ function subSelect(possibleSelectSection: any, ctx: GenerateContext): any {
             }
         }
 
-        return selectedFieldNames;
+        return selectedFieldNames.sort();
     } else if (typeof possibleSelectSection === 'object' && !Array.isArray(possibleSelectSection)) {
         const selectedSection: Record<string, any> = {};
 
