@@ -231,6 +231,24 @@ export class CodeGenHandler extends ServerHandler_ {
             if (top.objNullFn() !== undefined) {
                 value = Value.fromTyped({ objNullFn: map_obj(top.objNullFn()!, (e) => e === null ? null : map_fn(e)) });
             }
+            if (top.sel() !== undefined) {
+                value = Value.fromTyped({ sel: top.sel() });
+            }
+            if (top.nullSel() !== undefined) {
+                value = Value.fromTyped({ nullSel: top.nullSel() });
+            }
+            if (top.arrSel() !== undefined) {
+                value = Value.fromTyped({ arrSel: top.arrSel() });
+            }
+            if (top.arrNullSel() !== undefined) {
+                value = Value.fromTyped({ arrNullSel: top.arrNullSel() });
+            }
+            if (top.objSel() !== undefined) {
+                value = Value.fromTyped({ objSel: top.objSel() });
+            }
+            if (top.objNullSel() !== undefined) {
+                value = Value.fromTyped({ objNullSel: top.objNullSel() });
+            }
         }
 
         let output = test.Output.from_Ok_(test.Output.Ok_.fromTyped({ value }));

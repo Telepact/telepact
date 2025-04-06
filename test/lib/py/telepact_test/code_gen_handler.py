@@ -239,6 +239,24 @@ class CodeGenHandler(ServerHandler_):
             if top.objNullFn() != Undefined.Inst:
                 ok = test.Output.Ok_.from_typed(
                     value=Value.from_typed(objNullFn=self.map_obj(top.objNullFn(), self.map_fn)))
+            if top.sel() != Undefined.Inst:
+                ok = test.Output.Ok_.from_typed(
+                    value=Value.from_typed(sel=top.sel()))
+            if top.nullSel() != Undefined.Inst:
+                ok = test.Output.Ok_.from_typed(
+                    value=Value.from_typed(nullSel=top.nullSel()))
+            if top.arrSel() != Undefined.Inst:
+                ok = test.Output.Ok_.from_typed(
+                    value=Value.from_typed(arrSel=top.arrSel()))
+            if top.arrNullSel() != Undefined.Inst:
+                ok = test.Output.Ok_.from_typed(
+                    value=Value.from_typed(arrNullSel=top.arrNullSel()))
+            if top.objSel() != Undefined.Inst:
+                ok = test.Output.Ok_.from_typed(
+                    value=Value.from_typed(objSel=top.objSel()))
+            if top.objNullSel() != Undefined.Inst:
+                ok = test.Output.Ok_.from_typed(
+                    value=Value.from_typed(objNullSel=top.objNullSel()))
 
         return {}, test.Output.from_Ok_(ok)
 

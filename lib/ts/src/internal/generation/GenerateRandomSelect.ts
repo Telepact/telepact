@@ -31,11 +31,14 @@ function subSelect(possibleSelectSection: any, ctx: GenerateContext): any {
             }
         }
 
-        return selectedFieldNames;
+        return selectedFieldNames.sort();
     } else if (typeof possibleSelectSection === 'object' && !Array.isArray(possibleSelectSection)) {
         const selectedSection: Record<string, any> = {};
 
-        for (const [key, value] of Object.entries(possibleSelectSection)) {
+        const keys = Object.keys(possibleSelectSection).sort();
+
+        for (const key of keys) {
+            const value = possibleSelectSection[key];
             if (ctx.randomGenerator.nextBoolean()) {
                 const result = subSelect(value, ctx);
                 if (typeof result === 'object' && !Array.isArray(result) && Object.keys(result).length === 0) {

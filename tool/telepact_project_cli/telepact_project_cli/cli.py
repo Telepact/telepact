@@ -332,6 +332,17 @@ def bump() -> None:
         if 'sdk/prettier' in path:
             release_targets.add('prettier')
 
+    # Also respect project dependencies
+    if 'py' in release_targets:
+        release_targets.add('cli')
+    if 'ts' in release_targets:
+        release_targets.add('dart')
+        release_targets.add('console')
+    if 'cli' in release_targets:
+        release_targets.add('docker')
+    if 'prettier' in release_targets:
+        release_targets.add('console')
+
     sorted_release_targets = sorted(release_targets)
 
     print(f'release_targets: {sorted_release_targets}')

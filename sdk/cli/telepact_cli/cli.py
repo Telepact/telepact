@@ -80,9 +80,14 @@ def codegen(schema_dir: str, lang: str, out: str, package: str) -> None:
 
     schema_data: list[dict[str, object]] = cast(
         list[dict[str, object]], telepact_schema.original)
+    
+    select = telepact_schema.parsed['_ext.Select_']
+    possible_fn_selects = select.possible_selects
+    possible_fn_selects.pop('fn.ping_', None)
+    possible_fn_selects.pop('fn.api_', None)
 
     # Call the generate function
-    _generate_internal(schema_data, target, output_directory, package)
+    _generate_internal(schema_data, possible_fn_selects, target, output_directory, package)
 
 
 # Define the custom filter
@@ -109,7 +114,7 @@ def _raise_error(message: str) -> None:
     raise Exception(message)
 
 
-def _generate_internal(schema_data: list[dict[str, object]], target: str, output_dir: str, java_package: str) -> None:
+def _generate_internal(schema_data: list[dict[str, object]], possible_fn_selects: dict[str, object], target: str, output_dir: str, java_package: str) -> None:
 
     # Load jinja template from file
     # Adjust the path to your template directory if necessary
@@ -158,13 +163,13 @@ def _generate_internal(schema_data: list[dict[str, object]], target: str, output
                 functions.append(schema_key)
 
             _write_java_file('java_type_2.j2', {
-                'package': java_package, 'data': schema_entry}, f"{schema_key.split('.')[1]}.java")
+                'package': java_package, 'data': schema_entry, 'possible_fn_selects': possible_fn_selects}, f"{schema_key.split('.')[1]}.java")
 
         _write_java_file('java_server.j2', {
-                         'package': java_package, 'functions': functions}, f"ServerHandler_.java")
+                         'package': java_package, 'functions': functions, 'possible_fn_selects': possible_fn_selects}, f"ServerHandler_.java")
 
         _write_java_file('java_client.j2', {
-                         'package': java_package, 'functions': functions}, f"ClientInterface_.java")
+                         'package': java_package, 'functions': functions, 'possible_fn_selects': possible_fn_selects}, f"ClientInterface_.java")
 
         _write_java_file('java_optional.j2', {
                          'package': java_package}, f"Optional_.java")
@@ -174,6 +179,8 @@ def _generate_internal(schema_data: list[dict[str, object]], target: str, output
 
         _write_java_file('typed_message.j2', {
                          'package': java_package}, f"TypedMessage_.java")
+        
+        _write_java_file('java_select.j2', {'package': java_package, 'possible_fn_selects': possible_fn_selects}, f"Select_.java")
 
     elif target == 'py':
 
@@ -195,7 +202,8 @@ def _generate_internal(schema_data: list[dict[str, object]], target: str, output
 
         output = type_template.render({
             'input': schema_entries,
-            'functions': functions
+            'functions': functions,
+            'possible_fn_selects': possible_fn_selects
         })
 
         # Write the output to a file
@@ -240,7 +248,8 @@ def _generate_internal(schema_data: list[dict[str, object]], target: str, output
 
         output = ts_type_template.render({
             'input': ts_schema_entries,
-            'functions': functions
+            'functions': functions,
+            'possible_fn_selects': possible_fn_selects
         })
 
         # Write the output to a file

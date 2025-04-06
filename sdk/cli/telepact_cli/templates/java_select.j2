@@ -1,0 +1,25 @@
+package {{ package }};
+
+import java.util.HashMap;
+import java.util.Map;
+
+{%- macro select(possible_fn_selects) -%}
+public class Select_ {
+    public final Map<String, Object> pseudoJson = new HashMap<>();
+
+    public Select_(Map<String, Object> pseudoJson) {
+        this.pseudoJson.putAll(pseudoJson);
+    }
+
+    {%- for fn in possible_fn_selects -%}
+        {%- set fn_name = fn | regex_replace('^.*\\.', '') -%}
+
+    public static Select_ {{ fn_name }}({{ fn_name }}.Select_ select) {
+        return new Select_(select.pseudoJson);
+    }
+
+    {%- endfor -%}
+}
+{%- endmacro -%}
+
+{{ select(possible_fn_selects) }}

@@ -35,17 +35,21 @@ public class GenerateRandomSelect {
                 }
             }
 
-            return selectedFieldNames;
+            return selectedFieldNames.stream().sorted().toList();
         } else if (possibleSelectSection instanceof Map) {
+            final var m = (Map<String, Object>) possibleSelectSection;
             Map<String, Object> selectedSection = new HashMap<>();
 
-            for (Map.Entry<String, Object> entry : ((Map<String, Object>) possibleSelectSection).entrySet()) {
+            List<String> keys = m.keySet().stream().sorted().toList();
+
+            for (String key : keys) {
+                final var value = m.get(key);
                 if (ctx.randomGenerator.nextBoolean()) {
-                    Object result = subSelect(entry.getValue(), ctx);
+                    Object result = subSelect(value, ctx);
                     if (result instanceof Map && ((Map<?, ?>) result).isEmpty()) {
                         continue;
                     }
-                    selectedSection.put(entry.getKey(), result);
+                    selectedSection.put(key, result);
                 }
             }
 

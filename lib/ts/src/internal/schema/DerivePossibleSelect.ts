@@ -19,6 +19,9 @@ import { TUnion } from '../types/TUnion';
 import { TFn } from '../types/TFn';
 import { TStruct } from '../types/TStruct';
 import { TFieldDeclaration } from '../types/TFieldDeclaration';
+import { TArray } from '../types/TArray';
+import { TTypeDeclaration } from '../types/TTypeDeclaration';
+import { TObject } from '../types/TObject';
 
 export function derivePossibleSelect(fnName: string, result: TUnion): Record<string, any> {
     const nestedTypes: Record<string, TType> = {};
@@ -27,7 +30,9 @@ export function derivePossibleSelect(fnName: string, result: TUnion): Record<str
     const okFieldNames = Object.keys(okFields);
     okFieldNames.sort();
 
-    findNestedTypes(okFields, nestedTypes);
+    for (const fieldDecl of Object.values(okFields)) {
+        findNestedTypes(fieldDecl.typeDeclaration, nestedTypes);
+    }
 
     const possibleSelect: Record<string, object> = {};
 
@@ -37,7 +42,6 @@ export function derivePossibleSelect(fnName: string, result: TUnion): Record<str
 
     const sortedTypeKeys = Object.keys(nestedTypes).sort();
     for (const k of sortedTypeKeys) {
-        console.log(`k: ${k}`);
         const v = nestedTypes[k];
         if (v instanceof TUnion) {
             const unionSelect: Record<string, object> = {};
@@ -50,7 +54,9 @@ export function derivePossibleSelect(fnName: string, result: TUnion): Record<str
                     selectedFieldNames.push(fieldName);
                 }
 
-                unionSelect[c] = selectedFieldNames;
+                if (selectedFieldNames.length > 0) {
+                    unionSelect[c] = selectedFieldNames;
+                }
             }
 
             possibleSelect[k] = unionSelect;
@@ -61,24 +67,30 @@ export function derivePossibleSelect(fnName: string, result: TUnion): Record<str
                 structSelect.push(fieldName);
             }
 
-            possibleSelect[k] = structSelect;
+            if (structSelect.length > 0) {
+                possibleSelect[k] = structSelect;
+            }
         }
     }
 
     return possibleSelect;
 }
 
-function findNestedTypes(fields: Record<string, TFieldDeclaration>, nestedTypes: Record<string, TType>) {
-    for (const field of Object.values(fields)) {
-        const typ = field.typeDeclaration.type;
-        if (typ instanceof TUnion) {
-            nestedTypes[typ.name] = typ;
-            for (const c of Object.values(typ.tags)) {
-                findNestedTypes(c.fields, nestedTypes);
+function findNestedTypes(typeDeclaration: TTypeDeclaration, nestedTypes: Record<string, TType>) {
+    const typ = typeDeclaration.type;
+    if (typ instanceof TUnion) {
+        nestedTypes[typ.name] = typ;
+        for (const tag of Object.values(typ.tags)) {
+            for (const fieldDecl of Object.values(tag.fields)) {
+                findNestedTypes(fieldDecl.typeDeclaration, nestedTypes);
             }
-        } else if (typ instanceof TStruct) {
-            nestedTypes[typ.name] = typ;
-            findNestedTypes(typ.fields, nestedTypes);
         }
+    } else if (typ instanceof TStruct) {
+        nestedTypes[typ.name] = typ;
+        for (const fieldDecl of Object.values(typ.fields)) {
+            findNestedTypes(fieldDecl.typeDeclaration, nestedTypes);
+        }
+    } else if (typ instanceof TArray || typ instanceof TObject) {
+        findNestedTypes(typeDeclaration.typeParameters[0], nestedTypes);
     }
 }

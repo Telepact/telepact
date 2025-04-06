@@ -4,6 +4,7 @@ import java.util.AbstractMap;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.ArrayList;
 
 
 {%- macro to_java_type(t, wildcard) %}
@@ -39,7 +40,7 @@ import java.util.HashMap;
         Utility_.let({{ caller() }}, d{{depth}} -> d{{depth}} == null ? null : (({{ to_java_type(t, True) }}) d{{depth}}).entrySet().stream().map(e{{ depth }} -> new AbstractMap.SimpleEntry<>(e{{ depth }}.getKey(), {% call marshall_java_type(t[1:][0], depth + 1) %}e{{ depth }}.getValue(){% endcall %})).collect(() -> { {{ to_java_type(t)}} m = new HashMap<>(); return m; }, (m, e) -> m.put(e.getKey(), ({{ to_java_type(t[1]) }}) e.getValue()), Map::putAll))
     {%- elif typ == 'integer' -%}
         Utility_.let({{ caller() }}, d{{depth}} -> d{{depth}} == null ? null : d{{depth}} instanceof Integer ? ((Integer) d{{depth}}).longValue() : (Long) d{{depth}})
-    {%- elif typ.startswith('struct') or typ.startswith('fn') -%}
+    {%- elif typ.startswith('struct') or typ.startswith('fn') or typ == '_ext.Select_' -%}
         Utility_.let({{ caller() }}, d{{ depth }} -> d{{ depth }} == null ? null : new {{ to_java_type(t) }}((Map<String, Object>) d{{ depth }}))
     {%- elif typ.startswith('union') -%}
         Utility_.let({{ caller() }}, d{{depth}} -> d{{depth}} == null ? null : new {{ to_java_type(t) }}((Map<String, Object>) d{{depth}}))
@@ -54,7 +55,7 @@ import java.util.HashMap;
         Utility_.let({{ caller() }}, d{{depth}} -> d{{depth}} == null ? null : d{{depth}}.stream().map(e{{ depth }} -> {% call unmarshall_java_type(t[1:][0], depth + 1) %}e{{ depth }}{% endcall %}).toList())
     {%- elif typ == 'object' -%}
         Utility_.let({{ caller() }}, d{{depth}} -> d{{depth}} == null ? null : d{{depth}}.entrySet().stream().map(e{{ depth }} -> new AbstractMap.SimpleEntry<>(e{{ depth }}.getKey(), {% call unmarshall_java_type(t[1:][0], depth + 1) %}e{{ depth }}.getValue(){% endcall %})).collect(HashMap::new, (m, e) -> m.put(e.getKey(), e.getValue()), Map::putAll))
-    {%- elif typ.startswith('struct') or typ.startswith('fn') or typ.startswith('union') -%}
+    {%- elif typ.startswith('struct') or typ.startswith('fn') or typ.startswith('union') or typ == '_ext.Select_' -%}
         Utility_.let({{ caller() }}, d{{depth}} -> d{{depth}} == null ? null : d{{depth}}.pseudoJson)
     {%- else -%}
         {{ caller() }}
@@ -199,10 +200,82 @@ public {% if modifier %}{{ modifier }} {% endif %} class {{ display_name }} {
 }
 {%- endmacro %}
 
-{%- macro function(display_name, data, schema_key) %}
+{%- macro function(display_name, data, schema_key, fn_selects) %}
 public final class {{ display_name }} {
     {{ struct('Input', data['///'], data[schema_key], None, schema_key, 'static', schema_key) | indent }}
     {{ union ('Output', data['///'], data['->'], 'static') | indent }}
+
+    public static class Select_ {
+
+        public final Map<String, Object> pseudoJson = new HashMap<>();
+
+        {%- for key in fn_selects -%}
+            {%- if key.startswith('struct') -%}
+                {%- set name = key | regex_replace('^.*\\.', '') %}
+                {%- set fields = fn_selects[key] -%}
+
+                {%- for field in fields -%}
+
+        public Select_ {{ name }}{{ field | replace('!', '') }}() {
+            final var theseFields = (List<Object>) this.pseudoJson.getOrDefault("{{ key }}", new ArrayList<>());
+            if (!theseFields.contains("{{field}}")) {
+                theseFields.add("{{field}}");
+            }
+            this.pseudoJson.put("{{ key }}", theseFields);
+
+            return this;
+        }
+                {% endfor %}
+
+            {%- elif key.startswith('union') -%}
+                {%- set name = key | regex_replace('^.*\\.', '') %}
+                {%- set tags = fn_selects[key] -%}
+
+                {%- for tag in tags -%}
+                    {%- set fields = tags[tag] %}
+
+                    {%- for field in fields %}
+
+        public Select_ {{ name }}{{ tag }}{{ field | replace('!', '') }}() {
+            final var theseTags = (Map<String, Object>) this.pseudoJson.getOrDefault("{{ key }}", new HashMap<>());
+            if (!theseTags.containsKey("{{tag}}")) {
+                final var theseFields = (List<Object>) theseTags.getOrDefault("{{ tag }}", new ArrayList<>());
+                if (!theseFields.contains("{{field}}")) {
+                    theseFields.add("{{field}}");
+                }
+                theseTags.put("{{ tag }}", theseFields);
+            }
+            this.pseudoJson.put("{{ key }}", theseTags);
+
+            return this;
+        }
+
+                    {%- endfor -%}
+                {%- endfor -%}
+
+            {%- elif key == '->' -%}
+                {%- set okFields = fn_selects['->']['Ok_'] %}
+                {%- for okField in okFields %}
+
+        public Select_ ok{{ okField | replace('!', '') }}() {
+            final var resultUnion = (Map<String, Object>) this.pseudoJson.getOrDefault("->", new HashMap<>());
+
+            if (!resultUnion.containsKey("Ok_")) {
+                final var theseFields = (List<Object>) resultUnion.getOrDefault("Ok_", new ArrayList<>());
+                if (!theseFields.contains("{{okField}}")) {
+                    theseFields.add("{{okField}}");
+                }
+                resultUnion.put("Ok_", theseFields);
+            }
+            this.pseudoJson.put("->", resultUnion);
+            return this;
+        }
+
+                {%- endfor %}
+            {%- endif -%}
+
+        {%- endfor %}
+    }
 }
 {%- endmacro %}
 
@@ -215,6 +288,7 @@ public final class {{ display_name }} {
 {%- elif schema_key.startswith('union') %}
     {{ union(java_name, data['///'], data[schema_key]) }}
 {%- elif schema_key.startswith('fn') %}
-    {{ function(java_name, data, schema_key) }}
+    {%- set fn_selects = possible_fn_selects[schema_key] -%}
+    {{ function(java_name, data, schema_key, fn_selects) }}
 {%- endif %}
 
