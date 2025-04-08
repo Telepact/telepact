@@ -20,7 +20,11 @@
 	import DocCardStructFields from './DocCardStructFields.svelte';
 	import type { UnionTagTypeData } from '$lib';
 
-	export let tags: UnionTagTypeData[];
+	interface Props {
+		tags: UnionTagTypeData[];
+	}
+
+	let { tags }: Props = $props();
 </script>
 
 <ul class="space-y-2">

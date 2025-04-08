@@ -15,13 +15,18 @@
 <!--|                                                                            |-->
 
 <script lang="ts">
-	export let types: any[];
+	import TypeRef from './TypeRef.svelte';
+	interface Props {
+		types: any[];
+	}
+
+	let { types }: Props = $props();
 	let generics = types.slice(1, types.length);
 	let typeName = types[0];
 	let nullable = typeName.endsWith('?');
 	let cleanTypeName = typeName.replace(/\?$/g, '');
 	let displayNameSpit = cleanTypeName.split('.');
-	let displayName: string;
+	let displayName: string = $state();
 	if (displayNameSpit.length === 1) {
 		displayName = displayNameSpit[0];
 	} else {
@@ -43,7 +48,7 @@
 			class="px-0 hover:underline {cleanTypeName.startsWith('struct')
 				? 'text-sky-400'
 				: 'text-emerald-500'}">{displayName}</a
-		>{/if}{#if generics.length > 0}&lt;{#each generics as generic, i}<svelte:self
+		>{/if}{#if generics.length > 0}&lt;{#each generics as generic, i}<TypeRef
 				types={generic}
 			/>{#if i < generics.length - 1},&#20;{/if}{/each}&gt;{/if}{#if nullable}?{/if}</span
 >

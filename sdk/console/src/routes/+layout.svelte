@@ -15,6 +15,8 @@
 <!--|                                                                            |-->
 
 <script lang="ts">
+	import { preventDefault } from 'svelte/legacy';
+
 	import '../app.css';
 
 	import { goto } from '$app/navigation';
@@ -38,56 +40,60 @@
 	import { onMount } from 'svelte';
 	import { createJsonSchema } from '$lib/jsonSchema';
 	import * as monaco from 'monaco-editor';
+	interface Props {
+		children?: import('svelte').Snippet;
+	}
+
+	let { children }: Props = $props();
 
 	let requestEditor: MonacoEditor;
 	let schemaEditor: MonacoEditor;
 
-	let sourceUrl: string;
-	$: sourceUrl = $page.url.searchParams.get('s') ?? '';
+	let sourceUrl: string = $derived($page.url.searchParams.get('s') ?? '');
+	
 
-	let schemaSource: string;
-	$: schemaSource = $page.data.schemaSource;
+	let schemaSource: string = $derived($page.data.schemaSource);
+	
 
-	let schemaSourceReadOnly: boolean;
-	$: schemaSourceReadOnly = $page.data.readonlyEditor;
+	let schemaSourceReadOnly: boolean = $derived($page.data.readonlyEditor);
+	
 
-	let request: string | null;
-	$: request = $page.url.searchParams.get('r');
+	let request: string | null = $derived($page.url.searchParams.get('r'));
+	
 
-	let response: string | null;
-	$: response = $responseStore;
+	let response: string | null = $derived($responseStore);
+	
 
-	let showInternalApi: boolean;
-	$: showInternalApi = $page.data.showInternalApi;
+	let showInternalApi: boolean = $derived($page.data.showInternalApi);
+	
 
-	let telepactSchemaPromise: Promise<TelepactSchema>;
-	$: telepactSchemaPromise = $page.data.fullTelepactSchemaRef;
+	let telepactSchemaPromise: Promise<TelepactSchema> = $derived($page.data.fullTelepactSchemaRef);
+	
 
-	let schemaDraftPromise: Promise<string>;
-	$: schemaDraftPromise = $page.data.schemaDraft;
+	let schemaDraftPromise: Promise<string> = $derived($page.data.schemaDraft);
+	
 
-	let filteredSchemaPseudoJsonPromise: Promise<any[]>;
-	$: filteredSchemaPseudoJsonPromise = $page.data.filteredSchemaPseudoJson;
+	let filteredSchemaPseudoJsonPromise: Promise<any[]> = $derived($page.data.filteredSchemaPseudoJson);
+	
 
-	let authManaged: boolean;
-	$: authManaged = $page.data.authManaged;
+	let authManaged: boolean = $derived($page.data.authManaged);
+	
 
 	console.log(`page.data`, $page.data);
 
-	let selectedViews: string;
-	$: selectedViews = $page.url.searchParams.get('v') ?? 'd';
+	let selectedViews = $derived($page.url.searchParams.get('v') ?? 'd');
 
-	let activeViews: string;
-	$: activeViews = selectedViews.substring(0, 2);
+	let activeViews: string = $derived(selectedViews.substring(0, 2));
+	
 
-	let sortDocCardsAZ: boolean;
-	$: sortDocCardsAZ = $page.url.searchParams.get('az') === '1';
+	let sortDocCardsAZ: boolean = $derived($page.url.searchParams.get('az') === '1');
+	
 
-	let exampleFn: string;
-	$: exampleFn = $page.url.searchParams.get('mf') ?? 'fn.ping_';
+	let exampleFn: string = $derived($page.url.searchParams.get('mf') ?? 'fn.ping_');
+	
 
-	let exampleHeaders: Array<string>;
-	$: exampleHeaders = ($page.url.searchParams.get('mh') ?? '').split(',');
+	let exampleHeaders: Array<string> = $derived(($page.url.searchParams.get('mh') ?? '').split(','));
+	
 
 	onMount(() => {
 		telepactSchemaPromise.then((e) => {
@@ -111,7 +117,7 @@
 
 	type view = 's' | 'd' | 't' | 'r' | 'm';
 
-	let randomSeed = 1;
+	let randomSeed = $state(1);
 
 	function handleSourceGet(e: Event) {
 		console.log(`e`, e);
@@ -246,7 +252,6 @@
 
 <div class="text-gray-200">
 	<nav
-		on:wheel|preventDefault
 		class="fixed top-0 z-10 h-16 w-full border-y border-slate-600 bg-slate-800"
 	>
 		<div class="flex h-full items-center px-4">
@@ -277,7 +282,7 @@
 					<button
 						aria-label="Toggle Schema"
 						aria-pressed={activeViews.includes('s')}
-						on:click={toggleShowSchemaCode}
+						onclick={toggleShowSchemaCode}
 						class="rounded-s-md p-2 {activeViews.includes('s')
 							? 'bg-sky-700 text-cyan-300'
 							: 'bg-slate-700 text-gray-200'}"
@@ -298,7 +303,7 @@
 					<button
 						aria-label="Toggle Documentation"
 						aria-pressed={activeViews.includes('d')}
-						on:click={toggleShowDocUi}
+						onclick={toggleShowDocUi}
 						class="p-2 {activeViews.includes('d')
 							? 'bg-sky-700 text-cyan-300'
 							: 'bg-slate-700 text-gray-200'}"
@@ -319,7 +324,7 @@
 					<button
 						aria-label="Toggle Simulation"
 						aria-pressed={activeViews.includes('m')}
-						on:click={toggleShowExample}
+						onclick={toggleShowExample}
 						class="rounded-e-md p-2 {activeViews.includes('m')
 							? 'bg-sky-700 text-cyan-300'
 							: 'bg-slate-700 text-gray-200'}"
@@ -332,7 +337,7 @@
 						<button
 							aria-label="Toggle Terminal"
 							aria-pressed={activeViews.includes('t')}
-							on:click={toggleTerminal}
+							onclick={toggleTerminal}
 							class="rounded-s-md p-2 {activeViews.includes('t')
 								? 'bg-emerald-900 text-green-300'
 								: 'bg-slate-700 text-gray-200'}"
@@ -342,7 +347,7 @@
 						<button
 							aria-label="Toggle Results"
 							aria-pressed={activeViews.includes('r')}
-							on:click={toggleResults}
+							onclick={toggleResults}
 							class="rounded-e-md p-2 {activeViews.includes('r')
 								? 'bg-emerald-900 text-green-300'
 								: 'bg-slate-700 text-gray-200'}"
@@ -364,7 +369,7 @@
 				{/if}
 			</div>
 			<div class="flex basis-1/3 justify-end">
-				<form class="flex space-x-2" on:submit|preventDefault={handleSourceGet}>
+				<form class="flex space-x-2" onsubmit={preventDefault(handleSourceGet)}>
 					<div class="flex rounded-md border border-gray-500">
 						<label
 							for="url"
@@ -399,7 +404,6 @@
 			{#if activeViews.includes('s')}
 				<div
 					class="flex h-[calc(100vh-4em)] {getSectionClass('s', activeViews.length)}"
-					on:wheel|preventDefault
 				>
 					<div class="flex w-full flex-col p-6">
 						<div class="flex justify-between">
@@ -407,7 +411,7 @@
 							{#if !schemaSourceReadOnly}
 								<div>
 									<button
-										on:click={handleSchema}
+										onclick={handleSchema}
 										class="rounded-md bg-sky-700 px-3 py-2 text-sm font-semibold text-white hover:bg-sky-600"
 										>Save</button
 									>
@@ -443,7 +447,7 @@
 						{/key}
 						<div class="flex justify-center pb-4">
 							<button
-								on:click={toggleShowInternalApi}
+								onclick={toggleShowInternalApi}
 								class="mt-4 rounded-md bg-sky-700 px-3 py-2 text-sm font-semibold text-white hover:bg-sky-600"
 								>{showInternalApi
 									? 'Hide Internal Api'
@@ -459,7 +463,7 @@
 						<div class="flex items-start justify-between">
 							<h1 class="pb-4 text-xl font-semibold text-gray-100">Mocked Example</h1>
 							<button
-								on:click={incrementRandomSeed}
+								onclick={incrementRandomSeed}
 								class="rounded-md bg-sky-700 px-3 py-2 text-sm font-semibold text-white hover:bg-sky-600"
 							>
 								Regenerate
@@ -512,7 +516,7 @@
 				<div class="flex h-[calc(100vh-4em)] {getSectionClass('t', activeViews.length)}">
 					<form
 						data-sveltekit-keepfocus
-						on:submit|preventDefault={thisHandleRequest}
+						onsubmit={preventDefault(thisHandleRequest)}
 						class="flex w-full flex-col bg-zinc-700 p-6"
 					>
 						<div class="flex justify-between">
@@ -575,6 +579,6 @@
 				</div>
 			{/if}
 		{/if}
-		<slot />
+		{@render children?.()}
 	</main>
 </div>
