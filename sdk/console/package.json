@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "vite dev --force",
     "dev:test": "vite dev --port 3001 --force",
-    "build": "vite build && npm pack --pack-destination ./dist",
+    "build": "vite build",
     "preview": "vite preview",
     "test": "playwright test",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
@@ -14,6 +14,7 @@
     "format": "prettier --write ."
   },
   "devDependencies": {
+    "jsdom": "^26.0.0",
     "@playwright/test": "^1.28.1",
     "@sveltejs/adapter-auto": "^3.0.0",
     "@sveltejs/adapter-static": "^3.0.1",

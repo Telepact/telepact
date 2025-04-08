@@ -35,7 +35,6 @@ import estreePlugin from 'prettier/plugins/estree';
 import babelPlugin from 'prettier/plugins/babel';
 //import { createJsonSchema } from '$lib';
 
-export const ssr = false;
 export const prerender = true;
 
 declare global {

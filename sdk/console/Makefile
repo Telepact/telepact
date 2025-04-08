@@ -14,6 +14,8 @@
 #|  limitations under the License.
 #|
 
+VERSION := $(shell cat ../../VERSION.txt)
+
 .PHONY: all
 
 all: dep
@@ -27,10 +29,12 @@ all: dep
 	mkdir -p src/lib/prettier-plugin-telepact
 	cp -r ../../sdk/prettier/dist/* src/lib/prettier-plugin-telepact
 
+	docker build --progress=plain --no-cache -f Dockerfile -t telepact-console:${VERSION} .
+
 	mkdir -p dist
 
-	npm install
-	npm run build
+	docker save telepact-console:${VERSION} | gzip > dist/docker-image-telepact-console-${VERSION}.tar.gz
+
 
 dep:
 	$(MAKE) -C ../../lib/ts
