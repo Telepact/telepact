@@ -16,11 +16,11 @@
 
 // place files you want to import through the `$lib` alias in this folder.
 import { goto } from '$app/navigation';
-import * as monaco from 'monaco-editor';
 import * as telepact from './telepact/index.esm.js';
 import { _internal } from './telepact/index.esm.js';
 import { writable, type Writable } from 'svelte/store';
 import { createJsonSchema } from './jsonSchema';
+import { browser } from '$app/environment';
 
 export function createJsonSchema2(telepact: telepact.TelepactSchema): Record<string, any> {
 	return createJsonSchema(telepact);
@@ -428,187 +428,191 @@ export function findSchemaKey(definition: Record<string, any>): string {
 	}
 }
 
-monaco.languages.typescript.typescriptDefaults.setEagerModelSync(true);
-// monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
-// 	schemas: [
-// 		{
-// 			uri: 'internal://server/jsonschema.json',
-// 			fileMatch: ['schema.telepact.json'],
-// 			schema: telepact.jsonSchema
-// 		}
-// 	]
-// });
-monaco.languages.registerLinkProvider('json', {
-	provideLinks: (
-		model: monaco.editor.ITextModel,
-		token: monaco.CancellationToken
-	): monaco.languages.ProviderResult<monaco.languages.ILinksList> => {
-		let matches = model.findMatches(
-			'\\{[\\s\\n]*"fn\\..*":[\\s\\n]*\\{',
-			false,
-			true,
-			false,
-			'',
-			false,
-			undefined
-		);
+if (browser) {
+	const monaco = await import('monaco-editor');
 
-		let links: { range: monaco.Range }[] = matches
-			.map((m) => {
-				// @ts-ignore
-				let end: [monaco.Range, monaco.Range] = model._bracketPairs.matchBracket(
-					new monaco.Position(m.range.startLineNumber, m.range.startColumn)
-				);
+	monaco.languages.typescript.typescriptDefaults.setEagerModelSync(true);
+	// monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
+	// 	schemas: [
+	// 		{
+	// 			uri: 'internal://server/jsonschema.json',
+	// 			fileMatch: ['schema.telepact.json'],
+	// 			schema: telepact.jsonSchema
+	// 		}
+	// 	]
+	// });
+	monaco.languages.registerLinkProvider('json', {
+		provideLinks: (
+			model: monaco.editor.ITextModel,
+			token: monaco.CancellationToken
+		): monaco.languages.ProviderResult<monaco.languages.ILinksList> => {
+			let matches = model.findMatches(
+				'\\{[\\s\\n]*"fn\\..*":[\\s\\n]*\\{',
+				false,
+				true,
+				false,
+				'',
+				false,
+				undefined
+			);
 
-				if (!end) {
-					return null;
-				}
+			let links: { range: monaco.Range }[] = matches
+				.map((m) => {
+					// @ts-ignore
+					let end: [monaco.Range, monaco.Range] = model._bracketPairs.matchBracket(
+						new monaco.Position(m.range.startLineNumber, m.range.startColumn)
+					);
 
-				let ran = new monaco.Range(
-					m.range.startLineNumber,
-					m.range.startColumn,
-					end[1].endLineNumber,
-					end[1].endColumn
-				);
+					if (!end) {
+						return null;
+					}
 
-				let str = model.getValueInRange(ran);
+					let ran = new monaco.Range(
+						m.range.startLineNumber,
+						m.range.startColumn,
+						end[1].endLineNumber,
+						end[1].endColumn
+					);
 
-				return { range: ran, val: str };
-			})
-			.filter((e) => e !== null) as { range: monaco.Range }[];
-		return {
-			links: links
-		};
-	},
-	resolveLink: (
-		link: monaco.languages.ILink,
-		token: monaco.CancellationToken
-	): monaco.languages.ProviderResult<monaco.languages.ILink> => {
-		// @ts-ignore
-		handleRequest(JSON.stringify([{}, JSON.parse(link.val)]));
+					let str = model.getValueInRange(ran);
 
-		return {
-			range: link.range
-		};
-	}
-});
-monaco.languages.registerLinkProvider('json', {
-	provideLinks: (
-		model: monaco.editor.ITextModel,
-		token: monaco.CancellationToken
-	): monaco.languages.ProviderResult<monaco.languages.ILinksList> => {
-		return {
-			links: []
-		};
-	},
-	resolveLink: (
-		link: monaco.languages.ILink,
-		token: monaco.CancellationToken
-	): monaco.languages.ProviderResult<monaco.languages.ILink> => {
-		return {
-			range: link.range
-		};
-	}
-});
+					return { range: ran, val: str };
+				})
+				.filter((e) => e !== null) as { range: monaco.Range }[];
+			return {
+				links: links
+			};
+		},
+		resolveLink: (
+			link: monaco.languages.ILink,
+			token: monaco.CancellationToken
+		): monaco.languages.ProviderResult<monaco.languages.ILink> => {
+			// @ts-ignore
+			handleRequest(JSON.stringify([{}, JSON.parse(link.val)]));
 
-function generateJsonSourceMap(jsonString: string): any[] {
-	const sourceMap: any[] = [];
-	let path: (string | number)[] = [];
-	let line = 1;
-	let column = 1;
-
-	let inString = false;
-	let currentKey = '';
-	let currentArrayIndex = -1; // Tracks the current array index
-	let keyStartColumn = 0;
-
-	// Helper function to add to source map
-	const addToSourceMap = (
-		key: string | number,
-		keyLine: number,
-		keyColumnStart: number,
-		keyColumnEnd: number
-	) => {
-		sourceMap.push({
-			path: [...path, key],
-			line: keyLine,
-			columnStart: keyColumnStart,
-			columnEnd: keyColumnEnd
-		});
-	};
-
-	for (let i = 0; i < jsonString.length; i++) {
-		const char = jsonString[i];
-
-		// Handle line and column tracking
-		if (char === '\n') {
-			line++;
-			column = 0;
-		} else {
-			column++;
+			return {
+				range: link.range
+			};
 		}
+	});
+	monaco.languages.registerLinkProvider('json', {
+		provideLinks: (
+			model: monaco.editor.ITextModel,
+			token: monaco.CancellationToken
+		): monaco.languages.ProviderResult<monaco.languages.ILinksList> => {
+			return {
+				links: []
+			};
+		},
+		resolveLink: (
+			link: monaco.languages.ILink,
+			token: monaco.CancellationToken
+		): monaco.languages.ProviderResult<monaco.languages.ILink> => {
+			return {
+				range: link.range
+			};
+		}
+	});
 
-		// Toggle inString state
-		if (char === '"' && jsonString[i - 1] !== '\\') {
-			inString = !inString;
-			if (inString) {
-				keyStartColumn = column;
+	function generateJsonSourceMap(jsonString: string): any[] {
+		const sourceMap: any[] = [];
+		let path: (string | number)[] = [];
+		let line = 1;
+		let column = 1;
+
+		let inString = false;
+		let currentKey = '';
+		let currentArrayIndex = -1; // Tracks the current array index
+		let keyStartColumn = 0;
+
+		// Helper function to add to source map
+		const addToSourceMap = (
+			key: string | number,
+			keyLine: number,
+			keyColumnStart: number,
+			keyColumnEnd: number
+		) => {
+			sourceMap.push({
+				path: [...path, key],
+				line: keyLine,
+				columnStart: keyColumnStart,
+				columnEnd: keyColumnEnd
+			});
+		};
+
+		for (let i = 0; i < jsonString.length; i++) {
+			const char = jsonString[i];
+
+			// Handle line and column tracking
+			if (char === '\n') {
+				line++;
+				column = 0;
 			} else {
-				// End of string, add key to source map if we're not in an array
-				if (path.length > 0 && typeof path[path.length - 1] !== 'number') {
-					addToSourceMap(currentKey, line, keyStartColumn, column);
-				}
-				currentKey = '';
+				column++;
 			}
-			continue;
-		}
 
-		// Collect characters of a key
-		if (inString) {
-			currentKey += char;
-		}
-
-		// Handle object and array parsing
-		if (!inString) {
-			if (char === '{' || char === '[') {
-				// Entering a new object or array
-				if (currentKey) {
-					path.push(currentKey);
-					currentKey = '';
-					if (char === '[') {
-						currentArrayIndex = 0; // Initialize array index
-					}
-				} else if (char === '[') {
-					if (currentArrayIndex === -1) {
-						currentArrayIndex = 0; // Initialize array index at the start of a new array
-					} else {
-						path.push(currentArrayIndex);
-						currentArrayIndex = 0; // Reset for new nested array
-					}
-				}
-			} else if (char === '}' || char === ']') {
-				// Exiting an object or array
-				if (char === ']') {
-					if (typeof path[path.length - 1] === 'number') {
-						path.pop(); // Remove the array index when exiting the array
-					}
-					let lastIndex = path.length - 1;
-					currentArrayIndex =
-						path.length > 0 && typeof lastIndex === 'number' ? lastIndex + 1 : -1;
+			// Toggle inString state
+			if (char === '"' && jsonString[i - 1] !== '\\') {
+				inString = !inString;
+				if (inString) {
+					keyStartColumn = column;
 				} else {
-					currentArrayIndex = -1; // Reset array index when exiting an object
-				}
-				if (currentKey) {
-					path.pop();
+					// End of string, add key to source map if we're not in an array
+					if (path.length > 0 && typeof path[path.length - 1] !== 'number') {
+						addToSourceMap(currentKey, line, keyStartColumn, column);
+					}
 					currentKey = '';
 				}
-			} else if (char === ',' && typeof path[path.length - 1] === 'number') {
-				// Next item in array
-				currentArrayIndex++;
-				path[path.length - 1] = currentArrayIndex;
+				continue;
+			}
+
+			// Collect characters of a key
+			if (inString) {
+				currentKey += char;
+			}
+
+			// Handle object and array parsing
+			if (!inString) {
+				if (char === '{' || char === '[') {
+					// Entering a new object or array
+					if (currentKey) {
+						path.push(currentKey);
+						currentKey = '';
+						if (char === '[') {
+							currentArrayIndex = 0; // Initialize array index
+						}
+					} else if (char === '[') {
+						if (currentArrayIndex === -1) {
+							currentArrayIndex = 0; // Initialize array index at the start of a new array
+						} else {
+							path.push(currentArrayIndex);
+							currentArrayIndex = 0; // Reset for new nested array
+						}
+					}
+				} else if (char === '}' || char === ']') {
+					// Exiting an object or array
+					if (char === ']') {
+						if (typeof path[path.length - 1] === 'number') {
+							path.pop(); // Remove the array index when exiting the array
+						}
+						let lastIndex = path.length - 1;
+						currentArrayIndex =
+							path.length > 0 && typeof lastIndex === 'number' ? lastIndex + 1 : -1;
+					} else {
+						currentArrayIndex = -1; // Reset array index when exiting an object
+					}
+					if (currentKey) {
+						path.pop();
+						currentKey = '';
+					}
+				} else if (char === ',' && typeof path[path.length - 1] === 'number') {
+					// Next item in array
+					currentArrayIndex++;
+					path[path.length - 1] = currentArrayIndex;
+				}
 			}
 		}
-	}
 
-	return sourceMap;
+		return sourceMap;
+	}
 }

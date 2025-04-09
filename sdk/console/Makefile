@@ -29,6 +29,9 @@ all: dep
 	mkdir -p src/lib/prettier-plugin-telepact
 	cp -r ../../sdk/prettier/dist/* src/lib/prettier-plugin-telepact
 
+	npm install
+	npm run build
+
 	docker build --progress=plain --no-cache -f Dockerfile -t telepact-console:${VERSION} .
 
 	mkdir -p dist

@@ -39,7 +39,6 @@
 	import { responseStore } from '$lib';
 	import { onMount } from 'svelte';
 	import { createJsonSchema } from '$lib/jsonSchema';
-	import * as monaco from 'monaco-editor';
 	interface Props {
 		children?: import('svelte').Snippet;
 	}
@@ -79,8 +78,6 @@
 	let authManaged: boolean = $derived($page.data.authManaged);
 	
 
-	console.log(`page.data`, $page.data);
-
 	let selectedViews = $derived($page.url.searchParams.get('v') ?? 'd');
 
 	let activeViews: string = $derived(selectedViews.substring(0, 2));
@@ -95,7 +92,9 @@
 	let exampleHeaders: Array<string> = $derived(($page.url.searchParams.get('mh') ?? '').split(','));
 	
 
-	onMount(() => {
+	onMount(async () => {
+		const monaco = await import('monaco-editor');
+
 		telepactSchemaPromise.then((e) => {
 			const requestJsonSchema = createJsonSchema(e);
 			monaco.languages.json.jsonDefaults.setDiagnosticsOptions({

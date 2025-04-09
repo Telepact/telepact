@@ -35,8 +35,6 @@ import estreePlugin from 'prettier/plugins/estree';
 import babelPlugin from 'prettier/plugins/babel';
 //import { createJsonSchema } from '$lib';
 
-export const prerender = true;
-
 declare global {
 	interface Window {
 		getAuthHeader: () => Promise<Record<string, object>>;
@@ -48,7 +46,7 @@ export const load: LayoutLoad = async ({ url, params, route, fetch }) => {
 	let schemaSource = url.searchParams.get('s') ?? '';
 	let showInternalApi = url.searchParams.get('i') === '1';
 
-	const getAuthHeader = window.getAuthHeader;
+	const getAuthHeader = typeof window === 'undefined' ? undefined : window.getAuthHeader;
 	const authManaged = getAuthHeader !== undefined;
 
 	console.log(`authManaged ${authManaged}`);

@@ -17,9 +17,6 @@
 
 <script lang="ts">
 	import { onDestroy, onMount, afterUpdate, createEventDispatcher } from 'svelte';
-	import * as monaco from 'monaco-editor';
-	import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
-	import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
 
 	let editor: monaco.editor.IStandaloneCodeEditor;
 	let editorElement: HTMLDivElement;
@@ -53,6 +50,11 @@
 	};
 
 	onMount(async () => {
+		const monaco = await import('monaco-editor');
+		const editorWorker = (await import('monaco-editor/esm/vs/editor/editor.worker?worker')).default;
+		const jsonWorker  = (await import('monaco-editor/esm/vs/language/json/json.worker?worker')).default;
+		
+
 		self.MonacoEnvironment = {
 			getWorker: function (_: any, label: string) {
 				if (label === 'json') {
