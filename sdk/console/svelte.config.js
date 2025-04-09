@@ -14,10 +14,8 @@
 //|  limitations under the License.
 //|
 
-import adapter from '@sveltejs/adapter-node';
+import adapter from '@sveltejs/adapter-static';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
-
-let basePath = process.env.BASE_PATH || undefined;
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
@@ -27,9 +25,6 @@ const config = {
 
 	kit: {
 		adapter: adapter(),
-		paths: {
-			base: basePath
-		}
 	}
 };
 

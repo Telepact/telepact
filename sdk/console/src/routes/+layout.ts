@@ -36,6 +36,7 @@ import babelPlugin from 'prettier/plugins/babel';
 //import { createJsonSchema } from '$lib';
 
 export const prerender = true;
+export const ssr = false;
 
 declare global {
 	interface Window {

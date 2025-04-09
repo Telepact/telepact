@@ -1,20 +1,9 @@
-# Use an official Node.js runtime as a parent image
-FROM node:20
+FROM httpd:2.4
 
-# Set the working directory in the container
-WORKDIR /app
+COPY build/ /usr/local/apache2/htdocs/
 
-# Copy package.json and package-lock.json
-COPY package.json package-lock.json ./
+EXPOSE 8080
 
-# Install dependencies
-RUN npm install
+RUN sed -i 's/Listen 80/Listen 8080/' /usr/local/apache2/conf/httpd.conf
 
-# Copy the rest of the application code
-COPY . .
-
-# Expose the port the app runs on
-EXPOSE 3000
-
-# Run the startup script
-CMD ["bash", "./startup.sh"]
+USER nobody

@@ -29,10 +29,13 @@ all: dep
 	mkdir -p src/lib/prettier-plugin-telepact
 	cp -r ../../sdk/prettier/dist/* src/lib/prettier-plugin-telepact
 
-	docker build --progress=plain --no-cache -f Dockerfile -t telepact-console:${VERSION} .
+	npm install
+	npm run build
+	node clean-index.js
 
 	mkdir -p dist
 
+	docker build --progress=plain --no-cache -f Dockerfile -t telepact-console:${VERSION} .
 	docker save telepact-console:${VERSION} | gzip > dist/docker-image-telepact-console-${VERSION}.tar.gz
 
 
@@ -44,6 +47,7 @@ dev:
 	npm run dev
 
 clean:
+	rm -rf build
 	rm -rf src/lib/telepact
 	rm -rf src/lib/prettier-plugin-telepact
 	rm -rf node_modules
