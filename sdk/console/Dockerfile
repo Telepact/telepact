@@ -1,9 +1,10 @@
-FROM httpd:2.4
+FROM nginx:latest
 
-COPY build/ /usr/local/apache2/htdocs/
+COPY build/ /usr/share/nginx/html/
 
 EXPOSE 8080
 
-RUN sed -i 's/Listen 80/Listen 8080/' /usr/local/apache2/conf/httpd.conf
+# Create a custom nginx configuration file
+COPY custom-nginx.conf /etc/nginx/conf.d/custom-nginx.conf
 
-USER nobody
+RUN chown -R nginx:nginx /var/log/nginx

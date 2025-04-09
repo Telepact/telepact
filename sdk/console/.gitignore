@@ -13,3 +13,4 @@ src/lib/prettier-plugin-telepact
 LICENSE
 NOTICE
 test-results
+*.log

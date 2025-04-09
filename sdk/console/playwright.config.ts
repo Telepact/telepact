@@ -28,8 +28,8 @@ const VERSION = fs.readFileSync(path.resolve(__dirname, '../../VERSION.txt'), 'u
 const config: PlaywrightTestConfig = {
 	webServer: [
 		{
-			command: `npm run preview`,
-			port: 4173
+			command: `docker run --name telepact_console_test -p 8084:8080 telepact-console:${VERSION}`,
+			port: 8084,
 		},
 		{
 			command: 'telepact mock --port 8085 --dir tests/schema --generated-collection-length-min 2 --generated-collection-length-max 2',
@@ -40,11 +40,12 @@ const config: PlaywrightTestConfig = {
 	testDir: 'tests',
 	testMatch: /(.+\.)?(test|spec)\.[jt]s/,
 	use: {
-		baseURL: 'http://localhost:4173',
+		baseURL: 'http://localhost:8084',
 		contextOptions: {
 			permissions: ['clipboard-read']
 		}
-	}
+	},
+	globalTeardown: path.resolve(__dirname, 'teardown.js') // Ensure teardown script uses default export
 };
 
 export default config;
