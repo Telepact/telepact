@@ -17,8 +17,6 @@
 import adapter from '@sveltejs/adapter-node';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 
-let basePath = process.env.BASE_PATH || undefined;
-
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
 	// Consult https://kit.svelte.dev/docs/integrations#preprocessors
@@ -27,9 +25,6 @@ const config = {
 
 	kit: {
 		adapter: adapter(),
-		paths: {
-			base: basePath
-		}
 	}
 };
 
