@@ -57,3 +57,6 @@ clean:
 
 test:
 	npm run test
+
+dev-proxy:
+	node proxy-server.cjs
