@@ -2,7 +2,10 @@ FROM node:20
 
 WORKDIR /app
 
-COPY build build
+COPY . .
+
+RUN npm install
+RUN npm run build
 
 EXPOSE 3000
 

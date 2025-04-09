@@ -119,7 +119,6 @@
 	let randomSeed = $state(1);
 
 	function handleSourceGet(e: Event) {
-		console.log(`e`, e);
 		const formData = new FormData(e.target as HTMLFormElement);
 		const sourceUrl = formData.get('url') as string;
 

@@ -47,6 +47,7 @@ dev:
 	npm run dev
 
 clean:
+	rm -rf build
 	rm -rf src/lib/telepact
 	rm -rf src/lib/prettier-plugin-telepact
 	rm -rf node_modules
