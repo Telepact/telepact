@@ -14,12 +14,16 @@
 #|  limitations under the License.
 #|
 
-LIB_TAR_GZ := ../../sdk/console/dist/*.tgz
-TAR_GZ := telepact-console.tgz
+VERSION := $(shell cat ../../VERSION.txt)
+
+LIB_TAR_GZ := ../../sdk/console/dist/*.tar.gz
+TAR_GZ := telepact-console.tar.gz
 
 all: $(TAR_GZ)
-	npm install
-	npm run build
+	docker load < $(TAR_GZ)
+
+	docker build --progress=plain --no-cache -f Dockerfile -t telepact-console-self-host:${VERSION} --build-arg TELEPACT_VERSION=${VERSION} .
+
 
 $(TAR_GZ):
 	cp $(LIB_TAR_GZ) $(TAR_GZ)
