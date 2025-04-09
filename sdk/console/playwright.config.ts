@@ -45,7 +45,8 @@ const config: PlaywrightTestConfig = {
 		baseURL: 'http://localhost:8084',
 		contextOptions: {
 			permissions: ['clipboard-read']
-		}
+		},
+		video: 'retain-on-failure'
 	}
 };
 

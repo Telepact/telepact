@@ -36,6 +36,10 @@ async function selectAllCopyAndGet(page: Page, locator: Locator): Promise<string
 test.describe('Loading from demo server', () => {
 	test.beforeEach(async ({ page }) => {
 		await page.goto('/');
+
+		// Wait for 1 second
+		await page.waitForTimeout(500);
+
 		await expect(
 			page.getByRole('heading', { name: 'Telepact' }),
 			"Page should have a heading with the text 'Telepact'"
@@ -43,6 +47,7 @@ test.describe('Loading from demo server', () => {
 		
 		let source = page.getByRole('textbox', { name: 'Source' });
 		await source.fill('http://localhost:8085/api');
+
 		await page.getByRole('button', { name: 'Load'}).click();
 	});
 
@@ -53,6 +58,7 @@ test.describe('Loading from demo server', () => {
 		).toBeVisible();
 		
 		await page.getByRole('button', { name: 'Toggle Schema', pressed: false }).click();
+
 		await expect(
 			page.getByRole('button', { name: 'Toggle Schema', pressed: true }),
 			"Schema should be visible after clicking the button"
