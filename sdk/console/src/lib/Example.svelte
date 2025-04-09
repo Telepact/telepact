@@ -17,11 +17,15 @@
 <script lang="ts">
 	import MonacoEditor from './MonacoEditor.svelte';
 
-	export let schemaKey: string;
-	export let generate: () => string;
+	interface Props {
+		schemaKey: string;
+		generate: () => string;
+	}
 
-	let showExample: boolean = false;
-	let randomSeed: number = 1;
+	let { schemaKey, generate }: Props = $props();
+
+	let showExample: boolean = $state(false);
+	let randomSeed: number = $state(1);
 
 	function incrementRandomSeed() {
 		randomSeed += 1;
@@ -34,7 +38,7 @@
 
 <div class="flex items-center justify-center space-x-2">
 	<button
-		on:click={toggleShowExample}
+		onclick={toggleShowExample}
 		class="group mt-2 flex items-center rounded-lg hover:underline"
 	>
 		<h6 class="rounded-md p-2 {showExample ? 'border border-slate-500 font-bold' : ''}">
@@ -43,7 +47,7 @@
 	</button>
 	{#if showExample}
 		<button
-			on:click={incrementRandomSeed}
+			onclick={incrementRandomSeed}
 			class="group mt-2 flex items-center rounded-lg hover:underline"
 		>
 			<h6 class="rounded-md border border-slate-500 p-2 font-bold">Regenerate</h6>

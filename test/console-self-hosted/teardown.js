@@ -14,9 +14,13 @@
 //|  limitations under the License.
 //|
 
-import { test, expect } from '@playwright/test';
+import { execSync } from 'child_process';
 
-test('should display "Telepact" on page load', async ({ page }) => {
-  await page.goto('http://localhost:8082'); // Update URL if necessary
-  await expect(page.locator('text=Telepact')).toBeVisible();
-});
+export default function () {
+  try {
+    console.log('Stopping and removing Docker container...');
+    execSync('docker rm -f telepact_console_self_host_test', { stdio: 'inherit' });
+  } catch (error) {
+    console.error('Error during teardown:', error.message);
+  }
+}

@@ -38,14 +38,18 @@
 	import Example from './Example.svelte';
 	import MockIcon from './MockIcon.svelte';
 
-	export let entry: TypeData;
-	export let telepactSchema: TelepactSchema;
+	interface Props {
+		entry: TypeData;
+		telepactSchema: TelepactSchema;
+	}
+
+	let { entry, telepactSchema }: Props = $props();
 
 	let argumentExampleMonaco: MonacoEditor;
 
-	let showExample: boolean = false;
-	let includeErrorsInExample: boolean = false;
-	let randomSeed = 1;
+	let showExample: boolean = $state(false);
+	let includeErrorsInExample: boolean = $state(false);
+	let randomSeed = $state(1);
 
 	let data = entry.data;
 	let schemaKey = entry.name;
@@ -123,10 +127,10 @@
 			</h5>
 		</a>
 		{#if isFnTypeData(data)}
-			<span class="grow" />
+			<span class="grow"></span>
 			<div>
 				<button
-					on:click={applyFunctionToExample}
+					onclick={applyFunctionToExample}
 					class="group flex items-center space-x-2 py-2"
 				>
 					<span class="group-hover:underline">Simulate</span>
@@ -169,7 +173,7 @@
 
 					<div class="flex items-center justify-center space-x-2">
 						<button
-							on:click={toggleShowExample}
+							onclick={toggleShowExample}
 							class="group mt-2 flex items-center rounded-lg hover:underline"
 						>
 							<h6
@@ -182,7 +186,7 @@
 						</button>
 						{#if showExample}
 							<button
-								on:click={incrementRandomSeed}
+								onclick={incrementRandomSeed}
 								class="group mt-2 flex items-center rounded-lg hover:underline"
 							>
 								<h6 class="rounded-md border border-slate-500 p-2 font-bold">
@@ -266,19 +270,21 @@
 				{/if}
 
 				<DocCardStructFields fields={data.requestData}>
-					<div slot="field" let:header>
-						<button
-							on:click={() => toggleHeaderForExample(header, schemaKey)}
-							class="group flex items-center space-x-2"
-						>
-							<span class="group-hover:underline">Simulate</span>
-							<div
-								class="rounded-lg px-1 group-hover:bg-sky-700 group-hover:text-cyan-300"
+					{#snippet field({ header })}
+																<div  >
+							<button
+								onclick={() => toggleHeaderForExample(header, schemaKey)}
+								class="group flex items-center space-x-2"
 							>
-								<MockIcon />
-							</div>
-						</button>
-					</div>
+								<span class="group-hover:underline">Simulate</span>
+								<div
+									class="rounded-lg px-1 group-hover:bg-sky-700 group-hover:text-cyan-300"
+								>
+									<MockIcon />
+								</div>
+							</button>
+						</div>
+															{/snippet}
 				</DocCardStructFields>
 
 				{#if Object.keys(data.requestData).length > 0}

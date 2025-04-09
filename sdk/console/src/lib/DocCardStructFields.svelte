@@ -17,7 +17,12 @@
 <script lang="ts">
 	import TypeRef from './TypeRef.svelte';
 
-	export let fields: Record<string, any>;
+	interface Props {
+		fields: Record<string, any>;
+		field?: import('svelte').Snippet<[any]>;
+	}
+
+	let { fields, field }: Props = $props();
 </script>
 
 {#if Object.keys(fields).length === 0}
@@ -41,7 +46,7 @@
 					{/if}
 				</div>
 				<div>
-					<slot name="field" header={k} />
+					{@render field?.({ header: k, })}
 				</div>
 			</li>
 		{/each}

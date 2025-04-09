@@ -18,7 +18,9 @@ import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-	plugins: [sveltekit()],
+    plugins: [
+        sveltekit()
+    ],
 	build: {
 		commonjsOptions: {
 			include: [/lib/, /node_modules/]
@@ -31,5 +33,5 @@ export default defineConfig({
 		fs: {
 			allow: ['stub.js']
 		}
-	}
+	},
 });

@@ -14,26 +14,9 @@
 #|  limitations under the License.
 #|
 
-VERSION := $(shell cat ../../VERSION.txt)
+ARG TELEPACT_VERSION=latest
 
-LIB_TAR_GZ := ../../sdk/console/dist/*.tar.gz
-TAR_GZ := telepact-console.tar.gz
+FROM telepact-console:${TELEPACT_VERSION}
 
-all: $(TAR_GZ)
-	npm install
+COPY override.js /usr/share/nginx/html/override.js
 
-	docker load < $(TAR_GZ)
-
-	docker build --progress=plain --no-cache -f Dockerfile -t telepact-console-self-host:${VERSION} --build-arg TELEPACT_VERSION=${VERSION} .
-
-
-$(TAR_GZ):
-	cp $(LIB_TAR_GZ) $(TAR_GZ)
-
-clean:
-	rm -rf node_modules
-	rm -f package-lock.json
-	rm $(TAR_GZ)
-
-test:
-	npm run test
