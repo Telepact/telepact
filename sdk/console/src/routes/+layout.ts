@@ -40,7 +40,7 @@ export const ssr = false;
 
 declare global {
 	interface Window {
-		getAuthHeader: () => Promise<Record<string, object>>;
+		overrideAuthHeader: (schemaSource: string, next: (newAuthHeader: Record<string, object>) => Promise<Message>) => Promise<Message>
 	}
 }
 
@@ -49,8 +49,7 @@ export const load: LayoutLoad = async ({ url, params, route, fetch }) => {
 	let schemaSource = url.searchParams.get('s') ?? '';
 	let showInternalApi = url.searchParams.get('i') === '1';
 
-	const getAuthHeader = window.getAuthHeader;
-	const authManaged = getAuthHeader !== undefined;
+	const authManaged = window.overrideAuthHeader !== undefined;
 
 	console.log(`authManaged ${authManaged}`);
 
@@ -87,19 +86,32 @@ export const load: LayoutLoad = async ({ url, params, route, fetch }) => {
 		};
 	} else if (schemaSource?.startsWith('http')) {
 		let client = new Client(async (m: Message, s: Serializer) => {
-			if (getAuthHeader !== undefined) {
-				let authHeader = await getAuthHeader();
-				m.headers['@auth_'] = authHeader;
+			const maybeOverrideAuthHeader = async (newAuthHeader: Record<string, object> | undefined, next: () => Promise<Message>) => {
+				if (newAuthHeader !== undefined) {
+					m.headers['@auth_'] = newAuthHeader;
+				}
+
+				return next();
+			};
+
+			const finish = async () => {
+				let req = s.serialize(m);
+				let res = await fetch(schemaSource, {
+					method: 'POST',
+					body: req
+				});
+				let buf = await res.arrayBuffer();
+				let responseBytes = new Uint8Array(buf);
+				return s.deserialize(responseBytes);
 			}
 
-			let req = s.serialize(m);
-			let res = await fetch(schemaSource, {
-				method: 'POST',
-				body: req
-			});
-			let buf = await res.arrayBuffer();
-			let responseBytes = new Uint8Array(buf);
-			return s.deserialize(responseBytes);
+			if (window.overrideAuthHeader !== undefined) {
+				return window.overrideAuthHeader(schemaSource, (a) => maybeOverrideAuthHeader(a, finish));
+			} else {
+				return maybeOverrideAuthHeader(undefined, finish);
+			}
+
+
 		}, new ClientOptions());
 
 		result = {

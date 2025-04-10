@@ -389,7 +389,7 @@
 					</div>
 					<button
 						type="submit"
-						class="rounded-md bg-sky-700 px-3 py-2 text-sm font-semibold text-white hover:bg-sky-600"
+						class="rounded-md bg-sky-700 px-3 py-2 text-sm font-semibold text-white hover:bg-sky-600 active:bg-sky-700"
 						>Load</button
 					>
 				</form>
@@ -412,7 +412,7 @@
 								<div>
 									<button
 										onclick={handleSchema}
-										class="rounded-md bg-sky-700 px-3 py-2 text-sm font-semibold text-white hover:bg-sky-600"
+										class="rounded-md bg-sky-700 px-3 py-2 text-sm font-semibold text-white hover:bg-sky-600 active:bg-sky-700"
 										>Save</button
 									>
 								</div>
@@ -524,7 +524,7 @@
 							<div>
 								<button
 									type="submit"
-									class="rounded-md bg-sky-700 px-3 py-2 text-sm font-semibold text-white hover:bg-sky-600"
+									class="rounded-md bg-sky-700 px-3 py-2 text-sm font-semibold text-white hover:bg-sky-600 active:bg-sky-700"
 									>Submit</button
 								>
 							</div>
