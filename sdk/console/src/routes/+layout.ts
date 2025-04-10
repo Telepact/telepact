@@ -49,8 +49,7 @@ export const load: LayoutLoad = async ({ url, params, route, fetch }) => {
 	let schemaSource = url.searchParams.get('s') ?? '';
 	let showInternalApi = url.searchParams.get('i') === '1';
 
-	const getAuthHeader = window.getAuthHeader;
-	const authManaged = getAuthHeader !== undefined;
+	const authManaged = window.overrideAuthHeader !== undefined;
 
 	console.log(`authManaged ${authManaged}`);
 
