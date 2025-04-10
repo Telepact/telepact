@@ -18,10 +18,19 @@ FROM nginx:alpine
 
 COPY build/ /usr/share/nginx/html/
 
+RUN touch /usr/share/nginx/html/override.js
+
 EXPOSE 8080
 
-# Create a custom nginx configuration file
-COPY custom-nginx.conf /etc/nginx/conf.d/custom-nginx.conf
+COPY nginx.conf /etc/nginx/conf.d/nginx.conf
 
-RUN chown -R nginx:nginx /var/log/nginx && \
-    rm -rf /var/cache/apk/*
+RUN mkdir -p /var/log/nginx && \
+    mkdir -p /var/cache/nginx && \
+    mkdir -p /var/run/nginx && \
+    touch /var/run/nginx.pid && \
+    chown -R nobody:nogroup /var/log/nginx && \
+    chown -R nobody:nogroup /var/cache/nginx && \
+    chown -R nobody:nogroup /var/run/nginx && \
+    chown nobody:nogroup /var/run/nginx.pid
+
+USER nobody
