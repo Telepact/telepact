@@ -253,6 +253,8 @@ cases = {
         [[{'@select_': {'struct.ExStruct': ['optional!', 'required']}, '@ok_': {'value!': {'struct!': {'required': False}}}}, {'fn.test': {}}], [{}, {'Ok_': {'value!': {'struct!': {'required': False}}}}]],
         [[{'@select_': {'struct.ExStruct': []}, '@ok_': {'value!': {'struct!': {'optional!': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'Ok_': {'value!': {'struct!': {}}}}]],
         [[{'@select_': {'struct.ExStruct': []}, '@ok_': {'value!': {'struct!': {'required': False}}}}, {'fn.test': {}}], [{}, {'Ok_': {'value!': {'struct!': {}}}}]],
+        [[{'@select_': {'struct.Big': []}, '@ok_': {'items': [{'aF': False, 'bF': True, 'cF': False, 'dF': True}]}}, {'fn.getBigList': {}}], [{}, {'Ok_': {'items': [{}]}}]],
+        [[{'@select_': {'struct.Big': ['aF']}, '@ok_': {'items': [{'aF': False, 'bF': True, 'cF': False, 'dF': True}]}}, {'fn.getBigList': {}}], [{}, {'Ok_': {'items': [{'aF': False}]}}]],
         [[{'@select_': {'union.ExUnion': {}}, '@ok_': {'value!': {'union!': {'Two': {'optional!': False, 'required': False}}}}}, {'fn.test': {}}], [{}, {'Ok_': {'value!': {'union!': {'Two': {'optional!': False, 'required': False}}}}}]],
         [[{'@select_': {'union.ExUnion': {'Two': ['optional!']}}, '@ok_': {'value!': {'union!': {'Two': {'optional!': False, 'required': False}}}}}, {'fn.test': {}}], [{}, {'Ok_': {'value!': {'union!': {'Two': {'optional!': False}}}}}]],
         [[{'@select_': {'union.ExUnion': {'Two': ['optional!']}}, '@ok_': {'value!': {'union!': {'Two': {'required': False}}}}}, {'fn.test': {}}], [{}, {'Ok_': {'value!': {'union!': {'Two': {}}}}}]],
