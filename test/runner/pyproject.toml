@@ -1,17 +1,17 @@
-[project]
-name = "jAPI-qa-test"
+[tool.poetry]
+name = "telepact-qa-test"
 version = "0.1.0"
 description = ""
-requires-python = ">=3.11"
-
-[tool.poetry]
 package-mode = false
 
+[tool.poetry.dependencies]
+python = "^3.11"
+
 [tool.poetry.group.dev.dependencies]
-msgpack = "*"
-nats-py = "*"
-pytest = "*"
-prometheus-client = "*"
+msgpack = "^1.0"
+nats-py = "^2.8"
+pytest = "^8.1"
+prometheus-client = "^0.20"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

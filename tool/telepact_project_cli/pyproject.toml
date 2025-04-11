@@ -1,12 +1,7 @@
-[project]
+[tool.poetry]
 name = "telepact_project_cli"
 version = "1.0.0"
 description = "A CLI tool for developing the Telepact project."
-requires-python = ">=3.11"
-
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.dependencies]
 python = "^3.11"
@@ -15,7 +10,11 @@ toml = "^0.10.2"
 lxml = "^5.3.1"
 pyyaml = "^6.0.2"
 "ruamel.yaml" = "0.18.10"
-pygithub = "*"
+pygithub = "^2.3" # Suggested based on current stable version (Apr 2025)
 
 [tool.poetry.scripts]
 telepact-project = "telepact_project_cli.cli:main"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
