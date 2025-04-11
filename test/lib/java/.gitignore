@@ -1,5 +1,3 @@
-metrics/
-!metrics/.gitkeep
 target/
 src/gen/
 .built
