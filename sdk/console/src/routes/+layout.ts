@@ -105,10 +105,12 @@ export const load: LayoutLoad = async ({ url, params, route, fetch }) => {
 				return s.deserialize(responseBytes);
 			}
 
-			if (window.overrideAuthHeader !== undefined) {
-				return window.overrideAuthHeader(schemaSource, (a) => maybeOverrideAuthHeader(a, finish));
-			} else {
+			const fn = m.getBodyTarget();
+
+			if (fn.endsWith('_') || window.overrideAuthHeader === undefined) {
 				return maybeOverrideAuthHeader(undefined, finish);
+			} else {
+				return window.overrideAuthHeader(schemaSource, (a) => maybeOverrideAuthHeader(a, finish));
 			}
 
 
