@@ -62,7 +62,7 @@
 	let request: string | null = $derived($page.url.searchParams.get('r'));
 	
 
-	let response: string | null = $derived($responseStore);
+	let response: Promise<string> | null = $derived($responseStore);
 	
 
 	let showInternalApi: boolean = $derived($page.data.showInternalApi);
@@ -526,12 +526,30 @@
 						<div class="flex justify-between">
 							<h1 class="pb-4 text-xl font-semibold text-gray-100">Request</h1>
 							<div>
-								<button
-									type="submit"
-									onclick={thisHandleRequest}
-									class="rounded-md bg-sky-700 px-3 py-2 text-sm font-semibold text-white hover:bg-sky-600 active:bg-sky-700"
-									>Submit</button
-								>
+								{#if response}
+									{#await response}
+										<button
+											disabled
+											class="rounded-md bg-sky-600/40 px-3 py-2 text-sm font-semibold text-gray-300 cursor-not-allowed"
+										>Submit</button>
+									{:then}
+										<button
+											onclick={thisHandleRequest}
+											class="rounded-md bg-sky-700 px-3 py-2 text-sm font-semibold text-white active:bg-sky-800"
+										>Submit</button>
+									{:catch error}
+										<button
+											onclick={thisHandleRequest}
+											class="rounded-md bg-sky-700 px-3 py-2 text-sm font-semibold text-white active:bg-sky-800"
+											>Submit</button>
+									{/await}
+								{:else}
+									<button
+										onclick={thisHandleRequest}
+										class="rounded-md bg-sky-700 px-3 py-2 text-sm font-semibold text-white active:bg-sky-800"
+										>Submit</button
+									>
+								{/if}
 							</div>
 						</div>
 						{#key request}
@@ -556,8 +574,10 @@
 						<div class="flex w-full flex-col bg-zinc-700 p-6">
 							<h1 class="mb-4 text-xl font-semibold text-gray-100">Response</h1>
 							{#await response}
-								<div class="mb-4 grow">
-									<span>Loading...<span> </span></span>
+								<div class="grid h-full w-full place-content-center">
+									<div>
+										<span>Loading...<span>
+									</div>
 								</div>
 							{:then d}
 								{#key d}
@@ -572,6 +592,17 @@
 										/>
 									</div>
 								{/key}
+							{:catch error}
+								<div class="bg-red-500/20 p-4 h-full text-red-500 border border-red-700 rounded-md">
+									<div class="overflow-scroll">
+										<span>{error}</span>
+										{#if error.stack}
+											<div class="text-sm text-gray-400">
+												{error.stack}
+											</div>
+										{/if}
+									</div>
+								</div>
 							{/await}
 						</div>
 					{:else}
