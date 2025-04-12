@@ -33,6 +33,17 @@ async function selectAllCopyAndGet(page: Page, locator: Locator): Promise<string
 	return await page.evaluate(() => navigator.clipboard.readText());
 }
 
+async function ctrlClick(page: Page, locator: Locator) {
+	if (process.platform === 'darwin') {
+		await page.keyboard.down('Meta');
+	} else {
+		await page.keyboard.down('Control');
+	}
+	await locator.click();
+	await page.keyboard.up('Meta');
+	await page.keyboard.up('Control');
+}
+
 test.describe('Loading from demo server', () => {
 	test.beforeEach(async ({ page }) => {
 		await page.goto('/');
@@ -366,10 +377,9 @@ test.describe('Loading from demo server', () => {
 
 		await page.keyboard.press('Backspace');
 
-		await page.keyboard.type('[{}, {"fn.fn1": {"input1": "hello", "input2": 42}}]');
+		await page.keyboard.type('[{}, {"fn.fnA": {}}]');
 
 		await page.getByRole('button', { name: 'Submit'}).click();
-
 
 		let response2 = page.getByRole('textbox', { name: 'response'});
 	
@@ -381,6 +391,54 @@ test.describe('Loading from demo server', () => {
 	
 		expect(
 			response2PseudoJson,
+			"response should be valid json"
+		).toMatchObject([{}, {
+			"Ok_": {
+				"linkA": {
+					"fn.fn1": {
+						"input1": expect.any(String),
+						"input2": expect.any(Number)
+					}
+				}
+			}
+		}]);
+
+		let linkLocator = page.getByText('fn.fn1');
+
+		await expect(
+			linkLocator,
+			"fn.fn1 link should be visible"
+		).toBeVisible();
+
+		await ctrlClick(page, linkLocator);
+
+		await expect(page.getByRole('textbox', { name: 'response'})).not.toBeVisible();
+
+		let request2 = page.getByRole('textbox', { name: 'request'});
+		let request2Text = await selectAllCopyAndGet(page, request2.locator(".."));
+		let request2PseudoJson = JSON.parse(request2Text);
+		expect(
+			request2PseudoJson,
+			"request should be valid json"
+		).toEqual([{}, {
+			"fn.fn1": {
+				"input1": expect.any(String),
+				"input2": expect.any(Number)
+			}
+		}]);
+
+		await page.getByRole('button', { name: 'Submit'}).click();
+
+		let response3 = page.getByRole('textbox', { name: 'response'});
+	
+		let response3Text = await selectAllCopyAndGet(page, response3.locator(".."));
+	
+		let response3PseudoJson = JSON.parse(response3Text);
+
+		console.log(JSON.stringify(response3PseudoJson));
+	
+		expect(
+			response3PseudoJson,
 			"response should be valid json"
 		).toMatchObject([{}, {
 			"Ok_": {

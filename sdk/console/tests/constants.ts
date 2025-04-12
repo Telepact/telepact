@@ -32,6 +32,16 @@ export const schema = `[
     ]
   },
   {
+    "fn.fnA": {},
+    "->": [
+      {
+        "Ok_": {
+          "linkA": ["fn.fn1"]
+        }
+      }
+    ]
+  },
+  {
     "struct.Pad1": {
       "field1": ["string"],
       "field2": ["integer"]

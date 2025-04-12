@@ -26,7 +26,7 @@ export function createJsonSchema2(telepact: telepact.TelepactSchema): Record<str
 	return createJsonSchema(telepact);
 }
 
-export const responseStore: Writable<string | null> = writable(null);
+export const responseStore: Writable<Promise<string> | null> = writable(null);
 const authHeaderStore: Writable<Record<string, any> | null> = writable(null);
 
 export const stockPingRequest = `[
@@ -96,14 +96,27 @@ export function handleRequest(request: string, viewQuery: string) {
 }
 
 export function handleSubmitRequest(client: telepact.Client, request: string) {
-	let requestPseudoJson = JSON.parse(request);
-	let requestMessage = new telepact.Message(requestPseudoJson[0], requestPseudoJson[1]);
-	client
-		.request(requestMessage)
-		.then((rs: telepact.Message) => JSON.stringify([rs.headers, rs.body], null, 2))
-		.then((res) => {
-			responseStore.set(res);
-		});
+    let requestPseudoJson = JSON.parse(request);
+    let requestMessage = new telepact.Message(requestPseudoJson[0], requestPseudoJson[1]);
+
+    const startTime = Date.now();
+
+    const delayedPromise = new Promise<string>((resolve, reject) => {
+        setTimeout(async () => {
+            const originalPromise = client
+                .request(requestMessage)
+                .then((rs: telepact.Message) => JSON.stringify([rs.headers, rs.body], null, 2));
+
+			try {
+            	const response = await originalPromise;
+            	resolve(response);
+			} catch (error) {
+				reject(error);
+			}
+        }, Math.max(0, 500 - (Date.now() - startTime)));
+    });
+
+    responseStore.set(delayedPromise);
 }
 
 function lastChar(str: string) {
@@ -486,6 +499,8 @@ monaco.languages.registerLinkProvider('json', {
 	): monaco.languages.ProviderResult<monaco.languages.ILink> => {
 		// @ts-ignore
 		handleRequest(JSON.stringify([{}, JSON.parse(link.val)]));
+
+		responseStore.set(null);
 
 		return {
 			range: link.range
