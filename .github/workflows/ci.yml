@@ -356,8 +356,8 @@ jobs:
             echo "Versions up-to-date."
           fi
 
-  add-labels:
-    name: Add PR Labels
+  update-pr-labels:
+    name: Update PR Labels
     runs-on: ubuntu-latest
     needs: [start]
     timeout-minutes: 1
@@ -442,8 +442,8 @@ jobs:
         run: |
           make test
 
-  check-workflow:
-    name: Check Workflow
+  verify-workflow:
+    name: Verify Workflow
     runs-on: ubuntu-latest
     timeout-minutes: 1
     needs:
