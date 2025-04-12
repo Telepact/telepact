@@ -487,6 +487,8 @@ monaco.languages.registerLinkProvider('json', {
 		// @ts-ignore
 		handleRequest(JSON.stringify([{}, JSON.parse(link.val)]));
 
+		responseStore.set(null);
+
 		return {
 			range: link.range
 		};

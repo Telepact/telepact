@@ -21,6 +21,7 @@
 
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
+	import { beforeNavigate } from '$app/navigation';
 	import { TelepactSchema, Message, jsonSchema } from '$lib/telepact/index.esm';
 
 	import {
@@ -94,6 +95,11 @@
 
 	let exampleHeaders: Array<string> = $derived(($page.url.searchParams.get('mh') ?? '').split(','));
 	
+	beforeNavigate(({ type }) => {
+		if (type === 'popstate') {
+			$responseStore = null;
+		}
+	})
 
 	onMount(() => {
 		telepactSchemaPromise.then((e) => {
@@ -514,9 +520,7 @@
 		{#if schemaSource !== 'draft'}
 			{#if activeViews.includes('t')}
 				<div class="flex h-[calc(100vh-4em)] {getSectionClass('t', activeViews.length)}">
-					<form
-						data-sveltekit-keepfocus
-						onsubmit={preventDefault(thisHandleRequest)}
+					<div
 						class="flex w-full flex-col bg-zinc-700 p-6"
 					>
 						<div class="flex justify-between">
@@ -524,6 +528,7 @@
 							<div>
 								<button
 									type="submit"
+									onclick={thisHandleRequest}
 									class="rounded-md bg-sky-700 px-3 py-2 text-sm font-semibold text-white hover:bg-sky-600 active:bg-sky-700"
 									>Submit</button
 								>
@@ -542,7 +547,7 @@
 								/>
 							</div>
 						{/key}
-					</form>
+					</div>
 				</div>
 			{/if}
 			{#if activeViews.includes('r')}
