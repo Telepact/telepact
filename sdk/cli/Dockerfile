@@ -14,25 +14,19 @@
 #|  limitations under the License.
 #|
 
-version: '3.8'
+FROM python:3.11-slim
 
-services:
-  app:
-    build: .
-    ports:
-      - "8081:8080"
-    volumes:
-      - ./schema:/app/schema
-    environment:
-      PYTHONUNBUFFERED: 1
-      TELEPACT_DIRECTORY: /app/schema
+RUN pip install --no-cache-dir pipx
+ENV PATH="/root/.local/bin:${PATH}"
 
-  app2:
-    build: .
-    ports:
-      - "8082:8080"
-    environment:
-      PYTHONUNBUFFERED: 1
-      TELEPACT_HTTP_URL: http://app:8080/api
-      
+WORKDIR /app
 
+COPY dist/telepact_cli.tar.gz telepact_cli.tar.gz
+
+RUN pipx install telepact_cli.tar.gz
+
+USER nobody
+
+ENTRYPOINT ["telepact"]
+
+CMD ["--help"]

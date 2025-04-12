@@ -34,6 +34,11 @@ $(TAR_GZ): $(DEP_TAR_GZ) $(SRC_FILES)
 	poetry install
 	poetry build
 
+	docker build --progress=plain --no-cache -f Dockerfile -t telepact-cli:${VERSION} .
+
+	docker save telepact-cli:${VERSION} | gzip > dist/docker-image-telepact-cli-${VERSION}.tar.gz
+
+
 $(DEP_TAR_GZ):
 	$(MAKE) -C ../../lib/py
 
