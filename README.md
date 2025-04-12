@@ -10,8 +10,10 @@ For explanations of various design decisions, see [the FAQ](./doc/faq.md).
 ## At a glance
 
 Specify your API:
+```sh
+$ cat ./api/math.telepact.json
+```
 ```json
-// ./api/math.telepact.json
 [
    {
       "///": " Add two integers, `x` and `y`. ",
@@ -31,8 +33,10 @@ Specify your API:
 ```
 
 Serve it with one of the Telepact libraries over a transport of your choice:
+```sh
+$ cat ./server.py
+```
 ```py
-# ./server.py
 from telepact import TelepactSchemaFiles, TelepactSchema, Server, Message
 
 def handler(req_msg):
@@ -69,6 +73,9 @@ $ uvicorn server:app --port 8000
 ```
 
 Then tell your clients about your transport, and they can consume your API with minimal tooling:
+```
+$ cat ./client.js
+```
 ```js
 let request = [
     {},
@@ -82,7 +89,8 @@ let request = [
 var response = fetch('http://localhost:8000/api/telepact', { method: 'POST' }, JSON.stringify(request));
 console.log(`Response: ${await response.json()}`);
 ```
-```
+```sh
+$ node ./client.js
 Response: [{}, {'Ok_': {'result': 3}}]
 ```
 
