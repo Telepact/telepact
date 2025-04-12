@@ -152,7 +152,7 @@
 
 	function thisHandleRequest() {
 		if (schemaSource === 'http' && !sessionStorage.getItem('telepact-console:live-request-acknowledge')) {
-			if (!confirm('You are about to submit a request to a live server.\n\nIf you proceed, this message will be silenced for the remainder of this session.')) {
+			if (!confirm('You are about to submit a request to a live server.')) {
 				return;
 			} else {
 				sessionStorage.setItem('telepact-console:live-request-acknowledge', 'true');
