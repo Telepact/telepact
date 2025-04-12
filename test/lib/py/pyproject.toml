@@ -1,24 +1,21 @@
-[project]
+[tool.poetry]
 name = "telepacttest"
 version = "0.1.0"
 description = ""
-requires-python = ">=3.11"
-
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
-
-[tool.poetry]
 package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.11"
-build = "*"
-msgpack = "*"
-nats-py = "*"
-prometheus-client = "*"
+build = "^1.2"
+msgpack = "^1.0"
+nats-py = "^2.8"
+prometheus-client = "^0.20"
 telepact = {path = "telepact.tar.gz"}
 
 [tool.poetry.group.dev.dependencies]
-pytest = "*"
-toml = "*"
+pytest = "^8.1"
+toml = "^0.10.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

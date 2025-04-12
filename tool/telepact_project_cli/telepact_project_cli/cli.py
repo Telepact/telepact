@@ -190,7 +190,7 @@ def set_version(version: str) -> None:
     if os.path.exists("pyproject.toml"):
         with open("pyproject.toml", "r") as f:
             data = toml.load(f)
-        data["project"]["version"] = version
+        data["tool"]['poetry']["version"] = version
         with open("pyproject.toml", "w") as f:
             toml.dump(data, f)
         click.echo(f"Set pyproject.toml to version {version}")
