@@ -2,6 +2,8 @@
 name = "telepact_project_cli"
 version = "1.0.0"
 description = "A CLI tool for developing the Telepact project."
+authors = [ "Telepact Authors <telepact@googlegroups.com>",]
+license = "Apache-2.0"
 
 [tool.poetry.dependencies]
 python = "^3.11"
@@ -10,7 +12,7 @@ toml = "^0.10.2"
 lxml = "^5.3.1"
 pyyaml = "^6.0.2"
 "ruamel.yaml" = "0.18.10"
-pygithub = "^2.3" # Suggested based on current stable version (Apr 2025)
+pygithub = "^2.3"
 
 [tool.poetry.scripts]
 telepact-project = "telepact_project_cli.cli:main"

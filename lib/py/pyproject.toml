@@ -6,6 +6,7 @@ build-backend = "poetry.core.masonry.api"
 name = "telepact"
 version = "1.0.0-alpha.20"
 description = "Telepact for python"
+authors = [ "Telepact Authors <telepact@googlegroups.com>",]
 license = "Apache-2.0"
 readme = "README.md"
 classifiers = [ "Programming Language :: Python :: 3", "Programming Language :: Python :: 3.11", "License :: OSI Approved :: Apache Software License", "Operating System :: OS Independent",]
