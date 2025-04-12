@@ -53,7 +53,7 @@ def handler(req_msg):
 options = Server.Options()
 options.auth_required = False
 
-schema_files = TelepactSchema('./api')
+schema_files = TelepactSchemaFiles('./api')
 api = TelepactSchema.from_file_json_map(schema_files)
 server = Server(api, handler, options)
 
