@@ -41,6 +41,7 @@ export const ssr = false;
 declare global {
 	interface Window {
 		overrideAuthHeader: (schemaSource: string, next: (newAuthHeader: Record<string, object>) => Promise<Message>) => Promise<Message>
+		overrideDefaultSchema: () => string
 	}
 }
 
@@ -50,8 +51,10 @@ export const load: LayoutLoad = async ({ url, params, route, fetch }) => {
 	let showInternalApi = url.searchParams.get('i') === '1';
 
 	const authManaged = window.overrideAuthHeader !== undefined;
+	const overrideDefaultSchema = window.overrideDefaultSchema !== undefined;
 
 	console.log(`authManaged ${authManaged}`);
+	console.log(`overrideDefaultSchema ${overrideDefaultSchema}`);
 
 	let result: {
 		client?: Client;
@@ -60,7 +63,9 @@ export const load: LayoutLoad = async ({ url, params, route, fetch }) => {
 		schemaSource?: string;
 	} = {};
 	if (schemaSource === '') {
-		let schemaDraft = (url.searchParams.get('sd') as string) ?? '[{"info.Example":{}}]';
+		let defaultSchema = overrideDefaultSchema ? window.overrideDefaultSchema() : '[{"info.Example":{}}]';
+
+		let schemaDraft = (url.searchParams.get('sd') as string) ?? defaultSchema;
 
 		let telepactSchema = MockTelepactSchema.fromJson(schemaDraft);
 
