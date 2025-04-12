@@ -2,7 +2,8 @@
 name = "telepact_project_cli"
 version = "1.0.0"
 description = "A CLI tool for developing the Telepact project."
-package-mode = false
+authors = [ "Telepact Authors <telepact@googlegroups.com>",]
+license = "Apache-2.0"
 
 [tool.poetry.dependencies]
 python = "^3.11"
