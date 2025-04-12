@@ -36,7 +36,7 @@ from starlette.middleware.cors import CORSMiddleware
 import importlib.resources as pkg_resources
 import time
 import uvicorn
-from .telepact import Client, Server, Message, Serializer, TelepactSchema, MockTelepactSchema, MockServer, SerializationError # Added SerializationError import
+from .telepact import Client, Server, Message, Serializer, TelepactSchema, MockTelepactSchema, MockServer, SerializationError
 import asyncio
 import requests
 
