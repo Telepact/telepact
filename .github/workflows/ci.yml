@@ -447,6 +447,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 1
     needs:
+      - begin
       - build-ts
       - build-java
       - build-py
@@ -458,7 +459,7 @@ jobs:
       - check-license-header
       - check-version
       - run-tests
-    if: always()
+    if: needs.begin.result != 'skipped'
     steps:
       - name: Check build-ts
         if: needs.build-ts.result != 'success'
