@@ -113,18 +113,6 @@ clean-console-self-hosted:
 test-console-self-hosted:
 	$(MAKE) -C test/console-self-hosted test
 
-docker:
-	$(MAKE) -C sdk/docker
-
-dev-docker:
-	$(MAKE) -C sdk/docker dev
-
-test-docker:
-	$(MAKE) -C sdk/docker test
-
-clean-docker:
-	$(MAKE) -C sdk/docker clean
-
 project-cli:
 	$(MAKE) -C tool/telepact_project_cli
 

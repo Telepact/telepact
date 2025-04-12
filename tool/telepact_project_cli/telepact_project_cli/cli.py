@@ -227,8 +227,6 @@ def bump() -> None:
             release_targets.add('cli')
         if 'sdk/console' in path:
             release_targets.add('console')
-        if 'sdk/docker' in path:
-            release_targets.add('docker')
         if 'sdk/prettier' in path:
             release_targets.add('prettier')
 
@@ -238,8 +236,6 @@ def bump() -> None:
     if 'ts' in release_targets:
         release_targets.add('dart')
         release_targets.add('console')
-    if 'cli' in release_targets:
-        release_targets.add('docker')
     if 'prettier' in release_targets:
         release_targets.add('console')
 
@@ -352,7 +348,6 @@ def github_labels() -> None:
         "bind/dart": "dart",
         "sdk/cli": "cli",
         "sdk/console": "console",
-        "sdk/docker": "docker",
         "sdk/prettier": "prettier"
     }
 
@@ -430,7 +425,6 @@ def release() -> None:
         "dart": "bind/dart/dist",
         "cli": "sdk/cli/dist",
         "console": "sdk/console/dist",
-        "docker": "sdk/docker/dist",
         "prettier": "sdk/prettier/dist-tgz"
     }
 

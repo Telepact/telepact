@@ -18,14 +18,11 @@ include = "telepact_cli"
 [tool.poetry.dependencies]
 python = "^3.11"
 click = "^8.0.0"
-toml = "^0.10.2"
-lxml = "^5.3.1"
-pyyaml = "^6.0.2"
 jinja2 = "^3.1"
 msgpack = "^1.1.0"
-fastapi = "^0.68.0"
 uvicorn = "^0.15.0"
 requests = "^2.31"
+starlette = "^0.46.1"
 
 [tool.poetry.scripts]
 telepact = "telepact_cli.cli:main"

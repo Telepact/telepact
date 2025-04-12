@@ -16,6 +16,8 @@
 
 .PHONY: all dep clean
 
+VERSION := $(shell cat ../../VERSION.txt)
+
 SRC_FILES := $(shell find telepact_cli -type f)
 TAR_GZ := dist/*.tar.gz
 DEP_TAR_GZ := ../../lib/py/dist/*.tar.gz
@@ -33,6 +35,16 @@ $(TAR_GZ): $(DEP_TAR_GZ) $(SRC_FILES)
 	poetry lock
 	poetry install
 	poetry build
+
+	mkdir tmp
+	cp dist/telepact_cli-*.tar.gz tmp/telepact_cli.tar.gz
+
+	docker build --progress=plain --no-cache -f Dockerfile -t telepact-cli:${VERSION} .
+
+	rm -rf tmp
+
+	docker save telepact-cli:${VERSION} | gzip > dist/docker-image-telepact-cli-${VERSION}.tar.gz
+
 
 $(DEP_TAR_GZ):
 	$(MAKE) -C ../../lib/py

@@ -1,10 +1,10 @@
 High:
 - Clean up dangling print statements
-- Double check git urls in java pom
 - Make sure bytes type always returns as bytes from client lib interface
 
 Medium:
 - Also remove mock-internal from binary encoding like internal is omitted
+- Write tests for the cli mock and demo-server subcommands
 - Write tests that verify each type within a "link" function
 - Add backwards compatibility check to cli
 - Add http url as a Telepact source for code generation
