@@ -101,24 +101,27 @@
 		}
 	})
 
-	onMount(() => {
-		telepactSchemaPromise.then((e) => {
-			const requestJsonSchema = createJsonSchema(e);
-			monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
-				schemas: [
-					{
-						uri: 'internal://server/jsonschema-telepact.json',
-						fileMatch: ['schema.telepact.json'],
-						schema: jsonSchema
-					},
-					{
-						uri: 'internal://server/jsonschema-request.json',
-						fileMatch: ['request.json'],
-						schema: requestJsonSchema
-					}
-				]
+	$effect(() => {
+		if (telepactSchemaPromise) {
+			telepactSchemaPromise.then((e) => {
+				console.log('Reloading request json schema');
+				const requestJsonSchema = createJsonSchema(e);
+				monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
+					schemas: [
+						{
+							uri: 'internal://server/jsonschema-telepact.json',
+							fileMatch: ['schema.telepact.json'],
+							schema: jsonSchema
+						},
+						{
+							uri: 'internal://server/jsonschema-request.json',
+							fileMatch: ['request.json'],
+							schema: requestJsonSchema
+						}
+					]
+				});
 			});
-		});
+		}
 	});
 
 	type view = 's' | 'd' | 't' | 'r' | 'm';
