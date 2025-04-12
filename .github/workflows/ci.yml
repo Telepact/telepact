@@ -35,6 +35,7 @@ permissions:
 
 jobs:
   start:
+    name: Start
     runs-on: ubuntu-latest
     timeout-minutes: 1
     if: >
@@ -45,6 +46,7 @@ jobs:
         run: echo "No-op"
 
   build-ts:
+    name: Build TypeScript
     runs-on: ubuntu-latest
     needs: [start]
     timeout-minutes: 1
@@ -72,6 +74,7 @@ jobs:
           retention-days: 1
 
   build-java:
+    name: Build Java
     runs-on: ubuntu-latest
     needs: [start]
     timeout-minutes: 1
@@ -116,6 +119,7 @@ jobs:
           retention-days: 1
 
   build-py:
+    name: Build Python
     runs-on: ubuntu-latest
     needs: [start]
     timeout-minutes: 1
@@ -137,6 +141,7 @@ jobs:
           retention-days: 1
 
   build-cli:
+    name: Build CLI
     runs-on: ubuntu-latest
     timeout-minutes: 1
     needs: [build-py]
@@ -164,6 +169,7 @@ jobs:
           retention-days: 1
 
   build-dart:
+    name: Build Dart
     runs-on: ubuntu-latest
     timeout-minutes: 2
     needs: [build-ts]
@@ -201,6 +207,7 @@ jobs:
           retention-days: 1
 
   build-prettier:
+    name: Build Prettier Plugin
     runs-on: ubuntu-latest
     needs: [start]
     timeout-minutes: 1
@@ -226,8 +233,9 @@ jobs:
           retention-days: 1
 
   build-console:
+    name: Build Console
     runs-on: ubuntu-latest
-    timeout-minutes: 2
+    timeout-minutes: 3
     needs: [build-ts, build-cli, build-prettier]
     steps:
       - name: Checkout code
@@ -277,6 +285,7 @@ jobs:
           retention-days: 1
   
   test-console-self-host:
+    name: Test Self-Hosted Console
     runs-on: ubuntu-latest
     timeout-minutes: 2
     needs: [build-console]
@@ -300,6 +309,7 @@ jobs:
         run: make test-console-self-hosted
 
   check-license-header:
+    name: Check License Header
     runs-on: ubuntu-latest
     needs: [start]
     timeout-minutes: 1
@@ -323,6 +333,7 @@ jobs:
           fi
 
   check-version:
+    name: Check Versions
     runs-on: ubuntu-latest
     needs: [start]
     timeout-minutes: 1
@@ -346,6 +357,7 @@ jobs:
           fi
 
   add-labels:
+    name: Add PR Labels
     runs-on: ubuntu-latest
     needs: [start]
     timeout-minutes: 1
@@ -369,6 +381,7 @@ jobs:
         run: telepact-project github-labels
 
   run-tests:
+    name: Test
     runs-on: ubuntu-latest
     timeout-minutes: 5
     needs: [build-ts, build-java, build-py, build-cli]
@@ -429,7 +442,8 @@ jobs:
         run: |
           make test
 
-  finish:
+  check-workflow:
+    name: Check Workflow
     runs-on: ubuntu-latest
     timeout-minutes: 1
     needs:
@@ -440,11 +454,56 @@ jobs:
       - build-dart
       - build-prettier
       - build-console
+      - test-console-self-host
       - check-license-header
       - check-version
       - run-tests
-      - test-console-self-host
+    if: always()
     steps:
+      - name: Check build-ts
+        if: needs.build-ts.result != 'success'
+        run: exit 1
+
+      - name: Check build-java
+        if: needs.build-java.result != 'success'
+        run: exit 1
+
+      - name: Check build-py
+        if: needs.build-py.result != 'success'
+        run: exit 1
+
+      - name: Check build-cli
+        if: needs.build-cli.result != 'success'
+        run: exit 1
+
+      - name: Check build-dart
+        if: needs.build-dart.result != 'success'
+        run: exit 1
+
+      - name: Check build-prettier
+        if: needs.build-prettier.result != 'success'
+        run: exit 1
+
+      - name: Check build-console
+        if: needs.build-console.result != 'success'
+        run: exit 1
+
+      - name: Check test-console-self-host
+        if: needs.test-console-self-host.result != 'success'
+        run: exit 1
+
+      - name: Check check-license-header
+        if: needs.check-license-header.result != 'success'
+        run: exit 1
+
+      - name: Check check-version
+        if: needs.check-version.result != 'success'
+        run: exit 1
+
+      - name: Check run-tests
+        if: needs.run-tests.result != 'success'
+        run: exit 1
+
       - name: Checkout code
         uses: actions/checkout@v4
 
