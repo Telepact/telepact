@@ -21,7 +21,7 @@ ENV PATH="/root/.local/bin:${PATH}"
 
 WORKDIR /app
 
-COPY dist/telepact_cli.tar.gz telepact_cli.tar.gz
+COPY tmp/telepact_cli.tar.gz telepact_cli.tar.gz
 
 RUN pipx install telepact_cli.tar.gz
 
