@@ -341,8 +341,14 @@ test.describe('Loading from demo server', () => {
 		await expect(page.getByRole('heading', { name: 'Response'})).not.toBeVisible();
 
 		await expect(page.getByRole('button', {name: 'Toggle Results', pressed: false})).toBeVisible();
+
+		let promptCount = 0;
+		page.on('dialog', async dialog => {
+			promptCount += 1;
+			await dialog.accept();
+		});
 		
-		await page.getByRole('button', { name: 'Submit'}).click();
+		await page.getByRole('button', { name: 'Submit (live)'}).click();
 
 		await expect(page.getByRole('heading', { name: 'Response'})).toBeVisible();
 
@@ -379,7 +385,7 @@ test.describe('Loading from demo server', () => {
 
 		await page.keyboard.type('[{}, {"fn.fnA": {}}]');
 
-		await page.getByRole('button', { name: 'Submit'}).click();
+		await page.getByRole('button', { name: 'Submit (live)'}).click();
 
 		let response2 = page.getByRole('textbox', { name: 'response'});
 	
@@ -427,7 +433,7 @@ test.describe('Loading from demo server', () => {
 			}
 		}]);
 
-		await page.getByRole('button', { name: 'Submit'}).click();
+		await page.getByRole('button', { name: 'Submit (live)'}).click();
 
 		let response3 = page.getByRole('textbox', { name: 'response'});
 	
@@ -453,7 +459,9 @@ test.describe('Loading from demo server', () => {
 				}
 			]
 		}
-		}]);		
+		}]);
+
+		expect(promptCount).toBe(1);
 	});
 	
 });
