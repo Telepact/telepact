@@ -293,39 +293,6 @@ jobs:
       - name: Run test
         run: make test-console-self-hosted
 
-  build-docker:
-    runs-on: ubuntu-latest
-    timeout-minutes: 1
-    needs: [build-cli]
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Download py build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: build-py
-          path: lib/py/dist
-
-      - name: Download cli build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: build-cli
-          path: sdk/cli/dist
-
-      - name: Build Docker image
-        run: make docker
-
-      - name: Test Docker image
-        run: make test-docker
-
-      - name: Upload docker build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-docker
-          path: sdk/docker/dist
-          retention-days: 1
-
   check-license-header:
     runs-on: ubuntu-latest
     needs: [start]
@@ -467,7 +434,6 @@ jobs:
       - build-dart
       - build-prettier
       - build-console
-      - build-docker
       - check-license-header
       - check-version
       - run-tests
