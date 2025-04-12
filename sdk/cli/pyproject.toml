@@ -1,24 +1,18 @@
+[build-system]
+requires = [ "poetry-core>=1.0.0",]
+build-backend = "poetry.core.masonry.api"
+
 [tool.poetry]
 name = "telepact_cli"
 version = "1.0.0-alpha.19"
 description = "A CLI tool for various local Telepact operations."
 readme = "README.md"
 license = "Apache-2.0"
-keywords = ["cli", "telepact"]
-classifiers = [
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.11",
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: OS Independent",
-    "Topic :: Utilities",
-]
-include = [
-    "telepact_cli/telepact/**/*",
-]
-
-packages = [
-    { include = "telepact_cli" }
-]
+keywords = [ "cli", "telepact",]
+classifiers = [ "Programming Language :: Python :: 3", "Programming Language :: Python :: 3.11", "License :: OSI Approved :: MIT License", "Operating System :: OS Independent", "Topic :: Utilities",]
+include = [ "telepact_cli/telepact/**/*",]
+[[tool.poetry.packages]]
+include = "telepact_cli"
 
 [tool.poetry.dependencies]
 python = "^3.11"
@@ -32,12 +26,8 @@ fastapi = "^0.68.0"
 uvicorn = "^0.15.0"
 requests = "^2.31"
 
-[tool.poetry.group.dev.dependencies]
-pytest = "^8.1"
-
 [tool.poetry.scripts]
 telepact = "telepact_cli.cli:main"
 
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.1"

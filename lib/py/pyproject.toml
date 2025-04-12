@@ -1,24 +1,17 @@
+[build-system]
+requires = [ "poetry-core>=1.0.0",]
+build-backend = "poetry.core.masonry.api"
+
 [tool.poetry]
 name = "telepact"
 version = "1.0.0-alpha.19"
 description = "Telepact for python"
 license = "Apache-2.0"
 readme = "README.md"
-classifiers = [
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.11",
-    "License :: OSI Approved :: Apache Software License",
-    "Operating System :: OS Independent",
-]
-include = [
-    "telepact/json/*",
-    "telepact/LICENSE",
-    "telepact/NOTICE",
-]
-
-packages = [
-    { include = "telepact" }
-]
+classifiers = [ "Programming Language :: Python :: 3", "Programming Language :: Python :: 3.11", "License :: OSI Approved :: Apache Software License", "Operating System :: OS Independent",]
+include = [ "telepact/json/*", "telepact/LICENSE", "telepact/NOTICE",]
+[[tool.poetry.packages]]
+include = "telepact"
 
 [tool.poetry.dependencies]
 python = "^3.11"
@@ -30,7 +23,3 @@ prometheus-client = "^0.20"
 mypy = "^1.10"
 build = "^1.2"
 toml = "^0.10.2"
-
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
