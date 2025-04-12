@@ -1,25 +1,6 @@
-#|
-#|  Copyright The Telepact Authors
-#|
-#|  Licensed under the Apache License, Version 2.0 (the "License");
-#|  you may not use this file except in compliance with the License.
-#|  You may obtain a copy of the License at
-#|
-#|  https://www.apache.org/licenses/LICENSE-2.0
-#|
-#|  Unless required by applicable law or agreed to in writing, software
-#|  distributed under the License is distributed on an "AS IS" BASIS,
-#|  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#|  See the License for the specific language governing permissions and
-#|  limitations under the License.
-#|
-
 import click
 import os
-from lxml import etree as ET
 import json
-import toml
-import yaml
 import argparse
 import json
 import shutil
@@ -28,14 +9,18 @@ import jinja2
 import click
 from pathlib import Path
 import re
-from fastapi import FastAPI, Query, Request
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import Response
+from starlette.applications import Starlette
+from starlette.requests import Request
+from starlette.responses import Response
+from starlette.routing import Route
+from starlette.middleware import Middleware
+from starlette.middleware.cors import CORSMiddleware
+
+
 import importlib.resources as pkg_resources
 import time
 import uvicorn
-from .telepact import Client, Server, Message, Serializer, TelepactSchema, MockTelepactSchema, MockServer
-import pprint
+from .telepact import Client, Server, Message, Serializer, TelepactSchema, MockTelepactSchema, MockServer, SerializationError # Added SerializationError import
 import asyncio
 import requests
 
@@ -80,7 +65,7 @@ def codegen(schema_dir: str, lang: str, out: str, package: str) -> None:
 
     schema_data: list[dict[str, object]] = cast(
         list[dict[str, object]], telepact_schema.original)
-    
+
     select = telepact_schema.parsed['_ext.Select_']
     possible_fn_selects = select.possible_selects
     possible_fn_selects.pop('fn.ping_', None)
@@ -179,7 +164,7 @@ def _generate_internal(schema_data: list[dict[str, object]], possible_fn_selects
 
         _write_java_file('typed_message.j2', {
                          'package': java_package}, f"TypedMessage_.java")
-        
+
         _write_java_file('java_select.j2', {'package': java_package, 'possible_fn_selects': possible_fn_selects}, f"Select_.java")
 
     elif target == 'py':
@@ -272,18 +257,11 @@ def _generate_internal(schema_data: list[dict[str, object]], possible_fn_selects
 
 @click.command()
 def demo_server() -> None:
-    app = FastAPI()
-
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=["*"],
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
+    global_variables: dict[str, float] = {}
+    global_computations: list[dict[str, object]] = []
 
     async def handler(message: Message) -> Message:
-        global global_variables
+        nonlocal global_variables, global_computations
         function_name = next(iter(message.body.keys()))
         arguments: dict[str, object] = cast(
             dict[str, object], message.body[function_name])
@@ -329,14 +307,11 @@ def demo_server() -> None:
 
         elif function_name == 'fn.saveVariables':
             these_variables = cast(dict[str, float], arguments['variables'])
-
             global_variables.update(these_variables)
-
             return Message({}, {'Ok_': {}})
 
         elif function_name == 'fn.exportVariables':
             limit = cast(int, arguments.get('limit', 10))
-
             variables = [{"name": k, "value": v}
                          for k, v in global_variables.items()]
             if limit:
@@ -344,15 +319,14 @@ def demo_server() -> None:
             return Message({}, {'Ok_': {"variables": variables}})
 
         elif function_name == 'fn.getPaperTape':
-            # Assuming computations are stored in a global list
             return Message({}, {'Ok_': {"tape": global_computations}})
 
         elif function_name == 'fn.showExample':
             return Message({}, {'Ok_': {'link': {'fn.compute': {'x': {'Constant': {'value': 5}}, 'y': {'Constant': {'value': 7}}, 'op': {'Add': {}}}}}})
 
-        raise Exception("Invalid function")
+        raise Exception(f"Invalid function: {function_name}")
 
-    # Load json from file
+
     with pkg_resources.open_text('telepact_cli', 'calculator.telepact.json') as file:
         telepact_json = file.read()
 
@@ -360,28 +334,32 @@ def demo_server() -> None:
 
     server_options = Server.Options()
     server_options.auth_required = False
-    server = Server(telepact_schema, handler, server_options)
+    telepact_server = Server(telepact_schema, handler, server_options)
 
     print('Server defined')
 
-    global_variables: dict[str, float] = {}
-    global_computations: list[dict[str, object]] = []
-
-    @app.post('/api')
-    async def api(request: Request) -> Response:
+    async def api_endpoint(request: Request) -> Response:
         request_bytes = await request.body()
-
         print(f'Request: {request_bytes}')
 
-        response_bytes: bytes = await server.process(request_bytes)
-
+        # Use the pre-configured telepact_server instance
+        response_bytes: bytes = await telepact_server.process(request_bytes)
         print(f'Response: {response_bytes}')
 
-        media_type = 'application/octet-stream' if response_bytes[0] == 0x92 else 'application/json'
-
+        media_type = 'application/octet-stream' if response_bytes and response_bytes[0] == 0x92 else 'application/json'
         print(f'Media type: {media_type}')
 
         return Response(content=response_bytes, media_type=media_type)
+
+    routes = [
+        Route('/api', endpoint=api_endpoint, methods=['POST']),
+    ]
+
+    middleware = [
+        Middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
+    ]
+
+    app = Starlette(routes=routes, middleware=middleware)
 
     uvicorn.run(app, host='0.0.0.0', port=8000)
 
@@ -397,16 +375,9 @@ def mock(http_url: str, dir: str, generated_collection_length_min: int, generate
     print(f'dir: {dir}')
     print(f'generated_collection_length_min: {generated_collection_length_min}')
     print(f'generated_collection_length_max: {generated_collection_length_max}')
-    app = FastAPI()
 
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=["*"],
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
 
+    schema: MockTelepactSchema
     if http_url:
         url: str = http_url
 
@@ -414,32 +385,66 @@ def mock(http_url: str, dir: str, generated_collection_length_min: int, generate
             try:
                 request_bytes = s.serialize(m)
             except SerializationError as e:
-                if isinstance(e.__context__, OverflowError):
-                    return Message({"numberTooBig": True}, {"ErrorUnknown_": {}})
+                # Handle potential serialization errors (e.g., number overflow)
+                if isinstance(e.__cause__, OverflowError):
+                    # Example: Return a specific Telepact error message
+                    # Adjust the error format based on your Telepact schema
+                    return Message({}, {"ErrorUnknown_": {"detail": "Input number too large for serialization"}})
                 else:
-                    raise
+                    # Re-raise other serialization errors
+                     return Message({}, {"ErrorUnknown_": {"detail": f"Serialization Error: {e}"}})
 
-            response = requests.post(url, data=request_bytes)
-            response_bytes = response.content
-            response_message = s.deserialize(response_bytes)
-            return response_message
+
+            try:
+                 # Use a timeout for the request
+                response = requests.post(url, data=request_bytes, timeout=10) # 10 second timeout
+                response.raise_for_status() # Raise an exception for bad status codes (4xx or 5xx)
+                response_bytes = response.content
+                response_message = s.deserialize(response_bytes)
+                return response_message
+            except requests.exceptions.RequestException as e:
+                print(f"Error connecting to upstream API: {e}")
+                 # Return an appropriate Telepact error message
+                 # Adjust the error format based on your Telepact schema
+                return Message({}, {"ErrorUpstreamUnavailable_": {"url": url, "error": str(e)}})
+            except Exception as e: # Catch potential deserialization errors too
+                 print(f"Error processing upstream response: {e}")
+                 return Message({}, {"ErrorUnknown_": {"detail": f"Upstream response processing error: {e}"}})
+
 
         options = Client.Options()
         telepact_client = Client(adapter, options)
 
         retries = 3
+        response_message = None
         for attempt in range(retries):
             try:
+                # Ensure the async function is run correctly
                 response_message = asyncio.run(telepact_client.request(Message({}, {'fn.api_': {}})))
-                break
-            except Exception as e:
-                if attempt < retries - 1:
-                    time.sleep(1)
+                if 'Ok_' in response_message.body or 'Error' in next(iter(response_message.body.keys()), ""): # Check for valid Telepact response structure
+                    break
                 else:
-                    raise e
+                     print(f"Attempt {attempt+1}: Received unexpected response structure: {response_message.body}")
+                     if attempt < retries - 1: time.sleep(1)
+
+            except Exception as e:
+                print(f"Attempt {attempt+1} failed: {e}")
+                if attempt < retries - 1:
+                    time.sleep(1) # Wait before retrying
+                else:
+                    # If all retries fail, raise a clearer error
+                    raise ConnectionError(f"Failed to connect to Telepact API at {url} after {retries} attempts.") from e
+
+        # Check if we successfully got a response
+        if response_message is None:
+             raise Exception(f"Could not retrieve API schema from {url}. No valid response received.")
 
         if 'Ok_' not in response_message.body:
-            raise Exception("Invalid url: " + str(response_message))
+            # Provide more context on failure
+            error_key = next(iter(response_message.body.keys()), "UnknownError")
+            error_details = response_message.body.get(error_key, {})
+            raise Exception(f"Failed to fetch API schema from {url}. Server responded with error: {error_key} - {error_details}")
+
         api = cast(dict[str, object], response_message.body['Ok_'])['api']
         api_json = json.dumps(api)
         schema = MockTelepactSchema.from_json(api_json)
@@ -449,21 +454,31 @@ def mock(http_url: str, dir: str, generated_collection_length_min: int, generate
     else:
         raise click.BadParameter('Either --http-url or --dir must be provided.')
 
-    print('telepact JSON:')
-    print(json.dumps(schema.original, indent=4))
+    print('Telepact JSON loaded for mock server:')
+    # print(json.dumps(schema.original, indent=4)) # Optionally print the schema
 
     mock_server_options = MockServer.Options()
     mock_server_options.generated_collection_length_min = generated_collection_length_min
     mock_server_options.generated_collection_length_max = generated_collection_length_max
     mock_server = MockServer(schema, mock_server_options)
 
-    @app.post('/api')
-    async def api(request: Request) -> Response:
+    async def mock_api_endpoint(request: Request) -> Response:
         request_bytes = await request.body()
         response_bytes = await mock_server.process(request_bytes)
-        media_type = 'application/octet-stream' if response_bytes[0] == 0x92 else 'application/json'
+        media_type = 'application/octet-stream' if response_bytes and response_bytes[0] == 0x92 else 'application/json'
         return Response(content=response_bytes, media_type=media_type)
 
+    routes = [
+        Route('/api', endpoint=mock_api_endpoint, methods=['POST']),
+    ]
+
+    middleware = [
+        Middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
+    ]
+
+    app = Starlette(routes=routes, middleware=middleware)
+
+    print(f"Starting mock server on port {port}...")
     uvicorn.run(app, host='0.0.0.0', port=port)
 
 main.add_command(codegen)
