@@ -342,7 +342,9 @@ test.describe('Loading from demo server', () => {
 
 		await expect(page.getByRole('button', {name: 'Toggle Results', pressed: false})).toBeVisible();
 
+		let promptCount = 0;
 		page.on('dialog', async dialog => {
+			promptCount += 1;
 			await dialog.accept();
 		});
 		
@@ -457,7 +459,9 @@ test.describe('Loading from demo server', () => {
 				}
 			]
 		}
-		}]);		
+		}]);
+
+		expect(promptCount).toBe(1);
 	});
 	
 });
