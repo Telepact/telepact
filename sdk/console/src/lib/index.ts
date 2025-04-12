@@ -511,6 +511,7 @@ monaco.languages.registerLinkProvider('json', {
 	}
 });
 
+// TODO: Consider if a source map would help links
 function generateJsonSourceMap(jsonString: string): any[] {
 	const sourceMap: any[] = [];
 	let path: (string | number)[] = [];
