@@ -97,14 +97,6 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           run-id: ${{ github.event.inputs.artifacts_run_id }}
 
-      - name: Download docker artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: build-docker
-          path: sdk/docker/dist
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          run-id: ${{ github.event.inputs.artifacts_run_id }}
-
       - name: Install Project CLI
         run: make install-project-cli
 
