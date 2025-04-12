@@ -54,6 +54,8 @@
 	
 
 	let schemaSource: string = $derived($page.data.schemaSource);
+
+	let submitString: string = $derived(schemaSource === 'draft' ? 'Submit (mock)' : 'Submit (live)');
 	
 
 	let schemaSourceReadOnly: boolean = $derived($page.data.readonlyEditor);
@@ -149,6 +151,14 @@
 	}
 
 	function thisHandleRequest() {
+		if (schemaSource === 'http' && !sessionStorage.getItem('telepact-console:live-request-acknowledge')) {
+			if (!confirm('You are about to submit a request to a live server.\n\nIf you proceed, this message will be silenced for the remainder of this session.')) {
+				return;
+			} else {
+				sessionStorage.setItem('telepact-console:live-request-acknowledge', 'true');
+			}
+		}
+
 		let request = requestEditor.getContent();
 		handleRequest(request, 'tr');
 		handleSubmitRequest($page.data.client, request);
@@ -341,41 +351,39 @@
 						<MockIcon />
 					</button>
 				</div>
-				{#if schemaSource !== 'draft'}
-					<div class="inline-flex rounded-md">
-						<button
-							aria-label="Toggle Terminal"
-							aria-pressed={activeViews.includes('t')}
-							onclick={toggleTerminal}
-							class="rounded-s-md p-2 {activeViews.includes('t')
-								? 'bg-emerald-900 text-green-300'
-								: 'bg-slate-700 text-gray-200'}"
+				<div class="inline-flex rounded-md">
+					<button
+						aria-label="Toggle Terminal"
+						aria-pressed={activeViews.includes('t')}
+						onclick={toggleTerminal}
+						class="rounded-s-md p-2 {activeViews.includes('t')
+							? 'bg-emerald-900 text-green-300'
+							: 'bg-slate-700 text-gray-200'}"
+					>
+						<TerminalIcon />
+					</button>
+					<button
+						aria-label="Toggle Results"
+						aria-pressed={activeViews.includes('r')}
+						onclick={toggleResults}
+						class="rounded-e-md p-2 {activeViews.includes('r')
+							? 'bg-emerald-900 text-green-300'
+							: 'bg-slate-700 text-gray-200'}"
+					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke-width="1.5"
+							stroke="currentColor"
+							class="h-6 w-6"
 						>
-							<TerminalIcon />
-						</button>
-						<button
-							aria-label="Toggle Results"
-							aria-pressed={activeViews.includes('r')}
-							onclick={toggleResults}
-							class="rounded-e-md p-2 {activeViews.includes('r')
-								? 'bg-emerald-900 text-green-300'
-								: 'bg-slate-700 text-gray-200'}"
-						>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								fill="none"
-								viewBox="0 0 24 24"
-								stroke-width="1.5"
-								stroke="currentColor"
-								class="h-6 w-6"
-							>
-								<path
-									d="M 22 15 L 22 6 M 22 6 L 2 6 L 2 15 M 5 12 L 19 12 M 17 12 L 17 22 L 7 22 L 7 12 M 2 15 L 7 15 M 17 15 L 22 15 M 7 6 L 7 2 L 17 2 L 17 6 M 20 8 L 19 8 L 19 9 L 20 9 M 10 15 L 14 15 M 10 18 L 14 18 Z"
-								/>
-							</svg>
-						</button>
-					</div>
-				{/if}
+							<path
+								d="M 22 15 L 22 6 M 22 6 L 2 6 L 2 15 M 5 12 L 19 12 M 17 12 L 17 22 L 7 22 L 7 12 M 2 15 L 7 15 M 17 15 L 22 15 M 7 6 L 7 2 L 17 2 L 17 6 M 20 8 L 19 8 L 19 9 L 20 9 M 10 15 L 14 15 M 10 18 L 14 18 Z"
+							/>
+						</svg>
+					</button>
+				</div>
 			</div>
 			<div class="flex basis-1/3 justify-end">
 				<form class="flex space-x-2" onsubmit={preventDefault(handleSourceGet)}>
@@ -520,7 +528,6 @@
 		{:catch error}
 			<span>failed to get schema</span>
 		{/await}
-		{#if schemaSource !== 'draft'}
 			{#if activeViews.includes('t')}
 				<div class="flex h-[calc(100vh-4em)] {getSectionClass('t', activeViews.length)}">
 					<div
@@ -534,23 +541,23 @@
 										<button
 											disabled
 											class="rounded-md bg-sky-600/40 px-3 py-2 text-sm font-semibold text-gray-300 cursor-not-allowed"
-										>Submit</button>
+										>{submitString}</button>
 									{:then}
 										<button
 											onclick={thisHandleRequest}
 											class="rounded-md bg-sky-700 px-3 py-2 text-sm font-semibold text-white active:bg-sky-800"
-										>Submit</button>
+										>{submitString}</button>
 									{:catch error}
 										<button
 											onclick={thisHandleRequest}
 											class="rounded-md bg-sky-700 px-3 py-2 text-sm font-semibold text-white active:bg-sky-800"
-											>Submit</button>
+											>{submitString}</button>
 									{/await}
 								{:else}
 									<button
 										onclick={thisHandleRequest}
 										class="rounded-md bg-sky-700 px-3 py-2 text-sm font-semibold text-white active:bg-sky-800"
-										>Submit</button
+										>{submitString}</button
 									>
 								{/if}
 							</div>
@@ -617,7 +624,6 @@
 					{/if}
 				</div>
 			{/if}
-		{/if}
 		{@render children?.()}
 	</main>
 </div>
