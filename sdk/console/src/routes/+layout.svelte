@@ -395,7 +395,7 @@
 					</div>
 					<button
 						type="submit"
-						class="rounded-md bg-sky-700 px-3 py-2 text-sm font-semibold text-white hover:bg-sky-600 active:bg-sky-700"
+						class="rounded-md bg-sky-700 px-3 py-2 text-sm font-semibold text-white active:bg-sky-800"
 						>Load</button
 					>
 				</form>
