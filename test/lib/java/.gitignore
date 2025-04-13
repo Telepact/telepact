@@ -2,3 +2,5 @@ target/
 src/gen/
 .built
 .m2/
+metrics/*
+!metrics/*load*

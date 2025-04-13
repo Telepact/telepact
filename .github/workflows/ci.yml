@@ -459,7 +459,7 @@ jobs:
       - check-license-header
       - check-version
       - run-tests
-    if: needs.begin.result != 'skipped'
+    if: needs.begin.result == 'success'
     steps:
       - name: Check build-ts
         if: needs.build-ts.result != 'success'
