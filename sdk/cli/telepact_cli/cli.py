@@ -350,6 +350,7 @@ def demo_server() -> None:
 
     server_options = Server.Options()
     server_options.auth_required = False
+    server_options.on_error = lambda e: print(e)
     telepact_server = Server(telepact_schema, handler, server_options)
 
     print('Server defined')

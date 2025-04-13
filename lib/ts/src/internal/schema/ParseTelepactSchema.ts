@@ -48,6 +48,8 @@ export function parseTelepactSchema(telepactSchemaDocumentNamesToJson: Record<st
 
     const telepactSchemaDocumentNamesToPseudoJson: Record<string, any[]> = {};
 
+    console.log(`telepactDocuments: ${JSON.stringify(telepactSchemaDocumentNamesToJson)}`)
+
     for (const [documentName, jsonValue] of Object.entries(telepactSchemaDocumentNamesToJson)) {
         let telepactSchemaPseudoJsonInit: any;
         try {

@@ -19,7 +19,6 @@ from ...internal.validation.ValidationFailure import ValidationFailure
 
 if TYPE_CHECKING:
     from ..types.TFieldDeclaration import TFieldDeclaration
-    from ..types.TFn import TFn
 
 
 def validate_headers(headers: dict[str, object], parsed_request_headers: dict[str, 'TFieldDeclaration'], function_name: str) -> list['ValidationFailure']:

@@ -17,7 +17,6 @@
 from typing import TYPE_CHECKING, cast
 
 from .types.TArray import TArray
-from .types.TFn import TFn
 from .types.TObject import TObject
 from .types.TStruct import TStruct
 from .types.TUnion import TUnion
