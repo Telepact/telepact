@@ -37,8 +37,10 @@ def get_or_parse_type(path: list[object], type_name: str, ctx: 'ParseContext') -
     from ..types.TMockCall import TMockCall
     from ..types.TMockStub import TMockStub
     from ..types.TSelect import TSelect
+    from ..types.TUnion import TUnion
     from ..types.TAny import TAny
-    from ...internal.schema.ParseFunctionType import parse_function_type
+    from ...internal.schema.ParseFunctionType import parse_function_result_type
+    from ...internal.schema.ParseFunctionType import parse_function_errors_regex
     from ...internal.schema.ParseStructType import parse_struct_type
     from ...internal.schema.ParseUnionType import parse_union_type
 
@@ -97,8 +99,34 @@ def get_or_parse_type(path: list[object], type_name: str, ctx: 'ParseContext') -
             type = parse_union_type(this_path, definition, custom_type_name, [], [],
                                     ctx.copy(document_name=this_document_name))
         elif custom_type_name.startswith("fn"):
-            type = parse_function_type(this_path, definition, custom_type_name,
-                                       ctx.copy(document_name=this_document_name))
+            arg_type = parse_struct_type(path, definition,
+                                        custom_type_name, ["->", "_errors"],
+                                        ctx.copy(document_name=this_document_name))
+            type = TUnion(custom_type_name, {custom_type_name: arg_type}, {
+                            custom_type_name: 0})
+
+            # Redundant, but need to save early to short-circuit circular refs
+            ctx.parsed_types[custom_type_name] = type
+
+            if ctx.top_level:
+                result_type = parse_function_result_type(
+                    this_path,
+                    definition,
+                    custom_type_name,
+                    ctx.copy(document_name=this_document_name)
+                )
+
+                ctx.parsed_types[custom_type_name + '.->'] = result_type
+
+                errors_regex = parse_function_errors_regex(
+                    this_path,
+                    definition,
+                    custom_type_name,
+                    ctx.copy(document_name=this_document_name)
+                )
+
+                ctx.fn_error_regexes[custom_type_name] = errors_regex
+
         else:
             possible_type_extension = {
                 '_ext.Select_': TSelect(),

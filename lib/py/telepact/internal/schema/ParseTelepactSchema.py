@@ -48,6 +48,7 @@ def parse_vers_api_schema(
 
     original_schema: dict[str, object] = {}
     parsed_types: dict[str, TType] = {}
+    fn_error_regexes: dict[str, str] = {}
     parse_failures: list[SchemaParseFailure] = []
     failed_types: set[str] = set()
     schema_keys_to_document_names: dict[str, str] = {}
@@ -158,8 +159,10 @@ def parse_vers_api_schema(
                     schema_keys_to_document_names,
                     schema_keys_to_index,
                     parsed_types,
+                    fn_error_regexes,
                     parse_failures,
-                    failed_types
+                    failed_types,
+                    True
                 )
             )
         except TelepactSchemaParseError as e:
@@ -191,8 +194,10 @@ def parse_vers_api_schema(
                     schema_keys_to_document_names,
                     schema_keys_to_index,
                     parsed_types,
+                    fn_error_regexes,
                     parse_failures,
-                    failed_types
+                    failed_types,
+                    True
                 )
             )
             errors.append(error)
@@ -216,7 +221,7 @@ def parse_vers_api_schema(
     for error in errors:
         try:
             apply_error_to_parsed_types(
-                error, parsed_types, schema_keys_to_document_names, schema_keys_to_index, telepact_schema_document_names_to_json)
+                error, parsed_types, schema_keys_to_document_names, schema_keys_to_index, telepact_schema_document_names_to_json, fn_error_regexes)
         except TelepactSchemaParseError as e:
             parse_failures.extend(e.schema_parse_failures)
 
@@ -241,8 +246,10 @@ def parse_vers_api_schema(
                     schema_keys_to_document_names,
                     schema_keys_to_index,
                     parsed_types,
+                    fn_error_regexes,
                     parse_failures,
-                    failed_types
+                    failed_types,
+                    True
                 )
             )
             headers.append(header_type)

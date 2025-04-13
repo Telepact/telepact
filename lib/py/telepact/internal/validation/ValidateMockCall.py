@@ -26,7 +26,7 @@ if TYPE_CHECKING:
 
 def validate_mock_call(given_obj: object, types: dict[str, 'TType'], ctx: 'ValidateContext') -> list['ValidationFailure']:
     from ...internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
-    from ..types.TFn import TFn
+    from ..types.TUnion import TUnion
 
     if not isinstance(given_obj, dict):
         return get_type_unexpected_validation_failure([], given_obj, "Object")
@@ -43,11 +43,11 @@ def validate_mock_call(given_obj: object, types: dict[str, 'TType'], ctx: 'Valid
                                   {"regex": regex_string, "actual": len(matches), "expected": 1, "keys": keys})]
 
     function_name = matches[0]
-    function_def = cast(TFn, types[function_name])
+    function_def = cast(TUnion, types[function_name])
     input = given_map[function_name]
 
-    function_def_call = function_def.call
-    function_def_name = function_def.name
+    function_def_call = function_def
+    function_def_name = function_name
     function_def_call_tags = function_def_call.tags
 
     input_failures = function_def_call_tags[function_def_name].validate(

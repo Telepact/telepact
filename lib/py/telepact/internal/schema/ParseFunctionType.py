@@ -19,17 +19,16 @@ from ...internal.schema.DerivePossibleSelects import derive_possible_select
 from ...internal.schema.GetOrParseType import get_or_parse_type
 from ...internal.schema.SchemaParseFailure import SchemaParseFailure
 from ..types.TSelect import TSelect
-from ..types.TFn import TFn
 
 if TYPE_CHECKING:
     from ...internal.schema.ParseContext import ParseContext
     from ..types.TType import TType
+    from ..types.TUnion import TUnion
 
 
-def parse_function_type(path: list[object], function_definition_as_parsed_json: dict[str, object],
+def parse_function_result_type(path: list[object], function_definition_as_parsed_json: dict[str, object],
                         schema_key: str,
-                        ctx: 'ParseContext') -> 'TFn':
-    from ...internal.schema.GetTypeUnexpectedParseFailure import get_type_unexpected_parse_failure
+                        ctx: 'ParseContext') -> 'TUnion':
     from ...internal.schema.ParseStructType import parse_struct_type
     from ...internal.schema.ParseUnionType import parse_union_type
     from ...internal.schema.ParseUnionType import parse_union_type
@@ -38,16 +37,6 @@ def parse_function_type(path: list[object], function_definition_as_parsed_json: 
     from ..types.TUnion import TUnion
 
     parse_failures = []
-
-    call_type = None
-    try:
-        arg_type = parse_struct_type(path, function_definition_as_parsed_json,
-                                     schema_key, ["->", "_errors"],
-                                     ctx)
-        call_type = TUnion(schema_key, {schema_key: arg_type}, {
-                           schema_key: 0})
-    except TelepactSchemaParseError as e:
-        parse_failures.extend(e.schema_parse_failures)
 
     result_schema_key = "->"
 
@@ -64,11 +53,30 @@ def parse_function_type(path: list[object], function_definition_as_parsed_json: 
         except TelepactSchemaParseError as e:
             parse_failures.extend(e.schema_parse_failures)
 
+
+    if parse_failures:
+        raise TelepactSchemaParseError(
+            parse_failures, ctx.telepact_schema_document_names_to_json)
+
+    fn_select_type = derive_possible_select(
+        schema_key, cast(TUnion, result_type))
+    select_type = cast(TSelect, get_or_parse_type([], '_ext.Select_', ctx))
+    select_type.possible_selects[schema_key] = fn_select_type
+
+    return cast(TUnion, result_type)
+
+def parse_function_errors_regex(path: list[object], function_definition_as_parsed_json: dict[str, object],
+                        schema_key: str,
+                        ctx: 'ParseContext') -> str:
+    from ...internal.schema.GetTypeUnexpectedParseFailure import get_type_unexpected_parse_failure
+
+    parse_failures = []
+
     errors_regex_key = "_errors"
 
     regex_path = path + [errors_regex_key]
 
-    errors_regex = None
+    errors_regex: str | None = None
     if errors_regex_key in function_definition_as_parsed_json and not schema_key.endswith("_"):
         parse_failures.append(SchemaParseFailure(
             ctx.document_name, regex_path, "ObjectKeyDisallowed", {}))
@@ -83,13 +91,4 @@ def parse_function_type(path: list[object], function_definition_as_parsed_json: 
         else:
             errors_regex = errors_regex_init
 
-    if parse_failures:
-        raise TelepactSchemaParseError(
-            parse_failures, ctx.telepact_schema_document_names_to_json)
-
-    fn_select_type = derive_possible_select(
-        schema_key, cast(TUnion, result_type))
-    select_type = cast(TSelect, get_or_parse_type([], '_ext.Select_', ctx))
-    select_type.possible_selects[schema_key] = fn_select_type
-
-    return TFn(schema_key, cast(TUnion, call_type), cast(TUnion, result_type), cast(str, errors_regex))
+    return cast(str, errors_regex)
