@@ -41,6 +41,10 @@ export function derivePossibleSelect(fnName: string, result: TUnion): Record<str
 
     const sortedTypeKeys = Object.keys(nestedTypes).sort();
     for (const k of sortedTypeKeys) {
+        if (k.startsWith('fn.')) {
+            continue;
+        }
+
         const v = nestedTypes[k];
         if (v instanceof TUnion) {
             const unionSelect: Record<string, object> = {};

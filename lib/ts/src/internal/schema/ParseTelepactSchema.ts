@@ -170,8 +170,7 @@ export function parseTelepactSchema(telepactSchemaDocumentNamesToJson: Record<st
                     parsedTypes,
                     fnErrorRegexes,
                     parseFailures,
-                    failedTypes,
-                    true
+                    failedTypes
                 ),
             );
         } catch (e) {
@@ -210,8 +209,7 @@ export function parseTelepactSchema(telepactSchemaDocumentNamesToJson: Record<st
                         parsedTypes,
                         fnErrorRegexes,
                         parseFailures,
-                        failedTypes,
-                        true
+                        failedTypes
                     ),
                 );
                 errors.push(error);
@@ -296,8 +294,7 @@ export function parseTelepactSchema(telepactSchemaDocumentNamesToJson: Record<st
                     parsedTypes,
                     fnErrorRegexes,
                     parseFailures,
-                    failedTypes,
-                    true
+                    failedTypes
                 ),
             );
             headers.push(headerType);

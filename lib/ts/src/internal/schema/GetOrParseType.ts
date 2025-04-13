@@ -91,8 +91,10 @@ export function getOrParseType(path: any[], typeName: string, ctx: ParseContext)
                 definition,
                 customTypeName,
                 [],
-                ctx.copy({ documentName: thisDocumentName, topLevel: false }),
+                ctx.copy({ documentName: thisDocumentName }),
             );
+
+            ctx.parsedTypes[customTypeName] = type;
         } else if (customTypeName.startsWith('union')) {
             type = parseUnionType(
                 [thisIndex],
@@ -100,27 +102,29 @@ export function getOrParseType(path: any[], typeName: string, ctx: ParseContext)
                 customTypeName,
                 [],
                 [],
-                ctx.copy({ documentName: thisDocumentName, topLevel: false }),
+                ctx.copy({ documentName: thisDocumentName }),
             );
+
+            ctx.parsedTypes[customTypeName] = type;
         } else if (customTypeName.startsWith('fn')) {
-            const argType = parseStructType([thisIndex], definition, customTypeName, ['->', '_errors'], ctx.copy({ documentName: thisDocumentName, topLevel: false }));
+            const argType = parseStructType([thisIndex], definition, customTypeName, ['->', '_errors'], ctx.copy({ documentName: thisDocumentName }));
             type = new TUnion(customTypeName, { [customTypeName]: argType }, { [customTypeName]: 0 });
 
-            if (ctx.topLevel) {
-                const resultType = parseFunctionResultType([thisIndex],
-                    definition,
-                    customTypeName,
-                    ctx.copy({ documentName: thisDocumentName, topLevel: false }));
-                
-                ctx.parsedTypes[customTypeName + '.->'] = resultType;
+            ctx.parsedTypes[customTypeName] = type;
 
-                const errorsRegex = parseFunctionErrorsRegex([thisIndex],
-                    definition,
-                    customTypeName,
-                    ctx.copy({ documentName: thisDocumentName, topLevel: false }));
+            const resultType = parseFunctionResultType([thisIndex],
+                definition,
+                customTypeName,
+                ctx.copy({ documentName: thisDocumentName }));
+            
+            ctx.parsedTypes[customTypeName + '.->'] = resultType;
 
-                ctx.fnErrorRegexes[customTypeName] = errorsRegex;
-            }
+            const errorsRegex = parseFunctionErrorsRegex([thisIndex],
+                definition,
+                customTypeName,
+                ctx.copy({ documentName: thisDocumentName }));
+
+            ctx.fnErrorRegexes[customTypeName] = errorsRegex;
         } else {
             const possibleTypeExtension = {
                 '_ext.Select_': new TSelect(),
@@ -138,9 +142,10 @@ export function getOrParseType(path: any[], typeName: string, ctx: ParseContext)
                 );
             }
             type = possibleTypeExtension;
+
+            ctx.parsedTypes[customTypeName] = type;
         }
 
-        ctx.parsedTypes[customTypeName] = type;
 
         return type;
     } catch (e) {

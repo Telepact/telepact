@@ -161,8 +161,7 @@ def parse_vers_api_schema(
                     parsed_types,
                     fn_error_regexes,
                     parse_failures,
-                    failed_types,
-                    True
+                    failed_types
                 )
             )
         except TelepactSchemaParseError as e:
@@ -196,8 +195,7 @@ def parse_vers_api_schema(
                     parsed_types,
                     fn_error_regexes,
                     parse_failures,
-                    failed_types,
-                    True
+                    failed_types
                 )
             )
             errors.append(error)
@@ -248,8 +246,7 @@ def parse_vers_api_schema(
                     parsed_types,
                     fn_error_regexes,
                     parse_failures,
-                    failed_types,
-                    True
+                    failed_types
                 )
             )
             headers.append(header_type)

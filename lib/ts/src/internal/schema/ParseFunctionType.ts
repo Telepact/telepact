@@ -64,6 +64,9 @@ export function parseFunctionResultType(
     }
 
     const fnSelectType = derivePossibleSelect(schemaKey, resultType as TUnion);
+
+    console.log(`fnSelectType: ${JSON.stringify(fnSelectType)}`);
+
     const selectType = getOrParseType([], '_ext.Select_', ctx) as TSelect;
     selectType.possibleSelects[schemaKey] = fnSelectType;
 

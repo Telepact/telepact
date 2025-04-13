@@ -22,7 +22,6 @@ from ..Message import Message
 from .types.TTypeDeclaration import TTypeDeclaration
 
 if TYPE_CHECKING:
-    from .types.TUnion import TUnion
     from ..internal.validation.ValidationFailure import ValidationFailure
     from .types.TType import TType
     from ..TelepactSchema import TelepactSchema
@@ -38,7 +37,7 @@ async def handle_message(
     from ..internal.validation.GetInvalidErrorMessage import get_invalid_error_message
     from ..internal.validation.ValidateHeaders import validate_headers
     from ..internal.validation.ValidateResult import validate_result
-    from .types.TFn import TFn
+    from .types.TUnion import TUnion
     from ..internal.validation.ValidateContext import ValidateContext
 
     response_headers: dict[str, object] = {}

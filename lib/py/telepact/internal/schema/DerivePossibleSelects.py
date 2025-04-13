@@ -44,6 +44,9 @@ def derive_possible_select(fn_name: str, result: 'TUnion') -> dict[str, object]:
 
     sorted_type_keys = sorted(nested_types.keys())
     for k in sorted_type_keys:
+        if k.startswith('fn.'):
+            continue
+
         v = nested_types[k]
         if isinstance(v, TUnion):
             union_select: dict[str, list[str]] = {}

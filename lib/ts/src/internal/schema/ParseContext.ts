@@ -27,7 +27,6 @@ export class ParseContext {
     public readonly fnErrorRegexes: { [key: string]: string };
     public readonly allParseFailures: SchemaParseFailure[];
     public readonly failedTypes: Set<string>;
-    public readonly topLevel: boolean;
 
     constructor(
         documentName: string,
@@ -38,8 +37,7 @@ export class ParseContext {
         parsedTypes: { [key: string]: TType },
         fnErrorRegexes: { [key: string]: string },
         allParseFailures: SchemaParseFailure[],
-        failedTypes: Set<string>,
-        topLevel: boolean
+        failedTypes: Set<string>
     ) {
         this.documentName = documentName;
         this.telepactSchemaDocumentNamesToPseudoJson = telepactSchemaDocumentNamesToPseudoJson;
@@ -50,10 +48,9 @@ export class ParseContext {
         this.fnErrorRegexes = fnErrorRegexes;
         this.allParseFailures = allParseFailures;
         this.failedTypes = failedTypes;
-        this.topLevel = topLevel;
     }
 
-    public copy({ documentName, topLevel }: { documentName?: string, topLevel?: boolean }): ParseContext {
+    public copy({ documentName }: { documentName?: string }): ParseContext {
         return new ParseContext(
             documentName ?? this.documentName,
             this.telepactSchemaDocumentNamesToPseudoJson,
@@ -63,8 +60,7 @@ export class ParseContext {
             this.parsedTypes,
             this.fnErrorRegexes,
             this.allParseFailures,
-            this.failedTypes,
-            topLevel ?? this.topLevel
+            this.failedTypes
         );
     }
 }
