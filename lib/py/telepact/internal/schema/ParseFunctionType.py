@@ -69,6 +69,7 @@ def parse_function_errors_regex(path: list[object], function_definition_as_parse
                         schema_key: str,
                         ctx: 'ParseContext') -> str:
     from ...internal.schema.GetTypeUnexpectedParseFailure import get_type_unexpected_parse_failure
+    from ...TelepactSchemaParseError import TelepactSchemaParseError
 
     parse_failures = []
 
@@ -90,5 +91,9 @@ def parse_function_errors_regex(path: list[object], function_definition_as_parse
             parse_failures.extend(this_parse_failures)
         else:
             errors_regex = errors_regex_init
+
+    if parse_failures:
+        raise TelepactSchemaParseError(
+            parse_failures, ctx.telepact_schema_document_names_to_json)
 
     return cast(str, errors_regex)
