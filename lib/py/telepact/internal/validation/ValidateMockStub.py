@@ -23,14 +23,12 @@ if TYPE_CHECKING:
     from ...internal.validation.ValidateContext import ValidateContext
     from ..types.TStruct import TStruct
     from ..types.TType import TType
-    from ..types.TTypeDeclaration import TTypeDeclaration
-    from ..types.TUnion import TUnion
 
 
 def validate_mock_stub(given_obj: object,
                        types: dict[str, 'TType'], ctx: 'ValidateContext') -> list['ValidationFailure']:
     from ...internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
-    from ..types.TFn import TFn
+    from ..types.TUnion import TUnion
 
     validation_failures: list[ValidationFailure] = []
 
