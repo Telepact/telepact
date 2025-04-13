@@ -459,50 +459,49 @@ jobs:
       - check-license-header
       - check-version
       - run-tests
-    if: needs.begin.result == 'success'
     steps:
       - name: Check build-ts
-        if: needs.build-ts.result != 'success'
+        if: needs.build-ts.result != 'success' && needs.begin.result == 'success'
         run: exit 1
 
       - name: Check build-java
-        if: needs.build-java.result != 'success'
+        if: needs.build-java.result != 'success' && needs.begin.result == 'success'
         run: exit 1
 
       - name: Check build-py
-        if: needs.build-py.result != 'success'
+        if: needs.build-py.result != 'success' && needs.begin.result == 'success'
         run: exit 1
 
       - name: Check build-cli
-        if: needs.build-cli.result != 'success'
+        if: needs.build-cli.result != 'success' && needs.begin.result == 'success'
         run: exit 1
 
       - name: Check build-dart
-        if: needs.build-dart.result != 'success'
+        if: needs.build-dart.result != 'success' && needs.begin.result == 'success'
         run: exit 1
 
       - name: Check build-prettier
-        if: needs.build-prettier.result != 'success'
+        if: needs.build-prettier.result != 'success' && needs.begin.result == 'success'
         run: exit 1
 
       - name: Check build-console
-        if: needs.build-console.result != 'success'
+        if: needs.build-console.result != 'success' && needs.begin.result == 'success'
         run: exit 1
 
       - name: Check test-console-self-host
-        if: needs.test-console-self-host.result != 'success'
+        if: needs.test-console-self-host.result != 'success' && needs.begin.result == 'success'
         run: exit 1
 
       - name: Check check-license-header
-        if: needs.check-license-header.result != 'success'
+        if: needs.check-license-header.result != 'success' && needs.begin.result == 'success'
         run: exit 1
 
       - name: Check check-version
-        if: needs.check-version.result != 'success'
+        if: needs.check-version.result != 'success' && needs.begin.result == 'success'
         run: exit 1
 
       - name: Check run-tests
-        if: needs.run-tests.result != 'success'
+        if: needs.run-tests.result != 'success' && needs.begin.result == 'success'
         run: exit 1
 
       - name: Checkout code
