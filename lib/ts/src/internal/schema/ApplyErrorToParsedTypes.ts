@@ -36,11 +36,11 @@ export function applyErrorToParsedTypes(
     const documentName = schemaKeysToDocumentNames[errorKey];
 
     for (const parsedTypeName in parsedTypes) {
-        const parsedType = parsedTypes[parsedTypeName];
-
-        if (!parsedTypeName.endsWith('.->')) {
+        if (!parsedTypeName.startsWith("fn.") || parsedTypeName.endsWith('.->')) {
             continue;
         }
+
+        const parsedType = parsedTypes[parsedTypeName + '.->'];
 
         const f = parsedType as TUnion;
         const fnName = parsedTypeName;
