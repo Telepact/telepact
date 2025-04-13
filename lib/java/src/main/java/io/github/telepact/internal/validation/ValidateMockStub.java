@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import io.github.telepact.internal.types.TFn;
 import io.github.telepact.internal.types.TStruct;
 import io.github.telepact.internal.types.TType;
 import io.github.telepact.internal.types.TTypeDeclaration;
@@ -54,11 +53,11 @@ public class ValidateMockStub {
         }
 
         final var functionName = matches.get(0);
-        final var functionDef = (TFn) types.get(functionName);
         final var input = givenMap.get(functionName);
 
-        final TUnion functionDefCall = functionDef.call;
-        final String functionDefName = functionDef.name;
+        final TUnion functionDefCall = (TUnion) types.get(functionName);
+        final TUnion functionDefResult = (TUnion) types.get(functionName + ".->");
+        final String functionDefName = functionName;
         final Map<String, TStruct> functionDefCallTags = functionDefCall.tags;
         final var inputFailures = functionDefCallTags.get(functionDefName).validate(input, List.of(), ctx);
 
@@ -83,7 +82,7 @@ public class ValidateMockStub {
                     Map.of("key", resultDefKey)));
         } else {
             final var output = givenMap.get(resultDefKey);
-            final var outputFailures = functionDef.result.validate(output, List.of(), ctx);
+            final var outputFailures = functionDefResult.validate(output, List.of(), ctx);
 
             final var outputFailuresWithPath = new ArrayList<ValidationFailure>();
             for (final var f : outputFailures) {

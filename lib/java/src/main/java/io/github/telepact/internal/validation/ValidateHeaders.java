@@ -21,11 +21,10 @@ import java.util.List;
 import java.util.Map;
 
 import io.github.telepact.internal.types.TFieldDeclaration;
-import io.github.telepact.internal.types.TFn;
 
 public class ValidateHeaders {
     public static List<ValidationFailure> validateHeaders(
-            Map<String, Object> headers, Map<String, TFieldDeclaration> parsedRequestHeaders, TFn functionType) {
+            Map<String, Object> headers, Map<String, TFieldDeclaration> parsedRequestHeaders, String functionName) {
         final var validationFailures = new ArrayList<ValidationFailure>();
 
         for (final var entry : headers.entrySet()) {
@@ -39,7 +38,7 @@ public class ValidateHeaders {
             final var field = parsedRequestHeaders.get(header);
             if (field != null) {
                 final var thisValidationFailures = field.typeDeclaration.validate(headerValue,
-                        new ValidateContext(null, functionType.name,  false));
+                        new ValidateContext(null, functionName,  false));
                 final var thisValidationFailuresPath = thisValidationFailures.stream()
                         .map(e -> {
                             final var path = new ArrayList<>(e.path);

@@ -21,25 +21,26 @@ import static io.github.telepact.internal.generation.GenerateRandomStruct.genera
 import java.util.*;
 import java.util.stream.Collectors;
 
-import io.github.telepact.internal.types.TFn;
 import io.github.telepact.internal.types.TType;
+import io.github.telepact.internal.types.TUnion;
 
 public class GenerateRandomMockStub {
 
         public static Map<String, Object> generateRandomMockStub(Map<String, TType> types, GenerateContext ctx) {
-                List<TFn> functions = types.entrySet().stream()
-                                .filter(entry -> entry.getValue() instanceof TFn)
-                                .filter(entry -> !entry.getKey().endsWith("_"))
-                                .map(entry -> (TFn) entry.getValue())
-                                .sorted((fn1, fn2) -> fn1.name.compareTo(fn2.name))
+                List<String> functionNames = types.keySet().stream()
+                                .filter(key -> key.startsWith("fn.") && !key.endsWith(".->"))
+                                .filter(key -> !key.endsWith("_"))
+                                .sorted((fn1, fn2) -> fn1.compareTo(fn2))
                                 .collect(Collectors.toList());
 
-                int index = ctx.randomGenerator.nextIntWithCeiling(functions.size());
+                int index = ctx.randomGenerator.nextIntWithCeiling(functionNames.size());
 
-                TFn selectedFn = functions.get(index);
+                String selectedFnName = functionNames.get(index);
+                TUnion selectedFn = (TUnion) types.get(selectedFnName);
+                TUnion selectedFnResult = (TUnion) types.get(selectedFnName + ".->");
 
-                var argFields = selectedFn.call.tags.get(selectedFn.name).fields;
-                var okFields = selectedFn.result.tags.get("Ok_").fields;
+                var argFields = selectedFn.tags.get(selectedFn.name).fields;
+                var okFields = selectedFnResult.tags.get("Ok_").fields;
 
                 var arg = generateRandomStruct(null, false, argFields,
                                 ctx.copyWithNewAlwaysIncludeRequiredFields(false));
@@ -47,7 +48,7 @@ public class GenerateRandomMockStub {
                                 ctx.copyWithNewAlwaysIncludeRequiredFields(false));
 
                 return Map.ofEntries(
-                                Map.entry(selectedFn.name, arg),
+                                Map.entry(selectedFnName, arg),
                                 Map.entry("->", Map.of("Ok_", okResult)));
         }
 }

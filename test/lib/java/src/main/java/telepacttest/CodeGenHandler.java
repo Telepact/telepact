@@ -345,4 +345,25 @@ public class CodeGenHandler extends ServerHandler_ {
         throw new UnsupportedOperationException("Unimplemented method 'getBigList'");
     }
 
+    @Override
+    public TypedMessage_<telepacttest.gen.circularLink1.Output> circularLink1(Map<String, Object> headers,
+            telepacttest.gen.circularLink1.Input input) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'circularLink1'");
+    }
+
+    @Override
+    public TypedMessage_<telepacttest.gen.circularLink2.Output> circularLink2(Map<String, Object> headers,
+            telepacttest.gen.circularLink2.Input input) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'circularLink2'");
+    }
+
+    @Override
+    public TypedMessage_<telepacttest.gen.selfLink.Output> selfLink(Map<String, Object> headers,
+            telepacttest.gen.selfLink.Input input) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'selfLink'");
+    }
+
 }

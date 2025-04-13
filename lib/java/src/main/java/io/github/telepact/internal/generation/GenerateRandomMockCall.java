@@ -20,22 +20,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import io.github.telepact.internal.types.TFn;
 import io.github.telepact.internal.types.TType;
+import io.github.telepact.internal.types.TUnion;
 
 public class GenerateRandomMockCall {
 
     public static Object generateRandomMockCall(Map<String, TType> types, GenerateContext ctx) {
-        List<TFn> functions = types.entrySet().stream()
-                .filter(entry -> entry.getValue() instanceof TFn)
-                .filter(entry -> !entry.getKey().endsWith("_"))
-                .map(entry -> (TFn) entry.getValue())
-                .sorted((fn1, fn2) -> fn1.name.compareTo(fn2.name))
+        List<String> functionNames = types.keySet().stream()
+                .filter(key -> key.startsWith("fn.") && !key.endsWith(".->"))
+                .filter(key -> !key.endsWith("_"))
+                .sorted((fn1, fn2) -> fn1.compareTo(fn2))
                 .collect(Collectors.toList());
 
-        TFn selectedFn = functions.get(ctx.randomGenerator.nextIntWithCeiling(functions.size()));
+        String selectedFnName = functionNames.get(ctx.randomGenerator.nextIntWithCeiling(functionNames.size()));
+        TUnion selectedFn = (TUnion) types.get(selectedFnName);
 
-        return GenerateRandomUnion.generateRandomUnion(null, false, selectedFn.call.tags,
+        return GenerateRandomUnion.generateRandomUnion(null, false, selectedFn.tags,
                 ctx.copyWithNewAlwaysIncludeRequiredFields(false));
     }
 }

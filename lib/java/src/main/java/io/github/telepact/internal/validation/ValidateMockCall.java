@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import io.github.telepact.internal.types.TFn;
 import io.github.telepact.internal.types.TStruct;
 import io.github.telepact.internal.types.TType;
 import io.github.telepact.internal.types.TTypeDeclaration;
@@ -47,11 +46,11 @@ public class ValidateMockCall {
         }
 
         final var functionName = matches.get(0);
-        final var functionDef = (TFn) types.get(functionName);
+        final var functionDef = (TUnion) types.get(functionName);
         final var input = givenMap.get(functionName);
 
-        final TUnion functionDefCall = functionDef.call;
-        final String functionDefName = functionDef.name;
+        final TUnion functionDefCall = functionDef;
+        final String functionDefName = functionName;
         final Map<String, TStruct> functionDefCallTags = functionDefCall.tags;
 
         final var inputFailures = functionDefCallTags.get(functionDefName).validate(input, List.of(), ctx);
