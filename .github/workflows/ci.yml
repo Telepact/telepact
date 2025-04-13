@@ -459,6 +459,7 @@ jobs:
       - check-license-header
       - check-version
       - run-tests
+    if: always()
     steps:
       - name: Check build-ts
         if: needs.build-ts.result != 'success' && needs.begin.result == 'success'
