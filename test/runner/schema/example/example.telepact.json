@@ -165,6 +165,43 @@
         ]
     },
     {
+        "fn.selfLink": {
+            "required": ["boolean"],
+            "optional!": ["boolean"]
+        },
+        "->": [
+            {
+                "Ok_": {
+                    "followSelf": ["fn.selfLink"]
+                }
+            }
+        ]
+    },
+    {
+        "fn.circularLink1": {
+            "field1": ["boolean"]
+        },
+        "->": [
+            {
+                "Ok_": {
+                    "follow": ["fn.circularLink2"]
+                }
+            }
+        ]
+    },
+    {
+        "fn.circularLink2": {
+            "field2": ["boolean"]
+        },
+        "->": [
+            {
+                "Ok_": {
+                    "follow": ["fn.circularLink1"]
+                }
+            }
+        ]
+    },
+    {
         "headers.ExampleHeaders": {
             "@in": ["boolean"]
         },

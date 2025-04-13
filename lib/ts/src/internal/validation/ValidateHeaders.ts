@@ -15,14 +15,13 @@
 //|
 
 import { TFieldDeclaration } from '../types/TFieldDeclaration';
-import { TFn } from '../types/TFn';
 import { ValidationFailure } from '../../internal/validation/ValidationFailure';
 import { ValidateContext } from './ValidateContext';
 
 export function validateHeaders(
     headers: Record<string, any>,
     parsedRequestHeaders: Record<string, TFieldDeclaration>,
-    functionType: TFn,
+    functionName: string,
 ): ValidationFailure[] {
     const validationFailures: ValidationFailure[] = [];
 
@@ -37,7 +36,7 @@ export function validateHeaders(
         if (field) {
             const thisValidationFailures = field.typeDeclaration.validate(
                 headerValue,
-                new ValidateContext(null, functionType.name, false),
+                new ValidateContext(null, functionName, false),
             );
             const thisValidationFailuresPath = thisValidationFailures.map(
                 (e) => new ValidationFailure([header, ...e.path], e.reason, e.data),

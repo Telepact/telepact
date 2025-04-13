@@ -14,7 +14,6 @@
 //|  limitations under the License.
 //|
 
-import { TFn } from '../types/TFn';
 import { TUnion } from '../types/TUnion';
 import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
 import { getTypeUnexpectedParseFailure } from '../../internal/schema/GetTypeUnexpectedParseFailure';
@@ -26,25 +25,13 @@ import { getOrParseType } from './GetOrParseType';
 import { derivePossibleSelect } from './DerivePossibleSelect';
 import { TSelect } from '../types/TSelect';
 
-export function parseFunctionType(
+export function parseFunctionResultType(
     path: any[],
     functionDefinitionAsParsedJson: { [key: string]: any },
     schemaKey: string,
     ctx: ParseContext,
-): TFn {
+): TUnion {
     const parseFailures: SchemaParseFailure[] = [];
-
-    let callType: TUnion | null = null;
-    try {
-        const argType = parseStructType(path, functionDefinitionAsParsedJson, schemaKey, ['->', '_errors'], ctx);
-        callType = new TUnion(schemaKey, { [schemaKey]: argType }, { [schemaKey]: 0 });
-    } catch (e) {
-        if (e instanceof TelepactSchemaParseError) {
-            parseFailures.push(...e.schemaParseFailures);
-        } else {
-            throw e;
-        }
-    }
 
     const resultSchemaKey = '->';
 
@@ -71,6 +58,25 @@ export function parseFunctionType(
             }
         }
     }
+
+    if (parseFailures.length > 0) {
+        throw new TelepactSchemaParseError(parseFailures, ctx.telepactSchemaDocumentNamesToJson);
+    }
+
+    const fnSelectType = derivePossibleSelect(schemaKey, resultType as TUnion);
+    const selectType = getOrParseType([], '_ext.Select_', ctx) as TSelect;
+    selectType.possibleSelects[schemaKey] = fnSelectType;
+
+    return resultType;
+}
+
+export function parseFunctionErrorsRegex(
+    path: any[],
+    functionDefinitionAsParsedJson: { [key: string]: any },
+    schemaKey: string,
+    ctx: ParseContext,    
+): string {
+    const parseFailures: SchemaParseFailure[] = [];
 
     const errorsRegexKey = '_errors';
 
@@ -102,9 +108,5 @@ export function parseFunctionType(
         throw new TelepactSchemaParseError(parseFailures, ctx.telepactSchemaDocumentNamesToJson);
     }
 
-    const fnSelectType = derivePossibleSelect(schemaKey, resultType as TUnion);
-    const selectType = getOrParseType([], '_ext.Select_', ctx) as TSelect;
-    selectType.possibleSelects[schemaKey] = fnSelectType;
-
-    return new TFn(schemaKey, callType as TUnion, resultType as TUnion, errorsRegex as string);
+    return errorsRegex;
 }

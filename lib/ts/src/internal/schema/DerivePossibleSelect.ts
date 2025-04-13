@@ -16,7 +16,6 @@
 
 import { TType } from '../types/TType';
 import { TUnion } from '../types/TUnion';
-import { TFn } from '../types/TFn';
 import { TStruct } from '../types/TStruct';
 import { TFieldDeclaration } from '../types/TFieldDeclaration';
 import { TArray } from '../types/TArray';

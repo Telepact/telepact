@@ -25,13 +25,14 @@ import { TNumber } from '../types/TNumber';
 import { TString } from '../types/TString';
 import { TAny } from '../types/TAny';
 import { TBytes } from '../types/TBytes';
-import { parseFunctionType } from '../../internal/schema/ParseFunctionType';
+import { parseFunctionErrorsRegex, parseFunctionResultType } from '../../internal/schema/ParseFunctionType';
 import { parseStructType } from '../../internal/schema/ParseStructType';
 import { parseUnionType } from '../../internal/schema/ParseUnionType';
 import { TSelect } from '../types/TSelect';
 import { TMockCall } from '../types/TMockCall';
 import { TMockStub } from '../types/TMockStub';
 import { ParseContext } from '../../internal/schema/ParseContext';
+import { TUnion } from '../types/TUnion';
 
 export function getOrParseType(path: any[], typeName: string, ctx: ParseContext): TType {
     if (ctx.failedTypes.has(typeName)) {
@@ -90,7 +91,7 @@ export function getOrParseType(path: any[], typeName: string, ctx: ParseContext)
                 definition,
                 customTypeName,
                 [],
-                ctx.copy({ documentName: thisDocumentName }),
+                ctx.copy({ documentName: thisDocumentName, topLevel: false }),
             );
         } else if (customTypeName.startsWith('union')) {
             type = parseUnionType(
@@ -99,15 +100,27 @@ export function getOrParseType(path: any[], typeName: string, ctx: ParseContext)
                 customTypeName,
                 [],
                 [],
-                ctx.copy({ documentName: thisDocumentName }),
+                ctx.copy({ documentName: thisDocumentName, topLevel: false }),
             );
         } else if (customTypeName.startsWith('fn')) {
-            type = parseFunctionType(
-                [thisIndex],
-                definition,
-                customTypeName,
-                ctx.copy({ documentName: thisDocumentName }),
-            );
+            const argType = parseStructType([thisIndex], definition, customTypeName, ['->', '_errors'], ctx.copy({ documentName: thisDocumentName, topLevel: false }));
+            type = new TUnion(customTypeName, { [customTypeName]: argType }, { [customTypeName]: 0 });
+
+            if (ctx.topLevel) {
+                const resultType = parseFunctionResultType([thisIndex],
+                    definition,
+                    customTypeName,
+                    ctx.copy({ documentName: thisDocumentName, topLevel: false }));
+                
+                ctx.parsedTypes[customTypeName + '.->'] = resultType;
+
+                const errorsRegex = parseFunctionErrorsRegex([thisIndex],
+                    definition,
+                    customTypeName,
+                    ctx.copy({ documentName: thisDocumentName, topLevel: false }));
+
+                ctx.fnErrorRegexes[customTypeName] = errorsRegex;
+            }
         } else {
             const possibleTypeExtension = {
                 '_ext.Select_': new TSelect(),

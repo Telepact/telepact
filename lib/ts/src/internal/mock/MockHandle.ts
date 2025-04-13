@@ -23,9 +23,9 @@ import { isSubMap } from '../../internal/mock/IsSubMap';
 import { verify } from '../../internal/mock/Verify';
 import { verifyNoMoreInteractions } from '../../internal/mock/VerifyNoMoreInteractions';
 import { TelepactError } from '../../TelepactError';
-import { TFn } from '../types/TFn';
 import { objectsAreEqual } from '../../internal/ObjectsAreEqual';
 import { GenerateContext } from '../generation/GenerateContext';
+import { TUnion } from '../types/TUnion';
 
 export async function mockHandle(
     requestMessage: Message,
@@ -83,7 +83,7 @@ export async function mockHandle(
     } else {
         invocations.push(new MockInvocation(functionName, argument));
 
-        const definition = telepactSchema.parsed[functionName] as TFn;
+        const definition = telepactSchema.parsed[functionName + '.->'] as TUnion;
 
         for (const stub of stubs) {
             if (stub.count === 0) {
@@ -95,7 +95,7 @@ export async function mockHandle(
                         const useBlueprintValue = true;
                         const includeOptionalFields = false;
                         const alwaysIncludeRequiredFields = true;
-                        const resultInit = definition.result.generateRandomValue(
+                        const resultInit = definition.generateRandomValue(
                             stub.thenResult,
                             useBlueprintValue,
                             [],
@@ -118,7 +118,7 @@ export async function mockHandle(
                         const useBlueprintValue = true;
                         const includeOptionalFields = false;
                         const alwaysIncludeRequiredFields = true;
-                        const resultInit = definition.result.generateRandomValue(
+                        const resultInit = definition.generateRandomValue(
                             stub.thenResult,
                             useBlueprintValue,
                             [],
@@ -145,7 +145,7 @@ export async function mockHandle(
         }
 
         if (definition) {
-            const resultUnion = definition.result;
+            const resultUnion = definition;
             const okStructRef = resultUnion.tags['Ok_'];
             const useBlueprintValue = true;
             const includeOptionalFields = true;

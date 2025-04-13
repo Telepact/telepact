@@ -18,8 +18,8 @@ import { TError } from '../types/TError';
 import { TType } from '../types/TType';
 import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
 import { TelepactSchemaParseError } from '../../TelepactSchemaParseError';
-import { TFn } from '../types/TFn';
 import { getPathDocumentCoordinatesPseudoJson } from '../../internal/schema/GetPathDocumentCoordinatesPseudoJson';
+import { TUnion } from '../types/TUnion';
 
 export function applyErrorToParsedTypes(
     error: TError,
@@ -27,6 +27,7 @@ export function applyErrorToParsedTypes(
     schemaKeysToDocumentNames: { [key: string]: string },
     schemaKeysToIndex: { [key: string]: number },
     documentNamesToJson: { [key: string]: string },
+    fnErrorRegexes: { [key: string]: string },
 ): void {
     const parseFailures: SchemaParseFailure[] = [];
 
@@ -37,14 +38,15 @@ export function applyErrorToParsedTypes(
     for (const parsedTypeName in parsedTypes) {
         const parsedType = parsedTypes[parsedTypeName];
 
-        if (!(parsedType instanceof TFn)) {
+        if (!parsedTypeName.endsWith('.->')) {
             continue;
         }
 
-        const f = parsedType;
-        const fnName = f.name;
-        const regex = new RegExp(f.errorsRegex);
-        const fnResult = f.result;
+        const f = parsedType as TUnion;
+        const fnName = parsedTypeName;
+        const fnErrorRegex = fnErrorRegexes[fnName];
+        const regex = new RegExp(fnErrorRegex);
+        const fnResult = f;
         const fnResultTags = fnResult.tags;
         const errorErrors = error.errors;
         const errorTags = errorErrors.tags;
@@ -63,7 +65,7 @@ export function applyErrorToParsedTypes(
                 const otherPathIndex = schemaKeysToIndex[fnName];
                 const errorTagIndex = error.errors.tagIndices[newKey];
                 const otherDocumentName = schemaKeysToDocumentNames[fnName];
-                const fnErrorTagIndex = f.result.tagIndices[newKey];
+                const fnErrorTagIndex = f.tagIndices[newKey];
                 const otherPath = [otherPathIndex, '->', fnErrorTagIndex, newKey];
                 const otherDocumentJson = documentNamesToJson[otherDocumentName];
                 const otherLocation = getPathDocumentCoordinatesPseudoJson(otherPath, otherDocumentJson);

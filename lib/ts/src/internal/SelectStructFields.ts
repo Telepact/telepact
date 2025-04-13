@@ -15,7 +15,6 @@
 //|
 
 import { TArray } from './types/TArray';
-import { TFn } from './types/TFn';
 import { TObject } from './types/TObject';
 import { TStruct } from './types/TStruct';
 import { TUnion } from './types/TUnion';
@@ -51,31 +50,6 @@ export function selectStructFields(
         }
 
         return finalMap;
-    } else if (typeDeclarationType instanceof TFn) {
-        const valueAsMap = value as { [key: string]: any };
-        const [unionTag, unionData] = Object.entries(valueAsMap)[0];
-        const fnName = typeDeclarationType.name;
-        const fnCall = typeDeclarationType.call;
-        const fnCallTags = fnCall.tags;
-
-        const argStructReference = fnCallTags[unionTag];
-        const selectedFields = selectedStructFields[fnName] as string[] | undefined;
-        const finalMap: { [key: string]: any } = {};
-
-        for (const [fieldName, fieldValue] of Object.entries(unionData)) {
-            if (selectedFields === undefined || selectedFields.includes(fieldName)) {
-                const field = argStructReference.fields[fieldName];
-                const valueWithSelectedFields = selectStructFields(
-                    field.typeDeclaration,
-                    fieldValue,
-                    selectedStructFields,
-                );
-
-                finalMap[fieldName] = valueWithSelectedFields;
-            }
-        }
-
-        return { [unionTag]: finalMap };
     } else if (typeDeclarationType instanceof TUnion) {
         const valueAsMap = value as { [key: string]: any };
         const [unionTag, unionData] = Object.entries(valueAsMap)[0];

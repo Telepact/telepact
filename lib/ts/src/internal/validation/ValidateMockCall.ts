@@ -17,8 +17,8 @@
 import { ValidationFailure } from '../../internal/validation/ValidationFailure';
 import { TType } from '../types/TType';
 import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure';
-import { TFn } from '../types/TFn';
 import { ValidateContext } from './ValidateContext';
+import { TUnion } from '../types/TUnion';
 
 export function validateMockCall(
     givenObj: any,
@@ -48,11 +48,11 @@ export function validateMockCall(
     }
 
     const functionName = matches[0];
-    const functionDef = types[functionName] as TFn;
+    const functionDef = types[functionName] as TUnion;
     const input = givenMap[functionName];
 
-    const functionDefCall = functionDef.call;
-    const functionDefName = functionDef.name;
+    const functionDefCall = functionDef;
+    const functionDefName = functionName;
     const functionDefCallTags = functionDefCall.tags;
 
     const inputFailures = functionDefCallTags[functionDefName].validate(input, [], ctx);

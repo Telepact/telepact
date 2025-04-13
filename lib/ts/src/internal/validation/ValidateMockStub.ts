@@ -19,7 +19,6 @@ import { getTypeUnexpectedValidationFailure } from '../../internal/validation/Ge
 import { TStruct } from '../types/TStruct';
 import { TType } from '../types/TType';
 import { TUnion } from '../types/TUnion';
-import { TFn } from '../types/TFn';
 import { ValidateContext } from './ValidateContext';
 
 export function validateMockStub(
@@ -52,11 +51,11 @@ export function validateMockStub(
     }
 
     const functionName = matches[0];
-    const functionDef = types[functionName] as TFn;
     const input = givenMap[functionName];
 
-    const functionDefCall: TUnion = functionDef.call;
-    const functionDefName: string = functionDef.name;
+    const functionDefCall: TUnion = types[functionName] as TUnion;;
+    const functionDefResult: TUnion = types[`${functionName}.->`] as TUnion;
+    const functionDefName: string = functionName
     const functionDefCallTags: { [key: string]: TStruct } = functionDefCall.tags;
     const inputFailures = functionDefCallTags[functionDefName].validate(input, [], ctx);
 
@@ -79,7 +78,7 @@ export function validateMockStub(
         validationFailures.push(new ValidationFailure([], 'RequiredObjectKeyMissing', { key: resultDefKey }));
     } else {
         const output = givenMap[resultDefKey];
-        const outputFailures = functionDef.result.validate(output, [], ctx);
+        const outputFailures = functionDefResult.validate(output, [], ctx);
 
         const outputFailuresWithPath: ValidationFailure[] = [];
         for (const f of outputFailures) {
