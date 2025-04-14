@@ -15,30 +15,33 @@
 //|
 
 import { GenerateContext } from './GenerateContext';
-import { TFn } from '../types/TFn';
 import { TType } from '../types/TType';
 import { generateRandomStruct } from './GenerateRandomStruct';
+import { TUnion } from '../types/TUnion';
 
 export function generateRandomUMockStub(types: { [key: string]: TType }, ctx: GenerateContext): object {
-    const functions: Array<TFn> = Object.entries(types)
-        .filter(([key, value]) => value instanceof TFn)
-        .filter(([key, value]) => !key.endsWith('_'))
-        .map(([key, value]) => value as TFn);
+    const functions: string[] = Object.keys(types)
+        .filter((key) => key.startsWith('fn.') && !key.endsWith('.->'))
+        .filter((key) => !key.endsWith('_'))
+        .map((key) => key);
 
-    functions.sort((fn1, fn2) => fn1.name.localeCompare(fn2.name));
+    functions.sort((fn1, fn2) => fn1.localeCompare(fn2));
 
     const index = ctx.randomGenerator.nextIntWithCeiling(functions.length);
 
     const selectedFn = functions[index];
 
-    const argFields = selectedFn.call.tags[selectedFn.name].fields;
-    const okFields = selectedFn.result.tags['Ok_'].fields;
+    const selectedArgs = types[selectedFn] as TUnion;
+    const selectedResult = types[selectedFn + '.->'] as TUnion;
+
+    const argFields = selectedArgs.tags[selectedFn].fields;
+    const okFields = selectedResult.tags['Ok_'].fields;
 
     const arg = generateRandomStruct(null, false, argFields, ctx.copy({ alwaysIncludeRequiredFields: false }));
     const okResult = generateRandomStruct(null, false, okFields, ctx.copy({ alwaysIncludeRequiredFields: false }));
 
     return {
-        [selectedFn.name]: arg,
+        [selectedFn]: arg,
         '->': {
             Ok_: okResult,
         },

@@ -48,8 +48,18 @@ class StringReader {
 
 export function getPathDocumentCoordinatesPseudoJson(path: Path, document: string): Coordinates {
     //console.log(`getPathDocumentCoordinatesPseudoJson: path=${path}, document=${document}`);
-    const reader = new StringReader(document);
-    return findCoordinates(path, reader);
+    try {
+        const reader = new StringReader(document);
+        return findCoordinates(path, reader);
+    } catch (e) {
+        console.log('Could not determine document coordinates');
+        console.log(`path: ${path}`)
+        console.log(`document: ${document}`);
+        console.log(`e: ${e}`);
+        console.log(`e.trace: ${e.trace}`);
+
+        throw e;
+    }
 }
 
 function findCoordinates(path: Path, reader: StringReader, ovRow?: number, ovCol?: number): Coordinates {

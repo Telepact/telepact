@@ -23,7 +23,6 @@ import java.util.Map;
 
 import io.github.telepact.internal.types.TArray;
 import io.github.telepact.internal.types.TFieldDeclaration;
-import io.github.telepact.internal.types.TFn;
 import io.github.telepact.internal.types.TObject;
 import io.github.telepact.internal.types.TStruct;
 import io.github.telepact.internal.types.TType;
@@ -56,32 +55,6 @@ public class SelectStructFields {
             }
 
             return finalMap;
-        } else if (typeDeclarationType instanceof final TFn f) {
-            final var valueAsMap = (Map<String, Object>) value;
-            final Map.Entry<String, Object> uEntry = valueAsMap.entrySet().stream().findAny().get();
-            final var unionTag = uEntry.getKey();
-            final var unionData = (Map<String, Object>) uEntry.getValue();
-
-            final String fnName = f.name;
-            final TUnion fnCall = f.call;
-            final Map<String, TStruct> fnCallTags = fnCall.tags;
-
-            final var argStructReference = fnCallTags.get(unionTag);
-            final var selectedFields = (List<String>) selectedStructFields.get(fnName);
-            final var finalMap = new HashMap<>();
-
-            for (final var entry : unionData.entrySet()) {
-                final var fieldName = entry.getKey();
-                if (selectedFields == null || selectedFields.contains(fieldName)) {
-                    final var field = argStructReference.fields.get(fieldName);
-                    final var valueWithSelectedFields = selectStructFields(field.typeDeclaration, entry.getValue(),
-                            selectedStructFields);
-
-                    finalMap.put(entry.getKey(), valueWithSelectedFields);
-                }
-            }
-
-            return Map.of(uEntry.getKey(), finalMap);
         } else if (typeDeclarationType instanceof final TUnion u) {
             final var valueAsMap = (Map<String, Object>) value;
             final var uEntry = valueAsMap.entrySet().stream().findAny().get();

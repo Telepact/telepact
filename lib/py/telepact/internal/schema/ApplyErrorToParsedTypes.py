@@ -15,21 +15,25 @@
 #|
 
 import re
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 
 if TYPE_CHECKING:
     from ..types.TError import TError
     from ..types.TStruct import TStruct
     from ..types.TType import TType
-    from ..types.TUnion import TUnion
 
 
-def apply_error_to_parsed_types(error: 'TError', parsed_types: dict[str, 'TType'], schema_keys_to_document_names: dict[str, str], schema_keys_to_index: dict[str, int], document_names_to_json: dict[str, str]) -> None:
+def apply_error_to_parsed_types(error: 'TError', 
+                                parsed_types: dict[str, 'TType'],
+                                schema_keys_to_document_names: dict[str, str],
+                                schema_keys_to_index: dict[str, int],
+                                document_names_to_json: dict[str, str],
+                                fn_error_regexes: dict[str, str]) -> None:
     from ...internal.schema.SchemaParseFailure import SchemaParseFailure
     from ...TelepactSchemaParseError import TelepactSchemaParseError
     from ...internal.schema.GetPathDocumentCoordinatesPseudoJson import get_path_document_coordinates_pseudo_json
-    from ..types.TFn import TFn
+    from ..types.TUnion import TUnion
 
     parse_failures = []
 
@@ -37,16 +41,18 @@ def apply_error_to_parsed_types(error: 'TError', parsed_types: dict[str, 'TType'
     error_index = schema_keys_to_index[error_key]
     document_name = schema_keys_to_document_names[error_key]
 
-    for parsed_type_name, parsed_type in parsed_types.items():
-        if not isinstance(parsed_type, TFn):
+    for parsed_type_name in parsed_types.keys():
+        if not parsed_type_name.startswith('fn.') or parsed_type_name.endswith('.->'):
             continue
-        f = parsed_type
+        parsed_type = parsed_types[parsed_type_name + '.->']
+        f = cast(TUnion, parsed_type)
 
-        fn_name = f.name
+        fn_name = parsed_type_name
+        fn_error_regex = fn_error_regexes[fn_name]
 
-        regex = re.compile(f.errors_regex)
+        regex = re.compile(fn_error_regex)
 
-        fn_result = f.result
+        fn_result = f
         fn_result_tags = fn_result.tags
         error_errors = error.errors
         error_tags = error_errors.tags
@@ -62,7 +68,7 @@ def apply_error_to_parsed_types(error: 'TError', parsed_types: dict[str, 'TType'
                 other_path_index = schema_keys_to_index[fn_name]
                 error_tag_index = error.errors.tag_indices[new_key]
                 other_document_name = schema_keys_to_document_names[fn_name]
-                fn_error_tag_index = f.result.tag_indices[new_key]
+                fn_error_tag_index = f.tag_indices[new_key]
                 other_final_path = [other_path_index,
                                     "->", fn_error_tag_index, new_key]
                 other_document_json = document_names_to_json[other_document_name]

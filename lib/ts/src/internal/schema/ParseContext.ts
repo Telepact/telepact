@@ -24,6 +24,7 @@ export class ParseContext {
     public readonly schemaKeysToDocumentName: { [key: string]: string };
     public readonly schemaKeysToIndex: { [key: string]: number };
     public readonly parsedTypes: { [key: string]: TType };
+    public readonly fnErrorRegexes: { [key: string]: string };
     public readonly allParseFailures: SchemaParseFailure[];
     public readonly failedTypes: Set<string>;
 
@@ -34,8 +35,9 @@ export class ParseContext {
         schemaKeysToDocumentName: { [key: string]: string },
         schemaKeysToIndex: { [key: string]: number },
         parsedTypes: { [key: string]: TType },
+        fnErrorRegexes: { [key: string]: string },
         allParseFailures: SchemaParseFailure[],
-        failedTypes: Set<string>,
+        failedTypes: Set<string>
     ) {
         this.documentName = documentName;
         this.telepactSchemaDocumentNamesToPseudoJson = telepactSchemaDocumentNamesToPseudoJson;
@@ -43,6 +45,7 @@ export class ParseContext {
         this.schemaKeysToDocumentName = schemaKeysToDocumentName;
         this.schemaKeysToIndex = schemaKeysToIndex;
         this.parsedTypes = parsedTypes;
+        this.fnErrorRegexes = fnErrorRegexes;
         this.allParseFailures = allParseFailures;
         this.failedTypes = failedTypes;
     }
@@ -55,8 +58,9 @@ export class ParseContext {
             this.schemaKeysToDocumentName,
             this.schemaKeysToIndex,
             this.parsedTypes,
+            this.fnErrorRegexes,
             this.allParseFailures,
-            this.failedTypes,
+            this.failedTypes
         );
     }
 }

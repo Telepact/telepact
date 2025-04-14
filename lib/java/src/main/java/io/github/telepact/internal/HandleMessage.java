@@ -32,7 +32,6 @@ import java.util.function.Function;
 
 import io.github.telepact.Message;
 import io.github.telepact.TelepactSchema;
-import io.github.telepact.internal.types.TFn;
 import io.github.telepact.internal.types.TType;
 import io.github.telepact.internal.types.TTypeDeclaration;
 import io.github.telepact.internal.types.TUnion;
@@ -61,8 +60,9 @@ public class HandleMessage {
             requestTarget = requestTargetInit;
         }
 
-        final var functionType = (TFn) parsedTelepactSchema.get(requestTarget);
-        final var resultUnionType = functionType.result;
+        final var functionName = requestTarget;
+        final var callType = (TUnion) parsedTelepactSchema.get(requestTarget);
+        final var resultUnionType = (TUnion) parsedTelepactSchema.get(requestTarget + ".->");
 
         final var callId = requestHeaders.get("@id_");
         if (callId != null) {
@@ -80,7 +80,7 @@ public class HandleMessage {
         }
 
         final List<ValidationFailure> requestHeaderValidationFailures = validateHeaders(requestHeaders,
-                telepactSchema.parsedRequestHeaders, functionType);
+                telepactSchema.parsedRequestHeaders, functionName);
         if (!requestHeaderValidationFailures.isEmpty()) {
             return getInvalidErrorMessage("ErrorInvalidRequestHeaders_", requestHeaderValidationFailures,
                     resultUnionType,
@@ -110,7 +110,7 @@ public class HandleMessage {
             return new Message(responseHeaders, newErrorResult);
         }
 
-        final TUnion functionTypeCall = functionType.call;
+        final TUnion functionTypeCall = callType;
 
         final var callValidateCtx = new ValidateContext(null, null, false);
 
@@ -130,9 +130,9 @@ public class HandleMessage {
         final var callMessage = new Message(requestHeaders, Map.of(requestTarget, requestPayload));
 
         final Message resultMessage;
-        if (requestTarget.equals("fn.ping_")) {
+        if (functionName.equals("fn.ping_")) {
             resultMessage = new Message(Map.of(), Map.of("Ok_", Map.of()));
-        } else if (requestTarget.equals("fn.api_")) {
+        } else if (functionName.equals("fn.api_")) {
             resultMessage = new Message(Map.of(), Map.of("Ok_", Map.of("api", telepactSchema.original)));
         } else {
             try {
@@ -172,7 +172,7 @@ public class HandleMessage {
         }
         
         final List<ValidationFailure> responseHeaderValidationFailures = validateHeaders(finalResponseHeaders,
-                telepactSchema.parsedResponseHeaders, functionType);
+                telepactSchema.parsedResponseHeaders, functionName);
         if (!responseHeaderValidationFailures.isEmpty()) {
             return getInvalidErrorMessage("ErrorInvalidResponseHeaders_", responseHeaderValidationFailures,
                     resultUnionType,

@@ -16,7 +16,8 @@
 
 package io.github.telepact.internal.schema;
 
-import static io.github.telepact.internal.schema.ParseFunctionType.parseFunctionType;
+import static io.github.telepact.internal.schema.ParseFunctionType.parseFunctionResultType;
+import static io.github.telepact.internal.schema.ParseFunctionType.parseFunctionErrorsRegex;
 import static io.github.telepact.internal.schema.ParseStructType.parseStructType;
 import static io.github.telepact.internal.schema.ParseUnionType.parseUnionType;
 
@@ -40,6 +41,7 @@ import io.github.telepact.internal.types.TObject;
 import io.github.telepact.internal.types.TSelect;
 import io.github.telepact.internal.types.TString;
 import io.github.telepact.internal.types.TType;
+import io.github.telepact.internal.types.TUnion;
 
 public class GetOrParseType {
     static TType getOrParseType(
@@ -100,8 +102,31 @@ public class GetOrParseType {
                         List.of(),
                         ctx.copyWithNewDocumentName(thisDocumentName));
             } else if (customTypeName.startsWith("fn")) {
-                type = parseFunctionType(thisPath, definition, customTypeName,
-                        ctx.copyWithNewDocumentName(thisDocumentName));
+
+                final var argType = parseStructType(path, definition,
+                    customTypeName, List.of("->", "_errors"), ctx);
+                type = new TUnion(customTypeName, Map.of(customTypeName, argType), Map.of(customTypeName, 0));
+
+                ctx.parsedTypes.put(customTypeName, type);
+
+                final var resultType = parseFunctionResultType(
+                    thisPath,
+                    definition,
+                    customTypeName,
+                    ctx.copyWithNewDocumentName(thisDocumentName)
+                );
+
+                ctx.parsedTypes.put(customTypeName + ".->", resultType);
+
+                final var errorsRegex = parseFunctionErrorsRegex(
+                    thisPath,
+                    definition,
+                    customTypeName,
+                    ctx.copyWithNewDocumentName(thisDocumentName)
+                );
+
+                ctx.fnErrorRegexes.put(customTypeName, errorsRegex);
+
             } else {
                 TType possibleTypeExtension;
                 switch (customTypeName) {

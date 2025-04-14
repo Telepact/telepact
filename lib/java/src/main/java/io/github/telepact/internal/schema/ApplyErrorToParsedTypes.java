@@ -23,31 +23,32 @@ import java.util.regex.Pattern;
 
 import io.github.telepact.TelepactSchemaParseError;
 import io.github.telepact.internal.types.TError;
-import io.github.telepact.internal.types.TFn;
 import io.github.telepact.internal.types.TType;
+import io.github.telepact.internal.types.TUnion;
 
 public class ApplyErrorToParsedTypes {
     public static void applyErrorToParsedTypes(TError error,
             Map<String, TType> parsedTypes, Map<String, String> schemaKeysToDocumentNames,
-            Map<String, Integer> schemaKeysToIndex, Map<String, String> documentNamesToJson) {
+            Map<String, Integer> schemaKeysToIndex, Map<String, String> documentNamesToJson,
+            Map<String, String> fnErrorRegexes) {
         var parseFailures = new ArrayList<SchemaParseFailure>();
 
         var errorKey = error.name;
         var errorIndex = schemaKeysToIndex.get(errorKey);
         var documentName = schemaKeysToDocumentNames.get(errorKey);
 
-        for (var entry : parsedTypes.entrySet()) {
-            var parsedTypeName = entry.getKey();
-            var parsedType = entry.getValue();
-
-            if (!(parsedType instanceof TFn)) {
+        for (var parsedTypeName : parsedTypes.keySet()) {
+            if (!parsedTypeName.startsWith("fn.") || parsedTypeName.endsWith(".->")) {
                 continue;
             }
 
-            var f = (TFn) parsedType;
-            var fnName = f.name;
-            var regex = Pattern.compile(f.errorsRegex);
-            var fnResult = f.result;
+            var parsedType = parsedTypes.get(parsedTypeName + ".->");
+
+            var f = (TUnion) parsedType;
+            var fnName = parsedTypeName;
+            var fnErrorsRegex = fnErrorRegexes.get(fnName);
+            var regex = Pattern.compile(fnErrorsRegex);
+            var fnResult = f;
             var fnResultTags = fnResult.tags;
             var errorErrors = error.errors;
             var errorTags = errorErrors.tags;
@@ -66,7 +67,7 @@ public class ApplyErrorToParsedTypes {
                     var otherPathIndex = schemaKeysToIndex.get(fnName);
                     var errorTagIndex = error.errors.tagIndices.get(newKey);
                     var otherDocumentName = schemaKeysToDocumentNames.get(fnName);
-                    var fnErrorTagIndex = f.result.tagIndices.get(newKey);
+                    var fnErrorTagIndex = f.tagIndices.get(newKey);
                     List<Object> otherFinalPath = List.of(otherPathIndex, "->", fnErrorTagIndex, newKey);
                     var otherDocumentJson = documentNamesToJson.get(otherDocumentName);
                     var otherLocationPseudoJson = GetPathDocumentCoordinatesPseudoJson

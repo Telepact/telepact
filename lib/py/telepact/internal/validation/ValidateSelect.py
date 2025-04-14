@@ -29,9 +29,6 @@ def validate_select(given_obj: object, possible_fn_selects: dict[str, object], c
 
     fn_scope = cast(str, ctx.fn)
 
-    print(f'possible_fn_selects: {possible_fn_selects}')
-    print(f'fn_scope: {fn_scope}')
-
     possible_select = possible_fn_selects[fn_scope]
 
     return is_sub_select([], given_obj, possible_select)

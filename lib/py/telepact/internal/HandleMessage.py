@@ -22,7 +22,6 @@ from ..Message import Message
 from .types.TTypeDeclaration import TTypeDeclaration
 
 if TYPE_CHECKING:
-    from .types.TUnion import TUnion
     from ..internal.validation.ValidationFailure import ValidationFailure
     from .types.TType import TType
     from ..TelepactSchema import TelepactSchema
@@ -38,7 +37,7 @@ async def handle_message(
     from ..internal.validation.GetInvalidErrorMessage import get_invalid_error_message
     from ..internal.validation.ValidateHeaders import validate_headers
     from ..internal.validation.ValidateResult import validate_result
-    from .types.TFn import TFn
+    from .types.TUnion import TUnion
     from ..internal.validation.ValidateContext import ValidateContext
 
     response_headers: dict[str, object] = {}
@@ -60,8 +59,9 @@ async def handle_message(
         unknown_target = None
         request_target = request_target_init
 
-    function_type = cast(TFn, parsed_telepact_schema[request_target])
-    result_union_type: TUnion = function_type.result
+    function_name = request_target
+    call_type = cast(TUnion, parsed_telepact_schema[request_target])
+    result_union_type = cast(TUnion, parsed_telepact_schema[request_target + '.->'])
 
     call_id = request_headers.get("@id_")
     if call_id is not None:
@@ -78,7 +78,7 @@ async def handle_message(
         return Message(response_headers, new_error_result)
 
     request_header_validation_failures: list[ValidationFailure] = validate_headers(
-        request_headers, telepact_schema.parsed_request_headers, function_type
+        request_headers, telepact_schema.parsed_request_headers, function_name
     )
     if request_header_validation_failures:
         return get_invalid_error_message(
@@ -117,9 +117,9 @@ async def handle_message(
         validate_result(result_union_type, new_error_result)
         return Message(response_headers, new_error_result)
 
-    function_type_call: TUnion = function_type.call
+    function_type_call: TUnion = call_type
 
-    call_validate_ctx = ValidateContext(None, function_type.name, coerce_base64=False)
+    call_validate_ctx = ValidateContext(None, function_name, coerce_base64=False)
 
     call_validation_failures: list[ValidationFailure] = function_type_call.validate(
         request_body, [], call_validate_ctx)
@@ -140,9 +140,9 @@ async def handle_message(
         request_headers, {request_target: request_payload})
 
     result_message: Message
-    if request_target == "fn.ping_":
+    if function_name == "fn.ping_":
         result_message = Message({}, {"Ok_": {}})
-    elif request_target == "fn.api_":
+    elif function_name == "fn.api_":
         result_message = Message({}, {"Ok_": {"api": telepact_schema.original}})
     else:
         try:
@@ -162,7 +162,7 @@ async def handle_message(
     skip_result_validation: bool = unsafe_response_enabled
 
     coerce_base64 = final_response_headers.get("@binary_", False) == False
-    result_validate_ctx = ValidateContext(select_struct_fields_header, function_type.name, coerce_base64=coerce_base64)
+    result_validate_ctx = ValidateContext(select_struct_fields_header, function_name, coerce_base64=coerce_base64)
     result_validation_failures: list[ValidationFailure] = result_union_type.validate(
         result_union, [], result_validate_ctx)
     
@@ -184,7 +184,7 @@ async def handle_message(
         server_base64_decode(result_union, result_validate_ctx.bytes_coercions)
     
     response_header_validation_failures: list[ValidationFailure] = validate_headers(
-        final_response_headers, telepact_schema.parsed_response_headers, function_type
+        final_response_headers, telepact_schema.parsed_response_headers, function_name
     )
     if response_header_validation_failures:
         return get_invalid_error_message(

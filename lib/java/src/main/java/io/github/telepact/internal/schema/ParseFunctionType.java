@@ -27,28 +27,18 @@ import java.util.List;
 import java.util.Map;
 
 import io.github.telepact.TelepactSchemaParseError;
-import io.github.telepact.internal.types.TFn;
 import io.github.telepact.internal.types.TSelect;
 import io.github.telepact.internal.types.TStruct;
 import io.github.telepact.internal.types.TUnion;
 
 public class ParseFunctionType {
 
-    static TFn parseFunctionType(
+    static TUnion parseFunctionResultType(
             List<Object> path,
             Map<String, Object> functionDefinitionAsParsedJson,
             String schemaKey,
             ParseContext ctx) {
         final var parseFailures = new ArrayList<SchemaParseFailure>();
-
-        TUnion callType = null;
-        try {
-            final TStruct argType = parseStructType(path, functionDefinitionAsParsedJson,
-                    schemaKey, List.of("->", "_errors"), ctx);
-            callType = new TUnion(schemaKey, Map.of(schemaKey, argType), Map.of(schemaKey, 0));
-        } catch (TelepactSchemaParseError e) {
-            parseFailures.addAll(e.schemaParseFailures);
-        }
 
         final var resultSchemaKey = "->";
 
@@ -67,6 +57,26 @@ public class ParseFunctionType {
                 parseFailures.addAll(e.schemaParseFailures);
             }
         }
+
+
+        if (!parseFailures.isEmpty()) {
+            throw new TelepactSchemaParseError(parseFailures, ctx.telepactSchemaDocumentNamesToJson);
+        }
+
+        var fnSelectType = derivePossibleSelect(schemaKey, resultType);
+        var selectType = (TSelect) getOrParseType(path, "_ext.Select_", ctx);
+        selectType.possibleSelects.put(schemaKey, fnSelectType);
+
+        return resultType;
+    }
+
+    static String parseFunctionErrorsRegex(
+            List<Object> path,
+            Map<String, Object> functionDefinitionAsParsedJson,
+            String schemaKey,
+            ParseContext ctx) {
+        final var parseFailures = new ArrayList<SchemaParseFailure>();
+
 
         final var errorsRegexKey = "_errors";
 
@@ -89,17 +99,13 @@ public class ParseFunctionType {
             } else {
                 errorsRegex = (String) errorsRegexInit;
             }
-        }
+        }                
 
         if (!parseFailures.isEmpty()) {
             throw new TelepactSchemaParseError(parseFailures, ctx.telepactSchemaDocumentNamesToJson);
         }
 
-        var fnSelectType = derivePossibleSelect(schemaKey, resultType);
-        var selectType = (TSelect) getOrParseType(path, "_ext.Select_", ctx);
-        selectType.possibleSelects.put(schemaKey, fnSelectType);
-
-        return new TFn(schemaKey, callType, resultType, errorsRegex);
-    }
+        return errorsRegex;
+    }    
 
 }

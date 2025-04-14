@@ -45,6 +45,10 @@ public class DerivePossibleSelects {
         final var sortedTypeKeys = new ArrayList<>(nestedTypes.keySet());
         Collections.sort(sortedTypeKeys);
         for (final var k : sortedTypeKeys) {
+            if (k.startsWith("fn.")) {
+                continue;
+            }
+
             final var v = nestedTypes.get(k);
             if (v instanceof TUnion u) {
                 final var unionSelect = new HashMap<String, List<String>>();

@@ -31,7 +31,6 @@ import io.github.telepact.TelepactError;
 import io.github.telepact.TelepactSchema;
 import io.github.telepact.RandomGenerator;
 import io.github.telepact.internal.generation.GenerateContext;
-import io.github.telepact.internal.types.TFn;
 import io.github.telepact.internal.types.TUnion;
 
 public class MockHandle {
@@ -99,7 +98,7 @@ public class MockHandle {
             default -> {
                 invocations.add(new MockInvocation(functionName, new TreeMap<>(argument)));
 
-                final var definition = (TFn) telepactSchema.parsed.get(functionName);
+                final var definition = (TUnion) telepactSchema.parsed.get(functionName + ".->");
 
                 for (final var stub : stubs) {
                     if (stub.count == 0) {
@@ -111,7 +110,7 @@ public class MockHandle {
                                 final var useBlueprintValue = true;
                                 final var includeOptionalFields = false;
                                 final var alwaysIncludeRequiredFields = true;
-                                final var result = (Map<String, Object>) definition.result.generateRandomValue(
+                                final var result = (Map<String, Object>) definition.generateRandomValue(
                                         stub.thenResult, useBlueprintValue, List.of(),
                                         new GenerateContext(
                                                 includeOptionalFields, randomizeOptionalFieldGeneration,
@@ -127,7 +126,7 @@ public class MockHandle {
                                 final var useBlueprintValue = true;
                                 final var includeOptionalFields = false;
                                 final var alwaysIncludeRequiredFields = true;
-                                final var result = (Map<String, Object>) definition.result.generateRandomValue(
+                                final var result = (Map<String, Object>) definition.generateRandomValue(
                                         stub.thenResult, useBlueprintValue, List.of(),
                                         new GenerateContext(
                                                 includeOptionalFields, randomizeOptionalFieldGeneration,
@@ -147,7 +146,7 @@ public class MockHandle {
                 }
 
                 if (definition != null) {
-                    final var resultUnion = (TUnion) definition.result;
+                    final var resultUnion = (TUnion) definition;
                     final var okStructRef = resultUnion.tags.get("Ok_");
                     final var useBlueprintValue = true;
                     final var includeOptionalFields = true;

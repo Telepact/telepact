@@ -16,7 +16,6 @@
 
 import { TType } from '../types/TType';
 import { TUnion } from '../types/TUnion';
-import { TFn } from '../types/TFn';
 import { TStruct } from '../types/TStruct';
 import { TFieldDeclaration } from '../types/TFieldDeclaration';
 import { TArray } from '../types/TArray';
@@ -42,6 +41,10 @@ export function derivePossibleSelect(fnName: string, result: TUnion): Record<str
 
     const sortedTypeKeys = Object.keys(nestedTypes).sort();
     for (const k of sortedTypeKeys) {
+        if (k.startsWith('fn.')) {
+            continue;
+        }
+
         const v = nestedTypes[k];
         if (v instanceof TUnion) {
             const unionSelect: Record<string, object> = {};

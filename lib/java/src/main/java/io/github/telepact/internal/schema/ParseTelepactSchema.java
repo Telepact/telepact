@@ -55,6 +55,7 @@ public class ParseTelepactSchema {
         });
         final var parsedTypes = new HashMap<String, TType>();
         final var parseFailures = new ArrayList<SchemaParseFailure>();
+        final var fnErrorRegexes = new HashMap<String, String>();
         final var failedTypes = new HashSet<String>();
         final var schemaKeysToIndex = new HashMap<String, Integer>();
         final var schemaKeysToDocumentName = new HashMap<String, String>();
@@ -174,6 +175,7 @@ public class ParseTelepactSchema {
                                 schemaKeysToDocumentName,
                                 schemaKeysToIndex,
                                 parsedTypes,
+                                fnErrorRegexes,
                                 parseFailures,
                                 failedTypes));
             } catch (TelepactSchemaParseError e) {
@@ -205,6 +207,7 @@ public class ParseTelepactSchema {
                                 schemaKeysToDocumentName,
                                 schemaKeysToIndex,
                                 parsedTypes,
+                                fnErrorRegexes,
                                 parseFailures,
                                 failedTypes));
                 errors.add(error);
@@ -231,7 +234,7 @@ public class ParseTelepactSchema {
         for (var error : errors) {
             try {
                 applyErrorToParsedTypes(error, parsedTypes, schemaKeysToDocumentName, schemaKeysToIndex,
-                        telepactSchemaNameToJson);
+                        telepactSchemaNameToJson, fnErrorRegexes);
             } catch (TelepactSchemaParseError e) {
                 parseFailures.addAll(e.schemaParseFailures);
             }
@@ -260,6 +263,7 @@ public class ParseTelepactSchema {
                                 schemaKeysToDocumentName,
                                 schemaKeysToIndex,
                                 parsedTypes,
+                                fnErrorRegexes,
                                 parseFailures,
                                 failedTypes));
                 headers.add(headerType);

@@ -21,14 +21,11 @@ import static io.github.telepact.internal.binary.CreateChecksum.createChecksum;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.TreeSet;
 
 import io.github.telepact.TelepactSchema;
 import io.github.telepact.internal.types.TArray;
-import io.github.telepact.internal.types.TFn;
 import io.github.telepact.internal.types.TObject;
 import io.github.telepact.internal.types.TStruct;
 import io.github.telepact.internal.types.TTypeDeclaration;
@@ -76,38 +73,33 @@ public class ConstructBinaryEncoding {
 
     public static BinaryEncoding constructBinaryEncoding(TelepactSchema telepactSchema) {
         final var allKeys = new TreeSet<String>();
-        final var functions = new ArrayList<Map.Entry<String, TFn>>();
 
         for (final var entry : telepactSchema.parsed.entrySet()) {
             final var key = entry.getKey();
             final var value = entry.getValue();
-            if (value instanceof TFn) {
-                functions.add(Map.entry(key, (TFn) value));
-            }
-        }
 
-        for (final var function : functions) {
-            final var key = function.getKey();
-            final var value = function.getValue();
-            allKeys.add(key);
-            final var args = value.call.tags.get(key);
-            for (final var fieldEntry : args.fields.entrySet()) {
-                final var fieldKey = fieldEntry.getKey();
-                final var field = fieldEntry.getValue();
-                allKeys.add(fieldKey);
-                final var keys = traceType(field.typeDeclaration);
-                keys.forEach(allKeys::add);
+            if (key.endsWith(".->") && value instanceof TUnion u) {
+                final var result = u.tags.get("Ok_");
+                allKeys.add("Ok_");
+                for (final var fieldEntry : result.fields.entrySet()) {
+                    final var fieldKey = fieldEntry.getKey();
+                    final var field = fieldEntry.getValue();
+                    allKeys.add(fieldKey);
+                    final var keys = traceType(field.typeDeclaration);
+                    keys.forEach(allKeys::add);
+                }
+            } else if (key.startsWith("fn.") && value instanceof TUnion u)  {
+                allKeys.add(key);
+                final var args = u.tags.get(key);
+                for (final var fieldEntry : args.fields.entrySet()) {
+                    final var fieldKey = fieldEntry.getKey();
+                    final var field = fieldEntry.getValue();
+                    allKeys.add(fieldKey);
+                    final var keys = traceType(field.typeDeclaration);
+                    keys.forEach(allKeys::add);
+                }
             }
 
-            final var result = value.result.tags.get("Ok_");
-            allKeys.add("Ok_");
-            for (final var fieldEntry : result.fields.entrySet()) {
-                final var fieldKey = fieldEntry.getKey();
-                final var field = fieldEntry.getValue();
-                allKeys.add(fieldKey);
-                final var keys = traceType(field.typeDeclaration);
-                keys.forEach(allKeys::add);
-            }
         }
 
         final var sortedAllKeys = new ArrayList<>(allKeys);

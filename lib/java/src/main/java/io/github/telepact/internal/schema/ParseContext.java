@@ -30,6 +30,7 @@ public class ParseContext {
     public final Map<String, String> schemaKeysToDocumentName;
     public final Map<String, Integer> schemaKeysToIndex;
     public final Map<String, TType> parsedTypes;
+    public final Map<String, String> fnErrorRegexes;
     public final List<SchemaParseFailure> allParseFailures;
     public final Set<String> failedTypes;
 
@@ -38,6 +39,7 @@ public class ParseContext {
             Map<String, String> telepactSchemaDocumentNamesToJson,
             Map<String, String> schemaKeysToDocumentName, Map<String, Integer> schemaKeysToIndex,
             Map<String, TType> parsedTypes,
+            Map<String, String> fnErrorRegexes,
             List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
         this.documentName = documentName;
         this.telepactSchemaDocumentsToPseudoJson = telepactSchemaDocumentsToPseudoJson;
@@ -45,6 +47,7 @@ public class ParseContext {
         this.schemaKeysToDocumentName = schemaKeysToDocumentName;
         this.schemaKeysToIndex = schemaKeysToIndex;
         this.parsedTypes = parsedTypes;
+        this.fnErrorRegexes = fnErrorRegexes;
         this.allParseFailures = allParseFailures;
         this.failedTypes = failedTypes;
     }
@@ -52,6 +55,6 @@ public class ParseContext {
     public ParseContext copyWithNewDocumentName(String documentName) {
         return new ParseContext(documentName, telepactSchemaDocumentsToPseudoJson, telepactSchemaDocumentNamesToJson,
                 schemaKeysToDocumentName,
-                schemaKeysToIndex, parsedTypes, allParseFailures, failedTypes);
+                schemaKeysToIndex, parsedTypes, fnErrorRegexes, allParseFailures, failedTypes);
     }
 }

@@ -17,7 +17,6 @@
 from typing import List, Dict, Tuple, Set, Union
 from typing import TYPE_CHECKING
 
-
 from ...internal.binary.BinaryEncoding import BinaryEncoding
 from ...internal.binary.CreateChecksum import create_checksum
 
@@ -60,33 +59,29 @@ def trace_type(type_declaration: 'TTypeDeclaration') -> list[str]:
 
 
 def construct_binary_encoding(telepact_schema: 'TelepactSchema') -> 'BinaryEncoding':
-    from ..types.TTypeDeclaration import TTypeDeclaration
-    from ..types.TFn import TFn
+    from ..types.TUnion import TUnion
 
     all_keys: set[str] = set()
 
-    functions: list[Tuple[str, TFn]] = []
-
     for key, value in telepact_schema.parsed.items():
-        if isinstance(value, TFn):
-            functions.append((key, value))
 
-    for key, value in functions:
-        all_keys.add(key)
-        args = value.call.tags[key]
-        for field_key, field in args.fields.items():
-            all_keys.add(field_key)
-            keys = trace_type(field.type_declaration)
-            for key in keys:
-                all_keys.add(key)
+        if key.endswith('.->') and isinstance(value, TUnion):
+            result = value.tags['Ok_']
+            all_keys.add('Ok_')
+            for field_key, field in result.fields.items():
+                all_keys.add(field_key)
+                keys = trace_type(field.type_declaration)
+                for key in keys:
+                    all_keys.add(key)
 
-        result = value.result.tags['Ok_']
-        all_keys.add('Ok_')
-        for field_key, field in result.fields.items():
-            all_keys.add(field_key)
-            keys = trace_type(field.type_declaration)
-            for key in keys:
-                all_keys.add(key)
+        elif key.startswith('fn.') and isinstance(value, TUnion):
+            all_keys.add(key)
+            args = value.tags[key]
+            for field_key, field in args.fields.items():
+                all_keys.add(field_key)
+                keys = trace_type(field.type_declaration)
+                for key in keys:
+                    all_keys.add(key)
 
     sorted_all_keys = sorted(all_keys)
 

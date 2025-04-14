@@ -16,18 +16,18 @@
 
 import { GenerateContext } from './GenerateContext';
 import { generateRandomUnion } from './GenerateRandomUnion';
-import { TFn } from '../types/TFn';
 import { TType } from '../types/TType';
+import { TUnion } from '../types/TUnion';
 
 export function generateRandomUMockCall(types: { [key: string]: TType }, ctx: GenerateContext) {
-    const functions: Array<TFn> = Object.entries(types)
-        .filter(([key, value]) => value instanceof TFn)
+    const functions: Array<TUnion> = Object.entries(types)
+        .filter(([key, value]) => key.startsWith('fn.') && !key.endsWith('.->'))
         .filter(([key, value]) => !key.endsWith('_'))
-        .map(([key, value]) => value as TFn);
+        .map(([key, value]) => value as TUnion);
 
     functions.sort((fn1, fn2) => fn1.name.localeCompare(fn2.name));
 
     const selectedFn = functions[Math.floor(ctx.randomGenerator.nextIntWithCeiling(functions.length))];
 
-    return generateRandomUnion(null, false, selectedFn.call.tags, ctx.copy({ alwaysIncludeRequiredFields: false }));
+    return generateRandomUnion(null, false, selectedFn.tags, ctx.copy({ alwaysIncludeRequiredFields: false }));
 }

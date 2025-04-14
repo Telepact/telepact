@@ -17,7 +17,6 @@
 from typing import TYPE_CHECKING, cast
 
 from .types.TArray import TArray
-from .types.TFn import TFn
 from .types.TObject import TObject
 from .types.TStruct import TStruct
 from .types.TUnion import TUnion
@@ -49,29 +48,6 @@ def select_struct_fields(type_declaration: 'TTypeDeclaration', value: object,
                 final_map[field_name] = value_with_selected_fields
 
         return final_map
-    elif isinstance(type_declaration_type, TFn):
-        value_as_map = cast(dict[str, object], value)
-        union_tag, union_data = cast(
-            tuple[str, dict[str, object]], next(iter(value_as_map.items())))
-
-        fn_name = type_declaration_type.name
-        fn_call = type_declaration_type.call
-        fn_call_tags = fn_call.tags
-
-        arg_struct_reference = fn_call_tags[union_tag]
-        selected_fields = cast(
-            list[str] | None, selected_struct_fields.get(fn_name))
-        final_map = {}
-
-        for field_name, field_value in union_data.items():
-            if selected_fields is None or field_name in selected_fields:
-                field = arg_struct_reference.fields[field_name]
-                value_with_selected_fields = select_struct_fields(field.type_declaration, field_value,
-                                                                  selected_struct_fields)
-
-                final_map[field_name] = value_with_selected_fields
-
-        return {union_tag: final_map}
     elif isinstance(type_declaration_type, TUnion):
         value_as_map = cast(dict[str, object], value)
         union_tag, union_data = cast(

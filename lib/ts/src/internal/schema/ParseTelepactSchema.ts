@@ -38,6 +38,7 @@ export function parseTelepactSchema(telepactSchemaDocumentNamesToJson: Record<st
     const fullSchema: { [key: string]: Record<string, object> } = {};
     const parsedTypes: { [key: string]: TType } = {};
     const parseFailures: SchemaParseFailure[] = [];
+    const fnErrorRegexes: { [key: string]: string } = {};
     const failedTypes: Set<string> = new Set();
     const schemaKeysToIndex: { [key: string]: number } = {};
     const schemaKeysToDocumentName: { [key: string]: string } = {};
@@ -120,6 +121,7 @@ export function parseTelepactSchema(telepactSchemaDocumentNamesToJson: Record<st
                 schemaKeys.add(schemaKey);
                 schemaKeysToIndex[schemaKey] = index;
                 schemaKeysToDocumentName[schemaKey] = documentName;
+
                 if ('auto_' === documentName || !documentName.endsWith('_')) {
                     originalSchema[schemaKey] = def_;
                 }
@@ -166,8 +168,9 @@ export function parseTelepactSchema(telepactSchemaDocumentNamesToJson: Record<st
                     schemaKeysToDocumentName,
                     schemaKeysToIndex,
                     parsedTypes,
+                    fnErrorRegexes,
                     parseFailures,
-                    failedTypes,
+                    failedTypes
                 ),
             );
         } catch (e) {
@@ -204,8 +207,9 @@ export function parseTelepactSchema(telepactSchemaDocumentNamesToJson: Record<st
                         schemaKeysToDocumentName,
                         schemaKeysToIndex,
                         parsedTypes,
+                        fnErrorRegexes,
                         parseFailures,
-                        failedTypes,
+                        failedTypes
                     ),
                 );
                 errors.push(error);
@@ -257,6 +261,7 @@ export function parseTelepactSchema(telepactSchemaDocumentNamesToJson: Record<st
                 schemaKeysToDocumentName,
                 schemaKeysToIndex,
                 telepactSchemaDocumentNamesToJson,
+                fnErrorRegexes
             );
         } catch (e) {
             if (e instanceof TelepactSchemaParseError) {
@@ -287,8 +292,9 @@ export function parseTelepactSchema(telepactSchemaDocumentNamesToJson: Record<st
                     schemaKeysToDocumentName,
                     schemaKeysToIndex,
                     parsedTypes,
+                    fnErrorRegexes,
                     parseFailures,
-                    failedTypes,
+                    failedTypes
                 ),
             );
             headers.push(headerType);

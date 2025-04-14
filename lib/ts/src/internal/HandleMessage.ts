@@ -24,7 +24,6 @@ import { selectStructFields } from '../internal/SelectStructFields';
 import { getInvalidErrorMessage } from '../internal/validation/GetInvalidErrorMessage';
 import { validateHeaders } from '../internal/validation/ValidateHeaders';
 import { validateResult } from '../internal/validation/ValidateResult';
-import { TFn } from './types/TFn';
 import { mapValidationFailuresToInvalidFieldCases } from './validation/MapValidationFailuresToInvalidFieldCases';
 import { ValidateContext } from './validation/ValidateContext';
 import { serverBase64Decode } from './binary/ServerBase64Decode';
@@ -54,8 +53,9 @@ export async function handleMessage(
         requestTarget = requestTargetInit;
     }
 
-    const functionType = parsedTelepactSchema[requestTarget] as TFn;
-    const resultUnionType: TUnion = functionType.result;
+    const functionName = requestTarget;
+    const callType = parsedTelepactSchema[requestTarget] as TUnion;
+    const resultUnionType: TUnion = parsedTelepactSchema[`${requestTarget}.->`] as TUnion;
 
     const callId = requestHeaders['@id_'];
     if (callId !== undefined) {
@@ -76,7 +76,7 @@ export async function handleMessage(
     const requestHeaderValidationFailures: ValidationFailure[] = validateHeaders(
         requestHeaders,
         telepactSchema.parsedRequestHeaders,
-        functionType,
+        functionName,
     );
     if (requestHeaderValidationFailures.length > 0) {
         return getInvalidErrorMessage(
@@ -116,7 +116,7 @@ export async function handleMessage(
         return new Message(responseHeaders, newErrorResult);
     }
 
-    const functionTypeCall: TUnion = functionType.call;
+    const functionTypeCall: TUnion = callType;
 
     const warnings: ValidationFailure[] = [];
     const filterOutWarnings = (e: ValidationFailure) => {
@@ -127,7 +127,7 @@ export async function handleMessage(
         return !r;
     };
 
-    const callValidateCtx = new ValidateContext(null, functionType.name, false)
+    const callValidateCtx = new ValidateContext(null, functionName, false)
 
     const callValidationFailures: ValidationFailure[] = functionTypeCall
         .validate(requestBody, [], callValidateCtx)
@@ -153,12 +153,12 @@ export async function handleMessage(
 
     const unsafeResponseEnabled = requestHeaders['@unsafe_'] || false;
 
-    const callMessage: Message = new Message(requestHeaders, { [requestTarget]: requestPayload });
+    const callMessage: Message = new Message(requestHeaders, { [functionName]: requestPayload });
 
     let resultMessage: Message;
-    if (requestTarget === 'fn.ping_') {
+    if (functionName === 'fn.ping_') {
         resultMessage = new Message({}, { Ok_: {} });
-    } else if (requestTarget === 'fn.api_') {
+    } else if (functionName === 'fn.api_') {
         resultMessage = new Message({}, { Ok_: { api: telepactSchema.original } });
     } else {
         try {
@@ -181,7 +181,7 @@ export async function handleMessage(
     const skipResultValidation: boolean = unsafeResponseEnabled;
 
     const coerceBase64 = requestHeaders["@binary_"] != true
-    const resultValidateCtx = new ValidateContext(selectStructFieldsHeader, functionType.name, coerceBase64);
+    const resultValidateCtx = new ValidateContext(selectStructFieldsHeader, functionName, coerceBase64);
     const resultValidationFailures: ValidationFailure[] = resultUnionType
         .validate(resultUnion, [], resultValidateCtx)
         .filter(filterOutWarnings);
@@ -212,7 +212,7 @@ export async function handleMessage(
     const responseHeaderValidationFailures: ValidationFailure[] = validateHeaders(
         finalResponseHeaders,
         telepactSchema.parsedResponseHeaders,
-        functionType,
+        functionName
     );
     if (responseHeaderValidationFailures.length > 0) {
         return getInvalidErrorMessage(

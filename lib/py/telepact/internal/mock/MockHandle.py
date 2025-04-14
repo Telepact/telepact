@@ -32,7 +32,7 @@ async def mock_handle(request_message: 'Message', stubs: list['MockStub'], invoc
     from ...internal.mock.Verify import verify
     from ...internal.mock.VerifyNoMoreInteractions import verify_no_more_interactions
     from ...TelepactError import TelepactError
-    from ..types.TFn import TFn
+    from ..types.TUnion import TUnion
     from ...internal.generation.GenerateContext import GenerateContext
 
     header: dict[str, object] = request_message.headers
@@ -89,7 +89,7 @@ async def mock_handle(request_message: 'Message', stubs: list['MockStub'], invoc
     else:
         invocations.append(MockInvocation(function_name, dict(argument)))
 
-        definition = cast(TFn, telepact_schema.parsed.get(function_name))
+        definition = cast(TUnion, telepact_schema.parsed.get(function_name + '.->'))
 
         for stub in stubs:
             if stub.count == 0:
@@ -100,7 +100,7 @@ async def mock_handle(request_message: 'Message', stubs: list['MockStub'], invoc
                         use_blueprint_value = True
                         include_optional_fields = False
                         always_include_required_fields = True
-                        result_init = definition.result.generate_random_value(stub.then_result, use_blueprint_value, [],
+                        result_init = definition.generate_random_value(stub.then_result, use_blueprint_value, [],
                                                                               GenerateContext(
                                                                               include_optional_fields,
                                                                               randomize_optional_field_generation,
@@ -115,7 +115,7 @@ async def mock_handle(request_message: 'Message', stubs: list['MockStub'], invoc
                         use_blueprint_value = True
                         include_optional_fields = False
                         always_include_required_fields = True
-                        result_init = definition.result.generate_random_value(stub.then_result, use_blueprint_value, [],
+                        result_init = definition.generate_random_value(stub.then_result, use_blueprint_value, [],
                                                                               GenerateContext(
                                                                               include_optional_fields,
                                                                               randomize_optional_field_generation,
@@ -130,7 +130,7 @@ async def mock_handle(request_message: 'Message', stubs: list['MockStub'], invoc
             return Message({}, {"ErrorNoMatchingStub_": {}})
 
         if definition is not None:
-            result_union = definition.result
+            result_union = definition
             ok_struct_ref = result_union.tags["Ok_"]
             use_blueprint_value = True
             include_optional_fields = True

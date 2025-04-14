@@ -14,24 +14,28 @@
 #|  limitations under the License.
 #|
 
+from typing import cast
+
 from ...internal.generation.GenerateContext import GenerateContext
 from ...internal.generation.GenerateRandomStruct import generate_random_struct
-from ..types.TFn import TFn
 from ..types.TType import TType
 
 
 def generate_random_u_mock_stub(types: dict[str, TType], ctx: GenerateContext) -> object:
-    functions = [value for key, value in types.items() if isinstance(
-        value, TFn) and not key.endswith('_')]
+    from ...internal.types.TUnion import TUnion
 
-    functions.sort(key=lambda fn: fn.name)
+    functions = [key for key in types.keys() if key.startswith('fn.') and not key.endswith('.->') and not key.endswith('_')]
+
+    functions.sort()
 
     index = ctx.random_generator.next_int_with_ceiling(len(functions))
 
-    selected_fn = functions[index]
+    selected_fn_name = functions[index]
+    selected_fn = cast(TUnion, types[selected_fn_name])
+    selected_result = cast(TUnion, types[selected_fn_name + '.->'])
 
-    arg_fields = selected_fn.call.tags[selected_fn.name].fields
-    ok_fields = selected_fn.result.tags['Ok_'].fields
+    arg_fields = selected_fn.tags[selected_fn_name].fields
+    ok_fields = selected_result.tags['Ok_'].fields
 
     arg = generate_random_struct(None, False, arg_fields, ctx.copy(
         always_include_required_fields=False))
@@ -39,7 +43,7 @@ def generate_random_u_mock_stub(types: dict[str, TType], ctx: GenerateContext) -
                                        ok_fields, ctx.copy(always_include_required_fields=False))
 
     return {
-        selected_fn.name: arg,
+        selected_fn_name: arg,
         '->': {
             'Ok_': ok_result,
         },

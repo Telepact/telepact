@@ -19,7 +19,6 @@ import { BinaryEncoding } from '../../internal/binary/BinaryEncoding';
 import { createChecksum } from '../../internal/binary/CreateChecksum';
 import { TUnion } from '../types/TUnion';
 import { TStruct } from '../types/TStruct';
-import { TFn } from '../types/TFn';
 import { TArray } from '../types/TArray';
 import { TObject } from '../types/TObject';
 import { TTypeDeclaration } from '../types/TTypeDeclaration';
@@ -59,30 +58,26 @@ function traceType(typeDeclaration: TTypeDeclaration): string[] {
 export function constructBinaryEncoding(telepactSchema: TelepactSchema): BinaryEncoding {
     const allKeys: Set<string> = new Set();
 
-    const functions: [string, TFn][] = [];
-
     for (const [key, value] of Object.entries(telepactSchema.parsed)) {
-        if (value instanceof TFn) {
-            functions.push([key, value]);
+
+        if (key.endsWith('.->') && value instanceof TUnion) {
+            const result = value.tags['Ok_'];
+            allKeys.add('Ok_');
+            Object.entries(result.fields).forEach(([fieldKey, field]) => {
+                allKeys.add(fieldKey);
+                const keys = traceType(field.typeDeclaration);
+                keys.forEach((key) => allKeys.add(key));
+            });
+    
+        } else if (key.startsWith('fn.') && value instanceof TUnion) {
+            allKeys.add(key);
+            const args = value.tags[key];
+            Object.entries(args.fields).forEach(([fieldKey, field]) => {
+                allKeys.add(fieldKey);
+                const keys = traceType(field.typeDeclaration);
+                keys.forEach((key) => allKeys.add(key));
+            });
         }
-    }
-
-    for (const [key, value] of functions) {
-        allKeys.add(key);
-        const args = value.call.tags[key];
-        Object.entries(args.fields).forEach(([fieldKey, field]) => {
-            allKeys.add(fieldKey);
-            const keys = traceType(field.typeDeclaration);
-            keys.forEach((key) => allKeys.add(key));
-        });
-
-        const result = value.result.tags['Ok_'];
-        allKeys.add('Ok_');
-        Object.entries(result.fields).forEach(([fieldKey, field]) => {
-            allKeys.add(fieldKey);
-            const keys = traceType(field.typeDeclaration);
-            keys.forEach((key) => allKeys.add(key));
-        });
     }
 
     const sortedAllKeys = Array.from(allKeys).sort();
