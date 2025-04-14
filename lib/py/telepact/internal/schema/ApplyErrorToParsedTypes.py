@@ -50,10 +50,6 @@ def apply_error_to_parsed_types(error: 'TError',
         fn_name = parsed_type_name
         fn_error_regex = fn_error_regexes[fn_name]
 
-        print(f'parsed_type_name: {parsed_type_name}')
-        print(f'fn_error_regexes: {fn_error_regexes}')
-        print(f'fn_error_regex: {fn_error_regex}')
-
         regex = re.compile(fn_error_regex)
 
         fn_result = f
