@@ -184,7 +184,7 @@ export function generateFnResultExample(
 	blueprintValue: any,
 	useBlueprintValue: boolean
 ) {
-	let exampleResult = schemaInst.parsed[fn].result.generateRandomValue(
+	let exampleResult = schemaInst.parsed[fn + '.->'].generateRandomValue(
 		blueprintValue,
 		useBlueprintValue,
 		[],
