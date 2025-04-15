@@ -21,6 +21,8 @@ import * as telepact from './telepact/index.esm.js';
 import { _internal } from './telepact/index.esm.js';
 import { writable, type Writable } from 'svelte/store';
 import { createJsonSchema } from './jsonSchema';
+import { parse } from 'marked';
+import DOMPurify from 'dompurify';
 
 export function createJsonSchema2(telepact: telepact.TelepactSchema): Record<string, any> {
 	return createJsonSchema(telepact);
@@ -149,6 +151,15 @@ export interface HeaderData {
 	doc: string | string[];
 	requestData: Record<string, any>;
 	responseData: Record<string, any>;
+}
+
+export function markdownHtml(entry: Record<string, any>): string {
+	let descriptionDef = entry.doc;
+	let descriptionStr = Array.isArray(descriptionDef)
+		? descriptionDef.map((l) => l.trim()).join('\n')
+		: descriptionDef;
+	let markdownHtml = typeof descriptionStr == 'string' ? (parse(descriptionStr) as string) : '';
+	return DOMPurify.sanitize(markdownHtml);
 }
 
 export function isFnTypeData(data: any): data is FnTypeData {

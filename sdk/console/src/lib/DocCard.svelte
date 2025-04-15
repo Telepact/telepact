@@ -15,11 +15,9 @@
 <!--|                                                                            |-->
 
 <script lang="ts">
-	import { parse } from 'marked';
 	import DocCardEnumTags from './DocCardEnumTags.svelte';
 	import DocCardStructFields from './DocCardStructFields.svelte';
 	import TerminalIcon from './TerminalIcon.svelte';
-	import DOMPurify from 'dompurify';
 	import { goto } from '$app/navigation';
 	import {
 		generateExample,
@@ -28,6 +26,7 @@
 		isFnTypeData,
 		isHeaderData,
 		isUnionTagTypeData,
+		markdownHtml,
 		type TypeData
 	} from '$lib';
 	import { page } from '$app/stores';
@@ -54,12 +53,7 @@
 	let data = entry.data;
 	let schemaKey = entry.name;
 
-	let descriptionDef = entry.doc;
-	let descriptionStr = Array.isArray(descriptionDef)
-		? descriptionDef.map((l) => l.trim()).join('\n')
-		: descriptionDef;
-	let markdownHtml = typeof descriptionStr == 'string' ? (parse(descriptionStr) as string) : '';
-	let description: string = DOMPurify.sanitize(markdownHtml);
+	let description: string = markdownHtml(entry);
 	let nameParts = schemaKey.split('.');
 
 	function applyFunctionToExample() {
