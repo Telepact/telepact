@@ -38,6 +38,8 @@ A Telepact Schema is an array of the following definition patterns:
 Type expressions can be encased in a structured object (product) type. Structs may be used 
 in any type expression.
 
+The `!` symbol can be appended to a field name to indicate that it is optional.
+
 ```json
 [
   {
