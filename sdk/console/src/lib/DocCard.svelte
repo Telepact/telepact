@@ -145,7 +145,7 @@
 		{#if schemaKey.startsWith('struct')}
 			<DocCardStructFields fields={entry.data} />
 			{#if description}
-				<div class="docstring font-normal text-gray-400">
+				<div class="pt-4 prose prose-invert">
 					{@html description}
 				</div>
 			{/if}
@@ -156,7 +156,7 @@
 				<section aria-label="Arguments">
 				<DocCardStructFields fields={data.args} />
 				{#if description}
-					<div class="docstring font-normal text-gray-400">
+					<div class="pt-4 prose prose-invert">
 						{@html description}
 					</div>
 				{/if}
@@ -251,7 +251,7 @@
 			</div>
 		{:else if isUnionTagTypeData(data)}
 			{#if description}
-				<div class="docstring font-normal text-gray-400">
+				<div class="pb-2 prose prose-invert">
 					{@html description}
 				</div>
 			{/if}
@@ -264,7 +264,7 @@
 		{:else if isHeaderData(data)}
 			<div>
 				{#if description}
-					<div class="docstring font-normal text-gray-400">
+					<div class="prose prose-invert">
 						{@html description}
 					</div>
 				{/if}
@@ -317,7 +317,7 @@
 				{/if}
 			</div>
 		{:else if description}
-			<div class="docstring font-normal text-gray-400">
+			<div class="prose prose-invert">
 				{@html description}
 			</div>
 		{/if}
