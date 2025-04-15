@@ -264,7 +264,7 @@ All top-level definitions and union tags (including errors and function results)
 ```json
 [
   {
-    "///": " A struct that contains a `field`.",
+    "///": " A struct that contains a `field`. ",
     "struct.ExampleStruct": {
       "field": ["boolean"]
     }
@@ -272,7 +272,7 @@ All top-level definitions and union tags (including errors and function results)
   {
     "struct.ExampleUnion": [
       {
-        "///": " The default `Tag` that contains a `field`.",
+        "///": " The default `Tag` that contains a `field`. ",
         "Tag": {
           "field": ["integer"]
         }
