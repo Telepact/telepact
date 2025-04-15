@@ -104,7 +104,7 @@
 <section
 	id={schemaKey}
 	aria-label={schemaKey}
-	class="mb-2 rounded-lg border border-gray-200 bg-white p-6 shadow dark:border-gray-700 dark:bg-gray-800"
+	class="mb-2 rounded-lg border p-6 shadow border-gray-700 bg-gray-800"
 >
 	<div class="flex w-full items-center pb-4">
 		<a href="#{schemaKey}">
@@ -145,7 +145,7 @@
 		{#if schemaKey.startsWith('struct')}
 			<DocCardStructFields fields={entry.data} />
 			{#if description}
-				<div class="docstring font-normal text-gray-700 dark:text-gray-400">
+				<div class="docstring font-normal text-gray-400">
 					{@html description}
 				</div>
 			{/if}
@@ -156,7 +156,7 @@
 				<section aria-label="Arguments">
 				<DocCardStructFields fields={data.args} />
 				{#if description}
-					<div class="docstring font-normal text-gray-700 dark:text-gray-400">
+					<div class="docstring font-normal text-gray-400">
 						{@html description}
 					</div>
 				{/if}
@@ -251,7 +251,7 @@
 			</div>
 		{:else if isUnionTagTypeData(data)}
 			{#if description}
-				<div class="docstring font-normal text-gray-700 dark:text-gray-400">
+				<div class="docstring font-normal text-gray-400">
 					{@html description}
 				</div>
 			{/if}
@@ -264,7 +264,7 @@
 		{:else if isHeaderData(data)}
 			<div>
 				{#if description}
-					<div class="docstring font-normal text-gray-700 dark:text-gray-400">
+					<div class="docstring font-normal text-gray-400">
 						{@html description}
 					</div>
 				{/if}
@@ -317,7 +317,7 @@
 				{/if}
 			</div>
 		{:else if description}
-			<div class="docstring font-normal text-gray-700 dark:text-gray-400">
+			<div class="docstring font-normal text-gray-400">
 				{@html description}
 			</div>
 		{/if}
