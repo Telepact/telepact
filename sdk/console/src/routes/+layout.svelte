@@ -426,12 +426,35 @@
 						<div class="flex justify-between">
 							<h1 class="pb-4 text-xl font-semibold text-gray-100">Schema (JSON)</h1>
 							{#if !schemaSourceReadOnly}
-								<div>
+								<div class="flex space-x-2">
+									<a href="https://github.com/Telepact/telepact/blob/main/doc/schema-guide.md">
+										<button
+											onclick={handleSchema}
+											class="flex items-center rounded-md bg-gray-700 px-3 py-2 text-sm font-semibold text-white hover:underline hover:bg-gray-600"
+											>
+												<span>Writing Guide</span>
+												<svg
+												xmlns="http://www.w3.org/2000/svg"
+												fill="none"
+												viewBox="0 0 24 24"
+												stroke-width="3"
+												stroke="currentColor"
+												class="ml-2 h-4 w-4"
+											>
+												<path
+													d="M 14 2 L 4 2 A 4 4 0 0 0 0 6 L 0 20 A 4 4 0 0 0 4 24 L 18 24 A 4 4 0 0 0 22 20 L 22 10 M 11 13 L 24 0 L 18 0 M 24 0 L 24 6"
+												/>
+											</svg>
+											</button
+										>
+									</a>
+									<div>
 									<button
 										onclick={handleSchema}
 										class="rounded-md bg-sky-700 px-3 py-2 text-sm font-semibold text-white hover:bg-sky-600 active:bg-sky-700"
-										>Save</button
+										><span>Save</span></button
 									>
+									</div>
 								</div>
 							{/if}
 						</div>

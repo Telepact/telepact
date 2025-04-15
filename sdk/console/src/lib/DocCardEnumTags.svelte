@@ -39,7 +39,7 @@
 				<DocCardStructFields fields={thisTag.data} />
 			</div>
 			{#if thisTag.doc}
-				<div class="docstring ml-4 font-normal text-gray-700 dark:text-gray-400">
+				<div class="docstring ml-4 font-normal text-gray-400">
 					{@html thisTag.doc}
 				</div>
 			{/if}
