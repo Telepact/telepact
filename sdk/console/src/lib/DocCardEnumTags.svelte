@@ -15,10 +15,8 @@
 <!--|                                                                            |-->
 
 <script lang="ts">
-	import { doc } from 'prettier';
-	import TypeRef from './TypeRef.svelte';
 	import DocCardStructFields from './DocCardStructFields.svelte';
-	import type { UnionTagTypeData } from '$lib';
+	import { markdownHtml, type UnionTagTypeData } from '$lib';
 
 	interface Props {
 		tags: UnionTagTypeData[];
@@ -40,7 +38,7 @@
 			</div>
 			{#if thisTag.doc}
 				<div class="ml-4 prose prose-invert">
-					{@html thisTag.doc}
+					{@html markdownHtml(thisTag)}
 				</div>
 			{/if}
 		</li>
