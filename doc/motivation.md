@@ -26,12 +26,12 @@
 | Low development burden for servers                | ✅      | ✅   | ❌      | ✅       |
 | No required libraries for clients                 | ✅      | ❌   | ❌      | ✅       |
 | Type-safe generated code                          | 🤔      | ✅   | ✅      | ✅       |
-| Human-readable wire-format                        | ✅      | ❌   | 🤔      | ✅       |
+| Human-editable wire-format                        | ✅      | ❌   | 🤔      | ✅       |
 | Built-in binary data serialization protocol       | ❌      | ✅   | ❌      | ✅       |
 | Built-in dynamic response shaping                 | ❌      | ❌   | ✅      | ✅       |
 | No required ABI                                   | ✅      | ❌   | ✅      | ✅       |
 | Expressive distinction between null and undefined | ❌      | ❌   | ❌      | ✅       |
-| Built-in API documentation distribution           | ❌      | ❌   | ❌      | ✅       |
+| Built-in API documentation distribution           | 🤔      | ❌   | ✅      | ✅       |
 | Built-in mocking for tests                        | ❌      | ❌   | ❌      | ✅       |
 
 ## Why not RESTful APIs?
