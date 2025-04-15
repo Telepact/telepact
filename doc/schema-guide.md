@@ -35,7 +35,8 @@ A Telepact Schema is an array of the following definition patterns:
 - headers
 
 ### Struct Definition
-Type expressions can be encased in a structured object (product) type. Structs may be used in any type expression.
+Type expressions can be encased in a structured object (product) type. Structs may be used 
+in any type expression.
 
 ```json
 [
@@ -258,7 +259,8 @@ Example Invalid Request | Example Invalid Response
 `[{"@requestHeader": 1}, {"fn.ping_": {}}]` | `[{"@responseHeader": 1}, {"Ok_": {}}]`
 
 ### Docstrings
-All top-level definitions and union tags (including errors and function results) can include a docstring. Docstrings support markdown when rendered in the Telepact console.
+All top-level definitions and union tags (including errors and function results) can include 
+a docstring. Docstrings support markdown when rendered in the Telepact console.
 
 #### Single-line
 ```json
