@@ -3,27 +3,27 @@
 ## Type Expression
 Types are expressed with a non-empty array of strings.
 
-Type Expression | Example allowed JSON values | Example disalowed JSON values
+Type Expression | Example allowed JSON values | Example disallowed JSON values
 --- | --- | ---
 `["boolean"]` | `true`, `false` | `null`, `0`
 `["integer"]` | `1`, `0`, `-1` | `null`, `0.1`
 `["number"]` | `0.1`, `-0.1` | `null`, `"0"`
 `["string"]` | `""`, `"text"` | `null`, `0`
-`["array", ["boolean"]]` | `[]`, `[true, false]` | `null`, `0`, `{}`
-`["object", ["integer"]]` | `{}`, `{"key1": 0, "key2": 1}` | `null`, `0`, `[]`
+`["array", ["boolean"]]` | `[]`, `[true, false]` | `null`, `0`, `[null]` `{}`
+`["object", ["integer"]]` | `{}`, `{"k1": 0, "k2": 1}` | `null`, `0`, `{"k": null}`, `[]`
 `["any"]` | `false`, `0`, `0.1`, `""`, `[]`, `{}` | `null`
 
 ### Nullability
 The `?` symbol can be appended to type strings to indicate nullability.
 
-Type Expression | Example allowed JSON values | Example disalowed JSON values
+Type Expression | Example allowed JSON values | Example disallowed JSON values
 --- | --- | ---
 `["boolean?"]` | `null`, `true`, `false` | `0`
 `["integer?"]` | `null`, `1`, `0`, `-1` | `0.1`
 `["number?"]` | `null`, `0.1`, `-0.1` | `"0"`
 `["string?"]` | `null`, `""`, `"text"` | `0`
-`["array?", ["boolean?"]]` | `null`, `[]`, `[true, false]` | `0`, `{}`
-`["object?", ["integer?"]]` | `null`, `{}`, `{"key1": 0, "key2": 1}` | `0`, `[]`
+`["array?", ["boolean?"]]` | `null`, `[]`, `[true, false, null]` | `0`, `{}`
+`["object?", ["integer?"]]` | `null`, `{}`, `{"k1": 0, "k2": 1, "k3": null}` | `0`, `[]`
 `["any?"]` | `null`, `false`, `0`, `0.1`, `""`, `[]`, `{}` | (none)
 
 ## Definitions
@@ -35,8 +35,7 @@ A Telepact Schema is an array of the following definition patterns:
 - headers
 
 ### Struct Definition
-Type expressions can be encased in a structured object (product) type. They can
-then be used in any type expression.
+Type expressions can be encased in a structured object (product) type. Structs may be used in any type expression.
 
 ```json
 [
@@ -59,10 +58,11 @@ Type Expression | Example allowed JSON values | Example disallowed JSON values
 --- | --- | ---
 `["struct.ExampleStruct1"]` | `{"field": true, "anotherField": ["text1", "text2"]}` | `null`, `{}` 
 `["struct.ExampleStruct2"]` | `{"optionalField!": true}`, `{}` | `null`, `{"wrongField": true}`
+`["array", ["struct.ExampleStruct2"]]` | `[{"optionalField!": true}]` | `[null]`, `[{"wrongField": true}]`
 
 ### Union
-Type expressions can also be encased in tagged structered object (sum) type. They
-too can be used in any type expression.
+Type expressions can be encased in a tagged structered object (sum) type. Unions may be
+used in any type expression.
 
 At least one tag is required.
 
@@ -102,11 +102,12 @@ Request-Response semantics can be defined with functions. A function is a combin
 of a argument struct and a result union. The result union requires at least the `Ok_` tag.
 By convention, all non-`Ok_` tags are considered as errors.
 
-Clients interact with servers through functions; the client submits JSON data valid
+Clients interact with servers through functions. The client submits JSON data valid
 against the function arugument struct definition, and the server responds with JSON
 data valid against the function result union.
 
-When referenced as a type in type expressions, the result union is unused.
+When referenced as a type in type expressions, the result union is unused. Functions
+cannot be used in type expressions that extend down from a top-level function argument
 
 ```json
 [
@@ -172,7 +173,8 @@ expressions.
 ```
 
 With this error definition, the functions above would automatically be given these errors.
-(Note, the following example illustrates the effect of the errors definition at schema load time; the original schema is not re-written.)
+(Note, the following example only illustrates the effect of the errors definition at schema 
+load time; the original schema is not re-written.)
 
 ```json
 [
@@ -222,9 +224,9 @@ With this error definition, the functions above would automatically be given the
 ```
 
 ### Headers
-Headers definitions are similar to function definitions in that correlate to the
+Headers definitions are similar to function definitions in that they correlate to the
 request/response semantics, but only with respect to the headers object on the
-Telepact message. Both the request and reply definitions resemble struct definitions,
+Telepact message. Both the request and response definitions resemble struct definitions,
 with a few exceptions:
 - all header fields must be prepended with `@`
 - all header fields are implicitly optional
@@ -246,7 +248,7 @@ Headers definitions cannot be used in type expressions.
 ]
 ```
 
-Request | Example Response
+Example Request | Example Response
 --- | ---
 `[{"@requestHeader": true}, {"fn.ping_": {}}]` | `[{"@responseHeader": "text"}, {"Ok_": {}}]`
 `[{"@anotherRequestHeader": true}, {"fn.ping_": {}}]` | `[{"@unspecifiedHeader": true}, {"Ok_": {}}]`
@@ -255,3 +257,48 @@ Example Invalid Request | Example Invalid Response
 --- | ---
 `[{"@requestHeader": 1}, {"fn.ping_": {}}]` | `[{"@responseHeader": 1}, {"Ok_": {}}]`
 
+### Docstrings
+All top-level definitions and union tags (including errors and function results) can include a docstring. Docstrings support markdown when rendered in the Telepact console.
+
+#### Single-line
+```json
+[
+  {
+    "///": " A struct that contains a `field`.",
+    "struct.ExampleStruct": {
+      "field": ["boolean"]
+    }
+  },
+  {
+    "struct.ExampleUnion": [
+      {
+        "///": " The default `Tag` that contains a `field`.",
+        "Tag": {
+          "field": ["integer"]
+        }
+      }
+    ]
+  }
+]
+```
+
+#### Multi-line
+Multi-line docstrings are supported. For readability and ease of writing, schema writers
+are encouraged to use the Telepact Prettier plugin. (The Telepact console uses the prettier
+plugin in draft mode.)
+
+```json
+[
+  {
+    "///": [
+      " A struct that contains a field.                     ",
+      "                                                     ",
+      " Fields:                                             ",
+      "  - `field` (type: `boolean`)                        "
+    ],
+    "struct.ExampleStruct": {
+      "field": ["boolean"]
+    }
+  }
+]
+```
