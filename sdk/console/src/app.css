@@ -35,3 +35,11 @@
 	padding: 0.125em;
 	color: #cbd5e1;
 }
+
+.docstring a {
+	color: rgb(56 189 248 / var(--tw-text-opacity, 1));
+}
+
+.docstring a:hover {
+	text-decoration: underline;
+}
