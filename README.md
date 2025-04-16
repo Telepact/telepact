@@ -91,7 +91,7 @@ console.log(`Response: ${await response.json()}`);
 ```
 ```sh
 $ node ./client.js
-Response: [{}, {'Ok_': {'result': 3}}]
+Response: [{}, {"Ok_": {"result": 3}}]
 ```
 
 Or clients can also leverage telepact tooling to:

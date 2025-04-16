@@ -29,6 +29,7 @@ $(TAR_GZ): $(SRC_FILES)
 	mkdir -p dist
 	cp ../../LICENSE ../../NOTICE dist
 
+	rm -rf dist-tgz
 	mkdir -p dist-tgz
 
 	npm $(NPM_INSTALL)

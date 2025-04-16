@@ -27,6 +27,11 @@ def _find_stack() -> str:
             return f'{stack[i].function} {stack[i-1].function}'
     return 'unknown'
 
+words = [
+    "alpha", "beta", "gamma", "delta", "epsilon", "zeta", "eta", "theta",
+    "iota", "kappa", "lambda", "mu", "nu", "xi", "omicron", "pi",
+    "rho", "sigma", "tau", "upsilon", "phi", "chi", "psi", "omega"
+]
 
 class RandomGenerator:
     def __init__(self, collection_length_min: int, collection_length_max: int):
@@ -62,9 +67,8 @@ class RandomGenerator:
         return struct.pack(">i", self.next_int())
 
     def next_string(self) -> str:
-        import base64
-        bytes_data = self.next_bytes()
-        return base64.b64encode(bytes_data).decode().rstrip("=")
+        index = self.next_int_with_ceiling(len(words))
+        return words[index]
 
     def next_double(self) -> float:
         return float(self.next_int() & 0x7fffffff) / float(0x7fffffff)

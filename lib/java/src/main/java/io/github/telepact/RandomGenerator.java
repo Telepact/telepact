@@ -18,6 +18,7 @@ package io.github.telepact;
 
 import java.nio.ByteBuffer;
 import java.util.Base64;
+import java.util.List;
 
 /**
  * A utility class for generating random values.
@@ -27,6 +28,12 @@ public class RandomGenerator {
     private int collectionLengthMin;
     private int collectionLengthMax;
     private int count = 0;
+
+    final static List<String> words = List.of(
+        "alpha", "beta", "gamma", "delta", "epsilon", "zeta", "eta", "theta",
+        "iota", "kappa", "lambda", "mu", "nu", "xi", "omicron", "pi",
+        "rho", "sigma", "tau", "upsilon", "phi", "chi", "psi", "omega"
+    );
 
     /**
      * Constructs a RandomGenerator with specified collection length bounds.
@@ -129,8 +136,8 @@ public class RandomGenerator {
      * @return a random string
      */
     public String nextString() {
-        var bytes = nextBytes();
-        return Base64.getEncoder().withoutPadding().encodeToString(bytes);
+        var index = nextIntWithCeiling(words.size());
+        return words.get(index);
     }
 
     /**
