@@ -1,5 +1,4 @@
 High:
-- Clean up dangling print statements
 - Make sure bytes type always returns as bytes from client lib interface
 
 Medium:
@@ -16,7 +15,6 @@ Medium:
 
 Low:
 - Maybe: replace info. with telepact. and don't show type in console
-- For the random string generation, use random words rather than random chars
 - console: Improve consistency around simluation naming. Still have lingering ideas around mock and example.
 - Expose mock server options as command-line args in the cli
 - Console light mode and listen to os setting

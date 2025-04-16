@@ -29,6 +29,33 @@ function findStack() {
     throw new Error();
 }
 
+const words = [
+    "alpha",
+    "beta",
+    "gamma",
+    "delta",
+    "epsilon",
+    "zeta",
+    "eta",
+    "theta",
+    "iota",
+    "kappa",
+    "lambda",
+    "mu",
+    "nu",
+    "xi",
+    "omicron",
+    "pi",
+    "rho",
+    "sigma",
+    "tau",
+    "upsilon",
+    "phi",
+    "chi",
+    "psi",
+    "omega"
+];
+
 export class RandomGenerator {
     seed: number;
     private collectionLengthMin: number;
@@ -79,9 +106,8 @@ export class RandomGenerator {
     }
 
     nextString(): string {
-        const byteArray = this.nextBytes();
-        const base64String = btoa(String.fromCharCode.apply(null, byteArray));
-        return base64String.replace(/=/g, '');
+        const index = this.nextIntWithCeiling(words.length);
+        return words[index];
     }
 
     nextDouble(): number {
