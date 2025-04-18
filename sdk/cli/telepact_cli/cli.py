@@ -60,21 +60,29 @@ def main() -> None:
 
 
 @click.command()
-@click.option('--schema-dir', help='telepact schema directory', required=True)
+@click.option('--schema-http-url', help='telepact schema directory', required=False)
+@click.option('--schema-dir', help='telepact schema directory', required=False)
 @click.option('--lang', help='Language target (one of "java", "py", or "ts")', required=True)
 @click.option('--out', help='Output directory', required=True)
 @click.option('--package', help='Java package (use if --lang is "java")', callback=_validate_package)
-def codegen(schema_dir: str, lang: str, out: str, package: str) -> None:
+def codegen(schema_http_url: str, schema_dir: str, lang: str, out: str, package: str) -> None:
 
     print('Telepact CLI')
-    print('Schema directory:', schema_dir)
+    if schema_http_url:
+        print('Schema http url:', schema_http_url)
+        api_schema = get_api_from_http(schema_http_url)
+        telepact_schema = TelepactSchema.from_json(api_schema)
+    elif schema_dir:
+        print('Schema directory:', schema_dir)
+        telepact_schema = TelepactSchema.from_directory(schema_dir)
+    else:
+        raise click.BadParameter('Either --schema-http-url or --schema-dir must be provided.')
+    
     print('Language target:', lang)
     print('Output directory:', out)
     if package:
         print('Java package:', package)
 
-
-    telepact_schema = TelepactSchema.from_directory(schema_dir)
 
     target = lang
     output_directory = out
@@ -381,90 +389,103 @@ def demo_server() -> None:
     uvicorn.run(app, host='0.0.0.0', port=8000)
 
 
+def get_api_from_http(http_url: str) -> str:
+    url: str = http_url
+
+    async def adapter(m: Message, s: Serializer) -> Message:
+        try:
+            request_bytes = s.serialize(m)
+        except SerializationError as e:
+            # Handle potential serialization errors (e.g., number overflow)
+            if isinstance(e.__cause__, OverflowError):
+                # Example: Return a specific Telepact error message
+                # Adjust the error format based on your Telepact schema
+                return Message({}, {"ErrorUnknown_": {"detail": "Input number too large for serialization"}})
+            else:
+                # Re-raise other serialization errors
+                    return Message({}, {"ErrorUnknown_": {"detail": f"Serialization Error: {e}"}})
+
+
+        try:
+                # Use a timeout for the request
+            response = requests.post(url, data=request_bytes, timeout=10) # 10 second timeout
+            response.raise_for_status() # Raise an exception for bad status codes (4xx or 5xx)
+            response_bytes = response.content
+            response_message = s.deserialize(response_bytes)
+            return response_message
+        except requests.exceptions.RequestException as e:
+            print(f"Error connecting to upstream API: {e}")
+                # Return an appropriate Telepact error message
+                # Adjust the error format based on your Telepact schema
+            return Message({}, {"ErrorUpstreamUnavailable_": {"url": url, "error": str(e)}})
+        except Exception as e: # Catch potential deserialization errors too
+                print(f"Error processing upstream response: {e}")
+                return Message({}, {"ErrorUnknown_": {"detail": f"Upstream response processing error: {e}"}})
+
+
+    options = Client.Options()
+    telepact_client = Client(adapter, options)
+
+    retries = 3
+    response_message = None
+    for attempt in range(retries):
+        try:
+            # Ensure the async function is run correctly
+            response_message = asyncio.run(telepact_client.request(Message({}, {'fn.api_': {}})))
+            if 'Ok_' in response_message.body or 'Error' in next(iter(response_message.body.keys()), ""): # Check for valid Telepact response structure
+                break
+            else:
+                    print(f"Attempt {attempt+1}: Received unexpected response structure: {response_message.body}")
+                    if attempt < retries - 1: time.sleep(1)
+
+        except Exception as e:
+            print(f"Attempt {attempt+1} failed: {e}")
+            if attempt < retries - 1:
+                time.sleep(1) # Wait before retrying
+            else:
+                # If all retries fail, raise a clearer error
+                raise ConnectionError(f"Failed to connect to Telepact API at {url} after {retries} attempts.") from e
+
+    # Check if we successfully got a response
+    if response_message is None:
+            raise Exception(f"Could not retrieve API schema from {url}. No valid response received.")
+
+    if 'Ok_' not in response_message.body:
+        # Provide more context on failure
+        error_key = next(iter(response_message.body.keys()), "UnknownError")
+        error_details = response_message.body.get(error_key, {})
+        raise Exception(f"Failed to fetch API schema from {url}. Server responded with error: {error_key} - {error_details}")
+
+    api = cast(dict[str, object], response_message.body['Ok_'])['api']
+    api_json = json.dumps(api)
+
+    return api_json
+
+
 @click.command()
 @click.option('--http-url', help='HTTP URL of a Telepact API', required=False, envvar='TELEPACT_HTTP_URL')
 @click.option('--dir', help='Directory of Telepact schemas', required=False, envvar='TELEPACT_DIRECTORY')
-@click.option('--generated-collection-length-min', default=0, help='Minimum length of generated collections')
-@click.option('--generated-collection-length-max', default=3, help='Maximum length of generated collections')
-@click.option('--port', default=8080, help='Port to run the mock server on')
-def mock(http_url: str, dir: str, generated_collection_length_min: int, generated_collection_length_max: int, port: int) -> None:
-    print(f'http_url: {http_url}')
-    print(f'dir: {dir}')
-    print(f'generated_collection_length_min: {generated_collection_length_min}')
-    print(f'generated_collection_length_max: {generated_collection_length_max}')
-
+@click.option('--generated-collection-length-min', default=0, help='Minimum length of generated collections', envvar='GENERATED_COLLECTION_LENGTH_MIN')
+@click.option('--generated-collection-length-max', default=3, help='Maximum length of generated collections', envvar='GENERATED_COLLECTION_LENGTH_MAX')
+@click.option('--port', default=8080, help='Port to run the mock server on', envvar='MOCK_SERVER_PORT')
+@click.option('--disable-optional-field-generation', is_flag=True, default=False, help='Disable generation of optional fields (enabled by default)', envvar='DISABLE_OPTIONAL_FIELD_GENERATION')
+@click.option('--disable-message-response-generation', is_flag=True, default=False, help='Disable generation of message responses (enabled by default)', envvar='DISABLE_MESSAGE_RESPONSE_GENERATION')
+@click.option('--disable-random-optional-field-generation', is_flag=True, default=False, help='Disable randomization of optional field generation (enabled by default)', envvar='DISABLE_RANDOMIZE_OPTIONAL_FIELD_GENERATION')
+def mock(
+    http_url: str,
+    dir: str,
+    generated_collection_length_min: int,
+    generated_collection_length_max: int,
+    port: int,
+    disable_optional_field_generation: bool,
+    disable_message_response_generation: bool,
+    disable_random_optional_field_generation: bool
+) -> None:
 
     schema: MockTelepactSchema
     if http_url:
-        url: str = http_url
-
-        async def adapter(m: Message, s: Serializer) -> Message:
-            try:
-                request_bytes = s.serialize(m)
-            except SerializationError as e:
-                # Handle potential serialization errors (e.g., number overflow)
-                if isinstance(e.__cause__, OverflowError):
-                    # Example: Return a specific Telepact error message
-                    # Adjust the error format based on your Telepact schema
-                    return Message({}, {"ErrorUnknown_": {"detail": "Input number too large for serialization"}})
-                else:
-                    # Re-raise other serialization errors
-                     return Message({}, {"ErrorUnknown_": {"detail": f"Serialization Error: {e}"}})
-
-
-            try:
-                 # Use a timeout for the request
-                response = requests.post(url, data=request_bytes, timeout=10) # 10 second timeout
-                response.raise_for_status() # Raise an exception for bad status codes (4xx or 5xx)
-                response_bytes = response.content
-                response_message = s.deserialize(response_bytes)
-                return response_message
-            except requests.exceptions.RequestException as e:
-                print(f"Error connecting to upstream API: {e}")
-                 # Return an appropriate Telepact error message
-                 # Adjust the error format based on your Telepact schema
-                return Message({}, {"ErrorUpstreamUnavailable_": {"url": url, "error": str(e)}})
-            except Exception as e: # Catch potential deserialization errors too
-                 print(f"Error processing upstream response: {e}")
-                 return Message({}, {"ErrorUnknown_": {"detail": f"Upstream response processing error: {e}"}})
-
-
-        options = Client.Options()
-        telepact_client = Client(adapter, options)
-
-        retries = 3
-        response_message = None
-        for attempt in range(retries):
-            try:
-                # Ensure the async function is run correctly
-                response_message = asyncio.run(telepact_client.request(Message({}, {'fn.api_': {}})))
-                if 'Ok_' in response_message.body or 'Error' in next(iter(response_message.body.keys()), ""): # Check for valid Telepact response structure
-                    break
-                else:
-                     print(f"Attempt {attempt+1}: Received unexpected response structure: {response_message.body}")
-                     if attempt < retries - 1: time.sleep(1)
-
-            except Exception as e:
-                print(f"Attempt {attempt+1} failed: {e}")
-                if attempt < retries - 1:
-                    time.sleep(1) # Wait before retrying
-                else:
-                    # If all retries fail, raise a clearer error
-                    raise ConnectionError(f"Failed to connect to Telepact API at {url} after {retries} attempts.") from e
-
-        # Check if we successfully got a response
-        if response_message is None:
-             raise Exception(f"Could not retrieve API schema from {url}. No valid response received.")
-
-        if 'Ok_' not in response_message.body:
-            # Provide more context on failure
-            error_key = next(iter(response_message.body.keys()), "UnknownError")
-            error_details = response_message.body.get(error_key, {})
-            raise Exception(f"Failed to fetch API schema from {url}. Server responded with error: {error_key} - {error_details}")
-
-        api = cast(dict[str, object], response_message.body['Ok_'])['api']
-        api_json = json.dumps(api)
-        schema = MockTelepactSchema.from_json(api_json)
+        api_json = get_api_from_http(http_url)
+        schema = MockTelepactSchema.from_json(api_json)   
     elif dir:
         directory: str = dir
         schema = MockTelepactSchema.from_directory(directory)
@@ -477,6 +498,9 @@ def mock(http_url: str, dir: str, generated_collection_length_min: int, generate
     mock_server_options = MockServer.Options()
     mock_server_options.generated_collection_length_min = generated_collection_length_min
     mock_server_options.generated_collection_length_max = generated_collection_length_max
+    mock_server_options.enable_optional_field_generation = not disable_optional_field_generation
+    mock_server_options.enable_message_response_generation = not disable_message_response_generation
+    mock_server_options.randomize_optional_field_generation = not disable_random_optional_field_generation
     mock_server = MockServer(schema, mock_server_options)
 
     async def mock_api_endpoint(request: Request) -> Response:
@@ -498,9 +522,31 @@ def mock(http_url: str, dir: str, generated_collection_length_min: int, generate
     print(f"Starting mock server on port {port}...")
     uvicorn.run(app, host='0.0.0.0', port=port)
 
+
+@click.command()
+@click.option('--http-url', help='HTTP URL of a Telepact API', required=True)
+@click.option('--output-dir', help='Directory of Telepact schemas', required=True)
+def fetch(
+    http_url: str,
+    output_dir: str
+) -> None:
+
+    api_json = get_api_from_http(http_url)
+    schema = MockTelepactSchema.from_json(api_json)      
+
+    filepath = os.path.join(output_dir, 'api.telepact.json')
+
+    final_api_json = json.dumps(schema.original)
+
+    os.makedirs(filepath, exist_ok=True)
+    with open(filepath, 'w') as file:
+        file.write(final_api_json)
+
+
 main.add_command(codegen)
 main.add_command(demo_server)
 main.add_command(mock)
+main.add_command(fetch)
 
 if __name__ == "__main__":
     main()

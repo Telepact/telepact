@@ -1,5 +1,6 @@
 High:
 - Make sure bytes type always returns as bytes from client lib interface
+- Fix typos in writing guide
 
 Medium:
 - Also remove mock-internal from binary encoding like internal is omitted
