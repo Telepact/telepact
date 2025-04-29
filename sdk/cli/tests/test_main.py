@@ -19,11 +19,34 @@ from click.testing import CliRunner
 # Adjust the import path according to your project structure
 from telepact_cli.cli import main
 import traceback
+import subprocess
+import requests
+import json
+import time
 
 
 @pytest.fixture
 def runner() -> CliRunner:
     return CliRunner()
+
+
+def test_demo_server() -> None:
+    p = subprocess.Popen(['poetry', 'run', 'telepact', 'demo-server'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, cwd='tests/tmp')
+
+    try:
+        # Check if the server is running
+        time.sleep(1)
+        response = requests.post('http://localhost:8000/api', data=json.dumps([{}, {'fn.ping_': {}}]))
+        assert response.status_code == 200
+        assert response.json() == [{}, {'Ok_': {}}]
+    except requests.exceptions.RequestException as e:
+        print(f"Request failed: {e}")
+        assert False, "Demo server is not running or not reachable"
+    finally:
+        p.kill()
+        stdout, stderr = p.communicate(timeout=1)
+        print(f"stdout: {stdout}")
+        print(f"stderr: {stderr}")
 
 
 def test_command_java(runner: CliRunner) -> None:

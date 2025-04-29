@@ -280,7 +280,8 @@ def _generate_internal(schema_data: list[dict[str, object]], possible_fn_selects
 
 
 @click.command()
-def demo_server() -> None:
+@click.option('--port', default=8000, help='Port to run the mock server on', envvar='MOCK_SERVER_PORT')
+def demo_server(port: int) -> None:
     global_variables: dict[str, float] = {}
     global_computations: list[dict[str, object]] = []
 
@@ -361,7 +362,7 @@ def demo_server() -> None:
     server_options.on_error = lambda e: print(e)
     telepact_server = Server(telepact_schema, handler, server_options)
 
-    print('Server defined')
+    print('Telepact Server running at /api')
 
     async def api_endpoint(request: Request) -> Response:
         request_bytes = await request.body()
@@ -386,7 +387,7 @@ def demo_server() -> None:
 
     app = Starlette(routes=routes, middleware=middleware)
 
-    uvicorn.run(app, host='0.0.0.0', port=8000)
+    uvicorn.run(app, host='0.0.0.0', port=port)
 
 
 def get_api_from_http(http_url: str) -> str:
@@ -407,7 +408,7 @@ def get_api_from_http(http_url: str) -> str:
 
 
         try:
-                # Use a timeout for the request
+            # Use a timeout for the request
             response = requests.post(url, data=request_bytes, timeout=10) # 10 second timeout
             response.raise_for_status() # Raise an exception for bad status codes (4xx or 5xx)
             response_bytes = response.content

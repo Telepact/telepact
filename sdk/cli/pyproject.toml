@@ -29,3 +29,4 @@ telepact = "telepact_cli.cli:main"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.1"
+requests = "^2.32"
