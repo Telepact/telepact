@@ -98,6 +98,9 @@ clean-prettier:
 console:
 	$(MAKE) -C sdk/console
 
+console-playwright:
+	$(MAKE) -C sdk/console playwright
+
 dev-console:
 	$(MAKE) -C sdk/console dev
 

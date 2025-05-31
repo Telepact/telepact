@@ -50,6 +50,9 @@ $(DEP_PRETTIER_DIST):
 dev:
 	npm run dev
 
+playwright:
+	npx playwright install --with-deps --force
+
 clean:
 	rm -rf build
 	rm -rf src/lib/telepact
