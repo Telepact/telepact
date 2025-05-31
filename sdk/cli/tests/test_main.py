@@ -31,7 +31,7 @@ def runner() -> CliRunner:
     return CliRunner()
 
 @pytest.fixture(autouse=True, scope='function')
-def tmp_dir_manager() -> Generator[None]:
+def tmp_dir_manager() -> Generator[None, None, None]:
     import os
     import shutil
 
