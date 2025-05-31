@@ -272,6 +272,8 @@ jobs:
         run: make install-cli
 
       - name: Build console
+        env:
+          NPM_INSTALL: ci
         run: make console
       
       - name: Install Playwright Browsers

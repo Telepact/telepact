@@ -14,6 +14,7 @@
 #|  limitations under the License.
 #|
 
+NPM_INSTALL ?= install
 VERSION := $(shell cat ../../VERSION.txt)
 
 .PHONY: all
@@ -29,7 +30,7 @@ all: dep
 	mkdir -p src/lib/prettier-plugin-telepact
 	cp -r ../../sdk/prettier/dist/* src/lib/prettier-plugin-telepact
 
-	npm install
+	npm $(NPM_INSTALL)
 	npm run build
 	node clean-index.js
 
