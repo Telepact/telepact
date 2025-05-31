@@ -1,0 +1,52 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directories:
+      - "/lib/ts"
+      - "/sdk/prettier"
+      - "/sdk/console"
+    schedule:
+      interval: "weekly"
+    groups:
+      all-updates:
+        update-types: ["patch", "minor"]
+    labels:
+      - "dependabot"
+    open-pull-requests-limit: 1
+
+  - package-ecosystem: "pip"
+    directories:
+      - "/lib/py"
+      - "/sdk/cli"
+    schedule:
+      interval: "weekly"
+    groups:
+      all-updates:
+        update-types: ["patch", "minor"]
+    labels:
+      - "dependabot"
+    open-pull-requests-limit: 1
+
+  - package-ecosystem: "maven"
+    directories:
+      - "/lib/java"
+    schedule:
+      interval: "weekly"
+    groups:
+      all-updates:
+        update-types: ["patch", "minor"]
+    labels:
+      - "dependabot"
+    open-pull-requests-limit: 1
+
+  - package-ecosystem: "pub"
+    directories:
+      - "/bind/dart"
+    schedule:
+      interval: "weekly"
+    groups:
+      all-updates:
+        update-types: ["patch", "minor"]
+    labels:
+      - "dependabot"
+    open-pull-requests-limit: 1
