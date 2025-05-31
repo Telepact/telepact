@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "telepact_cli"
-version = "1.0.0-alpha.43"
+version = "1.0.0-alpha.44"
 description = "A CLI tool for various local Telepact operations."
 authors = [ "Telepact Authors <telepact@googlegroups.com>",]
 readme = "README.md"
@@ -17,12 +17,12 @@ include = "telepact_cli"
 
 [tool.poetry.dependencies]
 python = "^3.11"
-click = "^8.0.0"
+click = "^8.2.1"
 jinja2 = "^3.1"
 msgpack = "^1.1.0"
 uvicorn = "^0.15.0"
 requests = "^2.31"
-starlette = "^0.46.1"
+starlette = "^0.46.2"
 
 [tool.poetry.scripts]
 telepact = "telepact_cli.cli:main"
