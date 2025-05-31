@@ -275,7 +275,7 @@ jobs:
         run: make console
       
       - name: Install Playwright Browsers
-        run: npx playwright install --force
+        run: npx playwright install --with-deps --force
       
       - name: Run tests
         run: DEBUG=pw:api make test-console
