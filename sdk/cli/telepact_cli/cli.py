@@ -539,7 +539,7 @@ def fetch(
 
     final_api_json = json.dumps(schema.original)
 
-    os.makedirs(filepath, exist_ok=True)
+    os.makedirs(output_dir, exist_ok=True)
     with open(filepath, 'w') as file:
         file.write(final_api_json)
 

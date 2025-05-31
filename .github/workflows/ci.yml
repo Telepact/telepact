@@ -161,6 +161,9 @@ jobs:
       - name: Build cli
         run: make cli
 
+      - name: Test cli
+        run: make test-cli
+
       - name: Upload cli build artifacts
         uses: actions/upload-artifact@v4
         with:
