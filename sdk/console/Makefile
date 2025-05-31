@@ -14,11 +14,14 @@
 #|  limitations under the License.
 #|
 
+NPM_INSTALL ?= install
 VERSION := $(shell cat ../../VERSION.txt)
+DEP_LIB_DIST := ../../lib/ts/dist
+DEP_PRETTIER_DIST := ../../sdk/prettier/dist
 
 .PHONY: all
 
-all: dep
+all: $(DEP_LIB_DIST) $(DEP_PRETTIER_DIST)
 	cp ../../LICENSE ../../NOTICE ./
 	
 	rm -rf src/lib/telepact
@@ -29,7 +32,7 @@ all: dep
 	mkdir -p src/lib/prettier-plugin-telepact
 	cp -r ../../sdk/prettier/dist/* src/lib/prettier-plugin-telepact
 
-	npm install
+	npm $(NPM_INSTALL)
 	npm run build
 	node clean-index.js
 
@@ -38,13 +41,17 @@ all: dep
 	docker build --progress=plain --no-cache -f Dockerfile -t telepact-console:${VERSION} .
 	docker save telepact-console:${VERSION} | gzip > dist/docker-image-telepact-console-${VERSION}.tar.gz
 
-
-dep:
+$(DEP_LIB_DIST):
 	$(MAKE) -C ../../lib/ts
+
+$(DEP_PRETTIER_DIST):
 	$(MAKE) -C ../../sdk/prettier
 
 dev:
 	npm run dev
+
+playwright:
+	npx playwright install --with-deps --force
 
 clean:
 	rm -rf build

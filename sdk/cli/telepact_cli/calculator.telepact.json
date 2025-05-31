@@ -4,6 +4,20 @@
         "info.Calculator": {}
     },
     {
+        "///": " A function that adds two numbers. ",
+        "fn.add": {
+            "x": ["number"],
+            "y": ["number"]
+        },
+        "->": [
+            {
+                "Ok_": {
+                    "result": ["number"]
+                }
+            }
+        ]
+    },
+    {
         "///": " A value for computation that can take either a constant or variable form. ",
         "union.Value": [
             {

@@ -161,6 +161,9 @@ jobs:
       - name: Build cli
         run: make cli
 
+      - name: Test cli
+        run: make test-cli
+
       - name: Upload cli build artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -269,10 +272,12 @@ jobs:
         run: make install-cli
 
       - name: Build console
+        env:
+          NPM_INSTALL: ci
         run: make console
       
       - name: Install Playwright Browsers
-        run: npx playwright install --force
+        run: make console-playwright
       
       - name: Run tests
         run: DEBUG=pw:api make test-console
