@@ -510,6 +510,10 @@ jobs:
         if: needs.run-tests.result != 'success' && needs.begin.result == 'success'
         run: exit 1
 
+      #
+      #  Automation Triggers
+      #
+
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -520,3 +524,23 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh workflow run release.yml --ref main -f artifacts_run_id=${{ github.run_id }}
+
+      - name: Generate GitHub App token
+        if: >
+          github.event_name == 'pull_request' &&
+          github.actor == 'dependabot[bot]'
+        id: generate-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ vars.TELEPACT_BOT_APP_ID }}
+          private-key: ${{ secrets.TELEPACT_BOT_PRIVATE_KEY }}
+
+      - name: Trigger PR Approval and Auto-merge
+        if: >
+          github.event_name == 'pull_request' &&
+          github.actor == 'dependabot[bot]'
+        env:
+          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
+        run: |
+          gh pr review ${{ github.event.pull_request.number }} --approve
+          gh pr merge ${{ github.event.pull_request.number }} --squash --delete-branch
