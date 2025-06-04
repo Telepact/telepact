@@ -35,9 +35,18 @@ jobs:
           app-id: ${{ vars.TELEPACT_BOT_APP_ID }}
           private-key: ${{ secrets.TELEPACT_BOT_PRIVATE_KEY }}
 
-      - name: Trigger PR Approval and Auto-merge
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          token: ${{ steps.generate-token.outputs.token }}
+
+      - name: Install Project CLI
+        run: make install-project-cli
+
+      - name: Approve and merge PR
         env:
+          PR_NUMBER: ${{ github.event.inputs.pull_request_number }}
           GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
-        run: |
-          gh pr review ${{ github.event.inputs.pull_request_number }} --approve
-          gh pr merge ${{ github.event.inputs.pull_request_number }} --squash --delete-branch
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: telepact-project automerge

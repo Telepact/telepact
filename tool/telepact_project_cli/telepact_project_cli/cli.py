@@ -22,7 +22,7 @@ import json
 import toml
 from ruamel.yaml import YAML
 import subprocess
-from github import Github
+from github import Github, GithubException
 
 yaml = YAML()
 
@@ -522,12 +522,96 @@ def release() -> None:
     except Exception as e:
         click.echo(f"Failed to create release or upload assets: {e}")
 
+@click.command()
+def automerge():
+    """
+    Approves and squashes a Pull Request if the author is on the hardcoded allow list.
+    All necessary information is retrieved from environment variables.
+    """
+    click.echo("Starting automerge process using environment variables...")
+
+    ALLOWED_AUTHORS = ["dependabot[bot]"]
+
+    pr_number_str = os.getenv('PR_NUMBER')
+    github_token = os.getenv('GITHUB_TOKEN')
+    github_repository = os.getenv('GITHUB_REPOSITORY')
+
+    if not pr_number_str:
+        click.echo("Error: PR_NUMBER environment variable is not set.", err=True)
+        sys.exit(1)
+    try:
+        pr_number = int(pr_number_str)
+    except ValueError:
+        click.echo(f"Error: PR_NUMBER '{pr_number_str}' is not a valid integer.", err=True)
+        sys.exit(1)
+
+    if not github_token:
+        click.echo("Error: GITHUB_TOKEN environment variable is not set.", err=True)
+        sys.exit(1)
+    if not github_repository:
+        click.echo("Error: GITHUB_REPOSITORY environment variable is not set (e.g., 'owner/repo').", err=True)
+        sys.exit(1)
+
+    click.echo(f"Processing PR #{pr_number} in '{github_repository}'...")
+    click.echo(f"Hardcoded allowed authors for automerge: {', '.join(ALLOWED_AUTHORS)}")
+
+    try:
+        g = Github(github_token)
+        repo_obj = g.get_repo(github_repository)
+        pr = repo_obj.get_pull(pr_number)
+    except GithubException as e:
+        click.echo(f"Error accessing GitHub API for repo/PR: {e.status} - {e.data}", err=True)
+        sys.exit(1)
+    except Exception as e:
+        click.echo(f"An unexpected error occurred while fetching PR details: {e}", err=True)
+        sys.exit(1)
+
+    pr_author_login = pr.user.login
+    click.echo(f"Pull Request #{pr_number} is authored by @{pr_author_login}")
+
+    if pr_author_login not in ALLOWED_AUTHORS:
+        click.echo(f"Author @{pr_author_login} is NOT on the hardcoded allow list. Aborting automerge.", err=True)
+        sys.exit(1)
+
+    click.echo(f"Author @{pr_author_login} is on the allow list. Proceeding to approve and merge...")
+
+    try:
+        click.echo("Approving Pull Request...")
+        pr.create_review(event='APPROVE', body='Automerged by GitHub Action.')
+        click.echo("Pull Request approved.")
+
+        click.echo("Merging Pull Request (squash method)...")
+        merge_commit_message = f"Automerge PR #{pr_number}: {pr.title}"
+        pr.merge(merge_method='squash', commit_message=merge_commit_message)
+        click.echo("Pull Request squashed and merged.")
+
+        try:
+            repo_obj.get_git_ref(f"heads/{pr.head.ref}").delete()
+            click.echo(f"Branch '{pr.head.ref}' deleted.")
+        except GithubException as e:
+            if e.status == 422 and "Reference does not exist" in str(e.data):
+                click.echo(f"Branch '{pr.head.ref}' already deleted or does not exist.", err=True)
+            else:
+                click.echo(f"Warning: Could not delete branch '{pr.head.ref}': {e.status} - {e.data}", err=True)
+        except Exception as e:
+            click.echo(f"Warning: Unexpected error while trying to delete branch '{pr.head.ref}': {e}", err=True)
+
+    except GithubException as e:
+        click.echo(f"Error during PR approval or merge: {e.status} - {e.data}", err=True)
+        sys.exit(1)
+    except Exception as e:
+        click.echo(f"An unexpected error occurred during the merge process: {e}", err=True)
+        sys.exit(1)
+
+    click.echo("Automerge process completed successfully.")
+
 main.add_command(get)
 main.add_command(set_version)
 main.add_command(bump)
 main.add_command(license_header)
 main.add_command(github_labels)
 main.add_command(release)
+main.add_command(automerge)
 
 if __name__ == "__main__":
     main()
