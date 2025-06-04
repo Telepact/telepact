@@ -24,7 +24,7 @@ on:
         type: number
 
 jobs:
-  create-release:
+  automerge-pr:
     runs-on: ubuntu-latest
     timeout-minutes: 2
     steps:
