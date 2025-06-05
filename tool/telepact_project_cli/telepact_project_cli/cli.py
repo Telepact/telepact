@@ -577,7 +577,7 @@ def automerge():
 
     try:
         click.echo("Approving Pull Request...")
-        pr.create_review(event='APPROVE', body='Automerged by GitHub Action.')
+        pr.create_review(event='APPROVE')
         click.echo("Pull Request approved.")
 
         click.echo("Merging Pull Request (squash method)...")
