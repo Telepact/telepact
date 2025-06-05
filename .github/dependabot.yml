@@ -23,6 +23,7 @@ updates:
       - "/sdk/console"
     schedule:
       interval: "weekly"
+      day: "monday"
     groups:
       all-updates:
         update-types: ["patch", "minor"]
@@ -36,6 +37,7 @@ updates:
       - "/sdk/cli"
     schedule:
       interval: "weekly"
+      day: "tuesday"
     groups:
       all-updates:
         update-types: ["patch", "minor"]
@@ -48,6 +50,7 @@ updates:
       - "/lib/java"
     schedule:
       interval: "weekly"
+      day: "wedesday"
     groups:
       all-updates:
         update-types: ["patch", "minor"]
@@ -60,6 +63,7 @@ updates:
       - "/bind/dart"
     schedule:
       interval: "weekly"
+      day: "thursday"
     groups:
       all-updates:
         update-types: ["patch", "minor"]
