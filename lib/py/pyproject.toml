@@ -20,7 +20,7 @@ msgpack = "^1.1.0"
 
 [tool.poetry.group.dev.dependencies]
 nats-py = "^2.8"
-prometheus-client = "^0.20"
-mypy = "^1.10"
+prometheus-client = "^0.22"
+mypy = "^1.16"
 build = "^1.2"
 toml = "^0.10.2"
