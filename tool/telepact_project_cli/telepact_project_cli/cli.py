@@ -575,9 +575,40 @@ def automerge():
 
     click.echo(f"Author @{pr_author_login} is on the allow list. Proceeding to approve and merge...")
 
+    latest_commit = pr.get_commits().reversed[0]
+    click.echo(f"Checking build status for latest commit: {latest_commit.sha}")
+
+    all_checks_passed = True
+
+    try:
+        check_runs = latest_commit.get_check_runs()
+        if check_runs.totalCount > 0:
+            for check in check_runs:
+                click.echo(f"  Check Run '{check.name}': Status='{check.status}', Conclusion='{check.conclusion}'")
+                if check.status != 'completed' or check.conclusion not in ['success', 'skipped', 'neutral']:
+                    all_checks_passed = False
+                    click.echo(f"  Warning: Check '{check.name}' is not successful (status: {check.status}, conclusion: {check.conclusion}).")
+                    break
+        else:
+            all_checks_passed = False
+            click.echo("  No GitHub Check Runs found for this commit.")
+
+    except GithubException as e:
+        click.echo(f"Error accessing GitHub API for status checks: {e.status} - {e.data}", err=True)
+        sys.exit(1)
+    except Exception as e:
+        click.echo(f"An unexpected error occurred while fetching status checks: {e}", err=True)
+        sys.exit(1)
+
+    if not all_checks_passed:
+        click.echo("Latest commit does not have a passing build. Aborting automerge.", err=True)
+        sys.exit(1)
+
+    click.echo("All required build checks for the latest commit have passed!")
+
     try:
         click.echo("Approving Pull Request...")
-        pr.create_review(event='APPROVE', body='Automerged by GitHub Action.')
+        pr.create_review(event='APPROVE')
         click.echo("Pull Request approved.")
 
         click.echo("Merging Pull Request (squash method)...")
