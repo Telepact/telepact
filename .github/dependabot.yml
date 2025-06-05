@@ -50,7 +50,7 @@ updates:
       - "/lib/java"
     schedule:
       interval: "weekly"
-      day: "wedesday"
+      day: "wednesday"
     groups:
       all-updates:
         update-types: ["patch", "minor"]
