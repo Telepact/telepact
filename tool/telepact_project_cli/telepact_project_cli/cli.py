@@ -26,6 +26,8 @@ from github import Github, GithubException
 
 yaml = YAML()
 
+AUTOMERGE_ALLOWED_AUTHORS = ["dependabot[bot]"]
+
 def bump_version(version: str) -> str:
     major, minor, patch = map(int, version.split('.'))
     patch += 1
@@ -340,8 +342,7 @@ def license_header(license_header_path):
 
 @click.command()
 def github_labels() -> None:
-    # Directories and their corresponding tags
-    DIRECTORY_TAG_MAP = {
+    PROJECT_LABEL_MAP = {
         "lib/java": "java",
         "lib/py": "py",
         "lib/ts": "ts",
@@ -361,10 +362,10 @@ def github_labels() -> None:
             print(f"Error fetching or diffing: {e}")
             return ""
 
-    def get_modified_tags(files):
+    def get_modified_project_labels(files):
         tags = set()
         for file in files.split():
-            for directory, tag in DIRECTORY_TAG_MAP.items():
+            for directory, tag in PROJECT_LABEL_MAP.items():
                 if file.startswith(directory):
                     tags.add(tag)
         return tags
@@ -389,28 +390,46 @@ def github_labels() -> None:
     # Get current labels on the PR
     current_labels = {label.name for label in pr.get_labels()}
 
-    # Determine tags to add
-    new_tags = get_modified_tags(files)
-    print(f"Tags to be added: {new_tags}")
+    # Determine labels to add
+    new_labels = get_modified_project_labels(files)
+
+    print(f"Labels to be added: {new_labels}")
 
     # Update PR labels
-    added_tags = []
-    removed_tags = []
+    added_labels = []
+    removed_labels = []
 
     # Add new labels
-    for tag in new_tags:
-        if tag not in current_labels:
-            pr.add_to_labels(tag)
-            added_tags.append(tag)
+    for label in new_labels:
+        if label not in current_labels:
+            pr.add_to_labels(label)
+            added_labels.append(label)
 
     # Remove old labels
     for label in current_labels:
-        if label not in new_tags and label in DIRECTORY_TAG_MAP.values():
+        if label not in new_labels and label in PROJECT_LABEL_MAP.values():
             pr.remove_from_labels(label)
-            removed_tags.append(label)
+            removed_labels.append(label)
 
     # Print summary
-    print(f"Summary:\n  Added tags: {', '.join(added_tags) if added_tags else 'None'}\n  Removed tags: {', '.join(removed_tags) if removed_tags else 'None'}")
+    print(f"Summary:\n  Added tags: {', '.join(added_labels) if added_labels else 'None'}\n  Removed tags: {', '.join(removed_labels) if removed_labels else 'None'}")
+
+
+@click.command()
+def github_automerge_comment() -> None:
+    # Get environment variables
+    token = os.getenv('GITHUB_TOKEN')
+    repository = os.getenv('GITHUB_REPOSITORY')
+    pr_number = int(os.getenv('PR_NUMBER'))
+
+    # Initialize GitHub client
+    g = Github(token)
+    repo = g.get_repo(repository)
+    pr = repo.get_pull(pr_number)
+
+    pr.create_issue_comemnt('/automerge')
+    click.echo(f"Commented '/automerge' on PR #{pr_number} in {repository}.")
+
 
 @click.command()
 def release() -> None:
@@ -530,8 +549,6 @@ def automerge():
     """
     click.echo("Starting automerge process using environment variables...")
 
-    ALLOWED_AUTHORS = ["dependabot[bot]"]
-
     pr_number_str = os.getenv('PR_NUMBER')
     github_token = os.getenv('GITHUB_TOKEN')
     github_repository = os.getenv('GITHUB_REPOSITORY')
@@ -553,7 +570,7 @@ def automerge():
         sys.exit(1)
 
     click.echo(f"Processing PR #{pr_number} in '{github_repository}'...")
-    click.echo(f"Hardcoded allowed authors for automerge: {', '.join(ALLOWED_AUTHORS)}")
+    click.echo(f"Hardcoded allowed authors for automerge: {', '.join(AUTOMERGE_ALLOWED_AUTHORS)}")
 
     try:
         g = Github(github_token)
@@ -569,63 +586,28 @@ def automerge():
     pr_author_login = pr.user.login
     click.echo(f"Pull Request #{pr_number} is authored by @{pr_author_login}")
 
-    if pr_author_login not in ALLOWED_AUTHORS:
+    if pr_author_login not in AUTOMERGE_ALLOWED_AUTHORS:
         click.echo(f"Author @{pr_author_login} is NOT on the hardcoded allow list. Aborting automerge.", err=True)
+
+        # Add PR comment stating PR is not eligible for automerge
+        try:
+            comment = 'PR is not eligible for automerge.'
+            pr.create_issue_comment(comment)
+        except GithubException as e:
+            click.echo(f"Error adding comment to PR: {e.status} - {e.data}", err=True)
+        except Exception as e:
+            click.echo(f"An unexpected error occurred while commenting on the PR: {e}", err=True)
         sys.exit(1)
 
-    click.echo(f"Author @{pr_author_login} is on the allow list. Proceeding to approve and merge...")
-
-    latest_commit = pr.get_commits().reversed[0]
-    click.echo(f"Checking build status for latest commit: {latest_commit.sha}")
-
-    all_checks_passed = True
-
-    try:
-        check_runs = latest_commit.get_check_runs()
-        if check_runs.totalCount > 0:
-            for check in check_runs:
-                click.echo(f"  Check Run '{check.name}': Status='{check.status}', Conclusion='{check.conclusion}'")
-                if check.status != 'completed' or check.conclusion not in ['success', 'skipped', 'neutral']:
-                    all_checks_passed = False
-                    click.echo(f"  Warning: Check '{check.name}' is not successful (status: {check.status}, conclusion: {check.conclusion}).")
-                    break
-        else:
-            all_checks_passed = False
-            click.echo("  No GitHub Check Runs found for this commit.")
-
-    except GithubException as e:
-        click.echo(f"Error accessing GitHub API for status checks: {e.status} - {e.data}", err=True)
-        sys.exit(1)
-    except Exception as e:
-        click.echo(f"An unexpected error occurred while fetching status checks: {e}", err=True)
-        sys.exit(1)
-
-    if not all_checks_passed:
-        click.echo("Latest commit does not have a passing build. Aborting automerge.", err=True)
-        sys.exit(1)
-
-    click.echo("All required build checks for the latest commit have passed!")
+    click.echo(f"Author @{pr_author_login} is on the allow list. Proceeding to approve and enable auto-merge...")
 
     try:
         click.echo("Approving Pull Request...")
         pr.create_review(event='APPROVE')
         click.echo("Pull Request approved.")
 
-        click.echo("Merging Pull Request (squash method)...")
-        merge_commit_message = f"Automerge PR #{pr_number}: {pr.title}"
-        pr.merge(merge_method='squash', commit_message=merge_commit_message)
-        click.echo("Pull Request squashed and merged.")
-
-        try:
-            repo_obj.get_git_ref(f"heads/{pr.head.ref}").delete()
-            click.echo(f"Branch '{pr.head.ref}' deleted.")
-        except GithubException as e:
-            if e.status == 422 and "Reference does not exist" in str(e.data):
-                click.echo(f"Branch '{pr.head.ref}' already deleted or does not exist.", err=True)
-            else:
-                click.echo(f"Warning: Could not delete branch '{pr.head.ref}': {e.status} - {e.data}", err=True)
-        except Exception as e:
-            click.echo(f"Warning: Unexpected error while trying to delete branch '{pr.head.ref}': {e}", err=True)
+        pr.enable_automerge(merge_method='squash')
+        click.echo("Pull Request will be automerged when build succeeds.")
 
     except GithubException as e:
         click.echo(f"Error during PR approval or merge: {e.status} - {e.data}", err=True)
@@ -641,6 +623,7 @@ main.add_command(set_version)
 main.add_command(bump)
 main.add_command(license_header)
 main.add_command(github_labels)
+main.add_command(github_automerge_comment)
 main.add_command(release)
 main.add_command(automerge)
 
