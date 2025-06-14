@@ -112,7 +112,7 @@ jobs:
         run: git fetch origin release-pull-request-${{ github.event.pull_request.number }}
       
       - name: Merge release branch
-        run: git merge --ff-only release-pull-request-${{ github.event.pull_request.number }}
+        run: git merge --ff-only origin/release-pull-request-${{ github.event.pull_request.number }}
 
       - name: Push changes
         run: git push origin HEAD
