@@ -118,10 +118,3 @@ jobs:
           GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
           GITHUB_REPOSITORY: ${{ github.repository }}
         run: telepact-project release
-        
-
-
-    
-
-  
-          
