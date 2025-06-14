@@ -14,41 +14,15 @@
 #|  limitations under the License.
 #|
 
-name: CI
+name: Build
 
 on:
-  workflow_dispatch:
-
-  pull_request:
-    types:
-      - opened
-      - synchronize
-      - reopened
-    branches:
-      - main
-  push:
-    branches:
-      - main
-
-permissions:
-  actions: write
+  workflow_call:
 
 jobs:
-  begin:
-    name: Begin
-    runs-on: ubuntu-latest
-    timeout-minutes: 1
-    if: >
-      github.event_name == 'pull_request' ||
-      (github.event_name == 'push' && github.actor == 'telepact-notary[bot]')
-    steps:
-      - name: No-op
-        run: echo "No-op"
-
   build-ts:
     name: Build TypeScript
     runs-on: ubuntu-latest
-    needs: [begin]
     timeout-minutes: 1
     steps:
       - name: Checkout code
@@ -76,7 +50,6 @@ jobs:
   build-java:
     name: Build Java
     runs-on: ubuntu-latest
-    needs: [begin]
     timeout-minutes: 1
     steps:
       - name: Checkout code
@@ -121,7 +94,6 @@ jobs:
   build-py:
     name: Build Python
     runs-on: ubuntu-latest
-    needs: [begin]
     timeout-minutes: 1
     steps:
       - name: Checkout code
@@ -212,7 +184,6 @@ jobs:
   build-prettier:
     name: Build Prettier Plugin
     runs-on: ubuntu-latest
-    needs: [begin]
     timeout-minutes: 1
     steps:
       - name: Checkout code
@@ -316,7 +287,6 @@ jobs:
   check-license-header:
     name: Check License Header
     runs-on: ubuntu-latest
-    needs: [begin]
     timeout-minutes: 1
     steps:
       - name: Checkout code
@@ -340,7 +310,6 @@ jobs:
   check-version:
     name: Check Versions
     runs-on: ubuntu-latest
-    needs: [begin]
     timeout-minutes: 1
     steps:
       - name: Checkout code
@@ -360,30 +329,6 @@ jobs:
           else
             echo "Versions up-to-date."
           fi
-
-  update-pr-labels:
-    name: Update PR Labels
-    runs-on: ubuntu-latest
-    needs: [begin]
-    timeout-minutes: 1
-    if: github.event_name == 'pull_request'
-    permissions:
-      pull-requests: write
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Install Project CLI
-        run: make install-project-cli
-
-      - name: Determine and update tags
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-          BASE_BRANCH: ${{ github.event.pull_request.base.ref }}
-          HEAD_SHA: ${{ github.sha }}
-        run: telepact-project github-labels
 
   run-tests:
     name: Test
@@ -446,90 +391,3 @@ jobs:
       - name: Run tests
         run: |
           make test
-
-  verify-workflow:
-    name: Verify Workflow
-    runs-on: ubuntu-latest
-    timeout-minutes: 1
-    needs:
-      - begin
-      - build-ts
-      - build-java
-      - build-py
-      - build-cli
-      - build-dart
-      - build-prettier
-      - build-console
-      - test-console-self-host
-      - check-license-header
-      - check-version
-      - run-tests
-    if: always()
-    steps:
-      - name: Check build-ts
-        if: needs.build-ts.result != 'success' && needs.begin.result == 'success'
-        run: exit 1
-
-      - name: Check build-java
-        if: needs.build-java.result != 'success' && needs.begin.result == 'success'
-        run: exit 1
-
-      - name: Check build-py
-        if: needs.build-py.result != 'success' && needs.begin.result == 'success'
-        run: exit 1
-
-      - name: Check build-cli
-        if: needs.build-cli.result != 'success' && needs.begin.result == 'success'
-        run: exit 1
-
-      - name: Check build-dart
-        if: needs.build-dart.result != 'success' && needs.begin.result == 'success'
-        run: exit 1
-
-      - name: Check build-prettier
-        if: needs.build-prettier.result != 'success' && needs.begin.result == 'success'
-        run: exit 1
-
-      - name: Check build-console
-        if: needs.build-console.result != 'success' && needs.begin.result == 'success'
-        run: exit 1
-
-      - name: Check test-console-self-host
-        if: needs.test-console-self-host.result != 'success' && needs.begin.result == 'success'
-        run: exit 1
-
-      - name: Check check-license-header
-        if: needs.check-license-header.result != 'success' && needs.begin.result == 'success'
-        run: exit 1
-
-      - name: Check check-version
-        if: needs.check-version.result != 'success' && needs.begin.result == 'success'
-        run: exit 1
-
-      - name: Check run-tests
-        if: needs.run-tests.result != 'success' && needs.begin.result == 'success'
-        run: exit 1
-
-      #
-      #  Automation Triggers
-      #
-
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Trigger Release
-        if: >
-          github.event_name == 'push' &&
-          github.actor == 'telepact-notary[bot]'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh workflow run release.yml --ref main -f artifacts_run_id=${{ github.run_id }}
-
-      - name: Trigger Automerge
-        if: >
-          github.event_name == 'pull_request' &&
-          github.event.pull_request.user.login == 'dependabot[bot]' &&
-          github.repository == 'telepact/telepact'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh workflow run automerge.yml --ref main -f pull_request_number=${{ github.event.pull_request.number }}

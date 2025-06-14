@@ -14,19 +14,18 @@
 #|  limitations under the License.
 #|
 
-name: Automerge PR
+name: Comment
 
 on:
-  workflow_dispatch:
-    inputs:
-      pull_request_number:
-        required: true
-        type: number
+  issue_comment:
+    types: [created]
 
 jobs:
   automerge-pr:
+    name: Auto-merge PR
     runs-on: ubuntu-latest
     timeout-minutes: 2
+    if: github.event.issue.pull_request != null && github.event.comment.body == '/automerge'
     steps:
       - name: Generate GitHub App token
         id: generate-token
@@ -44,7 +43,7 @@ jobs:
       - name: Install Project CLI
         run: make install-project-cli
 
-      - name: Approve and merge PR
+      - name: Approve and auto-merge PR
         env:
           PR_NUMBER: ${{ github.event.inputs.pull_request_number }}
           GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
