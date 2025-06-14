@@ -32,8 +32,6 @@ jobs:
   build:
     name: Build
     uses: ./.github/workflows/build.yml
-    with:
-      branch: ${{ github.ref_name }}
 
   update-labels:
     name: Update Labels
@@ -42,8 +40,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          ref: ${{ inputs.branch }}
 
       - name: Install Project CLI
         run: make install-project-cli
@@ -57,8 +53,8 @@ jobs:
           HEAD_SHA: ${{ github.sha }}
         run: telepact-project github-labels
 
-  automerge:
-    name: Auto-merge
+  enable-automerge:
+    name: Enable Auto-merge
     runs-on: ubuntu-latest
     if: github.event.pull_request.user.login == 'dependabot[bot]' && github.event.action == 'opened'
     timeout-minutes: 1

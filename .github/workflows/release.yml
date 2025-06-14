@@ -17,113 +17,42 @@
 name: Release
 
 on:
-  pull_request:
-    types:
-      - closed
+  push:
     branches:
-      - main
+      - main  
 
 jobs:
-  create-release-branch:
-    name: Create release branch
-    if: github.event.pull_request.merged == true
+
+  check-version-change:
+    name: Check version change
     runs-on: ubuntu-latest
-    timeout-minutes: 2
+    outputs:
+      version-changed: ${{ steps.check-file.outputs.version_changed }}
     steps:
-      - name: Generate GitHub App token
-        id: generate-token
-        uses: actions/create-github-app-token@v1
-        with:
-          app-id: ${{ vars.TELEPACT_BOT_APP_ID }}
-          private-key: ${{ secrets.TELEPACT_BOT_PRIVATE_KEY }}
-
-      - name: Checkout code
+      - name: Checkout repository code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
-          token: ${{ steps.generate-token.outputs.token }}
 
-      # Required for bumping lock files
-      - name: Set up Dart
-        uses: dart-lang/setup-dart@v1
-        with:
-          sdk: 3.6
-
-      # Required for bumping lock files
-      - name: Install Poetry
-        run: pipx install poetry
-
-      - name: Install Project CLI
-        run: make install-project-cli
-
-      - name: Configure git identity
+      - name: Determine if VERSION.txt was modified in the latest commit
+        id: check-file
         run: |
-          git config --global user.name "telepact-notary[bot]"
-          git config --global user.email "telepact-notary[bot]@users.noreply.github.com"
+          if git show --name-only --pretty="" HEAD | grep -q "VERSION.txt"; then
+            echo "VERSION.txt was changed in the last commit."
+            echo "version_changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "VERSION.txt was NOT changed in the last commit. Subsequent jobs will be skipped."
+            echo "version_changed=false" >> "$GITHUB_OUTPUT"
+          fi
 
-      - name: git status
-        run: git status
-
-      - name: Bump version
-        env:
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-        run: telepact-project bump
-
-      - name: git log
-        run: git log -n 1
-
-      - name: Push release branch
-        run: git push origin HEAD:release-pull-request-${{ github.event.pull_request.number }}
-
-  build-release-branch:
+  build-release:
     name: Build release
+    needs: [check-version-change]
+    if: needs.check-version-change.outputs.version-changed == 'true'
     uses: ./.github/workflows/build.yml
-    needs: [create-release-branch]
-    with:
-      branch: release-pull-request-${{ github.event.pull_request.number }}
     
-  automerge-release-branch:
-    name: Automerge release branch
-    runs-on: ubuntu-latest
-    needs: [build-release-branch]
-    steps:
-      - name: Generate GitHub App token
-        id: generate-token
-        uses: actions/create-github-app-token@v1
-        with:
-          app-id: ${{ vars.TELEPACT_BOT_APP_ID }}
-          private-key: ${{ secrets.TELEPACT_BOT_PRIVATE_KEY }}
-
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
-          token: ${{ steps.generate-token.outputs.token }}
-
-      - name: Configure git identity
-        run: |
-          git config --global user.name "telepact-notary[bot]"
-          git config --global user.email "telepact-notary[bot]@users.noreply.github.com"
-
-      - name: git status
-        run: git status
-
-      - name: Fetch branches
-        run: git fetch origin release-pull-request-${{ github.event.pull_request.number }}
-      
-      - name: Merge release branch
-        run: git merge --ff-only origin/release-pull-request-${{ github.event.pull_request.number }}
-
-      - name: Push changes
-        run: git push origin HEAD
-
-      - name: Delete release branch
-        run: git push origin --delete release-pull-request-${{ github.event.pull_request.number }}
-
   create-release:
     name: Create release
     runs-on: ubuntu-latest
-    needs: [automerge-release-branch]
+    needs: [build-release]
     timeout-minutes: 2
     steps:
       - name: Generate GitHub App token
@@ -144,56 +73,42 @@ jobs:
         with:
           name: build-ts-tgz
           path: lib/ts/dist-tgz
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          run-id: ${{ github.event.inputs.artifacts_run_id }}
 
       - name: Download java artifacts
         uses: actions/download-artifact@v4
         with:
           name: build-java
           path: lib/java/target
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          run-id: ${{ github.event.inputs.artifacts_run_id }}
 
       - name: Download py artifacts
         uses: actions/download-artifact@v4
         with:
           name: build-py
           path: lib/py/dist
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          run-id: ${{ github.event.inputs.artifacts_run_id }}
 
       - name: Download dart artifacts
         uses: actions/download-artifact@v4
         with:
           name: build-dart
           path: bind/dart/dist
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          run-id: ${{ github.event.inputs.artifacts_run_id }}
 
       - name: Download cli artifacts
         uses: actions/download-artifact@v4
         with:
           name: build-cli
           path: sdk/cli/dist
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          run-id: ${{ github.event.inputs.artifacts_run_id }}
 
       - name: Download prettier artifacts
         uses: actions/download-artifact@v4
         with:
           name: build-prettier-tgz
           path: sdk/prettier/dist-tgz
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          run-id: ${{ github.event.inputs.artifacts_run_id }}
 
       - name: Download console artifacts
         uses: actions/download-artifact@v4
         with:
           name: build-console
           path: sdk/console/dist
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          run-id: ${{ github.event.inputs.artifacts_run_id }}
 
       - name: Install Project CLI
         run: make install-project-cli

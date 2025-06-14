@@ -18,11 +18,6 @@ name: Build
 
 on:
   workflow_call:
-    inputs:
-      branch:
-        required: true
-        type: string
-        description: 'Branch to build'
 
 jobs:
   build-ts:
@@ -32,8 +27,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          ref: ${{ inputs.branch }}
 
       - name: Build ts
         env:
@@ -61,8 +54,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          ref: ${{ inputs.branch }}
 
       - name: Set up Java
         uses: actions/setup-java@v4
@@ -107,8 +98,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          ref: ${{ inputs.branch }}
 
       - name: Install Poetry
         run: pipx install poetry
@@ -131,8 +120,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          ref: ${{ inputs.branch }}
 
       - name: Install Poetry
         run: pipx install poetry
@@ -164,8 +151,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          ref: ${{ inputs.branch }}
 
       - name: Set up Dart
         uses: dart-lang/setup-dart@v1
@@ -203,8 +188,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          ref: ${{ inputs.branch }}
 
       - name: Install dependencies
         run: make prettier
@@ -231,8 +214,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          ref: ${{ inputs.branch }}
 
       - name: Download ts build artifacts
         uses: actions/download-artifact@v4
@@ -287,8 +268,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          ref: ${{ inputs.branch }}
       
       - name: Download console build artifacts
         uses: actions/download-artifact@v4
@@ -312,8 +291,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          ref: ${{ inputs.branch }}
 
       - name: Install Project CLI
         run: make install-project-cli
@@ -337,8 +314,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          ref: ${{ inputs.branch }}
 
       - name: Install Project CLI
         run: make install-project-cli
@@ -363,8 +338,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          ref: ${{ inputs.branch }}
 
       - name: Install Poetry
         run: pipx install poetry
