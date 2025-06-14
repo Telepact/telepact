@@ -35,7 +35,8 @@ jobs:
       - name: Determine if VERSION.txt was modified in the latest commit
         id: check-file
         run: |
-          if git show --name-only --pretty="" HEAD | grep -q "VERSION.txt"; then
+          git show --name-only --pretty="" HEAD | grep -q "VERSION.txt"
+          if [ "$?" -eq 0 ]; then
             echo "VERSION.txt was changed in the last commit."
             echo "version_changed=true" >> "$GITHUB_OUTPUT"
           else
@@ -48,6 +49,9 @@ jobs:
     needs: [check-version-change]
     if: needs.check-version-change.outputs.version-changed == 'true'
     uses: ./.github/workflows/build.yml
+    secrets:
+      MVN_GPG_PRIVATE_KEY: ${{ secrets.MVN_GPG_PRIVATE_KEY }}
+      MVN_GPG_PASSPHRASE: ${{ secrets.MVN_GPG_PASSPHRASE }}
     
   create-release:
     name: Create release
