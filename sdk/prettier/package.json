@@ -1,6 +1,6 @@
 {
   "name": "prettier-plugin-telepact",
-  "version": "1.0.0-alpha.62",
+  "version": "1.0.0-alpha.63",
   "description": "Prettier plugin to format telepact docstrings.",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
