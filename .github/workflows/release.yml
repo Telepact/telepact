@@ -36,7 +36,7 @@ jobs:
         id: check-file
         run: |
           git show --name-only --pretty="" HEAD | grep -q "VERSION.txt"
-          if [ "$?" -eq 0 ]; then
+          if [ $? -eq 0 ]; then
             echo "VERSION.txt was changed in the last commit."
             echo "version_changed=true" >> "$GITHUB_OUTPUT"
           else
