@@ -547,75 +547,65 @@ def automerge():
     Approves and squashes a Pull Request if the author is on the hardcoded allow list.
     All necessary information is retrieved from environment variables.
     """
-    click.echo("Starting automerge process using environment variables...")
+    print("Starting automerge process using environment variables...")
 
     pr_number_str = os.getenv('PR_NUMBER')
     github_token = os.getenv('GITHUB_TOKEN')
     github_repository = os.getenv('GITHUB_REPOSITORY')
 
     if not pr_number_str:
-        click.echo("Error: PR_NUMBER environment variable is not set.", err=True)
         raise Exception("PR_NUMBER environment variable is not set.")
     try:
         pr_number = int(pr_number_str)
     except ValueError:
-        click.echo(f"Error: PR_NUMBER '{pr_number_str}' is not a valid integer.", err=True)
         raise Exception(f"PR_NUMBER '{pr_number_str}' is not a valid integer.")
 
     if not github_token:
-        click.echo("Error: GITHUB_TOKEN environment variable is not set.", err=True)
         raise Exception("GITHUB_TOKEN environment variable is not set.")
     if not github_repository:
-        click.echo("Error: GITHUB_REPOSITORY environment variable is not set (e.g., 'owner/repo').", err=True)
         raise Exception("GITHUB_REPOSITORY environment variable is not set (e.g., 'owner/repo').")
 
-    click.echo(f"Processing PR #{pr_number} in '{github_repository}'...")
-    click.echo(f"Hardcoded allowed authors for automerge: {', '.join(AUTOMERGE_ALLOWED_AUTHORS)}")
+    print(f"Processing PR #{pr_number} in '{github_repository}'...")
+    print(f"Hardcoded allowed authors for automerge: {', '.join(AUTOMERGE_ALLOWED_AUTHORS)}")
 
     try:
         g = Github(github_token)
         repo_obj = g.get_repo(github_repository)
         pr = repo_obj.get_pull(pr_number)
     except GithubException as e:
-        click.echo(f"Error accessing GitHub API for repo/PR: {e.status} - {e.data}", err=True)
         raise Exception(f"Error accessing GitHub API for repo/PR: {e.status} - {e.data}")
     except Exception as e:
-        click.echo(f"An unexpected error occurred while fetching PR details: {e}", err=True)
         raise Exception(f"An unexpected error occurred while fetching PR details: {e}")
 
     pr_author_login = pr.user.login
-    click.echo(f"Pull Request #{pr_number} is authored by @{pr_author_login}")
+    print(f"Pull Request #{pr_number} is authored by @{pr_author_login}")
 
     if pr_author_login not in AUTOMERGE_ALLOWED_AUTHORS:
-        click.echo(f"Author @{pr_author_login} is NOT on the hardcoded allow list. Aborting automerge.", err=True)
-
         try:
             comment = 'PR is not eligible for automerge.'
             pr.create_issue_comment(comment)
         except GithubException as e:
-            click.echo(f"Error adding comment to PR: {e.status} - {e.data}", err=True)
+            print(f"Error adding comment to PR: {e.status} - {e.data}")
         except Exception as e:
-            click.echo(f"An unexpected error occurred while commenting on the PR: {e}", err=True)
+            print(f"An unexpected error occurred while commenting on the PR: {e}")
         raise Exception(f"Author @{pr_author_login} is NOT on the hardcoded allow list. Aborting automerge.")
 
-    click.echo(f"Author @{pr_author_login} is on the allow list. Proceeding to approve and enable auto-merge...")
+    print(f"Author @{pr_author_login} is on the allow list. Proceeding to approve and enable auto-merge...")
 
     try:
-        click.echo("Approving Pull Request...")
+        print("Approving Pull Request...")
         pr.create_review(event='APPROVE')
-        click.echo("Pull Request approved.")
+        print("Pull Request approved.")
 
         pr.enable_automerge(merge_method='squash')
-        click.echo("Pull Request will be automerged when build succeeds.")
+        print("Pull Request will be automerged when build succeeds.")
 
     except GithubException as e:
-        click.echo(f"Error during PR approval or merge: {e.status} - {e.data}", err=True)
         raise Exception(f"Error during PR approval or merge: {e.status} - {e.data}")
     except Exception as e:
-        click.echo(f"An unexpected error occurred during the merge process: {e}", err=True)
         raise Exception(f"An unexpected error occurred during the merge process: {e}")
 
-    click.echo("Automerge process completed successfully.")
+    print("Automerge process completed successfully.")
 
 main.add_command(get)
 main.add_command(set_version)
