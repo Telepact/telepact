@@ -31,7 +31,10 @@ jobs:
     steps:
       - name: Checkout repository code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
 
+      # TODO: Remove the git --no-page show - it is just for debugging
       - name: Determine if VERSION.txt was modified in the latest commit
         id: check-file
         run: |
