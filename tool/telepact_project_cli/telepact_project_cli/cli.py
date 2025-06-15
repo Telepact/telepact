@@ -595,7 +595,6 @@ main.add_command(set_version)
 main.add_command(bump)
 main.add_command(license_header)
 main.add_command(github_labels)
-main.add_command(github_automerge_comment)
 main.add_command(release)
 main.add_command(automerge)
 
