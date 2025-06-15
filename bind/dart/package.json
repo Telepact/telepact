@@ -1,6 +1,6 @@
 {
   "name": "telepact-wrapped",
-  "version": "1.0.0-alpha.58",
+  "version": "1.0.0-alpha.59",
   "description": "A Dart library for wrapping an npm package.",
   "main": "index.js",
   "private": true,
