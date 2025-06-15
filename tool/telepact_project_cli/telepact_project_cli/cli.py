@@ -555,19 +555,19 @@ def automerge():
 
     if not pr_number_str:
         click.echo("Error: PR_NUMBER environment variable is not set.", err=True)
-        sys.exit(1)
+        raise Exception("PR_NUMBER environment variable is not set.")
     try:
         pr_number = int(pr_number_str)
     except ValueError:
         click.echo(f"Error: PR_NUMBER '{pr_number_str}' is not a valid integer.", err=True)
-        sys.exit(1)
+        raise Exception(f"PR_NUMBER '{pr_number_str}' is not a valid integer.")
 
     if not github_token:
         click.echo("Error: GITHUB_TOKEN environment variable is not set.", err=True)
-        sys.exit(1)
+        raise Exception("GITHUB_TOKEN environment variable is not set.")
     if not github_repository:
         click.echo("Error: GITHUB_REPOSITORY environment variable is not set (e.g., 'owner/repo').", err=True)
-        sys.exit(1)
+        raise Exception("GITHUB_REPOSITORY environment variable is not set (e.g., 'owner/repo').")
 
     click.echo(f"Processing PR #{pr_number} in '{github_repository}'...")
     click.echo(f"Hardcoded allowed authors for automerge: {', '.join(AUTOMERGE_ALLOWED_AUTHORS)}")
@@ -578,10 +578,10 @@ def automerge():
         pr = repo_obj.get_pull(pr_number)
     except GithubException as e:
         click.echo(f"Error accessing GitHub API for repo/PR: {e.status} - {e.data}", err=True)
-        sys.exit(1)
+        raise Exception(f"Error accessing GitHub API for repo/PR: {e.status} - {e.data}")
     except Exception as e:
         click.echo(f"An unexpected error occurred while fetching PR details: {e}", err=True)
-        sys.exit(1)
+        raise Exception(f"An unexpected error occurred while fetching PR details: {e}")
 
     pr_author_login = pr.user.login
     click.echo(f"Pull Request #{pr_number} is authored by @{pr_author_login}")
@@ -589,7 +589,6 @@ def automerge():
     if pr_author_login not in AUTOMERGE_ALLOWED_AUTHORS:
         click.echo(f"Author @{pr_author_login} is NOT on the hardcoded allow list. Aborting automerge.", err=True)
 
-        # Add PR comment stating PR is not eligible for automerge
         try:
             comment = 'PR is not eligible for automerge.'
             pr.create_issue_comment(comment)
@@ -597,7 +596,7 @@ def automerge():
             click.echo(f"Error adding comment to PR: {e.status} - {e.data}", err=True)
         except Exception as e:
             click.echo(f"An unexpected error occurred while commenting on the PR: {e}", err=True)
-        sys.exit(1)
+        raise Exception(f"Author @{pr_author_login} is NOT on the hardcoded allow list. Aborting automerge.")
 
     click.echo(f"Author @{pr_author_login} is on the allow list. Proceeding to approve and enable auto-merge...")
 
@@ -611,10 +610,10 @@ def automerge():
 
     except GithubException as e:
         click.echo(f"Error during PR approval or merge: {e.status} - {e.data}", err=True)
-        sys.exit(1)
+        raise Exception(f"Error during PR approval or merge: {e.status} - {e.data}")
     except Exception as e:
         click.echo(f"An unexpected error occurred during the merge process: {e}", err=True)
-        sys.exit(1)
+        raise Exception(f"An unexpected error occurred during the merge process: {e}")
 
     click.echo("Automerge process completed successfully.")
 
