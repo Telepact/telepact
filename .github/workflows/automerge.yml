@@ -14,38 +14,57 @@
 #|  limitations under the License.
 #|
 
-name: Comment
+name: Automerge
 
 on:
-  issue_comment:
-    types: [created]
+  workflow_run:
+    types: [completed]
+    workflows: ["PR"]
 
 jobs:
   automerge-pr:
     name: Auto-merge PR
     runs-on: ubuntu-latest
     timeout-minutes: 2
-    if: github.event.issue.pull_request != null && github.event.comment.body == '/automerge'
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download PR details
+        uses: actions/download-artifact@v4
+        with:
+          name: pr-details
+          path: pr-details.json
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
+
+      - name: Exract PR details
+        id: extract-pr-details
+        run: |
+          pr_details=$(cat pr-details.json)
+          pr_number=$(echo "$pr_details" | jq -r '.pr_number')
+          pr_author=$(echo "$pr_details" | jq -r '.pr_author')
+          echo "pr_number=$pr_number" >> "$GITHUB_OUTPUT"
+          echo "pr_author=$pr_author" >> "$GITHUB_OUTPUT"
+
       - name: Generate GitHub App token
         id: generate-token
+        if: steps.extract-pr-details.pr_author == 'dependabot[bot]'
         uses: actions/create-github-app-token@v1
         with:
           app-id: ${{ vars.TELEPACT_BOT_APP_ID }}
           private-key: ${{ secrets.TELEPACT_BOT_PRIVATE_KEY }}
 
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
-          token: ${{ steps.generate-token.outputs.token }}
-
       - name: Install Project CLI
+        if: steps.extract-pr-details.pr_author == 'dependabot[bot]'
         run: make install-project-cli
 
+      # NOTE that the 'if' condition on this step is only an optimization;
+      # the 'telepact-project' cli also validates auto-merge appropriateness.
       - name: Approve and auto-merge PR
+        if: steps.extract-pr-details.pr_author == 'dependabot[bot]'
         env:
-          PR_NUMBER: ${{ github.event.issue.number }}
+          PR_NUMBER: ${{ steps.extract-pr-details.outputs.pr_number }}
           GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
           GITHUB_REPOSITORY: ${{ github.repository }}
         run: telepact-project automerge
