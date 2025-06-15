@@ -67,7 +67,7 @@ jobs:
             \"pr_author\": \"${{ github.event.pull_request.user.login }}\"
           }" > pr-details.json
 
-      - name: Upload PR number
+      - name: Upload PR details
         uses: actions/upload-artifact@v4
         with:
           name: pr-details
