@@ -35,6 +35,7 @@ jobs:
       - name: Determine if VERSION.txt was modified in the latest commit
         id: check-file
         run: |
+          git --no-pager show
           git show --name-only --pretty="" HEAD | grep -q "VERSION.txt"
           if [ $? -eq 0 ]; then
             echo "VERSION.txt was changed in the last commit."
