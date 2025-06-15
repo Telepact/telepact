@@ -56,7 +56,9 @@ jobs:
   enable-automerge:
     name: Enable Auto-merge
     runs-on: ubuntu-latest
-    if: github.event.pull_request.user.login == 'dependabot[bot]' && github.event.action == 'opened'
+    if: |
+      github.event.pull_request.user.login == 'dependabot[bot]' &&
+      (github.event.action == 'opened' || github.event.action == 'reopened')
     timeout-minutes: 1
     steps:
       - name: Checkout code
