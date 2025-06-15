@@ -53,25 +53,22 @@ jobs:
           HEAD_SHA: ${{ github.sha }}
         run: telepact-project github-labels
 
-  enable-automerge:
-    name: Enable Auto-merge
+  cache-pr-details:
+    name: Cache PR Details
     runs-on: ubuntu-latest
-    if: |
-      github.event.pull_request.user.login == 'dependabot[bot]' &&
-      (github.event.action == 'opened' || github.event.action == 'reopened')
-    timeout-minutes: 1
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Cache PR details
+        run: |
+          echo "{
+            \"pr_number\": \"${{ github.event.pull_request.number }}\",
+            \"pr_author\": \"${{ github.event.pull_request.user.login }}\"
+          }" > pr-details.json
+
+      - name: Upload PR number
+        uses: actions/upload-artifact@v4
         with:
-          ref: ${{ inputs.branch }}
-
-      - name: Install Project CLI
-        run: make install-project-cli
-
-      - name: Auto-merge PR
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-        run: telepact-project github-automerge-comment
+          name: pr-details
+          path: pr-details.json

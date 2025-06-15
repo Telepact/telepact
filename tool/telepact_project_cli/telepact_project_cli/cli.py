@@ -414,23 +414,6 @@ def github_labels() -> None:
     # Print summary
     print(f"Summary:\n  Added tags: {', '.join(added_labels) if added_labels else 'None'}\n  Removed tags: {', '.join(removed_labels) if removed_labels else 'None'}")
 
-
-@click.command()
-def github_automerge_comment() -> None:
-    # Get environment variables
-    token = os.getenv('GITHUB_TOKEN')
-    repository = os.getenv('GITHUB_REPOSITORY')
-    pr_number = int(os.getenv('PR_NUMBER'))
-
-    # Initialize GitHub client
-    g = Github(token)
-    repo = g.get_repo(repository)
-    pr = repo.get_pull(pr_number)
-
-    pr.create_issue_comment('/automerge')
-    click.echo(f"Commented '/automerge' on PR #{pr_number} in {repository}.")
-
-
 @click.command()
 def release() -> None:
     """
