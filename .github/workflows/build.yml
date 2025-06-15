@@ -18,6 +18,11 @@ name: Build
 
 on:
   workflow_call:
+    secrets:
+      MVN_GPG_PRIVATE_KEY:
+        description: 'GPG private key for Maven signing'
+      MVN_GPG_PASSPHRASE:
+        description: 'Passphrase for the GPG private key'
 
 jobs:
   build-ts:
