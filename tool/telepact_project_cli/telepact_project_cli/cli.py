@@ -427,7 +427,7 @@ def github_automerge_comment() -> None:
     repo = g.get_repo(repository)
     pr = repo.get_pull(pr_number)
 
-    pr.create_issue_comemnt('/automerge')
+    pr.create_issue_comment('/automerge')
     click.echo(f"Commented '/automerge' on PR #{pr_number} in {repository}.")
 
 
