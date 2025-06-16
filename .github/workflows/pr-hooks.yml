@@ -34,15 +34,15 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: pr-details
-          path: pr-details.json
+          path: pr
           github-token: ${{ secrets.GITHUB_TOKEN }}
           run-id: ${{ github.event.workflow_run.id }}
 
       - name: Extract PR details
         id: extract-pr-details
         run: |
-          # Read the content of the pr-details.json file
-          pr_details=$(cat pr-details.json)
+          # Read the content of the pr/details.json file
+          pr_details=$(cat pr/details.json)
 
           # Extract the PR number using jq
           pr_number=$(echo "$pr_details" | jq -r '.pr_number')

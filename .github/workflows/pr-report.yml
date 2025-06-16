@@ -30,18 +30,16 @@ jobs:
     name: Save PR Details
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
       - name: Define PR details
         run: |
+          mkdir -p pr
           echo "{
             \"pr_number\": \"${{ github.event.pull_request.number }}\",
             \"pr_author\": \"${{ github.event.pull_request.user.login }}\"
-          }" > pr-details.json
+          }" > pr/details.json
 
       - name: Upload PR details
         uses: actions/upload-artifact@v4
         with:
           name: pr-details
-          path: pr-details.json
+          path: pr
