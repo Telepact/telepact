@@ -580,7 +580,7 @@ def automerge():
         pr.create_review(event='APPROVE')
         print("Pull Request approved.")
 
-        pr.enable_automerge(merge_method='squash')
+        pr.enable_automerge(merge_method='SQUASH')
         print("Pull Request will be automerged when build succeeds.")
 
     except GithubException as e:
