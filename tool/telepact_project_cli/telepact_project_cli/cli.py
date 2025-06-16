@@ -560,6 +560,14 @@ def automerge():
         raise Exception(f"Author @{pr_author_login} is NOT on the hardcoded allow list. Aborting automerge.")
     else:
         print(f"Author @{pr_author_login} is on the allow list.")
+    
+    for f in pr.get_files():
+        if f.status == 'removed':
+            raise Exception(f"Pull Request #{pr_number} contains removed files. Aborting automerge.")
+        if f.filename.startswith('tool'):
+            raise Exception(f"Pull Request #{pr_number} contains changes in the 'tool' directory. Aborting automerge.")
+        if f.filename.startswith('.github'):
+            raise Exception(f"Pull Request #{pr_number} contains changes in the '.github' directory. Aborting automerge.")
 
     print("Approving Pull Request...")
     pr.create_review(event='APPROVE')
