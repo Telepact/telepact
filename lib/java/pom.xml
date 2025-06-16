@@ -6,7 +6,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.github.telepact</groupId>
   <artifactId>telepact</artifactId>
-  <version>1.0.0-alpha.68</version>
+  <version>1.0.0-alpha.69</version>
   <properties>
     <maven.compiler.source>21</maven.compiler.source>
     <maven.compiler.target>21</maven.compiler.target>
