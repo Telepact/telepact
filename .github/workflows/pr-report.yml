@@ -14,41 +14,34 @@
 #|  limitations under the License.
 #|
 
-name: PR
+name: Report
 
 on:
   pull_request:
     types:
       - opened
-      - synchronize
       - reopened
     branches:
       - main
 
-permissions:
-  pull-requests: write
-
 jobs:
-  build:
-    name: Build
-    uses: ./.github/workflows/build.yml
 
-  update-labels:
-    name: Update Labels
+  save-pr-details:
+    name: Save PR Details
     runs-on: ubuntu-latest
-    timeout-minutes: 1
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install Project CLI
-        run: make install-project-cli
+      - name: Define PR details
+        run: |
+          echo "{
+            \"pr_number\": \"${{ github.event.pull_request.number }}\",
+            \"pr_author\": \"${{ github.event.pull_request.user.login }}\"
+          }" > pr-details.json
 
-      - name: Update PR labels
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-          BASE_BRANCH: ${{ github.event.pull_request.base.ref }}
-          HEAD_SHA: ${{ github.sha }}
-        run: telepact-project github-labels
+      - name: Upload PR details
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-details
+          path: pr-details.json
