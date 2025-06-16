@@ -538,10 +538,8 @@ def automerge():
 
     if not pr_number_str:
         raise Exception("PR_NUMBER environment variable is not set.")
-    try:
-        pr_number = int(pr_number_str)
-    except ValueError:
-        raise Exception(f"PR_NUMBER '{pr_number_str}' is not a valid integer.")
+
+    pr_number = int(pr_number_str)
 
     if not github_token:
         raise Exception("GITHUB_TOKEN environment variable is not set.")
@@ -551,44 +549,32 @@ def automerge():
     print(f"Processing PR #{pr_number} in '{github_repository}'...")
     print(f"Hardcoded allowed authors for automerge: {', '.join(AUTOMERGE_ALLOWED_AUTHORS)}")
 
-    try:
-        g = Github(github_token)
-        repo_obj = g.get_repo(github_repository)
-        pr = repo_obj.get_pull(pr_number)
-    except GithubException as e:
-        raise Exception(f"Error accessing GitHub API for repo/PR: {e.status} - {e.data}")
-    except Exception as e:
-        raise Exception(f"An unexpected error occurred while fetching PR details: {e}")
+    g = Github(github_token)
+    repo_obj = g.get_repo(github_repository)
+    pr = repo_obj.get_pull(pr_number)
 
     pr_author_login = pr.user.login
     print(f"Pull Request #{pr_number} is authored by @{pr_author_login}")
 
     if pr_author_login not in AUTOMERGE_ALLOWED_AUTHORS:
-        try:
-            comment = 'PR is not eligible for automerge.'
-            pr.create_issue_comment(comment)
-        except GithubException as e:
-            print(f"Error adding comment to PR: {e.status} - {e.data}")
-        except Exception as e:
-            print(f"An unexpected error occurred while commenting on the PR: {e}")
         raise Exception(f"Author @{pr_author_login} is NOT on the hardcoded allow list. Aborting automerge.")
+    else:
+        print(f"Author @{pr_author_login} is on the allow list.")
+    
+    for f in pr.get_files():
+        if f.status == 'removed':
+            raise Exception(f"Pull Request #{pr_number} contains removed files. Aborting automerge.")
+        if f.filename.startswith('tool'):
+            raise Exception(f"Pull Request #{pr_number} contains changes in the 'tool' directory. Aborting automerge.")
+        if f.filename.startswith('.github'):
+            raise Exception(f"Pull Request #{pr_number} contains changes in the '.github' directory. Aborting automerge.")
 
-    print(f"Author @{pr_author_login} is on the allow list. Proceeding to approve and enable auto-merge...")
+    print("Approving Pull Request...")
+    pr.create_review(event='APPROVE')
+    print("Pull Request approved.")
 
-    try:
-        print("Approving Pull Request...")
-        pr.create_review(event='APPROVE')
-        print("Pull Request approved.")
-
-        pr.enable_automerge(merge_method='SQUASH')
-        print("Pull Request will be automerged when build succeeds.")
-
-    except GithubException as e:
-        raise Exception(f"Error during PR approval or merge: {e.status} - {e.data}")
-    except Exception as e:
-        raise Exception(f"An unexpected error occurred during the merge process: {e}")
-
-    print("Automerge process completed successfully.")
+    pr.enable_automerge(merge_method='SQUASH')
+    print("Pull Request will be automerged when build succeeds.")
 
 main.add_command(get)
 main.add_command(set_version)
