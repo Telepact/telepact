@@ -19,7 +19,7 @@
     "build": "tsc && rollup -c && npm pack --pack-destination ./dist-tgz"
   },
   "devDependencies": {
-    "@rollup/plugin-commonjs": "^28.0.2",
+    "@rollup/plugin-commonjs": "^28.0.5",
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^16.0.0",
     "@rollup/plugin-typescript": "12.1.2",
@@ -27,7 +27,7 @@
     "@typescript-eslint/eslint-plugin": "^7.4.0",
     "@typescript-eslint/parser": "^7.4.0",
     "eslint": "^8.57.0",
-    "rollup": "4.42.0",
+    "rollup": "4.43.0",
     "tslib": "^2.8.1",
     "typescript": "^5.4.3",
     "typescript-eslint": "^7.4.0"
