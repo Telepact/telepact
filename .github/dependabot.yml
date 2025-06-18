@@ -18,9 +18,12 @@ version: 2
 updates:
   - package-ecosystem: "npm"
     directories:
+      - "/bind/dart"
       - "/lib/ts"
       - "/sdk/prettier"
       - "/sdk/console"
+      - "/test/console-self-hosted"
+      - "/test/lib/ts"
     schedule:
       interval: "weekly"
       day: "monday"
@@ -35,6 +38,9 @@ updates:
     directories:
       - "/lib/py"
       - "/sdk/cli"
+      - "/test/lib/py"
+      - "/test/runner"
+      - "/tool/telepact_project_cli"
     schedule:
       interval: "weekly"
       day: "tuesday"
@@ -48,6 +54,7 @@ updates:
   - package-ecosystem: "maven"
     directories:
       - "/lib/java"
+      - "/test/lib/java"
     schedule:
       interval: "weekly"
       day: "wednesday"

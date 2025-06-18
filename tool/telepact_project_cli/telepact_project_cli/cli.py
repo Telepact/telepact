@@ -26,8 +26,6 @@ from github import Github, GithubException
 
 yaml = YAML()
 
-AUTOMERGE_ALLOWED_AUTHORS = ["dependabot[bot]"]
-
 def bump_version(version: str) -> str:
     major, minor, patch = map(int, version.split('.'))
     patch += 1
@@ -530,7 +528,36 @@ def automerge():
     Approves and squashes a Pull Request if the author is on the hardcoded allow list.
     All necessary information is retrieved from environment variables.
     """
-    print("Starting automerge process using environment variables...")
+
+    AUTOMERGE_ALLOWED_AUTHORS = ["dependabot[bot]"]
+
+    AUTOMERGE_ALLOWED_FILES = [
+        "bind/dart/package-lock.json",
+        "bind/dart/package.json",
+        "bind/dart/pubspec.lock",
+        "bind/dart/pubspec.yaml",
+        "lib/java/pom.xml",
+        "lib/py/poetry.lock",
+        "lib/py/pyproject.toml",
+        "lib/ts/package-lock.json",
+        "lib/ts/package.json",
+        "package-lock.json",
+        "package.json",
+        "sdk/cli/poetry.lock",
+        "sdk/cli/pyproject.toml",
+        "sdk/console/package-lock.json",
+        "sdk/console/package.json",
+        "sdk/prettier/package-lock.json",
+        "sdk/prettier/package.json",
+        "test/console-self-hosted/package.json",
+        "test/lib/java/pom.xml",
+        "test/lib/py/pyproject.toml",
+        "test/lib/ts/package.json",
+        "test/runner/poetry.lock",
+        "test/runner/pyproject.toml",
+        "tool/telepact_project_cli/poetry.lock",
+        "tool/telepact_project_cli/pyproject.toml"
+    ]
 
     pr_number_str = os.getenv('PR_NUMBER')
     github_token = os.getenv('GITHUB_TOKEN')
@@ -564,10 +591,8 @@ def automerge():
     for f in pr.get_files():
         if f.status == 'removed':
             raise Exception(f"Pull Request #{pr_number} contains removed files. Aborting automerge.")
-        if f.filename.startswith('tool'):
-            raise Exception(f"Pull Request #{pr_number} contains changes in the 'tool' directory. Aborting automerge.")
-        if f.filename.startswith('.github'):
-            raise Exception(f"Pull Request #{pr_number} contains changes in the '.github' directory. Aborting automerge.")
+        if f.filename not in AUTOMERGE_ALLOWED_FILES:
+            raise Exception(f"Pull Request #{pr_number} contains changes in the file '{f.filename}' which is not allowed for automerge.")
 
     print("Approving Pull Request...")
     pr.create_review(event='APPROVE')
