@@ -7,7 +7,7 @@ What makes Telepact different? It brings together 3 previously incompatible
 ideas:
 1. **JSON Abstractions** - API clients can use their favorite industry standard JSON library to interface with an API server
 2. **Hypermedia** - API servers can incorporate API references in responses to create "links" across its API, without HTTP
-3. **Binary** - Clients can optionally enable efficient binary serialization while still preserving JSON abstractions
+3. **Binary** - Clients can optionally enable efficient binary serialization while still preserving simple JSON abstractions
 
 For further reading, see [Motivation](./doc/motivation.md).
 
