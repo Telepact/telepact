@@ -3,6 +3,12 @@
 Telepact is an API ecosystem for bridging programs across inter-process
 communication boundaries.
 
+What makes Telepact different? It brings together 3 previously incompatible
+ideas:
+1. **JSON Abstractions** - API clients can use their favorite industry JSON library to interface with an API server
+2. **Hypermedia** - API servers can incorporate API references in responses to create "links" across its API, without HTTP
+3. **Binary** - Clients can optionally enable efficient binary serialization while still preserving JSON abstractions
+
 For further reading, see [Motivation](./doc/motivation.md).
 
 For explanations of various design decisions, see [the FAQ](./doc/faq.md).
@@ -17,7 +23,7 @@ $ cat ./api/math.telepact.json
 [
    {
       "///": " Add two integers, `x` and `y`. ",
-      "fn.add": {
+      "fn.divide": {
          "x": ["integer"],
          "y": ["integer"]
       },
@@ -26,6 +32,9 @@ $ cat ./api/math.telepact.json
             "Ok_": {
                "result": ["integer"]
             }
+         },
+         {
+           "ErrorCannotDivideByZero": {}
          }
       ]
    }
@@ -42,10 +51,13 @@ from telepact import TelepactSchemaFiles, TelepactSchema, Server, Message
 def handler(req_msg):
     fn = req_msg.body.keys()[0]
     args = req_msg.body[fn]
-    if fn == 'fn.add':
+    if fn == 'fn.divide':
         x = args['x']
         y = args['y']
-        result = x + y
+        if y == 0:
+            return Message({}, {'ErrorCannotDivideByZero': {}})
+
+        result = x / y
         return Message({}, {'Ok_': {'result': result}})
     else:
         raise Error('Unknown function')
@@ -80,9 +92,9 @@ $ cat ./client.js
 let request = [
     {},
     {
-        'fn.add': {
-            'x': 1,
-            'y': 2
+        'fn.divide': {
+            'x': 6,
+            'y': 3
         }
     }
 ];
@@ -91,7 +103,7 @@ console.log(`Response: ${await response.json()}`);
 ```
 ```sh
 $ node ./client.js
-Response: [{}, {"Ok_": {"result": 3}}]
+Response: [{}, {"Ok_": {"result": 2}}]
 ```
 
 Or clients can also leverage telepact tooling to:
