@@ -1,0 +1,33 @@
+name: Publish
+
+on:
+  release:
+    types:
+      - published
+
+jobs:
+  publish-java:
+    runs-on: ubuntu-latest
+    if: ${{ contains(github.event.release.body, '- java') }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.target_commitish }}
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: "21"
+          distribution: "corretto"
+
+      - name: Configure GPG
+        run: echo "${{ secrets.MVN_GPG_PRIVATE_KEY }}" | gpg --batch --import --yes
+
+      - name: Upload to Maven Central
+        env:
+          GPG_PASSPHRASE: ${{ secrets.MVN_GPG_PASSPHRASE }}
+          CENTRAL_USERNAME: ${{ secrets.MVN_CENTRAL_USERNAME }}
+          CENTRAL_TOKEN: ${{ secrets.MVN_CENTRAL_TOKEN }}
+        run: make deploy-java
