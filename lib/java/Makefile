@@ -25,9 +25,8 @@ $(JAR_FILE): $(SRC_FILES)
 	cp ../../common/*.json src/main/resources
 	cp ../../LICENSE ../../NOTICE src/main/resources
 	
-	mvn $(MVN_BUILD) -s settings.xml | grep -v "from central"
-	@if [ $${PIPESTATUS[0]} -ne 0 ]; then exit 1; fi	
-
+	mvn $(MVN_BUILD) -s settings.xml | grep -v "from central"; if [ $${PIPESTATUS[0]} -ne 0 ]; then exit 1; fi
+	
 clean:
 	rm -rf src/main/resources
 	rm -rf target

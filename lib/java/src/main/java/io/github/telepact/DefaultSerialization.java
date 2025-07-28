@@ -49,85 +49,20 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 
 class DefaultSerialization implements Serialization {
 
-    // TODO: Remove this when new MsgPack feature is released.
-    //       https://github.com/msgpack/msgpack-java/pull/868
-    static class CustomMessagePackGenerator extends MessagePackGenerator {
-
-        private Method cachedMethod = null;
-
-        public CustomMessagePackGenerator(int features, ObjectCodec codec, OutputStream out,
-                PackerConfig config, boolean writeHeader) throws IOException {
-            super(features, codec, out, config, writeHeader);
-        }
-
-        @Override
-        public void writeFieldId(long id) throws IOException {
-            try {
-                if (cachedMethod == null) {
-                    try {
-                        cachedMethod = MessagePackGenerator.class.getDeclaredMethod("addKeyNode", Object.class);
-                    } catch (Exception e) {
-                        // fallback to older version of msgpack
-                        cachedMethod = MessagePackGenerator.class.getDeclaredMethod("addKeyToStackTop",
-                                Object.class);
-                    }
-                }
-                var privateMethod = cachedMethod;
-                privateMethod.setAccessible(true);
-                privateMethod.invoke(this, id);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
-    // TODO: Remove this when new MsgPack feature is released.
-    //       https://github.com/msgpack/msgpack-java/pull/868
-    static class CustomMessagePackFactory extends MessagePackFactory {
-        public CustomMessagePackFactory() {
-            super();
-        }
-
-        @Override
-        public JsonGenerator createGenerator(OutputStream out, JsonEncoding enc)
-                throws IOException {
-            return new CustomMessagePackGenerator(_generatorFeatures, _objectCodec, out,
-                    MessagePack.DEFAULT_PACKER_CONFIG,
-                    true);
-        }
-    }
-
-    // TODO: Replace reflection logic when new MsgPack feature is released.
-    //       https://github.com/msgpack/msgpack-java/pull/868
     static class MessagePackMapDeserializer extends MapDeserializer {
 
         public static KeyDeserializer keyDeserializer = new KeyDeserializer() {
 
-            private Field cachedField = null;
-
             @Override
             public Object deserializeKey(String s, DeserializationContext deserializationContext) throws IOException {
                 JsonParser parser = deserializationContext.getParser();
-                if (parser instanceof MessagePackParser p) {
-                    try {
-                        if (cachedField == null) {
-                            cachedField = MessagePackParser.class.getDeclaredField("type");
-                        }
-                        var field = cachedField;
-                        field.setAccessible(true);
-
-                        var typeValue = field.get(p);
-                        var typeValueString = typeValue.toString();
-
-                        if (typeValueString.equals("INT") || typeValueString.equals("LONG")) {
-                            return Integer.valueOf(s);
-                        }
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
+                if (parser instanceof MessagePackParser) {
+                    MessagePackParser p = (MessagePackParser) parser;
+                    if (p.isCurrentFieldId()) {
+                        return Integer.valueOf(s);
                     }
                 }
                 return s;
-
             }
         };
 
@@ -161,7 +96,8 @@ class DefaultSerialization implements Serialization {
     }
 
     private ObjectMapper jsonMapper = new ObjectMapper();
-    private ObjectMapper binaryMapper = new ObjectMapper(new CustomMessagePackFactory())
+    private ObjectMapper binaryMapper = new ObjectMapper(new MessagePackFactory()
+            .setSupportIntegerKeys(true))
             .registerModule(new SimpleModule()
                     .addDeserializer(Object.class,
                             (JsonDeserializer<Object>) new MessagePackUntypedObjectDeserializer())
