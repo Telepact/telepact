@@ -96,7 +96,8 @@ class DefaultSerialization implements Serialization {
     }
 
     private ObjectMapper jsonMapper = new ObjectMapper();
-    private ObjectMapper binaryMapper = new ObjectMapper(new MessagePackFactory())
+    private ObjectMapper binaryMapper = new ObjectMapper(new MessagePackFactory()
+            .setSupportIntegerKeys(true))
             .registerModule(new SimpleModule()
                     .addDeserializer(Object.class,
                             (JsonDeserializer<Object>) new MessagePackUntypedObjectDeserializer())
