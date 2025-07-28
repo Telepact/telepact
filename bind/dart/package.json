@@ -10,7 +10,7 @@
     "msgpackr": "^1.11.5"
   },
   "devDependencies": {
-    "rollup": "4.45.1",
+    "rollup": "4.46.1",
     "@rollup/plugin-commonjs": "^28.0.6"
   }
 }
