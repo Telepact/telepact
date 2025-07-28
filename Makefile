@@ -31,6 +31,9 @@ test-java:
 test-trace-java:
 	$(MAKE) -C test/runner test-trace-java
 
+deploy-java:
+	$(MAKE) -C lib/java deploy
+
 py:
 	$(MAKE) -C lib/py
 

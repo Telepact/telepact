@@ -33,4 +33,4 @@ clean:
 	rm -rf .m2
 
 deploy:
-	mvn -P credentialed deploy -Ddeploy.skipUpload=false
+	mvn -P credentialed deploy -s settings.xml -Ddeploy.skipUpload=false
