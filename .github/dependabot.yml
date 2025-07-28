@@ -20,11 +20,11 @@ multi-ecosystem-groups:
   all-weekly-updates:
     schedule:
       interval: "weekly"
-      day: "monday" # All updates will be scheduled for Monday
-    update-types: ["patch", "minor"] # Group patch and minor updates
+      day: "monday"
+    update-types: ["patch", "minor"]
     labels:
       - "dependabot"
-    open-pull-requests-limit: 1 # Still limits to one PR for this group
+    open-pull-requests-limit: 1
 
 updates:
   - package-ecosystem: "npm"
