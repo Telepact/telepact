@@ -15,65 +15,84 @@
 #|
 
 version: 2
+
+multi-ecosystem-groups:
+  all-weekly-updates:
+    schedule:
+      interval: "weekly"
+      day: "monday" # All updates will be scheduled for Monday
+    update-types: ["patch", "minor"] # Group patch and minor updates
+    labels:
+      - "dependabot"
+    open-pull-requests-limit: 1 # Still limits to one PR for this group
+
 updates:
   - package-ecosystem: "npm"
-    directories:
-      - "/bind/dart"
-      - "/lib/ts"
-      - "/sdk/prettier"
-      - "/sdk/console"
-      - "/test/console-self-hosted"
-      - "/test/lib/ts"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-    groups:
-      all-updates:
-        update-types: ["patch", "minor"]
-    labels:
-      - "dependabot"
-    open-pull-requests-limit: 1
+    directory: "/bind/dart"
+    multi-ecosystem-group: "all-weekly-updates"
+    patterns: ["*"]
+
+  - package-ecosystem: "npm"
+    directory: "/lib/ts"
+    multi-ecosystem-group: "all-weekly-updates"
+    patterns: ["*"]
+
+  - package-ecosystem: "npm"
+    directory: "/sdk/prettier"
+    multi-ecosystem-group: "all-weekly-updates"
+    patterns: ["*"]
+
+  - package-ecosystem: "npm"
+    directory: "/sdk/console"
+    multi-ecosystem-group: "all-weekly-updates"
+    patterns: ["*"]
+
+  - package-ecosystem: "npm"
+    directory: "/test/console-self-hosted"
+    multi-ecosystem-group: "all-weekly-updates"
+    patterns: ["*"]
+
+  - package-ecosystem: "npm"
+    directory: "/test/lib/ts"
+    multi-ecosystem-group: "all-weekly-updates"
+    patterns: ["*"]
 
   - package-ecosystem: "pip"
-    directories:
-      - "/lib/py"
-      - "/sdk/cli"
-      - "/test/lib/py"
-      - "/test/runner"
-      - "/tool/telepact_project_cli"
-    schedule:
-      interval: "weekly"
-      day: "tuesday"
-    groups:
-      all-updates:
-        update-types: ["patch", "minor"]
-    labels:
-      - "dependabot"
-    open-pull-requests-limit: 1
+    directory: "/lib/py"
+    multi-ecosystem-group: "all-weekly-updates"
+    patterns: ["*"]
+
+  - package-ecosystem: "pip"
+    directory: "/sdk/cli"
+    multi-ecosystem-group: "all-weekly-updates"
+    patterns: ["*"]
+
+  - package-ecosystem: "pip"
+    directory: "/test/lib/py"
+    multi-ecosystem-group: "all-weekly-updates"
+    patterns: ["*"]
+
+  - package-ecosystem: "pip"
+    directory: "/test/runner"
+    multi-ecosystem-group: "all-weekly-updates"
+    patterns: ["*"]
+
+  - package-ecosystem: "pip"
+    directory: "/tool/telepact_project_cli"
+    multi-ecosystem-group: "all-weekly-updates"
+    patterns: ["*"]
 
   - package-ecosystem: "maven"
-    directories:
-      - "/lib/java"
-      - "/test/lib/java"
-    schedule:
-      interval: "weekly"
-      day: "wednesday"
-    groups:
-      all-updates:
-        update-types: ["patch", "minor"]
-    labels:
-      - "dependabot"
-    open-pull-requests-limit: 1
+    directory: "/lib/java"
+    multi-ecosystem-group: "all-weekly-updates"
+    patterns: ["*"]
+
+  - package-ecosystem: "maven"
+    directory: "/test/lib/java"
+    multi-ecosystem-group: "all-weekly-updates"
+    patterns: ["*"]
 
   - package-ecosystem: "pub"
-    directories:
-      - "/bind/dart"
-    schedule:
-      interval: "weekly"
-      day: "thursday"
-    groups:
-      all-updates:
-        update-types: ["patch", "minor"]
-    labels:
-      - "dependabot"
-    open-pull-requests-limit: 1
+    directory: "/bind/dart"
+    multi-ecosystem-group: "all-weekly-updates"
+    patterns: ["*"]
