@@ -14,78 +14,78 @@
     {
         "///": " A struct value demonstrating all common type permutations. ",
         "struct.Value": {
-            "bool!": ["boolean"],
-            "nullBool!": ["boolean?"],
-            "arrBool!": ["array", ["boolean"]],
-            "arrNullBool!": ["array", ["boolean?"]],
-            "objBool!": ["object", ["boolean"]],
-            "objNullBool!": ["object", ["boolean?"]],
-            "int!": ["integer"],
-            "nullInt!": ["integer?"],
-            "arrInt!": ["array", ["integer"]],
-            "arrNullInt!": ["array", ["integer?"]],
-            "objInt!": ["object", ["integer"]],
-            "objNullInt!": ["object", ["integer?"]],
-            "num!": ["number"],
-            "nullNum!": ["number?"],
-            "arrNum!": ["array", ["number"]],
-            "arrNullNum!": ["array", ["number?"]],
-            "objNum!": ["object", ["number"]],
-            "objNullNum!": ["object", ["number?"]],
-            "str!": ["string"],
-            "nullStr!": ["string?"],
-            "arrStr!": ["array", ["string"]],
-            "arrNullStr!": ["array", ["string?"]],
-            "objStr!": ["object", ["string"]],
-            "objNullStr!": ["object", ["string?"]],
-            "any!": ["any"],
-            "nullAny!": ["any?"],
-            "arrAny!": ["array", ["any"]],
-            "arrNullAny!": ["array", ["any?"]],
-            "objAny!": ["object", ["any"]],
-            "objNullAny!": ["object", ["any?"]],
-            "bytes!": ["bytes"],
-            "nullBytes!": ["bytes?"],
-            "arrBytes!": ["array", ["bytes"]],
-            "arrNullBytes!": ["array", ["bytes?"]],
-            "objBytes!": ["object", ["bytes"]],
-            "objNullBytes!": ["object", ["bytes?"]],
-            "arr!": ["array", ["any"]],
-            "nullArr!": ["array?", ["any"]],
-            "arrArr!": ["array", ["array", ["any"]]],
-            "arrNullArr!": ["array", ["array?", ["any"]]],
-            "objArr!": ["object", ["array", ["any"]]],
-            "objNullArr!": ["object", ["array?", ["any"]]],
-            "obj!": ["object", ["any"]],
-            "nullObj!": ["object?", ["any"]],
-            "arrObj!": ["array", ["object", ["any"]]],
-            "arrNullObj!": ["array", ["object?", ["any"]]],
-            "objObj!": ["object", ["object", ["any"]]],
-            "objNullObj!": ["object", ["object?", ["any"]]],
-            "struct!": ["struct.ExStruct"],
-            "nullStruct!": ["struct.ExStruct?"],
-            "arrStruct!": ["array", ["struct.ExStruct"]],
-            "arrNullStruct!": ["array", ["struct.ExStruct?"]],
-            "objStruct!": ["object", ["struct.ExStruct"]],
-            "objNullStruct!": ["object", ["struct.ExStruct?"]],
-            "union!": ["union.ExUnion"],
-            "nullUnion!": ["union.ExUnion?"],
-            "arrUnion!": ["array", ["union.ExUnion"]],
-            "arrNullUnion!": ["array", ["union.ExUnion?"]],
-            "objUnion!": ["object", ["union.ExUnion"]],
-            "objNullUnion!": ["object", ["union.ExUnion?"]],
-            "fn!": ["fn.example"],
-            "nullFn!": ["fn.example?"],
-            "arrFn!": ["array", ["fn.example"]],
-            "arrNullFn!": ["array", ["fn.example?"]],
-            "objFn!": ["object", ["fn.example"]],
-            "objNullFn!": ["object", ["fn.example?"]],
-            "sel!": ["_ext.Select_"],
-            "nullSel!": ["_ext.Select_?"],
-            "arrSel!": ["array", ["_ext.Select_"]],
-            "arrNullSel!": ["array", ["_ext.Select_?"]],
-            "objSel!": ["object", ["_ext.Select_"]],
-            "objNullSel!": ["object", ["_ext.Select_?"]]
+            "bool!": "boolean",
+            "nullBool!": "boolean?",
+            "arrBool!": ["boolean"],
+            "arrNullBool!": ["boolean?"],
+            "objBool!": {"string": "boolean"},
+            "objNullBool!": {"string": "boolean?"},
+            "int!": "integer",
+            "nullInt!": "integer?",
+            "arrInt!": ["integer"],
+            "arrNullInt!": ["integer?"],
+            "objInt!": {"string": "integer"},
+            "objNullInt!": {"string": "integer?"},
+            "num!": "number",
+            "nullNum!": "number?",
+            "arrNum!": ["number"],
+            "arrNullNum!": ["number?"],
+            "objNum!": {"string": "number"},
+            "objNullNum!": {"string": "number?"},
+            "str!": "string",
+            "nullStr!": "string?",
+            "arrStr!": ["string"],
+            "arrNullStr!": ["string?"],
+            "objStr!": {"string": "string"},
+            "objNullStr!": {"string": "string?"},
+            "any!": "any",
+            "nullAny!": "any?",
+            "arrAny!": ["any"],
+            "arrNullAny!": ["any?"],
+            "objAny!": {"string": "any"},
+            "objNullAny!": {"string": "any?"},
+            "bytes!": "bytes",
+            "nullBytes!": "bytes?",
+            "arrBytes!": ["bytes"],
+            "arrNullBytes!": ["bytes?"],
+            "objBytes!": {"string": "bytes"},
+            "objNullBytes!": {"string": "bytes?"},
+            "arr!": ["any"],
+
+            "arrArr!": [["any"]],
+            "arrNullArr!": [["any"]],
+            "objArr!": {"string": ["any"]},
+
+            "obj!": {"string": "any"},
+
+            "arrObj!": [{"string": "any"}],
+            "arrNullObj!": [{"string": "any"}],
+            "objObj!": {"string": {"string": "any"}},
+
+            "struct!": "struct.ExStruct",
+            "nullStruct!": "struct.ExStruct?",
+            "arrStruct!": ["struct.ExStruct"],
+            "arrNullStruct!": ["struct.ExStruct?"],
+            "objStruct!": {"string": "struct.ExStruct"},
+            "objNullStruct!": {"string": "struct.ExStruct?"},
+            "union!": "union.ExUnion",
+            "nullUnion!": "union.ExUnion?",
+            "arrUnion!": ["union.ExUnion"],
+            "arrNullUnion!": ["union.ExUnion?"],
+            "objUnion!": {"string": "union.ExUnion"},
+            "objNullUnion!": {"string": "union.ExUnion?"},
+            "fn!": "fn.example",
+            "nullFn!": "fn.example?",
+            "arrFn!": ["fn.example"],
+            "arrNullFn!": ["fn.example?"],
+            "objFn!": {"string": "fn.example"},
+            "objNullFn!": {"string": "fn.example?"},
+            "sel!": "_ext.Select_",
+            "nullSel!": "_ext.Select_?",
+            "arrSel!": ["_ext.Select_"],
+            "arrNullSel!": ["_ext.Select_?"],
+            "objSel!": {"string": "_ext.Select_"},
+            "objNullSel!": {"string": "_ext.Select_?"}
         }
     },
     {
@@ -96,9 +96,9 @@
             " supplied.                                                                       "
         ],
         "struct.ExStruct": {
-            "required": ["boolean"],
-            "optional!": ["boolean"],
-            "optional2!": ["integer"]
+            "required": "boolean",
+            "optional!": "boolean",
+            "optional2!": "integer"
         }
     },
     {
@@ -108,48 +108,48 @@
             },
             {
                 "Two": {
-                    "required": ["boolean"],
-                    "optional!": ["boolean"]
+                    "required": "boolean",
+                    "optional!": "boolean"
                 }
             }
         ]
     },
     {
         "struct.Big": {
-            "aF": ["boolean"],
-            "cF": ["boolean"],
-            "bF": ["boolean"],
-            "dF": ["boolean"]
+            "aF": "boolean",
+            "cF": "boolean",
+            "bF": "boolean",
+            "dF": "boolean"
         }
     },
     {
         "///": " An example function. ",
         "fn.example": {
-            "required": ["boolean"],
-            "optional!": ["boolean"]
+            "required": "boolean",
+            "optional!": "boolean"
         },
         "->": [
             {
                 "Ok_": {
-                    "required": ["boolean"],
-                    "optional!": ["boolean"]
+                    "required": "boolean",
+                    "optional!": "boolean"
                 }
             }
         ]
     },
     {
         "fn.test": {
-            "value!": ["struct.Value"]
+            "value!": "struct.Value"
         },
         "->": [
             {
                 "Ok_": {
-                    "value!": ["struct.Value"]
+                    "value!": "struct.Value"
                 }
             },
             {
                 "ErrorExample": {
-                    "property": ["string"]
+                    "property": "string"
                 }
             }
         ]
@@ -159,54 +159,54 @@
         "->": [
             {
                 "Ok_": {
-                    "items": ["array", ["struct.Big"]]
+                    "items": ["struct.Big"]
                 }
             }
         ]
     },
     {
         "fn.selfLink": {
-            "required": ["boolean"],
-            "optional!": ["boolean"]
+            "required": "boolean",
+            "optional!": "boolean"
         },
         "->": [
             {
                 "Ok_": {
-                    "followSelf": ["fn.selfLink"]
+                    "followSelf": "fn.selfLink"
                 }
             }
         ]
     },
     {
         "fn.circularLink1": {
-            "field1": ["boolean"]
+            "field1": "boolean"
         },
         "->": [
             {
                 "Ok_": {
-                    "follow": ["fn.circularLink2"]
+                    "follow": "fn.circularLink2"
                 }
             }
         ]
     },
     {
         "fn.circularLink2": {
-            "field2": ["boolean"]
+            "field2": "boolean"
         },
         "->": [
             {
                 "Ok_": {
-                    "follow": ["fn.circularLink1"]
+                    "follow": "fn.circularLink1"
                 }
             }
         ]
     },
     {
         "headers.ExampleHeaders": {
-            "@in": ["boolean"]
+            "@in": "boolean"
         },
         "->": {
-            "@out": ["boolean"]
+            "@out": "boolean"
         }
     }
 ]

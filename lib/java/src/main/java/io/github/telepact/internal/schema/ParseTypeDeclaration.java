@@ -20,9 +20,9 @@ import static io.github.telepact.internal.schema.GetOrParseType.getOrParseType;
 import static io.github.telepact.internal.schema.GetTypeUnexpectedParseFailure.getTypeUnexpectedParseFailure;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 import io.github.telepact.TelepactSchemaParseError;
@@ -30,84 +30,94 @@ import io.github.telepact.internal.types.TType;
 import io.github.telepact.internal.types.TTypeDeclaration;
 
 public class ParseTypeDeclaration {
+
     static TTypeDeclaration parseTypeDeclaration(
             List<Object> path,
-            List<Object> typeDeclarationArray,
+            Object typeDeclarationObject,
             ParseContext ctx) {
-        if (typeDeclarationArray.isEmpty()) {
-            throw new TelepactSchemaParseError(List.of(new SchemaParseFailure(ctx.documentName, path,
-                    "EmptyArrayDisallowed", Map.of())), ctx.telepactSchemaDocumentNamesToJson);
+
+        if (typeDeclarationObject instanceof String) {
+            final String rootTypeString = (String) typeDeclarationObject;
+
+            final var regexString = "^(.+?)(\\?)?$";
+            final var regex = Pattern.compile(regexString);
+
+            final var matcher = regex.matcher(rootTypeString);
+            if (!matcher.find()) {
+                throw new TelepactSchemaParseError(List.of(new SchemaParseFailure(ctx.documentName, path,
+                        "StringRegexMatchFailed", Map.of("regex", regexString))), ctx.telepactSchemaDocumentNamesToJson);
+            }
+
+            final var typeName = matcher.group(1);
+            final var nullable = matcher.group(2) != null;
+
+            final TType type = getOrParseType(path, typeName, ctx);
+
+            if (type.getTypeParameterCount() != 0) {
+                throw new TelepactSchemaParseError(List.of(new SchemaParseFailure(ctx.documentName, path,
+                        "ArrayLengthUnexpected",
+                        Map.of("actual", 1, "expected", type.getTypeParameterCount() + 1))),
+                        ctx.telepactSchemaDocumentNamesToJson);
+            }
+
+            return new TTypeDeclaration(type, nullable, Collections.emptyList());
         }
 
-        final List<Object> basePath = new ArrayList<>(path);
-        basePath.add(0);
+        else if (typeDeclarationObject instanceof List) {
+            final List<Object> listObject = (List<Object>) typeDeclarationObject;
 
-        final var baseType = typeDeclarationArray.get(0);
+            if (listObject.size() != 1) {
+                throw new TelepactSchemaParseError(List.of(new SchemaParseFailure(ctx.documentName, path,
+                        "ArrayLengthUnexpected", Map.of("actual", listObject.size(), "expected", 1))),
+                        ctx.telepactSchemaDocumentNamesToJson);
+            }
 
-        if (!(baseType instanceof String)) {
-            final List<SchemaParseFailure> thisParseFailures = getTypeUnexpectedParseFailure(ctx.documentName, basePath,
-                    baseType, "String");
-            throw new TelepactSchemaParseError(thisParseFailures, ctx.telepactSchemaDocumentNamesToJson);
-        }
-        final String rootTypeString = (String) baseType;
+            final var elementTypeDeclaration = listObject.get(0);
+            final List<Object> newPath = new ArrayList<>(path);
+            newPath.add(0);
 
-        final var regexString = "^(.+?)(\\?)?$";
-        final var regex = Pattern.compile(regexString);
+            final TType arrayType = getOrParseType(path, "array", ctx);
+            final TTypeDeclaration parsedElementType = parseTypeDeclaration(newPath, elementTypeDeclaration, ctx);
 
-        final var matcher = regex.matcher(rootTypeString);
-        if (!matcher.find()) {
-            throw new TelepactSchemaParseError(List.of(new SchemaParseFailure(ctx.documentName, basePath,
-                    "StringRegexMatchFailed", Map.of("regex", regexString))), ctx.telepactSchemaDocumentNamesToJson);
+            return new TTypeDeclaration(arrayType, false, List.of(parsedElementType));
         }
 
-        final var typeName = matcher.group(1);
-        final var nullable = matcher.group(2) != null;
+        else if (typeDeclarationObject instanceof Map) {
+            final Map<?, ?> mapObject = (Map<?, ?>) typeDeclarationObject;
 
-        final TType type = getOrParseType(basePath, typeName, ctx);
+            if (mapObject.size() != 1) {
+                throw new TelepactSchemaParseError(List.of(new SchemaParseFailure(ctx.documentName, path,
+                        "ObjectSizeUnexpected", Map.of("actual", mapObject.size(), "expected", 1))),
+                        ctx.telepactSchemaDocumentNamesToJson);
+            }
 
-        final var givenTypeParameterCount = typeDeclarationArray.size() - 1;
-        if (type.getTypeParameterCount() != givenTypeParameterCount) {
-            throw new TelepactSchemaParseError(List.of(new SchemaParseFailure(ctx.documentName, path,
-                    "ArrayLengthUnexpected",
-                    Map.of("actual", typeDeclarationArray.size(), "expected", type.getTypeParameterCount() + 1))),
+            final var entry = mapObject.entrySet().iterator().next();
+            final var key = entry.getKey();
+            final var value = entry.getValue();
+
+            if (!(key instanceof String) || !"string".equals(key)) {
+                final var keyPath = new ArrayList<>(path);
+                keyPath.add("key");
+                throw new TelepactSchemaParseError(List.of(
+                    new SchemaParseFailure(ctx.documentName, path,"RequiredObjectKeyMissing", Map.of("key", "string")),
+                    new SchemaParseFailure(ctx.documentName, keyPath, "ObjectKeyDisallowed", Map.of())),
                     ctx.telepactSchemaDocumentNamesToJson);
-        }
-
-        final var parseFailures = new ArrayList<SchemaParseFailure>();
-        final var typeParameters = new ArrayList<TTypeDeclaration>();
-        final var givenTypeParameters = typeDeclarationArray.subList(1, typeDeclarationArray.size());
-
-        var index = 0;
-        for (final var e : givenTypeParameters) {
-            index += 1;
-
-            final List<Object> loopPath = new ArrayList<>(path);
-            loopPath.add(index);
-
-            if (!(e instanceof List)) {
-                final List<SchemaParseFailure> thisParseFailures = getTypeUnexpectedParseFailure(ctx.documentName,
-                        loopPath,
-                        e,
-                        "Array");
-
-                parseFailures.addAll(thisParseFailures);
-                continue;
             }
 
-            final TTypeDeclaration typeParameterTypeDeclaration;
-            try {
-                typeParameterTypeDeclaration = parseTypeDeclaration(loopPath, (List<Object>) e, ctx);
+            final List<Object> newPath = new ArrayList<>(path);
+            newPath.add(key);
 
-                typeParameters.add(typeParameterTypeDeclaration);
-            } catch (TelepactSchemaParseError e2) {
-                parseFailures.addAll(e2.schemaParseFailures);
-            }
+            final TType objectType = getOrParseType(path, "object", ctx);
+
+            final TTypeDeclaration parsedValueType = parseTypeDeclaration(newPath, value, ctx);
+
+            return new TTypeDeclaration(objectType, false, List.of(parsedValueType));
         }
 
-        if (!parseFailures.isEmpty()) {
-            throw new TelepactSchemaParseError(parseFailures, ctx.telepactSchemaDocumentNamesToJson);
+        else {
+            final List<SchemaParseFailure> failures = getTypeUnexpectedParseFailure(ctx.documentName, path,
+                    typeDeclarationObject, "StringOrArrayOrObject");
+            throw new TelepactSchemaParseError(failures, ctx.telepactSchemaDocumentNamesToJson);
         }
-
-        return new TTypeDeclaration(type, nullable, typeParameters);
     }
 }

@@ -15,7 +15,7 @@
         "->": [
             {
                 "Ok_": {
-                    "api": ["array", ["object", ["any"]]]
+                    "api": [{"string": "any"}]
                 }
             }
         ],
@@ -27,7 +27,7 @@
     {
         "///": " The `@time_` header indicates the request timeout honored by the client. ",
         "headers.Time_": {
-            "@time_": ["integer"]
+            "@time_": "integer"
         },
         "->": {}
     },
@@ -38,16 +38,16 @@
             " in the response.                                                                "
         ],
         "headers.Unsafe_": {
-            "@unsafe_": ["boolean"]
+            "@unsafe_": "boolean"
         },
         "->": {
-            "@unsafe_": ["boolean"]
+            "@unsafe_": "boolean"
         }
     },
     {
         "///": " The `@select_` header is used to select fields from structs. ",
         "headers.Select_": {
-            "@select_": ["_ext.Select_"]
+            "@select_": "_ext.Select_"
         },
         "->": {}
     },
@@ -66,20 +66,20 @@
             " the server will respond with a `@pac_` header with a `true` value.              "
         ],
         "headers.Binary_": {
-            "@bin_": ["array", ["integer"]],
-            "@pac_": ["boolean"]
+            "@bin_": ["integer"],
+            "@pac_": "boolean"
         },
         "->": {
-            "@bin_": ["array", ["integer"]],
-            "@enc_": ["object", ["integer"]],
-            "@pac_": ["boolean"]
+            "@bin_": ["integer"],
+            "@enc_": {"string": "integer"},
+            "@pac_": "boolean"
         }
     },
     {
         "///": " The `@warn_` header is used to send warnings to the client. ",
         "headers.Warning_": {},
         "->": {
-            "@warn_": ["array", ["any"]]
+            "@warn_": ["any"]
         }
     },
     {
@@ -88,10 +88,10 @@
             " reflect the client-provided `@id_` header as-is.                                "
         ],
         "headers.Id_": {
-            "@id_": ["any"]
+            "@id_": "any"
         },
         "->": {
-            "@id_": ["any"]
+            "@id_": "any"
         }
     },
     {
@@ -137,8 +137,8 @@
         "union.ValidationFailureReason_": [
             {
                 "TypeUnexpected": {
-                    "expected": ["union.Type_"],
-                    "actual": ["union.Type_"]
+                    "expected": "union.Type_",
+                    "actual": "union.Type_"
                 }
             },
             {
@@ -149,7 +149,7 @@
             },
             {
                 "RequiredObjectKeyPrefixMissing": {
-                    "prefix": ["string"]
+                    "prefix": "string"
                 }
             },
             {
@@ -160,27 +160,27 @@
             },
             {
                 "ObjectSizeUnexpected": {
-                    "expected": ["integer"],
-                    "actual": ["integer"]
+                    "expected": "integer",
+                    "actual": "integer"
                 }
             },
             {
                 "ExtensionValidationFailed": {
-                    "reason": ["string"],
-                    "data!": ["object", ["any"]]
+                    "reason": "string",
+                    "data!": {"string": "any"}
                 }
             },
             {
                 "ObjectKeyRegexMatchCountUnexpected": {
-                    "regex": ["string"],
-                    "expected": ["integer"],
-                    "actual": ["integer"],
-                    "keys": ["array", ["string"]]
+                    "regex": "string",
+                    "expected": "integer",
+                    "actual": "integer",
+                    "keys": ["string"]
                 }
             },
             {
                 "RequiredObjectKeyMissing": {
-                    "key": ["string"]
+                    "key": "string"
                 }
             },
             {
@@ -212,8 +212,8 @@
     {
         "///": " A validation failure located at a `path` explained by a `reason`. ",
         "struct.ValidationFailure_": {
-            "path": ["array", ["any"]],
-            "reason": ["union.ValidationFailureReason_"]
+            "path": ["any"],
+            "reason": "union.ValidationFailureReason_"
         }
     },
     {
@@ -226,31 +226,31 @@
             {
                 "///": " The headers on the request are invalid. ",
                 "ErrorInvalidRequestHeaders_": {
-                    "cases": ["array", ["struct.ValidationFailure_"]]
+                    "cases": ["struct.ValidationFailure_"]
                 }
             },
             {
                 "///": " The body on the request is invalid. ",
                 "ErrorInvalidRequestBody_": {
-                    "cases": ["array", ["struct.ValidationFailure_"]]
+                    "cases": ["struct.ValidationFailure_"]
                 }
             },
             {
                 "///": " The headers on the response are invalid. ",
                 "ErrorInvalidResponseHeaders_": {
-                    "cases": ["array", ["struct.ValidationFailure_"]]
+                    "cases": ["struct.ValidationFailure_"]
                 }
             },
             {
                 "///": " The body that the server attempted to put on the response is invalid. ",
                 "ErrorInvalidResponseBody_": {
-                    "cases": ["array", ["struct.ValidationFailure_"]]
+                    "cases": ["struct.ValidationFailure_"]
                 }
             },
             {
                 "///": " The request could not be parsed as a telepact Message. ",
                 "ErrorParseFailure_": {
-                    "reasons": ["array", ["union.ParseFailure_"]]
+                    "reasons": ["union.ParseFailure_"]
                 }
             }
         ]

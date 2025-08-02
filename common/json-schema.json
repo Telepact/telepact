@@ -239,98 +239,31 @@
         ]
     },
     "$defs": {
-        "typeDeclaration": {
-            "type": "array",
-            "if": {
-                "prefixItems": [
-                    {
-                        "type": "string",
-                        "pattern": "^((boolean|integer|number|string|any|bytes)|(fn|union|struct)\\.([a-zA-Z_]\\w*))(\\?)?$"
-                    }
-                ]
-            },
-            "then": {
-                "prefixItems": [
-                    {
-                        "type": "string",
-                        "pattern": "^((boolean|integer|number|string|any|bytes)|(fn|union|struct)\\.([a-zA-Z_]\\w*))(\\?)?$"
-                    }
-                ],
-                "items": false,
-                "minItems": 1,
-                "maxItems": 1
-            },
-            "else": {
-                "if": {
-                    "prefixItems": [
-                        {
-                            "type": "string",
-                            "pattern": "^((array|object)|(fn|(union|struct)<1>)\\.([a-zA-Z_]\\w*))(\\?)?$"
-                        }
-                    ]
-                },
-                "then": {
-                    "prefixItems": [
-                        {
-                            "type": "string",
-                            "pattern": "^((array|object)|(fn|(union|struct)<1>)\\.([a-zA-Z_]\\w*))(\\?)?$"
-                        }
-                    ],
-                    "items": { "$ref": "#/$defs/typeDeclaration" },
-                    "minItems": 2,
-                    "maxItems": 2
-                },
-                "else": {
-                    "if": {
-                        "prefixItems": [
-                            {
-                                "type": "string",
-                                "pattern": "^(fn|(union|struct)<2>)\\.([a-zA-Z_]\\w*)(\\?)?$"
-                            }
-                        ]
-                    },
-                    "then": {
-                        "prefixItems": [
-                            {
-                                "type": "string",
-                                "pattern": "^(fn|(union|struct)<2>)\\.([a-zA-Z_]\\w*)(\\?)?$"
-                            }
-                        ],
-                        "items": { "$ref": "#/$defs/typeDeclaration" },
-                        "minItems": 3,
-                        "maxItems": 3
-                    },
-                    "else": {
-                        "if": {
-                            "prefixItems": [
-                                {
-                                    "type": "string",
-                                    "pattern": "^(fn|(union|struct)<3>)\\.([a-zA-Z_]\\w*)(\\?)?$"
-                                }
-                            ]
-                        },
-                        "then": {
-                            "prefixItems": [
-                                {
-                                    "type": "string",
-                                    "pattern": "^(fn|(union|struct)<3>)\\.([a-zA-Z_]\\w*)(\\?)?$"
-                                }
-                            ],
-                            "items": { "$ref": "#/$defs/typeDeclaration" },
-                            "minItems": 4,
-                            "maxItems": 4
-                        },
-                        "else": {
-                            "prefixItems": [
-                                {
-                                    "type": "string",
-                                    "pattern": "^((boolean|integer|number|string|any|array|object)|(fn|(union|struct)(<[0-3]>)?)\\.([a-zA-Z_]\\w*))(\\?)?$"
-                                }
-                            ]
-                        }
-                    }
-                }
+    "typeDeclaration": {
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^((boolean|integer|number|string|any|bytes)|(fn|union|struct)\\.([a-zA-Z_]\\w*))(\\?)?$"
+        },
+        {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
+            "$ref": "#/$defs/typeDeclaration"
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "string": {
+              "$ref": "#/$defs/typeDeclaration"
             }
+          },
+          "required": ["string"],
+          "additionalProperties": false
         }
+      ]
     }
+  }
 }
