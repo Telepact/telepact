@@ -53,13 +53,13 @@
             "arr!": ["any"],
 
             "arrArr!": [["any"]],
-            "arrNullArr!": [["any"]],
+
             "objArr!": {"string": ["any"]},
 
             "obj!": {"string": "any"},
 
             "arrObj!": [{"string": "any"}],
-            "arrNullObj!": [{"string": "any"}],
+
             "objObj!": {"string": {"string": "any"}},
 
             "struct!": "struct.ExStruct",

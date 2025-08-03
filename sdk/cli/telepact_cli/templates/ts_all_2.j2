@@ -21,57 +21,63 @@ export class UntypedTaggedValue_ {
 }
 
 {%- macro to_ts_type(t, append_nullable=True) %}
-    {%- set nullable = '?' in t[0] -%}
-    {%- set typ = t[0] | replace('?', '') -%}
-    {%- if typ == 'array' -%}
-        Array<{{ to_ts_type(t[1:][0]) }}>
-    {%- elif typ == 'object' -%}
-        Record<string, {{ to_ts_type(t[1:][0]) }}>
-    {%- elif typ == 'boolean' -%}
-        boolean
-    {%- elif typ == 'integer' or typ == 'number' -%}
-        number
-    {%- elif typ == 'string' -%}
-        string
-    {%- elif typ == 'any' -%}
-        any
-    {%- elif typ == 'bytes' -%}
-        Uint8Array
-    {%- elif typ.startswith('fn.') -%}
-        {{ typ | regex_replace('^.*\\.', '') }}.Input
-    {%- else -%}
-        {{ typ | regex_replace('^.*\\.', '') }}
+    {%- if t is string -%}
+        {%- set nullable = '?' in t -%}
+        {%- set typ = t | replace('?', '') -%}
+        {%- if typ == 'boolean' -%}
+            boolean
+        {%- elif typ == 'integer' or typ == 'number' -%}
+            number
+        {%- elif typ == 'string' -%}
+            string
+        {%- elif typ == 'any' -%}
+            any
+        {%- elif typ == 'bytes' -%}
+            Uint8Array
+        {%- elif typ.startswith('fn.') -%}
+            {{ typ | regex_replace('^.*\\.', '') }}.Input
+        {%- else -%}
+            {{ typ | regex_replace('^.*\\.', '') }}
+        {%- endif -%}
+        {%- if append_nullable and nullable %} | null{%- endif -%}
+    {%- elif t is mapping -%}
+        Record<string, {{ to_ts_type(t.values() | first) }}>
+    {%- elif t is sequence -%}
+        Array<{{ to_ts_type(t[0]) }}>
     {%- endif -%}
-    {%- if append_nullable and nullable %} | null{%- endif -%}
 {%- endmacro -%}
 
 {%- macro marshall_ts_type(t, depth) -%}
-    {%- set nullable = '?' in t[0] %}
-    {%- set typ = t[0] | replace('?', '') -%}
-    {%- if typ == 'array' -%}
-        ((d{{ depth }}: {{ to_ts_type(t) }}) => {% if nullable %}d{{ depth }} === null ? null : {% endif %}d{{ depth }}.map((e{{ depth }}) => {% call marshall_ts_type(t[1:][0], depth + 1) %}e{{ depth }}{% endcall %}))({{ caller() }})
-    {%- elif typ == 'object' -%}
-        ((d{{ depth }}: {{ to_ts_type(t) }}) => {% if nullable %}d{{ depth }} === null ? null : {% endif %}Object.fromEntries(Object.entries(d{{ depth }}).map(([k{{ depth }}, v{{ depth }}]) => [k{{ depth }}, {% call marshall_ts_type(t[1:][0], depth + 1) %}v{{ depth }}{% endcall %}])))({{ caller() }})
-    {%- elif typ.startswith('struct') or typ.startswith('fn') or typ == '_ext.Select_' -%}
-        ((d{{ depth }}: any) => {% if nullable %}d{{ depth }} === null ? null : {% endif %}new {{ to_ts_type(t, False) }}(d{{ depth }}))({{ caller() }})
-    {%- elif typ.startswith('union') -%}
-        ((d{{ depth }}: any) => {% if nullable %}d{{ depth }} === null ? null : {% endif %}new {{ to_ts_type(t, False) }}(d{{ depth }}))({{ caller() }})
-    {%- else -%}
-        {{ caller() }}
-    {%- endif -%}
+    {%- if t is string -%}
+        {%- set nullable = '?' in t %}
+        {%- set typ = t | replace('?', '') -%}
+        {%- if typ.startswith('struct') or typ.startswith('fn') or typ == '_ext.Select_' -%}
+            ((d{{ depth }}: any) => {% if nullable %}d{{ depth }} === null ? null : {% endif %}new {{ to_ts_type(t, False) }}(d{{ depth }}))({{ caller() }})
+        {%- elif typ.startswith('union') -%}
+            ((d{{ depth }}: any) => {% if nullable %}d{{ depth }} === null ? null : {% endif %}new {{ to_ts_type(t, False) }}(d{{ depth }}))({{ caller() }})
+        {%- else -%}
+            {{ caller() }}
+        {%- endif -%}
+    {%- elif t is mapping -%}
+        ((d{{ depth }}: {{ to_ts_type(t) }}) => {% if nullable %}d{{ depth }} === null ? null : {% endif %}Object.fromEntries(Object.entries(d{{ depth }}).map(([k{{ depth }}, v{{ depth }}]) => [k{{ depth }}, {% call marshall_ts_type(t.values() | first, depth + 1) %}v{{ depth }}{% endcall %}])))({{ caller() }})
+    {%- elif t is sequence -%}
+        ((d{{ depth }}: {{ to_ts_type(t) }}) => {% if nullable %}d{{ depth }} === null ? null : {% endif %}d{{ depth }}.map((e{{ depth }}) => {% call marshall_ts_type(t[0], depth + 1) %}e{{ depth }}{% endcall %}))({{ caller() }})
+    {%- endif %}
 {%- endmacro -%}
 
 {%- macro unmarshall_ts_type(t, depth) -%}
-    {%- set nullable = '?' in t[0] %}
-    {%- set typ = t[0] | replace('?', '') -%}
-    {%- if typ == 'array' -%}
-        ((d{{ depth }}) => {% if nullable %}d{{ depth }} === null ? null : {% endif %}d{{ depth }}.map((e{{ depth }}) => {% call unmarshall_ts_type(t[1:][0], depth + 1) %}e{{ depth }}{% endcall %}))({{ caller() }})
-    {%- elif typ == 'object' -%}
-        ((d{{ depth }}) => {% if nullable %}d{{ depth }} === null ? null : {% endif %}Object.fromEntries(Object.entries(d{{ depth }}).map(([k{{ depth }}, v{{ depth }}]) => [k{{ depth }}, {% call unmarshall_ts_type(t[1:][0], depth + 1) %}v{{ depth }}{% endcall %}])))({{ caller() }})
-    {%- elif typ.startswith('struct') or typ.startswith('fn') or typ.startswith('union') or typ == '_ext.Select_' -%}
-        ((d{{ depth }}) => {% if nullable %}d{{ depth }} === null ? null : {% endif %}d{{ depth }}.pseudoJson)({{ caller() }})
-    {%- else -%}
-        {{ caller() }}
+    {%- if t is string -%}
+        {%- set nullable = '?' in t %}
+        {%- set typ = t | replace('?', '') -%}
+        {%- if typ.startswith('struct') or typ.startswith('fn') or typ.startswith('union') or typ == '_ext.Select_' -%}
+            ((d{{ depth }}) => {% if nullable %}d{{ depth }} === null ? null : {% endif %}d{{ depth }}.pseudoJson)({{ caller() }})
+        {%- else -%}
+            {{ caller() }}
+        {%- endif -%}
+    {%- elif t is mapping -%}
+        ((d{{ depth }}) => {% if nullable %}d{{ depth }} === null ? null : {% endif %}Object.fromEntries(Object.entries(d{{ depth }}).map(([k{{ depth }}, v{{ depth }}]) => [k{{ depth }}, {% call unmarshall_ts_type(t.values() | first, depth + 1) %}v{{ depth }}{% endcall %}])))({{ caller() }})
+    {%- elif t is sequence -%}
+        ((d{{ depth }}) => {% if nullable %}d{{ depth }} === null ? null : {% endif %}d{{ depth }}.map((e{{ depth }}) => {% call unmarshall_ts_type(t[0], depth + 1) %}e{{ depth }}{% endcall %}))({{ caller() }})
     {%- endif -%}
 {%- endmacro -%}
 
