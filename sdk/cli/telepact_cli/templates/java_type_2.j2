@@ -8,57 +8,69 @@ import java.util.ArrayList;
 
 
 {%- macro to_java_type(t, wildcard) %}
-    {%- set typ = t[0] | replace('?', '') %}
-    {%- if typ == 'array' -%}
-        List<{% if wildcard %}?{% else %}{{ to_java_type(t[1:][0]) }}{% endif %}>
-    {%- elif typ == 'object' -%}
-        Map<String, {% if wildcard %}?{% else %}{{ to_java_type(t[1:][0]) }}{% endif %}>
-    {%- elif typ == 'boolean' -%}
-        Boolean
-    {%- elif typ == 'integer' -%}
-        Long
-    {%- elif typ == 'number' -%}
-        Number
-    {%- elif typ == 'string' -%}
-        String
-    {%- elif typ == 'any' -%}
-        Object
-    {%- elif typ == 'bytes' -%}
-        byte[]
-    {%- elif typ.startswith('fn.') -%}
-        {{- typ | regex_replace('^.*\\.', '') -}}.Input
+    {%- if t is string -%}
+        {%- set typ = t | replace('?', '') %}
+        {%- if typ == 'boolean' -%}
+            Boolean
+        {%- elif typ == 'integer' -%}
+            Long
+        {%- elif typ == 'number' -%}
+            Number
+        {%- elif typ == 'string' -%}
+            String
+        {%- elif typ == 'any' -%}
+            Object
+        {%- elif typ == 'bytes' -%}
+            byte[]
+        {%- elif typ.startswith('fn.') -%}
+            {{- typ | regex_replace('^.*\\.', '') -}}.Input
+        {%- else -%}
+            {{- typ | regex_replace('^.*\\.', '') -}}
+        {%- endif %}
+    {%- elif t is mapping -%}
+        Map<String, {% if wildcard %}?{% else %}{{ to_java_type(t.values() | first) }}{% endif %}>
+    {%- elif t is sequence -%}
+        List<{% if wildcard %}?{% else %}{{ to_java_type(t[0]) }}{% endif %}>
     {%- else -%}
-        {{- typ | regex_replace('^.*\\.', '') -}}
+        {{ raise_error('Unsupported type: ' + t) }}
     {%- endif %}
 {%- endmacro -%}
 
 {%- macro marshall_java_type(t, depth) -%}
-    {%- set typ = t[0] | replace('?', '') -%}
-    {%- if typ == 'array' -%}
-        Utility_.let({{ caller() }}, d{{depth}} -> d{{depth}} == null ? null : (({{ to_java_type(t, True) }}) d{{depth}}).stream().map(e{{ depth }} -> {% call marshall_java_type(t[1:][0], depth + 1) %}e{{ depth }}{% endcall %}).toList())
-    {%- elif typ == 'object' -%}
-        Utility_.let({{ caller() }}, d{{depth}} -> d{{depth}} == null ? null : (({{ to_java_type(t, True) }}) d{{depth}}).entrySet().stream().map(e{{ depth }} -> new AbstractMap.SimpleEntry<>(e{{ depth }}.getKey(), {% call marshall_java_type(t[1:][0], depth + 1) %}e{{ depth }}.getValue(){% endcall %})).collect(() -> { {{ to_java_type(t)}} m = new HashMap<>(); return m; }, (m, e) -> m.put(e.getKey(), ({{ to_java_type(t[1]) }}) e.getValue()), Map::putAll))
-    {%- elif typ == 'integer' -%}
-        Utility_.let({{ caller() }}, d{{depth}} -> d{{depth}} == null ? null : d{{depth}} instanceof Integer ? ((Integer) d{{depth}}).longValue() : (Long) d{{depth}})
-    {%- elif typ.startswith('struct') or typ.startswith('fn') or typ == '_ext.Select_' -%}
-        Utility_.let({{ caller() }}, d{{ depth }} -> d{{ depth }} == null ? null : new {{ to_java_type(t) }}((Map<String, Object>) d{{ depth }}))
-    {%- elif typ.startswith('union') -%}
-        Utility_.let({{ caller() }}, d{{depth}} -> d{{depth}} == null ? null : new {{ to_java_type(t) }}((Map<String, Object>) d{{depth}}))
-    {%- else -%}
-        ({{ to_java_type(t) }}) {{ caller() }}
-    {%- endif -%}
+    {%- if t is string %}
+        {%- set typ = t | replace('?', '') -%}
+        {%- if typ == 'integer' -%}
+            Utility_.let({{ caller() }}, d{{depth}} -> d{{depth}} == null ? null : d{{depth}} instanceof Integer ? ((Integer) d{{depth}}).longValue() : (Long) d{{depth}})
+        {%- elif typ.startswith('struct') or typ.startswith('fn') or typ == '_ext.Select_' -%}
+            Utility_.let({{ caller() }}, d{{ depth }} -> d{{ depth }} == null ? null : new {{ to_java_type(t) }}((Map<String, Object>) d{{ depth }}))
+        {%- elif typ.startswith('union') -%}
+            Utility_.let({{ caller() }}, d{{depth}} -> d{{depth}} == null ? null : new {{ to_java_type(t) }}((Map<String, Object>) d{{depth}}))
+        {%- else -%}
+            ({{ to_java_type(t) }}) {{ caller() }}
+        {%- endif -%}
+    {%- elif t is mapping -%}
+        Utility_.let({{ caller() }}, d{{depth}} -> d{{depth}} == null ? null : (({{ to_java_type(t, True) }}) d{{depth}}).entrySet().stream().map(e{{ depth }} -> new AbstractMap.SimpleEntry<>(e{{ depth }}.getKey(), {% call marshall_java_type(t.values() | first, depth + 1) %}e{{ depth }}.getValue(){% endcall %})).collect(() -> { {{ to_java_type(t)}} m = new HashMap<>(); return m; }, (m, e) -> m.put(e.getKey(), ({{ to_java_type(t.values() | first) }}) e.getValue()), Map::putAll))
+    {%- elif t is sequence -%}
+        Utility_.let({{ caller() }}, d{{depth}} -> d{{depth}} == null ? null : (({{ to_java_type(t, True) }}) d{{depth}}).stream().map(e{{ depth }} -> {% call marshall_java_type(t[0], depth + 1) %}e{{ depth }}{% endcall %}).toList())
+    {%- endif %}
 {%- endmacro -%}
 
 {%- macro unmarshall_java_type(t, depth) -%}
-    {%- set typ = t[0] | replace('?', '') -%}
-    {%- if typ == 'array' -%}
-        Utility_.let({{ caller() }}, d{{depth}} -> d{{depth}} == null ? null : d{{depth}}.stream().map(e{{ depth }} -> {% call unmarshall_java_type(t[1:][0], depth + 1) %}e{{ depth }}{% endcall %}).toList())
-    {%- elif typ == 'object' -%}
-        Utility_.let({{ caller() }}, d{{depth}} -> d{{depth}} == null ? null : d{{depth}}.entrySet().stream().map(e{{ depth }} -> new AbstractMap.SimpleEntry<>(e{{ depth }}.getKey(), {% call unmarshall_java_type(t[1:][0], depth + 1) %}e{{ depth }}.getValue(){% endcall %})).collect(HashMap::new, (m, e) -> m.put(e.getKey(), e.getValue()), Map::putAll))
-    {%- elif typ.startswith('struct') or typ.startswith('fn') or typ.startswith('union') or typ == '_ext.Select_' -%}
-        Utility_.let({{ caller() }}, d{{depth}} -> d{{depth}} == null ? null : d{{depth}}.pseudoJson)
-    {%- else -%}
-        {{ caller() }}
+    {%- if t is string %}
+        {%- set typ = t | replace('?', '') -%}
+        {%- if typ == 'array' -%}
+            Utility_.let({{ caller() }}, d{{depth}} -> d{{depth}} == null ? null : d{{depth}}.stream().map(e{{ depth }} -> {% call unmarshall_java_type(t[1:][0], depth + 1) %}e{{ depth }}{% endcall %}).toList())
+        {%- elif typ == 'object' -%}
+            Utility_.let({{ caller() }}, d{{depth}} -> d{{depth}} == null ? null : d{{depth}}.entrySet().stream().map(e{{ depth }} -> new AbstractMap.SimpleEntry<>(e{{ depth }}.getKey(), {% call unmarshall_java_type(t[1:][0], depth + 1) %}e{{ depth }}.getValue(){% endcall %})).collect(HashMap::new, (m, e) -> m.put(e.getKey(), e.getValue()), Map::putAll))
+        {%- elif typ.startswith('struct') or typ.startswith('fn') or typ.startswith('union') or typ == '_ext.Select_' -%}
+            Utility_.let({{ caller() }}, d{{depth}} -> d{{depth}} == null ? null : d{{depth}}.pseudoJson)
+        {%- else -%}
+            {{ caller() }}
+        {%- endif -%}
+    {%- elif t is mapping -%}
+        Utility_.let({{ caller() }}, d{{depth}} -> d{{depth}} == null ? null : d{{depth}}.entrySet().stream().map(e{{ depth }} -> new AbstractMap.SimpleEntry<>(e{{ depth }}.getKey(), {% call unmarshall_java_type(t.values() | first, depth + 1) %}e{{ depth }}.getValue(){% endcall %})).collect(HashMap::new, (m, e) -> m.put(e.getKey(), e.getValue()), Map::putAll))
+    {%- elif t is sequence -%}
+        Utility_.let({{ caller() }}, d{{depth}} -> d{{depth}} == null ? null : d{{depth}}.stream().map(e{{ depth }} -> {% call unmarshall_java_type(t[0], depth + 1) %}e{{ depth }}{% endcall %}).toList())
     {%- endif -%}
 {%- endmacro -%}
 
