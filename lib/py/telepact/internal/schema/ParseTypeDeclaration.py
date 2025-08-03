@@ -16,6 +16,7 @@
 
 import re
 from typing import TYPE_CHECKING
+
 from ...internal.schema.SchemaParseFailure import SchemaParseFailure
 from ..types.TTypeDeclaration import TTypeDeclaration
 
@@ -28,6 +29,8 @@ def parse_type_declaration(
     type_declaration_object: object,
     ctx: 'ParseContext'
 ) -> 'TTypeDeclaration':
+    from ...internal.types.TArray import TArray
+    from ...internal.types.TObject import TObject
     from ...TelepactSchemaParseError import TelepactSchemaParseError
     from ...internal.schema.GetOrParseType import get_or_parse_type
     from ...internal.schema.GetTypeUnexpectedParseFailure import get_type_unexpected_parse_failure
@@ -74,7 +77,7 @@ def parse_type_declaration(
         element_type_declaration = list_object[0]
         new_path = path + [0]
 
-        array_type = get_or_parse_type(path, "array", ctx)
+        array_type = TArray()
         parsed_element_type = parse_type_declaration(new_path, element_type_declaration, ctx)
 
         return TTypeDeclaration(array_type, False, [parsed_element_type])
@@ -103,7 +106,7 @@ def parse_type_declaration(
 
         new_path = path + [key]
 
-        object_type = get_or_parse_type(path, "object", ctx)
+        object_type = TObject()
         parsed_value_type = parse_type_declaration(new_path, value, ctx)
 
         return TTypeDeclaration(object_type, False, [parsed_value_type])

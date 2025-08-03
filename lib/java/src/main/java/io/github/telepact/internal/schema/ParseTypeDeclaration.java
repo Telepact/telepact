@@ -26,6 +26,8 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import io.github.telepact.TelepactSchemaParseError;
+import io.github.telepact.internal.types.TArray;
+import io.github.telepact.internal.types.TObject;
 import io.github.telepact.internal.types.TType;
 import io.github.telepact.internal.types.TTypeDeclaration;
 
@@ -76,7 +78,7 @@ public class ParseTypeDeclaration {
             final List<Object> newPath = new ArrayList<>(path);
             newPath.add(0);
 
-            final TType arrayType = getOrParseType(path, "array", ctx);
+            final TType arrayType = new TArray();
             final TTypeDeclaration parsedElementType = parseTypeDeclaration(newPath, elementTypeDeclaration, ctx);
 
             return new TTypeDeclaration(arrayType, false, List.of(parsedElementType));
@@ -107,7 +109,7 @@ public class ParseTypeDeclaration {
             final List<Object> newPath = new ArrayList<>(path);
             newPath.add(key);
 
-            final TType objectType = getOrParseType(path, "object", ctx);
+            final TType objectType = new TObject();
 
             final TTypeDeclaration parsedValueType = parseTypeDeclaration(newPath, value, ctx);
 
