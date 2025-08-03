@@ -52,7 +52,7 @@ def get_or_parse_type(path: list[object], type_name: str, ctx: 'ParseContext') -
     if existing_type is not None:
         return existing_type
 
-    regex_string = r"^(boolean|integer|number|string|any|bytes|array|object)|((fn|(union|struct|_ext))\.([a-zA-Z_]\w*))$"
+    regex_string = r"^(boolean|integer|number|string|any|bytes)|((fn|(union|struct|_ext))\.([a-zA-Z_]\w*))$"
     regex = re.compile(regex_string)
 
     matcher = regex.match(type_name)

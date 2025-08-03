@@ -48,15 +48,7 @@ def parse_field(path: list[object], field_declaration: str, type_declaration_val
 
     this_path = path + [field_name]
 
-    if not isinstance(type_declaration_value, list):
-        raise TelepactSchemaParseError(get_type_unexpected_parse_failure(
-            ctx.document_name,
-            this_path,
-            type_declaration_value,
-            "Array"), ctx.telepact_schema_document_names_to_json)
-    type_declaration_array = type_declaration_value
-
     type_declaration = parse_type_declaration(this_path,
-                                              type_declaration_array, ctx)
+                                              type_declaration_value, ctx)
 
     return TFieldDeclaration(field_name, type_declaration, optional)
