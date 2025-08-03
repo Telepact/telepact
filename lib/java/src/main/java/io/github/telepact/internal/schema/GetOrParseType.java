@@ -74,8 +74,6 @@ public class GetOrParseType {
                 case "integer" -> new TInteger();
                 case "number" -> new TNumber();
                 case "string" -> new TString();
-                case "array" -> new TArray();
-                case "object" -> new TObject();
                 case "bytes" -> new TBytes();
                 default -> new TAny();
             };

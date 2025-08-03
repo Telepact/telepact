@@ -135,7 +135,7 @@ def _generate_internal(schema_data: list[dict[str, object]], possible_fn_selects
     template_env.filters['regex_replace'] = _regex_replace
     template_env.filters['find_schema_key'] = _find_schema_key
     template_env.filters['find_tag_key'] = _find_tag_key
-    template_env.filters['raise_error'] = _raise_error
+    template_env.globals['raise_error'] = _raise_error
 
     if target == "java":
 
