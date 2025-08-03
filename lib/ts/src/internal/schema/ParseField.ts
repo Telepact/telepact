@@ -47,15 +47,7 @@ export function parseField(
 
     const thisPath = [...path, fieldName];
 
-    if (!Array.isArray(typeDeclarationValue)) {
-        throw new TelepactSchemaParseError(
-            getTypeUnexpectedParseFailure(ctx.documentName, thisPath, typeDeclarationValue, 'Array'),
-            ctx.telepactSchemaDocumentNamesToJson,
-        );
-    }
-    const typeDeclarationArray = typeDeclarationValue;
-
-    const typeDeclaration = parseTypeDeclaration(thisPath, typeDeclarationArray, ctx);
+    const typeDeclaration = parseTypeDeclaration(thisPath, typeDeclarationValue, ctx);
 
     return new TFieldDeclaration(fieldName, typeDeclaration, optional);
 }
