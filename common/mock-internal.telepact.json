@@ -137,7 +137,7 @@
     {
         "///": " Set the seed of the random generator. ",
         "fn.setRandomSeed_": {
-            "seed": ["integer"]
+            "seed": "integer"
         },
         "->": [
             {

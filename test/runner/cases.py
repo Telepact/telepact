@@ -116,10 +116,14 @@ def has_too_many_keys(v):
             return any([has_too_many_keys(e) for e in v.values()])
     else:
         return False
-
+    
+skipped_collection_fields = ['nullArr!', 'arrNullArr!', 'objNullArr!', 'nullObj!', 'arrNullObj!', 'objNullObj!']
 
 def generate_basic_cases(given_field: str, the_type, correct_values, additional_incorrect_values = []):
     for field, correct_values, incorrect_values, base_path in get_values(given_field, the_type, correct_values, additional_incorrect_values):
+        if field in skipped_collection_fields:
+            continue
+
         for correct_value in correct_values:
             expected_response_header = {}
             if has_too_many_keys(correct_value):

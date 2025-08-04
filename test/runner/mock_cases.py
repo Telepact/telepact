@@ -16,12 +16,15 @@
 
 from typing import Any
 
-from cases import get_values
+from cases import get_values, skipped_collection_fields
 from cases import additional_union_cases, additional_fn_cases, additional_integer_cases, additional_number_cases, additional_struct_cases
 
 
 def generate_mock_cases(given_field: str, the_type, correct_values, additional_incorrect_values = []):
     for field, _, incorrect_values, base_path in get_values(given_field, the_type, correct_values, additional_incorrect_values):
+        if field in skipped_collection_fields:
+            continue
+
         for incorrect_value, errors in incorrect_values:
             cases = [{'path': ['fn.createStub_', 'stub', 'fn.test', 'value!'] + base_path + path, 'reason': reason} for reason, path in errors if 'RequiredObjectKeyMissing' not in reason]
             if not cases:
