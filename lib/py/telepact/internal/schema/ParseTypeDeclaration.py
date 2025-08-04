@@ -95,7 +95,7 @@ def parse_type_declaration(
         key, value = next(iter(map_object.items()))
 
         if not isinstance(key, str) or key != "string":
-            key_path = path + ["key"]
+            key_path = path + [key]
             raise TelepactSchemaParseError(
                 [
                     SchemaParseFailure(ctx.document_name, path, "RequiredObjectKeyMissing", {"key": "string"}),

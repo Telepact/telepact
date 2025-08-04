@@ -114,7 +114,7 @@ export function parseTypeDeclaration(
     const value = mapObject[key];
 
     if (key !== 'string') {
-      const keyPath = [...path, 'key'];
+      const keyPath = [...path, key];
       throw new TelepactSchemaParseError(
         [
           new SchemaParseFailure(

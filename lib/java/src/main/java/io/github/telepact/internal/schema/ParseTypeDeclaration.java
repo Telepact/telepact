@@ -99,7 +99,7 @@ public class ParseTypeDeclaration {
 
             if (!(key instanceof String) || !"string".equals(key)) {
                 final var keyPath = new ArrayList<>(path);
-                keyPath.add("key");
+                keyPath.add(key);
                 throw new TelepactSchemaParseError(List.of(
                     new SchemaParseFailure(ctx.documentName, path,"RequiredObjectKeyMissing", Map.of("key", "string")),
                     new SchemaParseFailure(ctx.documentName, keyPath, "ObjectKeyDisallowed", Map.of())),
