@@ -41,7 +41,7 @@ public class ParseTypeDeclaration {
         if (typeDeclarationObject instanceof String) {
             final String rootTypeString = (String) typeDeclarationObject;
 
-            final var regexString = "^(.+?)(\\?)?$";
+            final var regexString = "^(.*?)(\\?)?$";
             final var regex = Pattern.compile(regexString);
 
             final var matcher = regex.matcher(rootTypeString);

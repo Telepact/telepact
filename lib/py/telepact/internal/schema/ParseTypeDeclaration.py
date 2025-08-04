@@ -38,7 +38,7 @@ def parse_type_declaration(
     if isinstance(type_declaration_object, str):
         root_type_string = type_declaration_object
 
-        regex_string = r"^(.+?)(\?)?$"
+        regex_string = r"^(.*?)(\?)?$"
         regex = re.compile(regex_string)
 
         matcher = regex.match(root_type_string)

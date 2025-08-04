@@ -59,6 +59,11 @@
                 "expected": "integer"
             }
         }, {
+            "ObjectSizeUnexpected": {
+                "actual": "integer",
+                "expected": "integer"
+            }
+        }, {
             "TypeUnknown": {
                 "name": "string"
             }

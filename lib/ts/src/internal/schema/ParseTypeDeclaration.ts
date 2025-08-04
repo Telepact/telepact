@@ -30,7 +30,7 @@ export function parseTypeDeclaration(
   if (typeof typeDeclarationObject === 'string') {
     const rootTypeString: string = typeDeclarationObject;
 
-    const regexString = '^(.+?)(\\?)?$';
+    const regexString = '^(.*?)(\\?)?$';
     const regex = new RegExp(regexString);
 
     const matcher = rootTypeString.match(regex);
