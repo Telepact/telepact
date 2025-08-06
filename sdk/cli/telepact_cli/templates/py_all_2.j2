@@ -89,11 +89,7 @@ class UntypedTaggedValue_:
     {%- if t is string -%}
         {%- set nullable = '?' in t[0] -%}
         {%- set typ = t[0] | replace('?', '') -%}
-        {%- if typ == 'array' -%}
-            util_let({{ caller() }}, lambda d{{depth}}: {% if nullable %}None if d{{depth}} is None else {% endif %}[{% call unmarshall_py_type(t[1:][0], depth + 1 )%}e{{ depth }}{% endcall %} for e{{depth}} in d{{depth}}])
-        {%- elif typ == 'object' -%}
-            util_let({{ caller() }}, lambda d{{depth}}: {% if nullable %}None if d{{depth}} is None else {% endif %}{ k{{depth}}: {%- call unmarshall_py_type(t[1:][0], depth + 1) %}v{{ depth }}{% endcall %} for k{{depth}}, v{{depth}} in d{{depth}}.items()})
-        {%- elif typ.startswith('struct') or typ.startswith('fn') or typ.startswith('union') or typ == '_ext.Select_' -%}
+        {%- if typ.startswith('struct') or typ.startswith('fn') or typ.startswith('union') or typ == '_ext.Select_' -%}
             util_let({{ caller() }}, lambda d{{depth}}: {% if nullable %}None if d{{depth}} is None else {% endif %}d{{depth}}.pseudo_json)
         {%- else -%}
             {{ caller() }}
