@@ -87,8 +87,8 @@ class UntypedTaggedValue_:
 
 {%- macro unmarshall_py_type(t, depth) -%}
     {%- if t is string -%}
-        {%- set nullable = '?' in t[0] -%}
-        {%- set typ = t[0] | replace('?', '') -%}
+        {%- set nullable = '?' in t -%}
+        {%- set typ = t | replace('?', '') -%}
         {%- if typ.startswith('struct') or typ.startswith('fn') or typ.startswith('union') or typ == '_ext.Select_' -%}
             util_let({{ caller() }}, lambda d{{depth}}: {% if nullable %}None if d{{depth}} is None else {% endif %}d{{depth}}.pseudo_json)
         {%- else -%}
