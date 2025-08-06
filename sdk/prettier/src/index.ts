@@ -110,29 +110,29 @@ function printJsonAst(path: any, options: any, print: any): any {
 
     if (node.type === "ObjectExpression") {
         const isDownstreamOfLowercaseKey = () => {
-            let currentNode = path.node;
-            let parentNode = path.getParentNode();
+            const stack = path.stack;
+            const currentNode = stack[stack.length - 1];
 
-            while (parentNode) {
-                console.log("Checking parent node:", parentNode.type);
+            const startLine = currentNode.loc ? currentNode.loc.start.line : 'N/A';
+            const startCol = currentNode.loc ? currentNode.loc.start.column : 'N/A';
 
-                if (
-                    parentNode.type === "Property" ||
-                    parentNode.type === "ObjectProperty"
-                ) {
+            for (let i = stack.length - 2; i >= 0; i--) {
+                const parentNode = stack[i];
+
+                if (parentNode.type === "ObjectProperty") {
                     const key = parentNode.key;
-                    const keyName = key.type === "Identifier" ? key.name : key.value;
+                    // For JSON, keys are always string literals, so we use key.value
+                    const keyName = key.value;
 
-                    if (keyName && typeof keyName === 'string' && (/^@[a-z][a-zA-Z0-9_]*$/.test(keyName) || /^([a-z][a-zA-Z0-9_]*)(!)?$/.test(keyName))) {
-                        console.log(`Found a lowercase key ancestor: "${keyName}". Formatting on one line.`);
+                    const isLowercase = /^@[a-z][a-zA-Z0-9_]*$/.test(keyName) || /^([a-z][a-zA-Z0-9_]*)(!)?$/.test(keyName);
+
+                    if (isLowercase) {
                         return true;
                     }
-                }
 
-                currentNode = parentNode;
-                parentNode = path.getParentNode(currentNode);
+                }
             }
-            console.log("No lowercase key ancestor found. Using multi-line format.");
+
             return false;
         };
 

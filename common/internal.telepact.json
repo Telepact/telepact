@@ -15,9 +15,7 @@
         "->": [
             {
                 "Ok_": {
-                    "api": [{
-                        "string": "any"
-                    }]
+                    "api": [{"string": "any"}]
                 }
             }
         ],
