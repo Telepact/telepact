@@ -16,6 +16,19 @@ to erase just one field of a model, where null can be used to indicate the
 erasure of data, and optionality can be used to omit all fields except the one
 field you want to erase.
 
+## Why can I not define nullable arrays or objects?
+
+Nullability is indicated on base types by appending type strings with `?`, but
+since collection types are defined with native JSON array and object syntax,
+using `[]` and `{}` respectively, there is no way to append `?` to these expressions
+since free `?` characters are not legal JSON syntax.
+
+This apparent design constraint, albiet coincidental, aligns with Telepact's
+design goals of expressibility, while also minimizing redundant design options.
+In Telepact, null represent "empty" (while optional represents "unknown").
+Since array and object collection types can already express "emptiness,"
+nullability is unnecessary.
+
 ## Why do functions in Telepact not support positional arguments?
 
 Telepact functions are automatically associated with an argument struct and a
