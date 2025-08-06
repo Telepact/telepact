@@ -109,14 +109,45 @@ function printJsonAst(path: any, options: any, print: any): any {
     }
 
     if (node.type === "ObjectExpression") {
-        return node.properties.length === 0
-            ? "{}"
-            : [
-                  "{",
-                  indent(group([hardline, join(group([",", hardline]), path.map(print, "properties"))])),
-                  hardline,
-                  "}",
-              ];
+        const isDownstreamOfLowercaseKey = () => {
+            let currentNode = path.node;
+            let parentNode = path.getParentNode();
+
+            while (parentNode) {
+                console.log("Checking parent node:", parentNode.type);
+
+                if (
+                    parentNode.type === "Property" ||
+                    parentNode.type === "ObjectProperty"
+                ) {
+                    const key = parentNode.key;
+                    const keyName = key.type === "Identifier" ? key.name : key.value;
+
+                    if (keyName && typeof keyName === 'string' && (/^@[a-z][a-zA-Z0-9_]*$/.test(keyName) || /^([a-z][a-zA-Z0-9_]*)(!)?$/.test(keyName))) {
+                        console.log(`Found a lowercase key ancestor: "${keyName}". Formatting on one line.`);
+                        return true;
+                    }
+                }
+
+                currentNode = parentNode;
+                parentNode = path.getParentNode(currentNode);
+            }
+            console.log("No lowercase key ancestor found. Using multi-line format.");
+            return false;
+        };
+
+        const properties = path.map(print, "properties");
+
+        if (node.properties.length === 0 || isDownstreamOfLowercaseKey()) {
+            return ["{", join(", ", properties), "}"];
+        } else {
+            return [
+                "{",
+                indent(group([hardline, join(group([",", hardline]), properties)])),
+                hardline,
+                "}",
+            ];
+        }
     }
 
     if (node.type === "StringLiteral") {
