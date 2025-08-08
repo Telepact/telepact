@@ -6,13 +6,13 @@
     {
         "///": " A function that adds two numbers. ",
         "fn.add": {
-            "x": ["number"],
-            "y": ["number"]
+            "x": "number",
+            "y": "number"
         },
         "->": [
             {
                 "Ok_": {
-                    "result": ["number"]
+                    "result": "number"
                 }
             }
         ]
@@ -22,12 +22,12 @@
         "union.Value": [
             {
                 "Constant": {
-                    "value": ["number"]
+                    "value": "number"
                 }
             },
             {
                 "Variable": {
-                    "name": ["string"]
+                    "name": "string"
                 }
             }
         ]
@@ -52,14 +52,14 @@
     {
         "///": " A mathematical variable represented by a `name` that holds a certain `value`. ",
         "struct.Variable": {
-            "name": ["string"],
-            "value": ["number"]
+            "name": "string",
+            "value": "number"
         }
     },
     {
         "///": " Save a set of variables as a dynamic map of variable names to their value. ",
         "fn.saveVariables": {
-            "variables": ["object", ["number"]]
+            "variables": {"string": "number"}
         },
         "->": [
             {
@@ -70,14 +70,14 @@
     {
         "///": " Compute the `result` of the given `x` and `y` values. ",
         "fn.compute": {
-            "x": ["union.Value"],
-            "y": ["union.Value"],
-            "op": ["union.Operation"]
+            "x": "union.Value",
+            "y": "union.Value",
+            "op": "union.Operation"
         },
         "->": [
             {
                 "Ok_": {
-                    "result": ["number"]
+                    "result": "number"
                 }
             },
             {
@@ -88,12 +88,12 @@
     {
         "///": " Export all saved variables, up to an optional `limit`. ",
         "fn.exportVariables": {
-            "limit!": ["integer"]
+            "limit!": "integer"
         },
         "->": [
             {
                 "Ok_": {
-                    "variables": ["array", ["struct.Variable"]]
+                    "variables": ["struct.Variable"]
                 }
             }
         ]
@@ -104,7 +104,7 @@
         "->": [
             {
                 "Ok_": {
-                    "tape": ["array", ["struct.Computation"]]
+                    "tape": ["struct.Computation"]
                 }
             }
         ]
@@ -112,11 +112,11 @@
     {
         "///": " A computation. ",
         "struct.Computation": {
-            "firstOperand": ["union.Value"],
-            "secondOperand": ["union.Value"],
-            "operation": ["union.Operation"],
-            "timestamp": ["integer"],
-            "successful": ["boolean"]
+            "firstOperand": "union.Value",
+            "secondOperand": "union.Value",
+            "operation": "union.Operation",
+            "timestamp": "integer",
+            "successful": "boolean"
         }
     },
     {
@@ -124,7 +124,7 @@
         "->": [
             {
                 "Ok_": {
-                    "link": ["fn.compute"]
+                    "link": "fn.compute"
                 }
             }
         ]

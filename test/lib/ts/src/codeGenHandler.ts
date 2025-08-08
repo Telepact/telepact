@@ -108,39 +108,39 @@ export class CodeGenHandler extends ServerHandler_ {
             if (top.arr() !== undefined) {
                 value = Value.fromTyped({ arr: top.arr() });
             }
-            if (top.nullArr() !== undefined) {
-                value = Value.fromTyped({ nullArr: top.nullArr() });
-            }
+            // if (top.nullArr() !== undefined) {
+            //     value = Value.fromTyped({ nullArr: top.nullArr() });
+            // }
             if (top.arrArr() !== undefined) {
                 value = Value.fromTyped({ arrArr: top.arrArr() });
             }
-            if (top.arrNullArr() !== undefined) {
-                value = Value.fromTyped({ arrNullArr: top.arrNullArr() });
-            }
+            // if (top.arrNullArr() !== undefined) {
+            //     value = Value.fromTyped({ arrNullArr: top.arrNullArr() });
+            // }
             if (top.objArr() !== undefined) {
                 value = Value.fromTyped({ objArr: top.objArr() });
             }
-            if (top.objNullArr() !== undefined) {
-                value = Value.fromTyped({ objNullArr: top.objNullArr() });
-            }
+            // if (top.objNullArr() !== undefined) {
+            //     value = Value.fromTyped({ objNullArr: top.objNullArr() });
+            // }
             if (top.obj() !== undefined) {
                 value = Value.fromTyped({ obj: top.obj() });
             }
-            if (top.nullObj() !== undefined) {
-                value = Value.fromTyped({ nullObj: top.nullObj() });
-            }
+            // if (top.nullObj() !== undefined) {
+            //     value = Value.fromTyped({ nullObj: top.nullObj() });
+            // }
             if (top.arrObj() !== undefined) {
                 value = Value.fromTyped({ arrObj: top.arrObj() });
             }
-            if (top.arrNullObj() !== undefined) {
-                value = Value.fromTyped({ arrNullObj: top.arrNullObj() });
-            }
+            // if (top.arrNullObj() !== undefined) {
+            //     value = Value.fromTyped({ arrNullObj: top.arrNullObj() });
+            // }
             if (top.objObj() !== undefined) {
                 value = Value.fromTyped({ objObj: top.objObj() });
             }
-            if (top.objNullObj() !== undefined) {
-                value = Value.fromTyped({ objNullObj: top.objNullObj() });
-            }
+            // if (top.objNullObj() !== undefined) {
+            //     value = Value.fromTyped({ objNullObj: top.objNullObj() });
+            // }
             if (top.any() !== undefined) {
                 value = Value.fromTyped({ any: top.any() });
             }

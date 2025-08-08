@@ -4,7 +4,7 @@
         "->": [{
             "Ok_": {
                 "result": ["struct.Example"],
-                "extra": "string"
+                "extra": false
             }
         }]
     }

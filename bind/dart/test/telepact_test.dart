@@ -28,13 +28,13 @@ void main() {
       final telepactPseudoJson = [
         {
           "fn.add": {
-            "x": ["integer"],
-            "y": ["integer"]
+            "x": "integer",
+            "y": "integer"
           },
           "->": [
             {
               "Ok_": {
-                "result": ["integer"]
+                "result": "integer"
               }
             }
           ]

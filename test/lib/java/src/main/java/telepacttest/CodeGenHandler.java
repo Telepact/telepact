@@ -132,39 +132,39 @@ public class CodeGenHandler extends ServerHandler_ {
             top.arr().ifPresent(v -> {
                 value.set(new Value.Builder().arr(v));
             });
-            top.nullArr().ifPresent(v -> {
-                value.set(new Value.Builder().nullArr(v));
-            });
+            // top.nullArr().ifPresent(v -> {
+            //     value.set(new Value.Builder().nullArr(v));
+            // });
             top.arrArr().ifPresent(v -> {
                 value.set(new Value.Builder().arrArr(v));
             });
-            top.arrNullArr().ifPresent(v -> {
-                value.set(new Value.Builder().arrNullArr(v));
-            });
+            // top.arrNullArr().ifPresent(v -> {
+            //     value.set(new Value.Builder().arrNullArr(v));
+            // });
             top.objArr().ifPresent(v -> {
                 value.set(new Value.Builder().objArr(v));
             });
-            top.objNullArr().ifPresent(v -> {
-                value.set(new Value.Builder().objNullArr(v));
-            });
+            // top.objNullArr().ifPresent(v -> {
+            //     value.set(new Value.Builder().objNullArr(v));
+            // });
             top.obj().ifPresent(v -> {
                 value.set(new Value.Builder().obj(v));
             });
-            top.nullObj().ifPresent(v -> {
-                value.set(new Value.Builder().nullObj(v));
-            });
+            // top.nullObj().ifPresent(v -> {
+            //     value.set(new Value.Builder().nullObj(v));
+            // });
             top.arrObj().ifPresent(v -> {
                 value.set(new Value.Builder().arrObj(v));
             });
-            top.arrNullObj().ifPresent(v -> {
-                value.set(new Value.Builder().arrNullObj(v));
-            });
+            // top.arrNullObj().ifPresent(v -> {
+            //     value.set(new Value.Builder().arrNullObj(v));
+            // });
             top.objObj().ifPresent(v -> {
                 value.set(new Value.Builder().objObj(v));
             });
-            top.objNullObj().ifPresent(v -> {
-                value.set(new Value.Builder().objNullObj(v));
-            });
+            // top.objNullObj().ifPresent(v -> {
+            //     value.set(new Value.Builder().objNullObj(v));
+            // });
             top.any().ifPresent(v -> {
                 value.set(new Value.Builder().any(v));
             });

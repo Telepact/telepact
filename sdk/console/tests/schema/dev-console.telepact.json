@@ -4,13 +4,13 @@
     },
     {
         "fn.fn1": {
-            "input1": ["string"],
-            "input2": ["integer"]
+            "input1": "string",
+            "input2": "integer"
         },
         "->": [
             {
                 "Ok_": {
-                    "output1": ["array", ["struct.Struct1"]]
+                    "output1": ["struct.Struct1"]
                 }
             }
         ]
@@ -21,33 +21,33 @@
         "->": [
             {
                 "Ok_": {
-                    "linkA": ["fn.fn1"]
+                    "linkA": "fn.fn1"
                 }
             }
         ]
     },
     {
         "struct.Pad1": {
-            "field1": ["string"],
-            "field2": ["integer"]
+            "field1": "string",
+            "field2": "integer"
         }
     },
     {
         "struct.Pad2": {
-            "field1": ["string"],
-            "field2": ["integer"]
+            "field1": "string",
+            "field2": "integer"
         }
     },
     {
         "struct.Pad3": {
-            "field1": ["string"],
-            "field2": ["integer"]
+            "field1": "string",
+            "field2": "integer"
         }
     },
     {
         "struct.Struct1": {
-            "field1": ["string"],
-            "field2": ["integer"]
+            "field1": "string",
+            "field2": "integer"
         }
     }
 ]

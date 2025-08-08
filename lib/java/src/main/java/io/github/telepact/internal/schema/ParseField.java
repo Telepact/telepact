@@ -56,16 +56,9 @@ public class ParseField {
         final List<Object> thisPath = new ArrayList<>(path);
         thisPath.add(fieldName);
 
-        if (!(typeDeclarationValue instanceof List)) {
-            throw new TelepactSchemaParseError(
-                    getTypeUnexpectedParseFailure(ctx.documentName, thisPath, typeDeclarationValue, "Array"),
-                    ctx.telepactSchemaDocumentNamesToJson);
-        }
-        final List<Object> typeDeclarationArray = (List<Object>) typeDeclarationValue;
-
         final var typeDeclaration = parseTypeDeclaration(
                 thisPath,
-                typeDeclarationArray,
+                typeDeclarationValue,
                 ctx);
 
         return new TFieldDeclaration(fieldName, typeDeclaration, optional);

@@ -109,14 +109,45 @@ function printJsonAst(path: any, options: any, print: any): any {
     }
 
     if (node.type === "ObjectExpression") {
-        return node.properties.length === 0
-            ? "{}"
-            : [
-                  "{",
-                  indent(group([hardline, join(group([",", hardline]), path.map(print, "properties"))])),
-                  hardline,
-                  "}",
-              ];
+        const isDownstreamOfLowercaseKey = () => {
+            const stack = path.stack;
+            const currentNode = stack[stack.length - 1];
+
+            const startLine = currentNode.loc ? currentNode.loc.start.line : 'N/A';
+            const startCol = currentNode.loc ? currentNode.loc.start.column : 'N/A';
+
+            for (let i = stack.length - 2; i >= 0; i--) {
+                const parentNode = stack[i];
+
+                if (parentNode.type === "ObjectProperty") {
+                    const key = parentNode.key;
+                    // For JSON, keys are always string literals, so we use key.value
+                    const keyName = key.value;
+
+                    const isLowercase = /^@[a-z][a-zA-Z0-9_]*$/.test(keyName) || /^([a-z][a-zA-Z0-9_]*)(!)?$/.test(keyName);
+
+                    if (isLowercase) {
+                        return true;
+                    }
+
+                }
+            }
+
+            return false;
+        };
+
+        const properties = path.map(print, "properties");
+
+        if (node.properties.length === 0 || isDownstreamOfLowercaseKey()) {
+            return ["{", join(", ", properties), "}"];
+        } else {
+            return [
+                "{",
+                indent(group([hardline, join(group([",", hardline]), properties)])),
+                hardline,
+                "}",
+            ];
+        }
     }
 
     if (node.type === "StringLiteral") {

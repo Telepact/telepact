@@ -14,90 +14,134 @@
 //|  limitations under the License.
 //|
 
-import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
 import { TTypeDeclaration } from '../types/TTypeDeclaration';
+import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
+import { TArray } from '../../internal/types/TArray';
+import { TObject } from '../../internal/types/TObject';
 import { TelepactSchemaParseError } from '../../TelepactSchemaParseError';
 import { getOrParseType } from '../../internal/schema/GetOrParseType';
 import { getTypeUnexpectedParseFailure } from '../../internal/schema/GetTypeUnexpectedParseFailure';
-import { ParseContext } from '../../internal/schema/ParseContext';
 
-export function parseTypeDeclaration(path: any[], typeDeclarationArray: any[], ctx: ParseContext): TTypeDeclaration {
-    if (!typeDeclarationArray.length) {
-        throw new TelepactSchemaParseError(
-            [new SchemaParseFailure(ctx.documentName, path, 'EmptyArrayDisallowed', {})],
-            ctx.telepactSchemaDocumentNamesToJson,
-        );
-    }
+export function parseTypeDeclaration(
+  path: Array<any>,
+  typeDeclarationObject: any,
+  ctx: any,
+): TTypeDeclaration {
+  if (typeof typeDeclarationObject === 'string') {
+    const rootTypeString: string = typeDeclarationObject;
 
-    const basePath = path.concat([0]);
-    const baseType = typeDeclarationArray[0];
-
-    if (typeof baseType !== 'string') {
-        const thisParseFailures = getTypeUnexpectedParseFailure(ctx.documentName, basePath, baseType, 'String');
-        throw new TelepactSchemaParseError(thisParseFailures, ctx.telepactSchemaDocumentNamesToJson);
-    }
-
-    const rootTypeString = baseType;
-
-    const regexString = /^(.+?)(\?)?$/;
+    const regexString = '^(.*?)(\\?)?$';
     const regex = new RegExp(regexString);
 
     const matcher = rootTypeString.match(regex);
     if (!matcher) {
-        throw new TelepactSchemaParseError(
-            [
-                new SchemaParseFailure(ctx.documentName, basePath, 'StringRegexMatchFailed', {
-                    regex: regexString.toString().slice(1, -1),
-                }),
-            ],
-            ctx.telepactSchemaDocumentNamesToJson,
-        );
+      throw new TelepactSchemaParseError(
+        [
+          new SchemaParseFailure(
+            ctx.documentName,
+            path,
+            'StringRegexMatchFailed',
+            { regex: regexString }
+          ),
+        ],
+        ctx.telepactSchemaDocumentNamesToJson
+      );
     }
 
     const typeName = matcher[1];
-    const nullable = !!matcher[2];
+    const nullable = matcher[2] !== undefined;
 
-    const type_ = getOrParseType(basePath, typeName, ctx);
+    const tType = getOrParseType(path, typeName, ctx);
 
-    const givenTypeParameterCount = typeDeclarationArray.length - 1;
-    if (type_.getTypeParameterCount() !== givenTypeParameterCount) {
-        throw new TelepactSchemaParseError(
-            [
-                new SchemaParseFailure(ctx.documentName, path, 'ArrayLengthUnexpected', {
-                    actual: typeDeclarationArray.length,
-                    expected: type_.getTypeParameterCount() + 1,
-                }),
-            ],
-            ctx.telepactSchemaDocumentNamesToJson,
-        );
+    if (tType.getTypeParameterCount() !== 0) {
+      throw new TelepactSchemaParseError(
+        [
+          new SchemaParseFailure(
+            ctx.documentName,
+            path,
+            'ArrayLengthUnexpected',
+            { actual: 1, expected: tType.getTypeParameterCount() + 1 }
+          ),
+        ],
+        ctx.telepactSchemaDocumentNamesToJson
+      );
     }
 
-    const parseFailures: SchemaParseFailure[] = [];
-    const typeParameters: TTypeDeclaration[] = [];
-    const givenTypeParameters = typeDeclarationArray.slice(1);
+    return new TTypeDeclaration(tType, nullable, []);
+  } else if (Array.isArray(typeDeclarationObject)) {
+    const listObject: Array<any> = typeDeclarationObject;
 
-    for (let index = 1; index <= givenTypeParameters.length; index++) {
-        const e = givenTypeParameters[index - 1];
-        const loopPath = path.concat([index]);
-
-        if (!Array.isArray(e)) {
-            const thisParseFailures = getTypeUnexpectedParseFailure(ctx.documentName, loopPath, e, 'Array');
-            parseFailures.push(...thisParseFailures);
-            continue;
-        }
-
-        try {
-            const typeParameterTypeDeclaration = parseTypeDeclaration(loopPath, e, ctx);
-
-            typeParameters.push(typeParameterTypeDeclaration);
-        } catch (e2) {
-            parseFailures.push(...e2.schemaParseFailures);
-        }
+    if (listObject.length !== 1) {
+      throw new TelepactSchemaParseError(
+        [
+          new SchemaParseFailure(
+            ctx.documentName,
+            path,
+            'ArrayLengthUnexpected',
+            { actual: listObject.length, expected: 1 }
+          ),
+        ],
+        ctx.telepactSchemaDocumentNamesToJson
+      );
     }
 
-    if (parseFailures.length > 0) {
-        throw new TelepactSchemaParseError(parseFailures, ctx.telepactSchemaDocumentNamesToJson);
+    const elementTypeDeclaration = listObject[0];
+    const newPath = [...path, 0];
+
+    const arrayType = new TArray();
+    const parsedElementType = parseTypeDeclaration(newPath, elementTypeDeclaration, ctx);
+
+    return new TTypeDeclaration(arrayType, false, [parsedElementType]);
+  } else if (typeof typeDeclarationObject === 'object' && typeDeclarationObject !== null) {
+    const mapObject: Record<string, any> = typeDeclarationObject;
+
+    const keys = Object.keys(mapObject);
+    if (keys.length !== 1) {
+      throw new TelepactSchemaParseError(
+        [
+          new SchemaParseFailure(
+            ctx.documentName,
+            path,
+            'ObjectSizeUnexpected',
+            { actual: keys.length, expected: 1 }
+          ),
+        ],
+        ctx.telepactSchemaDocumentNamesToJson
+      );
     }
 
-    return new TTypeDeclaration(type_, nullable, typeParameters);
+    const key = keys[0];
+    const value = mapObject[key];
+
+    if (key !== 'string') {
+      const keyPath = [...path, key];
+      throw new TelepactSchemaParseError(
+        [
+          new SchemaParseFailure(
+            ctx.documentName,
+            path,
+            'RequiredObjectKeyMissing',
+            { key: 'string' }
+          ),
+          new SchemaParseFailure(ctx.documentName, keyPath, 'ObjectKeyDisallowed', {}),
+        ],
+        ctx.telepactSchemaDocumentNamesToJson
+      );
+    }
+
+    const newPath = [...path, key];
+
+    const objectType = new TObject();
+    const parsedValueType = parseTypeDeclaration(newPath, value, ctx);
+
+    return new TTypeDeclaration(objectType, false, [parsedValueType]);
+  } else {
+    const failures = getTypeUnexpectedParseFailure(
+      ctx.documentName,
+      path,
+      typeDeclarationObject,
+      'StringOrArrayOrObject'
+    );
+    throw new TelepactSchemaParseError(failures, ctx.telepactSchemaDocumentNamesToJson);
+  }
 }

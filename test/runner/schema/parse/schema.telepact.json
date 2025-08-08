@@ -19,6 +19,8 @@
         }, {
             "Object": {}
         }, {
+            "StringOrArrayOrObject": {}
+        }, {
             "Any": {}
         }, {
             "Unknown": {}
@@ -27,8 +29,8 @@
     {
         "union.ValidationFailureReason": [{
             "TypeUnexpected": {
-                "expected": ["union.Type"],
-                "actual": ["union.Type"]
+                "expected": "union.Type",
+                "actual": "union.Type"
             }
         }, {
             "ErrorDefinitionCannotTargetInternalFunctions": {}
@@ -38,43 +40,48 @@
             "EmptyObjectDisallowed": {}
         }, {
             "StringRegexMatchFailed": {
-                "regex": ["string"]
+                "regex": "string"
             }
         }, {
             "KeyRegexMatchFailed": {
-                "regex": ["string"]
+                "regex": "string"
             }
         }, {
             "ObjectKeyRegexMatchCountUnexpected": {
-                "regex": ["string"],
-                "expected": ["integer"],
-                "actual": ["integer"],
-                "keys": ["array", ["string"]]
+                "regex": "string",
+                "expected": "integer",
+                "actual": "integer",
+                "keys": ["string"]
             }
         }, {
             "ArrayLengthUnexpected": {
-                "actual": ["integer"],
-                "expected": ["integer"]
+                "actual": "integer",
+                "expected": "integer"
+            }
+        }, {
+            "ObjectSizeUnexpected": {
+                "actual": "integer",
+                "expected": "integer"
             }
         }, {
             "TypeUnknown": {
-                "name": ["string"]
+                "name": "string"
             }
         }, {
             "TypeExtensionImplementationMissing": {
-                "name": ["string"]
+                "name": "string"
             }
         }, {
             "RequiredObjectKeyMissing": {
-                "key": ["string"]
+                "key": "string"
             }
         }, {
             "JsonInvalid": {}
         }, {
             "PathCollision": {
-                "document": ["string"],
-                "path": ["array", ["any"]],
-                "location": ["struct.JsonLocation"]
+                "document": "string",
+                "path": ["any"],
+                "location": "struct.JsonLocation"
             }
         }, {
             "ObjectKeyDisallowed": {}
@@ -82,43 +89,43 @@
     },
     {
         "struct.JsonLocation": {
-            "row": ["integer"],
-            "col": ["integer"]
+            "row": "integer",
+            "col": "integer"
         }
     },
     {
         "struct.ValidationFailure": {
-            "document": ["string"],
-            "path": ["array", ["any"]],
-            "location": ["struct.JsonLocation"],
-            "reason": ["union.ValidationFailureReason"]
+            "document": "string",
+            "path": ["any"],
+            "location": "struct.JsonLocation",
+            "reason": "union.ValidationFailureReason"
         }
     },
     {
         "union.SchemaInput": [{
             "PseudoJson": {
-                "schema": ["any?"],
-                "extend!": ["any?"]
+                "schema": "any?",
+                "extend!": "any?"
             }
         }, {
             "Json": {
-                "schema": ["string"]
+                "schema": "string"
             }
         }, {
             "Directory": {
-                "schemaDirectory": ["string"]
+                "schemaDirectory": "string"
             }
         }]
     },
     {
         "fn.validateSchema": {
-            "input": ["union.SchemaInput"]
+            "input": "union.SchemaInput"
         },
         "->": [{
             "Ok_": {}
         }, {
             "ErrorValidationFailure": {
-                "cases": ["array", ["struct.ValidationFailure"]]
+                "cases": ["struct.ValidationFailure"]
             }
         }]
     }

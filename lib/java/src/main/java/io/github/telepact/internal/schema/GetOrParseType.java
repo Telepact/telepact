@@ -57,7 +57,7 @@ public class GetOrParseType {
             return existingType;
         }
 
-        final var regexString = "^(boolean|integer|number|string|any|bytes|array|object)|((fn|(union|struct|_ext))\\.([a-zA-Z_]\\w*))$";
+        final var regexString = "^(boolean|integer|number|string|any|bytes)|((fn|(union|struct|_ext))\\.([a-zA-Z_]\\w*))$";
 
         final var regex = Pattern.compile(regexString);
 
@@ -74,8 +74,6 @@ public class GetOrParseType {
                 case "integer" -> new TInteger();
                 case "number" -> new TNumber();
                 case "string" -> new TString();
-                case "array" -> new TArray();
-                case "object" -> new TObject();
                 case "bytes" -> new TBytes();
                 default -> new TAny();
             };

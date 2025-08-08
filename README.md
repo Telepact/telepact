@@ -24,13 +24,13 @@ $ cat ./api/math.telepact.json
    {
       "///": " Add two integers, `x` and `y`. ",
       "fn.divide": {
-         "x": ["integer"],
-         "y": ["integer"]
+         "x": "integer",
+         "y": "integer"
       },
       "->": [
          {
             "Ok_": {
-               "result": ["integer"]
+               "result": "integer"
             }
          },
          {

@@ -44,7 +44,7 @@ export function getOrParseType(path: any[], typeName: string, ctx: ParseContext)
         return existingType;
     }
 
-    const regexString = `^(boolean|integer|number|string|any|bytes|array|object)|((fn|(union|struct|_ext))\\.([a-zA-Z_]\\w*))$`;
+    const regexString = `^(boolean|integer|number|string|any|bytes)|((fn|(union|struct|_ext))\\.([a-zA-Z_]\\w*))$`;
     const regex = new RegExp(regexString);
 
     const matcher = typeName.match(regex);
@@ -64,8 +64,6 @@ export function getOrParseType(path: any[], typeName: string, ctx: ParseContext)
                 number: new TNumber(),
                 string: new TString(),
                 bytes: new TBytes(),
-                array: new TArray(),
-                object: new TObject(),
             }[standardTypeName] || new TAny()
         );
     }

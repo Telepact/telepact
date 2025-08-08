@@ -12,17 +12,17 @@
         "union.CallCountCriteria_": [
             {
                 "Exact": {
-                    "times": ["integer"]
+                    "times": "integer"
                 }
             },
             {
                 "AtMost": {
-                    "times": ["integer"]
+                    "times": "integer"
                 }
             },
             {
                 "AtLeast": {
-                    "times": ["integer"]
+                    "times": "integer"
                 }
             }
         ]
@@ -32,16 +32,16 @@
         "union.VerificationFailure_": [
             {
                 "TooFewMatchingCalls": {
-                    "wanted": ["union.CallCountCriteria_"],
-                    "found": ["integer"],
-                    "allCalls": ["array", ["_ext.Call_"]]
+                    "wanted": "union.CallCountCriteria_",
+                    "found": "integer",
+                    "allCalls": ["_ext.Call_"]
                 }
             },
             {
                 "TooManyMatchingCalls": {
-                    "wanted": ["union.CallCountCriteria_"],
-                    "found": ["integer"],
-                    "allCalls": ["array", ["_ext.Call_"]]
+                    "wanted": "union.CallCountCriteria_",
+                    "found": "integer",
+                    "allCalls": ["_ext.Call_"]
                 }
             }
         ]
@@ -61,9 +61,9 @@
             " necessary data required to make the `result` pass on response validation.       "
         ],
         "fn.createStub_": {
-            "stub": ["_ext.Stub_"],
-            "strictMatch!": ["boolean"],
-            "count!": ["integer"]
+            "stub": "_ext.Stub_",
+            "strictMatch!": "boolean",
+            "count!": "integer"
         },
         "->": [
             {
@@ -80,9 +80,9 @@
             " given `call` argument is Exactly a json sub-structure of the actual argument.   "
         ],
         "fn.verify_": {
-            "call": ["_ext.Call_"],
-            "strictMatch!": ["boolean"],
-            "count!": ["union.CallCountCriteria_"]
+            "call": "_ext.Call_",
+            "strictMatch!": "boolean",
+            "count!": "union.CallCountCriteria_"
         },
         "->": [
             {
@@ -90,7 +90,7 @@
             },
             {
                 "ErrorVerificationFailure": {
-                    "reason": ["union.VerificationFailure_"]
+                    "reason": "union.VerificationFailure_"
                 }
             }
         ],
@@ -108,7 +108,7 @@
             },
             {
                 "ErrorVerificationFailure": {
-                    "additionalUnverifiedCalls": ["array", ["_ext.Call_"]]
+                    "additionalUnverifiedCalls": ["_ext.Call_"]
                 }
             }
         ],
@@ -137,7 +137,7 @@
     {
         "///": " Set the seed of the random generator. ",
         "fn.setRandomSeed_": {
-            "seed": ["integer"]
+            "seed": "integer"
         },
         "->": [
             {

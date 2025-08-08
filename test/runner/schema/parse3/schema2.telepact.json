@@ -3,7 +3,7 @@
         "fn.example": {},
         "->": [{
             "Ok_": {
-                "result": ["struct.Example"]
+                "result": "struct.Example"
             }
         }]
     }
