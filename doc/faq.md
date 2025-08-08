@@ -23,7 +23,7 @@ since collection types are defined with native JSON array and object syntax,
 using `[]` and `{}` respectively, there is no way to append `?` to these expressions
 since free `?` characters are not legal JSON syntax.
 
-This apparent design constraint, albiet coincidental, aligns with Telepact's
+This apparent design constraint, albeit coincidental, aligns with Telepact's
 design goals of expressibility, while also minimizing redundant design options.
 In Telepact, null represent "empty" (while optional represents "unknown").
 Since array and object collection types can already express "emptiness,"
