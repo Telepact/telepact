@@ -98,7 +98,11 @@ let request = [
         }
     }
 ];
-var response = fetch('http://localhost:8000/api/telepact', { method: 'POST' }, JSON.stringify(request));
+var response = fetch(
+    'http://localhost:8000/api/telepact',
+    { method: 'POST' },
+    JSON.stringify(request)
+);
 console.log(`Response: ${await response.json()}`);
 ```
 ```sh
