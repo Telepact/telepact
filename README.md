@@ -13,8 +13,9 @@ key innovations:
 2. **Binary without code generation** - Binary protocols are established through
    runtime handshakes, rather than build-time code generation, offering binary
    efficiency to clients that want to avoid code generation toolchains
-3. **Hypermedia without HTTP** - API calls can return un-invoked function calls
-   that can be followed like a link, all achieved with pure JSON abstractions
+3. **Hypermedia without HTTP** - API calls can return functions with pre-filled
+   arguments, approximating a link that can be followed, all achieved with pure
+   JSON abstractions
 
 For further reading, see [Motivation](./doc/motivation.md).
 
