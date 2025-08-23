@@ -10,7 +10,7 @@ build = "^1.2"
 msgpack = "^1.0"
 nats-py = "^2.8"
 prometheus-client = "^0.20"
-telepact = {path = "telepact.tar.gz"}
+telepact = {path = "telepact.tar.gz", optional = true}
 
 [tool.poetry.extras]
 telepact = ["telepact"]
