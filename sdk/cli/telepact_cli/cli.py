@@ -66,6 +66,9 @@ def main() -> None:
 @click.option('--out', help='Output directory', required=True)
 @click.option('--package', help='Java package (use if --lang is "java")', callback=_validate_package)
 def codegen(schema_http_url: str, schema_dir: str, lang: str, out: str, package: str) -> None:
+    """
+    Generate code bindings for a Telepact API schema.
+    """
 
     print('Telepact CLI')
     if schema_http_url:
@@ -282,6 +285,10 @@ def _generate_internal(schema_data: list[dict[str, object]], possible_fn_selects
 @click.command()
 @click.option('--port', default=8000, help='Port to run the mock server on', envvar='MOCK_SERVER_PORT')
 def demo_server(port: int) -> None:
+    """
+    Start a demo Telepact server.
+    """
+
     global_variables: dict[str, float] = {}
     global_computations: list[dict[str, object]] = []
 
@@ -482,6 +489,9 @@ def mock(
     disable_message_response_generation: bool,
     disable_random_optional_field_generation: bool
 ) -> None:
+    """
+    Start a mock server for a Telepact API schema.
+    """
 
     schema: MockTelepactSchema
     if http_url:
@@ -531,6 +541,9 @@ def fetch(
     http_url: str,
     output_dir: str
 ) -> None:
+    """
+    Fetch a Telepact API schema to store locally.
+    """
 
     api_json = get_api_from_http(http_url)
     schema = MockTelepactSchema.from_json(api_json)      
