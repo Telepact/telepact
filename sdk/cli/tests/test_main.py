@@ -99,6 +99,25 @@ def test_demo_server_and_fetch_and_mock() -> None:
             print(f"Mock server stderr: {stderr_mock}")
 
 
+def test_compare(runner: CliRunner) -> None:
+    result = runner.invoke(
+        main, ['compare', '--old-schema-dir', 'tests/compare/old', '--new-schema-dir', 'tests/compare/new'])
+
+    # print stack trace
+    import traceback
+
+    # Assuming result.exc_info is a tuple (exc_type, exc_value, exc_traceback)
+    if result.exc_info:
+        # Format the traceback and print it
+        traceback_str = ''.join(traceback.format_exception(*result.exc_info))
+        print(traceback_str)
+
+    print(f'Output: {result.output}')
+
+    assert result.exit_code == 0
+    assert "Field 'field2' in struct 'struct.S1' has changed type from 'TInteger' to 'TBoolean'" in result.output
+
+
 def test_command_java(runner: CliRunner) -> None:
     result = runner.invoke(
         main, ['codegen', '--schema-dir', 'tests/data', '--lang', 'java', '--out', 'tests/output/java', '--package', 'output'])

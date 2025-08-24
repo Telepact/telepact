@@ -1,0 +1,20 @@
+[
+    {
+        "struct.S1": {
+            "field1": "string",
+            "field2": "boolean"
+        }
+    },
+    {
+        "fn.test": {
+            "arg1": "struct.S1"
+        },
+        "->": [
+            {
+                "Ok_": {
+                    "res1": "struct.S1"
+                }
+            }
+        ]
+    }
+]
