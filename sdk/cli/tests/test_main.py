@@ -47,7 +47,7 @@ def tmp_dir_manager() -> Generator[None, None, None]:
         shutil.rmtree(tmp_dir)
 
 
-def test_demo_server() -> None:
+def test_demo_server_and_fetch_and_mock() -> None:
     p = subprocess.Popen(['poetry', 'run', 'telepact', 'demo-server'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, cwd='tests/tmp')
 
     try:
@@ -73,6 +73,15 @@ def test_demo_server() -> None:
         print(f"Fetched schema: {schema_json}")
         assert schema_json == reference_json, "Fetched schema does not match the reference schema"
 
+        # Assert that we can start the mock server using the fetched schema
+        p_mock = subprocess.Popen(['poetry', 'run', 'telepact', 'mock', '--http-url', 'http://localhost:8000/api', '--port', '8001'])
+        time.sleep(1)
+
+        response_mock = requests.post('http://localhost:8001/api', data=json.dumps([{}, {'fn.add': {'x': 5, 'y': 3}}]))
+
+        assert response_mock.status_code == 200
+        assert response_mock.json() == [{}, {'Ok_': {'result': 0.001007557381413671}}] # result is mocked
+
 
     except requests.exceptions.RequestException as e:
         print(f"Request failed: {e}")
@@ -82,6 +91,12 @@ def test_demo_server() -> None:
         stdout, stderr = p.communicate(timeout=1)
         print(f"stdout: {stdout}")
         print(f"stderr: {stderr}")
+
+        if p_mock:
+            p_mock.kill()
+            stdout_mock, stderr_mock = p_mock.communicate(timeout=1)
+            print(f"Mock server stdout: {stdout_mock}")
+            print(f"Mock server stderr: {stderr_mock}")
 
 
 def test_command_java(runner: CliRunner) -> None:

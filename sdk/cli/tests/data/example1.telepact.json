@@ -6,48 +6,48 @@
             " This is the result. "
         ],
         "struct.Example1": {
-            "field1": ["integer"],
-            "int": ["boolean?"],
-            "long!": ["string"],
-            "field4": ["any"],
-            "field5": ["union.Un1"],
-            "field6": ["fn.test"],
-            "build": ["array", ["integer"]],
-            "build2": ["object", ["integer"]],
-            "field7!": ["union.Un1?"],
-            "field8!": ["struct.Example4"],
-            "field9": ["array", ["struct.Example5"]]
+            "field1": "integer",
+            "int": "boolean?",
+            "long!": "string",
+            "field4": "any",
+            "field5": "union.Un1",
+            "field6": "fn.test",
+            "build": ["integer"],
+            "build2": {"string": "integer"},
+            "field7!": "union.Un1?",
+            "field8!": "struct.Example4",
+            "field9": ["struct.Example5"]
         }
     },
     {
         "struct.Example2": {
-            "field1": ["boolean"],
-            "field2": ["array", ["string"]]
+            "field1": "boolean",
+            "field2": ["string"]
         }
     },
     {
         "struct.Example3": {
-            "field1": ["boolean"],
-            "field2": ["array", ["array", ["string"]]]
+            "field1": "boolean",
+            "field2": [["string"]]
         }
     },
     {
         "struct.Example4": {
-            "field1": ["boolean"],
-            "field2": ["object", ["boolean"]]
+            "field1": "boolean",
+            "field2": {"string": "boolean"}
         }
     },
     {
         "struct.Example5": {
-            "field1": ["array", ["boolean"]],
-            "field2": ["object", ["object", ["boolean"]]]
+            "field1": "boolean",
+            "field2": {"string": {"string": "boolean"}}
         }
     },
     {
         "struct.Example6": {
-            "field1": ["boolean"],
-            "field2": ["struct.Example1"],
-            "field3": ["struct.Example1?"]
+            "field1": "boolean",
+            "field2": "struct.Example1",
+            "field3": "struct.Example1?"
         }
     },
     {
@@ -63,8 +63,8 @@
                 " This is first.      "
             ],
             "First": {
-                "field1": ["integer"], 
-                "field2": ["boolean"]
+                "field1": "integer", 
+                "field2": "boolean"
             }
         }, {
             "///": [
@@ -73,8 +73,8 @@
                 " This is second.     "
             ],
             "Second": {
-                "field1": ["string"], 
-                "field2": ["boolean"]
+                "field1": "string", 
+                "field2": "boolean"
             }
         }]
     },      
@@ -85,17 +85,17 @@
             " This is the result. "
         ],
         "fn.test": {
-            "field1": ["integer"],
-            "field2": ["boolean"]
+            "field1": "integer",
+            "field2": "boolean"
         },
         "->": [{
             "Ok_": {
-                "field1": ["integer"],
-                "field2": ["boolean"]
+                "field1": "integer",
+                "field2": "boolean"
             }
         }, {
             "Err": {
-                "error": ["string"]
+                "error": "string"
             }
         }]
     },
@@ -104,7 +104,7 @@
         "->": [
             {
                 "Ok_": {
-                    "field1": ["integer"]
+                    "field1": "integer"
                 }
             }
         ]

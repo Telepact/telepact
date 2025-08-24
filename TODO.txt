@@ -3,8 +3,6 @@ High:
 - Fix typos in writing guide
 
 Medium:
-- Also remove mock-internal from binary encoding like internal is omitted
-- Write tests for the cli mock and demo-server subcommands
 - Write tests that verify each type within a "link" function
 - Add backwards compatibility check to cli
 - Add http url as a Telepact source for code generation
