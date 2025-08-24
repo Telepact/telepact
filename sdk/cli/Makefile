@@ -57,7 +57,7 @@ clean:
 	poetry env remove --all
 
 test:
-	poetry run python -m pytest -k test_demo_server -s -vv
+	poetry run python -m pytest -s -vv
 
 old-test:
 	poetry run telepact codegen --schema-dir tests/data --lang java --out tests/output/java --package output

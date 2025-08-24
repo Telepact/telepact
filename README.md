@@ -78,7 +78,7 @@ options = Server.Options()
 options.auth_required = False
 
 schema_files = TelepactSchemaFiles('./api')
-api = TelepactSchema.from_file_json_map(schema_files)
+api = TelepactSchema.from_file_json_map(schema_files.filenames_to_json)
 server = Server(api, handler, options)
 
 from fastapi import FastAPI, Request
