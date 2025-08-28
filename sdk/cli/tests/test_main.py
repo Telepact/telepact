@@ -24,6 +24,7 @@ import subprocess
 import requests
 import json
 import time
+from tests.test_data import compare_cases
 
 
 @pytest.fixture
@@ -45,7 +46,6 @@ def tmp_dir_manager() -> Generator[None, None, None]:
     # Cleanup after tests
     if os.path.exists(tmp_dir):
         shutil.rmtree(tmp_dir)
-
 
 def test_demo_server_and_fetch_and_mock() -> None:
     p = subprocess.Popen(['poetry', 'run', 'telepact', 'demo-server'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, cwd='tests/tmp')
@@ -99,9 +99,20 @@ def test_demo_server_and_fetch_and_mock() -> None:
             print(f"Mock server stderr: {stderr_mock}")
 
 
-def test_compare(runner: CliRunner) -> None:
+@pytest.mark.parametrize("old, new, expected, expected_code", compare_cases)
+def test_compare(runner: CliRunner, old: dict, new: dict, expected: list[str], expected_code: int) -> None:
+    import os
+    os.makedirs('tests/tmp/compare/old', exist_ok=True)
+    os.makedirs('tests/tmp/compare/new', exist_ok=True)
+    with open('tests/tmp/compare/old/schema.telepact.json', 'w') as f:
+        old_json = json.dumps(old, indent=2)
+        f.write(old_json)
+    with open('tests/tmp/compare/new/schema.telepact.json', 'w') as f:
+        new_json = json.dumps(new, indent=2)
+        f.write(new_json)
+
     result = runner.invoke(
-        main, ['compare', '--old-schema-dir', 'tests/compare/old', '--new-schema-dir', 'tests/compare/new'])
+        main, ['compare', '--old-schema-dir', 'tests/tmp/compare/old', '--new-schema-dir', 'tests/tmp/compare/new'])
 
     # print stack trace
     import traceback
@@ -114,8 +125,9 @@ def test_compare(runner: CliRunner) -> None:
 
     print(f'Output: {result.output}')
 
-    assert result.exit_code == 0
-    assert "Field 'field2' in struct 'struct.S1' has changed type from 'TInteger' to 'TBoolean'" in result.output
+    assert expected_code == result.exit_code
+    output_lines = [line.strip() for line in result.output.split('\n') if line.strip()]
+    assert expected == output_lines
 
 
 def test_command_java(runner: CliRunner) -> None:
