@@ -601,6 +601,7 @@ def compare(new_schema_dir: str, old_schema_dir: str) -> None:
     """
     from .telepact.internal.types.TStruct import TStruct
     from .telepact.internal.types.TUnion import TUnion
+    from .telepact.internal.types.TType import TType
 
     new_telepact_schema = TelepactSchema.from_directory(new_schema_dir)
     old_telepact_schema = TelepactSchema.from_directory(old_schema_dir)
@@ -613,7 +614,7 @@ def compare(new_schema_dir: str, old_schema_dir: str) -> None:
             res = cast(TUnion, v)
             ok_struct = res.tags['Ok_']
 
-            for name, field in ok_struct.fields.items():
+            for old_name, field in ok_struct.fields.items():
                 these_types = trace_type(field.type_declaration)
                 result_types.update(these_types)
 
@@ -621,7 +622,7 @@ def compare(new_schema_dir: str, old_schema_dir: str) -> None:
             fn = cast(TUnion, v)
             arg = fn.tags[k]
 
-            for name, field in arg.fields.items():
+            for old_name, field in arg.fields.items():
                 these_types = trace_type(field.type_declaration)
                 arg_types.update(these_types)
 
@@ -637,6 +638,10 @@ def compare(new_schema_dir: str, old_schema_dir: str) -> None:
             errors.append(f"Type '{old_type_name}' has been removed")
             continue
 
+        if old_type_name.startswith('fn') and not old_type_name.endswith('.->'):
+            old_type = cast(TUnion, old_type).tags[old_type_name]
+            new_type = cast(TUnion, new_type).tags[old_type_name]
+
         if isinstance(old_type, TStruct):
             is_arg_type = old_type_name in arg_types or (old_type_name.startswith('fn') and not old_type_name.endswith('.->'))
 
@@ -647,24 +652,34 @@ def compare(new_schema_dir: str, old_schema_dir: str) -> None:
             old_struct = cast(TStruct, old_type)
             new_struct = cast(TStruct, new_type)
 
-            for name, old_field in old_struct.fields.items():
-                if name not in new_struct.fields:
-                    errors.append(f"Field '{name}' has been removed from struct '{old_type_name}'")
+            for old_name, old_field in old_struct.fields.items():
+                if old_name not in new_struct.fields:
+                    errors.append(f"Field '{old_name}' has been removed from struct '{old_type_name}'")
                     continue
 
-                elif type(old_field.type_declaration.type) != type(new_struct.fields[name].type_declaration.type):
-                    errors.append(f"Field '{name}' in struct '{old_type_name}' has changed type from '{old_field.type_declaration.type.__class__.__name__}' to '{new_struct.fields[name].type_declaration.type.__class__.__name__}'")
+                elif type(old_field.type_declaration.type) != type(new_struct.fields[old_name].type_declaration.type):
+                    for entry in old_telepact_schema.original:
+                        if old_type_name in cast(dict, entry):
+                            old_entry = cast(dict, entry)
+                            break
+                    old_schema_name = old_entry[old_type_name][old_name]
+                    for entry in new_telepact_schema.original:
+                        if old_type_name in cast(dict, entry):
+                            new_entry = cast(dict, entry)
+                            break
+                    new_schema_name = new_entry[old_type_name][old_name]
+                    errors.append(f"Field '{old_name}' in struct '{old_type_name}' has changed type from '{old_schema_name}' to '{new_schema_name}'")
                     continue
 
-                elif is_arg_type and old_field.optional and not new_struct.fields[name].optional:
-                    errors.append(f"Field '{name}' in struct '{old_type_name}' has changed from optional to required on argument path")
+                elif is_arg_type and old_field.optional and not new_struct.fields[old_name].optional:
+                    errors.append(f"Field '{old_name}' in struct '{old_type_name}' has changed from optional to required on argument path")
                     continue
 
             if is_arg_type:
                 new_struct_fields = new_struct.fields.keys() - old_struct.fields.keys()
-                for name in new_struct_fields:
-                    if not new_struct.fields[name].optional:
-                        errors.append(f"New required field '{name}' has been added to struct '{old_type_name}' on argument path")
+                for new_name in new_struct_fields:
+                    if not new_struct.fields[new_name].optional:
+                        errors.append(f"New required field '{new_name}' has been added to struct '{old_type_name}' on argument path")
                         continue
 
         elif isinstance(old_type, TUnion):
@@ -686,24 +701,24 @@ def compare(new_schema_dir: str, old_schema_dir: str) -> None:
                 old_struct = old_tag
                 new_struct = new_union.tags[tag_key]
 
-                for name, old_field in old_struct.fields.items():
-                    if name not in new_struct.fields:
-                        errors.append(f"Field '{name}' has been removed from struct '{old_type_name}.{tag_key}'")
+                for old_name, old_field in old_struct.fields.items():
+                    if old_name not in new_struct.fields:
+                        errors.append(f"Field '{old_name}' has been removed from struct '{old_type_name}.{tag_key}'")
                         continue
 
-                    elif type(old_field.type_declaration.type) != type(new_struct.fields[name].type_declaration.type):
-                        errors.append(f"Field '{name}' in struct '{old_type_name}.{tag_key}' has changed type from '{type(old_field.type_declaration.type)}' to '{type(new_struct.fields[name].type_declaration.type)}'")
+                    elif type(old_field.type_declaration.type) != type(new_struct.fields[old_name].type_declaration.type):
+                        errors.append(f"Field '{old_name}' in struct '{old_type_name}.{tag_key}' has changed type from '{type(old_field.type_declaration.type)}' to '{type(new_struct.fields[old_name].type_declaration.type)}'")
                         continue
 
-                    elif is_arg_type and old_field.optional and not new_struct.fields[name].optional:
-                        errors.append(f"Field '{name}' in struct '{old_type_name}.{tag_key}' has changed from optional to required on argument path")
+                    elif is_arg_type and old_field.optional and not new_struct.fields[old_name].optional:
+                        errors.append(f"Field '{old_name}' in struct '{old_type_name}.{tag_key}' has changed from optional to required on argument path")
                         continue
 
                 if is_arg_type:
                     new_struct_fields = new_struct.fields.keys() - old_struct.fields.keys()
-                    for name in new_struct_fields:
-                        if not new_struct.fields[name].optional:
-                            errors.append(f"New required field '{name}' has been added to struct '{old_type_name}.{tag_key}' on argument path")
+                    for new_name in new_struct_fields:
+                        if not new_struct.fields[new_name].optional:
+                            errors.append(f"New required field '{new_name}' has been added to struct '{old_type_name}.{tag_key}' on argument path")
                             continue
 
             if is_result_type:
@@ -713,7 +728,7 @@ def compare(new_schema_dir: str, old_schema_dir: str) -> None:
                     continue
 
     if errors:
-        print("Schema compatibility check failed with the following errors:")
+        print("Backwards incompatible change(s) found:")
         for error in errors:
             print(f" - {error}")
         exit(1)
