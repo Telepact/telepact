@@ -40,6 +40,11 @@ from .telepact import Client, Server, Message, Serializer, TelepactSchema, MockT
 import asyncio
 import requests
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .telepact.internal.types.TTypeDeclaration import TTypeDeclaration
+
 def bump_version(version: str) -> str:
     major, minor, patch = map(int, version.split('.'))
     patch += 1
@@ -556,11 +561,215 @@ def fetch(
     with open(filepath, 'w') as file:
         file.write(final_api_json)
 
+def trace_type(type_declaration: 'TTypeDeclaration') -> list[str]:
+    from .telepact.internal.types.TArray import TArray
+    from .telepact.internal.types.TObject import TObject
+    from .telepact.internal.types.TStruct import TStruct
+    from .telepact.internal.types.TUnion import TUnion
+
+    this_all_types: list[str] = []
+
+    if isinstance(type_declaration.type, TArray):
+        these_keys2 = trace_type(type_declaration.type_parameters[0])
+        this_all_types.extend(these_keys2)
+    elif isinstance(type_declaration.type, TObject):
+        these_keys2 = trace_type(type_declaration.type_parameters[0])
+        this_all_types.extend(these_keys2)
+    elif isinstance(type_declaration.type, TStruct):
+        this_all_types.append(type_declaration.type.name)
+        struct_fields = type_declaration.type.fields
+        for struct_field_key, struct_field in struct_fields.items():
+            more_types = trace_type(struct_field.type_declaration)
+            this_all_types.extend(more_types)
+    elif isinstance(type_declaration.type, TUnion):
+        this_all_types.append(type_declaration.type.name)
+        union_tags = type_declaration.type.tags
+        for tag_key, tag_value in union_tags.items():
+            struct_fields = tag_value.fields
+            for struct_field_key, struct_field in struct_fields.items():
+                more_types = trace_type(struct_field.type_declaration)
+                this_all_types.extend(more_types)
+
+    return this_all_types
+
+
+
+from .telepact.internal.types.TStruct import TStruct
+from .telepact.internal.types.TUnion import TUnion
+from typing import cast, Dict, Any, Set
+
+def _get_original_schema_name(schema_original: list, type_name: str, field_name: str) -> str:
+    """Helper to get the original type name from the schema's raw data."""
+    cleaned_type_name = '.'.join(type_name.split('.')[0:2])
+    for entry in schema_original:
+        if cleaned_type_name in entry:
+            type_def = entry[cleaned_type_name] if '->' not in type_name else entry['->']
+            if isinstance(type_def, dict):
+                return type_def.get(field_name)
+            elif isinstance(type_def, list):
+                tag_key = type_name.split('.')[-1]
+                if tag_key:
+                    for tag_entry in type_def:
+                        if tag_key in tag_entry:
+                            return tag_entry[tag_key].get(field_name)
+    return "unknown_type"
+
+def _compare_structs(
+    errors: list,
+    old_struct: TStruct,
+    new_struct: TStruct,
+    type_name: str,
+    is_arg_type: bool,
+    old_schema_original: list,
+    new_schema_original: list
+):
+    """Compare two TStruct objects."""
+    for old_name, old_field in old_struct.fields.items():
+        if old_name not in new_struct.fields:
+            errors.append(f"Field '{old_name}' has been removed from struct '{type_name}'")
+            continue
+
+        new_field = new_struct.fields[old_name]
+        old_schema_name = _get_original_schema_name(old_schema_original, type_name, old_name)
+        new_schema_name = _get_original_schema_name(new_schema_original, type_name, old_name)
+        if old_schema_name != new_schema_name:
+            errors.append(
+                f"Field '{old_name}' in struct '{type_name}' has changed type from '{old_schema_name}' to '{new_schema_name}'"
+            )
+
+        elif is_arg_type and old_field.optional and not new_field.optional:
+            errors.append(
+                f"Field '{old_name}' in struct '{type_name}' has changed from optional to required on argument path"
+            )
+
+    if is_arg_type:
+        for new_name, new_field in new_struct.fields.items():
+            if new_name not in old_struct.fields and not new_field.optional:
+                errors.append(
+                    f"New required field '{new_name}' has been added to struct '{type_name}' on argument path"
+                )
+
+def _compare_unions(
+    errors: list,
+    old_union: TUnion,
+    new_union: TUnion,
+    type_name: str,
+    is_arg_type: bool,
+    is_result_type: bool,
+    old_schema_original: list,
+    new_schema_original: list
+):
+    """Compare two TUnion objects."""
+    for tag_key, old_tag in old_union.tags.items():
+        if tag_key not in new_union.tags:
+            errors.append(f"Tag '{tag_key}' has been removed from union '{type_name}'")
+            continue
+
+        _compare_structs(
+            errors,
+            old_tag,
+            new_union.tags[tag_key],
+            f"{type_name}.{tag_key}",
+            is_arg_type,
+            old_schema_original,
+            new_schema_original
+        )
+
+    if is_result_type:
+        for tag_key in new_union.tags.keys() - old_union.tags.keys():
+            errors.append(f"New tag '{tag_key}' has been added to union '{type_name}' on result path")
+
+def _get_types_by_path(telepact_schema: Any) -> tuple[Set[str], Set[str]]:
+    """Determine which types are on the argument or result paths."""
+    arg_types = set()
+    result_types = set()
+
+    for k, v in telepact_schema.parsed.items():
+        if k.endswith('.->'):
+            res = cast(TUnion, v)
+            ok_struct = res.tags.get('Ok_')
+            if ok_struct:
+                for field in ok_struct.fields.values():
+                    result_types.update(trace_type(field.type_declaration))
+
+        elif k.startswith('fn'):
+            fn = cast(TUnion, v)
+            arg = fn.tags.get(k)
+            if arg:
+                for field in arg.fields.values():
+                    arg_types.update(trace_type(field.type_declaration))
+
+    return arg_types, result_types
+
+@click.command()
+@click.option('--new-schema-dir', help='New telepact schema directory', required=True)
+@click.option('--old-schema-dir', help='Old telepact schema directory', required=True)
+def compare(new_schema_dir: str, old_schema_dir: str) -> None:
+    """
+    Compare two Telepact API schemas for backwards compatibility.
+    """
+    from .telepact.internal.types.TType import TType
+    from .telepact.TelepactSchema import TelepactSchema
+
+    new_telepact_schema = TelepactSchema.from_directory(new_schema_dir)
+    old_telepact_schema = TelepactSchema.from_directory(old_schema_dir)
+
+    arg_types, result_types = _get_types_by_path(old_telepact_schema)
+    errors = []
+
+    for old_type_name, old_type in old_telepact_schema.parsed.items():
+        new_type = new_telepact_schema.parsed.get(old_type_name)
+
+        if not new_type:
+            if old_type_name.endswith('.->'):
+                continue
+            
+            errors.append(f"Type '{old_type_name}' has been removed")
+            continue
+
+        is_arg_type = old_type_name in arg_types or (old_type_name.startswith('fn') and not old_type_name.endswith('.->'))
+        is_result_type = old_type_name in result_types
+
+        # Handle function types which are unions with a single tag
+        if old_type_name.startswith('fn') and not old_type_name.endswith('.->'):
+            old_type = cast(TUnion, old_type).tags[old_type_name]
+            new_type = cast(TUnion, new_type).tags[old_type_name]
+
+        if isinstance(old_type, TStruct):
+            _compare_structs(
+                errors,
+                cast(TStruct, old_type),
+                cast(TStruct, new_type),
+                old_type_name,
+                is_arg_type,
+                old_telepact_schema.original,
+                new_telepact_schema.original
+            )
+        elif isinstance(old_type, TUnion):
+            _compare_unions(
+                errors,
+                cast(TUnion, old_type),
+                cast(TUnion, new_type),
+                old_type_name,
+                is_arg_type,
+                is_result_type,
+                old_telepact_schema.original,
+                new_telepact_schema.original
+            )
+        # Note: No comparison for TType, as it's a base class
+
+    if errors:
+        print("Backwards incompatible change(s) found:")
+        for error in errors:
+            print(f" - {error}")
+        exit(1)
+
 
 main.add_command(codegen)
 main.add_command(demo_server)
 main.add_command(mock)
 main.add_command(fetch)
+main.add_command(compare)
 
 if __name__ == "__main__":
     main()

@@ -4,3 +4,4 @@ telepact_cli/LICENSE
 telepact_cli/NOTICE
 telepact_cli/telepact
 tmp/
+tests/tmp

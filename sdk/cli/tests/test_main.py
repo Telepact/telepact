@@ -24,6 +24,7 @@ import subprocess
 import requests
 import json
 import time
+from tests.test_data import compare_cases
 
 
 @pytest.fixture
@@ -45,7 +46,6 @@ def tmp_dir_manager() -> Generator[None, None, None]:
     # Cleanup after tests
     if os.path.exists(tmp_dir):
         shutil.rmtree(tmp_dir)
-
 
 def test_demo_server_and_fetch_and_mock() -> None:
     p = subprocess.Popen(['poetry', 'run', 'telepact', 'demo-server'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, cwd='tests/tmp')
@@ -97,6 +97,37 @@ def test_demo_server_and_fetch_and_mock() -> None:
             stdout_mock, stderr_mock = p_mock.communicate(timeout=1)
             print(f"Mock server stdout: {stdout_mock}")
             print(f"Mock server stderr: {stderr_mock}")
+
+
+@pytest.mark.parametrize("assertion, old, new, expected, expected_code", compare_cases)
+def test_compare(runner: CliRunner, assertion: str, old: dict, new: dict, expected: list[str], expected_code: int) -> None:
+    import os
+    os.makedirs('tests/tmp/compare/old', exist_ok=True)
+    os.makedirs('tests/tmp/compare/new', exist_ok=True)
+    with open('tests/tmp/compare/old/schema.telepact.json', 'w') as f:
+        old_json = json.dumps(old, indent=2)
+        f.write(old_json)
+    with open('tests/tmp/compare/new/schema.telepact.json', 'w') as f:
+        new_json = json.dumps(new, indent=2)
+        f.write(new_json)
+
+    result = runner.invoke(
+        main, ['compare', '--old-schema-dir', 'tests/tmp/compare/old', '--new-schema-dir', 'tests/tmp/compare/new'])
+
+    # print stack trace
+    import traceback
+
+    # Assuming result.exc_info is a tuple (exc_type, exc_value, exc_traceback)
+    if result.exc_info:
+        # Format the traceback and print it
+        traceback_str = ''.join(traceback.format_exception(*result.exc_info))
+        print(traceback_str)
+
+    print(f'Output: {result.output}')
+
+    assert expected_code == result.exit_code
+    output_lines = [line.strip() for line in result.output.split('\n') if line.strip()]
+    assert expected == output_lines
 
 
 def test_command_java(runner: CliRunner) -> None:
