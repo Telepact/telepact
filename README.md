@@ -21,7 +21,8 @@ For further reading, see [Motivation](./doc/motivation.md).
 
 For explanations of various design decisions, see [the FAQ](./doc/faq.md).
 
-# Language-Specific Libraries
+For how-to guides, see the [API Schema Guide](./doc/schema-guide.md), as well as
+the language-specific library documentation:
 
 -   [Typescript](./lib/ts/README.md)
 -   [Python](./lib/py/README.md)
@@ -145,11 +146,13 @@ The Telepact CLI is a powerful command-line tool for various API ecosystem
 operations. The CLI is currently installed from the releases assets.
 
 Example:
+
 ```
 pipx install https://github.com/Telepact/telepact/releases/download/1.0.0-alpha.102/telepact_cli-1.0.0a102.tar.gz
 ```
 
 Usage:
+
 ```
 telepact --help
 ```
