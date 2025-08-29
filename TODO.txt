@@ -1,5 +1,4 @@
 High:
-- Make sure bytes type always returns as bytes from client lib interface
 - Fix typos in writing guide
 
 Medium:
@@ -7,12 +6,10 @@ Medium:
 - Add websocket support in doc ui
 - Add websocket support in cli
 - Add websocket support for mock docker
-- Add docker to release targets
 
 Low:
 - Maybe: replace info. with telepact. and don't show type in console
 - console: Improve consistency around simluation naming. Still have lingering ideas around mock and example.
-- Expose mock server options as command-line args in the cli
 - Console light mode and listen to os setting
 - Clean up java test code coverage errors
 - Cleanup old UMock language
