@@ -1,4 +1,4 @@
-# Telepact
+# Introduction
 
 Telepact is an API ecosystem for bridging programs across inter-process
 communication boundaries.
@@ -26,21 +26,6 @@ For explanations of various design decisions, see [the FAQ](./doc/faq.md).
 -   [Typescript](./lib/ts/README.md)
 -   [Python](./lib/py/README.md)
 -   [Java](./lib/java/README.md)
-
-# CLI
-
-The Telepact CLI is a powerful command-line tool for various API ecosystem
-operations. The CLI is currently installed from the releases assets.
-
-Example:
-```
-pipx install https://github.com/Telepact/telepact/releases/download/1.0.0-alpha.102/telepact_cli-1.0.0a102.tar.gz
-```
-
-Usage:
-```
-telepact --help
-```
 
 # At a glance
 
@@ -153,6 +138,21 @@ Or clients can also leverage telepact tooling to:
 -   Select less fields to reduce response sizes
 -   Generate code to increase type safety
 -   Use binary serialization to reduce request/response sizes
+
+# CLI
+
+The Telepact CLI is a powerful command-line tool for various API ecosystem
+operations. The CLI is currently installed from the releases assets.
+
+Example:
+```
+pipx install https://github.com/Telepact/telepact/releases/download/1.0.0-alpha.102/telepact_cli-1.0.0a102.tar.gz
+```
+
+Usage:
+```
+telepact --help
+```
 
 # Licensing
 
