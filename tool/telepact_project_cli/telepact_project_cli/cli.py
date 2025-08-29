@@ -287,7 +287,7 @@ def license_header(license_header_path):
 
         return header_lines
 
-    def update_file(file_path, license_header, start_comment_syntax, end_comment_syntax):
+    def update_file(file_path, license_header, start_comment_syntax, end_comment_syntax) -> bool:
         with open(file_path, 'r') as file:
             lines = file.readlines()
 
@@ -318,25 +318,32 @@ def license_header(license_header_path):
         new_content = new_banner + ''.join(new_lines)
 
         if new_content == original_content:
-            print(f"Up-to-date: {file_path}")
-            return
+            #print(f"Up-to-date: {file_path}")
+            return False
 
         with open(file_path, 'w') as file:
             file.write(new_content)
         print(f"Re-written: {file_path}")
 
+        return True
+
     cli_command = subprocess.run(['git', 'ls-files'], stdout=subprocess.PIPE, text=True)
     files = cli_command.stdout.splitlines()
 
+    updated_files = 0
     for file_path in files:
         license_header = read_license_header(license_header_path)
         file_extension = os.path.splitext(file_path)[1].lower()
         file_name = os.path.basename(file_path)
         if file_name != 'pubspec.yaml' and file_extension in ['.py', '.java', '.ts', '.dart', '.sh', '.js', '.yaml', '.yml', '.html', '.css', '.svelte'] or file_name == 'Dockerfile' or file_name == 'Makefile':
             start_comment_syntax, end_comment_syntax = get_comment_syntax(file_extension, file_name)
-            update_file(file_path, license_header, start_comment_syntax, end_comment_syntax)
-        else:
-            print(f"ERROR: {file_path} - Unsupported file extension {file_extension}")
+            updated = update_file(file_path, license_header, start_comment_syntax, end_comment_syntax)
+            if updated:
+                updated_files += 1
+
+    if updated_files == 0:
+        print("All files are up-to-date.")
+
 
 @click.command()
 def github_labels() -> None:
