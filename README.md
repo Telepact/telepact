@@ -143,7 +143,11 @@ Or clients can also leverage telepact tooling to:
 # CLI
 
 The Telepact CLI is a powerful command-line tool for various API ecosystem
-operations. The CLI is currently installed from the releases assets.
+operations.
+
+The CLI is currently installed directly from
+[Releases](https://github.com/Telepact/telepact/releases). You can copy the link
+for the CLI from the release assets.
 
 Example:
 

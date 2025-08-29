@@ -2,8 +2,9 @@
 
 ## Installation
 
-Installation is currently sourced from the Release page. You can copy the link
-for the library found under the release assets.
+The library is currently installed directly from the
+[Releases](https://github.com/Telepact/telepact/releases) page. You can copy the
+link for the library from the release assets.
 
 Example:
 
