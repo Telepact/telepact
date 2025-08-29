@@ -24,13 +24,13 @@ For explanations of various design decisions, see [the FAQ](./doc/faq.md).
 For how-to guides, see the [API Schema Guide](./doc/schema-guide.md), as well as
 the various library and SDK documentation:
 
--   [Typescript](./lib/ts/README.md)
--   [Python](./lib/py/README.md)
--   [Java](./lib/java/README.md)
+-   [Library: Typescript](./lib/ts/README.md)
+-   [Library: Python](./lib/py/README.md)
+-   [Library: Java](./lib/java/README.md)
 
--   [CLI](./sdk/cli/README.md)
--   [Developer Console](./sdk/console/README.md)
--   [Prettier Plugin](./sdk/prettier/README.md)
+-   [SDK: CLI](./sdk/cli/README.md)
+-   [SDK: Developer Console](./sdk/console/README.md)
+-   [SDK: Prettier Plugin](./sdk/prettier/README.md)
 
 # At a glance
 
