@@ -707,7 +707,30 @@ def compare(new_schema_dir: str, old_schema_dir: str) -> None:
                         continue
 
                     elif type(old_field.type_declaration.type) != type(new_struct.fields[old_name].type_declaration.type):
-                        errors.append(f"Field '{old_name}' in struct '{old_type_name}.{tag_key}' has changed type from '{type(old_field.type_declaration.type)}' to '{type(new_struct.fields[old_name].type_declaration.type)}'")
+                        old_type_name_split = old_type_name.split('.->')[0]
+                        for entry in old_telepact_schema.original:
+                            if old_type_name_split in cast(dict, entry):
+                                old_union_entry = cast(dict, entry)
+                                break
+                        old_union_def = old_union_entry[old_type_name] if not old_type_name.endswith('.->') else old_union_entry['->']
+                        for entry in old_union_def:
+                            if tag_key in cast(dict, entry):
+                                old_union_struct = cast(dict, entry)
+                                break
+                        old_union_struct_field_type_name = old_union_struct[tag_key][old_name]
+
+                        for entry in new_telepact_schema.original:
+                            if old_type_name_split in cast(dict, entry):
+                                new_union_entry = cast(dict, entry)
+                                break
+                        new_schema_def = new_union_entry[old_type_name] if not old_type_name.endswith('.->') else new_union_entry['->']
+                        for entry in new_schema_def:
+                            if tag_key in cast(dict, entry):
+                                new_union_struct = cast(dict, entry)
+                                break
+                        new_union_struct_field_type_name = new_union_struct[tag_key][old_name]
+
+                        errors.append(f"Field '{old_name}' in struct '{old_type_name}.{tag_key}' has changed type from '{old_union_struct_field_type_name}' to '{new_union_struct_field_type_name}'")
                         continue
 
                     elif is_arg_type and old_field.optional and not new_struct.fields[old_name].optional:
