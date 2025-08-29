@@ -99,8 +99,8 @@ def test_demo_server_and_fetch_and_mock() -> None:
             print(f"Mock server stderr: {stderr_mock}")
 
 
-@pytest.mark.parametrize("old, new, expected, expected_code", compare_cases)
-def test_compare(runner: CliRunner, old: dict, new: dict, expected: list[str], expected_code: int) -> None:
+@pytest.mark.parametrize("assertion, old, new, expected, expected_code", compare_cases)
+def test_compare(runner: CliRunner, assertion: str, old: dict, new: dict, expected: list[str], expected_code: int) -> None:
     import os
     os.makedirs('tests/tmp/compare/old', exist_ok=True)
     os.makedirs('tests/tmp/compare/new', exist_ok=True)

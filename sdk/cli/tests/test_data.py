@@ -1,5 +1,6 @@
 compare_cases: list = [
     (
+        "No change in function signature or result",
         [
             {
                 "fn.test": {
@@ -32,6 +33,7 @@ compare_cases: list = [
         0
     ),
     (
+        "Adding new required field is compatible on result path",
         [
             {
                 "fn.test": {
@@ -65,6 +67,7 @@ compare_cases: list = [
         0
     ),
     (
+        "Removing required argument is incompatible",
         [
             {
                 "fn.test": {
@@ -101,6 +104,7 @@ compare_cases: list = [
         1
     ),
     (
+        "Adding new required argument is incompatible",
         [
             {
                 "fn.test": {
@@ -137,6 +141,7 @@ compare_cases: list = [
         1
     ),
     (
+        "Changing argument type is incompatible",
         [
             {
                 "fn.test": {
@@ -172,6 +177,7 @@ compare_cases: list = [
         1
     ),
     (
+        "Changing result type is incompatible",
         [
             {
                 "fn.test": {
@@ -207,6 +213,7 @@ compare_cases: list = [
         1
     ),
     (
+        "Changing struct field type is incompatible",
         [
             {
                 "struct.S1": {
@@ -252,6 +259,7 @@ compare_cases: list = [
         1
     ),
     (
+        "Adding new required struct field is incompatible on argument path",
         [
             {
                 "struct.S1": {
@@ -298,6 +306,7 @@ compare_cases: list = [
         1
     ),
     (
+        "Adding new optional struct field is compatible",
         [
             {
                 "struct.S1": {
@@ -341,111 +350,7 @@ compare_cases: list = [
         0
     ),
     (
-        [
-            {
-                "union.U1": [
-                    {
-                        "Tag1": {
-                            "field1": "boolean"
-                        },
-                    }
-                ]
-            },
-            {
-                "fn.test": {
-                    "arg1": "union.U1",
-                },
-                "->": [
-                    {
-                        "Ok_": {
-                            "res1": "union.U1"
-                        }
-                    }
-                ]
-            }
-        ],
-        [
-            {
-                "union.U1": [
-                    {
-                        "Tag1": {
-                            "field1": "integer",
-                        },
-                    }
-                ]
-            },
-            {
-                "fn.test": {
-                    "arg1": "union.U1",
-                },
-                "->": [
-                    {
-                        "Ok_": {
-                            "res1": "union.U1"
-                        }
-                    }
-                ]
-            }
-        ],
-        [
-            'Backwards incompatible change(s) found:',
-            "- Field 'field1' in struct 'union.U1.Tag1' has changed type from 'boolean' to 'integer'"
-        ],
-        1
-    ),
-    (
-        [
-            {
-                "union.U1": [
-                    {
-                        "Tag1": {
-                            "field1": "boolean"
-                        },
-                    }
-                ]
-            },
-            {
-                "fn.test": {
-                    "arg1": "union.U1",
-                },
-                "->": [
-                    {
-                        "Ok_": {
-                            "res1": "union.U1"
-                        }
-                    }
-                ]
-            }
-        ],
-        [
-            {
-                "union.U1": [
-                    {
-                        "Tag1": {
-                        },
-                    }
-                ]
-            },
-            {
-                "fn.test": {
-                    "arg1": "union.U1",
-                },
-                "->": [
-                    {
-                        "Ok_": {
-                            "res1": "union.U1"
-                        }
-                    }
-                ]
-            }
-        ],
-        [
-            'Backwards incompatible change(s) found:',
-            "- Field 'field1' has been removed from struct 'union.U1.Tag1'"
-        ],
-        1
-    ),
-    (
+        "Adding field to union tag is incompatible on argument path",
         [
             {
                 "union.U1": [
@@ -500,6 +405,222 @@ compare_cases: list = [
         1
     ),
     (
+        "Removing field in union tag is incompatible",
+        [
+            {
+                "union.U1": [
+                    {
+                        "Tag1": {
+                            "field1": "boolean"
+                        },
+                    }
+                ]
+            },
+            {
+                "fn.test": {
+                    "arg1": "union.U1",
+                },
+                "->": [
+                    {
+                        "Ok_": {
+                            "res1": "union.U1"
+                        }
+                    }
+                ]
+            }
+        ],
+        [
+            {
+                "union.U1": [
+                    {
+                        "Tag1": {
+                        },
+                    }
+                ]
+            },
+            {
+                "fn.test": {
+                    "arg1": "union.U1",
+                },
+                "->": [
+                    {
+                        "Ok_": {
+                            "res1": "union.U1"
+                        }
+                    }
+                ]
+            }
+        ],
+        [
+            'Backwards incompatible change(s) found:',
+            "- Field 'field1' has been removed from struct 'union.U1.Tag1'"
+        ],
+        1
+    ),    
+    (
+        "Changing union tag field type is incompatible",
+        [
+            {
+                "union.U1": [
+                    {
+                        "Tag1": {
+                            "field1": "boolean"
+                        },
+                    }
+                ]
+            },
+            {
+                "fn.test": {
+                    "arg1": "union.U1",
+                },
+                "->": [
+                    {
+                        "Ok_": {
+                            "res1": "union.U1"
+                        }
+                    }
+                ]
+            }
+        ],
+        [
+            {
+                "union.U1": [
+                    {
+                        "Tag1": {
+                            "field1": "integer",
+                        },
+                    }
+                ]
+            },
+            {
+                "fn.test": {
+                    "arg1": "union.U1",
+                },
+                "->": [
+                    {
+                        "Ok_": {
+                            "res1": "union.U1"
+                        }
+                    }
+                ]
+            }
+        ],
+        [
+            'Backwards incompatible change(s) found:',
+            "- Field 'field1' in struct 'union.U1.Tag1' has changed type from 'boolean' to 'integer'"
+        ],
+        1
+    ),
+    (
+        "Removing union tag field is incompatible",
+        [
+            {
+                "union.U1": [
+                    {
+                        "Tag1": {
+                            "field1": "boolean"
+                        },
+                    }
+                ]
+            },
+            {
+                "fn.test": {
+                    "arg1": "union.U1",
+                },
+                "->": [
+                    {
+                        "Ok_": {
+                            "res1": "union.U1"
+                        }
+                    }
+                ]
+            }
+        ],
+        [
+            {
+                "union.U1": [
+                    {
+                        "Tag1": {
+                        },
+                    }
+                ]
+            },
+            {
+                "fn.test": {
+                    "arg1": "union.U1",
+                },
+                "->": [
+                    {
+                        "Ok_": {
+                            "res1": "union.U1"
+                        }
+                    }
+                ]
+            }
+        ],
+        [
+            'Backwards incompatible change(s) found:',
+            "- Field 'field1' has been removed from struct 'union.U1.Tag1'"
+        ],
+        1
+    ),
+    (
+        "Adding new required union tag field is incompatible",
+        [
+            {
+                "union.U1": [
+                    {
+                        "Tag1": {
+                            "field1": "boolean"
+                        },
+                    }
+                ]
+            },
+            {
+                "fn.test": {
+                    "arg1": "union.U1",
+                },
+                "->": [
+                    {
+                        "Ok_": {
+                            "res1": "union.U1"
+                        }
+                    }
+                ]
+            }
+        ],
+        [
+            {
+                "union.U1": [
+                    {
+                        "Tag1": {
+                            "field1": "boolean",
+                            "field2": "boolean"
+                        },
+                    }
+                ]
+            },
+            {
+                "fn.test": {
+                    "arg1": "union.U1",
+                },
+                "->": [
+                    {
+                        "Ok_": {
+                            "res1": "union.U1"
+                        }
+                    }
+                ]
+            }
+        ],
+        [
+            'Backwards incompatible change(s) found:',
+            "- New required field 'field2' has been added to struct 'union.U1.Tag1' on argument path"
+        ],
+        1
+    ),
+    (
+        "Adding new union tag is incompatible on result path",
         [
             {
                 "union.U1": [
@@ -556,6 +677,7 @@ compare_cases: list = [
         1
     ),
     (
+        "Adding new union tag is compatible on argument path",
         [
             {
                 "union.U1": [
@@ -607,6 +729,7 @@ compare_cases: list = [
         0
     ),    
     (
+        "Removing union tag is incompatible",
         [
             {
                 "union.U1": [
