@@ -93,7 +93,6 @@ compare_cases: list = [
                 "->": [
                     {
                         "Ok_": {
-                            "res1": "boolean"
                         }
                     }
                 ]
@@ -107,7 +106,6 @@ compare_cases: list = [
                 "->": [
                     {
                         "Ok_": {
-                            "res1": "boolean",
                         }
                     }
                 ]
@@ -129,7 +127,6 @@ compare_cases: list = [
                 "->": [
                     {
                         "Ok_": {
-                            "res1": "boolean"
                         }
                     }
                 ]
@@ -144,7 +141,6 @@ compare_cases: list = [
                 "->": [
                     {
                         "Ok_": {
-                            "res1": "boolean",
                         }
                     }
                 ]
@@ -162,11 +158,12 @@ compare_cases: list = [
             {
                 "fn.test": {
                     "arg1": "boolean",
+                    "arg2": ["boolean"],
+                    "arg3": {"string": "boolean"}
                 },
                 "->": [
                     {
                         "Ok_": {
-                            "res1": "boolean"
                         }
                     }
                 ]
@@ -176,11 +173,12 @@ compare_cases: list = [
             {
                 "fn.test": {
                     "arg1": "integer",
+                    "arg2": ["integer"],
+                    "arg3": {"string": "integer"}
                 },
                 "->": [
                     {
                         "Ok_": {
-                            "res1": "boolean",
                         }
                     }
                 ]
@@ -188,7 +186,9 @@ compare_cases: list = [
         ],
         [
             'Backwards incompatible change(s) found:',
-            '- Field \'arg1\' in struct \'fn.test\' has changed type from \'boolean\' to \'integer\''
+            '- Field \'arg1\' in struct \'fn.test\' has changed type from \'boolean\' to \'integer\'',
+            '- Field \'arg2\' in struct \'fn.test\' has changed type from \'[\'boolean\']\' to \'[\'integer\']\'',
+            '- Field \'arg3\' in struct \'fn.test\' has changed type from \'{\'string\': \'boolean\'}\' to \'{\'string\': \'integer\'}\''
         ],
         1
     ),
@@ -233,7 +233,9 @@ compare_cases: list = [
         [
             {
                 "struct.S1": {
-                    "field1": "boolean"
+                    "field1": "boolean",
+                    "field2": ["boolean"],
+                    "field3": {"string": "boolean"}
                 }
             },
             {
@@ -252,7 +254,9 @@ compare_cases: list = [
         [
             {
                 "struct.S1": {
-                    "field1": "integer"
+                    "field1": "integer",
+                    "field2": ["integer"],
+                    "field3": {"string": "integer"}
                 }
             },
             {
@@ -270,7 +274,9 @@ compare_cases: list = [
         ],
         [
             'Backwards incompatible change(s) found:',
-            "- Field 'field1' in struct 'struct.S1' has changed type from 'boolean' to 'integer'"
+            "- Field 'field1' in struct 'struct.S1' has changed type from 'boolean' to 'integer'",
+            "- Field 'field2' in struct 'struct.S1' has changed type from '['boolean']' to '['integer']'",
+            "- Field 'field3' in struct 'struct.S1' has changed type from '{'string': 'boolean'}' to '{'string': 'integer'}'"
         ],
         1
     ),
