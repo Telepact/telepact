@@ -116,15 +116,14 @@ $ cat ./client.js
 ```
 
 ```js
-let request = [
-    {},
-    {
-        "fn.divide": {
-            x: 6,
-            y: 3,
-        },
-    },
-];
+let header = {};
+let body = {
+    "fn.divide": {
+        x: 6,
+        y: 3,
+    }
+};
+let request = [header, body];
 var response = fetch(
     "http://localhost:8000/api/telepact",
     { method: "POST" },
