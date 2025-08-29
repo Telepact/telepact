@@ -21,7 +21,18 @@ For further reading, see [Motivation](./doc/motivation.md).
 
 For explanations of various design decisions, see [the FAQ](./doc/faq.md).
 
-## At a glance
+For how-to guides, see the [API Schema Guide](./doc/schema-guide.md), as well as
+the various library and SDK documentation:
+
+-   [Library: Typescript](./lib/ts/README.md)
+-   [Library: Python](./lib/py/README.md)
+-   [Library: Java](./lib/java/README.md)
+
+-   [SDK: CLI](./sdk/cli/README.md)
+-   [SDK: Developer Console](./sdk/console/README.md)
+-   [SDK: Prettier Plugin](./sdk/prettier/README.md)
+
+# At a glance
 
 Specify your API:
 
@@ -129,26 +140,9 @@ Response: [{}, {"Ok_": {"result": 2}}]
 
 Or clients can also leverage telepact tooling to:
 
--   Slice responses to reduce response sizes
+-   Select less fields to reduce response sizes
 -   Generate code to increase type safety
 -   Use binary serialization to reduce request/response sizes
-
-# Development
-
-The Telepact project is structed as a monorepo.
-
--   `common` - files commonly used across the Telepact ecosystem
--   `bind` - contains lightweight wrapper libraries that use bindings to expose
-    a formal Telepact implementation in a language not yet targetted by a formal
-    Telepact implementation.
--   `lib` - contains all formal library implementations of Telepact in various
-    programming languages
--   `test` - contains the test framework that enforces the Telepact
-    specification on all implementations found in `lib`
--   `sdk` - contains various programs that assist developing in the Telepact
-    ecosystem
--   `tool` - contains various programs that assist the development of the
-    Telepact project
 
 # Licensing
 
