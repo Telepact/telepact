@@ -113,7 +113,7 @@ compare_cases: list = [
         ],
         [
             'Backwards incompatible change(s) found:',
-            '- Field \'arg2\' has been removed from struct \'fn.test\''
+            "- Field 'arg2' has been removed from struct 'fn.test'"
         ],
         1
     ),
@@ -148,7 +148,7 @@ compare_cases: list = [
         ],
         [
             'Backwards incompatible change(s) found:',
-            '- New required field \'arg2\' has been added to struct \'fn.test\' on argument path'
+            "- New required field 'arg2' has been added to struct 'fn.test' on argument path"
         ],
         1
     ),
@@ -186,9 +186,9 @@ compare_cases: list = [
         ],
         [
             'Backwards incompatible change(s) found:',
-            '- Field \'arg1\' in struct \'fn.test\' has changed type from \'boolean\' to \'integer\'',
-            '- Field \'arg2\' in struct \'fn.test\' has changed type from \'[\'boolean\']\' to \'[\'integer\']\'',
-            '- Field \'arg3\' in struct \'fn.test\' has changed type from \'{\'string\': \'boolean\'}\' to \'{\'string\': \'integer\'}\''
+            "- Field 'arg1' in struct 'fn.test' has changed type from 'boolean' to 'integer'",
+            "- Field 'arg2' in struct 'fn.test' has changed type from '['boolean']' to '['integer']'",
+            "- Field 'arg3' in struct 'fn.test' has changed type from '{'string': 'boolean'}' to '{'string': 'integer'}'"
         ],
         1
     ),
@@ -223,8 +223,8 @@ compare_cases: list = [
             }
         ],
         [
-            'Backwards incompatible change(s) found:',
-            '- Field \'res1\' in struct \'fn.test.->.Ok_\' has changed type from \'boolean\' to \'integer\''
+            "Backwards incompatible change(s) found:",
+            "- Field 'res1' in struct 'fn.test.->.Ok_' has changed type from 'boolean' to 'integer'"
         ],
         1
     ),
