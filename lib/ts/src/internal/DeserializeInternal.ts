@@ -52,8 +52,6 @@ export function deserializeInternal(
         throw new InvalidMessage();
     }
 
-    console.log(`Decoded to pseudo-json: ${JSON.stringify(messageAsPseudoJsonList)}`);
-
     let finalMessageAsPseudoJsonList: any[];
     if (isMsgPack) {
         finalMessageAsPseudoJsonList = binaryEncoder.decode(messageAsPseudoJsonList);

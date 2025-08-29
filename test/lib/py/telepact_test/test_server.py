@@ -148,7 +148,7 @@ async def start_client_test_server(connection: NatsClient, metrics: CollectorReg
             if isinstance(obj, bytes):
                 return base64.b64encode(obj).decode('utf-8')
             raise TypeError('Object of type {obj.__class__.__name__} is not JSON serializable')
-        
+
         response_bytes = json.dumps(response_pseudo_json, default=custom_converter).encode()
 
         print(f"   <-C  {response_bytes}")

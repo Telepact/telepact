@@ -196,7 +196,6 @@ function startClientTestServer(
 
             const responseJson = JSON.stringify(responsePseudoJson, uint8ArrayToBase64Replacer);
 
-
             const responseBytes = new TextEncoder().encode(responseJson);
 
             console.log(`   <-C  ${new TextDecoder().decode(responseBytes)}`);
