@@ -630,9 +630,9 @@ def _compare_structs(
             continue
 
         new_field = new_struct.fields[old_name]
-        if type(old_field.type_declaration.type) != type(new_field.type_declaration.type):
-            old_schema_name = _get_original_schema_name(old_schema_original, type_name, old_name)
-            new_schema_name = _get_original_schema_name(new_schema_original, type_name, old_name)
+        old_schema_name = _get_original_schema_name(old_schema_original, type_name, old_name)
+        new_schema_name = _get_original_schema_name(new_schema_original, type_name, old_name)
+        if old_schema_name != new_schema_name:
             errors.append(
                 f"Field '{old_name}' in struct '{type_name}' has changed type from '{old_schema_name}' to '{new_schema_name}'"
             )
