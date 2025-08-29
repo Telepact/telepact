@@ -604,10 +604,8 @@ def _get_original_schema_name(schema_original: list, type_name: str, field_name:
     for entry in schema_original:
         if cleaned_type_name in entry:
             type_def = entry[cleaned_type_name] if '->' not in type_name else entry['->']
-            # Handle structs and functions which are unions with a single tag
             if isinstance(type_def, dict):
                 return type_def.get(field_name)
-            # Handle unions with multiple tags
             elif isinstance(type_def, list):
                 tag_key = type_name.split('.')[-1]
                 if tag_key:
