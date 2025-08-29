@@ -1,4 +1,4 @@
-# Introduction
+# Telepact
 
 Telepact is an API ecosystem for bridging programs across inter-process
 communication boundaries.
@@ -21,7 +21,28 @@ For further reading, see [Motivation](./doc/motivation.md).
 
 For explanations of various design decisions, see [the FAQ](./doc/faq.md).
 
-## At a glance
+# Language-Specific Libraries
+
+-   [Typescript](./lib/ts/README.md)
+-   [Python](./lib/py/README.md)
+-   [Java](./lib/java/README.md)
+
+# CLI
+
+The Telepact CLI is a powerful command-line tool for various API ecosystem
+operations. The CLI is currently installed from the releases assets.
+
+Example:
+```
+pipx install https://github.com/Telepact/telepact/releases/download/1.0.0-alpha.102/telepact_cli-1.0.0a102.tar.gz
+```
+
+Usage:
+```
+telepact --help
+```
+
+# At a glance
 
 Specify your API:
 
@@ -129,26 +150,9 @@ Response: [{}, {"Ok_": {"result": 2}}]
 
 Or clients can also leverage telepact tooling to:
 
--   Slice responses to reduce response sizes
+-   Select less fields to reduce response sizes
 -   Generate code to increase type safety
 -   Use binary serialization to reduce request/response sizes
-
-# Development
-
-The Telepact project is structed as a monorepo.
-
--   `common` - files commonly used across the Telepact ecosystem
--   `bind` - contains lightweight wrapper libraries that use bindings to expose
-    a formal Telepact implementation in a language not yet targetted by a formal
-    Telepact implementation.
--   `lib` - contains all formal library implementations of Telepact in various
-    programming languages
--   `test` - contains the test framework that enforces the Telepact
-    specification on all implementations found in `lib`
--   `sdk` - contains various programs that assist developing in the Telepact
-    ecosystem
--   `tool` - contains various programs that assist the development of the
-    Telepact project
 
 # Licensing
 
