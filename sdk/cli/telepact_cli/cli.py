@@ -721,6 +721,9 @@ def compare(new_schema_dir: str, old_schema_dir: str) -> None:
         new_type = new_telepact_schema.parsed.get(old_type_name)
 
         if not new_type:
+            if old_type_name.endswith('.->'):
+                continue
+            
             errors.append(f"Type '{old_type_name}' has been removed")
             continue
 
@@ -731,10 +734,6 @@ def compare(new_schema_dir: str, old_schema_dir: str) -> None:
         if old_type_name.startswith('fn') and not old_type_name.endswith('.->'):
             old_type = cast(TUnion, old_type).tags[old_type_name]
             new_type = cast(TUnion, new_type).tags[old_type_name]
-
-        if type(old_type) != type(new_type):
-            errors.append(f"Type '{old_type_name}' has changed from '{type(old_type).__name__}' to '{type(new_type).__name__}'")
-            continue
 
         if isinstance(old_type, TStruct):
             _compare_structs(

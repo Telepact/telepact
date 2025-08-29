@@ -808,4 +808,43 @@ compare_cases: list = [
         ],
         1
     ),
+    (
+        "Removing fn definition is incompatible",
+        [
+            {
+                "fn.test": {
+                },
+                "->": [
+                    {
+                        "Ok_": {
+                        }
+                    }
+                ]
+            }
+        ],
+        [
+        ],
+        [
+            'Backwards incompatible change(s) found:',
+            "- Type 'fn.test' has been removed"
+        ],
+        1
+    ),
+    (
+        "Removing struct definition is incompatible",
+        [
+            {
+                "struct.S1": {
+                    "field1": "boolean"
+                },
+            }
+        ],
+        [
+        ],
+        [
+            'Backwards incompatible change(s) found:',
+            "- Type 'struct.S1' has been removed"
+        ],
+        1
+    ),     
 ]
