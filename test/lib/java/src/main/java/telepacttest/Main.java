@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.Base64;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -65,6 +66,36 @@ public class Main {
             gen.writeString(base64);
         }
     }
+
+    private static boolean containsBytesArray(Object data) {
+        if (data instanceof byte[]) {
+            return true;
+        }
+
+        if (data == null) {
+            return false;
+        }
+
+        if (data instanceof Map<?, ?>) {
+            Map<?, ?> map = (Map<?, ?>) data;
+            for (Object value : map.values()) {
+                if (containsBytesArray(value)) {
+                    return true;
+                }
+            }
+        }
+
+        if (data instanceof Collection<?>) {
+            Collection<?> collection = (Collection<?>) data;
+            for (Object element : collection) {
+                if (containsBytesArray(element)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }    
 
     public static Dispatcher startClientTestServer(io.nats.client.Connection connection, MetricRegistry metrics,
             String clientFrontdoorTopic,
@@ -164,6 +195,12 @@ public class Main {
                     System.out.println("bytes class: " + bytes.getClass());
                 } catch (Exception e) {
                     // ignore
+                }
+
+                var clientReturnedBinary = containsBytesArray(responsePseudoJson);
+
+                if (clientReturnedBinary) {
+                    ((Map<String, Object>)responsePseudoJson.get(0)).put("@clientReturnedBinary", true);
                 }
 
                 var responseBytes = objectMapper.writeValueAsBytes(responsePseudoJson);

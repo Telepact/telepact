@@ -300,10 +300,11 @@ async def verify_client_case(nats_client, request, expected_response, client_fro
         if 'Error' not in next(iter(response[1])):
             assert '@bin_' in response[0]
 
-    response[0].pop('@bin_', None)
+    binary_was_used = response[0].pop('@bin_', None) is not None
     response[0].pop('@enc_', None)
     response[0].pop('@pac_', None)
-    response[0].pop('@base64_', None)
+    base64_was_used = response[0].pop('@base64_', None) is not None
+    client_returned_binary = response[0].pop('@clientReturnedBinary', False)
 
     response_was_success = 'Ok_' in response[1]
 
@@ -330,6 +331,9 @@ async def verify_client_case(nats_client, request, expected_response, client_fro
                 assert response_binary_had_enough_integer_keys == True
             else:
                 assert response_binary_had_enough_integer_keys == False
+
+    if not binary_was_used:
+        assert base64_was_used == client_returned_binary
 
 
 async def send_case(nats_client: nats.aio.client.Client, request, expected_response, request_topic, just_send=False):

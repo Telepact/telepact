@@ -80,6 +80,32 @@ class Registry {
     }
 }
 
+function findUint8Array(obj: any): boolean {
+  if (obj instanceof Uint8Array) {
+    return true;
+  }
+
+  if (Array.isArray(obj)) {
+    for (const item of obj) {
+      if (findUint8Array(item)) {
+        return true;
+      }
+    }
+  } 
+
+  else if (obj !== null && typeof obj === 'object') {
+    for (const key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        if (findUint8Array(obj[key])) {
+          return true;
+        }
+      }
+    }
+  }
+
+  return false;
+}
+
 function uint8ArrayToBase64Replacer(key: string, value: object) {
     if (value instanceof Uint8Array) {
       return btoa(String.fromCharCode(...value));
@@ -162,9 +188,14 @@ function startClientTestServer(
                 time();
             }
 
+            if (findUint8Array(response.body)) {
+                response.headers['@clientReturnedBinary'] = true;
+            }
+
             const responsePseudoJson = [response.headers, response.body];
 
             const responseJson = JSON.stringify(responsePseudoJson, uint8ArrayToBase64Replacer);
+
 
             const responseBytes = new TextEncoder().encode(responseJson);
 

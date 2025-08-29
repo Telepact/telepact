@@ -26,6 +26,7 @@ export function clientBase64Decode(message: object[]): void {
 }
 
 function travelBase64Decode(value: unknown, base64Paths: unknown): unknown {
+    console.log(`Traveling: ${JSON.stringify(value)} with base64Paths: ${JSON.stringify(base64Paths)}`);
     if (typeof base64Paths === "object" && base64Paths !== null && !Array.isArray(base64Paths)) {
         for (const [key, val] of Object.entries(base64Paths)) {
             if (val === true) {
@@ -67,6 +68,7 @@ function travelBase64Decode(value: unknown, base64Paths: unknown): unknown {
         if (value === null) {
             return null;
         }
+        console.log(`Decoding: ${value}`)
         const result = decodeBase64(value as string)
         return result;
     } else {
