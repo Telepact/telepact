@@ -592,43 +592,131 @@ def trace_type(type_declaration: 'TTypeDeclaration') -> list[str]:
 
     return this_all_types
 
+
+
+from .telepact.internal.types.TStruct import TStruct
+from .telepact.internal.types.TUnion import TUnion
+from typing import cast, Dict, Any, Set
+
+def _get_original_schema_name(schema_original: list, type_name: str, field_name: str) -> str:
+    """Helper to get the original type name from the schema's raw data."""
+    cleaned_type_name = '.'.join(type_name.split('.')[0:2])
+    for entry in schema_original:
+        if cleaned_type_name in entry:
+            type_def = entry[cleaned_type_name] if '->' not in type_name else entry['->']
+            # Handle structs and functions which are unions with a single tag
+            if isinstance(type_def, dict):
+                return type_def.get(field_name)
+            # Handle unions with multiple tags
+            elif isinstance(type_def, list):
+                tag_key = type_name.split('.')[-1]
+                if tag_key:
+                    for tag_entry in type_def:
+                        if tag_key in tag_entry:
+                            return tag_entry[tag_key].get(field_name)
+    return "unknown_type"
+
+def _compare_structs(
+    errors: list,
+    old_struct: TStruct,
+    new_struct: TStruct,
+    type_name: str,
+    is_arg_type: bool,
+    old_schema_original: list,
+    new_schema_original: list
+):
+    """Compare two TStruct objects."""
+    for old_name, old_field in old_struct.fields.items():
+        if old_name not in new_struct.fields:
+            errors.append(f"Field '{old_name}' has been removed from struct '{type_name}'")
+            continue
+
+        new_field = new_struct.fields[old_name]
+        if type(old_field.type_declaration.type) != type(new_field.type_declaration.type):
+            old_schema_name = _get_original_schema_name(old_schema_original, type_name, old_name)
+            new_schema_name = _get_original_schema_name(new_schema_original, type_name, old_name)
+            errors.append(
+                f"Field '{old_name}' in struct '{type_name}' has changed type from '{old_schema_name}' to '{new_schema_name}'"
+            )
+
+        elif is_arg_type and old_field.optional and not new_field.optional:
+            errors.append(
+                f"Field '{old_name}' in struct '{type_name}' has changed from optional to required on argument path"
+            )
+
+    if is_arg_type:
+        for new_name, new_field in new_struct.fields.items():
+            if new_name not in old_struct.fields and not new_field.optional:
+                errors.append(
+                    f"New required field '{new_name}' has been added to struct '{type_name}' on argument path"
+                )
+
+def _compare_unions(
+    errors: list,
+    old_union: TUnion,
+    new_union: TUnion,
+    type_name: str,
+    is_arg_type: bool,
+    is_result_type: bool,
+    old_schema_original: list,
+    new_schema_original: list
+):
+    """Compare two TUnion objects."""
+    for tag_key, old_tag in old_union.tags.items():
+        if tag_key not in new_union.tags:
+            errors.append(f"Tag '{tag_key}' has been removed from union '{type_name}'")
+            continue
+
+        _compare_structs(
+            errors,
+            old_tag,
+            new_union.tags[tag_key],
+            f"{type_name}.{tag_key}",
+            is_arg_type,
+            old_schema_original,
+            new_schema_original
+        )
+
+    if is_result_type:
+        for tag_key in new_union.tags.keys() - old_union.tags.keys():
+            errors.append(f"New tag '{tag_key}' has been added to union '{type_name}' on result path")
+
+def _get_types_by_path(telepact_schema: Any) -> tuple[Set[str], Set[str]]:
+    """Determine which types are on the argument or result paths."""
+    arg_types = set()
+    result_types = set()
+
+    for k, v in telepact_schema.parsed.items():
+        if k.endswith('.->'):
+            res = cast(TUnion, v)
+            ok_struct = res.tags.get('Ok_')
+            if ok_struct:
+                for field in ok_struct.fields.values():
+                    result_types.update(trace_type(field.type_declaration))
+
+        elif k.startswith('fn'):
+            fn = cast(TUnion, v)
+            arg = fn.tags.get(k)
+            if arg:
+                for field in arg.fields.values():
+                    arg_types.update(trace_type(field.type_declaration))
+
+    return arg_types, result_types
+
 @click.command()
 @click.option('--new-schema-dir', help='New telepact schema directory', required=True)
 @click.option('--old-schema-dir', help='Old telepact schema directory', required=True)
 def compare(new_schema_dir: str, old_schema_dir: str) -> None:
     """
-    Compare two Telepact API schemas for backwards compatiability.
+    Compare two Telepact API schemas for backwards compatibility.
     """
-    from .telepact.internal.types.TStruct import TStruct
-    from .telepact.internal.types.TUnion import TUnion
     from .telepact.internal.types.TType import TType
+    from .telepact.TelepactSchema import TelepactSchema
 
     new_telepact_schema = TelepactSchema.from_directory(new_schema_dir)
     old_telepact_schema = TelepactSchema.from_directory(old_schema_dir)
 
-    arg_types = set()
-    result_types = set()
-
-    for k, v in old_telepact_schema.parsed.items():
-        if k.endswith('.->'):
-            res = cast(TUnion, v)
-            ok_struct = res.tags['Ok_']
-
-            for old_name, field in ok_struct.fields.items():
-                these_types = trace_type(field.type_declaration)
-                result_types.update(these_types)
-
-        elif k.startswith('fn'):
-            fn = cast(TUnion, v)
-            arg = fn.tags[k]
-
-            for old_name, field in arg.fields.items():
-                these_types = trace_type(field.type_declaration)
-                arg_types.update(these_types)
-
-    # all types disallow changed/removed fields
-    # arg types disallow new required struct fields
-    # result types disallow new union tags
+    arg_types, result_types = _get_types_by_path(old_telepact_schema)
     errors = []
 
     for old_type_name, old_type in old_telepact_schema.parsed.items():
@@ -638,117 +726,40 @@ def compare(new_schema_dir: str, old_schema_dir: str) -> None:
             errors.append(f"Type '{old_type_name}' has been removed")
             continue
 
+        is_arg_type = old_type_name in arg_types or (old_type_name.startswith('fn') and not old_type_name.endswith('.->'))
+        is_result_type = old_type_name in result_types
+
+        # Handle function types which are unions with a single tag
         if old_type_name.startswith('fn') and not old_type_name.endswith('.->'):
             old_type = cast(TUnion, old_type).tags[old_type_name]
             new_type = cast(TUnion, new_type).tags[old_type_name]
 
+        if type(old_type) != type(new_type):
+            errors.append(f"Type '{old_type_name}' has changed from '{type(old_type).__name__}' to '{type(new_type).__name__}'")
+            continue
+
         if isinstance(old_type, TStruct):
-            is_arg_type = old_type_name in arg_types or (old_type_name.startswith('fn') and not old_type_name.endswith('.->'))
-
-            if not isinstance(new_type, TStruct):
-                errors.append(f"Type '{old_type_name}' has changed from struct to '{type(new_type)}'")
-                continue
-
-            old_struct = cast(TStruct, old_type)
-            new_struct = cast(TStruct, new_type)
-
-            for old_name, old_field in old_struct.fields.items():
-                if old_name not in new_struct.fields:
-                    errors.append(f"Field '{old_name}' has been removed from struct '{old_type_name}'")
-                    continue
-
-                elif type(old_field.type_declaration.type) != type(new_struct.fields[old_name].type_declaration.type):
-                    for entry in old_telepact_schema.original:
-                        if old_type_name in cast(dict, entry):
-                            old_entry = cast(dict, entry)
-                            break
-                    old_schema_name = old_entry[old_type_name][old_name]
-                    for entry in new_telepact_schema.original:
-                        if old_type_name in cast(dict, entry):
-                            new_entry = cast(dict, entry)
-                            break
-                    new_schema_name = new_entry[old_type_name][old_name]
-                    errors.append(f"Field '{old_name}' in struct '{old_type_name}' has changed type from '{old_schema_name}' to '{new_schema_name}'")
-                    continue
-
-                elif is_arg_type and old_field.optional and not new_struct.fields[old_name].optional:
-                    errors.append(f"Field '{old_name}' in struct '{old_type_name}' has changed from optional to required on argument path")
-                    continue
-
-            if is_arg_type:
-                new_struct_fields = new_struct.fields.keys() - old_struct.fields.keys()
-                for new_name in new_struct_fields:
-                    if not new_struct.fields[new_name].optional:
-                        errors.append(f"New required field '{new_name}' has been added to struct '{old_type_name}' on argument path")
-                        continue
-
+            _compare_structs(
+                errors,
+                cast(TStruct, old_type),
+                cast(TStruct, new_type),
+                old_type_name,
+                is_arg_type,
+                old_telepact_schema.original,
+                new_telepact_schema.original
+            )
         elif isinstance(old_type, TUnion):
-            is_arg_type = old_type_name in arg_types or (old_type_name.startswith('fn') and not old_type_name.endswith('.->'))
-            is_result_type = old_type_name in result_types
-
-            if not isinstance(new_type, TUnion):
-                errors.append(f"Type '{old_type_name}' has changed from union to '{type(new_type)}'")
-                continue
-
-            old_union = cast(TUnion, old_type)
-            new_union = cast(TUnion, new_type)
-
-            for tag_key, old_tag in old_union.tags.items():
-                if tag_key not in new_union.tags:
-                    errors.append(f"Tag '{tag_key}' has been removed from union '{old_type_name}'")
-                    continue
-
-                old_struct = old_tag
-                new_struct = new_union.tags[tag_key]
-
-                for old_name, old_field in old_struct.fields.items():
-                    if old_name not in new_struct.fields:
-                        errors.append(f"Field '{old_name}' has been removed from struct '{old_type_name}.{tag_key}'")
-                        continue
-
-                    elif type(old_field.type_declaration.type) != type(new_struct.fields[old_name].type_declaration.type):
-                        old_type_name_split = old_type_name.split('.->')[0]
-                        for entry in old_telepact_schema.original:
-                            if old_type_name_split in cast(dict, entry):
-                                old_union_entry = cast(dict, entry)
-                                break
-                        old_union_def = old_union_entry[old_type_name] if not old_type_name.endswith('.->') else old_union_entry['->']
-                        for entry in old_union_def:
-                            if tag_key in cast(dict, entry):
-                                old_union_struct = cast(dict, entry)
-                                break
-                        old_union_struct_field_type_name = old_union_struct[tag_key][old_name]
-
-                        for entry in new_telepact_schema.original:
-                            if old_type_name_split in cast(dict, entry):
-                                new_union_entry = cast(dict, entry)
-                                break
-                        new_schema_def = new_union_entry[old_type_name] if not old_type_name.endswith('.->') else new_union_entry['->']
-                        for entry in new_schema_def:
-                            if tag_key in cast(dict, entry):
-                                new_union_struct = cast(dict, entry)
-                                break
-                        new_union_struct_field_type_name = new_union_struct[tag_key][old_name]
-
-                        errors.append(f"Field '{old_name}' in struct '{old_type_name}.{tag_key}' has changed type from '{old_union_struct_field_type_name}' to '{new_union_struct_field_type_name}'")
-                        continue
-
-                    elif is_arg_type and old_field.optional and not new_struct.fields[old_name].optional:
-                        errors.append(f"Field '{old_name}' in struct '{old_type_name}.{tag_key}' has changed from optional to required on argument path")
-                        continue
-
-                if is_arg_type:
-                    new_struct_fields = new_struct.fields.keys() - old_struct.fields.keys()
-                    for new_name in new_struct_fields:
-                        if not new_struct.fields[new_name].optional:
-                            errors.append(f"New required field '{new_name}' has been added to struct '{old_type_name}.{tag_key}' on argument path")
-                            continue
-
-            if is_result_type:
-                new_tags = new_union.tags.keys() - old_union.tags.keys()
-                for tag_key in new_tags:
-                    errors.append(f"New tag '{tag_key}' has been added to union '{old_type_name}' on result path")
-                    continue
+            _compare_unions(
+                errors,
+                cast(TUnion, old_type),
+                cast(TUnion, new_type),
+                old_type_name,
+                is_arg_type,
+                is_result_type,
+                old_telepact_schema.original,
+                new_telepact_schema.original
+            )
+        # Note: No comparison for TType, as it's a base class
 
     if errors:
         print("Backwards incompatible change(s) found:")
