@@ -56,6 +56,23 @@ def on_request_err(m):
 def on_response_err(m):
     if m.headers.get("@onResponseError_", False):
         raise RuntimeError()
+    
+
+def find_bytes(obj):
+  if isinstance(obj, bytes):
+    return True
+
+  if isinstance(obj, dict):
+    for value in obj.values():
+      if find_bytes(value):
+        return True
+  
+  elif isinstance(obj, (list, tuple)):
+    for item in obj:
+      if find_bytes(item):
+        return True
+
+  return False
 
 
 async def start_client_test_server(connection: NatsClient, metrics: CollectorRegistry,
@@ -121,6 +138,9 @@ async def start_client_test_server(connection: NatsClient, metrics: CollectorReg
                 return await client.request(Message(request_headers, request_body))
 
         response = await c()
+
+        if find_bytes(response.body):
+            response.headers['@clientReturnedBinary'] = True
 
         response_pseudo_json = [response.headers, response.body]
 
