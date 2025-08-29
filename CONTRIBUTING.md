@@ -1,7 +1,5 @@
 # Contributing
 
-Thanks for your interest in contributing to the Telepact project!
-
 ## Folder Structure
 
 The Telepact project is structed as a monorepo.
