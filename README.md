@@ -22,7 +22,7 @@ For further reading, see [Motivation](./doc/motivation.md).
 For explanations of various design decisions, see [the FAQ](./doc/faq.md).
 
 For how-to guides, see the [API Schema Guide](./doc/schema-guide.md), as well as
-the various library and SDK documentation:
+the library and SDK docs:
 
 -   [Library: Typescript](./lib/ts/README.md)
 -   [Library: Python](./lib/py/README.md)
