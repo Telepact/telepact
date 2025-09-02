@@ -213,4 +213,4 @@ def test_empty_schema(runner: CliRunner) -> None:
     print(f'Output: {result.output}')
 
     assert result.exit_code != 0
-    assert "Empty schema. Ensure you have at least one file in the schema directory that matches `*.telepact.json`." in result.output
+    assert "FileNamePatternInvalid" in traceback_str
