@@ -25,6 +25,9 @@ import requests
 import json
 import time
 from tests.test_data import compare_cases
+import os
+import shutil
+
 
 
 @pytest.fixture
@@ -33,9 +36,6 @@ def runner() -> CliRunner:
 
 @pytest.fixture(autouse=True, scope='function')
 def tmp_dir_manager() -> Generator[None, None, None]:
-    import os
-    import shutil
-
     tmp_dir = 'tests/tmp'
     if os.path.exists(tmp_dir):
         shutil.rmtree(tmp_dir)
@@ -191,3 +191,26 @@ def test_command_ts(runner: CliRunner) -> None:
 
     # open the generated file and check if it contains the expected content
     # TODO: implement this part
+
+def test_empty_schema(runner: CliRunner) -> None:
+    os.makedirs('tests/tmp/wrong', exist_ok=True)
+
+    # Copy the file in tests/data to tests/tmp/wrong/api.wrong.json
+    shutil.copy('tests/data/example1.telepact.json', 'tests/tmp/wrong/api.wrong.json')
+
+    result = runner.invoke(
+        main, ['codegen', '--schema-dir', 'tests/tmp/wrong', '--lang', 'py', '--out', 'tests/output/empty'])
+
+    # print stack trace
+    import traceback
+
+    # Assuming result.exc_info is a tuple (exc_type, exc_value, exc_traceback)
+    if result.exc_info:
+        # Format the traceback and print it
+        traceback_str = ''.join(traceback.format_exception(*result.exc_info))
+        print(traceback_str)
+
+    print(f'Output: {result.output}')
+
+    assert result.exit_code != 0
+    assert "FileNamePatternInvalid" in traceback_str

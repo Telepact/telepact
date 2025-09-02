@@ -18,18 +18,29 @@ import os
 from pathlib import Path
 from typing import Dict
 
+from ...internal.schema.SchemaParseFailure import SchemaParseFailure
+from ...TelepactSchemaParseError import TelepactSchemaParseError
+
 
 def get_schema_file_map(directory: str) -> Dict[str, str]:
     final_json_documents: Dict[str, str] = {}
 
+    schema_parse_failures = []
+
     try:
-        paths = list(Path(directory).rglob("*.telepact.json"))
+        paths = [str(p) for p in Path(directory).rglob('*') if p.is_file()]
+
         for path in paths:
             with open(path, 'r') as file:
                 content = file.read()
             relative_path = os.path.relpath(path, directory)
+            if not relative_path.endswith('.telepact.json'):
+                schema_parse_failures.append(SchemaParseFailure(relative_path, [], "FileNamePatternInvalid", {"expected": "*.telepact.json"}))
             final_json_documents[relative_path] = content
     except IOError as e:
         raise RuntimeError(e)
+
+    if schema_parse_failures:
+        raise TelepactSchemaParseError(schema_parse_failures, final_json_documents)
 
     return final_json_documents

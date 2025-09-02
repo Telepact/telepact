@@ -84,6 +84,10 @@
                 "location": "struct.JsonLocation"
             }
         }, {
+            "FileNamePatternInvalid": {
+                "expected": "string"
+            }
+        }, {
             "ObjectKeyDisallowed": {}
         }]
     },
