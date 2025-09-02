@@ -83,8 +83,13 @@ def codegen(schema_http_url: str, schema_dir: str, lang: str, out: str, package:
     elif schema_dir:
         print('Schema directory:', schema_dir)
         telepact_schema = TelepactSchema.from_directory(schema_dir)
+
+        if not telepact_schema.original:
+            raise click.ClickException("Empty schema. Ensure you have at least one file in the schema directory that matches `*.telepact.json`.")
+
     else:
         raise click.BadParameter('Either --schema-http-url or --schema-dir must be provided.')
+    
     
     print('Language target:', lang)
     print('Output directory:', out)
