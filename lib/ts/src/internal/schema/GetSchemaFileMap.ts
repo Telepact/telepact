@@ -15,17 +15,26 @@
 //|
 
 import { FsModule, PathModule } from '../../fileSystem';
+import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
+import { TelepactSchemaParseError } from '../../TelepactSchemaParseError';
 
 export function getSchemaFileMap(directory: string, fs: FsModule, path: PathModule): Record<string, string> {
     const finalJsonDocuments: Record<string, string> = {};
 
+    const schemaParseFailures: SchemaParseFailure[] = [];
+
     const paths = fs.readdirSync(directory).map((file) => path.join(directory, file));
     for (const filePath of paths) {
-        if (filePath.endsWith('.telepact.json')) {
-            const content = fs.readFileSync(filePath, 'utf-8');
-            const relativePath = path.relative(directory, filePath);
-            finalJsonDocuments[relativePath] = content;
+        const content = fs.readFileSync(filePath, 'utf-8');
+        const relativePath = path.relative(directory, filePath);
+        finalJsonDocuments[relativePath] = content;
+        if (!filePath.endsWith('.telepact.json')) {
+            schemaParseFailures.push(new SchemaParseFailure(relativePath, [], 'FileNamePatternInvalid', { expected: '*.telepact.json' }));
         }
+    }
+
+    if (schemaParseFailures.length > 0) {
+        throw new TelepactSchemaParseError(schemaParseFailures, finalJsonDocuments);
     }
 
     return finalJsonDocuments;

@@ -28,7 +28,8 @@ def get_schema_file_map(directory: str) -> Dict[str, str]:
     schema_parse_failures = []
 
     try:
-        paths = list(Path(directory).rglob("*.json"))
+        paths = [str(p) for p in Path(directory).rglob('*') if p.is_file()]
+
         for path in paths:
             with open(path, 'r') as file:
                 content = file.read()
