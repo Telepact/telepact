@@ -35,11 +35,13 @@ public class GetSchemaFileMap {
         try {
             var paths = Files.walk(Paths.get(directory)).toArray(Path[]::new);
             for (Path path : paths) {
+                String relativePath = Paths.get(directory).relativize(path).toString();
                 if (!Files.isRegularFile(path)) {
+                    schemaParseFailures.add(new SchemaParseFailure(relativePath, new java.util.ArrayList<>(), "DirectoryDisallowed", Map.of()));
+                    finalJsonDocuments.put(relativePath, "");
                     continue;
                 }
                 String content = new String(Files.readAllBytes(path));
-                String relativePath = Paths.get(directory).relativize(path).toString();
                 finalJsonDocuments.put(relativePath, content);
                 if (!path.toString().endsWith(".telepact.json")) {
                     schemaParseFailures.add(new SchemaParseFailure(relativePath, new java.util.ArrayList<>(), "FileNamePatternInvalid", Map.of("expected", "*.telepact.json")));
