@@ -35,6 +35,9 @@ public class GetSchemaFileMap {
         try {
             var paths = Files.walk(Paths.get(directory)).toArray(Path[]::new);
             for (Path path : paths) {
+                if (!Files.isRegularFile(path)) {
+                    continue;
+                }
                 String content = new String(Files.readAllBytes(path));
                 String relativePath = Paths.get(directory).relativize(path).toString();
                 finalJsonDocuments.put(relativePath, content);
