@@ -1,6 +1,7 @@
 High:
 - Add helpful UX message for default console state
 - Consider better generated code that can't be misused
+- Console button tool-tips
 
 Medium:
 - Write tests that verify each type within a "link" function
