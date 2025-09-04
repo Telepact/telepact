@@ -28,7 +28,7 @@ export function getSchemaFileMap(directory: string, fs: FsModule, path: PathModu
         const relativePath = path.relative(directory, filePath);
         if (fs.statSync(filePath).isDirectory()) {
             schemaParseFailures.push(new SchemaParseFailure(relativePath, [], 'DirectoryDisallowed', {}));
-            finalJsonDocuments[relativePath] = '';
+            finalJsonDocuments[relativePath] = '[]';
             continue;
         }
 

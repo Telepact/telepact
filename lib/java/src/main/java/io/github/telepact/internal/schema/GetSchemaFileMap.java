@@ -36,9 +36,13 @@ public class GetSchemaFileMap {
             var paths = Files.walk(Paths.get(directory)).toArray(Path[]::new);
             for (Path path : paths) {
                 String relativePath = Paths.get(directory).relativize(path).toString();
+                if (relativePath.isEmpty()) {
+                    // Skip root directory
+                    continue;
+                }
                 if (!Files.isRegularFile(path)) {
                     schemaParseFailures.add(new SchemaParseFailure(relativePath, new java.util.ArrayList<>(), "DirectoryDisallowed", Map.of()));
-                    finalJsonDocuments.put(relativePath, "");
+                    finalJsonDocuments.put(relativePath, "[]");
                     continue;
                 }
                 String content = new String(Files.readAllBytes(path));

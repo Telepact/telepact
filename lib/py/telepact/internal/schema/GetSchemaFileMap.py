@@ -28,7 +28,7 @@ def get_schema_file_map(directory: str) -> Dict[str, str]:
     schema_parse_failures = []
 
     try:
-        paths = [str(p) for p in Path(directory).rglob('*') if p.is_file()]
+        paths = [str(p) for p in Path(directory).rglob('*')]
 
         for path in paths:
             relative_path = os.path.relpath(path, directory)
@@ -37,7 +37,7 @@ def get_schema_file_map(directory: str) -> Dict[str, str]:
             # If it is, add a SchemaParseFailure for DirectoryDisallowed
             if os.path.isdir(path):
                 schema_parse_failures.append(SchemaParseFailure(relative_path, [], "DirectoryDisallowed", {}))
-                final_json_documents[relative_path] = ""
+                final_json_documents[relative_path] = "[]"
                 continue    
 
             with open(path, 'r') as file:
