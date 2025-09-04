@@ -22,7 +22,7 @@ all: codegen $(TAR_GZ)
 	poetry remove telepact || echo "no-op"
 	poetry add ./telepact.tar.gz
 
-	poetry install --all-extras
+	poetry install
 
 $(TAR_GZ): dep
 	cp $(LIB_TAR_GZ) telepact.tar.gz
