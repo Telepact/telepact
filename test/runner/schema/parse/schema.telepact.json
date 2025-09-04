@@ -88,6 +88,8 @@
                 "expected": "string"
             }
         }, {
+            "DirectoryDisallowed": {}
+        }, {
             "ObjectKeyDisallowed": {}
         }]
     },
