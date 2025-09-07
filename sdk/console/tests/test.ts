@@ -238,6 +238,21 @@ test.describe('Loading from demo server', () => {
 	
 	});
 
+	test('Doc UI shows internal API correctly', async ({ page }) => {
+		let fnCard = page.getByRole('region', { name: 'fn.ping_'});
+		await expect(
+			fnCard,
+			"ping_ function should not be visible"
+		).not.toBeVisible();
+
+		await page.getByRole('button', { name: 'Show Internal API'} ).click();
+
+		await expect(
+			fnCard,
+			"ping_ function should be visible"
+		).toBeVisible();
+	});	
+
 	test('Doc UI correctly navigates to simulation', async ({ page }) => {
 	
 		let fnCard = page.getByRole('region', { name: 'fn.fn1'});
