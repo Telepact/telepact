@@ -58,12 +58,24 @@ test.describe('Loading from demo server', () => {
 	});
 
 	test('Schema editor works correctly', async ({ page }) => {
+		let docButton = page.getByRole('button', { name: 'Toggle Documentation', pressed: true });
 		await expect(
-			page.getByRole('button', { name: 'Toggle Documentation', pressed: true }),
+			docButton,
 			"Documentation should be visible by default"
 		).toBeVisible();
-		
-		await page.getByRole('button', { name: 'Toggle Schema', pressed: false }).click();
+
+		await docButton.hover();
+		await expect(
+			page.getByRole('tooltip', { name: 'Documentation' }),
+		).toBeVisible();
+
+		let schemaButton = page.getByRole('button', { name: 'Toggle Schema', pressed: false });
+		await schemaButton.hover();
+		await expect(
+			page.getByRole('tooltip', { name: 'Schema' }),
+		).toBeVisible();
+
+		await schemaButton.click();
 		await expect(
 			page.getByRole('button', { name: 'Toggle Schema', pressed: true }),
 			"Schema should be visible after clicking the button"
@@ -261,7 +273,14 @@ test.describe('Loading from demo server', () => {
 			"fn1 function should be visible"
 		).toBeVisible();
 
-		await expect(page.getByRole('button', { name: 'Toggle Simulation', pressed: false })).toBeVisible();
+		let simulationButton = page.getByRole('button', { name: 'Toggle Simulation', pressed: false });
+
+		await expect(simulationButton).toBeVisible();
+
+		await simulationButton.hover();
+		await expect(
+			page.getByRole('tooltip', { name: 'Example' }),
+		).toBeVisible();
 
 		await fnCard.getByRole('button', { name: 'Simulate'}).click();
 
@@ -325,7 +344,16 @@ test.describe('Loading from demo server', () => {
 
 		await expect(page.getByRole('heading', {name: 'Request'})).not.toBeVisible();
 
-		await page.getByRole('button', { name: 'Toggle Terminal', pressed: false}).click();
+		let terminalButton = page.getByRole('button', { name: 'Toggle Terminal', pressed: false });
+		await expect(terminalButton).toBeVisible();
+		
+		await terminalButton.hover();
+		
+		await expect(
+			page.getByRole('tooltip', { name: 'Terminal' }),
+		).toBeVisible();
+
+		await terminalButton.click();
 
 		await expect(page.getByRole('heading', {name: 'Request'})).toBeVisible();
 
@@ -355,7 +383,13 @@ test.describe('Loading from demo server', () => {
 
 		await expect(page.getByRole('heading', { name: 'Response'})).not.toBeVisible();
 
-		await expect(page.getByRole('button', {name: 'Toggle Results', pressed: false})).toBeVisible();
+		let resultsButton = page.getByRole('button', { name: 'Toggle Results', pressed: false });
+		await expect(resultsButton).toBeVisible();
+
+		await resultsButton.hover();
+		await expect(
+			page.getByRole('tooltip', { name: 'Results' }),
+		).toBeVisible();
 
 		let promptCount = 0;
 		page.on('dialog', async dialog => {
