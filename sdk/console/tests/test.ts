@@ -52,7 +52,7 @@ test.describe('Loading from demo server', () => {
 			"Page should have a heading with the text 'Telepact'"
 		).toBeVisible();
 		
-		let source = page.getByRole('textbox', { name: 'Source' });
+		let source = page.getByRole('textbox', { name: 'Live URL' });
 		await source.fill('http://localhost:8085/api');
 		await page.getByRole('button', { name: 'Load'}).click();
 	});
