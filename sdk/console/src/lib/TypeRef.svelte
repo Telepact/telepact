@@ -31,11 +31,9 @@
 		let generics: any | null = null;
 
 		if (Array.isArray(typeData)) {
-			console.log(`Array types: ${JSON.stringify(typeData)}`);
 			typeName = "array";
 			cleanTypeName = "array";
 			displayName = "array";
-			console.log(`generics: ${JSON.stringify(typeData[0])}`);
 			generics = typeData[0]
 		} else if (typeof typeData === 'object' && typeData !== null) {
 			typeName = "object";
