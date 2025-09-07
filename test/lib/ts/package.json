@@ -16,7 +16,7 @@
     "telepact": "file:telepact.tgz"
   },
   "devDependencies": {
-    "@types/node": "^20.11.17",
+    "@types/node": "^24.3.1",
     "typescript": "^5.3.3"
   }
 }
