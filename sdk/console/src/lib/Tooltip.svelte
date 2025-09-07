@@ -66,20 +66,17 @@
   });
 </script>
 
-<span
+<div
   bind:this={triggerEl}
   class="relative"
-  tabindex="0"
   on:mouseenter={handleMouseEnter}
   on:mouseleave={handleMouseLeave}
   on:focus={handleMouseEnter}
   on:blur={handleMouseLeave}
-  aria-describedby={show && text ? 'tooltip' : undefined}
-  role="button"
 >
   <slot />
   {#if show && text}
-    <div
+    <span
       bind:this={tooltipEl}
       class="fixed z-50 px-3 py-2 text-sm rounded shadow-lg bg-gray-900 text-white opacity-90 pointer-events-none transition-opacity duration-100"
       style={tooltipStyle}
@@ -87,6 +84,6 @@
       aria-live="polite"
     >
       {text}
-    </div>
+    </span>
   {/if}
-</span>
+</div>

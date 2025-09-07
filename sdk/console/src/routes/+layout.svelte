@@ -395,15 +395,15 @@
 					<div class="flex rounded-md border border-gray-500">
 						<label
 							for="url"
-							class="content-center rounded-l-md bg-zinc-600 px-2 py-2 text-sm font-medium text-gray-200"
-							>Source</label
+							class="content-center rounded-l-md bg-zinc-600 px-2 py-2 text-sm font-medium text-gray-200 whitespace-nowrap"
+							>Live URL</label
 						>
 						<div>
 							<input
 								type="text"
 								name="url"
 								id="url"
-								placeholder="(draft mode)"
+								placeholder="None  (draft mode)"
 								value={sourceUrl}
 								class="rounded-r-md border-0 bg-zinc-700 py-2 placeholder:text-gray-400 focus:border-gray-500 focus:ring-1 focus:ring-inset focus:ring-gray-500"
 							/>

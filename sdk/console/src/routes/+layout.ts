@@ -63,7 +63,7 @@ export const load: LayoutLoad = async ({ url, params, route, fetch }) => {
 		schemaSource?: string;
 	} = {};
 	if (schemaSource === '') {
-		let defaultSchema = overrideDefaultSchema ? window.overrideDefaultSchema() : '[{"///": "No schema loaded.\\n\\nTry [editing the schema](/?v=ds), or loading a schema from a live running Telepact server by entering a URL in `Source` text box.", "info.Example":{}}]';
+		let defaultSchema = overrideDefaultSchema ? window.overrideDefaultSchema() : '[{"///": "No schema loaded.\\n\\nTry [editing the schema](/?v=ds), or loading a schema from a live running Telepact server by entering a URL in the `Live URL` text box.", "info.Example":{}}]';
 
 		let schemaDraft = (url.searchParams.get('sd') as string) ?? defaultSchema;
 
