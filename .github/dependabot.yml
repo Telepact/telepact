@@ -57,6 +57,11 @@ updates:
     multi-ecosystem-group: "all-weekly-updates"
     patterns: ["*"]
 
+  - package-ecosystem: "npm"
+    directory: "/test/console-self-hosted"
+    multi-ecosystem-group: "all-weekly-updates"
+    patterns: ["*"]
+
   - package-ecosystem: "pip"
     directory: "/lib/py"
     multi-ecosystem-group: "all-weekly-updates"
@@ -71,6 +76,8 @@ updates:
     directory: "/test/lib/py"
     multi-ecosystem-group: "all-weekly-updates"
     patterns: ["*"]
+    ignore:
+      - dependency-name: "telepact"
 
   - package-ecosystem: "pip"
     directory: "/test/runner"

@@ -23,22 +23,40 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.github.telepact.TelepactSchemaParseError;
+
 public class GetSchemaFileMap {
 
     public static Map<String, String> getSchemaFileMap(String directory) {
         var finalJsonDocuments = new HashMap<String, String>();
 
+        var schemaParseFailures = new java.util.ArrayList<SchemaParseFailure>();
+
         try {
             var paths = Files.walk(Paths.get(directory)).toArray(Path[]::new);
             for (Path path : paths) {
-                if (path.toString().endsWith(".telepact.json")) {
-                    String content = new String(Files.readAllBytes(path));
-                    String relativePath = Paths.get(directory).relativize(path).toString();
-                    finalJsonDocuments.put(relativePath, content);
+                String relativePath = Paths.get(directory).relativize(path).toString();
+                if (relativePath.isEmpty()) {
+                    // Skip root directory
+                    continue;
+                }
+                if (!Files.isRegularFile(path)) {
+                    schemaParseFailures.add(new SchemaParseFailure(relativePath, new java.util.ArrayList<>(), "DirectoryDisallowed", Map.of()));
+                    finalJsonDocuments.put(relativePath, "[]");
+                    continue;
+                }
+                String content = new String(Files.readAllBytes(path));
+                finalJsonDocuments.put(relativePath, content);
+                if (!path.toString().endsWith(".telepact.json")) {
+                    schemaParseFailures.add(new SchemaParseFailure(relativePath, new java.util.ArrayList<>(), "FileNamePatternInvalid", Map.of("expected", "*.telepact.json")));
                 }
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+
+        if (!schemaParseFailures.isEmpty()) {
+            throw new TelepactSchemaParseError(schemaParseFailures, finalJsonDocuments);
         }
 
         return finalJsonDocuments;

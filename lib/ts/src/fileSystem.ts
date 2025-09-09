@@ -36,6 +36,7 @@ export interface FsModule {
               }
             | BufferEncoding,
     ) => string;
+    statSync: (path: string | Buffer | URL) => { isDirectory: () => boolean };
 }
 
 export interface PathModule {

@@ -1,5 +1,7 @@
 High:
-- Fix typos in writing guide
+- Add helpful UX message for default console state
+- Consider better generated code that can't be misused
+- Console button tool-tips
 
 Medium:
 - Write tests that verify each type within a "link" function
@@ -13,3 +15,4 @@ Low:
 - Console light mode and listen to os setting
 - Clean up java test code coverage errors
 - Cleanup old UMock language
+- Cleanup old vers api language

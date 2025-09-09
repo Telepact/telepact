@@ -15,28 +15,50 @@
 <!--|                                                                            |-->
 
 <script lang="ts">
+	import { applyErrorToParsedTypes } from './telepact/src/internal/schema/ApplyErrorToParsedTypes';
 	import TypeRef from './TypeRef.svelte';
 	interface Props {
-		types: any[];
+		types: any;
 	}
 
 	let { types }: Props = $props();
-	let generics = types.slice(1, types.length);
-	let typeName = types[0];
-	let nullable = typeName.endsWith('?');
-	let cleanTypeName = typeName.replace(/\?$/g, '');
-	let displayNameSpit = cleanTypeName.split('.');
-	let displayName: string = $state();
-	if (displayNameSpit.length === 1) {
-		displayName = displayNameSpit[0];
-	} else {
-		let target = displayNameSpit[1];
-		if (isNaN(target)) {
-			displayName = target;
+	let typeName;
+	let nullable = false;
+
+	function getTypeInfo(typeData: any): [string, string, any | null] {
+		let cleanTypeName;
+		let displayName: string;
+		let generics: any | null = null;
+
+		if (Array.isArray(typeData)) {
+			typeName = "array";
+			cleanTypeName = "array";
+			displayName = "array";
+			generics = typeData[0]
+		} else if (typeof typeData === 'object' && typeData !== null) {
+			typeName = "object";
+			cleanTypeName = "object";
+			displayName = "object";
+			generics = typeData["string"];
 		} else {
-			displayName = `T${target}`;
+			typeName = typeData as string;
+			nullable = typeName.endsWith('?');
+			cleanTypeName = typeName.replace(/\?$/g, '');
+			let displayNameSpit = cleanTypeName.split('.');
+			if (displayNameSpit.length === 1) {
+				displayName = displayNameSpit[0];
+			} else {
+				let target = displayNameSpit[1];
+				displayName = target;
+			}
 		}
+
+		return [cleanTypeName, displayName, generics];
 	}
+
+	let [cleanTypeName, displayName, generics] = getTypeInfo(types);
+
+
 	const standardTypes = ['boolean', 'integer', 'number', 'string', 'array', 'object', 'any'];
 </script>
 
@@ -48,7 +70,7 @@
 			class="px-0 hover:underline {cleanTypeName.startsWith('struct')
 				? 'text-sky-400'
 				: 'text-emerald-500'}">{displayName}</a
-		>{/if}{#if generics.length > 0}&lt;{#each generics as generic, i}<TypeRef
-				types={generic}
-			/>{#if i < generics.length - 1},&#20;{/if}{/each}&gt;{/if}{#if nullable}?{/if}</span
+		>{/if}{#if generics != null}&lt;<TypeRef
+				types={generics}
+			/>&gt;{/if}{#if nullable}?{/if}</span
 >
