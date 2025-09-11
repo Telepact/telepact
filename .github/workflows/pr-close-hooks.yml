@@ -50,6 +50,7 @@ jobs:
 
   bump-version:
     if: needs.get-pr-close-info.outputs.pr_merged == 'true'
+    needs: [get-pr-close-info]
     runs-on: ubuntu-latest
     timeout-minutes: 2
     steps:
