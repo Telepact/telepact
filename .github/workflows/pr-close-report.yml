@@ -14,32 +14,31 @@
 #|  limitations under the License.
 #|
 
-name: PR Report
+name: PR Close Report
 
 on:
   pull_request:
     types:
-      - opened
-      - reopened
+      - closed
     branches:
       - main
 
 jobs:
 
-  save-pr-details:
-    name: Save PR Details
+  save-pr-close-details:
+    name: Save PR Close Details
     runs-on: ubuntu-latest
     steps:
-      - name: Define PR details
+      - name: Define PR Close details
         run: |
-          mkdir -p pr
+          mkdir -p pr-close
           echo "{
             \"pr_number\": \"${{ github.event.pull_request.number }}\",
-            \"pr_author\": \"${{ github.event.pull_request.user.login }}\"
-          }" > pr/details.json
+            \"pr_merged\": \"${{ github.event.pull_request.merged }}\"
+          }" > pr-close/details.json
 
-      - name: Upload PR details
+      - name: Upload PR Close details
         uses: actions/upload-artifact@v4
         with:
-          name: pr-details
-          path: pr
+          name: pr-close-details
+          path: pr-close
