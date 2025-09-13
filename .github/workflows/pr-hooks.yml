@@ -19,7 +19,7 @@ name: PR Hooks
 on:
   workflow_run:
     types: [completed]
-    workflows: ["Report"]
+    workflows: ["PR Report"]
 
 jobs:
   get-pr-info:
