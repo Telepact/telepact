@@ -251,7 +251,7 @@ export class CodeGenHandler extends ServerHandler_ {
             }
         }
 
-        let output = test.Output.from_Ok_(test.Output.Ok_.fromTyped({ value }));
+        let output = test.Output.from_Ok_({ value });
 
         return [{}, output];
     }
@@ -282,7 +282,7 @@ function map_union(u: ExUnion): ExUnion {
         if (tv.value.optional() !== undefined) {
             args.optional = tv.value.optional();
         }
-        return ExUnion.from_Two(ExUnion.Two.fromTyped(args));
+        return ExUnion.from_Two(args);
     } else {
         throw new Error("Unknown union type: " + u.constructor.name);
     }
