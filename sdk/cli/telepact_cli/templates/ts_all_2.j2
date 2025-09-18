@@ -126,7 +126,7 @@ export class {{ type_display }} {
         this.pseudoJson = pseudoJson;
     }
 
-    static fromTyped({
+    static from({
         {%- for field_name, field_type in fields.items() %}
         {{ sanitize_field_name(field_name) }},
         {%- endfor %}        
@@ -178,7 +178,7 @@ export class {{ type_display }} {
         {%- endfor %}        
     }): {{ type_prefix + type_display }} {
         return new {{ type_prefix + type_display }}({
-            "{{ tag_key }}": {{ tag_prefix + tag_key }}.fromTyped(payload).pseudoJson
+            "{{ tag_key }}": {{ tag_prefix + tag_key }}.from(payload).pseudoJson
         });
     }
     {%- endfor %}

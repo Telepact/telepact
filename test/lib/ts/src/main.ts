@@ -33,7 +33,7 @@ import { NatsConnection, connect, Subscription } from "nats";
 import * as fs from "fs";
 import * as path from 'path';
 import { min, max, mean, median, quantile } from "simple-statistics";
-import { ClientInterface_, test } from "./gen/all_.js";
+import { ClientInterface_, test } from "./gen/genTypes.js";
 import { CodeGenHandler } from "./codeGenHandler.js";
 
 class Timer {

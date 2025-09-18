@@ -233,7 +233,7 @@ def _generate_internal(schema_data: list[dict[str, object]], possible_fn_selects
             # Ensure the directory exists
             output_path.mkdir(parents=True, exist_ok=True)
 
-            file_path = output_path / f"all_.py"
+            file_path = output_path / f"gen_types.py"
 
             # Open the file for writing
             with file_path.open("w") as f:
@@ -279,7 +279,7 @@ def _generate_internal(schema_data: list[dict[str, object]], possible_fn_selects
             # Ensure the directory exists
             output_path.mkdir(parents=True, exist_ok=True)
 
-            file_path = output_path / f"all_.ts"
+            file_path = output_path / f"genTypes.ts"
 
             # Open the file for writing
             with file_path.open("w") as f:

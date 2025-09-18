@@ -40,7 +40,7 @@ import traceback
 import sys
 from concurrent.futures import ThreadPoolExecutor
 from telepact_test.code_gen_handler import CodeGenHandler
-from telepact_test.gen.all_ import ClientInterface_, test as fntest
+from telepact_test.gen.gen_types import ClientInterface_, test as fntest
 import base64
 
 
