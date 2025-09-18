@@ -290,7 +290,7 @@ public class CodeGenHandler extends ServerHandler_ {
         b.required(s.required());
         s.optional().ifPresent(b::optional);
         s.optional2().ifPresent(b::optional2);
-        return ExStruct.fromTyped(b);
+        return ExStruct.from(b);
     }
 
     private static ExUnion mapUnion(ExUnion u) {

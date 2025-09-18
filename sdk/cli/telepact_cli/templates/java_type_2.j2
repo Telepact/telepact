@@ -115,7 +115,7 @@ public {% if modifier %}{{ modifier }} {% endif %}class {{ display_name }}{% if 
         this.pseudoJson = pseudoJson;
     }
 
-    public static {{ display_name }} fromTyped(Builder b) {
+    public static {{ display_name }} from(Builder b) {
         var map = new HashMap<String, Object>();
         {%- for field_name, field_type in fields.items() %}
         {%- if '!' in field_name %}
@@ -155,7 +155,7 @@ public {% if modifier %}{{ modifier }} {% endif %}class {{ display_name }}{% if 
         }
         {%- endfor %}
         public {{ display_name }} build() {
-            return {{ display_name }}.fromTyped(this);
+            return {{ display_name }}.from(this);
         }
     }
 }
