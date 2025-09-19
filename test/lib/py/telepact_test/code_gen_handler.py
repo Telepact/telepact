@@ -275,8 +275,10 @@ class CodeGenHandler(ServerHandler_):
             return None
         tv = u.get_tagged_value()
         if tv.tag == "One":
+            v1 = tv.value
             return ExUnion.from_One()
         elif tv.tag == "Two":
+            v2 = tv.value
             if tv.value.optional() == Undefined.Inst:
                 return ExUnion.from_Two(
                     required=tv.value.required()
@@ -286,6 +288,9 @@ class CodeGenHandler(ServerHandler_):
                     required=tv.value.required(),
                     optional=tv.value.optional()
                 )
+        else:
+            v3 = tv.value
+            raise ValueError(f"Unknown tag: {tv.tag}")
 
     def map_fn(self, f: fnexample.Input) -> fnexample.Input:
         if f is None:

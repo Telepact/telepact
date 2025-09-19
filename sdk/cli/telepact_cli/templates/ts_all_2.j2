@@ -188,7 +188,7 @@ export class {{ type_display }} {
             {%- set tag_key = tag_entry | find_tag_key %}
             {%- set tag_data = tag_entry[tag_key] %}
         TaggedValue_<"{{ tag_key }}", {{ tag_prefix + tag_key }}> |
-        {%- endfor %} UntypedTaggedValue_ {
+        {%- endfor %} TaggedValue_<"NoMatch_", UntypedTaggedValue_> {
         const tag = Object.keys(this.pseudoJson)[0]!;
         {%- for tag_entry in tags %}
             {%- set tag_key = tag_entry | find_tag_key %}
@@ -196,7 +196,7 @@ export class {{ type_display }} {
             return new TaggedValue_("{{ tag_key }}", new {{ tag_prefix + tag_key }}(this.pseudoJson["{{ tag_key }}"]));
         }
         {%- endfor %}
-        return new UntypedTaggedValue_(tag, this.pseudoJson[tag]);
+        return new TaggedValue_("NoMatch_", new UntypedTaggedValue_(tag, this.pseudoJson[tag]));
     }
 }
 
