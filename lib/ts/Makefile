@@ -43,6 +43,4 @@ clean:
 	rm -f dist/LICENSE dist/NOTICE
 
 deploy: $(TAR_GZ)
-	$(eval TARBALL_TO_PUBLISH := $(shell ls -t $(TAR_GZ) | head -n 1))
-	@echo "Publishing $(TARBALL_TO_PUBLISH)"
-	npm publish $(TARBALL_TO_PUBLISH)
+	npm publish
