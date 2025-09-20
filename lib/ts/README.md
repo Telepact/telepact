@@ -15,7 +15,6 @@ npm install https://github.com/Telepact/telepact/releases/download/1.0.0-alpha.1
 ## Usage
 
 API:
-
 ```json
 [
     {
