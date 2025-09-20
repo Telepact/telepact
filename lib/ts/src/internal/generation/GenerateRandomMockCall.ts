@@ -19,7 +19,7 @@ import { generateRandomUnion } from './GenerateRandomUnion';
 import { TType } from '../types/TType';
 import { TUnion } from '../types/TUnion';
 
-export function generateRandomUMockCall(types: { [key: string]: TType }, ctx: GenerateContext) {
+export function generateRandomMockCall(types: { [key: string]: TType }, ctx: GenerateContext) {
     const functions: Array<TUnion> = Object.entries(types)
         .filter(([key, value]) => key.startsWith('fn.') && !key.endsWith('.->'))
         .filter(([key, value]) => !key.endsWith('_'))

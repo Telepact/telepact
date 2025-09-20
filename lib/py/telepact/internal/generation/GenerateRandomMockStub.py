@@ -16,13 +16,13 @@
 
 from typing import cast
 
-from ...internal.generation.GenerateContext import GenerateContext
-from ...internal.generation.GenerateRandomStruct import generate_random_struct
+from .GenerateContext import GenerateContext
+from .GenerateRandomStruct import generate_random_struct
 from ..types.TType import TType
 
 
-def generate_random_u_mock_stub(types: dict[str, TType], ctx: GenerateContext) -> object:
-    from ...internal.types.TUnion import TUnion
+def generate_random_mock_stub(types: dict[str, TType], ctx: GenerateContext) -> object:
+    from ..types.TUnion import TUnion
 
     functions = [key for key in types.keys() if key.startswith('fn.') and not key.endswith('.->') and not key.endswith('_')]
 

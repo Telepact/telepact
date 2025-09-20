@@ -16,13 +16,13 @@
 
 from typing import cast
 
-from ...internal.generation.GenerateContext import GenerateContext
-from ...internal.generation.GenerateRandomUnion import generate_random_union
+from .GenerateContext import GenerateContext
+from .GenerateRandomUnion import generate_random_union
 from ..types.TType import TType
 
 
-def generate_random_u_mock_call(types: dict[str, TType], ctx: GenerateContext) -> object:
-    from ...internal.types.TUnion import TUnion
+def generate_random_mock_call(types: dict[str, TType], ctx: GenerateContext) -> object:
+    from ..types.TUnion import TUnion
 
     function_names = [
         key for key in types.keys()

@@ -43,8 +43,8 @@ class TMockStub(TType):
         return validate_mock_stub(given_obj, self.types, ctx)
 
     def generate_random_value(self, blueprint_value: object, use_blueprint_value: bool, type_parameters: list['TTypeDeclaration'], ctx: 'GenerateContext') -> object:
-        from ..generation.GenerateRandomUMockStub import generate_random_u_mock_stub
-        return generate_random_u_mock_stub(self.types, ctx)
+        from ..generation.GenerateRandomMockStub import generate_random_mock_stub
+        return generate_random_mock_stub(self.types, ctx)
 
     def get_name(self, ctx: 'ValidateContext') -> str:
         return _MOCK_STUB_NAME
