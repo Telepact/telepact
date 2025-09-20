@@ -19,7 +19,7 @@ import { ValidationFailure } from '../validation/ValidationFailure';
 import { TType } from './TType';
 import { validateMockCall } from '../validation/ValidateMockCall';
 import { GenerateContext } from '../generation/GenerateContext';
-import { generateRandomUMockCall } from '../generation/GenerateRandomUMockCall';
+import { generateRandomMockCall } from '../generation/GenerateRandomMockCall';
 import { ValidateContext } from '../validation/ValidateContext';
 
 export const mockCallName: string = '_ext.Call_';
@@ -46,7 +46,7 @@ export class TMockCall extends TType {
         typeParameters: TTypeDeclaration[],
         ctx: GenerateContext,
     ): any {
-        return generateRandomUMockCall(this.types, ctx);
+        return generateRandomMockCall(this.types, ctx);
     }
 
     public getName(): string {
