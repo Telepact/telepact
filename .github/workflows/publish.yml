@@ -47,3 +47,19 @@ jobs:
           CENTRAL_USERNAME: ${{ secrets.MVN_CENTRAL_USERNAME }}
           CENTRAL_TOKEN: ${{ secrets.MVN_CENTRAL_TOKEN }}
         run: make deploy-java
+
+  publish-ts:
+    runs-on: ubuntu-latest
+    if: ${{ contains(github.event.release.body, '- ts') }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.target_commitish }}
+
+      - name: Publish to npm
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_INSTALL: ci
+        run: make deploy-ts
