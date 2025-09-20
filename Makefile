@@ -58,6 +58,9 @@ test-ts:
 test-trace-ts:
 	$(MAKE) -C test/runner test-trace-ts
 
+deploy-ts:
+	$(MAKE) -C lib/ts deploy
+
 .PHONY: test
 test:
 	$(MAKE) -C test/runner test

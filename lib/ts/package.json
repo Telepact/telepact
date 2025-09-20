@@ -1,11 +1,25 @@
 {
   "name": "telepact",
   "version": "1.0.0-alpha.115",
-  "description": "",
+  "description": "The Typescript Telepact library",
   "type": "module",
   "license": "Apache-2.0",
-  "keywords": [],
-  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/telepact/telepact.git"
+  },
+  "bugs": {
+    "url": "https://github.com/telepact/telepact/issues"
+  },
+  "homepage": "https://github.com/Telepact/telepact/blob/main/lib/ts/README.md",
+  "author": {
+    "name": "Telepact Authors",
+    "email": "telepact@googlegroups.com"
+  },
+  "keywords": [
+    "rpc",
+    "api"
+  ],
   "main": "./dist/index.cjs.js",
   "module": "./dist/index.esm.js",
   "types": "./dist/src/index.d.ts",

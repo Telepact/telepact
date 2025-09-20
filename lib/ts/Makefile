@@ -41,3 +41,6 @@ clean:
 	rm -rf dist-tgz
 	rm -rf node_modules
 	rm -f dist/LICENSE dist/NOTICE
+
+deploy: $(TAR_GZ)
+	npm publish $(TAR_GZ)
