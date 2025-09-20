@@ -27,7 +27,7 @@ if TYPE_CHECKING:
     from ..types.TFieldDeclaration import TFieldDeclaration
 
 
-def parse_vers_api_schema(
+def parse_telepact_schema(
     telepact_schema_document_names_to_json: dict[str, str],
 ) -> 'TelepactSchema':
     from ...TelepactSchemaParseError import TelepactSchemaParseError
