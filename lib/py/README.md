@@ -2,14 +2,8 @@
 
 ### Installation
 
-The library is currently installed directly from the
-[Releases](https://github.com/Telepact/telepact/releases) page. You can copy the
-link for the library from the release assets.
-
-Example:
-
 ```
-pip install https://github.com/Telepact/telepact/releases/download/1.0.0-alpha.102/telepact-1.0.0a102.tar.gz
+pip install telepact
 ```
 
 ### Usage
