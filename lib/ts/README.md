@@ -2,14 +2,8 @@
 
 ## Installation
 
-The library is currently installed directly from the
-[Releases](https://github.com/Telepact/telepact/releases) page. You can copy the
-link for the library from the release assets.
-
-Example:
-
 ```
-npm install https://github.com/Telepact/telepact/releases/download/1.0.0-alpha.102/telepact-1.0.0-alpha.102.tgz
+npm install telepact
 ```
 
 ## Usage
@@ -32,6 +26,9 @@ API:
 
 Server:
 ```ts
+import * as fs from 'fs';
+import * as path from 'path';
+
 const files = new TelepactSchemaFiles('/directory/containing/api/files', fs, path);
 const schema = TelepactSchema.fromFileJsonMap(files.filenamesToJson);
 
