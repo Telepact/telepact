@@ -11,7 +11,7 @@ readme = "README.md"
 license = "Apache-2.0"
 keywords = [ "cli", "telepact",]
 classifiers = [ "Programming Language :: Python :: 3", "Programming Language :: Python :: 3.11", "License :: OSI Approved :: MIT License", "Operating System :: OS Independent", "Topic :: Utilities",]
-include = [ "telepact_cli/telepact/**/*",]
+include = [ "telepact_cli/telepact/**/*", "LICENSE", "NOTICE",]
 [[tool.poetry.packages]]
 include = "telepact_cli"
 

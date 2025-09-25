@@ -23,7 +23,7 @@ TAR_GZ := dist/*.tar.gz
 DEP_TAR_GZ := ../../lib/py/dist/*.tar.gz
 
 $(TAR_GZ): $(DEP_TAR_GZ) $(SRC_FILES)
-	cp ../../LICENSE ../../NOTICE telepact_cli
+	cp ../../LICENSE ../../NOTICE ./
 	rm -rf tmp
 	mkdir -p tmp
 	tar -xzvf $(DEP_TAR_GZ) -C tmp
@@ -43,7 +43,8 @@ $(TAR_GZ): $(DEP_TAR_GZ) $(SRC_FILES)
 
 	rm -rf tmp
 
-	docker save telepact-cli:${VERSION} | gzip > dist/docker-image-telepact-cli-${VERSION}.tar.gz
+	mkdir -p docker-dist
+	docker save telepact-cli:${VERSION} | gzip > docker-dist/docker-image-telepact-cli-${VERSION}.tar.gz
 
 
 $(DEP_TAR_GZ):
@@ -51,9 +52,10 @@ $(DEP_TAR_GZ):
 
 clean:
 	rm -rf dist
+	rm -rf docker-dist
 	rm -rf telepact_cli/telepact
 	rm -rf tmp
-	rm -f telepact_cli/LICENSE telepact_cli/NOTICE
+	rm -f LICENSE NOTICE
 	poetry env remove --all
 
 test:
@@ -63,3 +65,6 @@ old-test:
 	poetry run telepact codegen --schema-dir tests/data --lang java --out tests/output/java --package output
 	poetry run telepact codegen --schema-dir tests/data --lang py --out tests/output/py
 	poetry run telepact codegen --schema-dir tests/data --lang ts --out tests/output/ts
+
+deploy: $(TAR_GZ)
+	poetry publish

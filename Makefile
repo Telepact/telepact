@@ -98,6 +98,9 @@ install-cli:
 uninstall-cli:
 	pipx uninstall telepact-cli
 
+deploy-cli:
+	$(MAKE) -C sdk/cli deploy
+
 prettier:
 	$(MAKE) -C sdk/prettier
 
