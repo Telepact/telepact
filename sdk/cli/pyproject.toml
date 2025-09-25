@@ -3,15 +3,15 @@ requires = [ "poetry-core>=1.0.0",]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
-name = "telepact_cli"
+name = "telepact-cli"
 version = "1.0.0-alpha.124"
 description = "A CLI tool for various local Telepact operations."
 authors = [ "Telepact Authors <telepact@googlegroups.com>",]
 readme = "README.md"
 license = "Apache-2.0"
 keywords = [ "cli", "telepact",]
-classifiers = [ "Programming Language :: Python :: 3", "Programming Language :: Python :: 3.11", "License :: OSI Approved :: MIT License", "Operating System :: OS Independent", "Topic :: Utilities",]
-include = [ "telepact_cli/telepact/**/*",]
+classifiers = [ "Programming Language :: Python :: 3", "Programming Language :: Python :: 3.11", "License :: OSI Approved :: Apache Software License", "Operating System :: OS Independent", "Topic :: Utilities",]
+include = [ "telepact_cli/telepact/**/*", "LICENSE", "NOTICE",]
 [[tool.poetry.packages]]
 include = "telepact_cli"
 
@@ -29,4 +29,3 @@ telepact = "telepact_cli.cli:main"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.4"
-requests = "^2.32"

@@ -1,7 +1,8 @@
 dist/
+docker-dist/
 .venv/
-telepact_cli/LICENSE
-telepact_cli/NOTICE
+LICENSE
+NOTICE
 telepact_cli/telepact
 tmp/
 tests/tmp

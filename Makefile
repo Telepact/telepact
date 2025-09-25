@@ -92,6 +92,9 @@ clean-cli:
 test-cli:
 	$(MAKE) -C sdk/cli test
 
+deploy-cli:
+	$(MAKE) -C sdk/cli deploy
+
 install-cli:
 	pipx install $(wildcard sdk/cli/dist/telepact_cli-*.tar.gz)
 

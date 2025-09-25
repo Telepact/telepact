@@ -87,3 +87,21 @@ jobs:
         env:
           POETRY_PYPI_TOKEN_PYPI: ${{ secrets.PYPI_TOKEN }}
         run: make deploy-py
+
+  publish-cli:
+    runs-on: ubuntu-latest
+    if: ${{ contains(github.event.release.body, '- cli') }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.target_commitish }}
+
+      - name: Install Poetry
+        run: pipx install poetry
+
+      - name: Publish to PyPI
+        env:
+          POETRY_PYPI_TOKEN_PYPI: ${{ secrets.PYPI_TOKEN }}
+        run: make deploy-cli
