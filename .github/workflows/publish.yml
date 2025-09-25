@@ -85,6 +85,9 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Install Poetry
+        run: pipx install poetry
+
       - name: Publish to PyPI
         env:
           POETRY_PYPI_TOKEN_PYPI: ${{ secrets.PYPI_TOKEN }}
