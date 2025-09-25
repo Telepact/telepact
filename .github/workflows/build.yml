@@ -214,7 +214,7 @@ jobs:
   build-console:
     name: Build Console
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 8
     needs: [build-ts, build-cli, build-prettier]
     steps:
       - name: Checkout code
