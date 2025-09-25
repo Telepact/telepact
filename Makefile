@@ -46,6 +46,9 @@ test-py:
 test-trace-py:
 	$(MAKE) -C test/runner test-trace-py
 
+deploy-py:
+	$(MAKE) -C lib/py deploy
+
 ts:
 	$(MAKE) -C lib/ts
 

@@ -5,12 +5,12 @@ build-backend = "poetry.core.masonry.api"
 [tool.poetry]
 name = "telepact"
 version = "1.0.0-alpha.121"
-description = "Telepact for python"
+description = "The Python Telepact library"
 authors = [ "Telepact Authors <telepact@googlegroups.com>",]
 license = "Apache-2.0"
 readme = "README.md"
 classifiers = [ "Programming Language :: Python :: 3", "Programming Language :: Python :: 3.11", "License :: OSI Approved :: Apache Software License", "Operating System :: OS Independent",]
-include = [ "telepact/json/*", "telepact/LICENSE", "telepact/NOTICE",]
+include = [ "telepact/json/*", "LICENSE", "NOTICE",]
 [[tool.poetry.packages]]
 include = "telepact"
 

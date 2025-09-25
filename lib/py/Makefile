@@ -22,7 +22,7 @@ TAR_GZ := dist/*.tar.gz
 $(TAR_GZ): $(SRC_FILES)
 	mkdir -p telepact/json
 	cp ../../common/*.json telepact/json
-	cp ../../LICENSE ../../NOTICE telepact/
+	cp ../../LICENSE ../../NOTICE ./
 	
 	rm -rf dist
 	poetry install
@@ -31,5 +31,8 @@ $(TAR_GZ): $(SRC_FILES)
 clean:
 	rm -rf dist
 	rm -rf telepact/json
-	rm -f telepact/LICENSE telepact/NOTICE
+	rm -f ./LICENSE ./NOTICE
 	poetry env remove --all
+
+deploy: $(TAR_GZ)
+	poetry publish
