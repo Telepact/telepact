@@ -35,5 +35,4 @@ clean:
 	poetry env remove --all
 
 deploy: $(TAR_GZ)
-	poetry config pypi-token.pypi ${PYPI_TOKEN}
 	poetry publish
