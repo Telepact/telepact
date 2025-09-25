@@ -80,11 +80,6 @@ jobs:
         with:
           ref: ${{ github.event.release.target_commitish }}
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.12"
-
       - name: Install Poetry
         run: pipx install poetry
 
