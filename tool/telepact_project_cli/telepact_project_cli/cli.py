@@ -426,13 +426,13 @@ def release() -> None:
     """
 
     RELEASE_TARGET_ASSET_DIRECTORY_MAP = {
-        "java": "lib/java/target/central-publishing",
-        "py": "lib/py/dist",
-        "ts": "lib/ts/dist-tgz",
-        "dart": "bind/dart/dist",
-        "cli": "sdk/cli/dist",
-        "console": "sdk/console/dist",
-        "prettier": "sdk/prettier/dist-tgz"
+        "java": ["lib/java/target/central-publishing"],
+        "py": ["lib/py/dist"],
+        "ts": ["lib/ts/dist-tgz"],
+        "dart": ["bind/dart/dist"],
+        "cli": ["sdk/cli/dist", "sdk/cli/docker-dist"],
+        "console": ["sdk/console/dist"],
+        "prettier": ["sdk/prettier/dist-tgz"]
     }
 
     MAX_ASSETS = 10  # Maximum number of assets to upload
@@ -507,22 +507,23 @@ def release() -> None:
         # Upload assets for each release target
         asset_count = 0
         for target in release_targets:
-            asset_directory = RELEASE_TARGET_ASSET_DIRECTORY_MAP.get(target)
-            if asset_directory and os.path.exists(asset_directory):
-                for file_name in os.listdir(asset_directory):
-                    if asset_count >= MAX_ASSETS:
-                        click.echo("Maximum asset upload limit reached. Aborting.")
-                        return
-                    file_path = os.path.join(asset_directory, file_name)
-                    if os.path.isfile(file_path):
-                        with open(file_path, 'rb') as asset_file:
-                            release.upload_asset(
-                                path=file_path,
-                                name=file_name,
-                                label=f" [{target}]: {file_name}"
-                            )
-                            asset_count += 1
-                            click.echo(f"Uploaded asset: {file_name} for target: {target}")
+            asset_directories = RELEASE_TARGET_ASSET_DIRECTORY_MAP.get(target, [])
+            for asset_directory in asset_directories:
+                if os.path.exists(asset_directory):
+                    for file_name in os.listdir(asset_directory):
+                        if asset_count >= MAX_ASSETS:
+                            click.echo("Maximum asset upload limit reached. Aborting.")
+                            return
+                        file_path = os.path.join(asset_directory, file_name)
+                        if os.path.isfile(file_path):
+                            with open(file_path, 'rb') as asset_file:
+                                release.upload_asset(
+                                    path=file_path,
+                                    name=file_name,
+                                    label=f" [{target}]: {file_name}"
+                                )
+                                asset_count += 1
+                                click.echo(f"Uploaded asset: {file_name} for target: {target}")
             else:
                 click.echo(f"No assets found for target: {target} in directory: {asset_directory}")
 
