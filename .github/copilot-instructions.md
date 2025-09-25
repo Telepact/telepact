@@ -64,3 +64,7 @@ The central test runner is located in `/test/runner`, which is a Python project.
 -   `sdk/console`: A SvelteKit and TypeScript project for the developer console.
 -   `sdk/cli`: A Python/Poetry project for the command-line interface.
 -   `sdk/prettier`: A project for the Prettier plugin.
+
+## Schema Authoring (`.telepact.json`)
+
+Telepact schemas are defined in `.telepact.json` files. These files are the single source of truth for API definitions. A schema is a JSON array of definitions. The full guide can be found in `doc/schema-guide.md`.
