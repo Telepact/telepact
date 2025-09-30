@@ -208,5 +208,14 @@
         "->": {
             "@out": "boolean"
         }
+    },
+    {
+        "errors.ExampleErrors": [
+            {
+                "ErrorExample2": {
+                    "field1": "string"
+                }
+            }
+        ]
     }
 ]
