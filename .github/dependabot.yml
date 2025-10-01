@@ -76,8 +76,6 @@ updates:
     directory: "/test/lib/py"
     multi-ecosystem-group: "all-weekly-updates"
     patterns: ["*"]
-    ignore:
-      - groups: ["test-deps"]
 
   - package-ecosystem: "pip"
     directory: "/test/runner"
