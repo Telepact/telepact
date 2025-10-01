@@ -102,7 +102,6 @@ async def telepact_handler(request):
     request_bytes = await request.body()
     response_bytes = await server.process(request_bytes)
     media_type = 'application/octet-stream' if response_bytes and response_bytes[0] == 0x92 else 'application/json'
-
     return Response(content=response_bytes, media_type=media_type)
 ```
 
