@@ -10,11 +10,6 @@ build = "^1.2"
 msgpack = "^1.0"
 nats-py = "^2.8"
 prometheus-client = "^0.20"
-
-[tool.poetry.group.test-deps]
-optional = true
-
-[tool.poetry.group.test-deps.dependencies]
 telepact = {path = "telepact.tar.gz"}
 
 [tool.poetry.group.dev.dependencies]

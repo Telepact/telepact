@@ -19,8 +19,7 @@ TAR_GZ := telepact.tar.gz
 
 all: codegen $(TAR_GZ)
 	poetry lock
-
-	poetry install --with test-deps
+	poetry install
 
 $(TAR_GZ): dep
 	cp $(LIB_TAR_GZ) telepact.tar.gz

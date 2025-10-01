@@ -76,6 +76,8 @@ updates:
     directory: "/test/lib/py"
     multi-ecosystem-group: "all-weekly-updates"
     patterns: ["*"]
+    ignore:
+      - dependency-name: "test/lib/py/telepact.tar.gz"
 
   - package-ecosystem: "pip"
     directory: "/test/runner"
