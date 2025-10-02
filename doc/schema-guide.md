@@ -189,9 +189,11 @@ cannot be used in type expressions.
 ]
 ```
 
-With this error definition, the functions above would automatically be given
-these errors. (Note, the following example only illustrates the effect of the
-errors definition at schema load time; the original schema is not re-written.)
+With this above error definition, the `fn.exampleFunction1` and
+`fn.exampleFunction2` functions from the previous section would automatically be
+given these errors. (Note, the following example only illustrates the effect of
+the errors definition at schema load time; the original schema is not
+re-written.)
 
 ```json
 [
