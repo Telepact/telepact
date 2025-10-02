@@ -108,5 +108,19 @@
                 }
             }
         ]
-    } 
+    },
+    {
+        "errors.Extra": [
+            {
+                "ExtraError1": {
+                    "field1": "integer"
+                }
+            },
+            {
+                "ExtraError2": {
+                    "field1": "string"
+                }
+            }
+        ]
+    }
 ]

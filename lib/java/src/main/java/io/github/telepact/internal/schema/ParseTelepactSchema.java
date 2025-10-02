@@ -133,7 +133,7 @@ public class ParseTelepactSchema {
                     schemaKeys.add(schemaKey);
                     schemaKeysToIndex.put(schemaKey, index);
                     schemaKeysToDocumentName.put(schemaKey, documentName);
-                    if ("auto_".equals(documentName) || !documentName.endsWith("_")) {
+                    if ("auto_".equals(documentName) || "auth_".equals(documentName) || !documentName.endsWith("_")) {
                         originalSchema.put(schemaKey, def);
                     }
                 } catch (TelepactSchemaParseError e) {
