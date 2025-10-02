@@ -34,7 +34,7 @@ def create_telepact_schema_from_file_json_map(json_documents: dict[str, str]) ->
         regex = re.compile(r'"struct\.Auth_"\s*:')
         matcher = regex.search(json)
         if matcher:
-            final_json_documents["@auth_"] = get_auth_telepact_json()
+            final_json_documents["auth_"] = get_auth_telepact_json()
             break
 
     return parse_telepact_schema(final_json_documents)

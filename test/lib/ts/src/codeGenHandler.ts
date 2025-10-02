@@ -23,13 +23,18 @@ export class CodeGenHandler extends ServerHandler_ {
     }
 
     async test(headers: { [key: string]: any }, input: test.Input): Promise<[Record<string, any>, test.Output]> {
-        let value = new Value({});
-
         try {
             console.log("input: " + JSON.stringify(input.pseudoJson));
         } catch (e) {
             console.error(e);
         }
+
+        if (headers["@error"] === true) {
+            let output = test.Output.from_ErrorExample2({ field1: "Boom!" });
+            return [{}, output];
+        }
+
+        let value = new Value({});
 
         const top = input.value();
         if (top) {
