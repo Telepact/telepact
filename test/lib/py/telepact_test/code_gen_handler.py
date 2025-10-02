@@ -26,8 +26,6 @@ class CodeGenHandler(ServerHandler_):
         raise NotImplementedError("Unimplemented method 'example'")
 
     async def test(self, headers: dict[str, object], input: test.Input) -> Tuple[dict[str, object], test.Output]:
-        ok: test.Output.Ok_ = None
-
         try:
             def default_serializer(obj):
                 if isinstance(obj, bytes):
@@ -37,6 +35,11 @@ class CodeGenHandler(ServerHandler_):
             print("input: " + json.dumps(input.pseudo_json, default=default_serializer))
         except json.JSONDecodeError as e:
             print(e)
+
+        if "@error" in headers and headers["@error"] == True:
+            return {}, test.Output.from_ErrorExample2(field1="Boom!")
+
+        ok: test.Output.Ok_ = None
 
         if input.value():
             top = input.value()
