@@ -29,6 +29,30 @@ null represents "empty" (while optional represents "unknown"). Since array and
 object collection types can already express "emptiness," nullability is
 unnecessary.
 
+## Why is there nothing like a standard 404 Not Found error?
+
+Telepact provides several standard errors to represent common integration
+issues, such as request and response incompatibilities and
+authentication/authorization errors, all reminisicent of the 400, 500, 401 and
+403 error codes, respectively, but there is no standard error that approximates
+404 Not Found.
+
+Instead, API designers are encouraged to abstract concepts as data whenever
+possible, and the 404 Not Found use-case can be trivially represented with an
+empty optional value.
+
+## But the given 400-like Bad Request errors are too precise. Why is a more general-purpose "Bad Request" error not available?
+
+Telepact has several errors to communicate request invalidity with respect to
+the API schema, but there is no out-of-the-box "Bad Request" error that a server
+can raise from some custom validation logic in the server handler.
+
+Overly generalized abstractions, such as a catch-all "Bad Request", are
+unpreferred in Telepact in favor rigid data types. Where necessary, all "Bad
+Request" use-cases can be enumerated in functions alongside the `Ok_` tag. API
+designers are encouraged to prefer data abstractions over errors wherever
+possible, such as preferring empty optionals over "not found" errors.
+
 ## Why do functions in Telepact not support positional arguments?
 
 Telepact functions are automatically associated with an argument struct and a
