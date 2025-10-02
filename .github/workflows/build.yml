@@ -135,6 +135,9 @@ jobs:
           name: build-py
           path: lib/py/dist
 
+      - name: Install Project CLI
+        run: make install-project-cli
+
       - name: Build cli
         run: make cli
 

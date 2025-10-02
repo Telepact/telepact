@@ -3,6 +3,6 @@ docker-dist/
 .venv/
 LICENSE
 NOTICE
-telepact_cli/telepact
 tmp/
 tests/tmp
+telepact_cli/telepact
