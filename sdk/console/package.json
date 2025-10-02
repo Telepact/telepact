@@ -1,6 +1,6 @@
 {
   "name": "telepact-console",
-  "version": "1.0.0-alpha.129",
+  "version": "1.0.0-alpha.130",
   "private": true,
   "scripts": {
     "dev": "vite dev --force",
