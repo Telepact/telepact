@@ -1,10 +1,7 @@
 High:
+- publish prettier plugin
 - Consider always-optional fields in generated code
 - Include ping_ in generated code
-- Consider auth errors in generated code
-- Add FAQ about middleware
-- Add FAQ about 400/404
-- Improve docs about how errors are appended to functions
 
 Medium:
 - Write tests that verify each type within a "link" function
