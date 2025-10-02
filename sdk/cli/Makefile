@@ -36,9 +36,9 @@ $(TAR_GZ): $(DEP_TAR_GZ) $(SRC_FILES)
 	poetry install
 
 	# TODO: Get "include" to work in pyproject.toml
-	sed -i '' '/^telepact_cli\/telepact/s/^/#/' .gitignore
+	telepact-project gitignore --remove telepact_cli/telepact
 	poetry build
-	sed -i '' '/^#telepact_cli\/telepact/s/^#//' .gitignore
+	telepact-project gitignore --add telepact_cli/telepact
 
 	mkdir tmp
 	cp dist/telepact_cli-*.tar.gz tmp/telepact_cli.tar.gz
@@ -72,6 +72,6 @@ old-test:
 
 deploy: $(TAR_GZ)
 	# TODO: Get "include" to work in pyproject.toml
-	sed -i '' '/^telepact_cli\/telepact/s/^/#/' .gitignore
+	telepact-project gitignore --remove telepact_cli/telepact
 	poetry publish
-	sed -i '' '/^#telepact_cli\/telepact/s/^#//' .gitignore
+	telepact-project gitignore --add telepact_cli/telepact
