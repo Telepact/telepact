@@ -96,7 +96,7 @@ deploy-cli:
 	$(MAKE) -C sdk/cli deploy
 
 install-cli:
-	pipx install $(wildcard sdk/cli/dist/telepact_cli-*.tar.gz)
+	pipx install $(wildcard sdk/cli/dist/telepact_cli-*.whl)
 
 uninstall-cli:
 	pipx uninstall telepact-cli
