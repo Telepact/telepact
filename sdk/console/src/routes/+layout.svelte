@@ -401,7 +401,7 @@
 								id="url"
 								placeholder="None  (draft mode)"
 								value={sourceUrl}
-								class="rounded-r-md border-0 bg-zinc-700 py-2 placeholder:text-gray-400 focus:border-gray-500 focus:ring-1 focus:ring-inset focus:ring-gray-500"
+								class="rounded-r-md border-0 bg-zinc-700 pl-2 py-2 placeholder:text-gray-400 focus:border-gray-500 focus:ring-1 focus:ring-inset focus:ring-gray-500"
 							/>
 						</div>
 					</div>
