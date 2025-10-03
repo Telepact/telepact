@@ -48,7 +48,7 @@ the API schema, but there is no out-of-the-box "Bad Request" error that a server
 can raise from some custom validation logic in the server handler.
 
 Overly generalized abstractions, such as a catch-all "Bad Request", are
-unpreferred in Telepact in precise of rigid data types. Where necessary, all
+unpreferred in Telepact in favor of precise data types. Where necessary, all
 "Bad Request" use-cases can be enumerated in function results alongside the
 `Ok_` tag. API designers are encouraged to prefer data abstractions over errors
 wherever possible, such as preferring empty optionals over "Not Found" errors.
