@@ -122,6 +122,9 @@ clean-console:
 test-console:
 	$(MAKE) -C sdk/console test
 
+deploy-console:
+	$(MAKE) -C sdk/console deploy
+
 console-self-hosted:
 	$(MAKE) -C test/console-self-hosted
 
