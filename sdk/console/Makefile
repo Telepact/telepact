@@ -32,9 +32,13 @@ all: $(DEP_LIB_DIST) $(DEP_PRETTIER_DIST)
 	mkdir -p src/lib/prettier-plugin-telepact
 	cp -r ../../sdk/prettier/dist/* src/lib/prettier-plugin-telepact
 
+	rm -rf dist-tgz
+	mkdir -p dist-tgz	
+
 	npm $(NPM_INSTALL)
 	npm run build
 	node clean-index.js
+	npm pack --pack-destination ./dist-tgz
 
 	mkdir -p dist
 
@@ -59,6 +63,7 @@ clean:
 	rm -rf src/lib/prettier-plugin-telepact
 	rm -rf node_modules
 	rm -rf dist
+	rm -rf dist-tgz
 	rm -rf LICENSE
 	rm -rf NOTICE
 
