@@ -40,6 +40,7 @@
   "type": "module",
   "dependencies": {
     "@prettier/sync": "^0.6.1",
+    "commander": "^14.0.1",
     "crc-32": "^1.2.2",
     "dompurify": "^3.2.7",
     "express": "^5.1.0",

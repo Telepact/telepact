@@ -19,20 +19,20 @@
 import express from 'express';
 import { fileURLToPath } from 'url';
 import { dirname, resolve } from 'path';
+import { Command } from 'commander';
+
+const program = new Command();
+
+program
+    .description('The Telepact Console is a web-based interface for inspecting, testing, and debugging live Telepact servers.')
+    .option('-p, --port <number>', 'port number', process.env.PORT || '4173')
+    .parse(process.argv);
+
+const options = program.opts();
+const port = parseInt(options.port, 10);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-
-const args = process.argv.slice(2);
-const portIndex = args.findIndex(arg => arg === '--port' || arg === '-p');
-let port = process.env.PORT || 4173;
-
-if (portIndex !== -1 && args[portIndex + 1]) {
-    const parsedPort = parseInt(args[portIndex + 1], 10);
-    if (!isNaN(parsedPort)) {
-        port = parsedPort;
-    }
-}
 
 const PORT = port;
 const BUILD_DIR = resolve(__dirname, 'build');
