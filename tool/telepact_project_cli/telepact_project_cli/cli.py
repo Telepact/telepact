@@ -533,8 +533,8 @@ def release() -> None:
                                 )
                                 asset_count += 1
                                 click.echo(f"Uploaded asset: {file_name} for target: {target}")
-            else:
-                click.echo(f"No assets found for target: {target} in directory: {asset_directory}")
+                else:
+                    click.echo(f"Asset directory does not exist: {asset_directory} for target: {target}")
 
     except Exception as e:
         click.echo(f"Failed to create release or upload assets: {e}")

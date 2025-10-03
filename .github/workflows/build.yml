@@ -151,6 +151,13 @@ jobs:
           path: sdk/cli/dist
           retention-days: 1
 
+      - name: Upload cli-docker build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-cli-docker
+          path: sdk/cli/docker-dist
+          retention-days: 1
+
   build-dart:
     name: Build Dart
     runs-on: ubuntu-latest
@@ -267,7 +274,14 @@ jobs:
           name: build-console
           path: sdk/console/dist
           retention-days: 1
-  
+
+      - name: Upload console-tgz build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-console-tgz
+          path: sdk/console/dist-tgz
+          retention-days: 1
+
   test-console-self-host:
     name: Test Self-Hosted Console
     runs-on: ubuntu-latest
