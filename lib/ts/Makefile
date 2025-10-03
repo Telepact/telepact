@@ -34,6 +34,7 @@ $(TAR_GZ): $(SRC_FILES)
 
 	npm $(NPM_INSTALL)
 	npm run build
+	npm pack --pack-destination ./dist-tgz
 
 clean:
 	rm -rf inc

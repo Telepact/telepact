@@ -103,6 +103,12 @@ jobs:
           name: build-cli
           path: sdk/cli/dist
 
+      - name: Download cli-docker artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-cli-docker
+          path: sdk/cli/dist-docker
+
       - name: Download prettier artifacts
         uses: actions/download-artifact@v4
         with:
@@ -114,6 +120,12 @@ jobs:
         with:
           name: build-console
           path: sdk/console/dist
+
+      - name: Download console-tgz artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-console-tgz
+          path: sdk/console/dist-tgz
 
       - name: Install Project CLI
         run: make install-project-cli

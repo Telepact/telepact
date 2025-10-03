@@ -31,7 +31,7 @@
     }
   },
   "scripts": {
-    "build": "tsc && rollup -c && npm pack --pack-destination ./dist-tgz"
+    "build": "tsc && rollup -c"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^28.0.6",
