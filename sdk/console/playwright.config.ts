@@ -28,7 +28,7 @@ const VERSION = fs.readFileSync(path.resolve(__dirname, '../../VERSION.txt'), 'u
 const config: PlaywrightTestConfig = {
 	webServer: [
 		{
-			command: `docker run --name telepact_console_test -p 8084:8080 telepact-console:${VERSION}`,
+			command: `npx . -p 8084`,
 			port: 8084,
 		},
 		{
@@ -44,8 +44,7 @@ const config: PlaywrightTestConfig = {
 		contextOptions: {
 			permissions: ['clipboard-read']
 		}
-	},
-	globalTeardown: path.resolve(__dirname, 'teardown.js') // Ensure teardown script uses default export
+	}
 };
 
 export default config;
