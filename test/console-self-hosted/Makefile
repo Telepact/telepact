@@ -16,7 +16,7 @@
 
 VERSION := $(shell cat ../../VERSION.txt)
 
-LIB_TAR_GZ := ../../sdk/console/dist/*.tar.gz
+LIB_TAR_GZ := ../../sdk/console/dist-docker/*.tar.gz
 TAR_GZ := telepact-console.tar.gz
 
 all: $(TAR_GZ)
