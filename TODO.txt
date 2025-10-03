@@ -1,5 +1,6 @@
 High:
 - publish prettier plugin
+- Publish console as an npx command
 - Consider always-optional fields in generated code
 - Include ping_ in generated code
 - Fix tailwind topography plugin
@@ -15,5 +16,3 @@ Low:
 - console: Improve consistency around simluation naming. Still have lingering ideas around mock and example.
 - Console light mode and listen to os setting
 - Clean up java test code coverage errors
-- Cleanup old UMock language
-- Cleanup old vers api language
