@@ -24,7 +24,7 @@ import { Command } from 'commander';
 const program = new Command();
 
 program
-    .description('The Telepact Console is a web-based interface for inspecting, testing, and debugging live Telepact servers.')
+    .description('The Telepact Console is a web-based interface for inspecting and testing Telepact APIs.')
     .option('-p, --port <number>', 'port number', process.env.PORT || '4173')
     .parse(process.argv);
 
