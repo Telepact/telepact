@@ -48,10 +48,10 @@ the API schema, but there is no out-of-the-box "Bad Request" error that a server
 can raise from some custom validation logic in the server handler.
 
 Overly generalized abstractions, such as a catch-all "Bad Request", are
-unpreferred in Telepact in favor rigid data types. Where necessary, all "Bad
-Request" use-cases can be enumerated in functions alongside the `Ok_` tag. API
-designers are encouraged to prefer data abstractions over errors wherever
-possible, such as preferring empty optionals over "not found" errors.
+unpreferred in Telepact in favor of rigid data types. Where necessary, all "Bad
+Request" use-cases can be enumerated in function results alongside the `Ok_`
+tag. API designers are encouraged to prefer data abstractions over errors
+wherever possible, such as preferring empty optionals over "Not Found" errors.
 
 ## Why do functions in Telepact not support positional arguments?
 
