@@ -1,6 +1,6 @@
 # Telepact Prettier Plugin
 
-Keep your Telepact API schemas well-formatted (especially the docstirngs) using
+Keep your Telepact API schemas well-formatted (especially the docstrings) using
 this prettier plugin
 
 ## Installation
