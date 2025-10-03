@@ -268,11 +268,11 @@ jobs:
       - name: Run tests
         run: DEBUG=pw:api make test-console
 
-      - name: Upload console build artifacts
+      - name: Upload console-docker build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: build-console
-          path: sdk/console/dist
+          name: build-console-docker
+          path: sdk/console/dist-docker
           retention-days: 1
 
       - name: Upload console-tgz build artifacts

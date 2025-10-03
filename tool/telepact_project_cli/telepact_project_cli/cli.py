@@ -439,8 +439,8 @@ def release() -> None:
         "py": ["lib/py/dist"],
         "ts": ["lib/ts/dist-tgz"],
         "dart": ["bind/dart/dist"],
-        "cli": ["sdk/cli/dist", "sdk/cli/docker-dist"],
-        "console": ["sdk/console/dist"],
+        "cli": ["sdk/cli/dist", "sdk/cli/dist-docker"],
+        "console": ["sdk/console/dist-tgz", "sdk/console/dist-docker"],
         "prettier": ["sdk/prettier/dist-tgz"]
     }
 

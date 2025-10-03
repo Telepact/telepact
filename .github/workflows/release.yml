@@ -115,11 +115,11 @@ jobs:
           name: build-prettier-tgz
           path: sdk/prettier/dist-tgz
 
-      - name: Download console artifacts
+      - name: Download console-docker artifacts
         uses: actions/download-artifact@v4
         with:
-          name: build-console
-          path: sdk/console/dist
+          name: build-console-docker
+          path: sdk/console/dist-docker
 
       - name: Download console-tgz artifacts
         uses: actions/download-artifact@v4

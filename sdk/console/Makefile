@@ -40,10 +40,10 @@ all: $(DEP_LIB_DIST) $(DEP_PRETTIER_DIST)
 	node clean-index.js
 	npm pack --pack-destination ./dist-tgz
 
-	mkdir -p dist
+	mkdir -p dist-docker
 
 	docker build --progress=plain --no-cache -f Dockerfile -t telepact-console:${VERSION} .
-	docker save telepact-console:${VERSION} | gzip > dist/docker-image-telepact-console-${VERSION}.tar.gz
+	docker save telepact-console:${VERSION} | gzip > dist-docker/docker-image-telepact-console-${VERSION}.tar.gz
 
 $(DEP_LIB_DIST):
 	$(MAKE) -C ../../lib/ts
@@ -62,7 +62,7 @@ clean:
 	rm -rf src/lib/telepact
 	rm -rf src/lib/prettier-plugin-telepact
 	rm -rf node_modules
-	rm -rf dist
+	rm -rf dist-docker
 	rm -rf dist-tgz
 	rm -rf LICENSE
 	rm -rf NOTICE
