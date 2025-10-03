@@ -64,10 +64,8 @@
 	}
 
 	function toggleHeaderForExample(header: string, schemaKey: string) {
-		console.log(`toggleHeaderForExample`, header, schemaKey);
 		let q = new URLSearchParams($page.url.searchParams.toString());
 		let existingHeaders = (q.get('mh') ?? '').split(',').filter((h) => h !== '');
-		console.log(`existingHeaders`, existingHeaders);
 		let newHeaders = existingHeaders.includes(header)
 			? existingHeaders.filter((h) => h !== header)
 			: [...existingHeaders, header];

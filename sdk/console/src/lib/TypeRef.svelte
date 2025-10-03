@@ -41,7 +41,6 @@
 			generics = typeData["string"];
 		} else {
 			typeName = typeData as string;
-			console.log("TypeName:", typeName);
 			nullable = typeName.endsWith('?');
 			cleanTypeName = typeName.replace(/\?$/g, '');
 			let displayNameSpit = cleanTypeName.split('.');

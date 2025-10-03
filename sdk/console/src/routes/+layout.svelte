@@ -77,8 +77,6 @@
 
 	let authManaged: boolean = $derived($page.data.authManaged);
 
-	console.log(`page.data`, $page.data);
-
 	let selectedViews = $derived($page.url.searchParams.get('v') ?? 'd');
 
 	let activeViews: string = $derived(selectedViews.substring(0, 2));
@@ -100,7 +98,6 @@
 	$effect(() => {
 		if (telepactSchemaPromise) {
 			telepactSchemaPromise.then((e) => {
-				console.log('Reloading request json schema');
 				const requestJsonSchema = createJsonSchema(e);
 				monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
 					schemas: [
@@ -125,7 +122,6 @@
 	let randomSeed = $state(1);
 
 	function handleSourceGet(e: Event) {
-		console.log(`e`, e);
 		const formData = new FormData(e.target as HTMLFormElement);
 		const sourceUrl = formData.get('url') as string;
 
