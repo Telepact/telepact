@@ -147,6 +147,20 @@ def _generate_internal(schema_data: list[dict[str, object]], possible_fn_selects
     template_env.filters['find_tag_key'] = _find_tag_key
     template_env.globals['raise_error'] = _raise_error
 
+    # Find all errors. definitions, and append to function results
+    errors: list[dict[str, object]] = []
+    for schema_entry in schema_data:
+        schema_key = _find_schema_key(schema_entry)
+        if schema_key.startswith('errors'):
+            errors.extend(cast(list[dict[str, object]], schema_entry[schema_key]))
+
+    if errors:
+        for schema_entry in schema_data:
+            schema_key = _find_schema_key(schema_entry)
+            if schema_key.startswith('fn'):
+                results = cast(list[dict[str, object]], schema_entry['->'])
+                results.extend(errors)
+
     if target == "java":
 
         functions: list[str] = []

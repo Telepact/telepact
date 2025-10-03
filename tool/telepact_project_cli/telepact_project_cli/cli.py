@@ -23,6 +23,7 @@ import toml
 from ruamel.yaml import YAML
 import subprocess
 from github import Github, GithubException
+from pathlib import Path
 
 yaml = YAML()
 
@@ -124,7 +125,11 @@ def bump() -> None:
         'sdk/console/package.json',
     ]
 
-    pr_number = int(os.getenv('PR_NUMBER'))
+    pr_number_str = os.getenv('PR_NUMBER')
+    if not pr_number_str:
+        click.echo("PR_NUMBER environment variable not set.", err=True)
+        sys.exit(1)
+    pr_number = int(pr_number_str)
 
     # Get the paths from the previous commit
     prev_commit_paths = subprocess.run(
@@ -379,7 +384,11 @@ def github_labels() -> None:
     # Get environment variables
     token = os.getenv('GITHUB_TOKEN')
     repository = os.getenv('GITHUB_REPOSITORY')
-    pr_number = int(os.getenv('PR_NUMBER'))
+    pr_number_str = os.getenv('PR_NUMBER')
+    if not pr_number_str:
+        click.echo("PR_NUMBER environment variable not set.", err=True)
+        sys.exit(1)
+    pr_number = int(pr_number_str)
     base_branch = os.getenv('BASE_BRANCH')
     head_sha = os.getenv('HEAD_SHA')
 
@@ -609,6 +618,36 @@ def automerge():
     pr.enable_automerge(merge_method='SQUASH')
     print("Pull Request will be automerged when build succeeds.")
 
+@click.command()
+@click.option('--add', 'add_name', help='Add a name to .gitignore')
+@click.option('--remove', 'remove_name', help='Remove a name from .gitignore')
+def gitignore(add_name, remove_name):
+    """Add or remove entries in .gitignore"""
+    if add_name and remove_name:
+        raise click.UsageError("Cannot use --add and --remove at the same time.")
+    if not add_name and not remove_name:
+        raise click.UsageError("Must provide either --add or --remove.")
+
+    gitignore_path = Path('.gitignore')
+
+    if not gitignore_path.exists():
+        if remove_name:
+            return  # Nothing to remove
+        if add_name:
+            gitignore_path.touch()
+
+    lines = gitignore_path.read_text().splitlines()
+    name = add_name or remove_name
+
+    if add_name:
+        if name not in lines:
+            with gitignore_path.open('a') as f:
+                f.write(f"\n{name}")
+    elif remove_name:
+        if name in lines:
+            new_lines = [line for line in lines if line != name]
+            gitignore_path.write_text('\n'.join(new_lines))
+
 main.add_command(get)
 main.add_command(set_version)
 main.add_command(bump)
@@ -616,6 +655,7 @@ main.add_command(license_header)
 main.add_command(github_labels)
 main.add_command(release)
 main.add_command(automerge)
+main.add_command(gitignore)
 
 if __name__ == "__main__":
     main()

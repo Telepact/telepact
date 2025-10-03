@@ -101,6 +101,9 @@ jobs:
       - name: Install Poetry
         run: pipx install poetry
 
+      - name: Install Project CLI
+        run: make install-project-cli
+
       - name: Publish to PyPI
         env:
           POETRY_PYPI_TOKEN_PYPI: ${{ secrets.PYPI_TOKEN }}

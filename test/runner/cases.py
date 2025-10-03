@@ -322,6 +322,9 @@ cases = {
     'testApplicationFailure': [
         [[{'@throw': True}, {'fn.test': {}}], [{}, {'ErrorUnknown_': {}}]],
     ],
+    'error': [
+        [[{'@error': True}, {'fn.test': {}}], [{}, {'ErrorExample2': {'field1': 'Boom!'}}]],
+    ],
     'multipleFailures': [
         [[{}, {'fn.test': {'value!': {'struct!': {'optional!': 'wrong', 'a': False}}}}], [{'@assert_': {'setCompare': True}}, {'ErrorInvalidRequestBody_': {'cases': [{'path': ['fn.test', 'value!', 'struct!', 'optional!'], 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}, {'path': ['fn.test', 'value!', 'struct!'], 'reason': {'RequiredObjectKeyMissing': {'key': 'required'}}}, {'path': ['fn.test', 'value!', 'struct!', 'a'], 'reason': {'ObjectKeyDisallowed': {}}}]}}]],
     ],

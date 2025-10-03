@@ -34,7 +34,11 @@ $(TAR_GZ): $(DEP_TAR_GZ) $(SRC_FILES)
 	rm -rf dist
 	poetry lock
 	poetry install
+
+	# TODO: Get "include" to work in pyproject.toml
+	telepact-project gitignore --remove telepact_cli/telepact
 	poetry build
+	telepact-project gitignore --add telepact_cli/telepact
 
 	mkdir tmp
 	cp dist/telepact_cli-*.tar.gz tmp/telepact_cli.tar.gz
@@ -67,4 +71,7 @@ old-test:
 	poetry run telepact codegen --schema-dir tests/data --lang ts --out tests/output/ts
 
 deploy: $(TAR_GZ)
+	# TODO: Get "include" to work in pyproject.toml
+	telepact-project gitignore --remove telepact_cli/telepact
 	poetry publish
+	telepact-project gitignore --add telepact_cli/telepact

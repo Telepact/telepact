@@ -601,7 +601,7 @@ public class Main {
             lock.lock();
             done.await();
 
-            metricsReporter.report();
+            //metricsReporter.report();
 
             System.out.println("Dispatcher exiting");
         }
