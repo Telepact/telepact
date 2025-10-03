@@ -71,6 +71,8 @@
   },
   "files": [
     "build",
-    "cli.js"
+    "cli.js",
+    "LICENSE",
+    "NOTICE"
   ]
 }
