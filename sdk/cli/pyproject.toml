@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "telepact-cli"
-version = "1.0.0-alpha.142"
+version = "1.0.0-alpha.143"
 description = "A CLI tool for various local Telepact operations."
 authors = [ "Telepact Authors <telepact@googlegroups.com>",]
 readme = "README.md"
