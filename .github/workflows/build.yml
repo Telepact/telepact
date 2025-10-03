@@ -155,7 +155,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: build-cli-docker
-          path: sdk/cli/docker-dist
+          path: sdk/cli/dist-docker
           retention-days: 1
 
   build-dart:

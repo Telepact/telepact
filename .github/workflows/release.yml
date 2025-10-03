@@ -107,7 +107,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: build-cli-docker
-          path: sdk/cli/docker-dist
+          path: sdk/cli/dist-docker
 
       - name: Download prettier artifacts
         uses: actions/download-artifact@v4

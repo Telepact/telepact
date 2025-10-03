@@ -47,8 +47,8 @@ $(TAR_GZ): $(DEP_TAR_GZ) $(SRC_FILES)
 
 	rm -rf tmp
 
-	mkdir -p docker-dist
-	docker save telepact-cli:${VERSION} | gzip > docker-dist/docker-image-telepact-cli-${VERSION}.tar.gz
+	mkdir -p dist-docker
+	docker save telepact-cli:${VERSION} | gzip > dist-docker/docker-image-telepact-cli-${VERSION}.tar.gz
 
 
 $(DEP_TAR_GZ):
@@ -56,7 +56,7 @@ $(DEP_TAR_GZ):
 
 clean:
 	rm -rf dist
-	rm -rf docker-dist
+	rm -rf dist-docker
 	rm -rf telepact_cli/telepact
 	rm -rf tmp
 	rm -f LICENSE NOTICE
