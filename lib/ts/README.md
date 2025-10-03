@@ -36,19 +36,33 @@ const handler = async (requestMessage: Message): Promise<Message> => {
     const functionName = Object.keys(requestMessage.body)[0];
     const arguments = requestMessage.body[functionName];
 
-    if (functionName == 'fn.greet') {
-        var subject = arguments['subject'];
-        return new Message({}, {Ok_: {message: `Hello ${subject}!`}});
+    try {
+        // Early in the handler, perform any pre-flight "middleware" operations, such as
+        // authentication, tracing, or logging.
+        log.info("Function started", {function: functionName});
+
+        // Dispatch request to appropriate function handling code.
+        // (This example uses manual dispatching, but you can also use a more advanced pattern.)
+        if (functionName == 'fn.greet') {
+            var subject = arguments['subject'];
+            return new Message({}, {Ok_: {message: `Hello ${subject}!`}});
+        }
+
+        throw new Error('Function not found');
+    } finally {
+        // At the end the handler, perform any post-flight "middleware" operations
+        log.info("Function finished", {function: functionName});
     }
-    
-    throw new Error('Function not found');
 };
 
 const options = new ServerOptions();
 const server = new Server(schema, handler, options);
 
 // Wire up request/response bytes from your transport of choice
-const responseBytes = server.process(requestBytes);
+transport.receive(async (requestBytes): Promise<Message> => {
+    const responseBytes = await server.process(requestBytes);
+    return responseBytes;
+});
 ```
 
 Client:
@@ -57,6 +71,7 @@ const adapter: (m: Message, s: Serializer) => Promise<Message> = async (m, s) =>
     const requestBytes = s.serialize(m);
 
     // Wire up request/response bytes to your transport of choice
+    const responseBytes = await transport.send(requestBytes);
 
     return s.deserialize(responseBytes);
 };
