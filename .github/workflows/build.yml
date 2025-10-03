@@ -294,8 +294,8 @@ jobs:
       - name: Download console build artifacts
         uses: actions/download-artifact@v4
         with:
-          name: build-console
-          path: sdk/console/dist
+          name: build-console-docker
+          path: sdk/console/dist-docker
 
       - name: Build test environment
         run: make console-self-hosted
