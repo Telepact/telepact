@@ -479,25 +479,27 @@
 			{#if activeViews.includes('d')}
 				<div class="flex overflow-scroll {getSectionClass('d', activeViews.length)}">
 					<div class="flex w-full flex-col p-6">
-						<div>
-							<h1 class="pb-4 text-xl font-semibold text-gray-100">Schema</h1>
-						</div>
-						{#key sortDocCardsAZ}
-							{#each parseTelepactSchema(filteredSchemaPseudoJson, telepactSchema, sortDocCardsAZ, showInternalApi) as entry}
-								{#if showInternalApi || !(Object.keys(entry)[0].split('.')[1] ?? '').endsWith('_')}
-									<DocCard {entry} {telepactSchema} />
-								{/if}
-							{/each}
+						{#key showInternalApi}
+							<div>
+								<h1 class="pb-4 text-xl font-semibold text-gray-100">Schema</h1>
+							</div>
+							{#key sortDocCardsAZ}
+								{#each parseTelepactSchema(filteredSchemaPseudoJson, telepactSchema, sortDocCardsAZ, showInternalApi) as entry}
+									{#if showInternalApi || !(Object.keys(entry)[0].split('.')[1] ?? '').endsWith('_')}
+										<DocCard {entry} {telepactSchema} />
+									{/if}
+								{/each}
+							{/key}
+							<div class="flex justify-center pb-4">
+								<button
+									onclick={toggleShowInternalApi}
+									class="mt-4 rounded-md bg-sky-700 px-3 py-2 text-sm font-semibold text-white hover:bg-sky-600"
+									>{showInternalApi
+										? 'Hide Internal Api'
+										: 'Show Internal Api'}</button
+								>
+							</div>
 						{/key}
-						<div class="flex justify-center pb-4">
-							<button
-								onclick={toggleShowInternalApi}
-								class="mt-4 rounded-md bg-sky-700 px-3 py-2 text-sm font-semibold text-white hover:bg-sky-600"
-								>{showInternalApi
-									? 'Hide Internal Api'
-									: 'Show Internal Api'}</button
-							>
-						</div>
 					</div>
 				</div>
 			{/if}

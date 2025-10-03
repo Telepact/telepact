@@ -15,7 +15,6 @@
 <!--|                                                                            |-->
 
 <script lang="ts">
-	import { applyErrorToParsedTypes } from './telepact/src/internal/schema/ApplyErrorToParsedTypes';
 	import TypeRef from './TypeRef.svelte';
 	interface Props {
 		types: any;
@@ -42,6 +41,7 @@
 			generics = typeData["string"];
 		} else {
 			typeName = typeData as string;
+			console.log("TypeName:", typeName);
 			nullable = typeName.endsWith('?');
 			cleanTypeName = typeName.replace(/\?$/g, '');
 			let displayNameSpit = cleanTypeName.split('.');
