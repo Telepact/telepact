@@ -34,19 +34,34 @@ var schema = TelepactSchema.fromFilesJsonMap(files.filenamesToJson)
 Function<Message, Message> handler = (requestMessage) -> {
     var functionName = requestMessage.body.keySet().stream().findAny();
     var arguments = (Map<String, Object>) requestMessage.body.get(functionName);
-    if (functionName.equals("fn.greet")) {
-        var subject = (String) arguments.get("subject");
-        return new Message(Map.of(), Map.of("Ok_", Map.of("message": "Hello %s!".formatted(subject))));
-    }
 
-    throw new RuntimeException("Function not found");
+    try {
+        // Early in the handler, perform any pre-flight "middleware" operations, such as
+        // authentication, tracing, or logging.
+        log.info("Function started", Map.of("function", functionName));
+
+        // Dispatch request to appropriate function handling code.
+        // (This example uses manual dispatching, but you can also use a more advanced pattern.)
+        if (functionName.equals("fn.greet")) {
+            var subject = (String) arguments.get("subject");
+            return new Message(Map.of(), Map.of("Ok_", Map.of("message": "Hello %s!".formatted(subject))));
+        }
+
+        throw new RuntimeException("Function not found");
+    } finally {
+        // At the end the handler, perform any post-flight "middleware" operations
+        log.info("Function finished", Map.of("function", functionName));
+    }
 };
 var options = new Server.Options();
 var server = new Server(schema, handler, options);
 
 
 // Wire up request/response bytes from your transport of choice
-var responseBytes = server.process(requestBytes);
+transport.receive((requestBytes) -> {
+    var responseBytes = server.process(requestBytes);
+    return responseBytes;
+});
 ```
 
 Client:
@@ -56,6 +71,7 @@ BiFunction<Message, Serializer, Future<Message>> adapter = (m, s) -> {
         var requestBytes = s.serialize(m);
         
         // Wire up request/response bytes to your transport of choice
+        var responseBytes = transport.send(requestBytes);
         
         return s.deserialize(responseBytes);
     });
