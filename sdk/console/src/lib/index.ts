@@ -209,7 +209,6 @@ export function generateHeaderExample(
 	headers: string[],
 	schemaInst: telepact.TelepactSchema
 ) {
-	console.log(`schemaInst.parsedRequestHeaders ${Object.keys(schemaInst.parsedRequestHeaders)}`);
 	let genHeaders: Record<string, any> = {};
 	for (const header of headers) {
 		if (headerType == 'request') {
@@ -241,7 +240,6 @@ export async function genExample(
 	headers: Array<string>,
 	schemaInst: telepact.TelepactSchema
 ) {
-	console.log(`Generating example for ${fn} with headers ${headers}`);
 	let example = schemaInst.parsed[fn].generateRandomValue(
 		null,
 		false,
@@ -304,7 +302,6 @@ export function parseTelepactSchema(
 	sortDocCardsAZ: boolean,
 	showInternalApi: boolean
 ): TypeData[] {
-	console.log(`Parsing schema with ${schemaInst} ${schemaInst.full} ${schemaInst.original}`);
 	let pseudoJson: Record<string, any>[] = showInternalApi ? schemaInst.full : schemaInst.original;
 
 	let preppedPseudoJson = pseudoJson.map((e) => [findSchemaKey(e), e] as [string, any]);

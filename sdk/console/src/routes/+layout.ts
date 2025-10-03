@@ -46,7 +46,6 @@ declare global {
 }
 
 export const load: LayoutLoad = async ({ url, params, route, fetch }) => {
-	console.log('layout load');
 	let schemaSource = url.searchParams.get('s') ?? '';
 	let showInternalApi = url.searchParams.get('i') === '1';
 
