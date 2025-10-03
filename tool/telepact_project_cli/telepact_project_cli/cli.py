@@ -301,7 +301,11 @@ def license_header(license_header_path):
         new_lines = []
         start_copying = False
 
+        shebang = lines[0] if lines and lines[0].startswith('#!') else None
+
         for line in lines:
+            if line.startswith('#!'):
+                continue
             if start_copying:
                 new_lines.append(line)
                 continue
@@ -316,6 +320,11 @@ def license_header(license_header_path):
         license_text = ''.join([f"{start_comment_syntax}  {line.strip().ljust(max_length)}{end_comment_syntax}".strip() + "\n" for line in license_header])
 
         new_banner = ""
+
+        if shebang:
+            new_banner += shebang
+            new_banner += "\n"
+
         new_banner += f"{start_comment_syntax}  {''.ljust(max_length)}{end_comment_syntax}".strip() + "\n"
         new_banner += f"{license_text.strip()}\n"
         new_banner += f"{start_comment_syntax}  {''.ljust(max_length)}{end_comment_syntax}".strip() + "\n\n"
