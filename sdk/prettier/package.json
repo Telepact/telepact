@@ -1,7 +1,21 @@
 {
   "name": "prettier-plugin-telepact",
   "version": "1.0.0-alpha.148",
-  "description": "Prettier plugin to format telepact docstrings.",
+  "description": "Prettier plugin to format Telepact API schemas.",
+  "type": "module",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/telepact/telepact.git"
+  },
+  "bugs": {
+    "url": "https://github.com/telepact/telepact/issues"
+  },
+  "homepage": "https://github.com/Telepact/telepact/blob/main/sdk/prettier/README.md",
+  "author": {
+    "name": "Telepact Authors",
+    "email": "telepact@googlegroups.com"
+  },
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
   "types": "dist/index.d.ts",
@@ -12,7 +26,6 @@
       "types": "./dist/index.d.ts"
     }
   },
-  "private": true,
   "keywords": [
     "prettier",
     "plugin",
@@ -31,6 +44,11 @@
     "typescript": "^5.9.3"
   },
   "scripts": {
-    "build": "tsc && rollup -c && npm pack --pack-destination ./dist-tgz"
-  }
+    "build": "tsc && rollup -c"
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "NOTICE"
+  ]
 }

@@ -14,19 +14,24 @@
 #|  limitations under the License.
 #|
 
-.PHONY: all
+NPM_INSTALL ?= install
+TAR_GZ := dist-tgz/*.tgz
 
-all:
+$(TAR_GZ):
 	rm -rf dist
 	mkdir -p dist
 	cp ../../LICENSE ../../NOTICE dist
 
 	mkdir -p dist-tgz
-	
-	npm install
+
+	npm $(NPM_INSTALL)
 	npm run build
+	npm pack --pack-destination ./dist-tgz
 
 clean:
 	rm -rf dist
 	rm -rf dist-tgz
 	rm -rf node_modules
+
+deploy: $(TAR_GZ)
+	npm publish

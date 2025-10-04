@@ -20,8 +20,6 @@ TAR_GZ := dist-tgz/*.tgz
 DEP_LIB_DIST := ../../lib/ts/dist
 DEP_PRETTIER_DIST := ../../sdk/prettier/dist
 
-.PHONY: all
-
 $(TAR_GZ): $(DEP_LIB_DIST) $(DEP_PRETTIER_DIST)
 	cp ../../LICENSE ../../NOTICE ./
 	

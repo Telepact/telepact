@@ -107,6 +107,9 @@ prettier:
 clean-prettier:
 	$(MAKE) -C sdk/prettier clean
 
+deploy-prettier:
+	$(MAKE) -C sdk/prettier deploy
+
 console:
 	$(MAKE) -C sdk/console
 
