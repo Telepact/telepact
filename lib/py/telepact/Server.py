@@ -65,11 +65,11 @@ class Server:
                 "Unauthenticated server. Either define a `struct.Auth_` in your schema or set `options.auth_required` to `false`."
             )
 
-    async def process(self, request_message_bytes: bytes) -> bytes:
+    async def process(self, request_message_bytes: bytes, override_headers: dict[str, object] = {}) -> bytes:
         """
         Process a given telepact Request Message into a telepact Response Message.
         """
         from .internal.ProcessBytes import process_bytes
 
-        return await process_bytes(request_message_bytes, self.serializer, self.telepact_schema, self.on_error,
+        return await process_bytes(request_message_bytes, override_headers, self.serializer, self.telepact_schema, self.on_error,
                                    self.on_request, self.on_response, self.handler)
