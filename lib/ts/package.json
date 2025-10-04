@@ -52,6 +52,8 @@
     "msgpackr": "^1.11.5"
   },
   "files": [
-    "dist"
+    "dist",
+    "LICENSE",
+    "NOTICE"
   ]
 }

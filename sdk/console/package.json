@@ -1,7 +1,27 @@
 {
   "name": "telepact-console",
   "version": "1.0.0-alpha.144",
-  "private": true,
+  "description": "A web-based interface for inspecting and testing Telepact APIs.",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/telepact/telepact.git",
+    "directory": "sdk/console"
+  },
+  "keywords": [
+    "telepact",
+    "console",
+    "api",
+    "developer-tools"
+  ],
+  "bugs": {
+    "url": "https://github.com/telepact/telepact/issues"
+  },
+  "homepage": "https://github.com/Telepact/telepact/blob/main/sdk/console/README.md",
+  "author": {
+    "name": "Telepact Authors",
+    "email": "telepact@googlegroups.com"
+  },
   "bin": "cli.js",
   "scripts": {
     "dev": "vite dev --force",
@@ -51,6 +71,8 @@
   },
   "files": [
     "build",
-    "cli.js"
+    "cli.js",
+    "LICENSE",
+    "NOTICE"
   ]
 }

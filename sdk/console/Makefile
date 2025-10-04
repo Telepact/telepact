@@ -16,12 +16,13 @@
 
 NPM_INSTALL ?= install
 VERSION := $(shell cat ../../VERSION.txt)
+TAR_GZ := dist-tgz/*.tgz
 DEP_LIB_DIST := ../../lib/ts/dist
 DEP_PRETTIER_DIST := ../../sdk/prettier/dist
 
 .PHONY: all
 
-all: $(DEP_LIB_DIST) $(DEP_PRETTIER_DIST)
+$(TAR_GZ): $(DEP_LIB_DIST) $(DEP_PRETTIER_DIST)
 	cp ../../LICENSE ../../NOTICE ./
 	
 	rm -rf src/lib/telepact
@@ -72,3 +73,6 @@ test:
 
 dev-proxy:
 	node proxy-server.cjs
+
+deploy: $(TAR_GZ)
+	npm publish
