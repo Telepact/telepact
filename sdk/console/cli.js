@@ -26,6 +26,7 @@ const program = new Command();
 program
     .description('The Telepact Console is a web-based interface for inspecting and testing Telepact APIs.')
     .option('-p, --port <number>', 'port number', process.env.PORT || '4173')
+    .option('-d, --debug', 'enable additional logging', false)
     .parse(process.argv);
 
 const options = program.opts();
@@ -39,10 +40,19 @@ const BUILD_DIR = resolve(__dirname, 'build');
 
 const app = express();
 
-app.use('/', express.static(BUILD_DIR));
+app.use('/', express.static(BUILD_DIR, {
+	fallthrough: false
+}));
 
-app.use((req, res) => {
-    res.sendFile(resolve(BUILD_DIR, 'index.html'));
+app.use((err, req, res, next) => {
+    if (err.code === 'ENOENT') {
+        if (options.debug) {
+            console.error(`File not found: ${req.path}`);
+        }
+        res.status(404).send('Not Found');
+    } else {
+        next(err);
+    }
 });
 
 app.listen(PORT, () => {
