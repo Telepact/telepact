@@ -45,5 +45,10 @@
   },
   "scripts": {
     "build": "tsc && rollup -c"
-  }
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "NOTICE"
+  ]
 }
