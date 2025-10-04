@@ -29,7 +29,7 @@ import io.github.telepact.TelepactSchema;
 import io.github.telepact.Serializer;
 
 public class ProcessBytes {
-    public static byte[] processBytes(byte[] requestMessageBytes, Serializer serializer, TelepactSchema telepactSchema,
+    public static byte[] processBytes(byte[] requestMessageBytes, Map<String, Object> overrideHeaders, Serializer serializer, TelepactSchema telepactSchema,
             Consumer<Throwable> onError, Consumer<Message> onRequest, Consumer<Message> onResponse,
             Function<Message, Message> handler) {
         try {
@@ -41,7 +41,7 @@ public class ProcessBytes {
             } catch (Throwable ignored) {
             }
 
-            final var responseMessage = handleMessage(requestMessage, telepactSchema, handler, onError);
+            final var responseMessage = handleMessage(requestMessage, overrideHeaders, telepactSchema, handler, onError);
 
             try {
                 onResponse.accept(responseMessage);

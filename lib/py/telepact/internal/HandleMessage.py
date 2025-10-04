@@ -29,6 +29,7 @@ if TYPE_CHECKING:
 
 async def handle_message(
     request_message: 'Message',
+    override_headers: dict[str, object],
     telepact_schema: 'TelepactSchema',
     handler: Callable[['Message'], Awaitable['Message']],
     on_error: Callable[[Exception], None],
@@ -45,6 +46,8 @@ async def handle_message(
     request_body: dict[str, object] = request_message.body
     parsed_telepact_schema: dict[str, TType] = telepact_schema.parsed
     request_entry: tuple[str, object] = next(iter(request_body.items()))
+
+    request_headers.update(override_headers)
 
     request_target_init = request_entry[0]
     request_payload = cast(

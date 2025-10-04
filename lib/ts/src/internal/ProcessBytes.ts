@@ -27,6 +27,7 @@ export type MessageHandler = (message: Message) => Promise<Message>;
 
 export async function processBytes(
     requestMessageBytes: Uint8Array,
+    overrideHeaders: Record<string, object>,
     serializer: Serializer,
     telepactSchema: TelepactSchema,
     onError: ErrorHandler,
@@ -43,7 +44,7 @@ export async function processBytes(
             // Handle error
         }
 
-        const responseMessage = await handleMessage(requestMessage, telepactSchema, handler, onError);
+        const responseMessage = await handleMessage(requestMessage, overrideHeaders, telepactSchema, handler, onError);
 
         try {
             onResponse(responseMessage);
