@@ -27,7 +27,7 @@ export type MessageHandler = (message: Message) => Promise<Message>;
 
 export async function processBytes(
     requestMessageBytes: Uint8Array,
-    overrideHeaders: Record<string, object>,
+    overrideHeaders: Record<string, any>,
     serializer: Serializer,
     telepactSchema: TelepactSchema,
     onError: ErrorHandler,

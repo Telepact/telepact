@@ -70,6 +70,8 @@ def handler(request):
         return None
     elif '@error' in header:
         return [response_header, {'ErrorExample2': {'field1': 'Boom!'}}]
+    elif header.get('@override', None) != 'new':
+        return [response_header, {'ErrorUnknown_': {}}]
     else:
         return [response_header, {'Ok_': {}}]
 

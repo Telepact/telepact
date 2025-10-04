@@ -30,7 +30,7 @@ import { serverBase64Decode } from './binary/ServerBase64Decode';
 
 export async function handleMessage(
     requestMessage: Message,
-    overrideHeaders: Record<string, object>,
+    overrideHeaders: Record<string, any>,
     telepactSchema: TelepactSchema,
     handler: (message: Message) => Promise<Message>,
     onError: (error: Error) => void,
