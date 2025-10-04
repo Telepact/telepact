@@ -1,9 +1,8 @@
 High:
+- Allow a "overrideHeaders" param to the telepact server.process()
 - publish prettier plugin
-- Publish console as an npx command
 - Consider always-optional fields in generated code
 - Include ping_ in generated code
-- Fix tailwind topography plugin
 
 Medium:
 - Write tests that verify each type within a "link" function
