@@ -27,7 +27,7 @@ if TYPE_CHECKING:
     from ..types.TFieldDeclaration import TFieldDeclaration
 
 
-def parse_vers_api_schema(
+def parse_telepact_schema(
     telepact_schema_document_names_to_json: dict[str, str],
 ) -> 'TelepactSchema':
     from ...TelepactSchemaParseError import TelepactSchemaParseError
@@ -121,7 +121,7 @@ def parse_vers_api_schema(
                 schema_keys.add(schema_key)
                 schema_keys_to_index[schema_key] = index
                 schema_keys_to_document_names[schema_key] = document_name
-                if document_name == 'auto_' or not document_name.endswith('_'):
+                if document_name == 'auto_' or document_name == 'auth_' or not document_name.endswith('_'):
                     original_schema[schema_key] = def_
 
             except TelepactSchemaParseError as e:

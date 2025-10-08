@@ -39,13 +39,15 @@ import io.github.telepact.internal.validation.ValidateContext;
 import io.github.telepact.internal.validation.ValidationFailure;
 
 public class HandleMessage {
-    static Message handleMessage(Message requestMessage, TelepactSchema telepactSchema, Function<Message, Message> handler,
+    static Message handleMessage(Message requestMessage, Map<String, Object> overrideHeaders, TelepactSchema telepactSchema, Function<Message, Message> handler,
             Consumer<Throwable> onError) {
         final var responseHeaders = (Map<String, Object>) new HashMap<String, Object>();
         final Map<String, Object> requestHeaders = requestMessage.headers;
         final Map<String, Object> requestBody = requestMessage.body;
         final Map<String, TType> parsedTelepactSchema = telepactSchema.parsed;
         final Map.Entry<String, Object> requestEntry = requestBody.entrySet().stream().findAny().get();
+
+        requestHeaders.putAll(overrideHeaders);
 
         final String requestTargetInit = requestEntry.getKey();
         final Map<String, Object> requestPayload = (Map<String, Object>) requestEntry.getValue();

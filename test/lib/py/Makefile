@@ -19,9 +19,6 @@ TAR_GZ := telepact.tar.gz
 
 all: codegen $(TAR_GZ)
 	poetry lock
-	poetry remove telepact || echo "no-op"
-	poetry add ./telepact.tar.gz
-
 	poetry install
 
 $(TAR_GZ): dep

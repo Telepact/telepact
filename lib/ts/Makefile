@@ -34,6 +34,7 @@ $(TAR_GZ): $(SRC_FILES)
 
 	npm $(NPM_INSTALL)
 	npm run build
+	npm pack --pack-destination ./dist-tgz
 
 clean:
 	rm -rf inc
@@ -41,3 +42,6 @@ clean:
 	rm -rf dist-tgz
 	rm -rf node_modules
 	rm -f dist/LICENSE dist/NOTICE
+
+deploy: $(TAR_GZ)
+	npm publish

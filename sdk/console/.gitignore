@@ -13,3 +13,5 @@ src/lib/prettier-plugin-telepact
 LICENSE
 NOTICE
 test-results
+dist-tgz
+dist-docker

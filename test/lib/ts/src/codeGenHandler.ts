@@ -23,13 +23,18 @@ export class CodeGenHandler extends ServerHandler_ {
     }
 
     async test(headers: { [key: string]: any }, input: test.Input): Promise<[Record<string, any>, test.Output]> {
-        let value = new Value({});
-
         try {
             console.log("input: " + JSON.stringify(input.pseudoJson));
         } catch (e) {
             console.error(e);
         }
+
+        if (headers["@error"] === true) {
+            let output = test.Output.from_ErrorExample2({ field1: "Boom!" });
+            return [{}, output];
+        }
+
+        let value = new Value({});
 
         const top = input.value();
         if (top) {
@@ -274,8 +279,10 @@ function mapStruct(s: ExStruct): ExStruct {
 function map_union(u: ExUnion): ExUnion {
     var tv = u.getTaggedValue();
     if (tv.tag === 'One') {
+        const v1 = tv.value;
         return ExUnion.from_One(ExUnion.One.from({}));
     } else if (tv.tag === 'Two') {
+        const v2 = tv.value;
         const args: { required: boolean, optional?: boolean} = {
             required: tv.value.required()
         }
@@ -284,6 +291,7 @@ function map_union(u: ExUnion): ExUnion {
         }
         return ExUnion.from_Two(args);
     } else {
+        const v3 = tv.value;
         throw new Error("Unknown union type: " + u.constructor.name);
     }
 }

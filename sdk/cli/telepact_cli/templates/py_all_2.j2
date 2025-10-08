@@ -221,7 +221,7 @@ class {{ type_display }}:
             {%- set tag_key = tag_entry | find_tag_key %}
             TaggedValue_[Literal["{{ tag_key }}"], '{{ tag_prefix + tag_key }}'], 
         {%- endfor %}
-            UntypedTaggedValue_]:
+            TaggedValue_[Literal["NoMatch_"], UntypedTaggedValue_]]:
         
         tag = next(iter(self.pseudo_json.keys()))
         {%- for tag_entry in tags %}
@@ -230,7 +230,7 @@ class {{ type_display }}:
             return TaggedValue_(cast(Literal["{{ tag_key }}"], "{{ tag_key }}"), {{ tag_prefix + tag_key }}(cast(dict[str, object], self.pseudo_json["{{ tag_key }}"])))
             {%- endfor %}
         else:
-            return UntypedTaggedValue_(tag, cast(dict[str, object], self.pseudo_json[tag]))
+            return TaggedValue_(cast(Literal["NoMatch_"], "NoMatch_"), UntypedTaggedValue_(tag, cast(dict[str, object], self.pseudo_json[tag])))
 {% for tag_entry in tags %}
     {%- set tag_key = tag_entry | find_tag_key %}
     {{- struct(tag_key, tag_entry['///'], tag_entry[tag_key], tag_prefix) | indent }}

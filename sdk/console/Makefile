@@ -16,12 +16,11 @@
 
 NPM_INSTALL ?= install
 VERSION := $(shell cat ../../VERSION.txt)
+TAR_GZ := dist-tgz/*.tgz
 DEP_LIB_DIST := ../../lib/ts/dist
 DEP_PRETTIER_DIST := ../../sdk/prettier/dist
 
-.PHONY: all
-
-all: $(DEP_LIB_DIST) $(DEP_PRETTIER_DIST)
+$(TAR_GZ): $(DEP_LIB_DIST) $(DEP_PRETTIER_DIST)
 	cp ../../LICENSE ../../NOTICE ./
 	
 	rm -rf src/lib/telepact
@@ -32,14 +31,18 @@ all: $(DEP_LIB_DIST) $(DEP_PRETTIER_DIST)
 	mkdir -p src/lib/prettier-plugin-telepact
 	cp -r ../../sdk/prettier/dist/* src/lib/prettier-plugin-telepact
 
+	rm -rf dist-tgz
+	mkdir -p dist-tgz	
+
 	npm $(NPM_INSTALL)
 	npm run build
 	node clean-index.js
+	npm pack --pack-destination ./dist-tgz
 
-	mkdir -p dist
+	mkdir -p dist-docker
 
 	docker build --progress=plain --no-cache -f Dockerfile -t telepact-console:${VERSION} .
-	docker save telepact-console:${VERSION} | gzip > dist/docker-image-telepact-console-${VERSION}.tar.gz
+	docker save telepact-console:${VERSION} | gzip > dist-docker/docker-image-telepact-console-${VERSION}.tar.gz
 
 $(DEP_LIB_DIST):
 	$(MAKE) -C ../../lib/ts
@@ -58,7 +61,8 @@ clean:
 	rm -rf src/lib/telepact
 	rm -rf src/lib/prettier-plugin-telepact
 	rm -rf node_modules
-	rm -rf dist
+	rm -rf dist-docker
+	rm -rf dist-tgz
 	rm -rf LICENSE
 	rm -rf NOTICE
 
@@ -67,3 +71,6 @@ test:
 
 dev-proxy:
 	node proxy-server.cjs
+
+deploy: $(TAR_GZ)
+	npm publish

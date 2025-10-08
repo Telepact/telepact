@@ -46,6 +46,9 @@ test-py:
 test-trace-py:
 	$(MAKE) -C test/runner test-trace-py
 
+deploy-py:
+	$(MAKE) -C lib/py deploy
+
 ts:
 	$(MAKE) -C lib/ts
 
@@ -57,6 +60,9 @@ test-ts:
 
 test-trace-ts:
 	$(MAKE) -C test/runner test-trace-ts
+
+deploy-ts:
+	$(MAKE) -C lib/ts deploy
 
 .PHONY: test
 test:
@@ -86,8 +92,11 @@ clean-cli:
 test-cli:
 	$(MAKE) -C sdk/cli test
 
+deploy-cli:
+	$(MAKE) -C sdk/cli deploy
+
 install-cli:
-	pipx install $(wildcard sdk/cli/dist/telepact_cli-*.tar.gz)
+	pipx install $(wildcard sdk/cli/dist/telepact_cli-*.whl)
 
 uninstall-cli:
 	pipx uninstall telepact-cli
@@ -97,6 +106,9 @@ prettier:
 
 clean-prettier:
 	$(MAKE) -C sdk/prettier clean
+
+deploy-prettier:
+	$(MAKE) -C sdk/prettier deploy
 
 console:
 	$(MAKE) -C sdk/console
@@ -112,6 +124,9 @@ clean-console:
 
 test-console:
 	$(MAKE) -C sdk/console test
+
+deploy-console:
+	$(MAKE) -C sdk/console deploy
 
 console-self-hosted:
 	$(MAKE) -C test/console-self-hosted

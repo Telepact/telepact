@@ -172,6 +172,10 @@ Errors definitions are similar to unions, except that the tags are automatically
 added to the result union of all user-defined functions. Errors definitions
 cannot be used in type expressions.
 
+API designers should be careful to avoid using errors definitions to abstract
+"reusable" errors. Errors definitions are only intended for systemic server
+errors that could be encountered by any function.
+
 ```json
 [
     {
@@ -189,9 +193,11 @@ cannot be used in type expressions.
 ]
 ```
 
-With this error definition, the functions above would automatically be given
-these errors. (Note, the following example only illustrates the effect of the
-errors definition at schema load time; the original schema is not re-written.)
+For example, if placed in the same schema, the above error definition would
+apply the errors `Error1` and `Error2` to both the `fn.exampleFunction1` and
+`fn.exampleFunction2` functions from the previous section, as indicated below
+(Note, the following example only illustrates the effect of the errors
+definition at schema load time; the original schema is not re-written.)
 
 ```json
 [

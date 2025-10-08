@@ -23,6 +23,7 @@ import toml
 from ruamel.yaml import YAML
 import subprocess
 from github import Github, GithubException
+from pathlib import Path
 
 yaml = YAML()
 
@@ -124,7 +125,11 @@ def bump() -> None:
         'sdk/console/package.json',
     ]
 
-    pr_number = int(os.getenv('PR_NUMBER'))
+    pr_number_str = os.getenv('PR_NUMBER')
+    if not pr_number_str:
+        click.echo("PR_NUMBER environment variable not set.", err=True)
+        sys.exit(1)
+    pr_number = int(pr_number_str)
 
     # Get the paths from the previous commit
     prev_commit_paths = subprocess.run(
@@ -296,7 +301,11 @@ def license_header(license_header_path):
         new_lines = []
         start_copying = False
 
+        shebang = lines[0] if lines and lines[0].startswith('#!') else None
+
         for line in lines:
+            if line.startswith('#!'):
+                continue
             if start_copying:
                 new_lines.append(line)
                 continue
@@ -311,6 +320,11 @@ def license_header(license_header_path):
         license_text = ''.join([f"{start_comment_syntax}  {line.strip().ljust(max_length)}{end_comment_syntax}".strip() + "\n" for line in license_header])
 
         new_banner = ""
+
+        if shebang:
+            new_banner += shebang
+            new_banner += "\n"
+
         new_banner += f"{start_comment_syntax}  {''.ljust(max_length)}{end_comment_syntax}".strip() + "\n"
         new_banner += f"{license_text.strip()}\n"
         new_banner += f"{start_comment_syntax}  {''.ljust(max_length)}{end_comment_syntax}".strip() + "\n\n"
@@ -379,7 +393,11 @@ def github_labels() -> None:
     # Get environment variables
     token = os.getenv('GITHUB_TOKEN')
     repository = os.getenv('GITHUB_REPOSITORY')
-    pr_number = int(os.getenv('PR_NUMBER'))
+    pr_number_str = os.getenv('PR_NUMBER')
+    if not pr_number_str:
+        click.echo("PR_NUMBER environment variable not set.", err=True)
+        sys.exit(1)
+    pr_number = int(pr_number_str)
     base_branch = os.getenv('BASE_BRANCH')
     head_sha = os.getenv('HEAD_SHA')
 
@@ -426,13 +444,13 @@ def release() -> None:
     """
 
     RELEASE_TARGET_ASSET_DIRECTORY_MAP = {
-        "java": "lib/java/target/central-publishing",
-        "py": "lib/py/dist",
-        "ts": "lib/ts/dist-tgz",
-        "dart": "bind/dart/dist",
-        "cli": "sdk/cli/dist",
-        "console": "sdk/console/dist",
-        "prettier": "sdk/prettier/dist-tgz"
+        "java": ["lib/java/target/central-publishing"],
+        "py": ["lib/py/dist"],
+        "ts": ["lib/ts/dist-tgz"],
+        "dart": ["bind/dart/dist"],
+        "cli": ["sdk/cli/dist", "sdk/cli/dist-docker"],
+        "console": ["sdk/console/dist-tgz", "sdk/console/dist-docker"],
+        "prettier": ["sdk/prettier/dist-tgz"]
     }
 
     MAX_ASSETS = 10  # Maximum number of assets to upload
@@ -507,24 +525,25 @@ def release() -> None:
         # Upload assets for each release target
         asset_count = 0
         for target in release_targets:
-            asset_directory = RELEASE_TARGET_ASSET_DIRECTORY_MAP.get(target)
-            if asset_directory and os.path.exists(asset_directory):
-                for file_name in os.listdir(asset_directory):
-                    if asset_count >= MAX_ASSETS:
-                        click.echo("Maximum asset upload limit reached. Aborting.")
-                        return
-                    file_path = os.path.join(asset_directory, file_name)
-                    if os.path.isfile(file_path):
-                        with open(file_path, 'rb') as asset_file:
-                            release.upload_asset(
-                                path=file_path,
-                                name=file_name,
-                                label=f" [{target}]: {file_name}"
-                            )
-                            asset_count += 1
-                            click.echo(f"Uploaded asset: {file_name} for target: {target}")
-            else:
-                click.echo(f"No assets found for target: {target} in directory: {asset_directory}")
+            asset_directories = RELEASE_TARGET_ASSET_DIRECTORY_MAP.get(target, [])
+            for asset_directory in asset_directories:
+                if os.path.exists(asset_directory):
+                    for file_name in os.listdir(asset_directory):
+                        if asset_count >= MAX_ASSETS:
+                            click.echo("Maximum asset upload limit reached. Aborting.")
+                            return
+                        file_path = os.path.join(asset_directory, file_name)
+                        if os.path.isfile(file_path):
+                            with open(file_path, 'rb') as asset_file:
+                                release.upload_asset(
+                                    path=file_path,
+                                    name=file_name,
+                                    label=f" [{target}]: {file_name}"
+                                )
+                                asset_count += 1
+                                click.echo(f"Uploaded asset: {file_name} for target: {target}")
+                else:
+                    click.echo(f"Asset directory does not exist: {asset_directory} for target: {target}")
 
     except Exception as e:
         click.echo(f"Failed to create release or upload assets: {e}")
@@ -608,6 +627,36 @@ def automerge():
     pr.enable_automerge(merge_method='SQUASH')
     print("Pull Request will be automerged when build succeeds.")
 
+@click.command()
+@click.option('--add', 'add_name', help='Add a name to .gitignore')
+@click.option('--remove', 'remove_name', help='Remove a name from .gitignore')
+def gitignore(add_name, remove_name):
+    """Add or remove entries in .gitignore"""
+    if add_name and remove_name:
+        raise click.UsageError("Cannot use --add and --remove at the same time.")
+    if not add_name and not remove_name:
+        raise click.UsageError("Must provide either --add or --remove.")
+
+    gitignore_path = Path('.gitignore')
+
+    if not gitignore_path.exists():
+        if remove_name:
+            return  # Nothing to remove
+        if add_name:
+            gitignore_path.touch()
+
+    lines = gitignore_path.read_text().splitlines()
+    name = add_name or remove_name
+
+    if add_name:
+        if name not in lines:
+            with gitignore_path.open('a') as f:
+                f.write(f"\n{name}")
+    elif remove_name:
+        if name in lines:
+            new_lines = [line for line in lines if line != name]
+            gitignore_path.write_text('\n'.join(new_lines))
+
 main.add_command(get)
 main.add_command(set_version)
 main.add_command(bump)
@@ -615,6 +664,7 @@ main.add_command(license_header)
 main.add_command(github_labels)
 main.add_command(release)
 main.add_command(automerge)
+main.add_command(gitignore)
 
 if __name__ == "__main__":
     main()

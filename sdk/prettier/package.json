@@ -1,12 +1,31 @@
 {
   "name": "prettier-plugin-telepact",
-  "version": "1.0.0-alpha.113",
-  "description": "Prettier plugin to format telepact docstrings.",
+  "version": "1.0.0-alpha.149",
+  "description": "Prettier plugin to format Telepact API schemas.",
+  "type": "module",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/telepact/telepact.git"
+  },
+  "bugs": {
+    "url": "https://github.com/telepact/telepact/issues"
+  },
+  "homepage": "https://github.com/Telepact/telepact/blob/main/sdk/prettier/README.md",
+  "author": {
+    "name": "Telepact Authors",
+    "email": "telepact@googlegroups.com"
+  },
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
   "types": "dist/index.d.ts",
-  "type": "module",
-  "private": true,
+  "exports": {
+    ".": {
+      "require": "./dist/index.cjs.js",
+      "import": "./dist/index.esm.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
   "keywords": [
     "prettier",
     "plugin",
@@ -20,11 +39,16 @@
     "@rollup/plugin-commonjs": "^28.0.6",
     "@rollup/plugin-node-resolve": "^16.0.1",
     "@rollup/plugin-typescript": "^12.1.4",
-    "rollup": "^4.50.1",
+    "rollup": "^4.52.3",
     "tslib": "^2.8.1",
-    "typescript": "^5.9.2"
+    "typescript": "^5.9.3"
   },
   "scripts": {
-    "build": "tsc && rollup -c && npm pack --pack-destination ./dist-tgz"
-  }
+    "build": "tsc && rollup -c"
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "NOTICE"
+  ]
 }

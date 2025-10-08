@@ -19,6 +19,7 @@ package io.github.telepact;
 import static io.github.telepact.internal.ProcessBytes.processBytes;
 import static io.github.telepact.internal.binary.ConstructBinaryEncoding.constructBinaryEncoding;
 
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -112,7 +113,20 @@ public class Server {
      * @return The bytes of the response message.
      */
     public byte[] process(byte[] requestMessageBytes) {
-        return processBytes(requestMessageBytes, this.serializer, this.telepactSchema, this.onError,
+        return processBytes(requestMessageBytes, Map.of(), this.serializer, this.telepactSchema, this.onError,
+                this.onRequest, this.onResponse, this.handler);
+    }
+
+    /**
+     * Process a given telepact Request Message into a telepact Response Message.
+     * 
+     * @param requestMessageBytes The bytes of the request message to be processed.
+     * @param overrideHeaders Headers that should override any headers in the request
+     *            message.
+     * @return The bytes of the response message.
+     */
+    public byte[] process(byte[] requestMessageBytes, Map<String, Object> overrideHeaders) {
+        return processBytes(requestMessageBytes, overrideHeaders, this.serializer, this.telepactSchema, this.onError,
                 this.onRequest, this.onResponse, this.handler);
     }
 }

@@ -31,7 +31,6 @@ export function createJsonSchema(telepact: TelepactSchema): Record<string, any> 
 				case 'object':
 					return { type: 'object', additionalProperties: convertType(subType) };
 				default:
-					console.log('array type', type);
 					if (type.startsWith('struct.')) {
 						return { $ref: `#/$defs/${type}` };
 					} else if (type.startsWith('union.')) {
@@ -61,7 +60,6 @@ export function createJsonSchema(telepact: TelepactSchema): Record<string, any> 
 
 	for (const item of original) {
 		var schemaKey = findSchemaKey(item);
-		console.log('schemaKey', schemaKey);
 
 		if (schemaKey.startsWith('struct.')) {
 			definitions[schemaKey] = convertType(item[schemaKey]);
@@ -130,8 +128,6 @@ export function createJsonSchema(telepact: TelepactSchema): Record<string, any> 
 		],
 		$defs: definitions
 	};
-
-	console.log(JSON.stringify(jsonSchema, null, 2));
 
 	return jsonSchema;
 }

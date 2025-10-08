@@ -47,3 +47,108 @@ jobs:
           CENTRAL_USERNAME: ${{ secrets.MVN_CENTRAL_USERNAME }}
           CENTRAL_TOKEN: ${{ secrets.MVN_CENTRAL_TOKEN }}
         run: make deploy-java
+
+  publish-ts:
+    runs-on: ubuntu-latest
+    if: ${{ contains(github.event.release.body, '- ts') }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.target_commitish }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org/"
+
+      - name: Publish to npm
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_INSTALL: ci
+        run: make deploy-ts
+
+  publish-py:
+    runs-on: ubuntu-latest
+    if: ${{ contains(github.event.release.body, '- py') }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.target_commitish }}
+
+      - name: Install Poetry
+        run: pipx install poetry
+
+      - name: Publish to PyPI
+        env:
+          POETRY_PYPI_TOKEN_PYPI: ${{ secrets.PYPI_TOKEN }}
+        run: make deploy-py
+
+  publish-cli:
+    runs-on: ubuntu-latest
+    if: ${{ contains(github.event.release.body, '- cli') }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.target_commitish }}
+
+      - name: Install Poetry
+        run: pipx install poetry
+
+      - name: Install Project CLI
+        run: make install-project-cli
+
+      - name: Publish to PyPI
+        env:
+          POETRY_PYPI_TOKEN_PYPI: ${{ secrets.PYPI_TOKEN }}
+        run: make deploy-cli
+
+  publish-console:
+    runs-on: ubuntu-latest
+    if: ${{ contains(github.event.release.body, '- console') }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.target_commitish }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org/"
+
+      - name: Publish to npm
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_INSTALL: ci
+        run: make deploy-console
+
+  publish-prettier:
+    runs-on: ubuntu-latest
+    if: ${{ contains(github.event.release.body, '- prettier') }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.target_commitish }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org/"
+
+      - name: Publish to npm
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_INSTALL: ci
+        run: make deploy-prettier

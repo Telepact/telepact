@@ -464,7 +464,8 @@ public class Main {
                 if (serveAlternateServer.get()) {
                     responseBytes = alternateServer.process(requestBytes);
                 } else {
-                    responseBytes = server.process(requestBytes);
+                    Map<String, Object> overrideHeaders = Map.of("@override", "new");
+                    responseBytes = server.process(requestBytes, overrideHeaders);
                 }
             }
             System.out.println("    <-S %s".formatted(new String(responseBytes)));
@@ -601,7 +602,7 @@ public class Main {
             lock.lock();
             done.await();
 
-            metricsReporter.report();
+            //metricsReporter.report();
 
             System.out.println("Dispatcher exiting");
         }

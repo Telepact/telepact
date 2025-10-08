@@ -42,8 +42,8 @@ class TMockCall(TType):
         return validate_mock_call(given_obj, self.types, ctx)
 
     def generate_random_value(self, blueprint_value: object, use_blueprint_value: bool, type_parameters: list['TTypeDeclaration'], ctx: 'GenerateContext') -> object:
-        from ..generation.GenerateRandomUMockCall import generate_random_u_mock_call
-        return generate_random_u_mock_call(self.types, ctx)
+        from ..generation.GenerateRandomMockCall import generate_random_mock_call
+        return generate_random_mock_call(self.types, ctx)
 
     def get_name(self, ctx: 'ValidateContext') -> str:
         return self._MOCK_CALL_NAME

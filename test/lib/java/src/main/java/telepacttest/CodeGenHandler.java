@@ -18,6 +18,7 @@ package telepacttest;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.HashMap;
 import java.util.function.Function;
@@ -35,6 +36,8 @@ import telepacttest.gen.example;
 import telepacttest.gen.test;
 import telepacttest.gen.example.Input;
 import telepacttest.gen.example.Output;
+import telepacttest.gen.test.Output.ErrorExample;
+import telepacttest.gen.test.Output.ErrorExample2;
 
 public class CodeGenHandler extends ServerHandler_ {
 
@@ -51,6 +54,11 @@ public class CodeGenHandler extends ServerHandler_ {
         } catch (JsonProcessingException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
+        }
+
+        if (Objects.equals(true, headers.get("@error"))) {
+            var errorOutput = test.Output.from_ErrorExample2(new ErrorExample2.Builder().field1("Boom!").build());
+            return new TypedMessage_<test.Output>(new HashMap<>(), errorOutput);
         }
 
         var value = new AtomicReference<>(new Value.Builder());

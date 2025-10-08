@@ -30,6 +30,7 @@ import { serverBase64Decode } from './binary/ServerBase64Decode';
 
 export async function handleMessage(
     requestMessage: Message,
+    overrideHeaders: Record<string, any>,
     telepactSchema: TelepactSchema,
     handler: (message: Message) => Promise<Message>,
     onError: (error: Error) => void,
@@ -39,6 +40,8 @@ export async function handleMessage(
     const requestBody: Record<string, any> = requestMessage.body;
     const parsedTelepactSchema: Record<string, TType> = telepactSchema.parsed;
     const requestEntry: [string, any] = Object.entries(requestBody)[0];
+
+    Object.assign(requestHeaders, overrideHeaders);
 
     const requestTargetInit = requestEntry[0];
     const requestPayload = requestEntry[1] as Record<string, any>;

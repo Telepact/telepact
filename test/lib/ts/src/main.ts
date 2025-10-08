@@ -444,7 +444,8 @@ function startTestServer(
                 if (serveAlternateServer.value) {
                     responseBytes = await alternateServer.process(requestBytes);
                 } else {
-                    responseBytes = await server.process(requestBytes);
+                    const overrideHeaders: Record<string, any> = { '@override': 'new' };
+                    responseBytes = await server.process(requestBytes, overrideHeaders);
                 }
             } finally {
                 time();

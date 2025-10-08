@@ -19,7 +19,7 @@ import { TType } from '../types/TType';
 import { generateRandomStruct } from './GenerateRandomStruct';
 import { TUnion } from '../types/TUnion';
 
-export function generateRandomUMockStub(types: { [key: string]: TType }, ctx: GenerateContext): object {
+export function generateRandomMockStub(types: { [key: string]: TType }, ctx: GenerateContext): object {
     const functions: string[] = Object.keys(types)
         .filter((key) => key.startsWith('fn.') && !key.endsWith('.->'))
         .filter((key) => !key.endsWith('_'))

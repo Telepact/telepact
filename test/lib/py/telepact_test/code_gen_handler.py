@@ -26,8 +26,6 @@ class CodeGenHandler(ServerHandler_):
         raise NotImplementedError("Unimplemented method 'example'")
 
     async def test(self, headers: dict[str, object], input: test.Input) -> Tuple[dict[str, object], test.Output]:
-        ok: test.Output.Ok_ = None
-
         try:
             def default_serializer(obj):
                 if isinstance(obj, bytes):
@@ -37,6 +35,11 @@ class CodeGenHandler(ServerHandler_):
             print("input: " + json.dumps(input.pseudo_json, default=default_serializer))
         except json.JSONDecodeError as e:
             print(e)
+
+        if "@error" in headers and headers["@error"] == True:
+            return {}, test.Output.from_ErrorExample2(field1="Boom!")
+
+        ok: test.Output.Ok_ = None
 
         if input.value():
             top = input.value()
@@ -275,8 +278,10 @@ class CodeGenHandler(ServerHandler_):
             return None
         tv = u.get_tagged_value()
         if tv.tag == "One":
+            v1 = tv.value
             return ExUnion.from_One()
         elif tv.tag == "Two":
+            v2 = tv.value
             if tv.value.optional() == Undefined.Inst:
                 return ExUnion.from_Two(
                     required=tv.value.required()
@@ -286,6 +291,9 @@ class CodeGenHandler(ServerHandler_):
                     required=tv.value.required(),
                     optional=tv.value.optional()
                 )
+        else:
+            v3 = tv.value
+            raise ValueError(f"Unknown tag: {tv.tag}")
 
     def map_fn(self, f: fnexample.Input) -> fnexample.Input:
         if f is None:

@@ -15,6 +15,7 @@
 /*|                                                                            |*/
 
 @import 'tailwindcss';
+@plugin "@tailwindcss/typography";
 
 @media (prefers-color-scheme: dark) {
 	body {

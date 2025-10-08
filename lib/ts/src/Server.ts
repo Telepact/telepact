@@ -53,9 +53,10 @@ export class Server {
         }
     }
 
-    async process(requestMessageBytes: Uint8Array): Promise<Uint8Array> {
+    async process(requestMessageBytes: Uint8Array, overrideHeaders: Record<string, any> = {}): Promise<Uint8Array> {
         return await processBytes(
             requestMessageBytes,
+            overrideHeaders,
             this.serializer,
             this.telepactSchema,
             this.onError,

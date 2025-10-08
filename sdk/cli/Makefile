@@ -23,7 +23,7 @@ TAR_GZ := dist/*.tar.gz
 DEP_TAR_GZ := ../../lib/py/dist/*.tar.gz
 
 $(TAR_GZ): $(DEP_TAR_GZ) $(SRC_FILES)
-	cp ../../LICENSE ../../NOTICE telepact_cli
+	cp ../../LICENSE ../../NOTICE ./
 	rm -rf tmp
 	mkdir -p tmp
 	tar -xzvf $(DEP_TAR_GZ) -C tmp
@@ -34,7 +34,11 @@ $(TAR_GZ): $(DEP_TAR_GZ) $(SRC_FILES)
 	rm -rf dist
 	poetry lock
 	poetry install
+
+	# TODO: Get "include" to work in pyproject.toml
+	telepact-project gitignore --remove telepact_cli/telepact
 	poetry build
+	telepact-project gitignore --add telepact_cli/telepact
 
 	mkdir tmp
 	cp dist/telepact_cli-*.tar.gz tmp/telepact_cli.tar.gz
@@ -43,7 +47,8 @@ $(TAR_GZ): $(DEP_TAR_GZ) $(SRC_FILES)
 
 	rm -rf tmp
 
-	docker save telepact-cli:${VERSION} | gzip > dist/docker-image-telepact-cli-${VERSION}.tar.gz
+	mkdir -p dist-docker
+	docker save telepact-cli:${VERSION} | gzip > dist-docker/docker-image-telepact-cli-${VERSION}.tar.gz
 
 
 $(DEP_TAR_GZ):
@@ -51,9 +56,10 @@ $(DEP_TAR_GZ):
 
 clean:
 	rm -rf dist
+	rm -rf dist-docker
 	rm -rf telepact_cli/telepact
 	rm -rf tmp
-	rm -f telepact_cli/LICENSE telepact_cli/NOTICE
+	rm -f LICENSE NOTICE
 	poetry env remove --all
 
 test:
@@ -63,3 +69,9 @@ old-test:
 	poetry run telepact codegen --schema-dir tests/data --lang java --out tests/output/java --package output
 	poetry run telepact codegen --schema-dir tests/data --lang py --out tests/output/py
 	poetry run telepact codegen --schema-dir tests/data --lang ts --out tests/output/ts
+
+deploy: $(TAR_GZ)
+	# TODO: Get "include" to work in pyproject.toml
+	telepact-project gitignore --remove telepact_cli/telepact
+	poetry publish
+	telepact-project gitignore --add telepact_cli/telepact

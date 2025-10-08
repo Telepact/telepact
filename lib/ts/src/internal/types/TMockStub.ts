@@ -19,7 +19,7 @@ import { ValidationFailure } from '../validation/ValidationFailure';
 import { TType } from './TType';
 import { validateMockStub } from '../validation/ValidateMockStub';
 import { GenerateContext } from '../generation/GenerateContext';
-import { generateRandomUMockStub } from '../generation/GenerateRandomUMockStub';
+import { generateRandomMockStub } from '../generation/GenerateRandomMockStub';
 import { ValidateContext } from '../validation/ValidateContext';
 
 export const mockStubName: string = '_ext.Stub_';
@@ -46,7 +46,7 @@ export class TMockStub extends TType {
         typeParameters: TTypeDeclaration[],
         ctx: GenerateContext,
     ): any {
-        return generateRandomUMockStub(this.types, ctx);
+        return generateRandomMockStub(this.types, ctx);
     }
 
     getName(): string {

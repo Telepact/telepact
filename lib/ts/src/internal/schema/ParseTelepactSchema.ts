@@ -122,7 +122,7 @@ export function parseTelepactSchema(telepactSchemaDocumentNamesToJson: Record<st
                 schemaKeysToIndex[schemaKey] = index;
                 schemaKeysToDocumentName[schemaKey] = documentName;
 
-                if ('auto_' === documentName || !documentName.endsWith('_')) {
+                if ('auto_' === documentName || 'auth_' === documentName || !documentName.endsWith('_')) {
                     originalSchema[schemaKey] = def_;
                 }
                 fullSchema[schemaKey] = def_;

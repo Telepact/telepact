@@ -77,8 +77,6 @@
 
 	let authManaged: boolean = $derived($page.data.authManaged);
 
-	console.log(`page.data`, $page.data);
-
 	let selectedViews = $derived($page.url.searchParams.get('v') ?? 'd');
 
 	let activeViews: string = $derived(selectedViews.substring(0, 2));
@@ -100,7 +98,6 @@
 	$effect(() => {
 		if (telepactSchemaPromise) {
 			telepactSchemaPromise.then((e) => {
-				console.log('Reloading request json schema');
 				const requestJsonSchema = createJsonSchema(e);
 				monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
 					schemas: [
@@ -125,7 +122,6 @@
 	let randomSeed = $state(1);
 
 	function handleSourceGet(e: Event) {
-		console.log(`e`, e);
 		const formData = new FormData(e.target as HTMLFormElement);
 		const sourceUrl = formData.get('url') as string;
 
@@ -405,7 +401,7 @@
 								id="url"
 								placeholder="None  (draft mode)"
 								value={sourceUrl}
-								class="rounded-r-md border-0 bg-zinc-700 py-2 placeholder:text-gray-400 focus:border-gray-500 focus:ring-1 focus:ring-inset focus:ring-gray-500"
+								class="rounded-r-md border-0 bg-zinc-700 pl-2 py-2 placeholder:text-gray-400 focus:border-gray-500 focus:ring-1 focus:ring-inset focus:ring-gray-500"
 							/>
 						</div>
 					</div>
@@ -479,25 +475,27 @@
 			{#if activeViews.includes('d')}
 				<div class="flex overflow-scroll {getSectionClass('d', activeViews.length)}">
 					<div class="flex w-full flex-col p-6">
-						<div>
-							<h1 class="pb-4 text-xl font-semibold text-gray-100">Schema</h1>
-						</div>
-						{#key sortDocCardsAZ}
-							{#each parseTelepactSchema(filteredSchemaPseudoJson, telepactSchema, sortDocCardsAZ, showInternalApi) as entry}
-								{#if showInternalApi || !(Object.keys(entry)[0].split('.')[1] ?? '').endsWith('_')}
-									<DocCard {entry} {telepactSchema} />
-								{/if}
-							{/each}
+						{#key showInternalApi}
+							<div>
+								<h1 class="pb-4 text-xl font-semibold text-gray-100">Schema</h1>
+							</div>
+							{#key sortDocCardsAZ}
+								{#each parseTelepactSchema(filteredSchemaPseudoJson, telepactSchema, sortDocCardsAZ, showInternalApi) as entry}
+									{#if showInternalApi || !(Object.keys(entry)[0].split('.')[1] ?? '').endsWith('_')}
+										<DocCard {entry} {telepactSchema} />
+									{/if}
+								{/each}
+							{/key}
+							<div class="flex justify-center pb-4">
+								<button
+									onclick={toggleShowInternalApi}
+									class="mt-4 rounded-md bg-sky-700 px-3 py-2 text-sm font-semibold text-white hover:bg-sky-600"
+									>{showInternalApi
+										? 'Hide Internal Api'
+										: 'Show Internal Api'}</button
+								>
+							</div>
 						{/key}
-						<div class="flex justify-center pb-4">
-							<button
-								onclick={toggleShowInternalApi}
-								class="mt-4 rounded-md bg-sky-700 px-3 py-2 text-sm font-semibold text-white hover:bg-sky-600"
-								>{showInternalApi
-									? 'Hide Internal Api'
-									: 'Show Internal Api'}</button
-							>
-						</div>
 					</div>
 				</div>
 			{/if}

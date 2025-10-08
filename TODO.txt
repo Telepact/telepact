@@ -1,7 +1,8 @@
 High:
-- Add helpful UX message for default console state
-- Consider better generated code that can't be misused
-- Console button tool-tips
+- Allow a "overrideHeaders" param to the telepact server.process()
+- publish prettier plugin
+- Consider always-optional fields in generated code
+- Include ping_ in generated code
 
 Medium:
 - Write tests that verify each type within a "link" function
@@ -14,5 +15,3 @@ Low:
 - console: Improve consistency around simluation naming. Still have lingering ideas around mock and example.
 - Console light mode and listen to os setting
 - Clean up java test code coverage errors
-- Cleanup old UMock language
-- Cleanup old vers api language

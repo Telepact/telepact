@@ -15,7 +15,6 @@
 <!--|                                                                            |-->
 
 <script lang="ts">
-	import { applyErrorToParsedTypes } from './telepact/src/internal/schema/ApplyErrorToParsedTypes';
 	import TypeRef from './TypeRef.svelte';
 	interface Props {
 		types: any;
