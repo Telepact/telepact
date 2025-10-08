@@ -18,7 +18,13 @@ package io.github.telepact;
 
 import static io.github.telepact.internal.mock.IsSubMap.isSubMap;
 
+import java.util.List;
 import java.util.Map;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.github.telepact.internal.generation.GenerateContext;
+import io.github.telepact.internal.types.TUnion;
 
 /**
  * A telepact client to be used in tests.
@@ -26,6 +32,8 @@ import java.util.Map;
 public class TestClient {
 
     private final Client client;
+    private final TelepactSchema schema;
+    private final RandomGenerator random;
 
     /**
      * Create a test client with the given client.
@@ -34,6 +42,17 @@ public class TestClient {
      */
     public TestClient(Client client) {
         this.client = client;
+        this.random = new RandomGenerator(0, 0);
+
+        var response = client.request(new Message(Map.of(), Map.of("fn.api_", Map.of())));
+        var ok = (Map<String, Object>) response.body.get("Ok_");
+        var api = (Map<String, Object>) ok.get("api");
+        try {
+            var json = new ObjectMapper().writeValueAsString(api);
+            this.schema = TelepactSchema.fromJson(json);
+        } catch (Exception e) {
+            throw new TelepactError(e);
+        }
     }
 
     /**
@@ -62,7 +81,22 @@ public class TestClient {
             if (didMatch) {
                 throw new AssertionError("Expected response body to not match");
             } else {
-                return expectedPseudoJsonBody;
+                final var useBlueprintValue = true;
+                final var includeOptionalFields = false;
+                final var alwaysIncludeRequiredFields = true;
+                final var randomizeOptionalFieldGeneration = false;
+
+                final var functionName = (String) requestMessage.getBodyTarget();
+                final var definition = (TUnion) schema.parsed.get(functionName + ".->");
+
+                final var generatedResult = (Map<String, Object>) definition.generateRandomValue(
+                    expectedPseudoJsonBody, useBlueprintValue, List.of(),
+                    new GenerateContext(
+                            includeOptionalFields, randomizeOptionalFieldGeneration,
+                            alwaysIncludeRequiredFields, functionName,
+                            random));
+
+                return generatedResult;
             }
         }
     }

@@ -1,6 +1,4 @@
 High:
-- Allow a "overrideHeaders" param to the telepact server.process()
-- publish prettier plugin
 - Consider always-optional fields in generated code
 - Include ping_ in generated code
 
