@@ -26,6 +26,7 @@ from mockgen_cases import cases as mockgen_cases
 from parse_cases import cases as parse_cases
 from garbage_cases import cases as garbage_cases
 from auth_cases import cases as auth_cases
+from test_client_cases import cases as test_client_cases
 from util import increment, ping, startup_check
 import json
 import nats
@@ -159,6 +160,9 @@ def pytest_generate_tests(metafunc: pytest.Metafunc):
     elif 'test_mock_case' == metafunc.function.__name__:
         metafunc.parametrize('name,req,res', [(
             k, rq, rs) for k in mock_invalid_cases for rq, rs in mock_invalid_cases[k]], ids=increment())
+    elif 'test_test_client_multi_case' == metafunc.function.__name__:
+        metafunc.parametrize('name,statements', [
+                             (k, [[rq, rs] for rq, rs in test_client_cases[k]]) for k in test_client_cases])
     elif 'test_schema_case' == metafunc.function.__name__:
         metafunc.parametrize('name,req,res', [(
             k, rq, rs) for k in parse_cases for rq, rs in parse_cases[k]], ids=increment())

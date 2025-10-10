@@ -17,6 +17,7 @@
 export * from './RandomGenerator';
 export * from './Client';
 export * from './Server';
+export * from './TestClient';
 export * from './MockServer';
 export * from './Message';
 export * from './Serializer';

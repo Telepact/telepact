@@ -27,7 +27,9 @@ import {
     MockServerOptions,
     TelepactSchema,
     MockTelepactSchema,
-    TelepactSchemaFiles
+    TelepactSchemaFiles,
+    TestClient,
+    TestClientOptions,
 } from "telepact";
 import { NatsConnection, connect, Subscription } from "nats";
 import * as fs from "fs";
@@ -119,7 +121,8 @@ function startClientTestServer(
     clientFrontdoorTopic: string,
     clientBackdoorTopic: string,
     defaultBinary: boolean,
-    useCodegen: boolean
+    useCodegen: boolean,
+    useTestClient: boolean,
 ): Subscription {
     const timer = registry.createTimer(clientBackdoorTopic);
 
@@ -156,6 +159,9 @@ function startClientTestServer(
     options.alwaysSendJson = !defaultBinary;
     const client = new Client(adapter, options);
 
+    const testClientOptions = new TestClientOptions();
+    const testClient = new TestClient(client, testClientOptions);
+
     const genClient = new ClientInterface_(client); 
 
     const sub: Subscription = connection.subscribe(clientFrontdoorTopic);
@@ -177,7 +183,25 @@ function startClientTestServer(
             let response: Message;
             const time = timer.startTimer();
             try {
-                if (useCodegen && functionName === "fn.test") {
+                if (useTestClient) {
+                    try {
+                        const resetSeed = requestHeaders["@setSeed"];
+                        if (resetSeed != null) {
+                            testClient.setSeed(resetSeed);
+                        }
+                        const expectedPseudoJsonBody = requestHeaders["@expectedPseudoJsonBody"];
+                        const expectMatch = requestHeaders["@expectMatch"] ?? true;
+                        response = await testClient.assertRequest(request, expectedPseudoJsonBody, expectMatch);
+                    } catch (e) {
+                        console.error(e);
+                        const responseHeaders: Record<string, any> = {};
+                        if (e instanceof Error && e.message.includes("Expected response body")) {
+                            responseHeaders["@assertionError"] = true;
+                        }
+                        response = new Message(responseHeaders, { ErrorUnknown_: {} });
+                    }
+                }
+                else if (useCodegen && functionName === "fn.test") {
                     const [responseHeaders, outputBody] = await genClient.test(requestHeaders, new test.Input(requestBody));
                     responseHeaders["@codegenc_"] = true;
                     response = new Message(responseHeaders, outputBody.pseudoJson);
@@ -539,6 +563,7 @@ async function runDispatcherServer(): Promise<void> {
                         const clientBackdoorTopic = payload["clientBackdoorTopic"] as string;
                         const useBinary = (payload["useBinary"] as boolean) ?? false;
                         const useCodegen = (payload["useCodeGen"] as boolean) ?? false;
+                        const useTestClient = (payload["useTestClient"] as boolean) ?? false;
 
                         const d = startClientTestServer(
                             connection,
@@ -546,7 +571,8 @@ async function runDispatcherServer(): Promise<void> {
                             clientFrontdoorTopic,
                             clientBackdoorTopic,
                             useBinary,
-                            useCodegen
+                            useCodegen,
+                            useTestClient
                         );
 
                         servers[id] = d;
