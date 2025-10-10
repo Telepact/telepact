@@ -17,6 +17,7 @@
 from .RandomGenerator import RandomGenerator
 from .Client import Client
 from .Server import Server
+from .TestClient import TestClient
 from .MockServer import MockServer
 from .Message import Message
 from .Serializer import Serializer
@@ -31,6 +32,7 @@ __all__ = [
     "RandomGenerator",
     "Client",
     "Server",
+    "TestClient",
     "MockServer",
     "Message",
     "Serializer",

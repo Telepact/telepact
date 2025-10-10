@@ -35,7 +35,7 @@ import json
 from nats.aio.client import Client as NATSClient, Subscription
 import asyncio
 import nats
-from telepact import SerializationError, Message, Serializer, Client, Server, TelepactSchema, MockTelepactSchema, MockServer, TelepactSchemaFiles, TelepactSchemaParseError
+from telepact import SerializationError, Message, Serializer, Client, Server, TelepactSchema, MockTelepactSchema, MockServer, TelepactSchemaFiles, TelepactSchemaParseError, TestClient
 import traceback
 import sys
 from concurrent.futures import ThreadPoolExecutor
@@ -79,7 +79,8 @@ async def start_client_test_server(connection: NatsClient, metrics: CollectorReg
                                    client_frontdoor_topic: str,
                                    client_backdoor_topic: str,
                                    default_binary: bool,
-                                   use_codegen: bool) -> Subscription:
+                                   use_codegen: bool,
+                                   use_test_client: bool) -> Subscription:
 
     timers = Summary(client_frontdoor_topic.replace(
         '.', '_').replace('-', '_'), '', registry=metrics)
@@ -115,6 +116,9 @@ async def start_client_test_server(connection: NatsClient, metrics: CollectorReg
     options.always_send_json = not default_binary
     client = Client(adapter, options)
 
+    test_client_options = TestClient.Options()
+    test_client = TestClient(client, test_client_options)
+
     generated_client = ClientInterface_(client)
 
     async def message_handler(msg: Msg) -> None:
@@ -130,7 +134,21 @@ async def start_client_test_server(connection: NatsClient, metrics: CollectorReg
 
         @timers.time()
         async def c() -> 'Message':
-            if use_codegen and function_name == "fn.test":
+            if use_test_client:
+                try:
+                    reset_seed = request_headers.get("@setSeed")
+                    if reset_seed is not None:
+                        test_client.set_seed(reset_seed)
+                    expected_pseudo_json_body = request_headers.get("@expectedPseudoJsonBody")
+                    expect_match = request_headers.get("@expectMatch", True)
+                    return await test_client.assert_request(Message(request_headers, request_body), expected_pseudo_json_body, expect_match)
+                except Exception as e:
+                    on_err(e)
+                    response_headers = {}
+                    if isinstance(e, AssertionError):
+                        response_headers["@assertionError"] = True
+                    return Message(response_headers, {"ErrorUnknown_": {}})
+            elif use_codegen and function_name == "fn.test":
                 headers, output = await generated_client.test(request_headers, fntest.Input(request_body))
                 headers['@codegenc_'] = True
                 return Message(headers, output.pseudo_json)
@@ -440,8 +458,9 @@ async def run_dispatcher_server():
                 client_backdoor_topic = payload["clientBackdoorTopic"]
                 use_binary = payload.get("useBinary", False)
                 use_codegen = payload.get('useCodeGen', False)
+                use_test_client = payload.get('useTestClient', False)
                 server = await start_client_test_server(
-                    connection, metrics, client_frontdoor_topic, client_backdoor_topic, use_binary, use_codegen)
+                    connection, metrics, client_frontdoor_topic, client_backdoor_topic, use_binary, use_codegen, use_test_client)
                 servers[server_id] = server
             elif target == "StartMockServer":
                 server_id = payload["id"]
