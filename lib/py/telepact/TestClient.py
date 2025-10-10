@@ -14,28 +14,70 @@
 #|  limitations under the License.
 #|
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional, cast
+import json
 
 if TYPE_CHECKING:
     from .Client import Client
     from .Message import Message
+    from .TelepactSchema import TelepactSchema
+    from .internal.types.TUnion import TUnion
 
 class TestClient:
-    def __init__(self, client: 'Client'):
+    class Options:
+        generated_collection_length_min: int = 0
+        generated_collection_length_max: int = 3
+
+    def __init__(self, client: 'Client', options: Options):
+        from .RandomGenerator import RandomGenerator
+
         self.client = client
+        self.random = RandomGenerator(options.generated_collection_length_min, options.generated_collection_length_max)
+        self.schema: Optional['TelepactSchema'] = None
 
-    async def assert_request(self, request_message: 'Message', expected_pseudo_json_body: dict[str, object], expect_match: bool) -> dict[str, object]:
+    async def assert_request(self, request_message: 'Message', expected_pseudo_json_body: dict[str, object], expect_match: bool) -> 'Message':
         from .internal.mock.IsSubMap import is_sub_map
+        from .Message import Message
+        from .TelepactSchema import TelepactSchema
+        from .internal.generation.GenerateContext import GenerateContext
+        from .internal.types.TUnion import TUnion
 
-        result = await self.client.request(request_message)
+        if self.schema is None:
+            response = await self.client.request(Message({}, {"fn.api_": {}}))
+            ok = cast(dict, response.body["Ok_"])
+            api = ok["api"]
+            json_str = json.dumps(api)
+            self.schema = TelepactSchema.from_json(json_str)
 
-        did_match = is_sub_map(expected_pseudo_json_body, result.body)
+        response_message = await self.client.request(request_message)
+
+        did_match = is_sub_map(expected_pseudo_json_body, response_message.body)
 
         if expect_match:
             if not did_match:
-                raise AssertionError("Expected response body to match")
-            return result.body
+                raise AssertionError(f"Expected response body was not a sub map. Expected: {expected_pseudo_json_body} Actual: {response_message.body}")
+            else:
+                return response_message
         else:
             if did_match:
-                raise AssertionError("Expected response body to not match")
-            return expected_pseudo_json_body
+                raise AssertionError(f"Expected response body was a sub map. Expected: {expected_pseudo_json_body} Actual: {response_message.body}")
+            else:
+                use_blueprint_value = True
+                include_optional_fields = False
+                always_include_required_fields = True
+                randomize_optional_field_generation = False
+
+                function_name = request_message.get_body_target()
+                definition = cast(TUnion, self.schema.parsed[f"{function_name}.->"])
+
+                generated_result = definition.generate_random_value(
+                    expected_pseudo_json_body, use_blueprint_value, [],
+                    GenerateContext(
+                        include_optional_fields, randomize_optional_field_generation,
+                        always_include_required_fields, function_name,
+                        self.random))
+
+                return Message(response_message.headers, cast(dict, generated_result))
+
+    def set_seed(self, seed: int):
+        self.random.set_seed(seed)
