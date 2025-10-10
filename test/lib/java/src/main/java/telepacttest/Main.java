@@ -42,6 +42,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
 import io.github.telepact.Client;
+import io.github.telepact.TestClient;
 import io.github.telepact.Message;
 import io.github.telepact.MockServer;
 import io.github.telepact.MockTelepactSchema;
@@ -99,7 +100,8 @@ public class Main {
 
     public static Dispatcher startClientTestServer(io.nats.client.Connection connection, MetricRegistry metrics,
             String clientFrontdoorTopic,
-            String clientBackdoorTopic, boolean defaultBinary, boolean useCodeGen)
+            String clientBackdoorTopic, boolean defaultBinary, boolean useCodeGen,
+            boolean useTestClient)
             throws IOException, InterruptedException {
         var objectMapper = new ObjectMapper();
 
@@ -151,6 +153,7 @@ public class Main {
         options.useBinary = defaultBinary;
         options.alwaysSendJson = !defaultBinary;
         var client = new Client(adapter, options);
+        var testClient = new TestClient(client);
 
         var generatedClient = new ClientInterface_(client);
 
@@ -171,15 +174,34 @@ public class Main {
 
                 Message response;
 
-                if (useCodeGen && "fn.test".equals(functionName)) {
-                    var outputMessage = generatedClient.test(requestHeaders, new test.Input(requestBody));
-                    var responseHeaders = outputMessage.headers;
-                    responseHeaders.put("@codegenc_", true);
-                    response = new Message(responseHeaders, outputMessage.body.pseudoJson);
+                if (useTestClient) {
+                    try {
+                        var resetSeed = (Integer) requestHeaders.get("@setSeed");
+                        if (resetSeed != null) {
+                            testClient.setSeed(resetSeed);
+                        }
+                        var expectedPseudoJsonBody = (Map<String, Object>) requestHeaders.get("@expectedPseudoJsonBody");
+                        var expectMatch = (Boolean) requestHeaders.getOrDefault("@expectMatch", true);
+                        response = testClient.assertRequest(request, expectedPseudoJsonBody, expectMatch);
+                    } catch (Throwable e) {
+                        e.printStackTrace();
+                        var responseHeaders = new HashMap<String, Object>();
+                        if (e instanceof AssertionError) {
+                            responseHeaders.put("@assertionError", true);
+                        }
+                        response = new Message(responseHeaders, Map.of("ErrorUnknown_", Map.of()));
+                    }
                 } else {
+                    if (useCodeGen && "fn.test".equals(functionName)) {
+                        var outputMessage = generatedClient.test(requestHeaders, new test.Input(requestBody));
+                        var responseHeaders = outputMessage.headers;
+                        responseHeaders.put("@codegenc_", true);
+                        response = new Message(responseHeaders, outputMessage.body.pseudoJson);
+                    } else {
 
-                    try (var time = timers.time()) {
-                        response = client.request(request);
+                        try (var time = timers.time()) {
+                            response = client.request(request);
+                        }
                     }
                 }
 
@@ -550,10 +572,11 @@ public class Main {
                             var clientBackdoorTopic = (String) payload.get("clientBackdoorTopic");
                             var useBinary = (Boolean) payload.getOrDefault("useBinary", false);
                             var useCodeGen = (Boolean) payload.getOrDefault("useCodeGen", false);
+                            var useTestClient = (Boolean) payload.getOrDefault("useTestClient", false);
 
                             var d = startClientTestServer(connection, metrics, clientFrontdoorTopic,
                                     clientBackdoorTopic,
-                                    useBinary, useCodeGen);
+                                    useBinary, useCodeGen, useTestClient);
 
                             servers.put(id, d);
                         }

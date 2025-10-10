@@ -20,6 +20,7 @@ import static io.github.telepact.internal.mock.IsSubMap.isSubMap;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -32,8 +33,8 @@ import io.github.telepact.internal.types.TUnion;
 public class TestClient {
 
     private final Client client;
-    private final TelepactSchema schema;
     private final RandomGenerator random;
+    private final AtomicReference<TelepactSchema> schema;
 
     /**
      * Create a test client with the given client.
@@ -43,16 +44,7 @@ public class TestClient {
     public TestClient(Client client) {
         this.client = client;
         this.random = new RandomGenerator(0, 0);
-
-        var response = client.request(new Message(Map.of(), Map.of("fn.api_", Map.of())));
-        var ok = (Map<String, Object>) response.body.get("Ok_");
-        var api = (Map<String, Object>) ok.get("api");
-        try {
-            var json = new ObjectMapper().writeValueAsString(api);
-            this.schema = TelepactSchema.fromJson(json);
-        } catch (Exception e) {
-            throw new TelepactError(e);
-        }
+        this.schema = new AtomicReference<>(null);
     }
 
     /**
@@ -66,20 +58,38 @@ public class TestClient {
      *         body if no match was expected and none was found
      * @throws AssertionError if the expectation is not met
      */
-    public Map<String, Object> assertRequest(Message requestMessage, Map<String, Object> expectedPseudoJsonBody, boolean expectMatch) {
-        final var result = client.request(requestMessage);
+    public Message assertRequest(Message requestMessage, Map<String, Object> expectedPseudoJsonBody, boolean expectMatch) {
+        var s = schema.updateAndGet(nullValue -> {
+            if (nullValue != null) {
+                return nullValue;
+            }
 
-        final var didMatch = isSubMap(expectedPseudoJsonBody, result.body);
+            var response = client.request(new Message(Map.of(), Map.of("fn.api_", Map.of())));
+            var ok = (Map<String, Object>) response.body.get("Ok_");
+            var api = (List<Object>) ok.get("api");
+            try {
+                var json = new ObjectMapper().writeValueAsString(api);
+                return TelepactSchema.fromJson(json);
+            } catch (Exception e) {
+                throw new TelepactError(e);
+            }
+        });
+
+        final var responseMessage = client.request(requestMessage);
+
+        final var didMatch = isSubMap(expectedPseudoJsonBody, responseMessage.body);
 
         if (expectMatch) {
             if (!didMatch) {
-                throw new AssertionError("Expected response body to match");
+                throw new AssertionError("Expected response body was not a sub map. Expected: %s Actual: %s".formatted(
+                    expectedPseudoJsonBody, responseMessage.body));
             } else {
-                return result.body;
+                return responseMessage;
             }
         } else {
             if (didMatch) {
-                throw new AssertionError("Expected response body to not match");
+                throw new AssertionError("Expected response body was a sub map. Expected: %s Actual: %s".formatted(
+                    expectedPseudoJsonBody, responseMessage.body));
             } else {
                 final var useBlueprintValue = true;
                 final var includeOptionalFields = false;
@@ -87,7 +97,7 @@ public class TestClient {
                 final var randomizeOptionalFieldGeneration = false;
 
                 final var functionName = (String) requestMessage.getBodyTarget();
-                final var definition = (TUnion) schema.parsed.get(functionName + ".->");
+                final var definition = (TUnion) s.parsed.get(functionName + ".->");
 
                 final var generatedResult = (Map<String, Object>) definition.generateRandomValue(
                     expectedPseudoJsonBody, useBlueprintValue, List.of(),
@@ -96,8 +106,12 @@ public class TestClient {
                             alwaysIncludeRequiredFields, functionName,
                             random));
 
-                return generatedResult;
+                return new Message(responseMessage.headers, generatedResult);
             }
         }
+    }
+
+    public void setSeed(int seed) {
+        this.random.setSeed(seed);
     }
 }
