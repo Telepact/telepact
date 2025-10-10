@@ -17,30 +17,91 @@
 import { Client } from "./Client";
 import { Message } from "./Message";
 import { isSubMap } from "./internal/mock/IsSubMap";
+import { RandomGenerator } from './RandomGenerator';
+import { TelepactSchema } from './TelepactSchema';
+import { TUnion } from './internal/types/TUnion';
+import { GenerateContext } from './internal/generation/GenerateContext';
+
+export class TestClientOptions {
+    generatedCollectionLengthMin: number;
+    generatedCollectionLengthMax: number;
+
+    constructor() {
+        this.generatedCollectionLengthMin = 0;
+        this.generatedCollectionLengthMax = 3;
+    }
+}
 
 export class TestClient {
+    private client: Client;
+    private random: RandomGenerator;
+    private schema: TelepactSchema | null = null;
 
-    client: Client;
-
-    constructor(client: Client) {
+    constructor(client: Client, options: TestClientOptions) {
         this.client = client;
+        this.random = new RandomGenerator(options.generatedCollectionLengthMin, options.generatedCollectionLengthMax);
     }
 
-    async assertRequest(requestMessage: Message, expectedPseudoJsonBody: Record<string, unknown>, expectMatch: boolean): Promise<Record<string, unknown>> {
-        const result = await this.client.request(requestMessage);
+    async assertRequest(
+        requestMessage: Message,
+        expectedPseudoJsonBody: Record<string, unknown>,
+        expectMatch: boolean,
+    ): Promise<Message> {
+        if (this.schema == null) {
+            const response = await this.client.request(new Message({}, { 'fn.api_': {} }));
+            const api = (response.body['Ok_'] as Record<string, unknown>)['api'] as any[];
+            this.schema = TelepactSchema.fromJson(JSON.stringify(api));
+        }
 
-        const didMatch = isSubMap(expectedPseudoJsonBody, result.body);
+        const responseMessage = await this.client.request(requestMessage);
+
+        const didMatch = isSubMap(expectedPseudoJsonBody, responseMessage.body);
 
         if (expectMatch) {
             if (!didMatch) {
-                throw new Error("Expected response body to match");
+                throw new Error(
+                    `Expected response body was not a sub map. Expected: ${JSON.stringify(
+                        expectedPseudoJsonBody,
+                    )} Actual: ${JSON.stringify(responseMessage.body)}`,
+                );
+            } else {
+                return responseMessage;
             }
-            return result.body;
         } else {
             if (didMatch) {
-                throw new Error("Expected response body to not match");
+                throw new Error(
+                    `Expected response body was a sub map. Expected: ${JSON.stringify(
+                        expectedPseudoJsonBody,
+                    )} Actual: ${JSON.stringify(responseMessage.body)}`,
+                );
+            } else {
+                const useBlueprintValue = true;
+                const includeOptionalFields = false;
+                const alwaysIncludeRequiredFields = true;
+                const randomizeOptionalFieldGeneration = false;
+
+                const functionName = requestMessage.getBodyTarget();
+                const definition = this.schema.parsed[`${functionName}.->`] as TUnion;
+
+                const generatedResult = definition.generateRandomValue(
+                    expectedPseudoJsonBody,
+                    useBlueprintValue,
+                    [],
+                    new GenerateContext(
+                        includeOptionalFields,
+                        randomizeOptionalFieldGeneration,
+                        alwaysIncludeRequiredFields,
+                        functionName,
+                        this.random,
+                    ),
+                );
+
+                return new Message(responseMessage.headers, generatedResult);
             }
-            return expectedPseudoJsonBody;
         }
+    }
+
+    setSeed(seed: number) {
+        this.random.setSeed(seed);
     }
 }
