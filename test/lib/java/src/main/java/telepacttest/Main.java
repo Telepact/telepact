@@ -153,7 +153,9 @@ public class Main {
         options.useBinary = defaultBinary;
         options.alwaysSendJson = !defaultBinary;
         var client = new Client(adapter, options);
-        var testClient = new TestClient(client);
+
+        var testClientOptions = new TestClient.Options();
+        var testClient = new TestClient(client, testClientOptions);
 
         var generatedClient = new ClientInterface_(client);
 

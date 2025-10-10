@@ -32,6 +32,21 @@ import io.github.telepact.internal.types.TUnion;
  */
 public class TestClient {
 
+    /**
+     * Options for configuring the TestClient.
+     */
+    public static class Options {
+        /**
+         * Minimum length for randomly generated arrays and objects.
+         */
+        public int generatedCollectionLengthMin = 0;
+
+        /**
+         * Maximum length for randomly generated arrays and objects.
+         */
+        public int generatedCollectionLengthMax = 3;        
+    }
+
     private final Client client;
     private final RandomGenerator random;
     private final AtomicReference<TelepactSchema> schema;
@@ -41,9 +56,9 @@ public class TestClient {
      *
      * @param client The client
      */
-    public TestClient(Client client) {
+    public TestClient(Client client, Options options) {
         this.client = client;
-        this.random = new RandomGenerator(0, 0);
+        this.random = new RandomGenerator(options.generatedCollectionLengthMin, options.generatedCollectionLengthMax);
         this.schema = new AtomicReference<>(null);
     }
 
@@ -111,6 +126,10 @@ public class TestClient {
         }
     }
 
+    /**
+     * Set the seed for the random generator.
+     * @param seed
+     */
     public void setSeed(int seed) {
         this.random.setSeed(seed);
     }
