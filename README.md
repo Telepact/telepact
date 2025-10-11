@@ -98,14 +98,14 @@ schema_files = TelepactSchemaFiles('./api')
 api = TelepactSchema.from_file_json_map(schema_files.filenames_to_json)
 server = Server(api, handler, options)
 
-async def telepact_handler(request):
+async def http_handler(request):
     request_bytes = await request.body()
     response_bytes = await server.process(request_bytes)
     media_type = 'application/octet-stream' if response_bytes and response_bytes[0] == 0x92 else 'application/json'
     return Response(content=response_bytes, media_type=media_type)
 
 routes = [
-    Route('/api/telepact', endpoint=telepact_handler, methods=['POST']),
+    Route('/api/telepact', endpoint=http_handler, methods=['POST']),
 ]
 
 middleware = [
