@@ -23,10 +23,14 @@ $(TAR_GZ): $(SRC_FILES)
 	mkdir -p telepact/json
 	cp ../../common/*.json telepact/json
 	cp ../../LICENSE ../../NOTICE ./
-	
+
 	rm -rf dist
 	poetry install
+
+	# TODO: Get "include" to work in pyproject.toml
+	telepact-project gitignore --remove telepact/json
 	poetry build
+	telepact-project gitignore --add telepact/json
 
 clean:
 	rm -rf dist
