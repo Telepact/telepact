@@ -333,3 +333,230 @@ console uses the prettier plugin in draft mode.)
     }
 ]
 ```
+
+## Automatic Definitions
+
+Some definitions are automatically appended to your schema at runtime.
+
+### Standard Definitions
+
+Standard definitions include utility functions, like `fn.ping_`, and
+common errors, like `ErrorInvalidRequest` and `ErrorUnknown_`. These are
+always included and cannot be turned off.
+
+You can find all standard definitions [here](https://raw.githubusercontent.com/Telepact/telepact/refs/heads/main/common/internal.telepact.json).
+
+### Auth Definitions
+
+Auth definitions include the `@auth_` header and the `ErrorUnauthenticated_` and `ErrorUnauthorized_` errors. These are included conditionally if the API writer
+defines a `struct.Auth_` definition in their schema.
+
+API writiers are strongly encouraged to place all auth-related functionality
+into the standard `@auth_` header, as this header is treated with greater
+sensitivity throughout the Telepact ecosystem.
+
+You can find details about auth definitions [here](https://raw.githubusercontent.com/Telepact/telepact/refs/heads/main/common/auth.telepact.json).
+
+### Mock Definitions
+
+Mock definitions include mocking functions, like `fn.createStub_` and `fn.verify_`
+for use in tests. These definitions are included if the API is served with a `MockServer`
+rather than a `Server` in the Telepact server-side library.
+
+You can find all mock defnitions [here](https://raw.githubusercontent.com/Telepact/telepact/refs/heads/main/common/mock-internal.telepact.json).
+
+
+## Full Example
+
+### Schema
+
+```json
+[
+    {
+        "///": " A calculator app that provides basic math computation capabilities. ",
+        "info.Calculator": {}
+    },
+    {
+        "///": " A function that adds two numbers. ",
+        "fn.add": {
+            "x": "number",
+            "y": "number"
+        },
+        "->": [
+            {
+                "Ok_": {
+                    "result": "number"
+                }
+            }
+        ]
+    },
+    {
+        "///": " A value for computation that can take either a constant or variable form. ",
+        "union.Value": [
+            {
+                "Constant": {
+                    "value": "number"
+                }
+            },
+            {
+                "Variable": {
+                    "name": "string"
+                }
+            }
+        ]
+    },
+    {
+        "///": " A basic mathematical operation. ",
+        "union.Operation": [
+            {
+                "Add": {}
+            },
+            {
+                "Sub": {}
+            },
+            {
+                "Mul": {}
+            },
+            {
+                "Div": {}
+            }
+        ]
+    },
+    {
+        "///": " A mathematical variable represented by a `name` that holds a certain `value`. ",
+        "struct.Variable": {
+            "name": "string",
+            "value": "number"
+        }
+    },
+    {
+        "///": " Save a set of variables as a dynamic map of variable names to their value. ",
+        "fn.saveVariables": {
+            "variables": { "string": "number" }
+        },
+        "->": [
+            {
+                "Ok_": {}
+            }
+        ]
+    },
+    {
+        "///": " Compute the `result` of the given `x` and `y` values. ",
+        "fn.compute": {
+            "x": "union.Value",
+            "y": "union.Value",
+            "op": "union.Operation"
+        },
+        "->": [
+            {
+                "Ok_": {
+                    "result": "number"
+                }
+            },
+            {
+                "ErrorCannotDivideByZero": {}
+            }
+        ]
+    },
+    {
+        "///": " Export all saved variables, up to an optional `limit`. ",
+        "fn.exportVariables": {
+            "limit!": "integer"
+        },
+        "->": [
+            {
+                "Ok_": {
+                    "variables": ["struct.Variable"]
+                }
+            }
+        ]
+    },
+    {
+        "///": " A function template. ",
+        "fn.getPaperTape": {},
+        "->": [
+            {
+                "Ok_": {
+                    "tape": ["struct.Computation"]
+                }
+            }
+        ]
+    },
+    {
+        "///": " A computation. ",
+        "struct.Computation": {
+            "user": "string?",
+            "firstOperand": "union.Value",
+            "secondOperand": "union.Value",
+            "operation": "union.Operation",
+            "result": "number?",
+            "successful": "boolean"
+        }
+    },
+    {
+        "fn.showExample": {},
+        "->": [
+            {
+                "Ok_": {
+                    "link": "fn.compute"
+                }
+            }
+        ]
+    },
+    {
+        "errors.RateLimit": [
+            {
+                "ErrorTooManyRequests": {}
+            }
+        ]
+    },
+    {
+        "headers.Identity": {
+            "@user": "string"
+        },
+        "->": {
+
+        }
+    }
+]
+```
+
+### Valid Client/Server Interactions
+
+```
+-> [{}, {"fn.ping_": {}}]
+<- [{}, {"Ok_": {}}]
+
+-> [{}, {"fn.add": {"x": 1, "z": 2}}]
+<- [{}, {"ErrorInvalidRequestBody_": {"cases": [{"path": ["fn.add", "z"], "reason": {"ObjectKeyDisallowed": {}}}, {"path": ["fn.add"], "reason": {"RequiredObjectKeyMissing": {"key": "y"}}}]}}]
+
+-> [{}, {"fn.add": {"x": 1, "y": 2}}]
+<- [{}, {"Ok_": {"result": 3}}]
+
+-> [{}, {"fn.saveVariables": {"a": 1, "b": 2}}]
+<- [{}, {"Ok_": {}}]
+
+-> [{}, {"fn.showExample": {}}]
+<- [{}, {"Ok_": {"link": {"fn.compute": {"x": {"Constant": {"value": 5}}, "y": {"Variable": {"name": "b"}}, "op": {"Mul": {}}}}}}]
+
+-> [{"@user": "bob"}, {"fn.compute": {"x": {"Constant": {"value": 5}}, "y": {"Variable": {"name": "b"}}, "op": {"Mul": {}}}}]
+<- [{}, {"Ok_": {"result": 10}}]
+
+-> [{"@user": "bob"}, {"fn.compute": {"x": {"Variable": {"name": "a"}}, "y": {"Constant": {"value": 0}}, "op": {"Div": {}}}}]
+<- [{}, {"ErrorCannotDivideByZero": {}}]
+
+-> [{}, {"fn.getPaperTape": {}}]
+<- [{}, {"Ok_": {"tape": [{"user": null, "firstOperand": {"Constant": {"value": 1}}, "secondOperand": {"Constant": {"value": 2}}, "operation": {"Add": {}}, "result": 3, "successful": true}, {"user": "bob", "firstOperand": {"Constant": {"value": 5}}, "secondOperand": {"Variable": {"name": "b"}}, "operation": {"Mul": {}}, "result": 10, "successful": true}, {"user": bob", "firstOperand": {"Variable": {"name": "a"}}, "secondOperand": {"Constant": {"value": 0}}, "operation": {"Div": {}}, "result": null, "successful": false}]}}]
+
+-> [{}, {"fn.exportVariables": {}}]
+<- [{}, {"Ok_": {"variables": [{"name": "a", "value": 1}, {"name": "b", "value": 2}]}}]
+
+-> [{}, {"fn.exportVariables": {"limit!": 1}}]
+<- [{}, {"Ok_": {"variables": [{"name": "a", "value": 1}]}}]
+
+-> [{}, {"fn.add": {"x": 1, "y": 2}}]
+<- [{}, {"ErrorTooManyRequests": {}}]
+
+-> [{}, {"fn.showExample": {}}]
+<- [{}, {"ErrorTooManyRequests": {}}]
+```
