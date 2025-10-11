@@ -51,7 +51,7 @@ import io.github.telepact.Serializer;
 import io.github.telepact.Server;
 import io.github.telepact.TelepactSchema;
 import io.github.telepact.TelepactSchemaParseError;
-import telepacttest.gen.ClientInterface_;
+import telepacttest.gen.TypedClient;
 import telepacttest.gen.test;
 import io.github.telepact.TelepactSchemaFiles;
 import io.nats.client.Dispatcher;
@@ -157,7 +157,7 @@ public class Main {
         var testClientOptions = new TestClient.Options();
         var testClient = new TestClient(client, testClientOptions);
 
-        var generatedClient = new ClientInterface_(client);
+        var generatedClient = new TypedClient(client);
 
         var dispatcher = connection.createDispatcher((msg) -> {
             try {
@@ -272,7 +272,8 @@ public class Main {
 
             byte[] responseBytes;
             try (var time = timers.time()) {
-                responseBytes = server.process(requestBytes);
+                final var response = server.process(requestBytes);
+                responseBytes = response.bytes;
             }
 
             System.out.println("    <-S %s".formatted(new String(responseBytes)));
@@ -350,7 +351,8 @@ public class Main {
 
             byte[] responseBytes;
             try (var time = timers.time()) {
-                responseBytes = server.process(requestBytes);
+                var response = server.process(requestBytes);
+                responseBytes = response.bytes;
             }
 
             System.out.println("    <-S %s".formatted(new String(responseBytes)));
@@ -486,10 +488,12 @@ public class Main {
             byte[] responseBytes;
             try (var time = timers.time()) {
                 if (serveAlternateServer.get()) {
-                    responseBytes = alternateServer.process(requestBytes);
+                    final var response = alternateServer.process(requestBytes);
+                    responseBytes = response.bytes;
                 } else {
                     Map<String, Object> overrideHeaders = Map.of("@override", "new");
-                    responseBytes = server.process(requestBytes, overrideHeaders);
+                    final var response = server.process(requestBytes, overrideHeaders);
+                    responseBytes = response.bytes;
                 }
             }
             System.out.println("    <-S %s".formatted(new String(responseBytes)));

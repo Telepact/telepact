@@ -199,13 +199,10 @@ def _generate_internal(schema_data: list[dict[str, object]], possible_fn_selects
                 'package': java_package, 'data': schema_entry, 'possible_fn_selects': possible_fn_selects}, f"{schema_key.split('.')[1]}.java")
 
         _write_java_file('java_server.j2', {
-                         'package': java_package, 'functions': functions, 'possible_fn_selects': possible_fn_selects}, f"ServerHandler_.java")
+                         'package': java_package, 'functions': functions, 'possible_fn_selects': possible_fn_selects}, f"TypedServer.java")
 
         _write_java_file('java_client.j2', {
-                         'package': java_package, 'functions': functions, 'possible_fn_selects': possible_fn_selects}, f"ClientInterface_.java")
-
-        _write_java_file('java_optional.j2', {
-                         'package': java_package}, f"Optional_.java")
+                         'package': java_package, 'functions': functions, 'possible_fn_selects': possible_fn_selects}, f"TypedClient.java")
 
         _write_java_file('java_utility.j2', {
                          'package': java_package}, f"Utility_.java")

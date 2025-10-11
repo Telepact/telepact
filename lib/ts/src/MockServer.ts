@@ -21,6 +21,7 @@ import { Server, ServerOptions as ServerOptions } from './Server';
 import { RandomGenerator } from './RandomGenerator';
 import { mockHandle } from './internal/mock/MockHandle';
 import { MockTelepactSchema } from './MockTelepactSchema';
+import { Response } from './Response';
 
 export class MockServer {
     /**
@@ -59,7 +60,7 @@ export class MockServer {
     private invocations: MockInvocation[];
     private server: Server;
 
-    async process(message: Uint8Array): Promise<Uint8Array> {
+    async process(message: Uint8Array): Promise<Response> {
         /**
          * Process a given telepact Request Message into a telepact Response Message.
          *
