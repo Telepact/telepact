@@ -455,6 +455,7 @@ console uses the prettier plugin in draft mode.)
     {
         "///": " A computation. ",
         "struct.Computation": {
+            "user": "string?",
             "firstOperand": "union.Value",
             "secondOperand": "union.Value",
             "operation": "union.Operation",
@@ -478,6 +479,14 @@ console uses the prettier plugin in draft mode.)
                 "ErrorTooManyRequests": {}
             }
         ]
+    },
+    {
+        "headers.Identity": {
+            "@user": "string"
+        },
+        "->": {
+
+        }
     }
 ]
 ```
@@ -494,14 +503,14 @@ console uses the prettier plugin in draft mode.)
 -> [{}, {"fn.showExample": {}}]
 <- [{}, {"Ok_": {"link": {"fn.compute": {"x": {"Constant": {"value": 5}}, "y": {"Variable": {"name": "b"}}, "op": {"Mul": {}}}}}}]
 
--> [{}, {"fn.compute": {"x": {"Constant": {"value": 5}}, "y": {"Variable": {"name": "b"}}, "op": {"Mul": {}}}}]
+-> [{"@user": "bob"}, {"fn.compute": {"x": {"Constant": {"value": 5}}, "y": {"Variable": {"name": "b"}}, "op": {"Mul": {}}}}]
 <- [{}, {"Ok_": {"result": 10}}]
 
--> [{}, {"fn.compute": {"x": {"Variable": {"name": "a"}}, "y": {"Constant": {"value": 0}}, "op": {"Div": {}}}}]
+-> [{"@user": "bob"}, {"fn.compute": {"x": {"Variable": {"name": "a"}}, "y": {"Constant": {"value": 0}}, "op": {"Div": {}}}}]
 <- [{}, {"ErrorCannotDivideByZero": {}}]
 
 -> [{}, {"fn.getPaperTape": {}}]
-<- [{}, {"Ok_": {"tape": [{"firstOperand": {"Constant": {"value": 1}}, "secondOperand": {"Constant": {"value": 2}}, "operation": {"Add": {}}, "result": 3, "successful": true}, {"firstOperand": {"Constant": {"value": 5}}, "secondOperand": {"Variable": {"name": "b"}}, "operation": {"Mul": {}}, "result": 10, "successful": true}, {"firstOperand": {"Variable": {"name": "a"}}, "secondOperand": {"Constant": {"value": 0}}, "operation": {"Div": {}}, "result": null, "successful": false}]}}]
+<- [{}, {"Ok_": {"tape": [{"user": null, "firstOperand": {"Constant": {"value": 1}}, "secondOperand": {"Constant": {"value": 2}}, "operation": {"Add": {}}, "result": 3, "successful": true}, {"user": "bob", "firstOperand": {"Constant": {"value": 5}}, "secondOperand": {"Variable": {"name": "b"}}, "operation": {"Mul": {}}, "result": 10, "successful": true}, {"user": bob", "firstOperand": {"Variable": {"name": "a"}}, "secondOperand": {"Constant": {"value": 0}}, "operation": {"Div": {}}, "result": null, "successful": false}]}}]
 
 -> [{}, {"fn.exportVariables": {}}]
 <- [{}, {"Ok_": {"variables": [{"name": "a", "value": 1}, {"name": "b", "value": 2}]}}]
