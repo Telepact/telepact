@@ -55,7 +55,7 @@ export async function processBytes(
 
         const responseBytes = serializer.serialize(responseMessage);
 
-        return new Response(responseBytes, responseMessage.headers);
+        return { bytes: responseBytes, headers: responseMessage.headers };
     } catch (error) {
         try {
             onError(error);
@@ -65,6 +65,6 @@ export async function processBytes(
 
         const responseBytes = serializer.serialize(new Message({}, { ErrorUnknown_: {} }));
 
-        return new Response(responseBytes, {});
+        return { bytes: responseBytes, headers: {} };
     }
 }

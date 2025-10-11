@@ -1,3 +1,4 @@
-export class Response {
-    constructor(public body: Uint8Array, public headers: Record<string, any>) {}
+export interface Response {
+    bytes: Uint8Array;
+    headers: Record<string, any>;
 }
