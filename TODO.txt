@@ -1,4 +1,5 @@
 High:
+- Make py lib python requirements software (just >=3.11)
 - Consider always-optional fields in generated code
 - Include ping_ in generated code
 

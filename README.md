@@ -78,7 +78,7 @@ from starlette.middleware.cors import CORSMiddleware
 import uvicorn
 
 async def handler(req_msg):
-    fn = next(iter(req_msg.body))
+    fn = req_msg.get_body_target()
     args = req_msg.body[fn]
     if fn == 'fn.divide':
         x = args['x']
@@ -105,7 +105,7 @@ async def telepact_handler(request):
     return Response(content=response_bytes, media_type=media_type)
 
 routes = [
-    Route('/api/telepact', endpoint=api_endpoint, methods=['POST']),
+    Route('/api/telepact', endpoint=telepact_handler, methods=['POST']),
 ]
 
 middleware = [
@@ -118,7 +118,8 @@ uvicorn.run(app, host='0.0.0.0', port=8000)
 ```
 
 ```sh
-$ python ./server.py
+$ poetry add uvicorn starlette telepact
+$ poetry run python ./server.py
 ```
 
 Then tell your clients about your transport, and they can consume your API with
