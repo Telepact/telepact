@@ -342,31 +342,35 @@ Some definitions are automatically appended to your schema at runtime.
 
 ### Standard Definitions
 
-Standard definitions include utility functions, like `fn.ping_`, and
-common errors, like `ErrorInvalidRequest` and `ErrorUnknown_`. These are
-always included and cannot be turned off.
+Standard definitions include utility functions, like `fn.ping_`, and common
+errors, like `ErrorInvalidRequest` and `ErrorUnknown_`. These are always
+included and cannot be turned off.
 
-You can find all standard definitions [here](https://raw.githubusercontent.com/Telepact/telepact/refs/heads/main/common/internal.telepact.json).
+You can find all standard definitions
+[here](https://raw.githubusercontent.com/Telepact/telepact/refs/heads/main/common/internal.telepact.json).
 
 ### Auth Definitions
 
-Auth definitions include the `@auth_` header and the `ErrorUnauthenticated_` and `ErrorUnauthorized_` errors. These are included conditionally if the API writer
+Auth definitions include the `@auth_` header and the `ErrorUnauthenticated_` and
+`ErrorUnauthorized_` errors. These are included conditionally if the API writer
 defines a `struct.Auth_` definition in their schema.
 
 API writiers are strongly encouraged to place all auth-related functionality
 into the standard `@auth_` header, as this header is treated with greater
 sensitivity throughout the Telepact ecosystem.
 
-You can find details about auth definitions [here](https://raw.githubusercontent.com/Telepact/telepact/refs/heads/main/common/auth.telepact.json).
+You can find details about auth definitions
+[here](https://raw.githubusercontent.com/Telepact/telepact/refs/heads/main/common/auth.telepact.json).
 
 ### Mock Definitions
 
-Mock definitions include mocking functions, like `fn.createStub_` and `fn.verify_`
-for use in tests. These definitions are included if the API is served with a `MockServer`
-rather than a `Server` in the Telepact server-side library.
+Mock definitions include mocking functions, like `fn.createStub_` and
+`fn.verify_` for use in tests. These definitions are included if the API is
+served with a `MockServer` rather than a `Server` in the Telepact server-side
+library.
 
-You can find all mock defnitions [here](https://raw.githubusercontent.com/Telepact/telepact/refs/heads/main/common/mock-internal.telepact.json).
-
+You can find all mock defnitions
+[here](https://raw.githubusercontent.com/Telepact/telepact/refs/heads/main/common/mock-internal.telepact.json).
 
 ## Full Example
 
@@ -516,9 +520,7 @@ You can find all mock defnitions [here](https://raw.githubusercontent.com/Telepa
         "headers.Identity": {
             "@user": "string"
         },
-        "->": {
-
-        }
+        "->": {}
     }
 ]
 ```
