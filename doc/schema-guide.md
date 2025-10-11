@@ -30,8 +30,8 @@ that it is not possible to express nullable arrays or objects.
 | `"integer?"`               | `null`, `1`, `0`, `-1`                         | `0.1`                          |
 | `"number?"`                | `null`, `0.1`, `-0.1`                          | `"0"`                          |
 | `"string?"`                | `null`, `""`, `"text"`                         | `0`                            |
-| `["boolean?"]`             | `[]`, `[true, false, null]`                    | `null`, `0`, `{}`                      |
-| `{"string": "integer?"}`   | `{}`, `{"k1": 0, "k2": 1, "k3": null}`         | `null`, `0`, `[]`                      |
+| `["boolean?"]`             | `[]`, `[true, false, null]`                    | `null`, `0`, `{}`              |
+| `{"string": "integer?"}`   | `{}`, `{"k1": 0, "k2": 1, "k3": null}`         | `null`, `0`, `[]`              |
 | `[{"string": "boolean?"}]` | `[{}]`, `[{"k1": null, "k2": false}]`          | `[{"k1": 0}]`, `[null]` `[0]`  |
 | `"any?"`                   | `null`, `false`, `0`, `0.1`, `""`, `[]`, `{}`  | (none)                         |
 
