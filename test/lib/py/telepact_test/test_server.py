@@ -40,7 +40,7 @@ import traceback
 import sys
 from concurrent.futures import ThreadPoolExecutor
 from telepact_test.code_gen_handler import CodeGenHandler
-from telepact_test.gen.gen_types import ClientInterface_, test as fntest
+from telepact_test.gen.gen_types import TypedClient, test as fntest
 import base64
 
 
@@ -119,7 +119,7 @@ async def start_client_test_server(connection: NatsClient, metrics: CollectorReg
     test_client_options = TestClient.Options()
     test_client = TestClient(client, test_client_options)
 
-    generated_client = ClientInterface_(client)
+    generated_client = TypedClient(client)
 
     async def message_handler(msg: Msg) -> None:
         request_bytes = msg.data
@@ -204,7 +204,8 @@ async def start_mock_test_server(connection: NatsClient, metrics: Any, api_schem
 
         @timers.time()
         async def s():
-            return await server.process(request_bytes)
+            response = await server.process(request_bytes)
+            return response.bytes
 
         response_bytes = await s()
 
@@ -269,7 +270,8 @@ async def start_schema_test_server(connection: NatsClient, metrics: CollectorReg
 
         @timers.time()
         async def s():
-            return await server.process(request_bytes)
+            response = await server.process(request_bytes)
+            return response.bytes
 
         response_bytes = await s()
 
@@ -384,10 +386,12 @@ async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, 
             nonlocal server
 
             if serve_alternate_server:
-                return await alternate_server.process(request_bytes)
+                response = await alternate_server.process(request_bytes)
+                return response.bytes
             else:
                 override_headers = {'@override': 'old'}
-                return await server.process(request_bytes, override_headers)
+                response = await server.process(request_bytes, override_headers)
+                return response.bytes
 
         response_bytes = await s()
 

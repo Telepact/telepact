@@ -71,7 +71,5 @@ class Server:
         """
         from .internal.ProcessBytes import process_bytes
 
-        response_bytes, response_headers = await process_bytes(request_message_bytes, override_headers, self.serializer, self.telepact_schema, self.on_error,
+        return await process_bytes(request_message_bytes, override_headers, self.serializer, self.telepact_schema, self.on_error,
                                    self.on_request, self.on_response, self.handler)
-
-        return Response(response_bytes, response_headers)
