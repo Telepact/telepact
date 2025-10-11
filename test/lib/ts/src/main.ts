@@ -35,7 +35,7 @@ import { NatsConnection, connect, Subscription } from "nats";
 import * as fs from "fs";
 import * as path from 'path';
 import { min, max, mean, median, quantile } from "simple-statistics";
-import { ClientInterface_, test } from "./gen/genTypes.js";
+import { TypedClient, test } from "./gen/genTypes.js";
 import { CodeGenHandler } from "./codeGenHandler.js";
 
 class Timer {
@@ -162,7 +162,7 @@ function startClientTestServer(
     const testClientOptions = new TestClientOptions();
     const testClient = new TestClient(client, testClientOptions);
 
-    const genClient = new ClientInterface_(client); 
+    const genClient = new TypedClient(client); 
 
     const sub: Subscription = connection.subscribe(clientFrontdoorTopic);
 
@@ -202,7 +202,7 @@ function startClientTestServer(
                     }
                 }
                 else if (useCodegen && functionName === "fn.test") {
-                    const [responseHeaders, outputBody] = await genClient.test(requestHeaders, new test.Input(requestBody));
+                    const { headers: responseHeaders, body: outputBody } = await genClient.test(requestHeaders, new test.Input(requestBody));
                     responseHeaders["@codegenc_"] = true;
                     response = new Message(responseHeaders, outputBody.pseudoJson);
                 } else {
@@ -264,7 +264,8 @@ function startMockTestServer(
             let responseBytes: Uint8Array;
             const time = timer.startTimer();
             try {
-                responseBytes = await server.process(requestBytes);
+                let response = await server.process(requestBytes);
+                responseBytes = response.bytes;
             } finally {
                 time();
             }
@@ -350,7 +351,8 @@ function startSchemaTestServer(
             let responseBytes: Uint8Array;
             const time = timer.startTimer();
             try {
-                responseBytes = await server.process(requestBytes);
+                let response = await server.process(requestBytes);
+                return response.bytes;
             } finally {
                 time();
             }
@@ -466,10 +468,12 @@ function startTestServer(
             const time = timer.startTimer();
             try {
                 if (serveAlternateServer.value) {
-                    responseBytes = await alternateServer.process(requestBytes);
+                    let response = await alternateServer.process(requestBytes);
+                    responseBytes = response.bytes;
                 } else {
                     const overrideHeaders: Record<string, any> = { '@override': 'new' };
-                    responseBytes = await server.process(requestBytes, overrideHeaders);
+                    let response = await server.process(requestBytes, overrideHeaders);
+                    responseBytes = response.bytes;
                 }
             } finally {
                 time();
