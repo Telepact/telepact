@@ -43,7 +43,7 @@ $ cat ./api/math.telepact.json
 ```json
 [
     {
-        "///": " Add two integers, `x` and `y`. ",
+        "///": " Divide two integers, `x` and `y`. ",
         "fn.divide": {
             "x": "integer",
             "y": "integer"
@@ -51,7 +51,7 @@ $ cat ./api/math.telepact.json
         "->": [
             {
                 "Ok_": {
-                    "result": "integer"
+                    "result": "number"
                 }
             },
             {
@@ -70,9 +70,15 @@ $ cat ./server.py
 
 ```py
 from telepact import TelepactSchemaFiles, TelepactSchema, Server, Message
+from starlette.applications import Starlette
+from starlette.responses import Response
+from starlette.routing import Route
+from starlette.middleware import Middleware
+from starlette.middleware.cors import CORSMiddleware
+import uvicorn
 
-def handler(req_msg):
-    fn = req_msg.body.keys()[0]
+async def handler(req_msg):
+    fn = req_msg.get_body_target()
     args = req_msg.body[fn]
     if fn == 'fn.divide':
         x = args['x']
@@ -83,7 +89,7 @@ def handler(req_msg):
         result = x / y
         return Message({}, {'Ok_': {'result': result}})
     else:
-        raise Error('Unknown function')
+        raise Exception('Unknown function')
 
 options = Server.Options()
 options.auth_required = False
@@ -92,21 +98,28 @@ schema_files = TelepactSchemaFiles('./api')
 api = TelepactSchema.from_file_json_map(schema_files.filenames_to_json)
 server = Server(api, handler, options)
 
-from fastapi import FastAPI, Request
-from fastapi.responses import Response
-
-app = FastAPI()
-
-@app.post('/api/telepact')
-async def telepact_handler(request):
+async def http_handler(request):
     request_bytes = await request.body()
     response_bytes = await server.process(request_bytes)
     media_type = 'application/octet-stream' if response_bytes and response_bytes[0] == 0x92 else 'application/json'
     return Response(content=response_bytes, media_type=media_type)
+
+routes = [
+    Route('/api/telepact', endpoint=http_handler, methods=['POST']),
+]
+
+middleware = [
+    Middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
+]
+
+app = Starlette(routes=routes, middleware=middleware)
+
+uvicorn.run(app, host='0.0.0.0', port=8000)
 ```
 
 ```sh
-$ uvicorn server:app --port 8000
+$ poetry add uvicorn starlette telepact
+$ poetry run python ./server.py
 ```
 
 Then tell your clients about your transport, and they can consume your API with
@@ -125,17 +138,20 @@ let body = {
     }
 };
 let request = [header, body];
-var response = fetch(
+let response = await fetch(
     "http://localhost:8000/api/telepact",
-    { method: "POST" },
-    JSON.stringify(request),
+    {
+        method: "POST",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(request),
+    },
 );
-console.log(`Response: ${await response.json()}`);
+console.log(`Response: ${JSON.stringify(await response.json())}`);
 ```
 
 ```sh
 $ node ./client.js
-Response: [{}, {"Ok_": {"result": 2}}]
+Response: [{},{"Ok_":{"result":2}}]
 ```
 
 Or clients can also leverage telepact tooling to:
