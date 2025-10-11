@@ -20,6 +20,7 @@ from .Server import Server
 from .TestClient import TestClient
 from .MockServer import MockServer
 from .Message import Message
+from .TypedMessage import TypedMessage
 from .Serializer import Serializer
 from .SerializationError import SerializationError
 from .Serialization import Serialization

@@ -1,18 +1,18 @@
-package {{ package }};
+package io.github.telepact;
 
 import java.util.function.Consumer;
 
-public class Optional_<T> {
+public class Optional<T> {
 
     private final T value;
     private final boolean isPresent;
 
-    public Optional_() {
+    public Optional() {
         this.value = null;
         this.isPresent = false;
     }
 
-    public Optional_(T value) {
+    public Optional(T value) {
         this.value = value;
         this.isPresent = true;
     }

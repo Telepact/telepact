@@ -26,7 +26,7 @@ if TYPE_CHECKING:
 async def process_bytes(request_message_bytes: bytes, override_headers: dict[str, object],
                         serializer: 'Serializer', telepact_schema: 'TelepactSchema',
                         on_error: Callable[[Exception], None], on_request: Callable[['Message'], None],
-                        on_response: Callable[['Message'], None], handler: Callable[['Message'], Awaitable['Message']]) -> bytes:
+                        on_response: Callable[['Message'], None], handler: Callable[['Message'], Awaitable['Message']]) -> tuple[bytes, dict[str, object]]:
     from ..internal.HandleMessage import handle_message
     from ..internal.ParseRequestMessage import parse_request_message
 
@@ -47,11 +47,11 @@ async def process_bytes(request_message_bytes: bytes, override_headers: dict[str
         except Exception:
             pass
 
-        return serializer.serialize(response_message)
+        return serializer.serialize(response_message), response_message.headers
     except Exception as e:
         try:
             on_error(e)
         except Exception:
             pass
 
-        return serializer.serialize(Message({}, {"ErrorUnknown_": {}}))
+        return serializer.serialize(Message({}, {"ErrorUnknown_": {}})), {}

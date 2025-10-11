@@ -20,6 +20,7 @@ export * from './Server';
 export * from './TestClient';
 export * from './MockServer';
 export * from './Message';
+export * from './TypedMessage';
 export * from './Serializer';
 export * from './internal/binary/ClientBinaryStrategy';
 export * from './SerializationError';

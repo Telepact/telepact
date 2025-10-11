@@ -14,13 +14,12 @@
 #|  limitations under the License.
 #|
 
-from typing import cast
+from typing import cast, NamedTuple
 
 
-class Message:
-    def __init__(self, headers: dict[str, object], body: dict[str, object]):
-        self.headers = headers.copy()
-        self.body = body
+class Message(NamedTuple):
+    headers: dict[str, object]
+    body: dict[str, object]
 
     def get_body_target(self) -> str:
         entry = next(iter(self.body.items()))
