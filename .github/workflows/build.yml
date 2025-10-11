@@ -107,7 +107,10 @@ jobs:
       - name: Install Poetry
         run: pipx install poetry
 
-      - name: Install dependencies
+      - name: Install Project CLI
+        run: make install-project-cli
+
+      - name: Build py
         run: make py
 
       - name: Upload py build artifacts
