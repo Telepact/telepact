@@ -23,6 +23,7 @@ import { constructBinaryEncoding } from './internal/binary/ConstructBinaryEncodi
 import { processBytes } from './internal/ProcessBytes';
 import { Serialization } from './Serialization';
 import { ServerBase64Encoder } from './internal/binary/ServerBase64Encoder';
+import { Response } from './Response';
 
 export class Server {
     handler: (message: Message) => Promise<Message>;
@@ -53,7 +54,7 @@ export class Server {
         }
     }
 
-    async process(requestMessageBytes: Uint8Array, overrideHeaders: Record<string, any> = {}): Promise<Uint8Array> {
+    async process(requestMessageBytes: Uint8Array, overrideHeaders: Record<string, any> = {}): Promise<Response> {
         return await processBytes(
             requestMessageBytes,
             overrideHeaders,

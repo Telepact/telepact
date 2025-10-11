@@ -19,6 +19,7 @@ import { TelepactSchema } from '../TelepactSchema';
 import { Message } from '../Message';
 import { handleMessage } from '../internal/HandleMessage';
 import { parseRequestMessage } from '../internal/ParseRequestMessage';
+import { Response } from '../Response';
 
 export type ErrorHandler = (error: any) => void;
 export type RequestHandler = (message: Message) => void;
@@ -34,7 +35,7 @@ export async function processBytes(
     onRequest: RequestHandler,
     onResponse: ResponseHandler,
     handler: MessageHandler,
-): Promise<Uint8Array> {
+): Promise<Response> {
     try {
         const requestMessage = parseRequestMessage(requestMessageBytes, serializer, telepactSchema, onError);
 
@@ -52,7 +53,9 @@ export async function processBytes(
             // Handle error
         }
 
-        return serializer.serialize(responseMessage);
+        const responseBytes = serializer.serialize(responseMessage);
+
+        return new Response(responseBytes, responseMessage.headers);
     } catch (error) {
         try {
             onError(error);
@@ -60,6 +63,8 @@ export async function processBytes(
             // Handle error
         }
 
-        return serializer.serialize(new Message({}, { ErrorUnknown_: {} }));
+        const responseBytes = serializer.serialize(new Message({}, { ErrorUnknown_: {} }));
+
+        return new Response(responseBytes, {});
     }
 }

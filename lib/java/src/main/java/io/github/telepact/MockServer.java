@@ -113,7 +113,7 @@ public class MockServer {
      * @param message the request message bytes
      * @return the response message bytes
      */
-    public byte[] process(byte[] message) {
+    public Response process(byte[] message) {
         return this.server.process(message);
     }
 

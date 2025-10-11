@@ -112,7 +112,7 @@ public class Server {
      * @param requestMessageBytes The bytes of the request message to be processed.
      * @return The bytes of the response message.
      */
-    public byte[] process(byte[] requestMessageBytes) {
+    public Response process(byte[] requestMessageBytes) {
         return processBytes(requestMessageBytes, Map.of(), this.serializer, this.telepactSchema, this.onError,
                 this.onRequest, this.onResponse, this.handler);
     }
@@ -125,7 +125,7 @@ public class Server {
      *            message.
      * @return The bytes of the response message.
      */
-    public byte[] process(byte[] requestMessageBytes, Map<String, Object> overrideHeaders) {
+    public Response process(byte[] requestMessageBytes, Map<String, Object> overrideHeaders) {
         return processBytes(requestMessageBytes, overrideHeaders, this.serializer, this.telepactSchema, this.onError,
                 this.onRequest, this.onResponse, this.handler);
     }
