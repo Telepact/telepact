@@ -43,7 +43,7 @@ $ cat ./api/math.telepact.json
 ```json
 [
     {
-        "///": " Add two integers, `x` and `y`. ",
+        "///": " Divide two integers, `x` and `y`. ",
         "fn.divide": {
             "x": "integer",
             "y": "integer"
@@ -51,7 +51,7 @@ $ cat ./api/math.telepact.json
         "->": [
             {
                 "Ok_": {
-                    "result": "integer"
+                    "result": "number"
                 }
             },
             {
@@ -71,8 +71,8 @@ $ cat ./server.py
 ```py
 from telepact import TelepactSchemaFiles, TelepactSchema, Server, Message
 
-def handler(req_msg):
-    fn = req_msg.body.keys()[0]
+async def handler(req_msg):
+    fn = next(iter(req_msg.body))
     args = req_msg.body[fn]
     if fn == 'fn.divide':
         x = args['x']
@@ -83,7 +83,7 @@ def handler(req_msg):
         result = x / y
         return Message({}, {'Ok_': {'result': result}})
     else:
-        raise Error('Unknown function')
+        raise Exception('Unknown function')
 
 options = Server.Options()
 options.auth_required = False
@@ -125,17 +125,20 @@ let body = {
     }
 };
 let request = [header, body];
-var response = fetch(
+let response = await fetch(
     "http://localhost:8000/api/telepact",
-    { method: "POST" },
-    JSON.stringify(request),
+    {
+        method: "POST",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(request),
+    },
 );
-console.log(`Response: ${await response.json()}`);
+console.log(`Response: ${JSON.stringify(await response.json())}`);
 ```
 
 ```sh
 $ node ./client.js
-Response: [{}, {"Ok_": {"result": 2}}]
+Response: [{},{"Ok_":{"result":2}}]
 ```
 
 Or clients can also leverage telepact tooling to:
