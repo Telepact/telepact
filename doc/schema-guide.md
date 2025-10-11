@@ -1,5 +1,7 @@
 # Schema Writing Guide
 
+This guide will explain how to understand and write `*.telepact.json` files.
+
 ## Type Expression
 
 Types are expressed with a string, which may be contained within conventional
@@ -22,16 +24,16 @@ allowed key type is `"string"`.
 The `?` symbol can be appended to type strings to indicate nullability. Note
 that it is not possible to express nullable arrays or objects.
 
-| Type Expression            | Example allowed JSON values                    | Example disallowed JSON values |
-| -------------------------- | ---------------------------------------------- | ------------------------------ |
-| `"boolean?"`               | `null`, `true`, `false`                        | `0`                            |
-| `"integer?"`               | `null`, `1`, `0`, `-1`                         | `0.1`                          |
-| `"number?"`                | `null`, `0.1`, `-0.1`                          | `"0"`                          |
-| `"string?"`                | `null`, `""`, `"text"`                         | `0`                            |
-| `["boolean?"]`             | `null`, `[]`, `[true, false, null]`            | `0`, `{}`                      |
-| `{"string": "integer?"}`   | `null`, `{}`, `{"k1": 0, "k2": 1, "k3": null}` | `0`, `[]`                      |
-| `[{"string": "boolean?"}]` | `[{}]`, `[{"k1": null, "k2": false}]`          | `[{"k1": 0}]`, `[null]` `[0]`  |
-| `"any?"`                   | `null`, `false`, `0`, `0.1`, `""`, `[]`, `{}`  | (none)                         |
+| Type Expression            | Example allowed JSON values                   | Example disallowed JSON values |
+| -------------------------- | --------------------------------------------- | ------------------------------ |
+| `"boolean?"`               | `null`, `true`, `false`                       | `0`                            |
+| `"integer?"`               | `null`, `1`, `0`, `-1`                        | `0.1`                          |
+| `"number?"`                | `null`, `0.1`, `-0.1`                         | `"0"`                          |
+| `"string?"`                | `null`, `""`, `"text"`                        | `0`                            |
+| `["boolean?"]`             | `[]`, `[true, false, null]`                   | `null`, `0`, `{}`              |
+| `{"string": "integer?"}`   | `{}`, `{"k1": 0, "k2": 1, "k3": null}`        | `null`, `0`, `[]`              |
+| `[{"string": "boolean?"}]` | `[{}]`, `[{"k1": null, "k2": false}]`         | `[{"k1": 0}]`, `[null]` `[0]`  |
+| `"any?"`                   | `null`, `false`, `0`, `0.1`, `""`, `[]`, `{}` | (none)                         |
 
 ## Definitions
 
@@ -106,10 +108,10 @@ At least one tag is required.
 ]
 ```
 
-| Type Expression          | Example allowed JSON values                          | Example disallowed JSON values                |
-| ------------------------ | ---------------------------------------------------- | --------------------------------------------- |
-| `"struct.ExampleUnion1"` | `{"Tag": {"field": 0}}`, `{"EmptyTag": {}}`          | `null`, `{}`, `{"Tag": {"wrongField": true}}` |
-| `"struct.ExampleUnion2"` | `{"Tag": {"optionalField!": "text"}}`, `{"Tag": {}}` | `null`, `{}`                                  |
+| Type Expression         | Example allowed JSON values                          | Example disallowed JSON values                |
+| ----------------------- | ---------------------------------------------------- | --------------------------------------------- |
+| `"union.ExampleUnion1"` | `{"Tag": {"field": 0}}`, `{"EmptyTag": {}}`          | `null`, `{}`, `{"Tag": {"wrongField": true}}` |
+| `"union.ExampleUnion2"` | `{"Tag": {"optionalField!": "text"}}`, `{"Tag": {}}` | `null`, `{}`                                  |
 
 ### Function
 
