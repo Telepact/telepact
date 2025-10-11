@@ -1,5 +1,7 @@
 # Schema Writing Guide
 
+This guide will explain how to understand and write `*.telepact.json` files.
+
 ## Type Expression
 
 Types are expressed with a string, which may be contained within conventional
@@ -28,8 +30,8 @@ that it is not possible to express nullable arrays or objects.
 | `"integer?"`               | `null`, `1`, `0`, `-1`                         | `0.1`                          |
 | `"number?"`                | `null`, `0.1`, `-0.1`                          | `"0"`                          |
 | `"string?"`                | `null`, `""`, `"text"`                         | `0`                            |
-| `["boolean?"]`             | `null`, `[]`, `[true, false, null]`            | `0`, `{}`                      |
-| `{"string": "integer?"}`   | `null`, `{}`, `{"k1": 0, "k2": 1, "k3": null}` | `0`, `[]`                      |
+| `["boolean?"]`             | `[]`, `[true, false, null]`            | `null`, `0`, `{}`                      |
+| `{"string": "integer?"}`   | `{}`, `{"k1": 0, "k2": 1, "k3": null}` | `null`, `0`, `[]`                      |
 | `[{"string": "boolean?"}]` | `[{}]`, `[{"k1": null, "k2": false}]`          | `[{"k1": 0}]`, `[null]` `[0]`  |
 | `"any?"`                   | `null`, `false`, `0`, `0.1`, `""`, `[]`, `{}`  | (none)                         |
 
@@ -108,8 +110,8 @@ At least one tag is required.
 
 | Type Expression          | Example allowed JSON values                          | Example disallowed JSON values                |
 | ------------------------ | ---------------------------------------------------- | --------------------------------------------- |
-| `"struct.ExampleUnion1"` | `{"Tag": {"field": 0}}`, `{"EmptyTag": {}}`          | `null`, `{}`, `{"Tag": {"wrongField": true}}` |
-| `"struct.ExampleUnion2"` | `{"Tag": {"optionalField!": "text"}}`, `{"Tag": {}}` | `null`, `{}`                                  |
+| `"union.ExampleUnion1"` | `{"Tag": {"field": 0}}`, `{"EmptyTag": {}}`          | `null`, `{}`, `{"Tag": {"wrongField": true}}` |
+| `"union.ExampleUnion2"` | `{"Tag": {"optionalField!": "text"}}`, `{"Tag": {}}` | `null`, `{}`                                  |
 
 ### Function
 
@@ -333,3 +335,171 @@ console uses the prettier plugin in draft mode.)
     }
 ]
 ```
+
+## Full Example
+
+### Schema
+
+```json
+[
+    {
+        "///": " A calculator app that provides basic math computation capabilities. ",
+        "info.Calculator": {}
+    },
+    {
+        "///": " A function that adds two numbers. ",
+        "fn.add": {
+            "x": "number",
+            "y": "number"
+        },
+        "->": [
+            {
+                "Ok_": {
+                    "result": "number"
+                }
+            }
+        ]
+    },
+    {
+        "///": " A value for computation that can take either a constant or variable form. ",
+        "union.Value": [
+            {
+                "Constant": {
+                    "value": "number"
+                }
+            },
+            {
+                "Variable": {
+                    "name": "string"
+                }
+            }
+        ]
+    },
+    {
+        "///": " A basic mathematical operation. ",
+        "union.Operation": [
+            {
+                "Add": {}
+            },
+            {
+                "Sub": {}
+            },
+            {
+                "Mul": {}
+            },
+            {
+                "Div": {}
+            }
+        ]
+    },
+    {
+        "///": " A mathematical variable represented by a `name` that holds a certain `value`. ",
+        "struct.Variable": {
+            "name": "string",
+            "value": "number"
+        }
+    },
+    {
+        "///": " Save a set of variables as a dynamic map of variable names to their value. ",
+        "fn.saveVariables": {
+            "variables": {"string": "number"}
+        },
+        "->": [
+            {
+                "Ok_": {}
+            }
+        ]
+    },
+    {
+        "///": " Compute the `result` of the given `x` and `y` values. ",
+        "fn.compute": {
+            "x": "union.Value",
+            "y": "union.Value",
+            "op": "union.Operation"
+        },
+        "->": [
+            {
+                "Ok_": {
+                    "result": "number"
+                }
+            },
+            {
+                "ErrorCannotDivideByZero": {}
+            }
+        ]
+    },
+    {
+        "///": " Export all saved variables, up to an optional `limit`. ",
+        "fn.exportVariables": {
+            "limit!": "integer"
+        },
+        "->": [
+            {
+                "Ok_": {
+                    "variables": ["struct.Variable"]
+                }
+            }
+        ]
+    },
+    {
+        "///": " A function template. ",
+        "fn.getPaperTape": {},
+        "->": [
+            {
+                "Ok_": {
+                    "tape": ["struct.Computation"]
+                }
+            }
+        ]
+    },
+    {
+        "///": " A computation. ",
+        "struct.Computation": {
+            "firstOperand": "union.Value",
+            "secondOperand": "union.Value",
+            "operation": "union.Operation",
+            "result": "number?",
+            "successful": "boolean"
+        }
+    },
+    {
+        "fn.showExample": {},
+        "->": [
+            {
+                "Ok_": {
+                    "link": "fn.compute"
+                }
+            }
+        ]
+    }
+]
+```
+
+### Valid Client/Server Interactions
+
+```
+-> [{}, {"fn.add": {"x": 1, "y": 2}}]
+<- [{}, {"Ok_": {"result": 3}}]
+
+-> [{}, {"fn.saveVariables": {"a": 1, "b": 2}}]
+<- [{}, {"Ok_": {}}]
+
+-> [{}, {"fn.showExample": {}}]
+<- [{}, {"Ok_": {"link": {"fn.compute": {"x": {"Constant": {"value": 5}}, "y": {"Variable": {"name": "b"}}, "op": {"Mul": {}}}}}}]
+
+-> [{}, {"fn.compute": {"x": {"Constant": {"value": 5}}, "y": {"Variable": {"name": "b"}}, "op": {"Mul": {}}}}]
+<- [{}, {"Ok_": {"result": 10}}]
+
+-> [{}, {"fn.compute": {"x": {"Variable": {"name": "a"}}, "y": {"Constant": {"value": 0}}, "op": {"Div": {}}}}]
+<- [{}, {"ErrorCannotDivideByZero": {}}]
+
+-> [{}, {"fn.getPaperTape": {}}]
+<- [{}, {"Ok_": {"tape": [{"firstOperand": {"Constant": {"value": 1}}, "secondOperand": {"Constant": {"value": 2}}, "operation": {"Add": {}}, "result": 3, "successful": true}, {"firstOperand": {"Constant": {"value": 5}}, "secondOperand": {"Variable": {"name": "b"}}, "operation": {"Mul": {}}, "result": 10, "successful": true}, {"firstOperand": {"Variable": {"name": "a"}}, "secondOperand": {"Constant": {"value": 0}}, "operation": {"Div": {}}, "result": null, "successful": false}]}}]
+
+-> [{}, {"fn.exportVariables": {}}]
+<- [{}, {"Ok_": {"variables": [{"name": "a", "value": 1}, {"name": "b", "value": 2}]}}]
+
+-> [{}, {"fn.exportVariables": {"limit!": 1}}]
+<- [{}, {"Ok_": {"variables": [{"name": "a", "value": 1}]}}]
+```
+
