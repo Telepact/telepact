@@ -352,7 +352,7 @@ function startSchemaTestServer(
             const time = timer.startTimer();
             try {
                 let response = await server.process(requestBytes);
-                return response.bytes;
+                responseBytes = response.bytes;
             } finally {
                 time();
             }
