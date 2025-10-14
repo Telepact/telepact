@@ -59,8 +59,8 @@ server = Server(schema, handler, options)
 
 # Wire up request/response bytes from your transport of choice
 async def transport_handler(request_bytes: bytes) -> bytes:
-    response_bytes = await server.process(request_bytes)
-    return response_bytes
+    response = await server.process(request_bytes)
+    return response.bytes
 
 transport.receive(transport_handler)
 ```
