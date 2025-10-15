@@ -126,6 +126,7 @@
             <configuration>
               <publishingServerId>central</publishingServerId>
               <skipPublishing>${deploy.skipUpload}</skipPublishing>
+              <autoPublish>true</autoPublish>
             </configuration>
           </plugin>
         </plugins>
