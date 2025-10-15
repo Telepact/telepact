@@ -363,7 +363,7 @@ class TypedClient:
         return telepact.TypedMessage(message.headers, {{ function_name }}.Output(message.body))
     {% endfor %}
 
-class TypedServer:
+class TypedServerHandler:
 
     {%- for fn in functions %}
     {%- set function_name = fn | replace('fn.', '') %}

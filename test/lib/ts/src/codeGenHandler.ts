@@ -14,10 +14,10 @@
 //|  limitations under the License.
 //|
 
-import { ExUnion, ExStruct, TypedServer, example, test, Value } from './gen/genTypes.js';
+import { ExUnion, ExStruct, TypedServerHandler, example, test, Value } from './gen/genTypes.js';
 import { TypedMessage } from 'telepact';
 
-export class CodeGenHandler extends TypedServer {
+export class CodeGenHandler extends TypedServerHandler {
 
     async example(headers: { [key: string]: any }, input: example.Input): Promise<TypedMessage<example.Output>> {
         throw new Error("Unimplemented method 'example'");

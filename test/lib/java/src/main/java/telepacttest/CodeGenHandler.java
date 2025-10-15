@@ -29,7 +29,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import telepacttest.gen.ExStruct;
 import telepacttest.gen.ExUnion;
-import telepacttest.gen.TypedServer;
+import telepacttest.gen.TypedServerHandler;
 import io.github.telepact.TypedMessage;
 import telepacttest.gen.Value;
 import telepacttest.gen.example;
@@ -39,7 +39,7 @@ import telepacttest.gen.example.Output;
 import telepacttest.gen.test.Output.ErrorExample;
 import telepacttest.gen.test.Output.ErrorExample2;
 
-public class CodeGenHandler extends TypedServer {
+public class CodeGenHandler extends TypedServerHandler {
 
     @Override
     public TypedMessage<Output> example(Map<String, Object> headers, Input input) {

@@ -340,7 +340,7 @@ export class TypedClient {
     {%- endfor %}
 }
 
-export class TypedServer {
+export class TypedServerHandler {
     {% for fn in functions %}
     {%- set function_name = fn | replace('fn.', '') %}
     async {{ function_name }}(headers: Record<string, any>, input: {{ function_name }}.Input): Promise<TypedMessage<{{ function_name }}.Output>> {

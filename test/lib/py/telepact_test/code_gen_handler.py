@@ -17,11 +17,11 @@
 import json
 import base64
 from typing import Any, Dict, List, Optional, TypeVar, Callable, Tuple
-from telepact_test.gen.gen_types import test, Value, TypedServer, example as fnexample, getBigList, Undefined, ExUnion, ExStruct
+from telepact_test.gen.gen_types import test, Value, TypedServerHandler, example as fnexample, getBigList, Undefined, ExUnion, ExStruct
 from telepact import Response
 
 
-class CodeGenHandler(TypedServer):
+class CodeGenHandler(TypedServerHandler):
 
     async def example(self, headers: dict[str, object], input: fnexample.Input) -> Response:
         raise NotImplementedError("Unimplemented method 'example'")
