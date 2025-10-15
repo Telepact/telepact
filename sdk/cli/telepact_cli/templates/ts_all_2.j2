@@ -95,15 +95,15 @@ export class UntypedTaggedValue_ {
 
 {%- macro docstring(doc) -%}
     {%- if doc -%}
-    /**
+/**
         {%- if doc is iterable and doc is not string -%}
             {%- for line in doc %}
-     * {{ line }}
+ * {{ line }}
             {%- endfor %}
         {%- else %}
-     * {{ doc }}
+ * {{ doc }}
         {%- endif %}
-     */
+ */
     {%- endif %}
 {%- endmacro -%}
 
