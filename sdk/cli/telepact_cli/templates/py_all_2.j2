@@ -4,7 +4,8 @@ from dataclasses import dataclass
 from typing import cast, ForwardRef
 import telepact.Message
 import telepact.Client
-from typing import Tuple
+import telepact.TypedMessage
+from typing import Tuple, NamedTuple
 from enum import Enum
 
 T = TypeVar('T')
@@ -349,7 +350,7 @@ class Select_:
 
 {{ select(possible_fn_selects) }}
 
-class ClientInterface_:
+class TypedClient:
 
     client: telepact.Client
 
@@ -357,16 +358,16 @@ class ClientInterface_:
         self.client = client
     {% for fn in functions %}
     {%- set function_name = fn | replace('fn.', '') %}
-    async def {{ function_name }}(self, headers: dict[str, object], input: {{ function_name }}.Input) -> Tuple[dict[str, object], {{ function_name }}.Output]:
+    async def {{ function_name }}(self, headers: dict[str, object], input: {{ function_name }}.Input) -> telepact.TypedMessage[{{ function_name }}.Output]:
         message = await self.client.request(telepact.Message(headers, input.pseudo_json))
-        return message.headers, {{ function_name }}.Output(message.body)
+        return telepact.TypedMessage(message.headers, {{ function_name }}.Output(message.body))
     {% endfor %}
 
-class ServerHandler_:
+class TypedServerHandler:
 
     {%- for fn in functions %}
     {%- set function_name = fn | replace('fn.', '') %}
-    async def {{function_name}}(self, headers: dict[str, object], input: {{ function_name }}.Input) -> Tuple[dict[str, object], {{ function_name }}.Output]:
+    async def {{function_name}}(self, headers: dict[str, object], input: {{ function_name }}.Input) -> telepact.TypedMessage[{{ function_name }}.Output]:
         raise NotImplementedError()
     {% endfor %}
     async def handler(self, message: telepact.Message) -> telepact.Message:

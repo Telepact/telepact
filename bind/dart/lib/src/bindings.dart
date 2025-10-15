@@ -42,6 +42,13 @@ extension type Message._(JSObject _) implements JSObject {
   external factory Message(JSAny? headers, JSAny? body);
 }
 
+extension type Response._(JSObject _) implements JSObject {
+  external JSUint8Array get bytes;
+  external JSAny get headers;
+
+  external factory Response(JSUint8Array bytes, JSAny? headers);
+}
+
 extension type Serialization._(JSObject _) implements JSObject {
   external JSUint8Array toJson(JSAny telepactMessage);
   external JSUint8Array toMsgpack(JSAny telepactMessage);
@@ -80,7 +87,7 @@ extension type ClientOptions._(JSObject _) implements JSObject {
 extension type Server._(JSObject _) implements JSObject {
   external factory Server(
       TelepactSchema telepactSchema, JSFunction handler, ServerOptions options);
-  external JSPromise<JSUint8Array> process(JSUint8Array requestMessageBytes);
+  external JSPromise<Response> process(JSUint8Array requestMessageBytes);
 }
 
 extension type ServerOptions._(JSObject _) implements JSObject {
@@ -101,7 +108,7 @@ extension type ServerOptions._(JSObject _) implements JSObject {
 
 extension type MockServer._(JSObject _) implements JSObject {
   external factory MockServer(JSAny mockTelepactSchema, JSAny options);
-  external JSPromise<JSUint8Array> process(JSUint8Array message);
+  external JSPromise<Response> process(JSUint8Array message);
 }
 
 extension type MockServerOptions._(JSObject _) implements JSObject {

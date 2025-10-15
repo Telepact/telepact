@@ -27,15 +27,10 @@ void main() {
     test('cleaner: should work e2e from client to server', () async {
       final telepactPseudoJson = [
         {
-          "fn.add": {
-            "x": "integer",
-            "y": "integer"
-          },
+          "fn.add": {"x": "integer", "y": "integer"},
           "->": [
             {
-              "Ok_": {
-                "result": "integer"
-              }
+              "Ok_": {"result": "integer"}
             }
           ]
         }
@@ -78,7 +73,8 @@ void main() {
         print('Adapter received message: ${m.body}');
         final requestBytes = s.serialize(m);
         print('Serialized requestBytes: ${String.fromCharCodes(requestBytes)}');
-        final responseBytes = await server.process(requestBytes);
+        final r = await server.process(requestBytes);
+        final responseBytes = r.bytes;
         print('Received responseBytes: ${String.fromCharCodes(responseBytes)}');
         final response = s.deserialize(responseBytes);
         print('Deserialized response: ${response.body}');
@@ -163,7 +159,8 @@ void main() {
         final requestBytes = s.serialize(m);
         print(
             'Mock: Serialized requestBytes: ${String.fromCharCodes(requestBytes)}');
-        final responseBytes = await mockServer.process(requestBytes);
+        final r = await mockServer.process(requestBytes);
+        final responseBytes = r.bytes;
         print(
             'Mock: Received responseBytes: ${String.fromCharCodes(responseBytes)}');
         final response = s.deserialize(responseBytes);

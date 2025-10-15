@@ -60,8 +60,8 @@ const server = new Server(schema, handler, options);
 
 // Wire up request/response bytes from your transport of choice
 transport.receive(async (requestBytes): Promise<Message> => {
-    const responseBytes = await server.process(requestBytes);
-    return responseBytes;
+    const response = await server.process(requestBytes);
+    return response.bytes;
 });
 ```
 

@@ -14,17 +14,10 @@
 #|  limitations under the License.
 #|
 
-from typing import cast, NamedTuple
+from typing import TypeVar, Generic, NamedTuple
 
+T = TypeVar('T')
 
-class Message(NamedTuple):
+class TypedMessage(NamedTuple, Generic[T]):
     headers: dict[str, object]
-    body: dict[str, object]
-
-    def get_body_target(self) -> str:
-        entry = next(iter(self.body.items()))
-        return entry[0]
-
-    def get_body_payload(self) -> dict[str, object]:
-        entry = next(iter(self.body.items()))
-        return cast(dict[str, object], entry[1])
+    body: T

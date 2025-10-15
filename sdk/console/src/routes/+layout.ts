@@ -79,7 +79,7 @@ export const load: LayoutLoad = async ({ url, params, route, fetch }) => {
 		let mockClient = new Client(async (m: Message, s: Serializer) => {
 			let req = s.serialize(m);
 			let res = await mockServer.process(req);
-			return s.deserialize(res);
+			return s.deserialize(res.bytes);
 		}, new ClientOptions());
 
 		result = {
@@ -163,7 +163,7 @@ export const load: LayoutLoad = async ({ url, params, route, fetch }) => {
 		let client = new Client(async (m: Message, s: Serializer) => {
 			let req = s.serialize(m);
 			let res = await server.process(req);
-			return s.deserialize(res);
+			return s.deserialize(res.bytes);
 		}, new ClientOptions());
 
 		result = {

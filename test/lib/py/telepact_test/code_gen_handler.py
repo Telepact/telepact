@@ -17,15 +17,16 @@
 import json
 import base64
 from typing import Any, Dict, List, Optional, TypeVar, Callable, Tuple
-from telepact_test.gen.gen_types import test, Value, ServerHandler_, example as fnexample, getBigList, Undefined, ExUnion, ExStruct
+from telepact_test.gen.gen_types import test, Value, TypedServerHandler, example as fnexample, getBigList, Undefined, ExUnion, ExStruct
+from telepact import Response
 
 
-class CodeGenHandler(ServerHandler_):
+class CodeGenHandler(TypedServerHandler):
 
-    async def example(self, headers: dict[str, object], input: fnexample.Input) -> Tuple[dict[str, object], fnexample.Output]:
+    async def example(self, headers: dict[str, object], input: fnexample.Input) -> Response:
         raise NotImplementedError("Unimplemented method 'example'")
 
-    async def test(self, headers: dict[str, object], input: test.Input) -> Tuple[dict[str, object], test.Output]:
+    async def test(self, headers: dict[str, object], input: test.Input) -> Response:
         try:
             def default_serializer(obj):
                 if isinstance(obj, bytes):

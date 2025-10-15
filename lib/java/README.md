@@ -59,8 +59,8 @@ var server = new Server(schema, handler, options);
 
 // Wire up request/response bytes from your transport of choice
 transport.receive((requestBytes) -> {
-    var responseBytes = server.process(requestBytes);
-    return responseBytes;
+    var response = server.process(requestBytes);
+    return response.bytes;
 });
 ```
 

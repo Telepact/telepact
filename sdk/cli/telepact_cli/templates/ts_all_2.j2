@@ -1,4 +1,4 @@
-import { Message, Client } from 'telepact';
+import { Message, Client, TypedMessage } from 'telepact';
 
 export class TaggedValue_<T, U> {
     tag: T;
@@ -324,7 +324,7 @@ export class Select_ {
 
 {{ select(possible_fn_selects) }}
 
-export class ClientInterface_ {
+export class TypedClient {
     client: Client;
 
     constructor(client: Client) {
@@ -333,17 +333,17 @@ export class ClientInterface_ {
 
     {% for fn in functions %}
     {%- set function_name = fn | replace('fn.', '') %}
-    async {{ function_name }}(headers: Record<string, any>, input: {{ function_name }}.Input): Promise<[Record<string, any>, {{ function_name }}.Output]> {
+    async {{ function_name }}(headers: Record<string, any>, input: {{ function_name }}.Input): Promise<TypedMessage<{{ function_name }}.Output>> {
         const message = await this.client.request(new Message(headers, input.pseudoJson));
-        return [message.headers, new {{ function_name }}.Output(message.body)];
+        return { headers: message.headers, body: new {{ function_name }}.Output(message.body)};
     }
     {%- endfor %}
 }
 
-export class ServerHandler_ {
+export class TypedServerHandler {
     {% for fn in functions %}
     {%- set function_name = fn | replace('fn.', '') %}
-    async {{ function_name }}(headers: Record<string, any>, input: {{ function_name }}.Input): Promise<[Record<string, any>, {{ function_name }}.Output]> {
+    async {{ function_name }}(headers: Record<string, any>, input: {{ function_name }}.Input): Promise<TypedMessage<{{ function_name }}.Output>> {
         throw new Error('Not implemented');
     }
     {%- endfor %}
@@ -354,8 +354,8 @@ export class ServerHandler_ {
         {% for fn in functions %}
         {%- set function_name = fn | replace('fn.', '') %}
         {% if loop.first %}if{% else %}else if{% endif %} (functionName === "{{ fn }}") {
-            const [headers, output] = await this.{{ function_name }}(message.headers, new {{ function_name }}.Input(message.body));
-            return new Message(headers, output.pseudoJson);
+            const { headers, body } = await this.{{ function_name }}(message.headers, new {{ function_name }}.Input(message.body));
+            return new Message(headers, body.pseudoJson);
         }
         {%- endfor %}
 

@@ -14,15 +14,16 @@
 //|  limitations under the License.
 //|
 
-import { ExUnion, ExStruct, ServerHandler_, example, test, Value } from './gen/genTypes.js';
+import { ExUnion, ExStruct, TypedServerHandler, example, test, Value } from './gen/genTypes.js';
+import { TypedMessage } from 'telepact';
 
-export class CodeGenHandler extends ServerHandler_ {
+export class CodeGenHandler extends TypedServerHandler {
 
-    async example(headers: { [key: string]: any }, input: example.Input): Promise<[ { [key: string]: any }, example.Output ]> {
+    async example(headers: { [key: string]: any }, input: example.Input): Promise<TypedMessage<example.Output>> {
         throw new Error("Unimplemented method 'example'");
     }
 
-    async test(headers: { [key: string]: any }, input: test.Input): Promise<[Record<string, any>, test.Output]> {
+    async test(headers: { [key: string]: any }, input: test.Input): Promise<TypedMessage<test.Output>> {
         try {
             console.log("input: " + JSON.stringify(input.pseudoJson));
         } catch (e) {
@@ -31,7 +32,7 @@ export class CodeGenHandler extends ServerHandler_ {
 
         if (headers["@error"] === true) {
             let output = test.Output.from_ErrorExample2({ field1: "Boom!" });
-            return [{}, output];
+            return { headers: {}, body: output };
         }
 
         let value = new Value({});
@@ -258,7 +259,7 @@ export class CodeGenHandler extends ServerHandler_ {
 
         let output = test.Output.from_Ok_({ value });
 
-        return [{}, output];
+        return { headers: {}, body: output };
     }
 }
 

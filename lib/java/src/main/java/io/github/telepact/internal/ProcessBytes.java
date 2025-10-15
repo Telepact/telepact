@@ -25,11 +25,12 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import io.github.telepact.Message;
+import io.github.telepact.Response;
 import io.github.telepact.TelepactSchema;
 import io.github.telepact.Serializer;
 
 public class ProcessBytes {
-    public static byte[] processBytes(byte[] requestMessageBytes, Map<String, Object> overrideHeaders, Serializer serializer, TelepactSchema telepactSchema,
+    public static Response processBytes(byte[] requestMessageBytes, Map<String, Object> overrideHeaders, Serializer serializer, TelepactSchema telepactSchema,
             Consumer<Throwable> onError, Consumer<Message> onRequest, Consumer<Message> onResponse,
             Function<Message, Message> handler) {
         try {
@@ -48,15 +49,17 @@ public class ProcessBytes {
             } catch (Throwable ignored) {
             }
 
-            return serializer.serialize(responseMessage);
+            final var responseBytes = serializer.serialize(responseMessage);
+            return new Response(responseBytes, responseMessage.headers);
         } catch (Throwable e) {
             try {
                 onError.accept(e);
             } catch (Throwable ignored) {
             }
 
-            return serializer
+            final var responseBytes = serializer
                     .serialize(new Message(new HashMap<>(), Map.of("ErrorUnknown_", Map.of())));
+            return new Response(responseBytes, Map.of());
         }
     }
 }

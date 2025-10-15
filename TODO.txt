@@ -4,6 +4,7 @@ High:
 - Include ping_ in generated code
 
 Medium:
+- Update py test to install whl instead of tgz
 - Write tests that verify each type within a "link" function
 - Add websocket support in doc ui
 - Add websocket support in cli

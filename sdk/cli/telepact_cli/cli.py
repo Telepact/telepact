@@ -199,19 +199,13 @@ def _generate_internal(schema_data: list[dict[str, object]], possible_fn_selects
                 'package': java_package, 'data': schema_entry, 'possible_fn_selects': possible_fn_selects}, f"{schema_key.split('.')[1]}.java")
 
         _write_java_file('java_server.j2', {
-                         'package': java_package, 'functions': functions, 'possible_fn_selects': possible_fn_selects}, f"ServerHandler_.java")
+                         'package': java_package, 'functions': functions, 'possible_fn_selects': possible_fn_selects}, f"TypedServerHandler.java")
 
         _write_java_file('java_client.j2', {
-                         'package': java_package, 'functions': functions, 'possible_fn_selects': possible_fn_selects}, f"ClientInterface_.java")
-
-        _write_java_file('java_optional.j2', {
-                         'package': java_package}, f"Optional_.java")
+                         'package': java_package, 'functions': functions, 'possible_fn_selects': possible_fn_selects}, f"TypedClient.java")
 
         _write_java_file('java_utility.j2', {
                          'package': java_package}, f"Utility_.java")
-
-        _write_java_file('typed_message.j2', {
-                         'package': java_package}, f"TypedMessage_.java")
 
         _write_java_file('java_select.j2', {'package': java_package, 'possible_fn_selects': possible_fn_selects}, f"Select_.java")
 
@@ -397,10 +391,10 @@ def demo_server(port: int) -> None:
         print(f'Request: {request_bytes}')
 
         # Use the pre-configured telepact_server instance
-        response_bytes: bytes = await telepact_server.process(request_bytes)
+        response_bytes, extracted_headers = await telepact_server.process(request_bytes)
         print(f'Response: {response_bytes}')
 
-        media_type = 'application/octet-stream' if response_bytes and response_bytes[0] == 0x92 else 'application/json'
+        media_type = 'application/octet-stream' if 'bin_' in extracted_headers else 'application/json'
         print(f'Media type: {media_type}')
 
         return Response(content=response_bytes, media_type=media_type)
@@ -537,8 +531,9 @@ def mock(
 
     async def mock_api_endpoint(request: Request) -> Response:
         request_bytes = await request.body()
-        response_bytes = await mock_server.process(request_bytes)
-        media_type = 'application/octet-stream' if response_bytes and response_bytes[0] == 0x92 else 'application/json'
+        response = await mock_server.process(request_bytes)
+        response_bytes: bytes = response.bytes
+        media_type = 'application/octet-stream' if 'bin_' in response.headers else 'application/json'
         return Response(content=response_bytes, media_type=media_type)
 
     routes = [

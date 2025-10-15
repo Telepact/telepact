@@ -29,8 +29,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import telepacttest.gen.ExStruct;
 import telepacttest.gen.ExUnion;
-import telepacttest.gen.ServerHandler_;
-import telepacttest.gen.TypedMessage_;
+import telepacttest.gen.TypedServerHandler;
+import io.github.telepact.TypedMessage;
 import telepacttest.gen.Value;
 import telepacttest.gen.example;
 import telepacttest.gen.test;
@@ -39,16 +39,16 @@ import telepacttest.gen.example.Output;
 import telepacttest.gen.test.Output.ErrorExample;
 import telepacttest.gen.test.Output.ErrorExample2;
 
-public class CodeGenHandler extends ServerHandler_ {
+public class CodeGenHandler extends TypedServerHandler {
 
     @Override
-    public TypedMessage_<Output> example(Map<String, Object> headers, Input input) {
+    public TypedMessage<Output> example(Map<String, Object> headers, Input input) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'example'");
     }
 
     @Override
-    public TypedMessage_<telepacttest.gen.test.Output> test(Map<String, Object> headers, telepacttest.gen.test.Input input) {
+    public TypedMessage<telepacttest.gen.test.Output> test(Map<String, Object> headers, telepacttest.gen.test.Input input) {
         try {
             System.out.println("input: " + new ObjectMapper().writeValueAsString(input.pseudoJson));
         } catch (JsonProcessingException e) {
@@ -58,7 +58,7 @@ public class CodeGenHandler extends ServerHandler_ {
 
         if (Objects.equals(true, headers.get("@error"))) {
             var errorOutput = test.Output.from_ErrorExample2(new ErrorExample2.Builder().field1("Boom!").build());
-            return new TypedMessage_<test.Output>(new HashMap<>(), errorOutput);
+            return new TypedMessage<test.Output>(new HashMap<>(), errorOutput);
         }
 
         var value = new AtomicReference<>(new Value.Builder());
@@ -287,7 +287,7 @@ public class CodeGenHandler extends ServerHandler_ {
         var ok = new test.Output.Ok_.Builder().value(value.get().build());
         var output = test.Output.from_Ok_(ok.build());
 
-        return new TypedMessage_<test.Output>(new HashMap<>(), output);
+        return new TypedMessage<test.Output>(new HashMap<>(), output);
     }
 
     private static ExStruct mapStruct(ExStruct s) {
@@ -347,28 +347,28 @@ public class CodeGenHandler extends ServerHandler_ {
     }
 
     @Override
-    public TypedMessage_<telepacttest.gen.getBigList.Output> getBigList(Map<String, Object> headers,
+    public TypedMessage<telepacttest.gen.getBigList.Output> getBigList(Map<String, Object> headers,
             telepacttest.gen.getBigList.Input input) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getBigList'");
     }
 
     @Override
-    public TypedMessage_<telepacttest.gen.circularLink1.Output> circularLink1(Map<String, Object> headers,
+    public TypedMessage<telepacttest.gen.circularLink1.Output> circularLink1(Map<String, Object> headers,
             telepacttest.gen.circularLink1.Input input) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'circularLink1'");
     }
 
     @Override
-    public TypedMessage_<telepacttest.gen.circularLink2.Output> circularLink2(Map<String, Object> headers,
+    public TypedMessage<telepacttest.gen.circularLink2.Output> circularLink2(Map<String, Object> headers,
             telepacttest.gen.circularLink2.Input input) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'circularLink2'");
     }
 
     @Override
-    public TypedMessage_<telepacttest.gen.selfLink.Output> selfLink(Map<String, Object> headers,
+    public TypedMessage<telepacttest.gen.selfLink.Output> selfLink(Map<String, Object> headers,
             telepacttest.gen.selfLink.Input input) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'selfLink'");

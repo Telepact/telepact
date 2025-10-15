@@ -70,6 +70,33 @@ class Message {
   Map<String, Object> get body => _body;
 }
 
+class Response {
+  Uint8List _bytes;
+  Map<String, Object> _headers;
+
+  /// Constructs a [Response] with the given bytes and headers.
+  Response(Uint8List bytes, Map<String, Object> headers)
+      : _bytes = bytes,
+        _headers = headers;
+
+  /// Constructs a [Response] from a JavaScript binding response.
+  Response.fromJS(b.Response response)
+      : _bytes = response.bytes.toDart,
+        _headers = Response.mapJsHeaders(response.headers);
+
+  /// Maps JavaScript headers to Dart headers.
+  static mapJsHeaders(JSAny headers) {
+    final h = headers.dartify() as Map<Object?, Object?>;
+    return h.cast<String, Object>();
+  }
+
+  /// Gets the bytes of the response.
+  Uint8List get bytes => _bytes;
+
+  /// Gets the headers of the response.
+  Map<String, Object> get headers => _headers;
+}
+
 /// A serializer for serializing and deserializing messages.
 class Serializer {
   final b.Serializer _serializer;
@@ -160,10 +187,10 @@ class Server {
     return b.Server(schema, outerHandler.toJS, options._options);
   }
 
-  /// Processes a request message and returns the response as a [Uint8List].
-  Future<Uint8List> process(Uint8List requestMessageBytes) async {
+  /// Processes a request message and returns the response as a [Response].
+  Future<Response> process(Uint8List requestMessageBytes) async {
     final response = await _server.process(requestMessageBytes.toJS).toDart;
-    return response.toDart;
+    return Response.fromJS(response);
   }
 }
 
@@ -267,9 +294,9 @@ class MockServer {
   /// Processes a request message and returns the response as a [Uint8List].
   ///
   /// [messageBytes] is the request message in bytes.
-  /// Returns the response message as a [Uint8List].
-  Future<Uint8List> process(Uint8List messageBytes) async {
+  /// Returns the response message as a [Response].
+  Future<Response> process(Uint8List messageBytes) async {
     final response = await _server.process(messageBytes.toJS).toDart;
-    return response.toDart;
+    return Response.fromJS(response);
   }
 }

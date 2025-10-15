@@ -268,7 +268,8 @@ export async function genExample(
 		schemaInst.parsedResponseHeaders
 	);
 	let mockServer = new telepact.MockServer(mockTelepact, mockServerOptions);
-	let responseBytes = await mockServer.process(requestBytes);
+	let r = await mockServer.process(requestBytes);
+	let responseBytes = r.bytes;
 	try {
 		let responseJson = new TextDecoder().decode(responseBytes);
 		let response = JSON.parse(responseJson);
