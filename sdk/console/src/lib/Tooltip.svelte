@@ -69,18 +69,10 @@
 <div
   bind:this={triggerEl}
   class="relative"
-  role="button"
-  tabindex="0"
   on:mouseenter={handleMouseEnter}
   on:mouseleave={handleMouseLeave}
   on:focus={handleMouseEnter}
   on:blur={handleMouseLeave}
-  on:keydown={(e) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      show = !show;
-    }
-  }}
 >
   <slot />
   {#if show && text}
