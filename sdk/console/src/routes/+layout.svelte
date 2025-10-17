@@ -48,8 +48,8 @@
 
 	let { children }: Props = $props();
 
-	let requestEditor: MonacoEditor;
-	let schemaEditor: MonacoEditor;
+	let requestEditor = $state<MonacoEditor>();
+	let schemaEditor = $state<MonacoEditor>();
 
 	let sourceUrl: string = $derived($page.url.searchParams.get('s') ?? '');
 
@@ -152,13 +152,15 @@
 			}
 		}
 
-		let request = requestEditor.getContent();
+		let request = requestEditor?.getContent?.();
+		if (!request) return;
 		handleRequest(request, 'tr');
 		handleSubmitRequest($page.data.client, request);
 	}
 
 	function handleSchema() {
-		let schema = schemaEditor.getContent();
+		let schema = schemaEditor?.getContent?.();
+		if (!schema) return;
 		let minifiedSchema = minifyJson(schema);
 		let q = new URLSearchParams($page.url.searchParams.toString());
 		q.set('s', '');
@@ -262,8 +264,8 @@
 	}
 </script>
 
-<div class="text-gray-200">
-	<nav class="fixed top-0 z-10 h-16 w-full border-y border-slate-600 bg-slate-800">
+<div class="text-gray-800 dark:text-gray-200">
+	<nav class="fixed top-0 z-10 h-16 w-full border-y border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800">
 		<div class="flex h-full items-center px-4">
 			<div class="flex basis-1/3">
 				<div class="flex items-center rounded-md py-2">
@@ -284,7 +286,7 @@
 							/>
 						</svg>
 					</div>
-					<h1 class="px-2 text-lg font-semibold text-gray-100">Telepact</h1>
+					<h1 class="px-2 text-lg font-semibold text-gray-900 dark:text-gray-100">Telepact</h1>
 				</div>
 			</div>
 			<div id="view-select" class="flex basis-1/3 content-center justify-center space-x-2">
@@ -296,7 +298,7 @@
 							onclick={toggleShowSchemaCode}
 							class="rounded-s-md p-2 {activeViews.includes('s')
 								? 'bg-sky-700 text-cyan-300'
-								: 'bg-slate-700 text-gray-200'}"
+								: 'bg-slate-200 text-gray-800 dark:bg-slate-700 dark:text-gray-200'}"
 						>
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
@@ -319,7 +321,7 @@
 							onclick={toggleShowDocUi}
 							class="p-2 {activeViews.includes('d')
 								? 'bg-sky-700 text-cyan-300'
-								: 'bg-slate-700 text-gray-200'}"
+								: 'bg-slate-200 text-gray-800 dark:bg-slate-700 dark:text-gray-200'}"
 						>
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
@@ -342,7 +344,7 @@
 							onclick={toggleShowExample}
 							class="rounded-e-md p-2 {activeViews.includes('m')
 								? 'bg-sky-700 text-cyan-300'
-								: 'bg-slate-700 text-gray-200'}"
+								: 'bg-slate-200 text-gray-800 dark:bg-slate-700 dark:text-gray-200'}"
 						>
 							<MockIcon />
 						</button>
@@ -356,7 +358,7 @@
 							onclick={toggleTerminal}
 							class="rounded-s-md p-2 {activeViews.includes('t')
 								? 'bg-emerald-900 text-green-300'
-								: 'bg-slate-700 text-gray-200'}"
+								: 'bg-slate-200 text-gray-800 dark:bg-slate-700 dark:text-gray-200'}"
 						>
 							<TerminalIcon />
 						</button>
@@ -368,7 +370,7 @@
 							onclick={toggleResults}
 							class="rounded-e-md p-2 {activeViews.includes('r')
 								? 'bg-emerald-900 text-green-300'
-								: 'bg-slate-700 text-gray-200'}"
+								: 'bg-slate-200 text-gray-800 dark:bg-slate-700 dark:text-gray-200'}"
 						>
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
@@ -388,10 +390,10 @@
 			</div>
 			<div class="flex basis-1/3 justify-end">
 				<form class="flex space-x-2" onsubmit={preventDefault(handleSourceGet)}>
-					<div class="flex rounded-md border border-gray-500">
+					<div class="flex rounded-md border border-gray-300 dark:border-gray-500">
 						<label
 							for="url"
-							class="content-center rounded-l-md bg-zinc-600 px-2 py-2 text-sm font-medium text-gray-200 whitespace-nowrap"
+							class="content-center rounded-l-md bg-zinc-200 dark:bg-zinc-600 px-2 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 whitespace-nowrap"
 							>Live URL</label
 						>
 						<div>
@@ -401,7 +403,7 @@
 								id="url"
 								placeholder="None  (draft mode)"
 								value={sourceUrl}
-								class="rounded-r-md border-0 bg-zinc-700 pl-2 py-2 placeholder:text-gray-400 focus:border-gray-500 focus:ring-1 focus:ring-inset focus:ring-gray-500"
+								class="rounded-r-md border-0 bg-zinc-100 dark:bg-zinc-700 pl-2 py-2 placeholder:text-gray-400 focus:border-gray-500 focus:ring-1 focus:ring-inset focus:ring-gray-500"
 							/>
 						</div>
 					</div>
@@ -415,7 +417,7 @@
 		</div>
 	</nav>
 
-	<main class="mt-16 flex h-[calc(100vh-4em)] bg-zinc-800">
+	<main class="mt-16 flex h-[calc(100vh-4em)] bg-zinc-50 dark:bg-zinc-800">
 		{#await Promise.all( [telepactSchemaPromise, filteredSchemaPseudoJsonPromise, schemaDraftPromise] )}
 			<span>loading schema</span>
 		{:then [telepactSchema, filteredSchemaPseudoJson, schemaDraft]}
@@ -423,7 +425,7 @@
 				<div class="flex h-[calc(100vh-4em)] {getSectionClass('s', activeViews.length)}">
 					<div class="flex w-full flex-col p-6">
 						<div class="flex justify-between">
-							<h1 class="pb-4 text-xl font-semibold text-gray-100">Schema (JSON)</h1>
+							<h1 class="pb-4 text-xl font-semibold text-gray-900 dark:text-gray-100">Schema (JSON)</h1>
 							{#if !schemaSourceReadOnly}
 								<div class="flex space-x-2">
 									<a
@@ -431,7 +433,7 @@
 									>
 										<button
 											onclick={handleSchema}
-											class="flex items-center rounded-md bg-gray-700 px-3 py-2 text-sm font-semibold text-white hover:bg-gray-600 hover:underline"
+											class="flex items-center rounded-md bg-gray-200 dark:bg-gray-700 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-white hover:bg-gray-300 dark:hover:bg-gray-600 hover:underline"
 										>
 											<span>Writing Guide</span>
 											<svg
@@ -458,7 +460,7 @@
 								</div>
 							{/if}
 						</div>
-						<div class="grow border border-zinc-600">
+						<div class="grow border border-zinc-300 dark:border-zinc-600">
 							<MonacoEditor
 								id="schema"
 								readOnly={schemaSourceReadOnly}
@@ -477,7 +479,7 @@
 					<div class="flex w-full flex-col p-6">
 						{#key showInternalApi}
 							<div>
-								<h1 class="pb-4 text-xl font-semibold text-gray-100">Schema</h1>
+								<h1 class="pb-4 text-xl font-semibold text-gray-900 dark:text-gray-100">Schema</h1>
 							</div>
 							{#key sortDocCardsAZ}
 								{#each parseTelepactSchema(filteredSchemaPseudoJson, telepactSchema, sortDocCardsAZ, showInternalApi) as entry}
@@ -503,7 +505,7 @@
 				<div class="flex overflow-scroll {getSectionClass('m', activeViews.length)}">
 					<div class="flex w-full flex-col p-6">
 						<div class="flex items-start justify-between">
-							<h1 class="pb-4 text-xl font-semibold text-gray-100">Mocked Example</h1>
+							<h1 class="pb-4 text-xl font-semibold text-gray-900 dark:text-gray-100">Mocked Example</h1>
 							<button
 								onclick={incrementRandomSeed}
 								class="rounded-md bg-sky-700 px-3 py-2 text-sm font-semibold text-white hover:bg-sky-600"
@@ -518,7 +520,7 @@
 								</div>
 							{:then example}
 								<div class="flex h-full flex-col space-y-2">
-									<div class="h-1/2 grow border border-zinc-600">
+									<div class="h-1/2 grow border border-zinc-300 dark:border-zinc-600">
 										<MonacoEditor
 											id={'requestExample'}
 											readOnly={true}
@@ -532,7 +534,7 @@
 									<div class="ml-4 shrink">
 										<span class="text-3xl text-emerald-500">→</span>
 									</div>
-									<div class="h-1/2 grow border border-zinc-600">
+									<div class="h-1/2 grow border border-zinc-300 dark:border-zinc-600">
 										<MonacoEditor
 											id={'responseExample'}
 											readOnly={true}
@@ -555,15 +557,15 @@
 		{/await}
 		{#if activeViews.includes('t')}
 			<div class="flex h-[calc(100vh-4em)] {getSectionClass('t', activeViews.length)}">
-				<div class="flex w-full flex-col bg-zinc-700 p-6">
+				<div class="flex w-full flex-col bg-zinc-100 dark:bg-zinc-700 p-6">
 					<div class="flex justify-between">
-						<h1 class="pb-4 text-xl font-semibold text-gray-100">Request</h1>
+						<h1 class="pb-4 text-xl font-semibold text-gray-900 dark:text-gray-100">Request</h1>
 						<div>
 							{#if response}
 								{#await response}
 									<button
 										disabled
-										class="cursor-not-allowed rounded-md bg-sky-600/40 px-3 py-2 text-sm font-semibold text-gray-300"
+										class="cursor-not-allowed rounded-md bg-sky-600/40 px-3 py-2 text-sm font-semibold text-gray-500 dark:text-gray-300"
 										>{submitString}</button
 									>
 								{:then}
@@ -589,7 +591,7 @@
 						</div>
 					</div>
 					{#key request}
-						<div class="grow border border-zinc-600">
+						<div class="grow border border-zinc-300 dark:border-zinc-600">
 							<MonacoEditor
 								id="request"
 								readOnly={false}
@@ -607,8 +609,8 @@
 		{#if activeViews.includes('r')}
 			<div class="flex h-[calc(100vh-4em)] {getSectionClass('r', activeViews.length)}">
 				{#if response}
-					<div class="flex w-full flex-col bg-zinc-700 p-6">
-						<h1 class="mb-4 text-xl font-semibold text-gray-100">Response</h1>
+					<div class="flex w-full flex-col bg-zinc-100 dark:bg-zinc-700 p-6">
+						<h1 class="mb-4 text-xl font-semibold text-gray-900 dark:text-gray-100">Response</h1>
 						{#await response}
 							<div class="grid h-full w-full place-content-center">
 								<div>
@@ -617,7 +619,7 @@
 							</div>
 						{:then d}
 							{#key d}
-								<div class="grow border border-zinc-600">
+								<div class="grow border border-zinc-300 dark:border-zinc-600">
 									<MonacoEditor
 										id="response"
 										readOnly={true}
@@ -630,12 +632,12 @@
 							{/key}
 						{:catch error}
 							<div
-								class="h-full rounded-md border border-red-700 bg-red-500/20 p-4 text-red-500"
+								class="h-full rounded-md border border-red-300 dark:border-red-700 bg-red-100 dark:bg-red-500/20 p-4 text-red-700 dark:text-red-500"
 							>
 								<div class="overflow-scroll">
 									<span>{error}</span>
 									{#if error.stack}
-										<div class="text-sm text-gray-400">
+										<div class="text-sm text-gray-600 dark:text-gray-400">
 											{error.stack}
 										</div>
 									{/if}

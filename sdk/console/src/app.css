@@ -15,10 +15,11 @@
 /*|                                                                            |*/
 
 @import 'tailwindcss';
-@plugin "@tailwindcss/typography";
 
-@media (prefers-color-scheme: dark) {
-	body {
-		background-color: #27272a;
-	}
+/* Light/Dark background driven by the `dark` class on <html> */
+html:not(.dark) body {
+	background-color: #fafafa; /* zinc-50 */
+}
+html.dark body {
+	background-color: #27272a; /* zinc-800 */
 }

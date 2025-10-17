@@ -61,11 +61,14 @@
 			}
 		};
 
+		const prefersDark = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+		const initialTheme = prefersDark ? 'vs-dark' : (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'vs' : 'vs-dark');
+
 		editor = monaco.editor.create(
 			editorElement,
 			{
 				automaticLayout: true,
-				theme: 'vs-dark',
+				theme: initialTheme,
 				scrollbar: {
 					alwaysConsumeMouseWheel: false
 				},
@@ -88,6 +91,16 @@
 				textModelService: null
 			}
 		);
+
+		// React to OS theme changes
+		if (typeof window !== 'undefined' && window.matchMedia) {
+			const mql = window.matchMedia('(prefers-color-scheme: dark)');
+			const applyTheme = (isDark: boolean) => {
+				monaco.editor.setTheme(isDark ? 'vs-dark' : 'vs');
+			};
+			applyTheme(mql.matches);
+			mql.addEventListener('change', (e) => applyTheme(e.matches));
+		}
 
 		const model = monaco.editor.createModel(
 			json,
@@ -125,8 +138,9 @@
 	});
 </script>
 
+
 <div class="z-1 relative w-full {fullHeight ? 'h-full' : ''}">
-	<div class={fullHeight ? 'h-full' : ''} bind:this={editorElement} />
+	<div class={fullHeight ? 'h-full' : ''} bind:this={editorElement}></div>
 	<div class="absolute right-0 top-0">
 		<slot />
 	</div>
