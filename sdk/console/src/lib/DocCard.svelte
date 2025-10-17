@@ -104,15 +104,15 @@
 				class="rounded-md px-2 py-1 font-mono text-2xl font-bold tracking-tight text-gray-900 dark:text-white {schemaKey.startsWith(
 					'fn'
 				)
-					? 'bg-amber-700'
+					? 'bg-amber-500 dark:bg-amber-700'
 					: schemaKey.startsWith('struct')
-						? 'bg-sky-700'
+						? 'bg-sky-500 dark:bg-sky-700'
 						: schemaKey.startsWith('union')
-							? 'bg-green-700'
+							? 'bg-green-500 dark:bg-green-700'
 							: schemaKey.startsWith('errors')
-								? 'bg-rose-800'
+								? 'bg-rose-500 dark:bg-rose-800'
 								: schemaKey.startsWith('info')
-									? 'bg-slate-600'
+									? 'bg-slate-300 dark:bg-slate-600'
 									: 'bg-gray-200 dark:bg-gray-700'}"
 			>
 				{schemaKey}
