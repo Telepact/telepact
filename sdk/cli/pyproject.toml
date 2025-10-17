@@ -16,7 +16,7 @@ include = [ "telepact_cli/telepact/**/*", "LICENSE", "NOTICE",]
 include = "telepact_cli"
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = ">=3.11"
 click = "^8.2.1"
 jinja2 = "^3.1"
 msgpack = "^1.1.1"

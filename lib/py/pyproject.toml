@@ -15,7 +15,7 @@ include = [ "telepact/json/*", "LICENSE", "NOTICE",]
 include = "telepact"
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = ">=3.11"
 msgpack = "^1.1.1"
 
 [tool.poetry.group.dev.dependencies]
