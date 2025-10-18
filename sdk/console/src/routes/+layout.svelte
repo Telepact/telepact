@@ -48,8 +48,8 @@
 
 	let { children }: Props = $props();
 
-	let requestEditor: MonacoEditor;
-	let schemaEditor: MonacoEditor;
+	let requestEditor = $state<MonacoEditor>();
+	let schemaEditor = $state<MonacoEditor>();
 
 	let sourceUrl: string = $derived($page.url.searchParams.get('s') ?? '');
 
@@ -152,13 +152,15 @@
 			}
 		}
 
-		let request = requestEditor.getContent();
+		let request = requestEditor?.getContent?.();
+		if (!request) return;
 		handleRequest(request, 'tr');
 		handleSubmitRequest($page.data.client, request);
 	}
 
 	function handleSchema() {
-		let schema = schemaEditor.getContent();
+		let schema = schemaEditor?.getContent?.();
+		if (!schema) return;
 		let minifiedSchema = minifyJson(schema);
 		let q = new URLSearchParams($page.url.searchParams.toString());
 		q.set('s', '');
@@ -262,29 +264,15 @@
 	}
 </script>
 
-<div class="text-gray-200">
-	<nav class="fixed top-0 z-10 h-16 w-full border-y border-slate-600 bg-slate-800">
+<div class="text-gray-800 dark:text-gray-200">
+	<nav class="fixed top-0 z-10 h-16 w-full border-y border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800">
 		<div class="flex h-full items-center px-4">
 			<div class="flex basis-1/3">
 				<div class="flex items-center rounded-md py-2">
 					<div class="text-sky-400">
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke-width="1"
-							stroke="currentColor"
-							class="h-8 w-8"
-						>
-							<!-- <path
-								d="M 12 16 A 1 1 0 0 0 12 8 A 1 1 0 0 0 12 16 M 8 16 L 5 19 M 3 20 A 1 1 0 0 0 3 22 A 1 1 0 0 0 3 20 M 16 8 L 19 5 M 21 4 A 1 1 0 0 0 21 2 A 1 1 0 0 0 21 4 M 7 12 L 5 12 M 4 12 A 1 1 0 0 0 2 12 A 1 1 0 0 0 4 12 M 17 12 L 19 12 M 20 12 A 1 1 0 0 0 22 12 A 1 1 0 0 0 20 12 M 12 7 L 12 4 M 12 17 L 12 20 M 10 22 L 14 22 M 10 2 L 14 2"
-							/> -->
-							<path
-								d="M 2.093 6.908 C 0.414 4.35 1.447 0.938 3 1 C 3.67 1.171 3.799 1.352 4.057 1.946 C 4.833 4.117 4 11 2 23 L 16 23 M 18 2 A 1 1 0 0 0 17 1 L 3 1 M 10 17 C 14.007 12.249 17 9 21 7 M 10.965 15.376 C 10.939 14.498 10.965 13.671 11.224 12.947 L 11.991 13.619 L 11.663 12.172 C 13.369 10.104 14.842 8.347 16.514 7.494 L 17.366 8.993 L 17.788 6.9 C 22.879 4.652 24.403 5.763 21.251 8.787 L 20.726 8.037 L 20.829 9.123 C 18.201 11.371 15.022 14.369 11.301 15.712 M 18 2 L 18 5 M 16 23 C 16.619 20.297 16.959 17.314 17.185 15.578"
-							/>
-						</svg>
+						<img src="/favicon.svg" alt="Telepact logo" class="h-8 w-8" />
 					</div>
-					<h1 class="px-2 text-lg font-semibold text-gray-100">Telepact</h1>
+					<h1 class="px-2 text-lg font-semibold text-gray-900 dark:text-gray-100">Telepact</h1>
 				</div>
 			</div>
 			<div id="view-select" class="flex basis-1/3 content-center justify-center space-x-2">
@@ -296,7 +284,7 @@
 							onclick={toggleShowSchemaCode}
 							class="rounded-s-md p-2 {activeViews.includes('s')
 								? 'bg-sky-700 text-cyan-300'
-								: 'bg-slate-700 text-gray-200'}"
+								: 'bg-slate-200 text-gray-800 dark:bg-slate-700 dark:text-gray-200'}"
 						>
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
@@ -319,7 +307,7 @@
 							onclick={toggleShowDocUi}
 							class="p-2 {activeViews.includes('d')
 								? 'bg-sky-700 text-cyan-300'
-								: 'bg-slate-700 text-gray-200'}"
+								: 'bg-slate-200 text-gray-800 dark:bg-slate-700 dark:text-gray-200'}"
 						>
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
@@ -342,7 +330,7 @@
 							onclick={toggleShowExample}
 							class="rounded-e-md p-2 {activeViews.includes('m')
 								? 'bg-sky-700 text-cyan-300'
-								: 'bg-slate-700 text-gray-200'}"
+								: 'bg-slate-200 text-gray-800 dark:bg-slate-700 dark:text-gray-200'}"
 						>
 							<MockIcon />
 						</button>
@@ -356,7 +344,7 @@
 							onclick={toggleTerminal}
 							class="rounded-s-md p-2 {activeViews.includes('t')
 								? 'bg-emerald-900 text-green-300'
-								: 'bg-slate-700 text-gray-200'}"
+								: 'bg-slate-200 text-gray-800 dark:bg-slate-700 dark:text-gray-200'}"
 						>
 							<TerminalIcon />
 						</button>
@@ -368,7 +356,7 @@
 							onclick={toggleResults}
 							class="rounded-e-md p-2 {activeViews.includes('r')
 								? 'bg-emerald-900 text-green-300'
-								: 'bg-slate-700 text-gray-200'}"
+								: 'bg-slate-200 text-gray-800 dark:bg-slate-700 dark:text-gray-200'}"
 						>
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
@@ -388,10 +376,10 @@
 			</div>
 			<div class="flex basis-1/3 justify-end">
 				<form class="flex space-x-2" onsubmit={preventDefault(handleSourceGet)}>
-					<div class="flex rounded-md border border-gray-500">
+					<div class="flex rounded-md border border-gray-300 dark:border-gray-500">
 						<label
 							for="url"
-							class="content-center rounded-l-md bg-zinc-600 px-2 py-2 text-sm font-medium text-gray-200 whitespace-nowrap"
+							class="content-center rounded-l-md bg-zinc-200 dark:bg-zinc-600 px-2 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 whitespace-nowrap"
 							>Live URL</label
 						>
 						<div>
@@ -401,7 +389,7 @@
 								id="url"
 								placeholder="None  (draft mode)"
 								value={sourceUrl}
-								class="rounded-r-md border-0 bg-zinc-700 pl-2 py-2 placeholder:text-gray-400 focus:border-gray-500 focus:ring-1 focus:ring-inset focus:ring-gray-500"
+								class="rounded-r-md border-0 bg-zinc-100 dark:bg-zinc-700 pl-2 py-2 placeholder:text-gray-400 focus:border-gray-500 focus:ring-1 focus:ring-inset focus:ring-gray-500"
 							/>
 						</div>
 					</div>
@@ -415,7 +403,7 @@
 		</div>
 	</nav>
 
-	<main class="mt-16 flex h-[calc(100vh-4em)] bg-zinc-800">
+	<main class="mt-16 flex h-[calc(100vh-4em)] bg-zinc-50 dark:bg-zinc-800">
 		{#await Promise.all( [telepactSchemaPromise, filteredSchemaPseudoJsonPromise, schemaDraftPromise] )}
 			<span>loading schema</span>
 		{:then [telepactSchema, filteredSchemaPseudoJson, schemaDraft]}
@@ -423,7 +411,7 @@
 				<div class="flex h-[calc(100vh-4em)] {getSectionClass('s', activeViews.length)}">
 					<div class="flex w-full flex-col p-6">
 						<div class="flex justify-between">
-							<h1 class="pb-4 text-xl font-semibold text-gray-100">Schema (JSON)</h1>
+							<h1 class="pb-4 text-xl font-semibold text-gray-900 dark:text-gray-100">Schema (JSON)</h1>
 							{#if !schemaSourceReadOnly}
 								<div class="flex space-x-2">
 									<a
@@ -431,7 +419,7 @@
 									>
 										<button
 											onclick={handleSchema}
-											class="flex items-center rounded-md bg-gray-700 px-3 py-2 text-sm font-semibold text-white hover:bg-gray-600 hover:underline"
+											class="flex items-center rounded-md bg-gray-200 dark:bg-gray-700 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-white hover:bg-gray-300 dark:hover:bg-gray-600 hover:underline"
 										>
 											<span>Writing Guide</span>
 											<svg
@@ -458,7 +446,7 @@
 								</div>
 							{/if}
 						</div>
-						<div class="grow border border-zinc-600">
+						<div class="grow border border-zinc-300 dark:border-zinc-600">
 							<MonacoEditor
 								id="schema"
 								readOnly={schemaSourceReadOnly}
@@ -477,7 +465,7 @@
 					<div class="flex w-full flex-col p-6">
 						{#key showInternalApi}
 							<div>
-								<h1 class="pb-4 text-xl font-semibold text-gray-100">Schema</h1>
+								<h1 class="pb-4 text-xl font-semibold text-gray-900 dark:text-gray-100">Schema</h1>
 							</div>
 							{#key sortDocCardsAZ}
 								{#each parseTelepactSchema(filteredSchemaPseudoJson, telepactSchema, sortDocCardsAZ, showInternalApi) as entry}
@@ -503,7 +491,7 @@
 				<div class="flex overflow-scroll {getSectionClass('m', activeViews.length)}">
 					<div class="flex w-full flex-col p-6">
 						<div class="flex items-start justify-between">
-							<h1 class="pb-4 text-xl font-semibold text-gray-100">Mocked Example</h1>
+							<h1 class="pb-4 text-xl font-semibold text-gray-900 dark:text-gray-100">Mocked Example</h1>
 							<button
 								onclick={incrementRandomSeed}
 								class="rounded-md bg-sky-700 px-3 py-2 text-sm font-semibold text-white hover:bg-sky-600"
@@ -518,7 +506,7 @@
 								</div>
 							{:then example}
 								<div class="flex h-full flex-col space-y-2">
-									<div class="h-1/2 grow border border-zinc-600">
+									<div class="h-1/2 grow border border-zinc-300 dark:border-zinc-600">
 										<MonacoEditor
 											id={'requestExample'}
 											readOnly={true}
@@ -532,7 +520,7 @@
 									<div class="ml-4 shrink">
 										<span class="text-3xl text-emerald-500">→</span>
 									</div>
-									<div class="h-1/2 grow border border-zinc-600">
+									<div class="h-1/2 grow border border-zinc-300 dark:border-zinc-600">
 										<MonacoEditor
 											id={'responseExample'}
 											readOnly={true}
@@ -555,15 +543,15 @@
 		{/await}
 		{#if activeViews.includes('t')}
 			<div class="flex h-[calc(100vh-4em)] {getSectionClass('t', activeViews.length)}">
-				<div class="flex w-full flex-col bg-zinc-700 p-6">
+				<div class="flex w-full flex-col bg-zinc-100 dark:bg-zinc-700 p-6">
 					<div class="flex justify-between">
-						<h1 class="pb-4 text-xl font-semibold text-gray-100">Request</h1>
+						<h1 class="pb-4 text-xl font-semibold text-gray-900 dark:text-gray-100">Request</h1>
 						<div>
 							{#if response}
 								{#await response}
 									<button
 										disabled
-										class="cursor-not-allowed rounded-md bg-sky-600/40 px-3 py-2 text-sm font-semibold text-gray-300"
+										class="cursor-not-allowed rounded-md bg-sky-600/40 px-3 py-2 text-sm font-semibold text-gray-500 dark:text-gray-300"
 										>{submitString}</button
 									>
 								{:then}
@@ -589,7 +577,7 @@
 						</div>
 					</div>
 					{#key request}
-						<div class="grow border border-zinc-600">
+						<div class="grow border border-zinc-300 dark:border-zinc-600">
 							<MonacoEditor
 								id="request"
 								readOnly={false}
@@ -607,8 +595,8 @@
 		{#if activeViews.includes('r')}
 			<div class="flex h-[calc(100vh-4em)] {getSectionClass('r', activeViews.length)}">
 				{#if response}
-					<div class="flex w-full flex-col bg-zinc-700 p-6">
-						<h1 class="mb-4 text-xl font-semibold text-gray-100">Response</h1>
+					<div class="flex w-full flex-col bg-zinc-100 dark:bg-zinc-700 p-6">
+						<h1 class="mb-4 text-xl font-semibold text-gray-900 dark:text-gray-100">Response</h1>
 						{#await response}
 							<div class="grid h-full w-full place-content-center">
 								<div>
@@ -617,7 +605,7 @@
 							</div>
 						{:then d}
 							{#key d}
-								<div class="grow border border-zinc-600">
+								<div class="grow border border-zinc-300 dark:border-zinc-600">
 									<MonacoEditor
 										id="response"
 										readOnly={true}
@@ -630,12 +618,12 @@
 							{/key}
 						{:catch error}
 							<div
-								class="h-full rounded-md border border-red-700 bg-red-500/20 p-4 text-red-500"
+								class="h-full rounded-md border border-red-300 dark:border-red-700 bg-red-100 dark:bg-red-500/20 p-4 text-red-700 dark:text-red-500"
 							>
 								<div class="overflow-scroll">
 									<span>{error}</span>
 									{#if error.stack}
-										<div class="text-sm text-gray-400">
+										<div class="text-sm text-gray-600 dark:text-gray-400">
 											{error.stack}
 										</div>
 									{/if}

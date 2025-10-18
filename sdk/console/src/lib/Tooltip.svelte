@@ -78,7 +78,7 @@
   {#if show && text}
     <span
       bind:this={tooltipEl}
-      class="fixed z-50 px-3 py-2 text-sm rounded shadow-lg bg-gray-900 text-white opacity-90 pointer-events-none transition-opacity duration-100"
+      class="fixed z-50 px-3 py-2 text-sm rounded shadow-lg bg-gray-900 text-white dark:bg-gray-900 dark:text-white bg-gray-800 text-white opacity-90 pointer-events-none transition-opacity duration-100"
       style={tooltipStyle}
       role="tooltip"
       aria-live="polite"
