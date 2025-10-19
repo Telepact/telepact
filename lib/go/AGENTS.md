@@ -16,7 +16,7 @@ Use the `PORT_PROGRESS.md` file in this directory:
 - DO NOT rename the target go file as indicated in `PORT_PROGRESS.md`
 
 ### Encouragements
-- Port as many as 10 files at a time.
+- Port at least 5 files at a time.
 
 ### Acknowledgement
 
