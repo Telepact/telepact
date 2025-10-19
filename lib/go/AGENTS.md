@@ -8,12 +8,17 @@ Use the `PORT_PROGRESS.md` file in this directory:
 
 ### Constraints:
 - DO NOT make your own porting plan.
-  - Every port should be a one-to-one file translation of python code to go code, so just use the outline in `PORT_PROGRESS.md` to help with that process.
+  - DO NOT waste time examining the entire partially ported go project.
+  - Just stick to the outline in `PORT_PROGRESS.md` to guide port.
+    - Every port should be a one-to-one file translation of python code to go code
 - DO NOT deviate from the outline in `PORT_PROGRESS.md`
   - That means DO NOT add test files. Don't waste time trying to run tests.
 - DO NOT rename the target go file as indicated in `PORT_PROGRESS.md`
 
+### Encouragements
+- Try to port as many files as you can for a single prompt.
+
 ### Acknowledgement
 
-- Sign and date a message in `lib/go/ACK.md` indicating you understand the contents of
-  this file.
+- Sign and date (with timestamp) a message in `lib/go/ACK.md` indicating you understand the 
+  contents of this file.
