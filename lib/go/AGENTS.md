@@ -6,7 +6,14 @@ Use the `PORT_PROGRESS.md` file in this directory:
 3. Translate the python code in the corresponding *.py file to go code in the *.go file.
 4. Mark the row as checked.
 
-I repeat, DO NOT make your own porting plan. Every port should be a one-to-one
-file translation of python code to go code, so just use the outline in
-`PORT_PROGRESS.md` to help with that process. DO NOT deviate from the
-outline in `PORT_PROGRESS.md`; DO NOT add test files.
+### Constraints:
+- DO NOT make your own porting plan.
+  - Every port should be a one-to-one file translation of python code to go code, so just use the outline in `PORT_PROGRESS.md` to help with that process.
+- DO NOT deviate from the outline in `PORT_PROGRESS.md`
+  - That means DO NOT add test files. Don't waste time trying to run tests.
+- DO NOT rename the target go file as indicated in `PORT_PROGRESS.md`
+
+### Acknowledgement
+
+- Sign and date a message in `lib/go/ACK.md` indicating you understand the contents of
+  this file.

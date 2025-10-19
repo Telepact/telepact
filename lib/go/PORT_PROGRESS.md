@@ -24,14 +24,14 @@
 - [ ] lib/py/telepact/internal/ProcessBytes.py → lib/go/telepact/internal/ProcessBytes.go
 - [ ] lib/py/telepact/internal/SelectStructFields.py → lib/go/telepact/internal/SelectStructFields.go
 - [ ] lib/py/telepact/internal/SerializeInternal.py → lib/go/telepact/internal/SerializeInternal.go
-- [ ] lib/py/telepact/internal/binary/Base64Encoder.py → lib/go/telepact/internal/binary/Base64Encoder.go
-- [ ] lib/py/telepact/internal/binary/BinaryEncoder.py → lib/go/telepact/internal/binary/BinaryEncoder.go
-- [ ] lib/py/telepact/internal/binary/BinaryEncoderUnavailableError.py → lib/go/telepact/internal/binary/BinaryEncoderUnavailableError.go
-- [ ] lib/py/telepact/internal/binary/BinaryEncoding.py → lib/go/telepact/internal/binary/BinaryEncoding.go
+- [x] lib/py/telepact/internal/binary/Base64Encoder.py → lib/go/telepact/internal/binary/Base64Encoder.go
+- [x] lib/py/telepact/internal/binary/BinaryEncoder.py → lib/go/telepact/internal/binary/BinaryEncoder.go
+- [x] lib/py/telepact/internal/binary/BinaryEncoderUnavailableError.py → lib/go/telepact/internal/binary/BinaryEncoderUnavailableError.go
+- [x] lib/py/telepact/internal/binary/BinaryEncoding.py → lib/go/telepact/internal/binary/BinaryEncoding.go
 - [ ] lib/py/telepact/internal/binary/BinaryEncodingCache.py → lib/go/telepact/internal/binary/BinaryEncodingCache.go
-- [ ] lib/py/telepact/internal/binary/BinaryEncodingMissing.py → lib/go/telepact/internal/binary/BinaryEncodingMissing.go
-- [ ] lib/py/telepact/internal/binary/BinaryPackNode.py → lib/go/telepact/internal/binary/BinaryPackNode.go
-- [ ] lib/py/telepact/internal/binary/CannotPack.py → lib/go/telepact/internal/binary/CannotPack.go
+- [x] lib/py/telepact/internal/binary/BinaryEncodingMissing.py → lib/go/telepact/internal/binary/BinaryEncodingMissing.go
+- [x] lib/py/telepact/internal/binary/BinaryPackNode.py → lib/go/telepact/internal/binary/BinaryPackNode.go
+- [x] lib/py/telepact/internal/binary/CannotPack.py → lib/go/telepact/internal/binary/CannotPack.go
 - [ ] lib/py/telepact/internal/binary/ClientBase64Decode.py → lib/go/telepact/internal/binary/ClientBase64Decode.go
 - [ ] lib/py/telepact/internal/binary/ClientBase64Encode.py → lib/go/telepact/internal/binary/ClientBase64Encode.go
 - [ ] lib/py/telepact/internal/binary/ClientBase64Encoder.py → lib/go/telepact/internal/binary/ClientBase64Encoder.go
