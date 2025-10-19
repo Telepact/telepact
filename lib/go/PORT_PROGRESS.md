@@ -17,7 +17,7 @@
 - DO NOT rename the target go file as indicated in `PORT_PROGRESS.md`
 
 ### Encouragements
-- Port at least 5 files at a time.
+- Port at least 25 files at a time.
 
 
 ## Checklist
