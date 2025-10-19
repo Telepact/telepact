@@ -57,31 +57,31 @@
 - [x] lib/py/telepact/internal/binary/ClientBase64Decode.py → lib/go/telepact/internal/binary/ClientBase64Decode.go
 - [x] lib/py/telepact/internal/binary/ClientBase64Encode.py → lib/go/telepact/internal/binary/ClientBase64Encode.go
 - [x] lib/py/telepact/internal/binary/ClientBase64Encoder.py → lib/go/telepact/internal/binary/ClientBase64Encoder.go
-- [ ] lib/py/telepact/internal/binary/ClientBinaryDecode.py → lib/go/telepact/internal/binary/ClientBinaryDecode.go
-- [ ] lib/py/telepact/internal/binary/ClientBinaryEncode.py → lib/go/telepact/internal/binary/ClientBinaryEncode.go
-- [ ] lib/py/telepact/internal/binary/ClientBinaryEncoder.py → lib/go/telepact/internal/binary/ClientBinaryEncoder.go
-- [ ] lib/py/telepact/internal/binary/ClientBinaryStrategy.py → lib/go/telepact/internal/binary/ClientBinaryStrategy.go
+- [x] lib/py/telepact/internal/binary/ClientBinaryDecode.py → lib/go/telepact/internal/binary/ClientBinaryDecode.go
+- [x] lib/py/telepact/internal/binary/ClientBinaryEncode.py → lib/go/telepact/internal/binary/ClientBinaryEncode.go
+- [x] lib/py/telepact/internal/binary/ClientBinaryEncoder.py → lib/go/telepact/internal/binary/ClientBinaryEncoder.go
+- [x] lib/py/telepact/internal/binary/ClientBinaryStrategy.py → lib/go/telepact/internal/binary/ClientBinaryStrategy.go
 - [ ] lib/py/telepact/internal/binary/ConstructBinaryEncoding.py → lib/go/telepact/internal/binary/ConstructBinaryEncoding.go
-- [ ] lib/py/telepact/internal/binary/CreateChecksum.py → lib/go/telepact/internal/binary/CreateChecksum.go
-- [ ] lib/py/telepact/internal/binary/DecodeBody.py → lib/go/telepact/internal/binary/DecodeBody.go
-- [ ] lib/py/telepact/internal/binary/DecodeKeys.py → lib/go/telepact/internal/binary/DecodeKeys.go
-- [ ] lib/py/telepact/internal/binary/DefaultBinaryEncodingCache.py → lib/go/telepact/internal/binary/DefaultBinaryEncodingCache.go
-- [ ] lib/py/telepact/internal/binary/EncodeBody.py → lib/go/telepact/internal/binary/EncodeBody.go
-- [ ] lib/py/telepact/internal/binary/EncodeKeys.py → lib/go/telepact/internal/binary/EncodeKeys.go
-- [ ] lib/py/telepact/internal/binary/Pack.py → lib/go/telepact/internal/binary/Pack.go
-- [ ] lib/py/telepact/internal/binary/PackBody.py → lib/go/telepact/internal/binary/PackBody.go
-- [ ] lib/py/telepact/internal/binary/PackList.py → lib/go/telepact/internal/binary/PackList.go
-- [ ] lib/py/telepact/internal/binary/PackMap.py → lib/go/telepact/internal/binary/PackMap.go
-- [ ] lib/py/telepact/internal/binary/ServerBase64Decode.py → lib/go/telepact/internal/binary/ServerBase64Decode.go
-- [ ] lib/py/telepact/internal/binary/ServerBase64Encode.py → lib/go/telepact/internal/binary/ServerBase64Encode.go
+- [x] lib/py/telepact/internal/binary/CreateChecksum.py → lib/go/telepact/internal/binary/CreateChecksum.go
+- [x] lib/py/telepact/internal/binary/DecodeBody.py → lib/go/telepact/internal/binary/DecodeBody.go
+- [x] lib/py/telepact/internal/binary/DecodeKeys.py → lib/go/telepact/internal/binary/DecodeKeys.go
+- [x] lib/py/telepact/internal/binary/DefaultBinaryEncodingCache.py → lib/go/telepact/internal/binary/DefaultBinaryEncodingCache.go
+- [x] lib/py/telepact/internal/binary/EncodeBody.py → lib/go/telepact/internal/binary/EncodeBody.go
+- [x] lib/py/telepact/internal/binary/EncodeKeys.py → lib/go/telepact/internal/binary/EncodeKeys.go
+- [x] lib/py/telepact/internal/binary/Pack.py → lib/go/telepact/internal/binary/Pack.go
+- [x] lib/py/telepact/internal/binary/PackBody.py → lib/go/telepact/internal/binary/PackBody.go
+- [x] lib/py/telepact/internal/binary/PackList.py → lib/go/telepact/internal/binary/PackList.go
+- [x] lib/py/telepact/internal/binary/PackMap.py → lib/go/telepact/internal/binary/PackMap.go
+- [x] lib/py/telepact/internal/binary/ServerBase64Decode.py → lib/go/telepact/internal/binary/ServerBase64Decode.go
+- [x] lib/py/telepact/internal/binary/ServerBase64Encode.py → lib/go/telepact/internal/binary/ServerBase64Encode.go
 - [ ] lib/py/telepact/internal/binary/ServerBase64Encoder.py → lib/go/telepact/internal/binary/ServerBase64Encoder.go
 - [ ] lib/py/telepact/internal/binary/ServerBinaryDecode.py → lib/go/telepact/internal/binary/ServerBinaryDecode.go
 - [ ] lib/py/telepact/internal/binary/ServerBinaryEncode.py → lib/go/telepact/internal/binary/ServerBinaryEncode.go
 - [ ] lib/py/telepact/internal/binary/ServerBinaryEncoder.py → lib/go/telepact/internal/binary/ServerBinaryEncoder.go
-- [ ] lib/py/telepact/internal/binary/Unpack.py → lib/go/telepact/internal/binary/Unpack.go
-- [ ] lib/py/telepact/internal/binary/UnpackBody.py → lib/go/telepact/internal/binary/UnpackBody.go
-- [ ] lib/py/telepact/internal/binary/UnpackList.py → lib/go/telepact/internal/binary/UnpackList.go
-- [ ] lib/py/telepact/internal/binary/UnpackMap.py → lib/go/telepact/internal/binary/UnpackMap.go
+- [x] lib/py/telepact/internal/binary/Unpack.py → lib/go/telepact/internal/binary/Unpack.go
+- [x] lib/py/telepact/internal/binary/UnpackBody.py → lib/go/telepact/internal/binary/UnpackBody.go
+- [x] lib/py/telepact/internal/binary/UnpackList.py → lib/go/telepact/internal/binary/UnpackList.go
+- [x] lib/py/telepact/internal/binary/UnpackMap.py → lib/go/telepact/internal/binary/UnpackMap.go
 - [ ] lib/py/telepact/internal/generation/GenerateContext.py → lib/go/telepact/internal/generation/GenerateContext.go
 - [ ] lib/py/telepact/internal/generation/GenerateRandomAny.py → lib/go/telepact/internal/generation/GenerateRandomAny.go
 - [ ] lib/py/telepact/internal/generation/GenerateRandomArray.py → lib/go/telepact/internal/generation/GenerateRandomArray.go
