@@ -544,6 +544,18 @@ def release() -> None:
                                 click.echo(f"Uploaded asset: {file_name} for target: {target}")
                 else:
                     click.echo(f"Asset directory does not exist: {asset_directory} for target: {target}")
+        
+        # Upload consolidated readme as a release asset
+        consolidated_readme_path = "dist/CONSOLIDATED_README.md"
+        if os.path.exists(consolidated_readme_path):
+            release.upload_asset(
+                path=consolidated_readme_path,
+                name="CONSOLIDATED_README.md",
+                label="Consolidated README"
+            )
+            click.echo(f"Uploaded consolidated readme: {consolidated_readme_path}")
+        else:
+            click.echo(f"Consolidated readme not found at: {consolidated_readme_path}")
 
     except Exception as e:
         click.echo(f"Failed to create release or upload assets: {e}")
