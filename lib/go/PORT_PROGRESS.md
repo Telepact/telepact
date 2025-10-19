@@ -1,22 +1,22 @@
 # Python Port Progress
 
 - [ ] lib/py/telepact/Client.py → lib/go/telepact/Client.go
-- [ ] lib/py/telepact/DefaultSerialization.py → lib/go/telepact/DefaultSerialization.go
-- [ ] lib/py/telepact/Message.py → lib/go/telepact/Message.go
+- [x] lib/py/telepact/DefaultSerialization.py → lib/go/telepact/DefaultSerialization.go
+- [x] lib/py/telepact/Message.py → lib/go/telepact/Message.go
 - [ ] lib/py/telepact/MockServer.py → lib/go/telepact/MockServer.go
 - [ ] lib/py/telepact/MockTelepactSchema.py → lib/go/telepact/MockTelepactSchema.go
 - [ ] lib/py/telepact/RandomGenerator.py → lib/go/telepact/RandomGenerator.go
-- [ ] lib/py/telepact/Response.py → lib/go/telepact/Response.go
-- [ ] lib/py/telepact/Serialization.py → lib/go/telepact/Serialization.go
-- [ ] lib/py/telepact/SerializationError.py → lib/go/telepact/SerializationError.go
+- [x] lib/py/telepact/Response.py → lib/go/telepact/Response.go
+- [x] lib/py/telepact/Serialization.py → lib/go/telepact/Serialization.go
+- [x] lib/py/telepact/SerializationError.py → lib/go/telepact/SerializationError.go
 - [ ] lib/py/telepact/Serializer.py → lib/go/telepact/Serializer.go
 - [ ] lib/py/telepact/Server.py → lib/go/telepact/Server.go
-- [ ] lib/py/telepact/TelepactError.py → lib/go/telepact/TelepactError.go
+- [x] lib/py/telepact/TelepactError.py → lib/go/telepact/TelepactError.go
 - [ ] lib/py/telepact/TelepactSchema.py → lib/go/telepact/TelepactSchema.go
 - [ ] lib/py/telepact/TelepactSchemaFiles.py → lib/go/telepact/TelepactSchemaFiles.go
 - [ ] lib/py/telepact/TelepactSchemaParseError.py → lib/go/telepact/TelepactSchemaParseError.go
 - [ ] lib/py/telepact/TestClient.py → lib/go/telepact/TestClient.go
-- [ ] lib/py/telepact/TypedMessage.py → lib/go/telepact/TypedMessage.go
+- [x] lib/py/telepact/TypedMessage.py → lib/go/telepact/TypedMessage.go
 - [ ] lib/py/telepact/internal/ClientHandleMessage.py → lib/go/telepact/internal/ClientHandleMessage.go
 - [ ] lib/py/telepact/internal/DeserializeInternal.py → lib/go/telepact/internal/DeserializeInternal.go
 - [ ] lib/py/telepact/internal/HandleMessage.py → lib/go/telepact/internal/HandleMessage.go
