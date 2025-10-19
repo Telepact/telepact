@@ -98,14 +98,14 @@
 - [x] lib/py/telepact/internal/generation/GenerateRandomStruct.py → lib/go/telepact/internal/generation/GenerateRandomStruct.go
 - [x] lib/py/telepact/internal/generation/GenerateRandomUnion.py → lib/go/telepact/internal/generation/GenerateRandomUnion.go
 - [x] lib/py/telepact/internal/generation/GenerateRandomValueOfType.py → lib/go/telepact/internal/generation/GenerateRandomValueOfType.go
-- [ ] lib/py/telepact/internal/mock/IsSubMap.py → lib/go/telepact/internal/mock/IsSubMap.go
-- [ ] lib/py/telepact/internal/mock/IsSubMapEntryEqual.py → lib/go/telepact/internal/mock/IsSubMapEntryEqual.go
+- [x] lib/py/telepact/internal/mock/IsSubMap.py → lib/go/telepact/internal/mock/IsSubMap.go
+- [x] lib/py/telepact/internal/mock/IsSubMapEntryEqual.py → lib/go/telepact/internal/mock/IsSubMapEntryEqual.go
 - [ ] lib/py/telepact/internal/mock/MockHandle.py → lib/go/telepact/internal/mock/MockHandle.go
-- [ ] lib/py/telepact/internal/mock/MockInvocation.py → lib/go/telepact/internal/mock/MockInvocation.go
-- [ ] lib/py/telepact/internal/mock/MockStub.py → lib/go/telepact/internal/mock/MockStub.go
-- [ ] lib/py/telepact/internal/mock/PartiallyMatches.py → lib/go/telepact/internal/mock/PartiallyMatches.go
-- [ ] lib/py/telepact/internal/mock/Verify.py → lib/go/telepact/internal/mock/Verify.go
-- [ ] lib/py/telepact/internal/mock/VerifyNoMoreInteractions.py → lib/go/telepact/internal/mock/VerifyNoMoreInteractions.go
+- [x] lib/py/telepact/internal/mock/MockInvocation.py → lib/go/telepact/internal/mock/MockInvocation.go
+- [x] lib/py/telepact/internal/mock/MockStub.py → lib/go/telepact/internal/mock/MockStub.go
+- [x] lib/py/telepact/internal/mock/PartiallyMatches.py → lib/go/telepact/internal/mock/PartiallyMatches.go
+- [x] lib/py/telepact/internal/mock/Verify.py → lib/go/telepact/internal/mock/Verify.go
+- [x] lib/py/telepact/internal/mock/VerifyNoMoreInteractions.py → lib/go/telepact/internal/mock/VerifyNoMoreInteractions.go
 - [ ] lib/py/telepact/internal/schema/ApplyErrorToParsedTypes.py → lib/go/telepact/internal/schema/ApplyErrorToParsedTypes.go
 - [ ] lib/py/telepact/internal/schema/CatchErrorCollisions.py → lib/go/telepact/internal/schema/CatchErrorCollisions.go
 - [ ] lib/py/telepact/internal/schema/CatchHeaderCollisions.py → lib/go/telepact/internal/schema/CatchHeaderCollisions.go
