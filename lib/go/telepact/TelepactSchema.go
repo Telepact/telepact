@@ -21,22 +21,22 @@ import (
 	"github.com/telepact/telepact/lib/go/telepact/internal/types"
 )
 
-// MockTelepactSchema represents a schema prepared for mock usage.
-type MockTelepactSchema struct {
+// TelepactSchema represents a parsed Telepact schema.
+type TelepactSchema struct {
 	Original              []any
 	Parsed                map[string]*types.TType
 	ParsedRequestHeaders  map[string]*types.TFieldDeclaration
 	ParsedResponseHeaders map[string]*types.TFieldDeclaration
 }
 
-// NewMockTelepactSchema constructs a MockTelepactSchema with the supplied values.
-func NewMockTelepactSchema(
+// NewTelepactSchema constructs a TelepactSchema with the supplied values.
+func NewTelepactSchema(
 	original []any,
 	parsed map[string]*types.TType,
 	parsedRequestHeaders map[string]*types.TFieldDeclaration,
 	parsedResponseHeaders map[string]*types.TFieldDeclaration,
-) *MockTelepactSchema {
-	return &MockTelepactSchema{
+) *TelepactSchema {
+	return &TelepactSchema{
 		Original:              cloneAnySlice(original),
 		Parsed:                parsed,
 		ParsedRequestHeaders:  parsedRequestHeaders,
@@ -44,30 +44,21 @@ func NewMockTelepactSchema(
 	}
 }
 
-// MockTelepactSchemaFromJSON constructs a MockTelepactSchema from JSON content.
-func MockTelepactSchemaFromJSON(json string) (*MockTelepactSchema, error) {
-	return schema.CreateMockTelepactSchemaFromFileJSONMap(map[string]string{"auto_": json})
+// TelepactSchemaFromJSON constructs a TelepactSchema from JSON content.
+func TelepactSchemaFromJSON(json string) (*TelepactSchema, error) {
+	return schema.CreateTelepactSchemaFromFileJSONMap(map[string]string{"auto_": json})
 }
 
-// MockTelepactSchemaFromFileJSONMap constructs a MockTelepactSchema from a map of filenames to JSON content.
-func MockTelepactSchemaFromFileJSONMap(fileJSONMap map[string]string) (*MockTelepactSchema, error) {
-	return schema.CreateMockTelepactSchemaFromFileJSONMap(fileJSONMap)
+// TelepactSchemaFromFileJSONMap constructs a TelepactSchema from a map of filenames to JSON content.
+func TelepactSchemaFromFileJSONMap(fileJSONMap map[string]string) (*TelepactSchema, error) {
+	return schema.CreateTelepactSchemaFromFileJSONMap(fileJSONMap)
 }
 
-// MockTelepactSchemaFromDirectory constructs a MockTelepactSchema from the JSON files contained in a directory.
-func MockTelepactSchemaFromDirectory(directory string) (*MockTelepactSchema, error) {
+// TelepactSchemaFromDirectory constructs a TelepactSchema from the JSON files contained in a directory.
+func TelepactSchemaFromDirectory(directory string) (*TelepactSchema, error) {
 	schemaFileMap, err := schema.GetSchemaFileMap(directory)
 	if err != nil {
 		return nil, err
 	}
-	return schema.CreateMockTelepactSchemaFromFileJSONMap(schemaFileMap)
-}
-
-func cloneAnySlice(values []any) []any {
-	if values == nil {
-		return nil
-	}
-	cloned := make([]any, len(values))
-	copy(cloned, values)
-	return cloned
+	return schema.CreateTelepactSchemaFromFileJSONMap(schemaFileMap)
 }

@@ -25,16 +25,16 @@
 - [x] lib/py/telepact/Client.py → lib/go/telepact/Client.go
 - [x] lib/py/telepact/DefaultSerialization.py → lib/go/telepact/DefaultSerialization.go
 - [x] lib/py/telepact/Message.py → lib/go/telepact/Message.go
-- [ ] lib/py/telepact/MockServer.py → lib/go/telepact/MockServer.go
-- [ ] lib/py/telepact/MockTelepactSchema.py → lib/go/telepact/MockTelepactSchema.go
+- [x] lib/py/telepact/MockServer.py → lib/go/telepact/MockServer.go
+- [x] lib/py/telepact/MockTelepactSchema.py → lib/go/telepact/MockTelepactSchema.go
 - [x] lib/py/telepact/RandomGenerator.py → lib/go/telepact/RandomGenerator.go
 - [x] lib/py/telepact/Response.py → lib/go/telepact/Response.go
 - [x] lib/py/telepact/Serialization.py → lib/go/telepact/Serialization.go
 - [x] lib/py/telepact/SerializationError.py → lib/go/telepact/SerializationError.go
 - [x] lib/py/telepact/Serializer.py → lib/go/telepact/Serializer.go
-- [ ] lib/py/telepact/Server.py → lib/go/telepact/Server.go
+- [x] lib/py/telepact/Server.py → lib/go/telepact/Server.go
 - [x] lib/py/telepact/TelepactError.py → lib/go/telepact/TelepactError.go
-- [ ] lib/py/telepact/TelepactSchema.py → lib/go/telepact/TelepactSchema.go
+- [x] lib/py/telepact/TelepactSchema.py → lib/go/telepact/TelepactSchema.go
 - [ ] lib/py/telepact/TelepactSchemaFiles.py → lib/go/telepact/TelepactSchemaFiles.go
 - [ ] lib/py/telepact/TelepactSchemaParseError.py → lib/go/telepact/TelepactSchemaParseError.go
 - [ ] lib/py/telepact/TestClient.py → lib/go/telepact/TestClient.go
