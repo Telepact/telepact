@@ -27,11 +27,11 @@
 - [x] lib/py/telepact/Message.py → lib/go/telepact/Message.go
 - [ ] lib/py/telepact/MockServer.py → lib/go/telepact/MockServer.go
 - [ ] lib/py/telepact/MockTelepactSchema.py → lib/go/telepact/MockTelepactSchema.go
-- [ ] lib/py/telepact/RandomGenerator.py → lib/go/telepact/RandomGenerator.go
+- [x] lib/py/telepact/RandomGenerator.py → lib/go/telepact/RandomGenerator.go
 - [x] lib/py/telepact/Response.py → lib/go/telepact/Response.go
 - [x] lib/py/telepact/Serialization.py → lib/go/telepact/Serialization.go
 - [x] lib/py/telepact/SerializationError.py → lib/go/telepact/SerializationError.go
-- [ ] lib/py/telepact/Serializer.py → lib/go/telepact/Serializer.go
+- [x] lib/py/telepact/Serializer.py → lib/go/telepact/Serializer.go
 - [ ] lib/py/telepact/Server.py → lib/go/telepact/Server.go
 - [x] lib/py/telepact/TelepactError.py → lib/go/telepact/TelepactError.go
 - [ ] lib/py/telepact/TelepactSchema.py → lib/go/telepact/TelepactSchema.go
@@ -40,12 +40,12 @@
 - [ ] lib/py/telepact/TestClient.py → lib/go/telepact/TestClient.go
 - [x] lib/py/telepact/TypedMessage.py → lib/go/telepact/TypedMessage.go
 - [ ] lib/py/telepact/internal/ClientHandleMessage.py → lib/go/telepact/internal/ClientHandleMessage.go
-- [ ] lib/py/telepact/internal/DeserializeInternal.py → lib/go/telepact/internal/DeserializeInternal.go
+- [x] lib/py/telepact/internal/DeserializeInternal.py → lib/go/telepact/internal/DeserializeInternal.go
 - [ ] lib/py/telepact/internal/HandleMessage.py → lib/go/telepact/internal/HandleMessage.go
 - [ ] lib/py/telepact/internal/ParseRequestMessage.py → lib/go/telepact/internal/ParseRequestMessage.go
 - [ ] lib/py/telepact/internal/ProcessBytes.py → lib/go/telepact/internal/ProcessBytes.go
 - [ ] lib/py/telepact/internal/SelectStructFields.py → lib/go/telepact/internal/SelectStructFields.go
-- [ ] lib/py/telepact/internal/SerializeInternal.py → lib/go/telepact/internal/SerializeInternal.go
+- [x] lib/py/telepact/internal/SerializeInternal.py → lib/go/telepact/internal/SerializeInternal.go
 - [x] lib/py/telepact/internal/binary/Base64Encoder.py → lib/go/telepact/internal/binary/Base64Encoder.go
 - [x] lib/py/telepact/internal/binary/BinaryEncoder.py → lib/go/telepact/internal/binary/BinaryEncoder.go
 - [x] lib/py/telepact/internal/binary/BinaryEncoderUnavailableError.py → lib/go/telepact/internal/binary/BinaryEncoderUnavailableError.go
@@ -154,8 +154,8 @@
 - [ ] lib/py/telepact/internal/types/TUnion.py → lib/go/telepact/internal/types/TUnion.go
 - [ ] lib/py/telepact/internal/validation/GetInvalidErrorMessage.py → lib/go/telepact/internal/validation/GetInvalidErrorMessage.go
 - [ ] lib/py/telepact/internal/validation/GetTypeUnexpectedValidationFailure.py → lib/go/telepact/internal/validation/GetTypeUnexpectedValidationFailure.go
-- [ ] lib/py/telepact/internal/validation/InvalidMessage.py → lib/go/telepact/internal/validation/InvalidMessage.go
-- [ ] lib/py/telepact/internal/validation/InvalidMessageBody.py → lib/go/telepact/internal/validation/InvalidMessageBody.go
+- [x] lib/py/telepact/internal/validation/InvalidMessage.py → lib/go/telepact/internal/validation/InvalidMessage.go
+- [x] lib/py/telepact/internal/validation/InvalidMessageBody.py → lib/go/telepact/internal/validation/InvalidMessageBody.go
 - [ ] lib/py/telepact/internal/validation/MapValidationFailuresToInvalidFieldCases.py → lib/go/telepact/internal/validation/MapValidationFailuresToInvalidFieldCases.go
 - [ ] lib/py/telepact/internal/validation/ValidateArray.py → lib/go/telepact/internal/validation/ValidateArray.go
 - [ ] lib/py/telepact/internal/validation/ValidateBoolean.py → lib/go/telepact/internal/validation/ValidateBoolean.go
