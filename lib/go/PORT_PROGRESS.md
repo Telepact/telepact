@@ -28,7 +28,7 @@
 - [x] lib/py/telepact/internal/binary/BinaryEncoder.py → lib/go/telepact/internal/binary/BinaryEncoder.go
 - [x] lib/py/telepact/internal/binary/BinaryEncoderUnavailableError.py → lib/go/telepact/internal/binary/BinaryEncoderUnavailableError.go
 - [x] lib/py/telepact/internal/binary/BinaryEncoding.py → lib/go/telepact/internal/binary/BinaryEncoding.go
-- [ ] lib/py/telepact/internal/binary/BinaryEncodingCache.py → lib/go/telepact/internal/binary/BinaryEncodingCache.go
+- [x] lib/py/telepact/internal/binary/BinaryEncodingCache.py → lib/go/telepact/internal/binary/BinaryEncodingCache.go
 - [x] lib/py/telepact/internal/binary/BinaryEncodingMissing.py → lib/go/telepact/internal/binary/BinaryEncodingMissing.go
 - [x] lib/py/telepact/internal/binary/BinaryPackNode.py → lib/go/telepact/internal/binary/BinaryPackNode.go
 - [x] lib/py/telepact/internal/binary/CannotPack.py → lib/go/telepact/internal/binary/CannotPack.go
