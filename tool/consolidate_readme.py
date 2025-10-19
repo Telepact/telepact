@@ -15,6 +15,22 @@
 #|  limitations under the License.
 #|
 
+"""
+Consolidated README Generator
+
+This script creates a consolidated README by:
+1. Taking the main README.md
+2. Following all links to other markdown documents
+3. Concatenating those documents inline with sensible headings
+4. Replacing cross-document links with doc-local anchor links
+
+Usage:
+    python3 consolidate_readme.py <readme_path> <output_path>
+
+Example:
+    python3 consolidate_readme.py README.md dist/CONSOLIDATED_README.md
+"""
+
 import re
 import os
 import sys
