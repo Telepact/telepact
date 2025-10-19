@@ -1,4 +1,26 @@
-# Python Port Progress
+# Python to Go Port Progress
+
+## Porting Instructions
+
+1. Pick an unchecked row in the checklist.
+2. Create the *.go file exactly how it is defined in the row.
+3. Translate the python code in the corresponding *.py file to go code in the *.go file.
+4. Mark the row as checked.
+
+### Constraints:
+- DO NOT make your own porting plan.
+  - DO NOT waste time examining the entire partially ported go project.
+  - Just stick to the outline in `PORT_PROGRESS.md` to guide port.
+    - Every port should be a one-to-one file translation of python code to go code
+- DO NOT deviate from the outline in `PORT_PROGRESS.md`
+  - That means DO NOT add test files. Don't waste time trying to run tests.
+- DO NOT rename the target go file as indicated in `PORT_PROGRESS.md`
+
+### Encouragements
+- Port at least 5 files at a time.
+
+
+## Checklist
 
 - [ ] lib/py/telepact/Client.py → lib/go/telepact/Client.go
 - [x] lib/py/telepact/DefaultSerialization.py → lib/go/telepact/DefaultSerialization.go
@@ -33,8 +55,8 @@
 - [x] lib/py/telepact/internal/binary/BinaryPackNode.py → lib/go/telepact/internal/binary/BinaryPackNode.go
 - [x] lib/py/telepact/internal/binary/CannotPack.py → lib/go/telepact/internal/binary/CannotPack.go
 - [x] lib/py/telepact/internal/binary/ClientBase64Decode.py → lib/go/telepact/internal/binary/ClientBase64Decode.go
-- [ ] lib/py/telepact/internal/binary/ClientBase64Encode.py → lib/go/telepact/internal/binary/ClientBase64Encode.go
-- [ ] lib/py/telepact/internal/binary/ClientBase64Encoder.py → lib/go/telepact/internal/binary/ClientBase64Encoder.go
+- [x] lib/py/telepact/internal/binary/ClientBase64Encode.py → lib/go/telepact/internal/binary/ClientBase64Encode.go
+- [x] lib/py/telepact/internal/binary/ClientBase64Encoder.py → lib/go/telepact/internal/binary/ClientBase64Encoder.go
 - [ ] lib/py/telepact/internal/binary/ClientBinaryDecode.py → lib/go/telepact/internal/binary/ClientBinaryDecode.go
 - [ ] lib/py/telepact/internal/binary/ClientBinaryEncode.py → lib/go/telepact/internal/binary/ClientBinaryEncode.go
 - [ ] lib/py/telepact/internal/binary/ClientBinaryEncoder.py → lib/go/telepact/internal/binary/ClientBinaryEncoder.go
