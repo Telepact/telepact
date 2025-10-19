@@ -32,7 +32,7 @@
 - [x] lib/py/telepact/internal/binary/BinaryEncodingMissing.py → lib/go/telepact/internal/binary/BinaryEncodingMissing.go
 - [x] lib/py/telepact/internal/binary/BinaryPackNode.py → lib/go/telepact/internal/binary/BinaryPackNode.go
 - [x] lib/py/telepact/internal/binary/CannotPack.py → lib/go/telepact/internal/binary/CannotPack.go
-- [ ] lib/py/telepact/internal/binary/ClientBase64Decode.py → lib/go/telepact/internal/binary/ClientBase64Decode.go
+- [x] lib/py/telepact/internal/binary/ClientBase64Decode.py → lib/go/telepact/internal/binary/ClientBase64Decode.go
 - [ ] lib/py/telepact/internal/binary/ClientBase64Encode.py → lib/go/telepact/internal/binary/ClientBase64Encode.go
 - [ ] lib/py/telepact/internal/binary/ClientBase64Encoder.py → lib/go/telepact/internal/binary/ClientBase64Encoder.go
 - [ ] lib/py/telepact/internal/binary/ClientBinaryDecode.py → lib/go/telepact/internal/binary/ClientBinaryDecode.go
