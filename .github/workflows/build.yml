@@ -33,10 +33,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Install Project CLI
+        run: make install-project-cli
+
       - name: Build consolidated readme
         run: |
           mkdir -p dist
-          python3 tool/consolidate_readme.py README.md dist/CONSOLIDATED_README.md
+          telepact-project consolidated-readme README.md dist/CONSOLIDATED_README.md
 
       - name: Upload consolidated readme artifact
         uses: actions/upload-artifact@v4

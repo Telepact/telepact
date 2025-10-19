@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 #|
 #|  Copyright The Telepact Authors
 #|
@@ -15,27 +14,12 @@
 #|  limitations under the License.
 #|
 
-"""
-Consolidated README Generator
-
-This script creates a consolidated README by:
-1. Taking the main README.md
-2. Following all links to other markdown documents
-3. Concatenating those documents inline with sensible headings
-4. Replacing cross-document links with doc-local anchor links
-
-Usage:
-    python3 consolidate_readme.py <readme_path> <output_path>
-
-Example:
-    python3 consolidate_readme.py README.md dist/CONSOLIDATED_README.md
-"""
-
+import click
 import re
-import os
 import sys
 from pathlib import Path
 from typing import Dict, List, Tuple
+
 
 def slugify(text: str) -> str:
     """Convert a heading text to a GitHub-style anchor ID."""
@@ -51,6 +35,7 @@ def slugify(text: str) -> str:
     slug = slug.strip('-')
     return slug
 
+
 def extract_markdown_links(content: str) -> List[Tuple[str, str, str]]:
     """
     Extract markdown links from content.
@@ -61,15 +46,6 @@ def extract_markdown_links(content: str) -> List[Tuple[str, str, str]]:
     matches = re.findall(pattern, content)
     return [(f'[{text}]({path})', text, path) for text, path in matches]
 
-def get_top_heading(content: str, default: str) -> str:
-    """Extract the first heading from markdown content."""
-    lines = content.split('\n')
-    for line in lines:
-        if line.startswith('#'):
-            # Remove the # symbols and strip whitespace
-            heading = re.sub(r'^#+\s*', '', line).strip()
-            return heading
-    return default
 
 def read_file(file_path: Path) -> str:
     """Read a file and return its content."""
@@ -77,10 +53,11 @@ def read_file(file_path: Path) -> str:
         with open(file_path, 'r', encoding='utf-8') as f:
             return f.read()
     except FileNotFoundError:
-        print(f"Warning: File not found: {file_path}", file=sys.stderr)
+        click.echo(f"Warning: File not found: {file_path}", err=True)
         return ""
 
-def consolidate_readme(readme_path: Path, output_path: Path) -> None:
+
+def consolidate_readme_impl(readme_path: Path, output_path: Path) -> None:
     """
     Consolidate README with linked documents.
     
@@ -93,7 +70,7 @@ def consolidate_readme(readme_path: Path, output_path: Path) -> None:
     # Read the main README
     main_content = read_file(readme_path)
     if not main_content:
-        print("Error: Could not read main README.md", file=sys.stderr)
+        click.echo("Error: Could not read main README.md", err=True)
         sys.exit(1)
     
     # Extract all markdown links
@@ -157,18 +134,20 @@ def consolidate_readme(readme_path: Path, output_path: Path) -> None:
     with open(output_path, 'w', encoding='utf-8') as f:
         f.write(consolidated)
     
-    print(f"Consolidated README written to: {output_path}")
+    click.echo(f"Consolidated README written to: {output_path}")
 
-def main():
-    """Main entry point."""
-    if len(sys.argv) != 3:
-        print("Usage: consolidate_readme.py <readme_path> <output_path>", file=sys.stderr)
-        sys.exit(1)
-    
-    readme_path = Path(sys.argv[1])
-    output_path = Path(sys.argv[2])
-    
-    consolidate_readme(readme_path, output_path)
 
-if __name__ == "__main__":
-    main()
+@click.command()
+@click.argument('readme_path', type=click.Path(exists=True, path_type=Path))
+@click.argument('output_path', type=click.Path(path_type=Path))
+def consolidated_readme(readme_path: Path, output_path: Path) -> None:
+    """
+    Create a consolidated README by combining the main README with all linked documents.
+    
+    This command:
+    1. Takes the main README.md
+    2. Follows all links to other markdown documents
+    3. Concatenates those documents inline with sensible headings
+    4. Replaces cross-document links with doc-local anchor links
+    """
+    consolidate_readme_impl(readme_path, output_path)

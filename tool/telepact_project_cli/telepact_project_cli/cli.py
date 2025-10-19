@@ -25,6 +25,8 @@ import subprocess
 from github import Github, GithubException
 from pathlib import Path
 
+from .commands.consolidated_readme import consolidated_readme
+
 yaml = YAML()
 
 def bump_version(version: str) -> str:
@@ -677,6 +679,7 @@ main.add_command(github_labels)
 main.add_command(release)
 main.add_command(automerge)
 main.add_command(gitignore)
+main.add_command(consolidated_readme)
 
 if __name__ == "__main__":
     main()
