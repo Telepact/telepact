@@ -35,16 +35,16 @@
 - [x] lib/py/telepact/Server.py → lib/go/telepact/Server.go
 - [x] lib/py/telepact/TelepactError.py → lib/go/telepact/TelepactError.go
 - [x] lib/py/telepact/TelepactSchema.py → lib/go/telepact/TelepactSchema.go
-- [ ] lib/py/telepact/TelepactSchemaFiles.py → lib/go/telepact/TelepactSchemaFiles.go
-- [ ] lib/py/telepact/TelepactSchemaParseError.py → lib/go/telepact/TelepactSchemaParseError.go
-- [ ] lib/py/telepact/TestClient.py → lib/go/telepact/TestClient.go
+- [x] lib/py/telepact/TelepactSchemaFiles.py → lib/go/telepact/TelepactSchemaFiles.go
+- [x] lib/py/telepact/TelepactSchemaParseError.py → lib/go/telepact/TelepactSchemaParseError.go
+- [x] lib/py/telepact/TestClient.py → lib/go/telepact/TestClient.go
 - [x] lib/py/telepact/TypedMessage.py → lib/go/telepact/TypedMessage.go
 - [x] lib/py/telepact/internal/ClientHandleMessage.py → lib/go/telepact/internal/ClientHandleMessage.go
 - [x] lib/py/telepact/internal/DeserializeInternal.py → lib/go/telepact/internal/DeserializeInternal.go
 - [ ] lib/py/telepact/internal/HandleMessage.py → lib/go/telepact/internal/HandleMessage.go
 - [ ] lib/py/telepact/internal/ParseRequestMessage.py → lib/go/telepact/internal/ParseRequestMessage.go
 - [ ] lib/py/telepact/internal/ProcessBytes.py → lib/go/telepact/internal/ProcessBytes.go
-- [ ] lib/py/telepact/internal/SelectStructFields.py → lib/go/telepact/internal/SelectStructFields.go
+- [x] lib/py/telepact/internal/SelectStructFields.py → lib/go/telepact/internal/SelectStructFields.go
 - [x] lib/py/telepact/internal/SerializeInternal.py → lib/go/telepact/internal/SerializeInternal.go
 - [x] lib/py/telepact/internal/binary/Base64Encoder.py → lib/go/telepact/internal/binary/Base64Encoder.go
 - [x] lib/py/telepact/internal/binary/BinaryEncoder.py → lib/go/telepact/internal/binary/BinaryEncoder.go
@@ -61,7 +61,7 @@
 - [x] lib/py/telepact/internal/binary/ClientBinaryEncode.py → lib/go/telepact/internal/binary/ClientBinaryEncode.go
 - [x] lib/py/telepact/internal/binary/ClientBinaryEncoder.py → lib/go/telepact/internal/binary/ClientBinaryEncoder.go
 - [x] lib/py/telepact/internal/binary/ClientBinaryStrategy.py → lib/go/telepact/internal/binary/ClientBinaryStrategy.go
-- [ ] lib/py/telepact/internal/binary/ConstructBinaryEncoding.py → lib/go/telepact/internal/binary/ConstructBinaryEncoding.go
+- [x] lib/py/telepact/internal/binary/ConstructBinaryEncoding.py → lib/go/telepact/internal/binary/ConstructBinaryEncoding.go
 - [x] lib/py/telepact/internal/binary/CreateChecksum.py → lib/go/telepact/internal/binary/CreateChecksum.go
 - [x] lib/py/telepact/internal/binary/DecodeBody.py → lib/go/telepact/internal/binary/DecodeBody.go
 - [x] lib/py/telepact/internal/binary/DecodeKeys.py → lib/go/telepact/internal/binary/DecodeKeys.go
@@ -74,30 +74,30 @@
 - [x] lib/py/telepact/internal/binary/PackMap.py → lib/go/telepact/internal/binary/PackMap.go
 - [x] lib/py/telepact/internal/binary/ServerBase64Decode.py → lib/go/telepact/internal/binary/ServerBase64Decode.go
 - [x] lib/py/telepact/internal/binary/ServerBase64Encode.py → lib/go/telepact/internal/binary/ServerBase64Encode.go
-- [ ] lib/py/telepact/internal/binary/ServerBase64Encoder.py → lib/go/telepact/internal/binary/ServerBase64Encoder.go
-- [ ] lib/py/telepact/internal/binary/ServerBinaryDecode.py → lib/go/telepact/internal/binary/ServerBinaryDecode.go
-- [ ] lib/py/telepact/internal/binary/ServerBinaryEncode.py → lib/go/telepact/internal/binary/ServerBinaryEncode.go
-- [ ] lib/py/telepact/internal/binary/ServerBinaryEncoder.py → lib/go/telepact/internal/binary/ServerBinaryEncoder.go
+- [x] lib/py/telepact/internal/binary/ServerBase64Encoder.py → lib/go/telepact/internal/binary/ServerBase64Encoder.go
+- [x] lib/py/telepact/internal/binary/ServerBinaryDecode.py → lib/go/telepact/internal/binary/ServerBinaryDecode.go
+- [x] lib/py/telepact/internal/binary/ServerBinaryEncode.py → lib/go/telepact/internal/binary/ServerBinaryEncode.go
+- [x] lib/py/telepact/internal/binary/ServerBinaryEncoder.py → lib/go/telepact/internal/binary/ServerBinaryEncoder.go
 - [x] lib/py/telepact/internal/binary/Unpack.py → lib/go/telepact/internal/binary/Unpack.go
 - [x] lib/py/telepact/internal/binary/UnpackBody.py → lib/go/telepact/internal/binary/UnpackBody.go
 - [x] lib/py/telepact/internal/binary/UnpackList.py → lib/go/telepact/internal/binary/UnpackList.go
 - [x] lib/py/telepact/internal/binary/UnpackMap.py → lib/go/telepact/internal/binary/UnpackMap.go
-- [ ] lib/py/telepact/internal/generation/GenerateContext.py → lib/go/telepact/internal/generation/GenerateContext.go
-- [ ] lib/py/telepact/internal/generation/GenerateRandomAny.py → lib/go/telepact/internal/generation/GenerateRandomAny.go
-- [ ] lib/py/telepact/internal/generation/GenerateRandomArray.py → lib/go/telepact/internal/generation/GenerateRandomArray.go
-- [ ] lib/py/telepact/internal/generation/GenerateRandomBoolean.py → lib/go/telepact/internal/generation/GenerateRandomBoolean.go
-- [ ] lib/py/telepact/internal/generation/GenerateRandomBytes.py → lib/go/telepact/internal/generation/GenerateRandomBytes.go
-- [ ] lib/py/telepact/internal/generation/GenerateRandomFn.py → lib/go/telepact/internal/generation/GenerateRandomFn.go
-- [ ] lib/py/telepact/internal/generation/GenerateRandomInteger.py → lib/go/telepact/internal/generation/GenerateRandomInteger.go
-- [ ] lib/py/telepact/internal/generation/GenerateRandomMockCall.py → lib/go/telepact/internal/generation/GenerateRandomMockCall.go
-- [ ] lib/py/telepact/internal/generation/GenerateRandomMockStub.py → lib/go/telepact/internal/generation/GenerateRandomMockStub.go
-- [ ] lib/py/telepact/internal/generation/GenerateRandomNumber.py → lib/go/telepact/internal/generation/GenerateRandomNumber.go
-- [ ] lib/py/telepact/internal/generation/GenerateRandomObject.py → lib/go/telepact/internal/generation/GenerateRandomObject.go
-- [ ] lib/py/telepact/internal/generation/GenerateRandomSelect.py → lib/go/telepact/internal/generation/GenerateRandomSelect.go
-- [ ] lib/py/telepact/internal/generation/GenerateRandomString.py → lib/go/telepact/internal/generation/GenerateRandomString.go
-- [ ] lib/py/telepact/internal/generation/GenerateRandomStruct.py → lib/go/telepact/internal/generation/GenerateRandomStruct.go
-- [ ] lib/py/telepact/internal/generation/GenerateRandomUnion.py → lib/go/telepact/internal/generation/GenerateRandomUnion.go
-- [ ] lib/py/telepact/internal/generation/GenerateRandomValueOfType.py → lib/go/telepact/internal/generation/GenerateRandomValueOfType.go
+- [x] lib/py/telepact/internal/generation/GenerateContext.py → lib/go/telepact/internal/generation/GenerateContext.go
+- [x] lib/py/telepact/internal/generation/GenerateRandomAny.py → lib/go/telepact/internal/generation/GenerateRandomAny.go
+- [x] lib/py/telepact/internal/generation/GenerateRandomArray.py → lib/go/telepact/internal/generation/GenerateRandomArray.go
+- [x] lib/py/telepact/internal/generation/GenerateRandomBoolean.py → lib/go/telepact/internal/generation/GenerateRandomBoolean.go
+- [x] lib/py/telepact/internal/generation/GenerateRandomBytes.py → lib/go/telepact/internal/generation/GenerateRandomBytes.go
+- [x] lib/py/telepact/internal/generation/GenerateRandomFn.py → lib/go/telepact/internal/generation/GenerateRandomFn.go
+- [x] lib/py/telepact/internal/generation/GenerateRandomInteger.py → lib/go/telepact/internal/generation/GenerateRandomInteger.go
+- [x] lib/py/telepact/internal/generation/GenerateRandomMockCall.py → lib/go/telepact/internal/generation/GenerateRandomMockCall.go
+- [x] lib/py/telepact/internal/generation/GenerateRandomMockStub.py → lib/go/telepact/internal/generation/GenerateRandomMockStub.go
+- [x] lib/py/telepact/internal/generation/GenerateRandomNumber.py → lib/go/telepact/internal/generation/GenerateRandomNumber.go
+- [x] lib/py/telepact/internal/generation/GenerateRandomObject.py → lib/go/telepact/internal/generation/GenerateRandomObject.go
+- [x] lib/py/telepact/internal/generation/GenerateRandomSelect.py → lib/go/telepact/internal/generation/GenerateRandomSelect.go
+- [x] lib/py/telepact/internal/generation/GenerateRandomString.py → lib/go/telepact/internal/generation/GenerateRandomString.go
+- [x] lib/py/telepact/internal/generation/GenerateRandomStruct.py → lib/go/telepact/internal/generation/GenerateRandomStruct.go
+- [x] lib/py/telepact/internal/generation/GenerateRandomUnion.py → lib/go/telepact/internal/generation/GenerateRandomUnion.go
+- [x] lib/py/telepact/internal/generation/GenerateRandomValueOfType.py → lib/go/telepact/internal/generation/GenerateRandomValueOfType.go
 - [ ] lib/py/telepact/internal/mock/IsSubMap.py → lib/go/telepact/internal/mock/IsSubMap.go
 - [ ] lib/py/telepact/internal/mock/IsSubMapEntryEqual.py → lib/go/telepact/internal/mock/IsSubMapEntryEqual.go
 - [ ] lib/py/telepact/internal/mock/MockHandle.py → lib/go/telepact/internal/mock/MockHandle.go
