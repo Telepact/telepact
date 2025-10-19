@@ -22,7 +22,7 @@
 
 ## Checklist
 
-- [ ] lib/py/telepact/Client.py → lib/go/telepact/Client.go
+- [x] lib/py/telepact/Client.py → lib/go/telepact/Client.go
 - [x] lib/py/telepact/DefaultSerialization.py → lib/go/telepact/DefaultSerialization.go
 - [x] lib/py/telepact/Message.py → lib/go/telepact/Message.go
 - [ ] lib/py/telepact/MockServer.py → lib/go/telepact/MockServer.go
@@ -39,7 +39,7 @@
 - [ ] lib/py/telepact/TelepactSchemaParseError.py → lib/go/telepact/TelepactSchemaParseError.go
 - [ ] lib/py/telepact/TestClient.py → lib/go/telepact/TestClient.go
 - [x] lib/py/telepact/TypedMessage.py → lib/go/telepact/TypedMessage.go
-- [ ] lib/py/telepact/internal/ClientHandleMessage.py → lib/go/telepact/internal/ClientHandleMessage.go
+- [x] lib/py/telepact/internal/ClientHandleMessage.py → lib/go/telepact/internal/ClientHandleMessage.go
 - [x] lib/py/telepact/internal/DeserializeInternal.py → lib/go/telepact/internal/DeserializeInternal.go
 - [ ] lib/py/telepact/internal/HandleMessage.py → lib/go/telepact/internal/HandleMessage.go
 - [ ] lib/py/telepact/internal/ParseRequestMessage.py → lib/go/telepact/internal/ParseRequestMessage.go
