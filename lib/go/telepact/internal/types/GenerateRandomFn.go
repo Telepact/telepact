@@ -14,15 +14,9 @@
 //|  limitations under the License.
 //|
 
-package generation
+package types
 
-// GenerateRandomBytes returns a pseudo-random byte slice, optionally reusing a blueprint value.
-func GenerateRandomBytes(blueprintValue any, useBlueprintValue bool, ctx *GenerateContext) any {
-	if useBlueprintValue {
-		return blueprintValue
-	}
-	if ctx == nil || ctx.RandomGenerator == nil {
-		return nil
-	}
-	return ctx.RandomGenerator.NextBytes()
+// GenerateRandomFn delegates to GenerateRandomUnion for function unions.
+func GenerateRandomFn(blueprintValue any, useBlueprintValue bool, callTags map[string]*TStruct, ctx *GenerateContext) any {
+	return GenerateRandomUnion(blueprintValue, useBlueprintValue, callTags, ctx)
 }

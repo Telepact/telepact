@@ -14,17 +14,15 @@
 //|  limitations under the License.
 //|
 
-package generation
+package types
 
 import (
 	"sort"
 	"strings"
-
-	"github.com/telepact/telepact/lib/go/telepact/internal/types"
 )
 
 // GenerateRandomMockCall produces a pseudo-random mock call structure based on the supplied schema types.
-func GenerateRandomMockCall(typesMap map[string]types.TType, ctx *GenerateContext) any {
+func GenerateRandomMockCall(typesMap map[string]TType, ctx *GenerateContext) any {
 	if ctx == nil || ctx.RandomGenerator == nil {
 		return nil
 	}
@@ -44,7 +42,7 @@ func GenerateRandomMockCall(typesMap map[string]types.TType, ctx *GenerateContex
 	selectedFnName := functionNames[ctx.RandomGenerator.NextIntWithCeiling(len(functionNames))]
 
 	typeEntry := typesMap[selectedFnName]
-	unionType, ok := typeEntry.(*types.TUnion)
+	unionType, ok := typeEntry.(*TUnion)
 	if !ok {
 		return nil
 	}

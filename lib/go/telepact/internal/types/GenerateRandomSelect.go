@@ -14,7 +14,7 @@
 //|  limitations under the License.
 //|
 
-package generation
+package types
 
 import (
 	"fmt"

@@ -14,21 +14,20 @@
 //|  limitations under the License.
 //|
 
-package generation
+package types
 
-// GenerateRandomAny produces a pseudo-random primitive value.
-func GenerateRandomAny(ctx *GenerateContext) any {
-	if ctx == nil || ctx.RandomGenerator == nil {
-		return nil
-	}
+// THeaders captures request/response header declarations for a function.
+type THeaders struct {
+	Name            string
+	RequestHeaders  map[string]*TFieldDeclaration
+	ResponseHeaders map[string]*TFieldDeclaration
+}
 
-	selectType := ctx.RandomGenerator.NextIntWithCeiling(3)
-	switch selectType {
-	case 0:
-		return ctx.RandomGenerator.NextBoolean()
-	case 1:
-		return ctx.RandomGenerator.NextInt()
-	default:
-		return ctx.RandomGenerator.NextString()
+// NewTHeaders constructs a THeaders instance.
+func NewTHeaders(name string, requestHeaders, responseHeaders map[string]*TFieldDeclaration) *THeaders {
+	return &THeaders{
+		Name:            name,
+		RequestHeaders:  requestHeaders,
+		ResponseHeaders: responseHeaders,
 	}
 }

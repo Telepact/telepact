@@ -3,6 +3,7 @@
 //|
 //|  Licensed under the Apache License, Version 2.0 (the "License");
 //|  you may not use this file except in compliance with the License.
+//|
 //|  You may obtain a copy of the License at
 //|
 //|  https://www.apache.org/licenses/LICENSE-2.0
@@ -14,15 +15,19 @@
 //|  limitations under the License.
 //|
 
-package generation
+package types
 
-// GenerateRandomNumber returns a pseudo-random floating-point number, optionally reusing a blueprint value.
-func GenerateRandomNumber(blueprintValue any, useBlueprintValue bool, ctx *GenerateContext) any {
-	if useBlueprintValue {
-		return blueprintValue
+// MapValidationFailuresToInvalidFieldCases mirrors the Python helper for serialising validation failures.
+func MapValidationFailuresToInvalidFieldCases(argumentValidationFailures []*ValidationFailure) []map[string]any {
+	cases := make([]map[string]any, 0, len(argumentValidationFailures))
+	for _, failure := range argumentValidationFailures {
+		if failure == nil {
+			continue
+		}
+		cases = append(cases, map[string]any{
+			"path":   append([]any{}, failure.Path...),
+			"reason": map[string]any{failure.Reason: cloneStringInterfaceMap(failure.Data)},
+		})
 	}
-	if ctx == nil || ctx.RandomGenerator == nil {
-		return 0.0
-	}
-	return ctx.RandomGenerator.NextDouble()
+	return cases
 }

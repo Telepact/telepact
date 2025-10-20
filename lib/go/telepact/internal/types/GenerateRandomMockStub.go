@@ -14,17 +14,15 @@
 //|  limitations under the License.
 //|
 
-package generation
+package types
 
 import (
 	"sort"
 	"strings"
-
-	"github.com/telepact/telepact/lib/go/telepact/internal/types"
 )
 
 // GenerateRandomMockStub creates a pseudo-random mock stub based on Telepact schema types.
-func GenerateRandomMockStub(typesMap map[string]types.TType, ctx *GenerateContext) any {
+func GenerateRandomMockStub(typesMap map[string]TType, ctx *GenerateContext) any {
 	if ctx == nil || ctx.RandomGenerator == nil {
 		return nil
 	}
@@ -44,12 +42,12 @@ func GenerateRandomMockStub(typesMap map[string]types.TType, ctx *GenerateContex
 	index := ctx.RandomGenerator.NextIntWithCeiling(len(functions))
 	selectedFnName := functions[index]
 
-	selectedFn, ok := typesMap[selectedFnName].(*types.TUnion)
+	selectedFn, ok := typesMap[selectedFnName].(*TUnion)
 	if !ok {
 		return nil
 	}
 
-	selectedResult, ok := typesMap[selectedFnName+".->"].(*types.TUnion)
+	selectedResult, ok := typesMap[selectedFnName+".->"].(*TUnion)
 	if !ok {
 		return nil
 	}

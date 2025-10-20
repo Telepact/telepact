@@ -14,7 +14,7 @@
 //|  limitations under the License.
 //|
 
-package validation
+package types
 
 import "fmt"
 

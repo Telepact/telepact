@@ -20,7 +20,7 @@ import (
 	"fmt"
 
 	"github.com/telepact/telepact/lib/go/telepact/internal/binary"
-	"github.com/telepact/telepact/lib/go/telepact/internal/validation"
+	"github.com/telepact/telepact/lib/go/telepact/internal/types"
 )
 
 // DeserializeInternal converts serialized bytes back into Telepact headers and body maps.
@@ -31,7 +31,7 @@ func DeserializeInternal(
 	base64Encoder binary.Base64Encoder,
 ) (map[string]any, map[string]any, error) {
 	if len(messageBytes) == 0 {
-		return nil, nil, validation.NewInvalidMessage(fmt.Errorf("empty payload"))
+		return nil, nil, types.NewInvalidMessage(fmt.Errorf("empty payload"))
 	}
 
 	var (
@@ -47,12 +47,12 @@ func DeserializeInternal(
 		messageAsPseudoJSON, err = serializer.FromJSON(messageBytes)
 	}
 	if err != nil {
-		return nil, nil, validation.NewInvalidMessage(err)
+		return nil, nil, types.NewInvalidMessage(err)
 	}
 
 	messageList, ok := messageAsPseudoJSON.([]any)
 	if !ok || len(messageList) != 2 {
-		return nil, nil, validation.NewInvalidMessage(nil)
+		return nil, nil, types.NewInvalidMessage(nil)
 	}
 
 	var finalList []any
@@ -62,31 +62,31 @@ func DeserializeInternal(
 		finalList, err = base64Encoder.Decode(messageList)
 	}
 	if err != nil {
-		return nil, nil, validation.NewInvalidMessage(err)
+		return nil, nil, types.NewInvalidMessage(err)
 	}
 
 	if len(finalList) != 2 {
-		return nil, nil, validation.NewInvalidMessage(nil)
+		return nil, nil, types.NewInvalidMessage(nil)
 	}
 
 	headers, ok := toStringMap(finalList[0])
 	if !ok {
-		return nil, nil, validation.NewInvalidMessage(nil)
+		return nil, nil, types.NewInvalidMessage(nil)
 	}
 
 	body, ok := toStringMap(finalList[1])
 	if !ok {
-		return nil, nil, validation.NewInvalidMessage(nil)
+		return nil, nil, types.NewInvalidMessage(nil)
 	}
 
 	if len(body) != 1 {
-		return nil, nil, validation.NewInvalidMessageBody()
+		return nil, nil, types.NewInvalidMessageBody()
 	}
 
 	for key, value := range body {
 		converted, ok := toStringMap(value)
 		if !ok {
-			return nil, nil, validation.NewInvalidMessageBody()
+			return nil, nil, types.NewInvalidMessageBody()
 		}
 		body[key] = converted
 	}

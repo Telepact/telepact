@@ -14,17 +14,15 @@
 //|  limitations under the License.
 //|
 
-package validation
+package types
 
-// InvalidMessageBody indicates that a Telepact message body failed structural validation.
-type InvalidMessageBody struct{}
-
-// NewInvalidMessageBody constructs a new InvalidMessageBody error.
-func NewInvalidMessageBody() *InvalidMessageBody {
-	return &InvalidMessageBody{}
+// TError represents an error type wrapping an underlying union.
+type TError struct {
+	Name   string
+	Errors *TUnion
 }
 
-// Error implements the error interface.
-func (e *InvalidMessageBody) Error() string {
-	return "invalid message body"
+// NewTError constructs a TError instance.
+func NewTError(name string, errors *TUnion) *TError {
+	return &TError{Name: name, Errors: errors}
 }

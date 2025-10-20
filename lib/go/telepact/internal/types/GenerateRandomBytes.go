@@ -14,15 +14,15 @@
 //|  limitations under the License.
 //|
 
-package generation
+package types
 
-// GenerateRandomInteger returns a pseudo-random integer, optionally reusing a blueprint value.
-func GenerateRandomInteger(blueprintValue any, useBlueprintValue bool, ctx *GenerateContext) any {
+// GenerateRandomBytes returns a pseudo-random byte slice, optionally reusing a blueprint value.
+func GenerateRandomBytes(blueprintValue any, useBlueprintValue bool, ctx *GenerateContext) any {
 	if useBlueprintValue {
 		return blueprintValue
 	}
 	if ctx == nil || ctx.RandomGenerator == nil {
-		return 0
+		return nil
 	}
-	return ctx.RandomGenerator.NextInt()
+	return ctx.RandomGenerator.NextBytes()
 }

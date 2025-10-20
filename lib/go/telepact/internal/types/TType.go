@@ -14,15 +14,12 @@
 //|  limitations under the License.
 //|
 
-package generation
+package types
 
-// GenerateRandomString returns a pseudo-random string, optionally reusing a blueprint value.
-func GenerateRandomString(blueprintValue any, useBlueprintValue bool, ctx *GenerateContext) any {
-	if useBlueprintValue {
-		return blueprintValue
-	}
-	if ctx == nil || ctx.RandomGenerator == nil {
-		return ""
-	}
-	return ctx.RandomGenerator.NextString()
+// TType represents a Telepact schema type node.
+type TType interface {
+	GetTypeParameterCount() int
+	Validate(value any, typeParameters []*TTypeDeclaration, ctx *ValidateContext) []*ValidationFailure
+	GenerateRandomValue(blueprintValue any, useBlueprintValue bool, typeParameters []*TTypeDeclaration, ctx *GenerateContext) any
+	GetName(ctx *ValidateContext) string
 }

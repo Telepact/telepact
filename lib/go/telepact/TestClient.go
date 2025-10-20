@@ -20,7 +20,6 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/telepact/telepact/lib/go/telepact/internal/generation"
 	"github.com/telepact/telepact/lib/go/telepact/internal/mock"
 	"github.com/telepact/telepact/lib/go/telepact/internal/types"
 )
@@ -100,7 +99,7 @@ func (tc *TestClient) AssertRequest(request Message, expectedPseudoJSONBody map[
 		return Message{}, fmt.Errorf("result type for %s is not a union", functionName)
 	}
 
-	ctx := generation.NewGenerateContext(
+	ctx := types.NewGenerateContext(
 		includeOptionalFields,
 		randomizeOptionalFieldGeneration,
 		alwaysIncludeRequiredFields,

@@ -14,16 +14,12 @@
 //|  limitations under the License.
 //|
 
-package generation
+package types
 
-import (
-	"sort"
-
-	"github.com/telepact/telepact/lib/go/telepact/internal/types"
-)
+import "sort"
 
 // GenerateRandomStruct produces a pseudo-random struct object that respects the provided field declarations.
-func GenerateRandomStruct(blueprintValue any, useBlueprintValue bool, referenceStruct map[string]*types.TFieldDeclaration, ctx *GenerateContext) map[string]any {
+func GenerateRandomStruct(blueprintValue any, useBlueprintValue bool, referenceStruct map[string]*TFieldDeclaration, ctx *GenerateContext) map[string]any {
 	if ctx == nil {
 		return map[string]any{}
 	}

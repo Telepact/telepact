@@ -14,7 +14,7 @@
 //|  limitations under the License.
 //|
 
-package generation
+package types
 
 // RandomGenerator captures the pseudo-random behaviour required during value generation.
 type RandomGenerator interface {

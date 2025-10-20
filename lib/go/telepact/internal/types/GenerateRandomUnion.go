@@ -14,16 +14,12 @@
 //|  limitations under the License.
 //|
 
-package generation
+package types
 
-import (
-	"sort"
-
-	"github.com/telepact/telepact/lib/go/telepact/internal/types"
-)
+import "sort"
 
 // GenerateRandomUnion produces a pseudo-random union value respecting the supplied union tag definitions.
-func GenerateRandomUnion(blueprintValue any, useBlueprintValue bool, unionTagsReference map[string]*types.TStruct, ctx *GenerateContext) map[string]any {
+func GenerateRandomUnion(blueprintValue any, useBlueprintValue bool, unionTagsReference map[string]*TStruct, ctx *GenerateContext) map[string]any {
 	if ctx == nil {
 		return map[string]any{}
 	}

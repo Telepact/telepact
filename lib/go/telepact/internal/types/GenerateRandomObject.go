@@ -14,26 +14,24 @@
 //|  limitations under the License.
 //|
 
-package generation
+package types
 
-import "github.com/telepact/telepact/lib/go/telepact/internal/types"
-
-// GenerateRandomArray produces an array value compliant with the supplied type declaration.
-func GenerateRandomArray(blueprintValue any, useBlueprintValue bool, typeParameters []*types.TTypeDeclaration, ctx *GenerateContext) []any {
+// GenerateRandomObject produces a pseudo-random object adhering to the provided type declaration.
+func GenerateRandomObject(blueprintValue any, useBlueprintValue bool, typeParameters []*TTypeDeclaration, ctx *GenerateContext) map[string]any {
 	if len(typeParameters) == 0 {
-		return []any{}
+		return map[string]any{}
 	}
 
 	nestedTypeDeclaration := typeParameters[0]
 
 	if useBlueprintValue {
-		startingArray := toAnySlice(blueprintValue)
-		array := make([]any, 0, len(startingArray))
-		for _, startingValue := range startingArray {
+		startingObj, _ := coerceToStringAnyMap(blueprintValue)
+		obj := make(map[string]any, len(startingObj))
+		for key, startingValue := range startingObj {
 			value := nestedTypeDeclaration.GenerateRandomValue(startingValue, true, ctx)
-			array = append(array, value)
+			obj[key] = value
 		}
-		return array
+		return obj
 	}
 
 	length := 0
@@ -41,20 +39,15 @@ func GenerateRandomArray(blueprintValue any, useBlueprintValue bool, typeParamet
 		length = ctx.RandomGenerator.NextCollectionLength()
 	}
 
-	array := make([]any, 0, length)
+	obj := make(map[string]any, length)
 	for i := 0; i < length; i++ {
+		key := ""
+		if ctx != nil && ctx.RandomGenerator != nil {
+			key = ctx.RandomGenerator.NextString()
+		}
 		value := nestedTypeDeclaration.GenerateRandomValue(nil, false, ctx)
-		array = append(array, value)
+		obj[key] = value
 	}
 
-	return array
-}
-
-func toAnySlice(value any) []any {
-	switch typed := value.(type) {
-	case []any:
-		return typed
-	default:
-		return []any{}
-	}
+	return obj
 }

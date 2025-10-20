@@ -14,11 +14,20 @@
 //|  limitations under the License.
 //|
 
-package generation
+package types
 
-import "github.com/telepact/telepact/lib/go/telepact/internal/types"
+// GenerateRandomValueOfType produces a pseudo-random value for the provided type declaration.
+func GenerateRandomValueOfType(
+	blueprintValue any,
+	useBlueprintValue bool,
+	thisType TType,
+	nullable bool,
+	typeParameters []*TTypeDeclaration,
+	ctx *GenerateContext,
+) any {
+	if nullable && !useBlueprintValue && ctx != nil && ctx.RandomGenerator != nil && ctx.RandomGenerator.NextBoolean() {
+		return nil
+	}
 
-// GenerateRandomFn delegates to GenerateRandomUnion for function unions.
-func GenerateRandomFn(blueprintValue any, useBlueprintValue bool, callTags map[string]*types.TStruct, ctx *GenerateContext) any {
-	return GenerateRandomUnion(blueprintValue, useBlueprintValue, callTags, ctx)
+	return thisType.GenerateRandomValue(blueprintValue, useBlueprintValue, typeParameters, ctx)
 }

@@ -14,22 +14,20 @@
 //|  limitations under the License.
 //|
 
-package generation
+package types
 
-import "github.com/telepact/telepact/lib/go/telepact/internal/types"
+// TFieldDeclaration describes a struct field in a Telepact schema.
+type TFieldDeclaration struct {
+	FieldName       string
+	TypeDeclaration *TTypeDeclaration
+	Optional        bool
+}
 
-// GenerateRandomValueOfType produces a pseudo-random value for the provided type declaration.
-func GenerateRandomValueOfType(
-	blueprintValue any,
-	useBlueprintValue bool,
-	thisType types.TType,
-	nullable bool,
-	typeParameters []*types.TTypeDeclaration,
-	ctx *GenerateContext,
-) any {
-	if nullable && !useBlueprintValue && ctx != nil && ctx.RandomGenerator != nil && ctx.RandomGenerator.NextBoolean() {
-		return nil
+// NewTFieldDeclaration constructs a TFieldDeclaration instance.
+func NewTFieldDeclaration(fieldName string, typeDeclaration *TTypeDeclaration, optional bool) *TFieldDeclaration {
+	return &TFieldDeclaration{
+		FieldName:       fieldName,
+		TypeDeclaration: typeDeclaration,
+		Optional:        optional,
 	}
-
-	return thisType.GenerateRandomValue(blueprintValue, useBlueprintValue, typeParameters, ctx)
 }

@@ -14,15 +14,15 @@
 //|  limitations under the License.
 //|
 
-package generation
+package types
 
-// GenerateRandomBoolean returns a pseudo-random boolean, optionally reusing a blueprint value.
-func GenerateRandomBoolean(blueprintValue any, useBlueprintValue bool, ctx *GenerateContext) any {
+// GenerateRandomString returns a pseudo-random string, optionally reusing a blueprint value.
+func GenerateRandomString(blueprintValue any, useBlueprintValue bool, ctx *GenerateContext) any {
 	if useBlueprintValue {
 		return blueprintValue
 	}
 	if ctx == nil || ctx.RandomGenerator == nil {
-		return nil
+		return ""
 	}
-	return ctx.RandomGenerator.NextBoolean()
+	return ctx.RandomGenerator.NextString()
 }
