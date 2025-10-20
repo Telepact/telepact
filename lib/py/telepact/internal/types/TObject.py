@@ -16,6 +16,8 @@
 
 from typing import TYPE_CHECKING
 
+from .type_labels import OBJECT
+from .TType import TType
 
 if TYPE_CHECKING:
     from ..validation.ValidateContext import ValidateContext
@@ -23,10 +25,6 @@ if TYPE_CHECKING:
     from .TTypeDeclaration import TTypeDeclaration
     from ..validation.ValidationFailure import ValidationFailure
     from ..generation.GenerateContext import GenerateContext
-
-from .TType import TType
-
-_OBJECT_NAME: str = "Object"
 
 
 class TObject(TType):
@@ -44,4 +42,4 @@ class TObject(TType):
         return generate_random_object(blueprint_value, use_blueprint_value, type_parameters, ctx)
 
     def get_name(self, ctx: 'ValidateContext') -> str:
-        return _OBJECT_NAME
+        return OBJECT

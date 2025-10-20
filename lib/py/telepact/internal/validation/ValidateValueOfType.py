@@ -16,24 +16,25 @@
 
 from typing import TYPE_CHECKING
 
-
 if TYPE_CHECKING:
-    from ...internal.validation.ValidateContext import ValidateContext
     from ...internal.validation.ValidationFailure import ValidationFailure
-    from ..types.TType import TType
-    from ..types.TTypeDeclaration import TTypeDeclaration
 
 
 def validate_value_of_type(value: object,
-                           this_type: 'TType',
-                           nullable: bool, type_parameters: list['TTypeDeclaration'],
-                           ctx: 'ValidateContext') -> list['ValidationFailure']:
+                           this_type: object,
+                           nullable: bool, type_parameters: list[object],
+                           ctx: object) -> list['ValidationFailure']:
     from ...internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
 
     if value is None:
+        get_name = getattr(this_type, "get_name", None)
+        type_name = get_name(ctx) if callable(get_name) else "Unknown"
         if not nullable:
-            return get_type_unexpected_validation_failure([], value, this_type.get_name(ctx))
-        else:
-            return []
+            return get_type_unexpected_validation_failure([], value, type_name)
+        return []
 
-    return this_type.validate(value, type_parameters, ctx)
+    validate = getattr(this_type, "validate", None)
+    if callable(validate):
+        return validate(value, type_parameters, ctx)
+
+    return []

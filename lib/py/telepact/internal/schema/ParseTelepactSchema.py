@@ -16,7 +16,8 @@
 
 from typing import TYPE_CHECKING, cast
 
-from ...TelepactSchema import TelepactSchema
+from dataclasses import dataclass
+
 from .SchemaParseFailure import SchemaParseFailure
 
 import json
@@ -27,9 +28,17 @@ if TYPE_CHECKING:
     from ..types.TFieldDeclaration import TFieldDeclaration
 
 
+@dataclass
+class ParsedTelepactSchema:
+    original: list[object]
+    parsed: dict[str, 'TType']
+    request_headers: dict[str, 'TFieldDeclaration']
+    response_headers: dict[str, 'TFieldDeclaration']
+
+
 def parse_telepact_schema(
     telepact_schema_document_names_to_json: dict[str, str],
-) -> 'TelepactSchema':
+) -> ParsedTelepactSchema:
     from ...TelepactSchemaParseError import TelepactSchemaParseError
     from .ApplyErrorToParsedTypes import apply_error_to_parsed_types
     from .CatchErrorCollisions import catch_error_collisions
@@ -161,7 +170,8 @@ def parse_telepact_schema(
                     parsed_types,
                     fn_error_regexes,
                     parse_failures,
-                    failed_types
+                    failed_types,
+                    get_or_parse_type
                 )
             )
         except TelepactSchemaParseError as e:
@@ -195,7 +205,8 @@ def parse_telepact_schema(
                     parsed_types,
                     fn_error_regexes,
                     parse_failures,
-                    failed_types
+                    failed_types,
+                    get_or_parse_type
                 )
             )
             errors.append(error)
@@ -246,7 +257,8 @@ def parse_telepact_schema(
                     parsed_types,
                     fn_error_regexes,
                     parse_failures,
-                    failed_types
+                    failed_types,
+                    get_or_parse_type
                 )
             )
             headers.append(header_type)
@@ -277,7 +289,7 @@ def parse_telepact_schema(
     final_original_schema = [original_schema[k]
                              for k in sorted(original_schema.keys(), key=lambda k: (not k.startswith("info."), k))]
 
-    return TelepactSchema(
+    return ParsedTelepactSchema(
         final_original_schema,
         parsed_types,
         request_headers,

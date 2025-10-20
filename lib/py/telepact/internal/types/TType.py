@@ -14,16 +14,29 @@
 #|  limitations under the License.
 #|
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 from abc import ABCMeta, abstractmethod
 
 
 if TYPE_CHECKING:
     from ..validation.ValidateContext import ValidateContext
     from ...RandomGenerator import RandomGenerator
-    from .TTypeDeclaration import TTypeDeclaration
     from ..validation.ValidationFailure import ValidationFailure
     from ..generation.GenerateContext import GenerateContext
+    from typing import Protocol
+
+    class TTypeDeclaration(Protocol):
+        type: 'TType'
+        nullable: bool
+        type_parameters: list['TTypeDeclaration']
+
+        def validate(self, value: object, ctx: 'ValidateContext') -> list['ValidationFailure']:
+            ...
+
+        def generate_random_value(self, blueprint_value: object, use_blueprint_value: bool, ctx: 'GenerateContext') -> object:
+            ...
+else:
+    TTypeDeclaration = Any
 
 
 class TType(metaclass=ABCMeta):

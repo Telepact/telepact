@@ -15,17 +15,19 @@
 #|
 
 from typing import TYPE_CHECKING
-from ...MockTelepactSchema import MockTelepactSchema
+
+if TYPE_CHECKING:
+    from .ParseTelepactSchema import ParsedTelepactSchema
 
 
-def create_mock_telepact_schema_from_file_json_map(json_documents: dict[str, str]) -> 'MockTelepactSchema':
+def create_mock_telepact_schema_from_file_json_map(json_documents: dict[str, str]) -> 'ParsedTelepactSchema':
     from .GetMockTelepactJson import get_mock_telepact_json
     from .CreateTelepactSchemaFromFileJsonMap import create_telepact_schema_from_file_json_map
 
     final_json_documents = json_documents.copy()
     final_json_documents["mock_"] = get_mock_telepact_json()
 
-    telepact_schema = create_telepact_schema_from_file_json_map(
+    parsed_schema = create_telepact_schema_from_file_json_map(
         final_json_documents)
 
-    return MockTelepactSchema(telepact_schema.original, telepact_schema.parsed, telepact_schema.parsed_request_headers, telepact_schema.parsed_response_headers)
+    return parsed_schema

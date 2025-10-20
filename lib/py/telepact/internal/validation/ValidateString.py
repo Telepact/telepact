@@ -14,7 +14,7 @@
 #|  limitations under the License.
 #|
 
-from ..types.TString import _STRING_NAME
+from ..types.type_labels import STRING
 from ...internal.validation.ValidationFailure import ValidationFailure
 
 
@@ -24,4 +24,4 @@ def validate_string(value: object) -> list['ValidationFailure']:
     if isinstance(value, str):
         return []
     else:
-        return get_type_unexpected_validation_failure([], value, _STRING_NAME)
+        return get_type_unexpected_validation_failure([], value, STRING)

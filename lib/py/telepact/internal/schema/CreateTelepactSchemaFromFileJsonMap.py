@@ -18,10 +18,10 @@ from typing import TYPE_CHECKING
 import re
 
 if TYPE_CHECKING:
-    from ...TelepactSchema import TelepactSchema
+    from .ParseTelepactSchema import ParsedTelepactSchema
 
 
-def create_telepact_schema_from_file_json_map(json_documents: dict[str, str]) -> 'TelepactSchema':
+def create_telepact_schema_from_file_json_map(json_documents: dict[str, str]) -> 'ParsedTelepactSchema':
     from .ParseTelepactSchema import parse_telepact_schema
     from .GetInternalTelepactJson import get_internal_telepact_json
     from .GetAuthTelepactJson import get_auth_telepact_json
@@ -37,4 +37,6 @@ def create_telepact_schema_from_file_json_map(json_documents: dict[str, str]) ->
             final_json_documents["auth_"] = get_auth_telepact_json()
             break
 
-    return parse_telepact_schema(final_json_documents)
+    parsed_schema = parse_telepact_schema(final_json_documents)
+
+    return parsed_schema

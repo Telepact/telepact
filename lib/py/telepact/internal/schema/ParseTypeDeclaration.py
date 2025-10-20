@@ -32,7 +32,6 @@ def parse_type_declaration(
     from ...internal.types.TArray import TArray
     from ...internal.types.TObject import TObject
     from ...TelepactSchemaParseError import TelepactSchemaParseError
-    from ...internal.schema.GetOrParseType import get_or_parse_type
     from ...internal.schema.GetTypeUnexpectedParseFailure import get_type_unexpected_parse_failure
 
     if isinstance(type_declaration_object, str):
@@ -52,7 +51,7 @@ def parse_type_declaration(
         type_name = matcher.group(1)
         nullable = matcher.group(2) is not None
 
-        t_type = get_or_parse_type(path, type_name, ctx)
+        t_type = ctx.resolve_type(path, type_name, ctx)
 
         if t_type.get_type_parameter_count() != 0:
             raise TelepactSchemaParseError(

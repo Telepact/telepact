@@ -14,20 +14,25 @@
 #|  limitations under the License.
 #|
 
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from ...RandomGenerator import RandomGenerator
-    from ..types.TType import TType
-    from ..types.TTypeDeclaration import TTypeDeclaration
-    from ...internal.generation.GenerateContext import GenerateContext
-
-
 def generate_random_value_of_type(
         blueprint_value: object, use_blueprint_value: bool,
-        this_type: 'TType', nullable: bool,
-        type_parameters: list['TTypeDeclaration'], ctx: 'GenerateContext') -> object:
-    if nullable and not use_blueprint_value and ctx.random_generator.next_boolean():
+        this_type: object, nullable: bool,
+        type_parameters: list[object], ctx: object) -> object:
+    random_generator = getattr(ctx, "random_generator", None)
+    next_boolean = getattr(random_generator, "next_boolean", None)
+
+    should_return_none = (
+        nullable
+        and not use_blueprint_value
+        and callable(next_boolean)
+        and bool(next_boolean())
+    )
+
+    if should_return_none:
         return None
-    else:
-        return this_type.generate_random_value(blueprint_value, use_blueprint_value, type_parameters, ctx)
+
+    generate = getattr(this_type, "generate_random_value", None)
+    if callable(generate):
+        return generate(blueprint_value, use_blueprint_value, type_parameters, ctx)
+
+    return blueprint_value

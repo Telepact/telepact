@@ -15,7 +15,8 @@
 #|
 
 from typing import TYPE_CHECKING
-from ..types.TArray import _ARRAY_NAME
+
+from ..types.type_labels import ARRAY
 from ...internal.validation.ValidationFailure import ValidationFailure
 
 if TYPE_CHECKING:
@@ -51,4 +52,4 @@ def validate_array(value: object,
 
         return validation_failures
     else:
-        return get_type_unexpected_validation_failure([], value, _ARRAY_NAME)
+        return get_type_unexpected_validation_failure([], value, ARRAY)

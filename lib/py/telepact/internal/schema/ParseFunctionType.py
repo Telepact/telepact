@@ -16,7 +16,6 @@
 
 from typing import TYPE_CHECKING, cast
 from ...internal.schema.DerivePossibleSelects import derive_possible_select
-from ...internal.schema.GetOrParseType import get_or_parse_type
 from ...internal.schema.SchemaParseFailure import SchemaParseFailure
 from ..types.TSelect import TSelect
 
@@ -60,7 +59,7 @@ def parse_function_result_type(path: list[object], function_definition_as_parsed
 
     fn_select_type = derive_possible_select(
         schema_key, cast(TUnion, result_type))
-    select_type = cast(TSelect, get_or_parse_type([], '_ext.Select_', ctx))
+    select_type = cast(TSelect, ctx.resolve_type([], '_ext.Select_', ctx))
     select_type.possible_selects[schema_key] = fn_select_type
 
     return cast(TUnion, result_type)

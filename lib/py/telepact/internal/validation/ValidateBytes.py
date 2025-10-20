@@ -17,7 +17,7 @@
 from typing import TYPE_CHECKING, cast
 import base64
 
-from ...internal.types.TBytes import _BYTES_NAME
+from ..types.type_labels import BYTES
 
 if TYPE_CHECKING:
     from .ValidationFailure import ValidationFailure
@@ -40,8 +40,8 @@ def validate_bytes(value: object, ctx: 'ValidateContext') -> list['ValidationFai
         except Exception as e:
             return get_type_unexpected_validation_failure([], value, 'Base64String')
     else:
-        return get_type_unexpected_validation_failure([], value, _BYTES_NAME)
-        
+        return get_type_unexpected_validation_failure([], value, BYTES)
+
 
 def set_coerced_path(path: list[str], coerced_path: dict[str, object]):
     part = path[0]

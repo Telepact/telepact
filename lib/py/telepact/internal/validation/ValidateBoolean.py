@@ -15,7 +15,8 @@
 #|
 
 from typing import TYPE_CHECKING
-from ..types.TBoolean import _BOOLEAN_NAME
+
+from ..types.type_labels import BOOLEAN
 
 if TYPE_CHECKING:
     from ...internal.validation.ValidationFailure import ValidationFailure
@@ -27,4 +28,4 @@ def validate_boolean(value: object) -> list['ValidationFailure']:
     if isinstance(value, bool):
         return []
     else:
-        return get_type_unexpected_validation_failure([], value, _BOOLEAN_NAME)
+        return get_type_unexpected_validation_failure([], value, BOOLEAN)

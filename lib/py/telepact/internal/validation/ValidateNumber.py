@@ -14,8 +14,8 @@
 #|  limitations under the License.
 #|
 
-from ..types.TNumber import _NUMBER_NAME
 from ...internal.validation.ValidationFailure import ValidationFailure
+from ..types.type_labels import NUMBER
 
 
 def validate_number(value: object) -> list['ValidationFailure']:
@@ -30,4 +30,4 @@ def validate_number(value: object) -> list['ValidationFailure']:
         else:
             return []
     else:
-        return get_type_unexpected_validation_failure([], value, _NUMBER_NAME)
+        return get_type_unexpected_validation_failure([], value, NUMBER)

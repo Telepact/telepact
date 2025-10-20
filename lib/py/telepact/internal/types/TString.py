@@ -16,6 +16,8 @@
 
 from typing import TYPE_CHECKING
 
+from .type_labels import STRING
+from .TType import TType
 
 if TYPE_CHECKING:
     from ..validation.ValidateContext import ValidateContext
@@ -23,10 +25,6 @@ if TYPE_CHECKING:
     from .TTypeDeclaration import TTypeDeclaration
     from ..validation.ValidationFailure import ValidationFailure
     from ..generation.GenerateContext import GenerateContext
-
-from .TType import TType
-
-_STRING_NAME: str = "String"
 
 
 class TString(TType):
@@ -44,4 +42,4 @@ class TString(TType):
         return generate_random_string(blueprint_value, use_blueprint_value, ctx)
 
     def get_name(self, ctx: 'ValidateContext') -> str:
-        return _STRING_NAME
+        return STRING

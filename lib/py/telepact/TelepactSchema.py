@@ -36,16 +36,34 @@ class TelepactSchema:
     @staticmethod
     def from_json(json: str) -> 'TelepactSchema':
         from .internal.schema.CreateTelepactSchemaFromFileJsonMap import create_telepact_schema_from_file_json_map
-        return create_telepact_schema_from_file_json_map({"auto_": json})
+        parsed_schema = create_telepact_schema_from_file_json_map({"auto_": json})
+        return TelepactSchema(
+            parsed_schema.original,
+            parsed_schema.parsed,
+            parsed_schema.request_headers,
+            parsed_schema.response_headers
+        )
 
     @staticmethod
     def from_file_json_map(file_json_map: dict[str, str]) -> 'TelepactSchema':
         from .internal.schema.CreateTelepactSchemaFromFileJsonMap import create_telepact_schema_from_file_json_map
-        return create_telepact_schema_from_file_json_map(file_json_map)
+        parsed_schema = create_telepact_schema_from_file_json_map(file_json_map)
+        return TelepactSchema(
+            parsed_schema.original,
+            parsed_schema.parsed,
+            parsed_schema.request_headers,
+            parsed_schema.response_headers
+        )
 
     @staticmethod
     def from_directory(directory: str) -> 'TelepactSchema':
         from .internal.schema.CreateTelepactSchemaFromFileJsonMap import create_telepact_schema_from_file_json_map
         from .internal.schema.GetSchemaFileMap import get_schema_file_map
         schema_file_map = get_schema_file_map(directory)
-        return create_telepact_schema_from_file_json_map(schema_file_map)
+        parsed_schema = create_telepact_schema_from_file_json_map(schema_file_map)
+        return TelepactSchema(
+            parsed_schema.original,
+            parsed_schema.parsed,
+            parsed_schema.request_headers,
+            parsed_schema.response_headers
+        )

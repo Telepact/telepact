@@ -16,7 +16,7 @@
 
 from typing import TYPE_CHECKING
 
-from ..types.TObject import _OBJECT_NAME
+from ..types.type_labels import OBJECT
 from ...internal.validation.ValidationFailure import ValidationFailure
 
 if TYPE_CHECKING:
@@ -51,4 +51,4 @@ def validate_object(value: object,
 
         return validation_failures
     else:
-        return get_type_unexpected_validation_failure([], value, _OBJECT_NAME)
+        return get_type_unexpected_validation_failure([], value, OBJECT)

@@ -16,6 +16,8 @@
 
 from typing import TYPE_CHECKING
 
+from .type_labels import NUMBER
+from .TType import TType
 
 if TYPE_CHECKING:
     from ..validation.ValidateContext import ValidateContext
@@ -23,11 +25,6 @@ if TYPE_CHECKING:
     from .TTypeDeclaration import TTypeDeclaration
     from ..validation.ValidationFailure import ValidationFailure
     from ..generation.GenerateContext import GenerateContext
-
-
-from .TType import TType
-
-_NUMBER_NAME: str = "Number"
 
 
 class TNumber(TType):
@@ -45,4 +42,4 @@ class TNumber(TType):
         return generate_random_number(blueprint_value, use_blueprint_value, ctx)
 
     def get_name(self, ctx: 'ValidateContext') -> str:
-        return _NUMBER_NAME
+        return NUMBER

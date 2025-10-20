@@ -16,6 +16,8 @@
 
 from typing import TYPE_CHECKING
 
+from .type_labels import STRUCT
+from .TType import TType
 
 if TYPE_CHECKING:
     from ..validation.ValidateContext import ValidateContext
@@ -24,10 +26,6 @@ if TYPE_CHECKING:
     from .TFieldDeclaration import TFieldDeclaration
     from .TTypeDeclaration import TTypeDeclaration
     from ..generation.GenerateContext import GenerateContext
-
-from .TType import TType
-
-_STRUCT_NAME: str = "Object"
 
 
 class TStruct(TType):
@@ -49,4 +47,4 @@ class TStruct(TType):
         return generate_random_struct(blueprint_value, use_blueprint_value, self.fields, ctx)
 
     def get_name(self, ctx: 'ValidateContext') -> str:
-        return _STRUCT_NAME
+        return STRUCT

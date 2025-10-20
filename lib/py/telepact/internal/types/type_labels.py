@@ -14,8 +14,26 @@
 #|  limitations under the License.
 #|
 
-from ...internal.binary.Unpack import unpack_list as _unpack_list
+"""Common Telepact type labels shared between type definitions and helpers."""
 
+ARRAY = "Array"
+BOOLEAN = "Boolean"
+BYTES = "Bytes"
+INTEGER = "Integer"
+NUMBER = "Number"
+OBJECT = "Object"
+STRING = "String"
+STRUCT = "Object"
+UNION = "Object"
 
-def unpack_list(lst: list[object]) -> list[object]:
-    return _unpack_list(lst)
+__all__ = [
+    "ARRAY",
+    "BOOLEAN",
+    "BYTES",
+    "INTEGER",
+    "NUMBER",
+    "OBJECT",
+    "STRING",
+    "STRUCT",
+    "UNION",
+]

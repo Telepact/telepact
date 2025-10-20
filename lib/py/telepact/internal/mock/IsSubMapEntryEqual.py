@@ -14,10 +14,27 @@
 #|  limitations under the License.
 #|
 
-def is_sub_map_entry_equal(part_value: object, whole_value: object) -> bool:
-    from ...internal.mock.IsSubMap import is_sub_map
-    from ...internal.mock.PartiallyMatches import partially_matches
+from typing import cast
 
+
+def is_sub_map(part: dict[str, object], whole: dict[str, object]) -> bool:
+    for part_key in part.keys():
+        whole_value = cast(dict[str, object], whole.get(part_key))
+        part_value = cast(dict[str, object], part.get(part_key))
+        entry_is_equal = is_sub_map_entry_equal(part_value, whole_value)
+        if not entry_is_equal:
+            return False
+    return True
+
+
+def partially_matches(whole_list: list[object], part_element: object) -> bool:
+    for whole_element in whole_list:
+        if is_sub_map_entry_equal(part_element, whole_element):
+            return True
+    return False
+
+
+def is_sub_map_entry_equal(part_value: object, whole_value: object) -> bool:
     if isinstance(part_value, dict) and isinstance(whole_value, dict):
         return is_sub_map(part_value, whole_value)
     elif isinstance(part_value, list) and isinstance(whole_value, list):

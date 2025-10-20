@@ -15,7 +15,8 @@
 #|
 
 from typing import TYPE_CHECKING, cast
-from ..types.TStruct import _STRUCT_NAME
+
+from ..types.type_labels import STRUCT
 
 if TYPE_CHECKING:
     from ...internal.validation.ValidateContext import ValidateContext
@@ -34,4 +35,4 @@ def validate_struct(value: object,
             list[str], ctx.select.get(name) if ctx.select else None)
         return validate_struct_fields(fields, selected_fields, value, ctx)
     else:
-        return get_type_unexpected_validation_failure([], value, _STRUCT_NAME)
+        return get_type_unexpected_validation_failure([], value, STRUCT)

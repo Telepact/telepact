@@ -14,10 +14,8 @@
 #|  limitations under the License.
 #|
 
-def partially_matches(whole_list: list[object], part_element: object) -> bool:
-    from ...internal.mock.IsSubMapEntryEqual import is_sub_map_entry_equal
+from ...internal.mock.IsSubMapEntryEqual import partially_matches as _partially_matches
 
-    for whole_element in whole_list:
-        if is_sub_map_entry_equal(part_element, whole_element):
-            return True
-    return False
+
+def partially_matches(whole_list: list[object], part_element: object) -> bool:
+    return _partially_matches(whole_list, part_element)

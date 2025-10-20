@@ -16,6 +16,8 @@
 
 from typing import TYPE_CHECKING
 
+from .type_labels import BOOLEAN
+from .TType import TType
 
 if TYPE_CHECKING:
     from ..validation.ValidateContext import ValidateContext
@@ -23,10 +25,6 @@ if TYPE_CHECKING:
     from ..validation.ValidationFailure import ValidationFailure
     from .TTypeDeclaration import TTypeDeclaration
     from ..generation.GenerateContext import GenerateContext
-
-from .TType import TType
-
-_BOOLEAN_NAME: str = "Boolean"
 
 
 class TBoolean(TType):
@@ -44,4 +42,4 @@ class TBoolean(TType):
         return generate_random_boolean(blueprint_value, use_blueprint_value, ctx)
 
     def get_name(self, ctx: 'ValidateContext') -> str:
-        return _BOOLEAN_NAME
+        return BOOLEAN

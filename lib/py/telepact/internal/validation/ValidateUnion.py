@@ -15,7 +15,8 @@
 #|
 
 from typing import TYPE_CHECKING, cast
-from ..types.TUnion import _UNION_NAME
+
+from ..types.type_labels import UNION
 from ...internal.validation.ValidationFailure import ValidationFailure
 
 if TYPE_CHECKING:
@@ -39,4 +40,4 @@ def validate_union(value: object,
                 dict[str, object], ctx.select.get(name) if ctx.select else None)
         return validate_union_tags(tags, selected_tags, value, ctx)
     else:
-        return get_type_unexpected_validation_failure([], value, _UNION_NAME)
+        return get_type_unexpected_validation_failure([], value, UNION)

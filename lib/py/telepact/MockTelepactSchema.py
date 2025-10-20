@@ -36,16 +36,34 @@ class MockTelepactSchema:
     @staticmethod
     def from_json(json: str) -> 'MockTelepactSchema':
         from .internal.schema.CreateMockTelepactSchemaFromFileJsonMap import create_mock_telepact_schema_from_file_json_map
-        return create_mock_telepact_schema_from_file_json_map({"auto_": json})
+        parsed_schema = create_mock_telepact_schema_from_file_json_map({"auto_": json})
+        return MockTelepactSchema(
+            parsed_schema.original,
+            parsed_schema.parsed,
+            parsed_schema.request_headers,
+            parsed_schema.response_headers
+        )
 
     @staticmethod
     def from_file_json_map(file_json_map: dict[str, str]) -> 'MockTelepactSchema':
         from .internal.schema.CreateMockTelepactSchemaFromFileJsonMap import create_mock_telepact_schema_from_file_json_map
-        return create_mock_telepact_schema_from_file_json_map(file_json_map)
+        parsed_schema = create_mock_telepact_schema_from_file_json_map(file_json_map)
+        return MockTelepactSchema(
+            parsed_schema.original,
+            parsed_schema.parsed,
+            parsed_schema.request_headers,
+            parsed_schema.response_headers
+        )
 
     @staticmethod
     def from_directory(directory: str) -> 'MockTelepactSchema':
         from .internal.schema.CreateMockTelepactSchemaFromFileJsonMap import create_mock_telepact_schema_from_file_json_map
         from .internal.schema.GetSchemaFileMap import get_schema_file_map
         schema_file_map = get_schema_file_map(directory)
-        return create_mock_telepact_schema_from_file_json_map(schema_file_map)
+        parsed_schema = create_mock_telepact_schema_from_file_json_map(schema_file_map)
+        return MockTelepactSchema(
+            parsed_schema.original,
+            parsed_schema.parsed,
+            parsed_schema.request_headers,
+            parsed_schema.response_headers
+        )

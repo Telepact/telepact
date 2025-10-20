@@ -16,6 +16,8 @@
 
 from typing import TYPE_CHECKING
 
+from .type_labels import BYTES
+from .TType import TType
 
 if TYPE_CHECKING:
     from ..validation.ValidateContext import ValidateContext
@@ -23,10 +25,6 @@ if TYPE_CHECKING:
     from ..validation.ValidationFailure import ValidationFailure
     from .TTypeDeclaration import TTypeDeclaration
     from ..generation.GenerateContext import GenerateContext
-
-from .TType import TType
-
-_BYTES_NAME: str = "Bytes"
 
 class TBytes(TType):
 
@@ -43,4 +41,4 @@ class TBytes(TType):
         return generate_random_bytes(blueprint_value, use_blueprint_value, ctx)
 
     def get_name(self, ctx: 'ValidateContext') -> str:
-        return _BYTES_NAME
+        return BYTES

@@ -15,6 +15,8 @@
 #|
 
 from typing import TYPE_CHECKING
+
+from .type_labels import UNION
 from .TType import TType
 
 if TYPE_CHECKING:
@@ -24,8 +26,6 @@ if TYPE_CHECKING:
     from ..validation.ValidationFailure import ValidationFailure
     from .TStruct import TStruct
     from .TTypeDeclaration import TTypeDeclaration
-
-_UNION_NAME: str = "Object"
 
 
 class TUnion(TType):
@@ -47,4 +47,4 @@ class TUnion(TType):
         return generate_random_union(blueprint_value, use_blueprint_value, self.tags, ctx)
 
     def get_name(self, ctx: 'ValidateContext') -> str:
-        return _UNION_NAME
+        return UNION
