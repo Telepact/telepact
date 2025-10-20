@@ -98,7 +98,8 @@ def consolidate_readme_impl(readme_path: Path, output_path: Path) -> None:
         heading = link_text
         if heading.lower().startswith('the '):
             heading = heading[4:]  # Remove "the " prefix
-        anchor = slugify(link_text)  # Use original link text for anchor to match links
+        # Generate anchor from the cleaned heading so it matches
+        anchor = slugify(heading)
         
         link_map[link_path] = (anchor, heading, doc_content)
     
