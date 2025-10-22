@@ -19,6 +19,8 @@
 ### Encouragements
 - Port at least 25 files at a time.
 
+> **Status note:** The Go implementation consolidated several helpers (notably the generation and validation code) into the `telepact/internal/types` package. The checklist below reflects the actual Go locations for the Python functionality.
+
 
 ## Checklist
 
@@ -41,9 +43,9 @@
 - [x] lib/py/telepact/TypedMessage.py → lib/go/telepact/TypedMessage.go
 - [x] lib/py/telepact/internal/ClientHandleMessage.py → lib/go/telepact/internal/ClientHandleMessage.go
 - [x] lib/py/telepact/internal/DeserializeInternal.py → lib/go/telepact/internal/DeserializeInternal.go
-- [ ] lib/py/telepact/internal/HandleMessage.py → lib/go/telepact/internal/HandleMessage.go
-- [ ] lib/py/telepact/internal/ParseRequestMessage.py → lib/go/telepact/internal/ParseRequestMessage.go
-- [ ] lib/py/telepact/internal/ProcessBytes.py → lib/go/telepact/internal/ProcessBytes.go
+- [x] lib/py/telepact/internal/HandleMessage.py → lib/go/telepact/internal/HandleMessage.go
+- [x] lib/py/telepact/internal/ParseRequestMessage.py → lib/go/telepact/internal/ParseRequestMessage.go
+- [x] lib/py/telepact/internal/ProcessBytes.py → lib/go/telepact/internal/ProcessBytes.go
 - [x] lib/py/telepact/internal/SelectStructFields.py → lib/go/telepact/internal/SelectStructFields.go
 - [x] lib/py/telepact/internal/SerializeInternal.py → lib/go/telepact/internal/SerializeInternal.go
 - [x] lib/py/telepact/internal/binary/Base64Encoder.py → lib/go/telepact/internal/binary/Base64Encoder.go
@@ -82,22 +84,22 @@
 - [x] lib/py/telepact/internal/binary/UnpackBody.py → lib/go/telepact/internal/binary/UnpackBody.go
 - [x] lib/py/telepact/internal/binary/UnpackList.py → lib/go/telepact/internal/binary/UnpackList.go
 - [x] lib/py/telepact/internal/binary/UnpackMap.py → lib/go/telepact/internal/binary/UnpackMap.go
-- [x] lib/py/telepact/internal/generation/GenerateContext.py → lib/go/telepact/internal/generation/GenerateContext.go
-- [x] lib/py/telepact/internal/generation/GenerateRandomAny.py → lib/go/telepact/internal/generation/GenerateRandomAny.go
-- [x] lib/py/telepact/internal/generation/GenerateRandomArray.py → lib/go/telepact/internal/generation/GenerateRandomArray.go
-- [x] lib/py/telepact/internal/generation/GenerateRandomBoolean.py → lib/go/telepact/internal/generation/GenerateRandomBoolean.go
-- [x] lib/py/telepact/internal/generation/GenerateRandomBytes.py → lib/go/telepact/internal/generation/GenerateRandomBytes.go
-- [x] lib/py/telepact/internal/generation/GenerateRandomFn.py → lib/go/telepact/internal/generation/GenerateRandomFn.go
-- [x] lib/py/telepact/internal/generation/GenerateRandomInteger.py → lib/go/telepact/internal/generation/GenerateRandomInteger.go
-- [x] lib/py/telepact/internal/generation/GenerateRandomMockCall.py → lib/go/telepact/internal/generation/GenerateRandomMockCall.go
-- [x] lib/py/telepact/internal/generation/GenerateRandomMockStub.py → lib/go/telepact/internal/generation/GenerateRandomMockStub.go
-- [x] lib/py/telepact/internal/generation/GenerateRandomNumber.py → lib/go/telepact/internal/generation/GenerateRandomNumber.go
-- [x] lib/py/telepact/internal/generation/GenerateRandomObject.py → lib/go/telepact/internal/generation/GenerateRandomObject.go
-- [x] lib/py/telepact/internal/generation/GenerateRandomSelect.py → lib/go/telepact/internal/generation/GenerateRandomSelect.go
-- [x] lib/py/telepact/internal/generation/GenerateRandomString.py → lib/go/telepact/internal/generation/GenerateRandomString.go
-- [x] lib/py/telepact/internal/generation/GenerateRandomStruct.py → lib/go/telepact/internal/generation/GenerateRandomStruct.go
-- [x] lib/py/telepact/internal/generation/GenerateRandomUnion.py → lib/go/telepact/internal/generation/GenerateRandomUnion.go
-- [x] lib/py/telepact/internal/generation/GenerateRandomValueOfType.py → lib/go/telepact/internal/generation/GenerateRandomValueOfType.go
+- [x] lib/py/telepact/internal/generation/GenerateContext.py → lib/go/telepact/internal/types/GenerateContext.go
+- [x] lib/py/telepact/internal/generation/GenerateRandomAny.py → lib/go/telepact/internal/types/GenerateRandomAny.go
+- [x] lib/py/telepact/internal/generation/GenerateRandomArray.py → lib/go/telepact/internal/types/GenerateRandomArray.go
+- [x] lib/py/telepact/internal/generation/GenerateRandomBoolean.py → lib/go/telepact/internal/types/GenerateRandomBoolean.go
+- [x] lib/py/telepact/internal/generation/GenerateRandomBytes.py → lib/go/telepact/internal/types/GenerateRandomBytes.go
+- [x] lib/py/telepact/internal/generation/GenerateRandomFn.py → lib/go/telepact/internal/types/GenerateRandomFn.go
+- [x] lib/py/telepact/internal/generation/GenerateRandomInteger.py → lib/go/telepact/internal/types/GenerateRandomInteger.go
+- [x] lib/py/telepact/internal/generation/GenerateRandomMockCall.py → lib/go/telepact/internal/types/GenerateRandomMockCall.go
+- [x] lib/py/telepact/internal/generation/GenerateRandomMockStub.py → lib/go/telepact/internal/types/GenerateRandomMockStub.go
+- [x] lib/py/telepact/internal/generation/GenerateRandomNumber.py → lib/go/telepact/internal/types/GenerateRandomNumber.go
+- [x] lib/py/telepact/internal/generation/GenerateRandomObject.py → lib/go/telepact/internal/types/GenerateRandomObject.go
+- [x] lib/py/telepact/internal/generation/GenerateRandomSelect.py → lib/go/telepact/internal/types/GenerateRandomSelect.go
+- [x] lib/py/telepact/internal/generation/GenerateRandomString.py → lib/go/telepact/internal/types/GenerateRandomString.go
+- [x] lib/py/telepact/internal/generation/GenerateRandomStruct.py → lib/go/telepact/internal/types/GenerateRandomStruct.go
+- [x] lib/py/telepact/internal/generation/GenerateRandomUnion.py → lib/go/telepact/internal/types/GenerateRandomUnion.go
+- [x] lib/py/telepact/internal/generation/GenerateRandomValueOfType.py → lib/go/telepact/internal/types/GenerateRandomValueOfType.go
 - [x] lib/py/telepact/internal/mock/IsSubMap.py → lib/go/telepact/internal/mock/IsSubMap.go
 - [x] lib/py/telepact/internal/mock/IsSubMapEntryEqual.py → lib/go/telepact/internal/mock/IsSubMapEntryEqual.go
 - [ ] lib/py/telepact/internal/mock/MockHandle.py → lib/go/telepact/internal/mock/MockHandle.go
@@ -133,47 +135,53 @@
 - [ ] lib/py/telepact/internal/schema/ParseTypeDeclaration.py → lib/go/telepact/internal/schema/ParseTypeDeclaration.go
 - [ ] lib/py/telepact/internal/schema/ParseUnionType.py → lib/go/telepact/internal/schema/ParseUnionType.go
 - [ ] lib/py/telepact/internal/schema/SchemaParseFailure.py → lib/go/telepact/internal/schema/SchemaParseFailure.go
-- [ ] lib/py/telepact/internal/types/GetType.py → lib/go/telepact/internal/types/GetType.go
-- [ ] lib/py/telepact/internal/types/TAny.py → lib/go/telepact/internal/types/TAny.go
-- [ ] lib/py/telepact/internal/types/TArray.py → lib/go/telepact/internal/types/TArray.go
-- [ ] lib/py/telepact/internal/types/TBoolean.py → lib/go/telepact/internal/types/TBoolean.go
-- [ ] lib/py/telepact/internal/types/TBytes.py → lib/go/telepact/internal/types/TBytes.go
-- [ ] lib/py/telepact/internal/types/TError.py → lib/go/telepact/internal/types/TError.go
-- [ ] lib/py/telepact/internal/types/TFieldDeclaration.py → lib/go/telepact/internal/types/TFieldDeclaration.go
-- [ ] lib/py/telepact/internal/types/THeaders.py → lib/go/telepact/internal/types/THeaders.go
-- [ ] lib/py/telepact/internal/types/TInteger.py → lib/go/telepact/internal/types/TInteger.go
-- [ ] lib/py/telepact/internal/types/TMockCall.py → lib/go/telepact/internal/types/TMockCall.go
-- [ ] lib/py/telepact/internal/types/TMockStub.py → lib/go/telepact/internal/types/TMockStub.go
-- [ ] lib/py/telepact/internal/types/TNumber.py → lib/go/telepact/internal/types/TNumber.go
-- [ ] lib/py/telepact/internal/types/TObject.py → lib/go/telepact/internal/types/TObject.go
-- [ ] lib/py/telepact/internal/types/TSelect.py → lib/go/telepact/internal/types/TSelect.go
-- [ ] lib/py/telepact/internal/types/TString.py → lib/go/telepact/internal/types/TString.go
-- [ ] lib/py/telepact/internal/types/TStruct.py → lib/go/telepact/internal/types/TStruct.go
-- [ ] lib/py/telepact/internal/types/TType.py → lib/go/telepact/internal/types/TType.go
-- [ ] lib/py/telepact/internal/types/TTypeDeclaration.py → lib/go/telepact/internal/types/TTypeDeclaration.go
-- [ ] lib/py/telepact/internal/types/TUnion.py → lib/go/telepact/internal/types/TUnion.go
-- [ ] lib/py/telepact/internal/validation/GetInvalidErrorMessage.py → lib/go/telepact/internal/validation/GetInvalidErrorMessage.go
-- [ ] lib/py/telepact/internal/validation/GetTypeUnexpectedValidationFailure.py → lib/go/telepact/internal/validation/GetTypeUnexpectedValidationFailure.go
-- [x] lib/py/telepact/internal/validation/InvalidMessage.py → lib/go/telepact/internal/validation/InvalidMessage.go
-- [x] lib/py/telepact/internal/validation/InvalidMessageBody.py → lib/go/telepact/internal/validation/InvalidMessageBody.go
-- [ ] lib/py/telepact/internal/validation/MapValidationFailuresToInvalidFieldCases.py → lib/go/telepact/internal/validation/MapValidationFailuresToInvalidFieldCases.go
-- [ ] lib/py/telepact/internal/validation/ValidateArray.py → lib/go/telepact/internal/validation/ValidateArray.go
-- [ ] lib/py/telepact/internal/validation/ValidateBoolean.py → lib/go/telepact/internal/validation/ValidateBoolean.go
-- [ ] lib/py/telepact/internal/validation/ValidateBytes.py → lib/go/telepact/internal/validation/ValidateBytes.go
-- [ ] lib/py/telepact/internal/validation/ValidateContext.py → lib/go/telepact/internal/validation/ValidateContext.go
-- [ ] lib/py/telepact/internal/validation/ValidateHeaders.py → lib/go/telepact/internal/validation/ValidateHeaders.go
-- [ ] lib/py/telepact/internal/validation/ValidateInteger.py → lib/go/telepact/internal/validation/ValidateInteger.go
-- [ ] lib/py/telepact/internal/validation/ValidateMockCall.py → lib/go/telepact/internal/validation/ValidateMockCall.go
-- [ ] lib/py/telepact/internal/validation/ValidateMockStub.py → lib/go/telepact/internal/validation/ValidateMockStub.go
-- [ ] lib/py/telepact/internal/validation/ValidateNumber.py → lib/go/telepact/internal/validation/ValidateNumber.go
-- [ ] lib/py/telepact/internal/validation/ValidateObject.py → lib/go/telepact/internal/validation/ValidateObject.go
-- [ ] lib/py/telepact/internal/validation/ValidateResult.py → lib/go/telepact/internal/validation/ValidateResult.go
-- [ ] lib/py/telepact/internal/validation/ValidateSelect.py → lib/go/telepact/internal/validation/ValidateSelect.go
-- [ ] lib/py/telepact/internal/validation/ValidateString.py → lib/go/telepact/internal/validation/ValidateString.go
-- [ ] lib/py/telepact/internal/validation/ValidateStruct.py → lib/go/telepact/internal/validation/ValidateStruct.go
-- [ ] lib/py/telepact/internal/validation/ValidateStructFields.py → lib/go/telepact/internal/validation/ValidateStructFields.go
-- [ ] lib/py/telepact/internal/validation/ValidateUnion.py → lib/go/telepact/internal/validation/ValidateUnion.go
-- [ ] lib/py/telepact/internal/validation/ValidateUnionStruct.py → lib/go/telepact/internal/validation/ValidateUnionStruct.go
-- [ ] lib/py/telepact/internal/validation/ValidateUnionTags.py → lib/go/telepact/internal/validation/ValidateUnionTags.go
-- [ ] lib/py/telepact/internal/validation/ValidateValueOfType.py → lib/go/telepact/internal/validation/ValidateValueOfType.go
-- [ ] lib/py/telepact/internal/validation/ValidationFailure.py → lib/go/telepact/internal/validation/ValidationFailure.go
+
+### Internal Types
+
+- [x] lib/py/telepact/internal/types/GetType.py → lib/go/telepact/internal/types/GetType.go
+- [x] lib/py/telepact/internal/types/TAny.py → lib/go/telepact/internal/types/TAny.go
+- [x] lib/py/telepact/internal/types/TArray.py → lib/go/telepact/internal/types/TArray.go
+- [x] lib/py/telepact/internal/types/TBoolean.py → lib/go/telepact/internal/types/TBoolean.go
+- [x] lib/py/telepact/internal/types/TBytes.py → lib/go/telepact/internal/types/TBytes.go
+- [x] lib/py/telepact/internal/types/TError.py → lib/go/telepact/internal/types/TError.go
+- [x] lib/py/telepact/internal/types/TFieldDeclaration.py → lib/go/telepact/internal/types/TFieldDeclaration.go
+- [x] lib/py/telepact/internal/types/THeaders.py → lib/go/telepact/internal/types/THeaders.go
+- [x] lib/py/telepact/internal/types/TInteger.py → lib/go/telepact/internal/types/TInteger.go
+- [x] lib/py/telepact/internal/types/TMockCall.py → lib/go/telepact/internal/types/TMockCall.go
+- [x] lib/py/telepact/internal/types/TMockStub.py → lib/go/telepact/internal/types/TMockStub.go
+- [x] lib/py/telepact/internal/types/TNumber.py → lib/go/telepact/internal/types/TNumber.go
+- [x] lib/py/telepact/internal/types/TObject.py → lib/go/telepact/internal/types/TObject.go
+- [x] lib/py/telepact/internal/types/TSelect.py → lib/go/telepact/internal/types/TSelect.go
+- [x] lib/py/telepact/internal/types/TString.py → lib/go/telepact/internal/types/TString.go
+- [x] lib/py/telepact/internal/types/TStruct.py → lib/go/telepact/internal/types/TStruct.go
+- [x] lib/py/telepact/internal/types/TType.py → lib/go/telepact/internal/types/TType.go
+- [x] lib/py/telepact/internal/types/TTypeDeclaration.py → lib/go/telepact/internal/types/TTypeDeclaration.go
+- [x] lib/py/telepact/internal/types/TUnion.py → lib/go/telepact/internal/types/TUnion.go
+
+### Validation & Error Helpers
+
+- [x] lib/py/telepact/internal/validation/GetInvalidErrorMessage.py → lib/go/telepact/internal/validation/GetInvalidErrorMessage.go
+- [x] lib/py/telepact/internal/validation/GetTypeUnexpectedValidationFailure.py → lib/go/telepact/internal/types/ValidationHelpers.go
+- [x] lib/py/telepact/internal/validation/InvalidMessage.py → lib/go/telepact/internal/types/InvalidMessage.go
+- [x] lib/py/telepact/internal/validation/InvalidMessageBody.py → lib/go/telepact/internal/types/InvalidMessageBody.go
+- [x] lib/py/telepact/internal/validation/MapValidationFailuresToInvalidFieldCases.py → lib/go/telepact/internal/types/ValidationMapping.go
+- [x] lib/py/telepact/internal/validation/ValidateArray.py → lib/go/telepact/internal/types/ValidationPrimitives.go
+- [x] lib/py/telepact/internal/validation/ValidateBoolean.py → lib/go/telepact/internal/types/ValidationPrimitives.go
+- [x] lib/py/telepact/internal/validation/ValidateBytes.py → lib/go/telepact/internal/types/ValidationPrimitives.go
+- [x] lib/py/telepact/internal/validation/ValidateContext.py → lib/go/telepact/internal/types/ValidateContext.go
+- [x] lib/py/telepact/internal/validation/ValidateHeaders.py → lib/go/telepact/internal/types/ValidationHeaders.go
+- [x] lib/py/telepact/internal/validation/ValidateInteger.py → lib/go/telepact/internal/types/ValidationPrimitives.go
+- [x] lib/py/telepact/internal/validation/ValidateMockCall.py → lib/go/telepact/internal/types/ValidationMock.go
+- [x] lib/py/telepact/internal/validation/ValidateMockStub.py → lib/go/telepact/internal/types/ValidationMock.go
+- [x] lib/py/telepact/internal/validation/ValidateNumber.py → lib/go/telepact/internal/types/ValidationPrimitives.go
+- [x] lib/py/telepact/internal/validation/ValidateObject.py → lib/go/telepact/internal/types/ValidationPrimitives.go
+- [x] lib/py/telepact/internal/validation/ValidateResult.py → lib/go/telepact/internal/validation/ValidateResult.go
+- [x] lib/py/telepact/internal/validation/ValidateSelect.py → lib/go/telepact/internal/types/ValidationStruct.go
+- [x] lib/py/telepact/internal/validation/ValidateString.py → lib/go/telepact/internal/types/ValidationPrimitives.go
+- [x] lib/py/telepact/internal/validation/ValidateStruct.py → lib/go/telepact/internal/types/ValidationStruct.go
+- [x] lib/py/telepact/internal/validation/ValidateStructFields.py → lib/go/telepact/internal/types/ValidationStruct.go (helper `validateStructFields`)
+- [x] lib/py/telepact/internal/validation/ValidateUnion.py → lib/go/telepact/internal/types/ValidationStruct.go
+- [x] lib/py/telepact/internal/validation/ValidateUnionStruct.py → lib/go/telepact/internal/types/ValidationStruct.go (helper `validateUnionStruct` logic)
+- [x] lib/py/telepact/internal/validation/ValidateUnionTags.py → lib/go/telepact/internal/types/ValidationStruct.go (helper `validateUnionTags`)
+- [x] lib/py/telepact/internal/validation/ValidateValueOfType.py → lib/go/telepact/internal/types/ValidationPrimitives.go
+- [x] lib/py/telepact/internal/validation/ValidationFailure.py → lib/go/telepact/internal/types/ValidationFailure.go
