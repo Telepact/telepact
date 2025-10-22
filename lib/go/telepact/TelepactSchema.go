@@ -62,3 +62,35 @@ func TelepactSchemaFromDirectory(directory string) (*TelepactSchema, error) {
 	}
 	return schema.CreateTelepactSchemaFromFileJSONMap(schemaFileMap)
 }
+
+// ParsedDefinitions returns the parsed schema definitions keyed by message name.
+func (t *TelepactSchema) ParsedDefinitions() map[string]*types.TType {
+	if t == nil {
+		return nil
+	}
+	return t.Parsed
+}
+
+// RequestHeaderDeclarations returns the parsed request header declarations keyed by header name.
+func (t *TelepactSchema) RequestHeaderDeclarations() map[string]*types.TFieldDeclaration {
+	if t == nil {
+		return nil
+	}
+	return t.ParsedRequestHeaders
+}
+
+// ResponseHeaderDeclarations returns the parsed response header declarations keyed by header name.
+func (t *TelepactSchema) ResponseHeaderDeclarations() map[string]*types.TFieldDeclaration {
+	if t == nil {
+		return nil
+	}
+	return t.ParsedResponseHeaders
+}
+
+// OriginalDefinitions returns the original schema definitions slice.
+func (t *TelepactSchema) OriginalDefinitions() []any {
+	if t == nil {
+		return nil
+	}
+	return t.Original
+}

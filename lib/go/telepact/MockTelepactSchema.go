@@ -63,6 +63,38 @@ func MockTelepactSchemaFromDirectory(directory string) (*MockTelepactSchema, err
 	return schema.CreateMockTelepactSchemaFromFileJSONMap(schemaFileMap)
 }
 
+// ParsedDefinitions returns the parsed schema definitions keyed by message name.
+func (m *MockTelepactSchema) ParsedDefinitions() map[string]*types.TType {
+	if m == nil {
+		return nil
+	}
+	return m.Parsed
+}
+
+// RequestHeaderDeclarations returns the parsed request header declarations keyed by header name.
+func (m *MockTelepactSchema) RequestHeaderDeclarations() map[string]*types.TFieldDeclaration {
+	if m == nil {
+		return nil
+	}
+	return m.ParsedRequestHeaders
+}
+
+// ResponseHeaderDeclarations returns the parsed response header declarations keyed by header name.
+func (m *MockTelepactSchema) ResponseHeaderDeclarations() map[string]*types.TFieldDeclaration {
+	if m == nil {
+		return nil
+	}
+	return m.ParsedResponseHeaders
+}
+
+// OriginalDefinitions returns the original schema definitions slice.
+func (m *MockTelepactSchema) OriginalDefinitions() []any {
+	if m == nil {
+		return nil
+	}
+	return m.Original
+}
+
 func cloneAnySlice(values []any) []any {
 	if values == nil {
 		return nil

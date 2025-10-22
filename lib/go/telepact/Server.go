@@ -115,16 +115,51 @@ func (s *Server) ProcessWithHeaders(requestMessageBytes []byte, overrideHeaders 
 		overrideHeaders = map[string]any{}
 	}
 
-	return telepactinternal.ProcessBytes(
+	deserialize := func(bytes []byte) (telepactinternal.ServerMessage, error) {
+		msg, err := s.serializer.Deserialize(bytes)
+		if err != nil {
+			return telepactinternal.ServerMessage{}, err
+		}
+		return telepactinternal.ServerMessage{Headers: msg.Headers, Body: msg.Body}, nil
+	}
+
+	serialize := func(message telepactinternal.ServerMessage) ([]byte, error) {
+		goMessage := NewMessage(message.Headers, message.Body)
+		return s.serializer.Serialize(goMessage)
+	}
+
+	internalOnRequest := func(message telepactinternal.ServerMessage) {
+		s.onRequest(NewMessage(message.Headers, message.Body))
+	}
+
+	internalOnResponse := func(message telepactinternal.ServerMessage) {
+		s.onResponse(NewMessage(message.Headers, message.Body))
+	}
+
+	internalHandler := func(message telepactinternal.ServerMessage) (telepactinternal.ServerMessage, error) {
+		response, err := s.handler(NewMessage(message.Headers, message.Body))
+		if err != nil {
+			return telepactinternal.ServerMessage{}, err
+		}
+		return telepactinternal.ServerMessage{Headers: response.Headers, Body: response.Body}, nil
+	}
+
+	responseMessage, responseBytes, err := telepactinternal.ProcessBytes(
 		requestMessageBytes,
 		overrideHeaders,
-		s.serializer,
+		deserialize,
+		serialize,
 		s.telepactSchema,
 		s.onError,
-		s.onRequest,
-		s.onResponse,
-		s.handler,
+		internalOnRequest,
+		internalOnResponse,
+		internalHandler,
 	)
+	if err != nil {
+		return Response{}, err
+	}
+
+	return NewResponse(responseBytes, responseMessage.Headers), nil
 }
 
 // Process processes a request message without any header overrides.
