@@ -35,7 +35,7 @@ func (t *TObject) GetTypeParameterCount() int {
 
 // Validate implements TType.
 func (t *TObject) Validate(value any, typeParameters []*TTypeDeclaration, ctx *ValidateContext) []*ValidationFailure {
-	return ValidateObject(value, ctx)
+	return ValidateObject(value, typeParameters, ctx)
 }
 
 // GenerateRandomValue implements TType.

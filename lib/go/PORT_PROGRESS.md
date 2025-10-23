@@ -108,9 +108,9 @@
 - [x] lib/py/telepact/internal/mock/PartiallyMatches.py → lib/go/telepact/internal/mock/PartiallyMatches.go
 - [x] lib/py/telepact/internal/mock/Verify.py → lib/go/telepact/internal/mock/Verify.go
 - [x] lib/py/telepact/internal/mock/VerifyNoMoreInteractions.py → lib/go/telepact/internal/mock/VerifyNoMoreInteractions.go
-- [ ] lib/py/telepact/internal/schema/ApplyErrorToParsedTypes.py → lib/go/telepact/internal/schema/ApplyErrorToParsedTypes.go
-- [ ] lib/py/telepact/internal/schema/CatchErrorCollisions.py → lib/go/telepact/internal/schema/CatchErrorCollisions.go
-- [ ] lib/py/telepact/internal/schema/CatchHeaderCollisions.py → lib/go/telepact/internal/schema/CatchHeaderCollisions.go
+- [x] lib/py/telepact/internal/schema/ApplyErrorToParsedTypes.py → lib/go/telepact/internal/schema/ApplyErrorToParsedTypes.go
+- [x] lib/py/telepact/internal/schema/CatchErrorCollisions.py → lib/go/telepact/internal/schema/CatchErrorCollisions.go
+- [x] lib/py/telepact/internal/schema/CatchHeaderCollisions.py → lib/go/telepact/internal/schema/CatchHeaderCollisions.go
 - [ ] lib/py/telepact/internal/schema/CreateMockTelepactSchemaFromFileJsonMap.py → lib/go/telepact/internal/schema/CreateMockTelepactSchemaFromFileJsonMap.go
 - [ ] lib/py/telepact/internal/schema/CreateTelepactSchemaFromFileJsonMap.py → lib/go/telepact/internal/schema/CreateTelepactSchemaFromFileJsonMap.go
 - [ ] lib/py/telepact/internal/schema/DerivePossibleSelects.py → lib/go/telepact/internal/schema/DerivePossibleSelects.go
@@ -120,10 +120,10 @@
 - [ ] lib/py/telepact/internal/schema/GetInternalTelepactJson.py → lib/go/telepact/internal/schema/GetInternalTelepactJson.go
 - [ ] lib/py/telepact/internal/schema/GetMockTelepactJson.py → lib/go/telepact/internal/schema/GetMockTelepactJson.go
 - [ ] lib/py/telepact/internal/schema/GetOrParseType.py → lib/go/telepact/internal/schema/GetOrParseType.go
-- [ ] lib/py/telepact/internal/schema/GetPathDocumentCoordinatesPseudoJson.py → lib/go/telepact/internal/schema/GetPathDocumentCoordinatesPseudoJson.go
-- [ ] lib/py/telepact/internal/schema/GetSchemaFileMap.py → lib/go/telepact/internal/schema/GetSchemaFileMap.go
-- [ ] lib/py/telepact/internal/schema/GetTypeUnexpectedParseFailure.py → lib/go/telepact/internal/schema/GetTypeUnexpectedParseFailure.go
-- [ ] lib/py/telepact/internal/schema/MapSchemaParseFailuresToPseudoJson.py → lib/go/telepact/internal/schema/MapSchemaParseFailuresToPseudoJson.go
+- [x] lib/py/telepact/internal/schema/GetPathDocumentCoordinatesPseudoJson.py → lib/go/telepact/internal/schema/GetPathDocumentCoordinatesPseudoJSON.go
+- [x] lib/py/telepact/internal/schema/GetSchemaFileMap.py → lib/go/telepact/internal/schema/GetSchemaFileMap.go
+- [x] lib/py/telepact/internal/schema/GetTypeUnexpectedParseFailure.py → lib/go/telepact/internal/schema/GetTypeUnexpectedParseFailure.go
+- [x] lib/py/telepact/internal/schema/MapSchemaParseFailuresToPseudoJson.py → lib/go/telepact/internal/schema/MapSchemaParseFailuresToPseudoJSON.go
 - [ ] lib/py/telepact/internal/schema/ParseContext.py → lib/go/telepact/internal/schema/ParseContext.go
 - [ ] lib/py/telepact/internal/schema/ParseErrorType.py → lib/go/telepact/internal/schema/ParseErrorType.go
 - [ ] lib/py/telepact/internal/schema/ParseField.py → lib/go/telepact/internal/schema/ParseField.go
@@ -134,7 +134,7 @@
 - [ ] lib/py/telepact/internal/schema/ParseTelepactSchema.py → lib/go/telepact/internal/schema/ParseTelepactSchema.go
 - [ ] lib/py/telepact/internal/schema/ParseTypeDeclaration.py → lib/go/telepact/internal/schema/ParseTypeDeclaration.go
 - [ ] lib/py/telepact/internal/schema/ParseUnionType.py → lib/go/telepact/internal/schema/ParseUnionType.go
-- [ ] lib/py/telepact/internal/schema/SchemaParseFailure.py → lib/go/telepact/internal/schema/SchemaParseFailure.go
+- [x] lib/py/telepact/internal/schema/SchemaParseFailure.py → lib/go/telepact/internal/schema/SchemaParseFailure.go
 
 ### Internal Types
 
