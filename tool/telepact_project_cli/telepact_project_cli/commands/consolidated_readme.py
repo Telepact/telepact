@@ -47,6 +47,17 @@ def extract_markdown_links(content: str) -> List[Tuple[str, str, str]]:
     return [(f'[{text}]({path})', text, path) for text, path in matches]
 
 
+def extract_github_raw_links(content: str) -> List[Tuple[str, str, str]]:
+    """
+    Extract GitHub raw.githubusercontent.com links from content.
+    Returns list of tuples: (full_match, link_text, url)
+    """
+    # Match links to raw.githubusercontent.com
+    pattern = r'\[([^\]]+)\]\((https://raw\.githubusercontent\.com/Telepact/telepact/refs/heads/main/([^\)]+))\)'
+    matches = re.findall(pattern, content)
+    return [(f'[{text}]({url})', text, url, local_path) for text, url, local_path in matches]
+
+
 def read_file(file_path: Path) -> str:
     """Read a file and return its content."""
     try:
@@ -129,6 +140,42 @@ def consolidate_readme_impl(readme_path: Path, output_path: Path) -> None:
                 content_lines.append(line)
         
         consolidated += '\n'.join(content_lines).strip()
+    
+    # Extract and process GitHub raw links
+    github_links = extract_github_raw_links(consolidated)
+    code_files: Dict[str, Tuple[str, str, str]] = {}  # local_path -> (anchor, filename, content)
+    
+    for full_match, link_text, url, local_path in github_links:
+        if local_path in code_files:
+            continue  # Already processed this file
+        
+        # Read the local file
+        file_path = base_dir / local_path
+        file_content = read_file(file_path)
+        if not file_content:
+            continue
+        
+        # Generate a heading from the filename
+        filename = Path(local_path).name
+        heading = filename.replace('.', ' ').replace('-', ' ').title()
+        anchor = slugify(filename)
+        
+        code_files[local_path] = (anchor, filename, file_content)
+    
+    # Replace GitHub raw links with anchor links
+    for full_match, link_text, url, local_path in github_links:
+        if local_path in code_files:
+            anchor, _, _ = code_files[local_path]
+            new_link = f'[{link_text}](#{anchor})'
+            consolidated = consolidated.replace(full_match, new_link)
+    
+    # Add Appendix section with code files
+    if code_files:
+        consolidated += "\n\n---\n\n# Appendix\n\n"
+        
+        for local_path, (anchor, filename, file_content) in code_files.items():
+            consolidated += f"## {filename}\n\n"
+            consolidated += f"```json\n{file_content}\n```\n\n"
     
     # Write the consolidated README
     output_path.parent.mkdir(parents=True, exist_ok=True)
