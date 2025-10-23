@@ -30,7 +30,7 @@ func NewTObject() *TObject {
 
 // GetTypeParameterCount implements TType.
 func (t *TObject) GetTypeParameterCount() int {
-	return 0
+	return 1
 }
 
 // Validate implements TType.

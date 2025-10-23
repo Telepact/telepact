@@ -49,10 +49,13 @@ func GenerateRandomArray(blueprintValue any, useBlueprintValue bool, typeParamet
 }
 
 func toAnySlice(value any) []any {
-	switch typed := value.(type) {
-	case []any:
-		return typed
-	default:
-		return []any{}
+	if value == nil {
+		return nil
 	}
+
+	if coerced, ok := coerceToInterfaceSlice(value); ok {
+		return coerced
+	}
+
+	return nil
 }
