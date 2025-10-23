@@ -14,14 +14,18 @@
 //|  limitations under the License.
 //|
 
-package internal
+package schema
 
-import "github.com/telepact/telepact/lib/go/telepact/internal/types"
+// ParseError represents a collection of schema parse failures.
+type ParseError struct {
+    Failures     []*SchemaParseFailure
+    DocumentJSON map[string]string
+}
 
-// SchemaAccessor exposes the Telepact schema details required by server helpers.
-type SchemaAccessor interface {
-	ParsedDefinitions() map[string]types.TType
-	RequestHeaderDeclarations() map[string]*types.TFieldDeclaration
-	ResponseHeaderDeclarations() map[string]*types.TFieldDeclaration
-	OriginalDefinitions() []any
+// Error implements the error interface.
+func (e *ParseError) Error() string {
+    if e == nil {
+        return ""
+    }
+    return "telepact: schema parse failure"
 }

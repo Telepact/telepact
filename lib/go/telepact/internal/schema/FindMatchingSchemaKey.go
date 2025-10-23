@@ -14,14 +14,19 @@
 //|  limitations under the License.
 //|
 
-package internal
+package schema
 
-import "github.com/telepact/telepact/lib/go/telepact/internal/types"
+import "strings"
 
-// SchemaAccessor exposes the Telepact schema details required by server helpers.
-type SchemaAccessor interface {
-	ParsedDefinitions() map[string]types.TType
-	RequestHeaderDeclarations() map[string]*types.TFieldDeclaration
-	ResponseHeaderDeclarations() map[string]*types.TFieldDeclaration
-	OriginalDefinitions() []any
+// FindMatchingSchemaKey finds an existing schema key equivalent to the supplied key, accounting for info keys.
+func FindMatchingSchemaKey(schemaKeys map[string]struct{}, schemaKey string) string {
+    for key := range schemaKeys {
+        if strings.HasPrefix(schemaKey, "info.") && strings.HasPrefix(key, "info.") {
+            return key
+        }
+        if key == schemaKey {
+            return key
+        }
+    }
+    return ""
 }

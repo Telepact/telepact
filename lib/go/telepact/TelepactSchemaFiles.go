@@ -25,9 +25,12 @@ type TelepactSchemaFiles struct {
 
 // NewTelepactSchemaFiles constructs a TelepactSchemaFiles instance by reading schema files from a directory.
 func NewTelepactSchemaFiles(directory string) (*TelepactSchemaFiles, error) {
-	fileMap, err := schema.GetSchemaFileMap(directory)
+	fileMap, parseFailures, err := schema.GetSchemaFileMap(directory)
 	if err != nil {
 		return nil, err
+	}
+	if len(parseFailures) > 0 {
+		return nil, NewTelepactSchemaParseError(parseFailures, fileMap)
 	}
 
 	return &TelepactSchemaFiles{

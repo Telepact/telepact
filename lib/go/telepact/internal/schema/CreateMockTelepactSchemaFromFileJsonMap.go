@@ -14,14 +14,16 @@
 //|  limitations under the License.
 //|
 
-package internal
+package schema
 
-import "github.com/telepact/telepact/lib/go/telepact/internal/types"
+// CreateMockTelepactSchemaFromFileJSONMap constructs a mock Telepact schema from the supplied JSON documents map.
+func CreateMockTelepactSchemaFromFileJSONMap(jsonDocuments map[string]string) (*ParsedSchemaResult, error) {
+    finalDocuments := make(map[string]string, len(jsonDocuments)+1)
+    for key, value := range jsonDocuments {
+        finalDocuments[key] = value
+    }
 
-// SchemaAccessor exposes the Telepact schema details required by server helpers.
-type SchemaAccessor interface {
-	ParsedDefinitions() map[string]types.TType
-	RequestHeaderDeclarations() map[string]*types.TFieldDeclaration
-	ResponseHeaderDeclarations() map[string]*types.TFieldDeclaration
-	OriginalDefinitions() []any
+    finalDocuments["mock_"] = GetMockTelepactJSON()
+
+    return CreateTelepactSchemaFromFileJSONMap(finalDocuments)
 }

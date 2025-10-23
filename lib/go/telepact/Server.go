@@ -82,7 +82,7 @@ func NewServer(telepactSchema *TelepactSchema, handler ServerHandler, options *S
 		serializationImpl = NewDefaultSerialization()
 	}
 
-	binaryEncoding, err := binary.ConstructBinaryEncoding(telepactSchema)
+	binaryEncoding, err := binary.ConstructBinaryEncoding(telepactSchema.Parsed)
 	if err != nil {
 		return nil, err
 	}

@@ -14,14 +14,14 @@
 //|  limitations under the License.
 //|
 
-package internal
+package schema
 
 import "github.com/telepact/telepact/lib/go/telepact/internal/types"
 
-// SchemaAccessor exposes the Telepact schema details required by server helpers.
-type SchemaAccessor interface {
-	ParsedDefinitions() map[string]types.TType
-	RequestHeaderDeclarations() map[string]*types.TFieldDeclaration
-	ResponseHeaderDeclarations() map[string]*types.TFieldDeclaration
-	OriginalDefinitions() []any
+// ParsedSchemaResult contains the parsed schema artifacts required to construct a Telepact schema.
+type ParsedSchemaResult struct {
+	Original              []any
+	Parsed                map[string]types.TType
+	ParsedRequestHeaders  map[string]*types.TFieldDeclaration
+	ParsedResponseHeaders map[string]*types.TFieldDeclaration
 }

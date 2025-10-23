@@ -24,7 +24,7 @@ import (
 )
 
 // ConstructBinaryEncoding builds a BinaryEncoding from the supplied parsed Telepact schema types.
-func ConstructBinaryEncoding(parsed map[string]*types.TType) (*BinaryEncoding, error) {
+func ConstructBinaryEncoding(parsed map[string]types.TType) (*BinaryEncoding, error) {
 	allKeys := make(map[string]struct{})
 
 	for key, value := range parsed {

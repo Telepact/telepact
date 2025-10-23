@@ -14,14 +14,23 @@
 //|  limitations under the License.
 //|
 
-package internal
+package schema
 
-import "github.com/telepact/telepact/lib/go/telepact/internal/types"
+import "sync"
 
-// SchemaAccessor exposes the Telepact schema details required by server helpers.
-type SchemaAccessor interface {
-	ParsedDefinitions() map[string]types.TType
-	RequestHeaderDeclarations() map[string]*types.TFieldDeclaration
-	ResponseHeaderDeclarations() map[string]*types.TFieldDeclaration
-	OriginalDefinitions() []any
+var (
+    internalTelepactJSON     string
+    internalTelepactJSONOnce sync.Once
+)
+
+// GetInternalTelepactJSON returns the bundled Telepact internal schema JSON content.
+func GetInternalTelepactJSON() string {
+    internalTelepactJSONOnce.Do(func() {
+        content, err := loadBundledSchema("internal.telepact.json")
+        if err != nil {
+            panic(err)
+        }
+        internalTelepactJSON = content
+    })
+    return internalTelepactJSON
 }

@@ -110,14 +110,31 @@ func (ms *MockServer) handle(request Message) (Message, error) {
 		return Message{}, NewTelepactError("telepact: mock server is nil")
 	}
 
-	return mock.MockHandle(
-		request,
-		ms.stubs,
-		ms.invocations,
+	functionName, err := request.BodyTarget()
+	if err != nil {
+		return Message{}, err
+	}
+
+	argument, err := request.BodyPayload()
+	if err != nil {
+		return Message{}, err
+	}
+
+	responseHeaders, responseBody, handleErr := mock.MockHandle(
+		request.Headers,
+		functionName,
+		argument,
+		&ms.stubs,
+		&ms.invocations,
 		ms.random,
-		ms.server.telepactSchema,
+		ms.server.telepactSchema.Parsed,
 		ms.enableGeneratedDefaultStub,
 		ms.enableOptionalFieldGeneration,
 		ms.randomizeOptionalFieldGeneration,
 	)
+	if handleErr != nil {
+		return Message{}, NewTelepactError(handleErr.Error())
+	}
+
+	return NewMessage(responseHeaders, responseBody), nil
 }

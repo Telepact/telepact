@@ -24,7 +24,7 @@ import (
 // MockTelepactSchema represents a schema prepared for mock usage.
 type MockTelepactSchema struct {
 	Original              []any
-	Parsed                map[string]*types.TType
+	Parsed                map[string]types.TType
 	ParsedRequestHeaders  map[string]*types.TFieldDeclaration
 	ParsedResponseHeaders map[string]*types.TFieldDeclaration
 }
@@ -32,7 +32,7 @@ type MockTelepactSchema struct {
 // NewMockTelepactSchema constructs a MockTelepactSchema with the supplied values.
 func NewMockTelepactSchema(
 	original []any,
-	parsed map[string]*types.TType,
+	parsed map[string]types.TType,
 	parsedRequestHeaders map[string]*types.TFieldDeclaration,
 	parsedResponseHeaders map[string]*types.TFieldDeclaration,
 ) *MockTelepactSchema {
@@ -46,25 +46,40 @@ func NewMockTelepactSchema(
 
 // MockTelepactSchemaFromJSON constructs a MockTelepactSchema from JSON content.
 func MockTelepactSchemaFromJSON(json string) (*MockTelepactSchema, error) {
-	return schema.CreateMockTelepactSchemaFromFileJSONMap(map[string]string{"auto_": json})
+	result, err := schema.CreateMockTelepactSchemaFromFileJSONMap(map[string]string{"auto_": json})
+	if err != nil {
+		return nil, wrapParseError(err)
+	}
+	return mockTelepactSchemaFromParsed(result), nil
 }
 
 // MockTelepactSchemaFromFileJSONMap constructs a MockTelepactSchema from a map of filenames to JSON content.
 func MockTelepactSchemaFromFileJSONMap(fileJSONMap map[string]string) (*MockTelepactSchema, error) {
-	return schema.CreateMockTelepactSchemaFromFileJSONMap(fileJSONMap)
+	result, err := schema.CreateMockTelepactSchemaFromFileJSONMap(fileJSONMap)
+	if err != nil {
+		return nil, wrapParseError(err)
+	}
+	return mockTelepactSchemaFromParsed(result), nil
 }
 
 // MockTelepactSchemaFromDirectory constructs a MockTelepactSchema from the JSON files contained in a directory.
 func MockTelepactSchemaFromDirectory(directory string) (*MockTelepactSchema, error) {
-	schemaFileMap, err := schema.GetSchemaFileMap(directory)
+	schemaFileMap, parseFailures, err := schema.GetSchemaFileMap(directory)
 	if err != nil {
 		return nil, err
 	}
-	return schema.CreateMockTelepactSchemaFromFileJSONMap(schemaFileMap)
+	if len(parseFailures) > 0 {
+		return nil, NewTelepactSchemaParseError(parseFailures, schemaFileMap)
+	}
+	result, err := schema.CreateMockTelepactSchemaFromFileJSONMap(schemaFileMap)
+	if err != nil {
+		return nil, wrapParseError(err)
+	}
+	return mockTelepactSchemaFromParsed(result), nil
 }
 
 // ParsedDefinitions returns the parsed schema definitions keyed by message name.
-func (m *MockTelepactSchema) ParsedDefinitions() map[string]*types.TType {
+func (m *MockTelepactSchema) ParsedDefinitions() map[string]types.TType {
 	if m == nil {
 		return nil
 	}
@@ -102,4 +117,11 @@ func cloneAnySlice(values []any) []any {
 	cloned := make([]any, len(values))
 	copy(cloned, values)
 	return cloned
+}
+
+func mockTelepactSchemaFromParsed(result *schema.ParsedSchemaResult) *MockTelepactSchema {
+	if result == nil {
+		return nil
+	}
+	return NewMockTelepactSchema(result.Original, result.Parsed, result.ParsedRequestHeaders, result.ParsedResponseHeaders)
 }

@@ -229,12 +229,11 @@ func firstServerMessageEntry(body map[string]any) (string, any, error) {
 	return "", nil, fmt.Errorf("telepact: message body missing target entry")
 }
 
-func lookupUnionType(parsed map[string]*types.TType, key string) (*types.TUnion, error) {
-	definitionPtr, ok := parsed[key]
-	if !ok || definitionPtr == nil {
+func lookupUnionType(parsed map[string]types.TType, key string) (*types.TUnion, error) {
+	definition, ok := parsed[key]
+	if !ok || definition == nil {
 		return nil, fmt.Errorf("telepact: schema missing definition for %s", key)
 	}
-	definition := *definitionPtr
 	union, ok := definition.(*types.TUnion)
 	if !ok || union == nil {
 		return nil, fmt.Errorf("telepact: definition for %s is not a union", key)
