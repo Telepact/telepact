@@ -58,6 +58,19 @@ def extract_github_raw_links(content: str) -> List[Tuple[str, str, str]]:
     return [(f'[{text}]({url})', text, url, local_path) for text, url, local_path in matches]
 
 
+def get_top_heading(content: str) -> str:
+    """Extract the first heading from markdown content (any level)."""
+    lines = content.split('\n')
+    for line in lines:
+        # Match any heading level (# through ######)
+        if line.startswith('#'):
+            # Remove all # symbols and whitespace to get the heading text
+            heading = line.lstrip('#').strip()
+            if heading:  # Only return non-empty headings
+                return heading
+    return ""
+
+
 def read_file(file_path: Path) -> str:
     """Read a file and return its content."""
     try:
@@ -88,7 +101,7 @@ def consolidate_readme_impl(readme_path: Path, output_path: Path) -> None:
     links = extract_markdown_links(main_content)
     
     # Build a mapping of link paths to their content and anchor
-    link_map: Dict[str, Tuple[str, str, str]] = {}  # path -> (anchor, heading, content)
+    link_map: Dict[str, Tuple[str, str]] = {}  # path -> (anchor, content)
     
     for full_match, link_text, link_path in links:
         # Resolve the relative path
@@ -103,43 +116,30 @@ def consolidate_readme_impl(readme_path: Path, output_path: Path) -> None:
         if not doc_content:
             continue
         
-        # Use the link text as the heading to provide context
-        # This ensures each section has a meaningful, unique heading
-        # Clean up common articles from link text for better headings
-        heading = link_text
-        if heading.lower().startswith('the '):
-            heading = heading[4:]  # Remove "the " prefix
-        # Generate anchor from the cleaned heading so it matches
+        # Extract the original top-level heading from the document
+        heading = get_top_heading(doc_content)
+        if not heading:
+            # Fallback to link text if no heading found
+            heading = link_text
+        
+        # Generate anchor from the heading
         anchor = slugify(heading)
         
-        link_map[link_path] = (anchor, heading, doc_content)
+        link_map[link_path] = (anchor, doc_content)
     
     # Replace links in the main README with anchor links
     consolidated = main_content
     for full_match, link_text, link_path in links:
         if link_path in link_map:
-            anchor, _, _ = link_map[link_path]
+            anchor, _ = link_map[link_path]
             # Replace the link with an anchor link
             new_link = f'[{link_text}](#{anchor})'
             consolidated = consolidated.replace(full_match, new_link)
     
     # Append all linked documents to the consolidated README
-    for link_path, (anchor, heading, doc_content) in link_map.items():
-        # Add a separator and the document content
-        consolidated += f"\n\n---\n\n# {heading}\n\n"
-        
-        # Remove the first heading from doc_content since we're adding it above
-        lines = doc_content.split('\n')
-        content_lines = []
-        found_first_heading = False
-        for line in lines:
-            if not found_first_heading and line.startswith('#'):
-                found_first_heading = True
-                continue
-            if found_first_heading:
-                content_lines.append(line)
-        
-        consolidated += '\n'.join(content_lines).strip()
+    for link_path, (anchor, doc_content) in link_map.items():
+        # Add a separator and the document content with its original heading
+        consolidated += f"\n\n---\n\n{doc_content}"
     
     # Extract and process GitHub raw links
     github_links = extract_github_raw_links(consolidated)
