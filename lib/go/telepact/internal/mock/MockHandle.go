@@ -116,8 +116,14 @@ func MockHandle(
 		return nil, nil, fmt.Errorf("telepact: union type missing Ok_ tag")
 	}
 
+	// The Python implementation always enables optional field generation for the
+	// auto-generated Ok_ stub response, regardless of the server option. We
+	// mirror that behavior here to keep the port faithful.
+	includeOptionalFields := true
+	_ = enableOptionalFieldGeneration
+
 	ctx := types.NewGenerateContext(
-		enableOptionalFieldGeneration,
+		includeOptionalFields,
 		randomizeOptionalFieldGeneration,
 		true,
 		functionName,
