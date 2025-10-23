@@ -58,8 +58,8 @@ def extract_github_raw_links(content: str) -> List[Tuple[str, str, str]]:
     return [(f'[{text}]({url})', text, url, local_path) for text, url, local_path in matches]
 
 
-def get_top_heading(content: str) -> str:
-    """Extract the first heading from markdown content (any level)."""
+def get_top_heading(content: str, file_path: str) -> str:
+    """Extract the first heading from markdown content (any level). Raises an error if no heading found."""
     lines = content.split('\n')
     for line in lines:
         # Match any heading level (# through ######)
@@ -68,17 +68,20 @@ def get_top_heading(content: str) -> str:
             heading = line.lstrip('#').strip()
             if heading:  # Only return non-empty headings
                 return heading
-    return ""
+    
+    # No heading found - this is an error
+    click.echo(f"Error: No heading found in document: {file_path}", err=True)
+    sys.exit(1)
 
 
 def read_file(file_path: Path) -> str:
-    """Read a file and return its content."""
+    """Read a file and return its content. Raises an error if file not found."""
     try:
         with open(file_path, 'r', encoding='utf-8') as f:
             return f.read()
     except FileNotFoundError:
-        click.echo(f"Warning: File not found: {file_path}", err=True)
-        return ""
+        click.echo(f"Error: File not found: {file_path}", err=True)
+        sys.exit(1)
 
 
 def consolidate_readme_impl(readme_path: Path, output_path: Path) -> None:
@@ -111,16 +114,11 @@ def consolidate_readme_impl(readme_path: Path, output_path: Path) -> None:
         if link_path in link_map:
             continue  # Already processed this document
         
-        # Read the linked document
+        # Read the linked document (will error if file not found)
         doc_content = read_file(resolved_path)
-        if not doc_content:
-            continue
         
-        # Extract the original top-level heading from the document
-        heading = get_top_heading(doc_content)
-        if not heading:
-            # Fallback to link text if no heading found
-            heading = link_text
+        # Extract the original top-level heading from the document (will error if no heading)
+        heading = get_top_heading(doc_content, str(resolved_path))
         
         # Generate anchor from the heading
         anchor = slugify(heading)
@@ -149,11 +147,9 @@ def consolidate_readme_impl(readme_path: Path, output_path: Path) -> None:
         if local_path in code_files:
             continue  # Already processed this file
         
-        # Read the local file
+        # Read the local file (will error if file not found)
         file_path = base_dir / local_path
         file_content = read_file(file_path)
-        if not file_content:
-            continue
         
         # Generate a heading from the filename
         filename = Path(local_path).name
