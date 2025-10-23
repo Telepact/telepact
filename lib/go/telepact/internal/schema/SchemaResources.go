@@ -17,46 +17,46 @@
 package schema
 
 import (
-    "fmt"
-    "os"
-    "path/filepath"
-    "runtime"
-    "sync"
+	"fmt"
+	"os"
+	"path/filepath"
+	"runtime"
+	"sync"
 )
 
 var (
-    commonSchemaDirectory     string
-    commonSchemaDirectoryOnce sync.Once
-    commonSchemaDirectoryErr  error
+	commonSchemaDirectory     string
+	commonSchemaDirectoryOnce sync.Once
+	commonSchemaDirectoryErr  error
 )
 
 func resolveCommonSchemaDirectory() (string, error) {
-    commonSchemaDirectoryOnce.Do(func() {
-        _, currentFile, _, ok := runtime.Caller(0)
-        if !ok {
-            commonSchemaDirectoryErr = fmt.Errorf("telepact: unable to resolve schema resource path")
-            return
-        }
+	commonSchemaDirectoryOnce.Do(func() {
+		_, currentFile, _, ok := runtime.Caller(0)
+		if !ok {
+			commonSchemaDirectoryErr = fmt.Errorf("telepact: unable to resolve schema resource path")
+			return
+		}
 
-        currentDir := filepath.Dir(currentFile)
-        commonPath := filepath.Join(currentDir, "../../../../../common")
-        commonSchemaDirectory = filepath.Clean(commonPath)
-    })
+		currentDir := filepath.Dir(currentFile)
+		commonPath := filepath.Join(currentDir, "../../../../../common")
+		commonSchemaDirectory = filepath.Clean(commonPath)
+	})
 
-    return commonSchemaDirectory, commonSchemaDirectoryErr
+	return commonSchemaDirectory, commonSchemaDirectoryErr
 }
 
 func loadBundledSchema(filename string) (string, error) {
-    baseDir, err := resolveCommonSchemaDirectory()
-    if err != nil {
-        return "", err
-    }
+	baseDir, err := resolveCommonSchemaDirectory()
+	if err != nil {
+		return "", err
+	}
 
-    path := filepath.Join(baseDir, filename)
-    bytes, err := os.ReadFile(path)
-    if err != nil {
-        return "", fmt.Errorf("telepact: failed to read bundled schema %s: %w", filename, err)
-    }
+	path := filepath.Join(baseDir, filename)
+	bytes, err := os.ReadFile(path)
+	if err != nil {
+		return "", fmt.Errorf("telepact: failed to read bundled schema %s: %w", filename, err)
+	}
 
-    return string(bytes), nil
+	return string(bytes), nil
 }

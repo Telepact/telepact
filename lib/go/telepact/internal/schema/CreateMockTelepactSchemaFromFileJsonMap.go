@@ -18,12 +18,12 @@ package schema
 
 // CreateMockTelepactSchemaFromFileJSONMap constructs a mock Telepact schema from the supplied JSON documents map.
 func CreateMockTelepactSchemaFromFileJSONMap(jsonDocuments map[string]string) (*ParsedSchemaResult, error) {
-    finalDocuments := make(map[string]string, len(jsonDocuments)+1)
-    for key, value := range jsonDocuments {
-        finalDocuments[key] = value
-    }
+	finalDocuments := make(map[string]string, len(jsonDocuments)+1)
+	for key, value := range jsonDocuments {
+		finalDocuments[key] = value
+	}
 
-    finalDocuments["mock_"] = GetMockTelepactJSON()
+	finalDocuments["mock_"] = GetMockTelepactJSON()
 
-    return CreateTelepactSchemaFromFileJSONMap(finalDocuments)
+	return CreateTelepactSchemaFromFileJSONMap(finalDocuments)
 }

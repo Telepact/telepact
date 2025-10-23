@@ -20,20 +20,20 @@ import "regexp"
 
 // CreateTelepactSchemaFromFileJSONMap constructs a Telepact schema from the supplied JSON documents map.
 func CreateTelepactSchemaFromFileJSONMap(jsonDocuments map[string]string) (*ParsedSchemaResult, error) {
-    finalDocuments := make(map[string]string, len(jsonDocuments)+1)
-    for key, value := range jsonDocuments {
-        finalDocuments[key] = value
-    }
+	finalDocuments := make(map[string]string, len(jsonDocuments)+1)
+	for key, value := range jsonDocuments {
+		finalDocuments[key] = value
+	}
 
-    finalDocuments["internal_"] = GetInternalTelepactJSON()
+	finalDocuments["internal_"] = GetInternalTelepactJSON()
 
-    authPattern := regexp.MustCompile(`"struct\.Auth_"\s*:`)
-    for _, document := range jsonDocuments {
-        if authPattern.MatchString(document) {
-            finalDocuments["auth_"] = GetAuthTelepactJSON()
-            break
-        }
-    }
+	authPattern := regexp.MustCompile(`"struct\.Auth_"\s*:`)
+	for _, document := range jsonDocuments {
+		if authPattern.MatchString(document) {
+			finalDocuments["auth_"] = GetAuthTelepactJSON()
+			break
+		}
+	}
 
-    return ParseTelepactSchema(finalDocuments)
+	return ParseTelepactSchema(finalDocuments)
 }
