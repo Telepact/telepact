@@ -37,7 +37,7 @@
 				<DocCardStructFields fields={thisTag.data} />
 			</div>
 			{#if thisTag.doc}
-				<div class="ml-4 prose prose-invert">
+				<div class="ml-4 prose dark:prose-invert">
 					{@html markdownHtml(thisTag)}
 				</div>
 			{/if}
