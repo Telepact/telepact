@@ -21,6 +21,8 @@ import (
 	"encoding/json"
 	"math"
 	"reflect"
+	"strconv"
+	"strings"
 )
 
 // ValidateBoolean validates that the value is a boolean.
@@ -46,7 +48,7 @@ func ValidateNumber(value any, ctx *ValidateContext) []*ValidationFailure {
 		return validateSignedInt(v)
 	case uint:
 		if v > math.MaxInt64 {
-			return []*ValidationFailure{NewValidationFailure(nil, "NumberOutOfRange", map[string]any{})}
+			return numberOutOfRangeFailure()
 		}
 		return nil
 	case uint8:
@@ -55,22 +57,38 @@ func ValidateNumber(value any, ctx *ValidateContext) []*ValidationFailure {
 		return nil
 	case uint32:
 		if uint64(v) > uint64(math.MaxInt64) {
-			return []*ValidationFailure{NewValidationFailure(nil, "NumberOutOfRange", map[string]any{})}
+			return numberOutOfRangeFailure()
 		}
 		return nil
 	case uint64:
 		if v > uint64(math.MaxInt64) {
-			return []*ValidationFailure{NewValidationFailure(nil, "NumberOutOfRange", map[string]any{})}
+			return numberOutOfRangeFailure()
 		}
 		return nil
-	case float32, float64:
-		return nil
+	case float32:
+		return validateFloat(float64(v))
+	case float64:
+		return validateFloat(v)
 	case json.Number:
-		// Accept numeric JSON values without forcing premature conversion; defer range checks to conversion.
-		if _, err := v.Float64(); err != nil {
+		raw := string(v)
+
+		if !strings.ContainsAny(raw, ".eE") {
+			if _, err := strconv.ParseInt(raw, 10, 64); err == nil {
+				return nil
+			} else if numErr, ok := err.(*strconv.NumError); ok && numErr.Err == strconv.ErrRange {
+				return numberOutOfRangeFailure()
+			}
+		}
+
+		num, err := strconv.ParseFloat(raw, 64)
+		if err != nil {
+			if numErr, ok := err.(*strconv.NumError); ok && numErr.Err == strconv.ErrRange {
+				return numberOutOfRangeFailure()
+			}
 			return GetTypeUnexpectedValidationFailure(nil, value, numberName)
 		}
-		return nil
+
+		return validateFloat(num)
 	default:
 		return GetTypeUnexpectedValidationFailure(nil, value, numberName)
 	}
@@ -94,7 +112,7 @@ func ValidateInteger(value any) []*ValidationFailure {
 			return validateSignedInt(i)
 		}
 		if _, err := v.Float64(); err == nil {
-			return []*ValidationFailure{NewValidationFailure(nil, "NumberOutOfRange", map[string]any{})}
+			return numberOutOfRangeFailure()
 		}
 		return GetTypeUnexpectedValidationFailure(nil, value, integerName)
 	default:
@@ -103,10 +121,19 @@ func ValidateInteger(value any) []*ValidationFailure {
 }
 
 func validateSignedInt(v int64) []*ValidationFailure {
-	if v > math.MaxInt64 || v < math.MinInt64 {
-		return []*ValidationFailure{NewValidationFailure(nil, "NumberOutOfRange", map[string]any{})}
+	return validateFloat(float64(v))
+}
+
+func validateFloat(v float64) []*ValidationFailure {
+	if math.IsNaN(v) || math.IsInf(v, 0) {
+		return numberOutOfRangeFailure()
 	}
+
 	return nil
+}
+
+func numberOutOfRangeFailure() []*ValidationFailure {
+	return []*ValidationFailure{NewValidationFailure(nil, "NumberOutOfRange", map[string]any{})}
 }
 
 // ValidateString ensures the value is a string.

@@ -31,4 +31,4 @@ test failure to investigate individually, or run the test suite again
 to reset your baseline of failed tests, from which then you can choose
 one test to run and investigate.
 
-Repeat until the test suite passes.
+Repeat until the whole test suite passes.

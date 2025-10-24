@@ -21,6 +21,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"math"
+	"strconv"
+	"strings"
 
 	"github.com/vmihailenco/msgpack/v5"
 )
@@ -53,8 +55,11 @@ func (d *DefaultSerialization) ToMsgpack(message any) ([]byte, error) {
 
 // FromJSON decodes JSON bytes into a pseudo-JSON object.
 func (d *DefaultSerialization) FromJSON(data []byte) (any, error) {
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.UseNumber()
+
 	var out any
-	if err := json.Unmarshal(data, &out); err != nil {
+	if err := decoder.Decode(&out); err != nil {
 		return nil, NewSerializationError(err, "decode JSON")
 	}
 	return normalizePseudoJSON(out), nil
@@ -113,7 +118,30 @@ func normalizePseudoJSON(value any) any {
 			return int64(v)
 		}
 		return v
+	case json.Number:
+		normalized, ok := normalizeJSONNumber(v)
+		if ok {
+			return normalized
+		}
+		return v
 	default:
 		return v
 	}
+}
+
+func normalizeJSONNumber(value json.Number) (any, bool) {
+	raw := string(value)
+
+	if !strings.ContainsAny(raw, ".eE") {
+		if i, err := strconv.ParseInt(raw, 10, 64); err == nil {
+			return i, true
+		}
+		return nil, false
+	}
+
+	if f, err := strconv.ParseFloat(raw, 64); err == nil && !math.IsNaN(f) && !math.IsInf(f, 0) {
+		return f, true
+	}
+
+	return nil, false
 }
