@@ -153,7 +153,7 @@ func GetOrParseType(path []any, typeName string, ctx *ParseContext) (types.TType
 		}
 		return ctx.ParsedTypes[customTypeName], nil
 	default:
-		parsedType, err = resolveTypeExtension(customTypeName, ctx)
+		parsedType, err = resolveTypeExtension(customTypeName, path, ctx)
 	}
 
 	if err != nil {
@@ -184,7 +184,7 @@ func storeParsedType(ctx *ParseContext, name string, typ types.TType) types.TTyp
 	return typ
 }
 
-func resolveTypeExtension(customTypeName string, ctx *ParseContext) (types.TType, error) {
+func resolveTypeExtension(customTypeName string, path []any, ctx *ParseContext) (types.TType, error) {
 	switch customTypeName {
 	case "_ext.Select_":
 		return types.NewTSelect(map[string]any{}), nil
@@ -195,7 +195,7 @@ func resolveTypeExtension(customTypeName string, ctx *ParseContext) (types.TType
 	default:
 		failure := NewSchemaParseFailure(
 			ctx.DocumentName,
-			nil,
+			append([]any{}, path...),
 			"TypeExtensionImplementationMissing",
 			map[string]any{"name": customTypeName},
 		)

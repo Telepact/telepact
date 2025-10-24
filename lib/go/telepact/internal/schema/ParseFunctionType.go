@@ -30,11 +30,11 @@ func ParseFunctionResultType(path []any, functionDefinition map[string]any, sche
 
 	parseFailures := make([]*SchemaParseFailure, 0)
 	resultSchemaKey := "->"
-	resultPath := append(append([]any{}, path...), resultSchemaKey)
 
 	var resultType *types.TUnion
 	if _, exists := functionDefinition[resultSchemaKey]; !exists {
-		parseFailures = append(parseFailures, NewSchemaParseFailure(ctx.DocumentName, resultPath, "RequiredObjectKeyMissing", map[string]any{"key": resultSchemaKey}))
+		missingKeyPath := append([]any{}, path...)
+		parseFailures = append(parseFailures, NewSchemaParseFailure(ctx.DocumentName, missingKeyPath, "RequiredObjectKeyMissing", map[string]any{"key": resultSchemaKey}))
 	} else {
 		ignoreKeys := make([]string, 0, len(functionDefinition))
 		for key := range functionDefinition {

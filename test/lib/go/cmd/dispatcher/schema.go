@@ -10,13 +10,6 @@ import (
 
 type codeGenHandler struct{}
 
-type validationFailure struct {
-	Document string         `json:"document"`
-	Location any            `json:"location"`
-	Path     any            `json:"path"`
-	Reason   map[string]any `json:"reason"`
-}
-
 func newCodeGenHandler(enabled bool) *codeGenHandler {
 	if !enabled {
 		return nil
@@ -43,29 +36,30 @@ func (c *codeGenHandler) Handle(message telepact.Message) (telepact.Message, err
 	return telepact.NewMessage(headers, body), nil
 }
 
-func validatePseudoJSONSchema(input map[string]any) ([]validationFailure, error) {
+func validatePseudoJSONSchema(input map[string]any) ([]map[string]any, error) {
 	schemaRaw, ok := input["schema"]
 	if !ok {
 		return nil, errors.New("missing schema")
 	}
 
-	schemaBytes, err := json.Marshal(schemaRaw)
+	schemaJSON, err := toJSONString(schemaRaw)
 	if err != nil {
 		return nil, err
 	}
 
+	var extendJSON string
 	if extendRaw, ok := input["extend!"]; ok {
-		extendBytes, err := json.Marshal(extendRaw)
+		extendJSON, err = toJSONString(extendRaw)
 		if err != nil {
 			return nil, err
 		}
 
 		_, err = telepact.TelepactSchemaFromFileJSONMap(map[string]string{
-			"default": string(schemaBytes),
-			"extend":  string(extendBytes),
+			"default": schemaJSON,
+			"extend":  extendJSON,
 		})
 	} else {
-		_, err = telepact.TelepactSchemaFromJSON(string(schemaBytes))
+		_, err = telepact.TelepactSchemaFromJSON(schemaJSON)
 	}
 	if err == nil {
 		return nil, nil
@@ -76,30 +70,53 @@ func validatePseudoJSONSchema(input map[string]any) ([]validationFailure, error)
 		return nil, err
 	}
 
-	failures, ok := parseErr.SchemaParseFailuresPseudoJSON.([]any)
-	if !ok {
+	var entries []map[string]any
+	switch typed := parseErr.SchemaParseFailuresPseudoJSON.(type) {
+	case []map[string]any:
+		entries = typed
+	case []any:
+		entries = make([]map[string]any, 0, len(typed))
+		for _, entry := range typed {
+			if converted, err := asMap(entry); err == nil {
+				entries = append(entries, converted)
+			}
+		}
+	default:
 		return nil, fmt.Errorf("unexpected parse failure pseudo json type %T", parseErr.SchemaParseFailuresPseudoJSON)
 	}
 
-	result := make([]validationFailure, 0, len(failures))
-	for _, entry := range failures {
-		if converted, err := asMap(entry); err == nil {
-			failure := validationFailure{}
-			if doc, ok := converted["document"].(string); ok {
-				failure.Document = doc
-			}
-			if loc, ok := converted["location"]; ok {
-				failure.Location = loc
-			}
-			if path, ok := converted["path"]; ok {
-				failure.Path = path
-			}
-			if reason, ok := converted["reason"].(map[string]any); ok {
-				failure.Reason = reason
-			}
-			result = append(result, failure)
+	result := make([]map[string]any, 0, len(entries))
+	for _, converted := range entries {
+		failure := make(map[string]any, len(converted))
+		if doc, ok := converted["document"].(string); ok {
+			failure["document"] = doc
 		}
+		if loc, ok := converted["location"]; ok {
+			failure["location"] = loc
+		}
+		if path, ok := converted["path"]; ok {
+			failure["path"] = path
+		}
+		if reason, ok := converted["reason"].(map[string]any); ok {
+			failure["reason"] = reason
+		}
+		result = append(result, failure)
 	}
 
 	return result, nil
+}
+
+func toJSONString(value any) (string, error) {
+	switch typed := value.(type) {
+	case string:
+		return typed, nil
+	case json.RawMessage:
+		return string(typed), nil
+	default:
+		bytes, err := json.Marshal(typed)
+		if err != nil {
+			return "", err
+		}
+		return string(bytes), nil
+	}
 }
