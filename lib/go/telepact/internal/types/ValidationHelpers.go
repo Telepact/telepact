@@ -16,7 +16,12 @@
 
 package types
 
-import "math"
+import (
+	"fmt"
+	"math"
+	"sort"
+	"strings"
+)
 
 // GetTypeUnexpectedValidationFailure mirrors the Python helper producing a standardized type mismatch failure.
 func GetTypeUnexpectedValidationFailure(path []any, value any, expectedType string) []*ValidationFailure {
@@ -52,6 +57,61 @@ func prependPathToFailures(failures []*ValidationFailure, prefix ...any) []*Vali
 		result = append(result, prependPath(failure, prefix...))
 	}
 	return result
+}
+
+func sortValidationFailures(failures []*ValidationFailure) {
+	sort.SliceStable(failures, func(i, j int) bool {
+		cmp := comparePaths(failures[i].Path, failures[j].Path)
+		if cmp != 0 {
+			return cmp < 0
+		}
+		return failures[i].Reason < failures[j].Reason
+	})
+}
+
+func comparePaths(a, b []any) int {
+	if len(a) == 0 && len(b) == 0 {
+		return 0
+	}
+	if len(a) == 0 {
+		return -1
+	}
+	if len(b) == 0 {
+		return 1
+	}
+	limit := len(a)
+	if len(b) < limit {
+		limit = len(b)
+	}
+	for i := 0; i < limit; i++ {
+		segA := segmentSortableString(a[i])
+		segB := segmentSortableString(b[i])
+		if cmp := strings.Compare(segA, segB); cmp != 0 {
+			return cmp
+		}
+	}
+	if len(a) < len(b) {
+		return -1
+	}
+	if len(a) > len(b) {
+		return 1
+	}
+	return 0
+}
+
+func segmentSortableString(value any) string {
+	switch v := value.(type) {
+	case string:
+		return "0:" + v
+	case int:
+		return fmt.Sprintf("1:%020d", v)
+	case int64:
+		return fmt.Sprintf("1:%020d", v)
+	case float64:
+		return fmt.Sprintf("2:%f", v)
+	default:
+		return fmt.Sprintf("3:%v", v)
+	}
 }
 
 // withinSigned64Bit checks whether v fits within signed 64-bit range.

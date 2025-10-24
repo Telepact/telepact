@@ -79,6 +79,7 @@ func ValidateMockCall(givenObj any, typesMap map[string]TType, ctx *ValidateCont
 		filtered = append(filtered, failure)
 	}
 
+	sortValidationFailures(filtered)
 	return filtered
 }
 
@@ -168,5 +169,6 @@ func ValidateMockStub(givenObj any, typesMap map[string]TType, ctx *ValidateCont
 		failures = append(failures, NewValidationFailure([]any{key}, "ObjectKeyDisallowed", map[string]any{}))
 	}
 
+	sortValidationFailures(failures)
 	return failures
 }

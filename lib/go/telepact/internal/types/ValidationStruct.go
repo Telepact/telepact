@@ -62,7 +62,14 @@ func validateStructFields(fields map[string]*TFieldDeclaration, selectedFields [
 		failures = append(failures, NewValidationFailure(nil, "RequiredObjectKeyMissing", map[string]any{"key": missing}))
 	}
 
-	for fieldName, fieldValue := range actual {
+	actualKeys := make([]string, 0, len(actual))
+	for fieldName := range actual {
+		actualKeys = append(actualKeys, fieldName)
+	}
+	sort.Strings(actualKeys)
+
+	for _, fieldName := range actualKeys {
+		fieldValue := actual[fieldName]
 		referenceField, exists := fields[fieldName]
 		if !exists {
 			failures = append(failures, NewValidationFailure([]any{fieldName}, "ObjectKeyDisallowed", map[string]any{}))
@@ -79,6 +86,7 @@ func validateStructFields(fields map[string]*TFieldDeclaration, selectedFields [
 		failures = append(failures, prependPathToFailures(nestedFailures, fieldName)...)
 	}
 
+	sortValidationFailures(failures)
 	return failures
 }
 
