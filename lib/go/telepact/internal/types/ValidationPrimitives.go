@@ -107,6 +107,25 @@ func ValidateInteger(value any) []*ValidationFailure {
 		return validateSignedInt(int64(v))
 	case int64:
 		return validateSignedInt(v)
+	case uint:
+		if v > math.MaxInt64 {
+			return numberOutOfRangeFailure()
+		}
+		return nil
+	case uint8:
+		return nil
+	case uint16:
+		return nil
+	case uint32:
+		if uint64(v) > uint64(math.MaxInt64) {
+			return numberOutOfRangeFailure()
+		}
+		return nil
+	case uint64:
+		if v > uint64(math.MaxInt64) {
+			return numberOutOfRangeFailure()
+		}
+		return nil
 	case json.Number:
 		if i, err := v.Int64(); err == nil {
 			return validateSignedInt(i)

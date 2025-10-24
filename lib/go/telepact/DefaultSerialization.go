@@ -27,6 +27,25 @@ import (
 	"github.com/vmihailenco/msgpack/v5"
 )
 
+const msgpackJSONNumberExtType = 0x2a
+
+type msgpackJSONNumber struct {
+	Value string
+}
+
+func (n *msgpackJSONNumber) MarshalMsgpack() ([]byte, error) {
+	return []byte(n.Value), nil
+}
+
+func (n *msgpackJSONNumber) UnmarshalMsgpack(data []byte) error {
+	n.Value = string(data)
+	return nil
+}
+
+func init() {
+	msgpack.RegisterExt(msgpackJSONNumberExtType, (*msgpackJSONNumber)(nil))
+}
+
 // DefaultSerialization implements the Serialization interface using encoding/json and vmihailenco/msgpack.
 type DefaultSerialization struct{}
 
@@ -46,7 +65,8 @@ func (d *DefaultSerialization) ToJSON(message any) ([]byte, error) {
 
 // ToMsgpack converts a pseudo-JSON object into its MessagePack-encoded bytes representation.
 func (d *DefaultSerialization) ToMsgpack(message any) ([]byte, error) {
-	payload, err := msgpack.Marshal(message)
+	prepared := wrapJSONNumbers(message)
+	payload, err := msgpack.Marshal(prepared)
 	if err != nil {
 		return nil, NewSerializationError(err, "encode msgpack")
 	}
@@ -92,7 +112,7 @@ func (d *DefaultSerialization) FromMsgpack(data []byte) (any, error) {
 	if err != nil {
 		return nil, NewSerializationError(err, "decode msgpack")
 	}
-	return normalizePseudoJSON(value), nil
+	return normalizePseudoJSON(unwrapJSONNumbers(value)), nil
 }
 
 func normalizePseudoJSON(value any) any {
@@ -126,6 +146,64 @@ func normalizePseudoJSON(value any) any {
 		return v
 	default:
 		return v
+	}
+}
+
+func wrapJSONNumbers(value any) any {
+	switch v := value.(type) {
+	case map[string]any:
+		result := make(map[string]any, len(v))
+		for key, val := range v {
+			result[key] = wrapJSONNumbers(val)
+		}
+		return result
+	case map[any]any:
+		result := make(map[any]any, len(v))
+		for key, val := range v {
+			result[key] = wrapJSONNumbers(val)
+		}
+		return result
+	case []any:
+		result := make([]any, len(v))
+		for i, val := range v {
+			result[i] = wrapJSONNumbers(val)
+		}
+		return result
+	case json.Number:
+		return &msgpackJSONNumber{Value: string(v)}
+	case *msgpackJSONNumber:
+		return v
+	default:
+		return value
+	}
+}
+
+func unwrapJSONNumbers(value any) any {
+	switch v := value.(type) {
+	case map[string]any:
+		for key, val := range v {
+			v[key] = unwrapJSONNumbers(val)
+		}
+		return v
+	case map[any]any:
+		for key, val := range v {
+			v[key] = unwrapJSONNumbers(val)
+		}
+		return v
+	case []any:
+		for i, val := range v {
+			v[i] = unwrapJSONNumbers(val)
+		}
+		return v
+	case *msgpackJSONNumber:
+		if v == nil {
+			return nil
+		}
+		return json.Number(v.Value)
+	case msgpackJSONNumber:
+		return json.Number(v.Value)
+	default:
+		return value
 	}
 }
 
