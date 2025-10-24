@@ -205,7 +205,7 @@ def consolidate_readme_impl(readme_path: Path, output_path: Path) -> None:
         consolidated += "\n\n---\n\n# Appendix\n\n"
         
         for local_path, (anchor, filename, file_content) in code_files.items():
-            consolidated += f"## {filename}\n\n"
+            consolidated += f"## {anchor}\n\n"
             consolidated += f"```json\n{file_content}\n```\n\n"
     
     # Write the consolidated README
