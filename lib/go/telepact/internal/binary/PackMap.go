@@ -16,11 +16,20 @@
 
 package binary
 
+import "sort"
+
 // PackMap attempts to pack a dictionary with integer keys into a compact row representation.
 func PackMap(m map[int]any, header *[]any, keyIndexMap map[int]*BinaryPackNode) ([]any, error) {
 	row := make([]any, 0, len(m))
 
-	for key, rawValue := range m {
+	keys := make([]int, 0, len(m))
+	for key := range m {
+		keys = append(keys, key)
+	}
+	sort.Ints(keys)
+
+	for _, key := range keys {
+		rawValue := m[key]
 		node, exists := keyIndexMap[key]
 		if !exists {
 			node = NewBinaryPackNode(len(*header)-1, make(map[int]*BinaryPackNode))

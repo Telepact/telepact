@@ -16,7 +16,10 @@
 
 package binary
 
-import "fmt"
+import (
+	"fmt"
+	"strconv"
+)
 
 // DecodeKeys recursively decodes map keys using the provided BinaryEncoding lookup tables.
 func DecodeKeys(given any, encoding *BinaryEncoding) (any, error) {
@@ -27,6 +30,12 @@ func DecodeKeys(given any, encoding *BinaryEncoding) (any, error) {
 			decodedValue, err := DecodeKeys(value, encoding)
 			if err != nil {
 				return nil, err
+			}
+			if decodedKey, ok, convErr := decodeNumericStringKey(key, encoding); convErr != nil {
+				return nil, convErr
+			} else if ok {
+				result[decodedKey] = decodedValue
+				continue
 			}
 			result[key] = decodedValue
 		}
@@ -55,6 +64,12 @@ func DecodeKeys(given any, encoding *BinaryEncoding) (any, error) {
 
 			switch key := rawKey.(type) {
 			case string:
+				if decodedKey, ok, convErr := decodeNumericStringKey(key, encoding); convErr != nil {
+					return nil, convErr
+				} else if ok {
+					result[decodedKey] = decodedValue
+					break
+				}
 				result[key] = decodedValue
 			default:
 				intKey, ok := toInt(key)
@@ -82,4 +97,22 @@ func DecodeKeys(given any, encoding *BinaryEncoding) (any, error) {
 	default:
 		return given, nil
 	}
+}
+
+func decodeNumericStringKey(key string, encoding *BinaryEncoding) (string, bool, error) {
+	if encoding == nil {
+		return "", false, nil
+	}
+	if len(key) == 0 {
+		return "", false, nil
+	}
+	if key[0] == '-' || (key[0] >= '0' && key[0] <= '9') {
+		if intKey, err := strconv.Atoi(key); err == nil {
+			if decoded, ok := encoding.DecodeMap[intKey]; ok {
+				return decoded, true, nil
+			}
+			return "", false, NewBinaryEncodingMissing(intKey)
+		}
+	}
+	return "", false, nil
 }

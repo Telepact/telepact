@@ -40,7 +40,7 @@ func ParseRequestMessage(
 
 	reason := "ExpectedJsonArrayOfTwoObjects"
 
-	var unavailableErr *binary.BinaryEncoderUnavailableError
+	var unavailableErr binary.BinaryEncoderUnavailableError
 	if errors.As(err, &unavailableErr) {
 		reason = "IncompatibleBinaryEncoding"
 	} else {
