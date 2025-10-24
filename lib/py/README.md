@@ -1,4 +1,4 @@
-## Telepact
+## Telepact Library for Python
 
 ### Installation
 

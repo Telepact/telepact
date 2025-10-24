@@ -18,22 +18,53 @@ import click
 import re
 import sys
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Set
 
 
-def slugify(text: str) -> str:
-    """Convert a heading text to a GitHub-style anchor ID."""
-    # Convert to lowercase
-    slug = text.lower()
-    # Remove special characters, keep alphanumeric, spaces, and hyphens
-    slug = re.sub(r'[^a-z0-9\s-]', '', slug)
-    # Replace spaces with hyphens
-    slug = re.sub(r'\s+', '-', slug)
-    # Remove consecutive hyphens
-    slug = re.sub(r'-+', '-', slug)
-    # Remove leading/trailing hyphens
-    slug = slug.strip('-')
-    return slug
+class SlugTracker:
+    """Track generated slugs to detect duplicates."""
+    
+    def __init__(self):
+        self.slugs: Set[str] = set()
+    
+    def slugify(self, text: str, context: str = "") -> str:
+        """
+        Convert a heading text to a GitHub-style anchor ID.
+        Tracks all generated slugs and errors if a duplicate is created.
+        
+        Args:
+            text: The text to slugify
+            context: Additional context for error messages (e.g., file path)
+        
+        Returns:
+            The generated slug
+        
+        Raises:
+            SystemExit if a duplicate slug is detected
+        """
+        # Convert to lowercase
+        slug = text.lower()
+        # Replace periods with hyphens (keep them, but convert)
+        slug = slug.replace('.', '-')
+        # Remove special characters, keep alphanumeric, spaces, and hyphens
+        slug = re.sub(r'[^a-z0-9\s-]', '', slug)
+        # Replace spaces with hyphens
+        slug = re.sub(r'\s+', '-', slug)
+        # Remove consecutive hyphens
+        slug = re.sub(r'-+', '-', slug)
+        # Remove leading/trailing hyphens
+        slug = slug.strip('-')
+        
+        # Check for duplicates
+        if slug in self.slugs:
+            error_msg = f"Error: Duplicate slug detected: '{slug}'"
+            if context:
+                error_msg += f" (context: {context})"
+            click.echo(error_msg, err=True)
+            sys.exit(1)
+        
+        self.slugs.add(slug)
+        return slug
 
 
 def extract_markdown_links(content: str) -> List[Tuple[str, str, str]]:
@@ -94,6 +125,9 @@ def consolidate_readme_impl(readme_path: Path, output_path: Path) -> None:
     """
     base_dir = readme_path.parent
     
+    # Create slug tracker to detect duplicates
+    slug_tracker = SlugTracker()
+    
     # Read the main README
     main_content = read_file(readme_path)
     if not main_content:
@@ -120,8 +154,8 @@ def consolidate_readme_impl(readme_path: Path, output_path: Path) -> None:
         # Extract the original top-level heading from the document (will error if no heading)
         heading = get_top_heading(doc_content, str(resolved_path))
         
-        # Generate anchor from the heading
-        anchor = slugify(heading)
+        # Generate anchor from the heading (will error if duplicate)
+        anchor = slug_tracker.slugify(heading, str(resolved_path))
         
         link_map[link_path] = (anchor, doc_content)
     
@@ -154,7 +188,8 @@ def consolidate_readme_impl(readme_path: Path, output_path: Path) -> None:
         # Generate a heading from the filename
         filename = Path(local_path).name
         heading = filename.replace('.', ' ').replace('-', ' ').title()
-        anchor = slugify(filename)
+        # Generate anchor from the filename (will error if duplicate)
+        anchor = slug_tracker.slugify(filename, f"code file: {local_path}")
         
         code_files[local_path] = (anchor, filename, file_content)
     
