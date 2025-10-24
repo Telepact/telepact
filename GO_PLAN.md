@@ -7,9 +7,28 @@ so that the Telepact test suite passes on the golang library as it does for
 the other libraries. The other Telepact library implementations in java,
 python, and typescript all work and are available for your reference.
 
+# Education
+
+To understand what success looks like, from the `test/runner` directory, run:
+`poetry run python -m pytest -k 'test_server_case[py'`.
+
+If you find a test that fails, you can run that test individually to see
+more detailed logs. From the `test/runner` directory, run:
+`poetry run python -m pytest -k 'test_server_case[py-boolean-req0-res0]' -s -vv`.
+
+
 # Goal
 
-Your goal is to get `make test-trace-go` to succeed.
+Your goal is to, from the `test/runner` directory, get `poetry run python -m pytest -k 'test_server_case[go'` to pass.
 
-Be sure to run `make test-trace-java`, `make test-trace-py`, and `make test-trace-ts`
-to learn what success looks like.
+If a test fails when running the suite, DO NOT investigate right away.
+The suite logs are too sparse. You MUST choose one of the tests that failed
+and run that test individually to see the increased log output, such as
+`poetry run python -m pytest -k 'test_server_case[go-boolean-req0-res0]' -s -vv`.
+
+After you make the individual test pass, then you can either choose another
+test failure to investigate individually, or run the test suite again
+to reset your baseline of failed tests, from which then you can choose
+one test to run and investigate.
+
+Repeat until the test suite passes.

@@ -18,6 +18,7 @@ package internal
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/telepact/telepact/lib/go/telepact/internal/types"
 )
@@ -32,11 +33,11 @@ func SelectStructFields(typeDeclaration *types.TTypeDeclaration, value any, sele
 	case *types.TStruct:
 		valueMap := toStringAnyMap(value)
 		structName := typed.Name
-		selectedFields := toStringSlice(selectedStructFields[structName])
+		selectedFields := toStringSlice(getSelectEntry(selectedStructFields, structName))
 
 		result := make(map[string]any)
 		for fieldName, fieldValue := range valueMap {
-			if len(selectedFields) > 0 && !containsString(selectedFields, fieldName) {
+			if selectedFields != nil && !containsString(selectedFields, fieldName) {
 				continue
 			}
 
@@ -63,7 +64,7 @@ func SelectStructFields(typeDeclaration *types.TTypeDeclaration, value any, sele
 			defaultTagSelections[tagKey] = fieldNames
 		}
 
-		unionSelectedRaw := selectedStructFields[typed.Name]
+		unionSelectedRaw := getSelectEntry(selectedStructFields, typed.Name)
 		unionSelected := toMapOfStringToInterface(unionSelectedRaw)
 		if len(unionSelected) == 0 {
 			for tagKey, fieldNames := range defaultTagSelections {
@@ -87,7 +88,7 @@ func SelectStructFields(typeDeclaration *types.TTypeDeclaration, value any, sele
 		}
 
 		for fieldName, fieldValue := range unionData {
-			if len(selectedFields) > 0 && !containsString(selectedFields, fieldName) {
+			if selectedFields != nil && !containsString(selectedFields, fieldName) {
 				continue
 			}
 			fieldDecl := unionStruct.Fields[fieldName]
@@ -142,6 +143,21 @@ func toStringAnyMap(value any) map[string]any {
 	default:
 		return map[string]any{}
 	}
+}
+
+func getSelectEntry(selected map[string]any, key string) any {
+	if selected == nil {
+		return nil
+	}
+	if value, ok := selected[key]; ok {
+		return value
+	}
+	if strings.HasPrefix(key, "fn.") && strings.HasSuffix(key, ".->") {
+		if value, ok := selected["->"]; ok {
+			return value
+		}
+	}
+	return nil
 }
 
 func toAnySlice(value any) []any {

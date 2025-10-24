@@ -166,25 +166,27 @@ func ValidateSelect(givenObj any, possibleSelects map[string]any, ctx *ValidateC
 }
 
 func isSubSelect(path []any, givenObj any, possibleSection any) []*ValidationFailure {
-	switch allowed := possibleSection.(type) {
-	case []any:
+	if allowedSlice, ok := coerceToInterfaceSlice(possibleSection); ok {
 		givenSlice, ok := coerceToInterfaceSlice(givenObj)
 		if !ok {
 			return GetTypeUnexpectedValidationFailure(path, givenObj, arrayName)
 		}
 
-		failures := make([]*ValidationFailure, 0)
-		allowedSet := make(map[any]struct{}, len(allowed))
-		for _, v := range allowed {
-			allowedSet[v] = struct{}{}
+		normalizedAllowed := make([]any, len(allowedSlice))
+		for i, value := range allowedSlice {
+			normalizedAllowed[i] = normalizeSelectValue(value)
 		}
+
+		failures := make([]*ValidationFailure, 0)
 		for index, element := range givenSlice {
-			if _, ok := allowedSet[element]; !ok {
+			if !sliceContains(normalizedAllowed, normalizeSelectValue(element)) {
 				failures = append(failures, NewValidationFailure(append(clonePath(path), index), "ArrayElementDisallowed", map[string]any{}))
 			}
 		}
 		return failures
-	case map[string]any:
+	}
+
+	if allowedMap, ok := coerceToStringAnyMap(possibleSection); ok {
 		givenMap, ok := coerceToStringAnyMap(givenObj)
 		if !ok {
 			return GetTypeUnexpectedValidationFailure(path, givenObj, objectName)
@@ -192,7 +194,7 @@ func isSubSelect(path []any, givenObj any, possibleSection any) []*ValidationFai
 
 		failures := make([]*ValidationFailure, 0)
 		for key, value := range givenMap {
-			allowedSub, exists := allowed[key]
+			allowedSub, exists := allowedMap[key]
 			if !exists {
 				failures = append(failures, NewValidationFailure(append(clonePath(path), key), "ObjectKeyDisallowed", map[string]any{}))
 				continue
@@ -201,9 +203,42 @@ func isSubSelect(path []any, givenObj any, possibleSection any) []*ValidationFai
 			failures = append(failures, childFailures...)
 		}
 		return failures
-	default:
+	}
+
+	if reflect.DeepEqual(normalizeSelectValue(possibleSection), normalizeSelectValue(givenObj)) {
 		return nil
 	}
+
+	return []*ValidationFailure{NewValidationFailure(clonePath(path), "ValueDisallowed", map[string]any{"actual": givenObj})}
+}
+
+func normalizeSelectValue(value any) any {
+	if slice, ok := coerceToInterfaceSlice(value); ok {
+		normalized := make([]any, len(slice))
+		for i, element := range slice {
+			normalized[i] = normalizeSelectValue(element)
+		}
+		return normalized
+	}
+
+	if m, ok := coerceToStringAnyMap(value); ok {
+		normalized := make(map[string]any, len(m))
+		for key, element := range m {
+			normalized[key] = normalizeSelectValue(element)
+		}
+		return normalized
+	}
+
+	return value
+}
+
+func sliceContains(slice []any, target any) bool {
+	for _, candidate := range slice {
+		if reflect.DeepEqual(candidate, target) {
+			return true
+		}
+	}
+	return false
 }
 
 // toStringAnyMap attempts to coerce common map representations to map[string]any.

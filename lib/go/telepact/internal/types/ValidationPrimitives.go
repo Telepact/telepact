@@ -18,6 +18,7 @@ package types
 
 import (
 	"encoding/base64"
+	"encoding/json"
 	"math"
 	"reflect"
 )
@@ -64,6 +65,12 @@ func ValidateNumber(value any, ctx *ValidateContext) []*ValidationFailure {
 		return nil
 	case float32, float64:
 		return nil
+	case json.Number:
+		// Accept numeric JSON values without forcing premature conversion; defer range checks to conversion.
+		if _, err := v.Float64(); err != nil {
+			return GetTypeUnexpectedValidationFailure(nil, value, numberName)
+		}
+		return nil
 	default:
 		return GetTypeUnexpectedValidationFailure(nil, value, numberName)
 	}
@@ -82,6 +89,14 @@ func ValidateInteger(value any) []*ValidationFailure {
 		return validateSignedInt(int64(v))
 	case int64:
 		return validateSignedInt(v)
+	case json.Number:
+		if i, err := v.Int64(); err == nil {
+			return validateSignedInt(i)
+		}
+		if _, err := v.Float64(); err == nil {
+			return []*ValidationFailure{NewValidationFailure(nil, "NumberOutOfRange", map[string]any{})}
+		}
+		return GetTypeUnexpectedValidationFailure(nil, value, integerName)
 	default:
 		return GetTypeUnexpectedValidationFailure(nil, value, integerName)
 	}

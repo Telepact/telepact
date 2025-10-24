@@ -129,7 +129,7 @@ func startTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscription, 
 
 	forwardRequest := func(message telepact.Message) (telepact.Message, error) {
 		payload := []any{message.Headers, message.Body}
-		bytes, err := json.Marshal(payload)
+		payloadBytes, err := json.Marshal(payload)
 		if err != nil {
 			return telepact.Message{}, err
 		}
@@ -137,15 +137,23 @@ func startTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscription, 
 		ctx, cancel := context.WithTimeout(context.Background(), requestTimeout)
 		defer cancel()
 
-		reply, err := d.conn.RequestWithContext(ctx, cfg.BackdoorTopic, bytes)
+		reply, err := d.conn.RequestWithContext(ctx, cfg.BackdoorTopic, payloadBytes)
 		if err != nil {
 			return telepact.Message{}, err
 		}
 
 		var response []any
-		if err := json.Unmarshal(reply.Data, &response); err != nil {
+		decoder := json.NewDecoder(bytes.NewReader(reply.Data))
+		decoder.UseNumber()
+		if err := decoder.Decode(&response); err != nil {
 			return telepact.Message{}, err
 		}
+		normalized := normalizeJSONNumbers(response)
+		responseSlice, ok := normalized.([]any)
+		if !ok {
+			return telepact.Message{}, fmt.Errorf("invalid backdoor response payload")
+		}
+		response = responseSlice
 		if len(response) != 2 {
 			return telepact.Message{}, errors.New("invalid backdoor response payload")
 		}
@@ -617,12 +625,20 @@ func (d *Dispatcher) handleClientRequest(
 
 func deserializePseudoJSON(data []byte) ([]any, error) {
 	var envelope []any
-	if err := json.Unmarshal(data, &envelope); err != nil {
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.UseNumber()
+	if err := decoder.Decode(&envelope); err != nil {
 		decoder := msgpack.NewDecoder(bytes.NewReader(data))
 		if err := decoder.Decode(&envelope); err != nil {
 			return nil, fmt.Errorf("decode pseudo-json: %w", err)
 		}
 	}
+	normalized := normalizeJSONNumbers(envelope)
+	normalizedSlice, ok := normalized.([]any)
+	if !ok {
+		return nil, errors.New("invalid pseudo-json envelope type")
+	}
+	envelope = normalizedSlice
 	if len(envelope) != 2 {
 		return nil, errors.New("invalid pseudo-json envelope length")
 	}
@@ -665,6 +681,36 @@ func containsBytes(value any) bool {
 		return true
 	}
 	return false
+}
+
+func normalizeJSONNumbers(value any) any {
+	switch typed := value.(type) {
+	case map[string]any:
+		normalized := make(map[string]any, len(typed))
+		for key, entry := range typed {
+			normalized[key] = normalizeJSONNumbers(entry)
+		}
+		return normalized
+	case []any:
+		normalized := make([]any, len(typed))
+		for i, entry := range typed {
+			normalized[i] = normalizeJSONNumbers(entry)
+		}
+		return normalized
+	case json.Number:
+		if intval, err := typed.Int64(); err == nil {
+			return intval
+		}
+		if str := typed.String(); !strings.ContainsAny(str, ".eE") && !strings.ContainsRune(str, '.') {
+			return typed
+		}
+		if floatval, err := typed.Float64(); err == nil {
+			return floatval
+		}
+		return typed
+	default:
+		return typed
+	}
 }
 
 func boolValue(value any) bool {
