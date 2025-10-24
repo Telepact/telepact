@@ -20,6 +20,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"math"
 
 	"github.com/vmihailenco/msgpack/v5"
 )
@@ -105,6 +106,11 @@ func normalizePseudoJSON(value any) any {
 	case []any:
 		for i, val := range v {
 			v[i] = normalizePseudoJSON(val)
+		}
+		return v
+	case float64:
+		if math.Trunc(v) == v && v <= math.MaxInt64 && v >= math.MinInt64 {
+			return int64(v)
 		}
 		return v
 	default:

@@ -17,7 +17,7 @@
 SHELL := /bin/bash
 
 BIN := bin/telepact-go-dispatcher
-GO_SOURCES := $(shell find cmd -type f -name '*.go') $(shell find internal -type f -name '*.go' 2>/dev/null) main.go
+GO_SOURCES := $(shell find cmd -type f -name '*.go') $(shell find internal -type f -name '*.go' 2>/dev/null)
 
 all: codegen build
 

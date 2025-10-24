@@ -47,7 +47,7 @@ func ParseField(path []any, fieldDeclaration string, typeDeclarationValue any, i
 	fieldName := fieldDeclaration
 	optional := true
 	if !isHeader {
-		fieldName = matches[1]
+		fieldName = matches[0]
 		optional = matches[2] != ""
 	}
 

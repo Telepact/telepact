@@ -121,12 +121,20 @@ func GetOrParseType(path []any, typeName string, ctx *ParseContext) (types.TType
 	case strings.HasPrefix(customTypeName, "union"):
 		parsedType, err = ParseUnionType(thisPath, definition, customTypeName, nil, nil, childCtx)
 	case strings.HasPrefix(customTypeName, "fn"):
-		argType, argErr := ParseStructType(path, definition, customTypeName, []string{"->", "_errors"}, ctx)
+		argStruct, argErr := ParseStructType(path, definition, customTypeName, []string{"->", "_errors"}, ctx)
 		if argErr != nil {
 			err = argErr
 			break
 		}
-		storeParsedType(ctx, customTypeName, argType)
+
+		// Functions are represented as a single-variant union containing their call struct.
+		unionTags := map[string]*types.TStruct{}
+		unionIndices := map[string]int{}
+		if argStruct != nil {
+			unionTags[customTypeName] = argStruct
+			unionIndices[customTypeName] = 0
+		}
+		storeParsedType(ctx, customTypeName, types.NewTUnion(customTypeName, unionTags, unionIndices))
 
 		resultType, resultErr := ParseFunctionResultType(thisPath, definition, customTypeName, childCtx)
 		if resultErr != nil {
