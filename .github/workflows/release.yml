@@ -127,6 +127,12 @@ jobs:
           name: build-console-tgz
           path: sdk/console/dist-tgz
 
+      - name: Download consolidated readme artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: build-consolidated-readme
+          path: dist
+
       - name: Install Project CLI
         run: make install-project-cli
 

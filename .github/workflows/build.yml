@@ -25,6 +25,29 @@ on:
         description: 'Passphrase for the GPG private key'
 
 jobs:
+  build-consolidated-readme:
+    name: Build Consolidated README
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Project CLI
+        run: make install-project-cli
+
+      - name: Build consolidated readme
+        run: |
+          mkdir -p dist
+          telepact-project consolidated-readme README.md dist/CONSOLIDATED_README.md
+
+      - name: Upload consolidated readme artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-consolidated-readme
+          path: dist/CONSOLIDATED_README.md
+          retention-days: 1
+
   build-ts:
     name: Build TypeScript
     runs-on: ubuntu-latest

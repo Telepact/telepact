@@ -25,6 +25,8 @@ import subprocess
 from github import Github, GithubException
 from pathlib import Path
 
+from .commands.consolidated_readme import consolidated_readme
+
 yaml = YAML()
 
 def bump_version(version: str) -> str:
@@ -544,6 +546,18 @@ def release() -> None:
                                 click.echo(f"Uploaded asset: {file_name} for target: {target}")
                 else:
                     click.echo(f"Asset directory does not exist: {asset_directory} for target: {target}")
+        
+        # Upload consolidated readme as a release asset
+        consolidated_readme_path = "dist/CONSOLIDATED_README.md"
+        if os.path.exists(consolidated_readme_path):
+            release.upload_asset(
+                path=consolidated_readme_path,
+                name="CONSOLIDATED_README.md",
+                label="Consolidated README"
+            )
+            click.echo(f"Uploaded consolidated readme: {consolidated_readme_path}")
+        else:
+            click.echo(f"Consolidated readme not found at: {consolidated_readme_path}")
 
     except Exception as e:
         click.echo(f"Failed to create release or upload assets: {e}")
@@ -665,6 +679,7 @@ main.add_command(github_labels)
 main.add_command(release)
 main.add_command(automerge)
 main.add_command(gitignore)
+main.add_command(consolidated_readme)
 
 if __name__ == "__main__":
     main()
