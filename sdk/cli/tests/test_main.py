@@ -15,6 +15,8 @@
 #|
 
 from typing import Generator
+from pathlib import Path
+import traceback
 import pytest
 from click.testing import CliRunner
 # Adjust the import path according to your project structure
@@ -191,6 +193,31 @@ def test_command_ts(runner: CliRunner) -> None:
 
     # open the generated file and check if it contains the expected content
     # TODO: implement this part
+
+
+def test_command_go(runner: CliRunner) -> None:
+    output_dir = Path('tests/output/go')
+    result = runner.invoke(
+        main, ['codegen', '--schema-dir', 'tests/data', '--lang', 'go', '--out', str(output_dir), '--package', 'output'])
+
+    if result.exc_info:
+        traceback_str = ''.join(traceback.format_exception(*result.exc_info))
+        print(traceback_str)
+
+    print(f'Output: {result.output}')
+
+    assert result.exit_code == 0
+
+    generated_path = output_dir / 'generated.go'
+    expected_path = Path('tests/fixtures/go/generated.go')
+
+    assert generated_path.exists(), "Generated Go file not found"
+    assert expected_path.exists(), "Expected Go fixture missing"
+
+    generated_content = generated_path.read_text().strip()
+    expected_content = expected_path.read_text().strip()
+
+    assert generated_content == expected_content
 
 def test_empty_schema(runner: CliRunner) -> None:
     os.makedirs('tests/tmp/wrong', exist_ok=True)

@@ -143,6 +143,67 @@ def _to_pascal_case(name: str) -> str:
     return result
 
 
+_GO_RESERVED_KEYWORDS: set[str] = {
+    'break', 'default', 'func', 'interface', 'select', 'case', 'defer', 'go',
+    'map', 'struct', 'chan', 'else', 'goto', 'package', 'switch', 'const',
+    'fallthrough', 'if', 'range', 'type', 'continue', 'for', 'import', 'return',
+    'var', 'bool', 'int', 'string', 'float64', 'error', 'byte', 'rune',
+}
+
+
+def _to_camel_case(name: str) -> str:
+    pascal = _to_pascal_case(name)
+    if not pascal:
+        return name
+    return pascal[:1].lower() + pascal[1:]
+
+
+def _sanitize_go_identifier(name: str) -> str:
+    sanitized = re.sub(r'[^0-9A-Za-z_]', '', name)
+    if not sanitized:
+        sanitized = 'Field'
+    if sanitized[0].isdigit():
+        sanitized = f'Field{sanitized}'
+    lower = sanitized.lower()
+    if lower in _GO_RESERVED_KEYWORDS:
+        sanitized = f'{sanitized}_'
+    return sanitized
+
+
+def _process_go_fields(fields: dict[str, object]) -> list[dict[str, object]]:
+    processed: list[dict[str, object]] = []
+    for field_name, field_type in fields.items():
+        base_name = field_name.replace('!', '')
+        sanitized = _sanitize_go_identifier(base_name)
+        method_name = _to_pascal_case(sanitized)
+        param_name = _to_camel_case(sanitized)
+        if sanitized.endswith('_'):
+            param_name = sanitized
+        processed.append({
+            'json_name': field_name,
+            'method_name': method_name,
+            'param_name': param_name,
+            'type': field_type,
+            'optional': '!' in field_name,
+            'nullable': isinstance(field_type, str) and '?' in field_type,
+        })
+    return processed
+
+
+def _process_go_tags(tag_entries: list[dict[str, object]]) -> list[dict[str, object]]:
+    processed_tags: list[dict[str, object]] = []
+    for tag_entry in tag_entries:
+        tag_key = _find_tag_key(tag_entry)
+        tag_fields = cast(dict[str, object], tag_entry[tag_key])
+        processed_tags.append({
+            'json_name': tag_key,
+            'name': _to_pascal_case(tag_key),
+            'doc': tag_entry.get('///'),
+            'fields': _process_go_fields(tag_fields),
+        })
+    return processed_tags
+
+
 def _generate_internal(schema_data: list[dict[str, object]], possible_fn_selects: dict[str, object], target: str, output_dir: str, package_name: str) -> None:
 
     # Load jinja template from file
@@ -155,6 +216,8 @@ def _generate_internal(schema_data: list[dict[str, object]], possible_fn_selects
     template_env.filters['regex_replace'] = _regex_replace
     template_env.filters['find_schema_key'] = _find_schema_key
     template_env.filters['find_tag_key'] = _find_tag_key
+    template_env.filters['to_pascal_case'] = _to_pascal_case
+    template_env.filters['to_camel_case'] = _to_camel_case
     template_env.globals['raise_error'] = _raise_error
 
     # Find all errors. definitions, and append to function results
@@ -311,28 +374,61 @@ def _generate_internal(schema_data: list[dict[str, object]], possible_fn_selects
         if not package_name:
             raise Exception('Go code generation requires --package to be set')
 
-        go_functions: list[dict[str, str]] = []
+        go_entries: list[dict[str, object]] = []
+        go_functions: list[dict[str, object]] = []
+
         for schema_entry in schema_data:
             schema_key = _find_schema_key(schema_entry)
             if schema_key.startswith('info') or schema_key.startswith('headers'):
                 continue
 
-            if not schema_key.startswith('fn'):
-                continue
+            base_name = schema_key.split('.')[1]
+            go_name = _to_pascal_case(base_name)
+            doc = schema_entry.get('///')
 
-            if schema_key not in possible_fn_selects:
-                continue
+            if schema_key.startswith('struct'):
+                fields = cast(dict[str, object], schema_entry[schema_key])
+                go_entries.append({
+                    'kind': 'struct',
+                    'schema_key': schema_key,
+                    'name': go_name,
+                    'doc': doc,
+                    'fields': _process_go_fields(fields),
+                })
 
-            fn_name = schema_key.split('.')[1]
-            go_functions.append({
-                'key': schema_key,
-                'pascal_name': _to_pascal_case(fn_name),
-            })
+            elif schema_key.startswith('union'):
+                tags = cast(list[dict[str, object]], schema_entry[schema_key])
+                go_entries.append({
+                    'kind': 'union',
+                    'schema_key': schema_key,
+                    'name': go_name,
+                    'doc': doc,
+                    'tags': _process_go_tags(tags),
+                })
+
+            elif schema_key.startswith('fn'):
+                input_fields = cast(dict[str, object], schema_entry[schema_key])
+                result_tags = cast(list[dict[str, object]], schema_entry['->'])
+                fn_entry: dict[str, object] = {
+                    'kind': 'function',
+                    'schema_key': schema_key,
+                    'name': go_name,
+                    'doc': doc,
+                    'input_fields': _process_go_fields(input_fields),
+                    'output_tags': _process_go_tags(result_tags),
+                    'select': possible_fn_selects.get(schema_key, {}),
+                    'raw_name': schema_key,
+                    'camel_name': _to_camel_case(base_name),
+                }
+                go_entries.append(fn_entry)
+                go_functions.append(fn_entry)
 
         go_template = template_env.get_template('go_all.j2')
         output = go_template.render({
             'package': package_name,
+            'entries': go_entries,
             'functions': go_functions,
+            'possible_fn_selects': possible_fn_selects,
         })
 
         if output_dir:
