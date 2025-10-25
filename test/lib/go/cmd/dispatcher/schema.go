@@ -6,34 +6,81 @@ import (
 	"fmt"
 
 	telepact "github.com/telepact/telepact/lib/go/telepact"
+	gen "github.com/telepact/telepact/test/lib/go/cmd/dispatcher/gen"
 )
 
-type codeGenHandler struct{}
+type codeGenHandler struct {
+	handler *gen.TypedServerHandler
+}
 
 func newCodeGenHandler(enabled bool) *codeGenHandler {
 	if !enabled {
 		return nil
 	}
-	return &codeGenHandler{}
+	impl := &typedCodeGenServer{}
+	return &codeGenHandler{handler: gen.NewTypedServerHandler(impl)}
 }
 
 func (c *codeGenHandler) Handle(message telepact.Message) (telepact.Message, error) {
-	if c == nil {
+	if c == nil || c.handler == nil {
 		return message, nil
 	}
 
-	headers := message.Headers
-	body := message.Body
+	response, err := c.handler.Handler(message)
+	if err != nil {
+		return telepact.Message{}, err
+	}
 
+	headers := response.Headers
 	if headers == nil {
 		headers = map[string]any{}
 	}
-	if body == nil {
-		body = map[string]any{}
+	headers["@codegens_"] = true
+
+	return telepact.NewMessage(headers, response.Body), nil
+}
+
+type typedCodeGenServer struct{}
+
+func (s *typedCodeGenServer) CircularLink1(headers map[string]any, input gen.CircularLink1Input) (telepact.TypedMessage[gen.CircularLink1Output], error) {
+	return telepact.TypedMessage[gen.CircularLink1Output]{}, telepact.NewTelepactError("generated server circularLink1 not implemented")
+}
+
+func (s *typedCodeGenServer) CircularLink2(headers map[string]any, input gen.CircularLink2Input) (telepact.TypedMessage[gen.CircularLink2Output], error) {
+	return telepact.TypedMessage[gen.CircularLink2Output]{}, telepact.NewTelepactError("generated server circularLink2 not implemented")
+}
+
+func (s *typedCodeGenServer) Example(headers map[string]any, input gen.ExampleInput) (telepact.TypedMessage[gen.ExampleOutput], error) {
+	return telepact.TypedMessage[gen.ExampleOutput]{}, telepact.NewTelepactError("generated server example not implemented")
+}
+
+func (s *typedCodeGenServer) GetBigList(headers map[string]any, input gen.GetBigListInput) (telepact.TypedMessage[gen.GetBigListOutput], error) {
+	return telepact.TypedMessage[gen.GetBigListOutput]{}, telepact.NewTelepactError("generated server getBigList not implemented")
+}
+
+func (s *typedCodeGenServer) SelfLink(headers map[string]any, input gen.SelfLinkInput) (telepact.TypedMessage[gen.SelfLinkOutput], error) {
+	return telepact.TypedMessage[gen.SelfLinkOutput]{}, telepact.NewTelepactError("generated server selfLink not implemented")
+}
+
+func (s *typedCodeGenServer) Test(headers map[string]any, input gen.TestInput) (telepact.TypedMessage[gen.TestOutput], error) {
+	if boolValue(headers["@error"]) {
+		body := gen.NewTestOutputFromErrorExample2(gen.NewTestOutputErrorExample2("Boom!"))
+		return telepact.NewTypedMessage(map[string]any{}, body), nil
 	}
 
-	headers["@codegens_"] = true
-	return telepact.NewMessage(headers, body), nil
+	valueOpt := gen.None[gen.Value]()
+	if top, ok := input.Value(); ok {
+		valueOpt = gen.Some(copyValue(top))
+	}
+
+	okBody := gen.NewTestOutputOk(valueOpt)
+	body := gen.NewTestOutputFromOk(okBody)
+
+	return telepact.NewTypedMessage(map[string]any{}, body), nil
+}
+
+func copyValue(value gen.Value) gen.Value {
+	return gen.NewValueFromPseudoJSON(value.PseudoJSON())
 }
 
 func validatePseudoJSONSchema(input map[string]any) ([]map[string]any, error) {

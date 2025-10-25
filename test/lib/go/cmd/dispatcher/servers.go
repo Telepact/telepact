@@ -183,17 +183,19 @@ func startTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscription, 
 			return telepact.Message{}, fmt.Errorf("telepact: requested server error")
 		}
 
-		if cfg.BackdoorTopic == "" {
-			return telepact.Message{}, fmt.Errorf("telepact: backdoor topic not configured")
-		}
-
-		msg, err := forwardRequest(message)
-		if err != nil {
-			return telepact.Message{}, err
-		}
-
+		var msg telepact.Message
+		var err error
 		if codegenHandler != nil {
-			msg, err = codegenHandler.Handle(msg)
+			msg, err = codegenHandler.Handle(message)
+			if err != nil {
+				return telepact.Message{}, err
+			}
+		} else {
+			if cfg.BackdoorTopic == "" {
+				return telepact.Message{}, fmt.Errorf("telepact: backdoor topic not configured")
+			}
+
+			msg, err = forwardRequest(message)
 			if err != nil {
 				return telepact.Message{}, err
 			}
