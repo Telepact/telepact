@@ -46,5 +46,6 @@ test-server: codegen
 clean:
 	rm -rf bin
 	rm -f metrics.txt
+	rm -rf $(CODEGEN_DIR)
 
 .PHONY: all build codegen mod-tidy run test-server clean

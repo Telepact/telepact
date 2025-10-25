@@ -9,7 +9,10 @@ output. You can reference cli logic for the other supported code-gen target lang
 
 # Goal
 
-Your goal is to generate go-lang code by running `make test-cli` and inspecting
-the generated results in `sdk/cli/tests/output`. The go-lang code results
-should very comparable to the other programming languages, especially
+Your intial goal is to generate go-lang code by running `make test-cli` and inspecting the generated results in `sdk/cli/tests/output`. The go-lang code results should very comparable to the other programming languages, especially
 typescript and python.
+
+Your final goal is to, from the `test/runner` directory, run
+`poetry run python -m pytest -k 'test_client_server_codegen_case[go'` and 
+have it pass. You will need to load your new cli before you can do that
+with `make uninstall-cli cli install-cli clean-test test-trace-go`.

@@ -77,11 +77,16 @@
         {%- set nullable = '?' in t -%}
         {%- set typ = t | replace('?', '') -%}
         {%- set base = go_non_nullable_simple(typ) -%}
+        {%- set resolved_type = go_type(t) -%}
         {%- if nullable -%}
-            {%- if typ.startswith('struct.') or typ.startswith('union.') or typ.startswith('fn.') or typ == '_ext.Select_' -%}
-                encodeNullable({{ expr }}, func(v {{ base }}) any { return {{ encode_expression(typ, 'v', depth + 1) }} })
+            {%- if resolved_type.startswith('*') -%}
+                {%- if typ.startswith('struct.') or typ.startswith('union.') or typ.startswith('fn.') or typ == '_ext.Select_' -%}
+                    encodeNullable({{ expr }}, func(v {{ base }}) any { return {{ encode_expression(typ, 'v', depth + 1) }} })
+                {%- else -%}
+                    encodeNullable({{ expr }}, identity[{{ base }}])
+                {%- endif -%}
             {%- else -%}
-                encodeNullable({{ expr }}, identity[{{ base }}])
+                {{ encode_expression(typ, expr, depth + 1) }}
             {%- endif -%}
         {%- else -%}
             {%- if typ.startswith('struct.') or typ.startswith('union.') or typ.startswith('fn.') or typ == '_ext.Select_' -%}
@@ -103,8 +108,13 @@
     {%- if t is string -%}
         {%- set nullable = '?' in t -%}
         {%- set typ = t | replace('?', '') -%}
+        {%- set resolved_type = go_type(t) -%}
         {%- if nullable -%}
-            nullable({{ expr }}, func(v any) {{ go_non_nullable_simple(typ) }} { return {{ decode_expression(typ, 'v', depth + 1) }} })
+            {%- if resolved_type.startswith('*') -%}
+                nullable({{ expr }}, func(v any) {{ go_non_nullable_simple(typ) }} { return {{ decode_expression(typ, 'v', depth + 1) }} })
+            {%- else -%}
+                {{ decode_expression(typ, expr, depth + 1) }}
+            {%- endif -%}
         {%- else -%}
             {%- if typ == 'boolean' -%}
                 asBool({{ expr }})
@@ -364,6 +374,10 @@ type Select struct {
 
 func NewSelect() *Select {
     return &Select{pseudoJSON: map[string]any{}}
+}
+
+func NewSelectFromPseudoJSON(p map[string]any) Select {
+    return Select{pseudoJSON: cloneMap(p)}
 }
 
 func (s *Select) PseudoJSON() map[string]any {

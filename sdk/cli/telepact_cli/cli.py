@@ -147,7 +147,7 @@ _GO_RESERVED_KEYWORDS: set[str] = {
     'break', 'default', 'func', 'interface', 'select', 'case', 'defer', 'go',
     'map', 'struct', 'chan', 'else', 'goto', 'package', 'switch', 'const',
     'fallthrough', 'if', 'range', 'type', 'continue', 'for', 'import', 'return',
-    'var', 'bool', 'int', 'string', 'float64', 'error', 'byte', 'rune',
+    'var', 'bool', 'int', 'string', 'float64', 'error', 'byte', 'rune', 'any',
 }
 
 
