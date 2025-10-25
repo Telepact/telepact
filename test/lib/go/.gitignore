@@ -4,3 +4,4 @@ telepact.tgz
 telepact.tar.gz
 telepact.zip
 *.log
+cmd/dispatcher/gen/

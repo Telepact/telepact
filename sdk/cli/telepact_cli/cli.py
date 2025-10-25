@@ -53,9 +53,9 @@ def bump_version(version: str) -> str:
 
 def _validate_package(ctx: click.Context, param: click.Parameter, value: str) -> str:
     lang = ctx.params.get('lang')
-    if lang == 'java' and not value:
+    if lang in ('java', 'go') and not value:
         raise click.BadParameter(
-            '--package is required when --lang is java')
+            '--package is required when --lang is {}'.format(lang))
     return value
 
 
@@ -67,7 +67,7 @@ def main() -> None:
 @click.command()
 @click.option('--schema-http-url', help='telepact schema directory', required=False)
 @click.option('--schema-dir', help='telepact schema directory', required=False)
-@click.option('--lang', help='Language target (one of "java", "py", or "ts")', required=True)
+@click.option('--lang', help='Language target (one of "java", "py", "ts", or "go")', required=True)
 @click.option('--out', help='Output directory', required=True)
 @click.option('--package', help='Java package (use if --lang is "java")', callback=_validate_package)
 def codegen(schema_http_url: str, schema_dir: str, lang: str, out: str, package: str) -> None:
@@ -91,7 +91,7 @@ def codegen(schema_http_url: str, schema_dir: str, lang: str, out: str, package:
     print('Language target:', lang)
     print('Output directory:', out)
     if package:
-        print('Java package:', package)
+        print('Package:', package)
 
 
     target = lang
@@ -133,7 +133,17 @@ def _raise_error(message: str) -> None:
     raise Exception(message)
 
 
-def _generate_internal(schema_data: list[dict[str, object]], possible_fn_selects: dict[str, object], target: str, output_dir: str, java_package: str) -> None:
+def _to_pascal_case(name: str) -> str:
+    tokens = re.split(r'[^0-9A-Za-z]+', name)
+    result = ''.join(token[:1].upper() + token[1:] for token in tokens if token)
+    if not result:
+        result = name.title()
+    if result and result[0].isdigit():
+        result = f'Fn{result}'
+    return result
+
+
+def _generate_internal(schema_data: list[dict[str, object]], possible_fn_selects: dict[str, object], target: str, output_dir: str, package_name: str) -> None:
 
     # Load jinja template from file
     # Adjust the path to your template directory if necessary
@@ -196,18 +206,18 @@ def _generate_internal(schema_data: list[dict[str, object]], possible_fn_selects
                 functions.append(schema_key)
 
             _write_java_file('java_type_2.j2', {
-                'package': java_package, 'data': schema_entry, 'possible_fn_selects': possible_fn_selects}, f"{schema_key.split('.')[1]}.java")
+                'package': package_name, 'data': schema_entry, 'possible_fn_selects': possible_fn_selects}, f"{schema_key.split('.')[1]}.java")
 
         _write_java_file('java_server.j2', {
-                         'package': java_package, 'functions': functions, 'possible_fn_selects': possible_fn_selects}, f"TypedServerHandler.java")
+                         'package': package_name, 'functions': functions, 'possible_fn_selects': possible_fn_selects}, f"TypedServerHandler.java")
 
         _write_java_file('java_client.j2', {
-                         'package': java_package, 'functions': functions, 'possible_fn_selects': possible_fn_selects}, f"TypedClient.java")
+                         'package': package_name, 'functions': functions, 'possible_fn_selects': possible_fn_selects}, f"TypedClient.java")
 
         _write_java_file('java_utility.j2', {
-                         'package': java_package}, f"Utility_.java")
+                         'package': package_name}, f"Utility_.java")
 
-        _write_java_file('java_select.j2', {'package': java_package, 'possible_fn_selects': possible_fn_selects}, f"Select_.java")
+        _write_java_file('java_select.j2', {'package': package_name, 'possible_fn_selects': possible_fn_selects}, f"Select_.java")
 
     elif target == 'py':
 
@@ -293,6 +303,44 @@ def _generate_internal(schema_data: list[dict[str, object]], possible_fn_selects
             with file_path.open("w") as f:
                 f.write(output)
 
+        else:
+            print(output)
+
+    elif target == 'go':
+
+        if not package_name:
+            raise Exception('Go code generation requires --package to be set')
+
+        go_functions: list[dict[str, str]] = []
+        for schema_entry in schema_data:
+            schema_key = _find_schema_key(schema_entry)
+            if schema_key.startswith('info') or schema_key.startswith('headers'):
+                continue
+
+            if not schema_key.startswith('fn'):
+                continue
+
+            if schema_key not in possible_fn_selects:
+                continue
+
+            fn_name = schema_key.split('.')[1]
+            go_functions.append({
+                'key': schema_key,
+                'pascal_name': _to_pascal_case(fn_name),
+            })
+
+        go_template = template_env.get_template('go_all.j2')
+        output = go_template.render({
+            'package': package_name,
+            'functions': go_functions,
+        })
+
+        if output_dir:
+            output_path = Path(output_dir)
+            output_path.mkdir(parents=True, exist_ok=True)
+            file_path = output_path / "generated.go"
+            with file_path.open("w") as f:
+                f.write(output)
         else:
             print(output)
 

@@ -325,11 +325,7 @@ func startClientTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscrip
 
 	var generatedClient *generatedTypedClient
 	if cfg.UseCodegen {
-		schema, err := telepact.TelepactSchemaFromDirectory(cfg.APISchemaPath)
-		if err != nil {
-			return nil, err
-		}
-		generatedClient = newGeneratedTypedClient(client, schema)
+		generatedClient = newGeneratedTypedClient(client)
 	}
 
 	sub, err := d.conn.Subscribe(cfg.ClientFrontdoor, func(msg *nats.Msg) {

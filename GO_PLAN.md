@@ -1,30 +1,29 @@
 # Background
 
 You are a programmer helping to create a golang port of the Telepact library.
-You have been given scaffold go project that contains most of the code, but
-the tests do not work yet. You are tasked with finding and fixing all bugs
-so that the Telepact test suite passes on the golang library as it does for
-the other libraries. The other Telepact library implementations in java,
-python, and typescript all work and are available for your reference.
+The main go library project is largely complete in `lib/go`, and most of the
+tests are passing in `test/runner` (with the go test harness setup in `test/lib/go`).
 
-# Education
+Now you need to add go-lang code generation to the telepact cli in `sdk/cli`. You
+can reference the other supported languages there like python and typescript.
 
-To understand what success looks like, from the `test/runner` directory, run:
-`poetry run python -m pytest -k 'test_mock_multi_case[py'`.
+# Development Loop
 
-If you find a test that fails, you can run that test individually to see
-more detailed logs. From the `test/runner` directory, run:
-`poetry run python -m pytest -k 'test_mock_multi_case[py-0]' -s -vv`.
+To make changes that you can test, use the following procedure
+1. Make changes in `sdk/cli`.
+2. Build and install the new cli code with `make uninstall-cli clean-cli cli install-cli`
+3. Clean and rebuild the test harness with `make clean-test test-trace-go`
+4. Run a specific test in `test/runner` to verify if fix worked, such as `poetry run python -m pytest -k 'test_client_server_codegen_case[go-0]' -s -vv`.
 
 
 # Goal
 
-Your goal is to, from the `test/runner` directory, get `poetry run python -m pytest -k 'test_mock_multi_case[go'` to pass.
+Your goal is to, from the `test/runner` directory, get `poetry run python -m pytest -k 'test_client_server_codegen_case[go'` to pass.
 
 If a test fails when running the suite, DO NOT investigate right away.
 The suite logs are too sparse. You MUST choose one of the tests that failed
 and run that test individually to see the increased log output, such as
-`poetry run python -m pytest -k 'test_mock_multi_case[go-0]' -s -vv`.
+`poetry run python -m pytest -k 'test_client_server_codegen_case[go-0]' -s -vv`.
 
 After you make the individual test pass, then you can either choose another
 test failure to investigate individually, or run the test suite again
