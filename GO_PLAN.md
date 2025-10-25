@@ -10,21 +10,21 @@ python, and typescript all work and are available for your reference.
 # Education
 
 To understand what success looks like, from the `test/runner` directory, run:
-`poetry run python -m pytest -k 'test_mock_case[py'`.
+`poetry run python -m pytest -k 'test_mock_multi_case[py'`.
 
 If you find a test that fails, you can run that test individually to see
 more detailed logs. From the `test/runner` directory, run:
-`poetry run python -m pytest -k 'test_mock_case[py-0]' -s -vv`.
+`poetry run python -m pytest -k 'test_mock_multi_case[py-0]' -s -vv`.
 
 
 # Goal
 
-Your goal is to, from the `test/runner` directory, get `poetry run python -m pytest -k 'test_mock_case[go'` to pass.
+Your goal is to, from the `test/runner` directory, get `poetry run python -m pytest -k 'test_mock_multi_case[go'` to pass.
 
 If a test fails when running the suite, DO NOT investigate right away.
 The suite logs are too sparse. You MUST choose one of the tests that failed
 and run that test individually to see the increased log output, such as
-`poetry run python -m pytest -k 'test_mock_case[go-0]' -s -vv`.
+`poetry run python -m pytest -k 'test_mock_multi_case[go-0]' -s -vv`.
 
 After you make the individual test pass, then you can either choose another
 test failure to investigate individually, or run the test suite again

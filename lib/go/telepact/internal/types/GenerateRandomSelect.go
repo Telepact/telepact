@@ -47,6 +47,15 @@ func subSelect(possibleSelectSection any, ctx *GenerateContext) any {
 		}
 		sort.Strings(selectedFieldNames)
 		return selectedFieldNames
+	case []string:
+		selectedFieldNames := make([]string, 0, len(typed))
+		for _, fieldName := range typed {
+			if ctx.RandomGenerator == nil || ctx.RandomGenerator.NextBoolean() {
+				selectedFieldNames = append(selectedFieldNames, fieldName)
+			}
+		}
+		sort.Strings(selectedFieldNames)
+		return selectedFieldNames
 	case map[string]any:
 		selectedSection := make(map[string]any)
 		keys := make([]string, 0, len(typed))
@@ -69,6 +78,12 @@ func subSelect(possibleSelectSection any, ctx *GenerateContext) any {
 		}
 
 		return selectedSection
+	case map[string][]string:
+		converted := make(map[string]any, len(typed))
+		for key, value := range typed {
+			converted[key] = value
+		}
+		return subSelect(converted, ctx)
 	case map[any]any:
 		converted := make(map[string]any, len(typed))
 		for key, value := range typed {

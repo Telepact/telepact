@@ -53,16 +53,16 @@ func (r *RandomGenerator) SetSeed(seed int32) {
 
 // NextInt returns the next pseudo-random positive 31-bit integer.
 func (r *RandomGenerator) NextInt() int {
-	x := uint32(r.seed)
+	x := r.seed
 	x ^= x << 16
 	x ^= x >> 11
 	x ^= x << 5
 	if x == 0 {
 		x = 1
 	}
-	r.seed = int32(x)
+	r.seed = x
 	r.count++
-	return int(int32(x & 0x7fffffff))
+	return int(x & 0x7fffffff)
 }
 
 // NextIntWithCeiling returns the next pseudo-random integer modulo the provided ceiling.
