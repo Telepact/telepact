@@ -163,8 +163,14 @@ func keySetsEqual(a, b map[string]struct{}) bool {
 }
 
 func firstKey(m map[string]struct{}) string {
-	for key := range m {
-		return key
+	if len(m) == 0 {
+		return ""
 	}
-	return ""
+
+	keys := make([]string, 0, len(m))
+	for key := range m {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+	return keys[0]
 }

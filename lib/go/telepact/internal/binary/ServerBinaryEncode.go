@@ -16,7 +16,10 @@
 
 package binary
 
-import "fmt"
+import (
+	"fmt"
+	"sort"
+)
 
 // ServerBinaryEncode encodes a pseudo-JSON response message into its binary representation for the client.
 func ServerBinaryEncode(message []any, binaryEncoding *BinaryEncoding) ([]any, error) {
@@ -88,8 +91,14 @@ func ServerBinaryEncode(message []any, binaryEncoding *BinaryEncoding) ([]any, e
 }
 
 func firstKey(m map[string]any) string {
-	for key := range m {
-		return key
+	if len(m) == 0 {
+		return ""
 	}
-	return ""
+
+	keys := make([]string, 0, len(m))
+	for key := range m {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+	return keys[0]
 }

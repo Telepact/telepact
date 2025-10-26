@@ -18,6 +18,7 @@ package internal
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 
 	"github.com/telepact/telepact/lib/go/telepact/internal/types"
@@ -36,7 +37,9 @@ func SelectStructFields(typeDeclaration *types.TTypeDeclaration, value any, sele
 		selectedFields := toStringSlice(getSelectEntry(selectedStructFields, structName))
 
 		result := make(map[string]any)
-		for fieldName, fieldValue := range valueMap {
+		fieldNames := sortedStringKeys(valueMap)
+		for _, fieldName := range fieldNames {
+			fieldValue := valueMap[fieldName]
 			if selectedFields != nil && !containsString(selectedFields, fieldName) {
 				continue
 			}
@@ -56,11 +59,10 @@ func SelectStructFields(typeDeclaration *types.TTypeDeclaration, value any, sele
 		unionData := toStringAnyMap(valueMap[unionTag])
 
 		defaultTagSelections := make(map[string][]string, len(typed.Tags))
-		for tagKey, unionStruct := range typed.Tags {
-			fieldNames := make([]string, 0, len(unionStruct.Fields))
-			for fieldName := range unionStruct.Fields {
-				fieldNames = append(fieldNames, fieldName)
-			}
+		tagKeys := sortedStringKeys(typed.Tags)
+		for _, tagKey := range tagKeys {
+			unionStruct := typed.Tags[tagKey]
+			fieldNames := sortedStringKeys(unionStruct.Fields)
 			defaultTagSelections[tagKey] = fieldNames
 		}
 
@@ -87,7 +89,9 @@ func SelectStructFields(typeDeclaration *types.TTypeDeclaration, value any, sele
 			return map[string]any{unionTag: result}
 		}
 
-		for fieldName, fieldValue := range unionData {
+		unionFieldNames := sortedStringKeys(unionData)
+		for _, fieldName := range unionFieldNames {
+			fieldValue := unionData[fieldName]
 			if selectedFields != nil && !containsString(selectedFields, fieldName) {
 				continue
 			}
@@ -108,7 +112,9 @@ func SelectStructFields(typeDeclaration *types.TTypeDeclaration, value any, sele
 
 		nestedType := typeDeclaration.TypeParameters[0]
 		result := make(map[string]any, len(valueMap))
-		for key, entry := range valueMap {
+		keys := sortedStringKeys(valueMap)
+		for _, key := range keys {
+			entry := valueMap[key]
 			result[key] = SelectStructFields(nestedType, entry, selectedStructFields)
 		}
 		return result
@@ -217,10 +223,24 @@ func containsString(slice []string, target string) bool {
 }
 
 func firstKey(m map[string]any) string {
-	for key := range m {
-		return key
+	keys := sortedStringKeys(m)
+	if len(keys) == 0 {
+		return ""
 	}
-	return ""
+	return keys[0]
+}
+
+func sortedStringKeys[T any](m map[string]T) []string {
+	if len(m) == 0 {
+		return nil
+	}
+
+	keys := make([]string, 0, len(m))
+	for key := range m {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+	return keys
 }
 
 func toString(value any) string {

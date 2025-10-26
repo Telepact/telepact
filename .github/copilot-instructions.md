@@ -20,7 +20,6 @@ The entire project uses a hierarchical `Makefile` system. The root `Makefile` de
 
 ### Building
 
--   To build everything: `make` (though this is often not necessary).
 -   To build a specific library, navigate to its directory or use the root makefile. For example, to build the Java library:
     ```sh
     make java
@@ -31,28 +30,13 @@ The entire project uses a hierarchical `Makefile` system. The root `Makefile` de
 
 ### Testing
 
-The central test runner is located in `/test/runner`, which is a Python project. It is responsible for orchestrating tests across all language libraries to ensure they are interoperable.
-
--   To run all tests:
+-   Run tests from the `/test/runner` directory:
     ```sh
-    make test
+    poetry run python -m pytest -s -vv -k <test_name>
     ```
--   To run tests for a specific language:
-    ```sh
-    make test-java
-    make test-py
-    make test-ts
-    ```
--   When in the `/test/runner` directory, you can run tests directly with `poetry run python -m pytest`.
 
--   To run a single test case (e.g., for debugging), use `pytest`'s `-k` option to select a test by name. The `test/runner/Makefile` has `test-trace-*` targets that are good examples:
-    ```sh
-    # From the root directory
-    make test-trace-java
-
-    # Or, from the test/runner directory
-    poetry run python -m pytest -k test_client_server_case[java-0] -s -vv
-    ```
+-   NOTE: You need the `-s` flag to show all request/response payloads for debugging.
+    HOWEVER, avoid using `-s` when `-k` is not specified, as it will produce excessive output.
 
 ### Key Files & Directories
 
