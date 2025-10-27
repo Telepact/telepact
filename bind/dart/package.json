@@ -11,6 +11,6 @@
   },
   "devDependencies": {
     "rollup": "4.52.5",
-    "@rollup/plugin-commonjs": "^28.0.8"
+    "@rollup/plugin-commonjs": "^28.0.9"
   }
 }
