@@ -18,6 +18,7 @@ package schema
 
 import (
 	"regexp"
+	"sort"
 
 	"github.com/telepact/telepact/lib/go/telepact/internal/types"
 )
@@ -120,6 +121,7 @@ func ParseUnionType(path []any, unionDefinition map[string]any, schemaKey string
 		for key := range elementCopy {
 			keys = append(keys, key)
 		}
+		sort.Strings(keys)
 
 		matches := make([]string, 0)
 		for _, key := range keys {
