@@ -1,8 +1,6 @@
 package main
 
 import (
-	"encoding/json"
-	"errors"
 	"fmt"
 
 	telepact "github.com/telepact/telepact/lib/go/telepact"
@@ -637,87 +635,62 @@ func cloneBytesMap(values map[string][]byte) map[string]any {
 	return result
 }
 
-func validatePseudoJSONSchema(input map[string]any) ([]map[string]any, error) {
-	schemaRaw, ok := input["schema"]
-	if !ok {
-		return nil, errors.New("missing schema")
-	}
-
-	schemaJSON, err := toJSONString(schemaRaw)
-	if err != nil {
-		return nil, err
-	}
-
-	var extendJSON string
-	if extendRaw, ok := input["extend!"]; ok {
-		extendJSON, err = toJSONString(extendRaw)
-		if err != nil {
-			return nil, err
-		}
-
-		_, err = telepact.TelepactSchemaFromFileJSONMap(map[string]string{
-			"default": schemaJSON,
-			"extend":  extendJSON,
-		})
-	} else {
-		_, err = telepact.TelepactSchemaFromJSON(schemaJSON)
-	}
-	if err == nil {
-		return nil, nil
-	}
-
-	parseErr, ok := err.(*telepact.TelepactSchemaParseError)
-	if !ok {
-		return nil, err
-	}
-
-	var entries []map[string]any
-	switch typed := parseErr.SchemaParseFailuresPseudoJSON.(type) {
-	case []map[string]any:
-		entries = typed
-	case []any:
-		entries = make([]map[string]any, 0, len(typed))
-		for _, entry := range typed {
-			if converted, err := asMap(entry); err == nil {
-				entries = append(entries, converted)
-			}
-		}
-	default:
-		return nil, fmt.Errorf("unexpected parse failure pseudo json type %T", parseErr.SchemaParseFailuresPseudoJSON)
-	}
-
-	result := make([]map[string]any, 0, len(entries))
-	for _, converted := range entries {
-		failure := make(map[string]any, len(converted))
-		if doc, ok := converted["document"].(string); ok {
-			failure["document"] = doc
-		}
-		if loc, ok := converted["location"]; ok {
-			failure["location"] = loc
-		}
-		if path, ok := converted["path"]; ok {
-			failure["path"] = path
-		}
-		if reason, ok := converted["reason"].(map[string]any); ok {
-			failure["reason"] = reason
-		}
-		result = append(result, failure)
-	}
-
-	return result, nil
+type generatedTypedClient struct {
+	client *telepact.Client
+	typed  *gen.TypedClient
 }
 
-func toJSONString(value any) (string, error) {
-	switch typed := value.(type) {
-	case string:
-		return typed, nil
-	case json.RawMessage:
-		return string(typed), nil
-	default:
-		bytes, err := json.Marshal(typed)
-		if err != nil {
-			return "", err
-		}
-		return string(bytes), nil
+func newGeneratedTypedClient(client *telepact.Client) *generatedTypedClient {
+	if client == nil {
+		return &generatedTypedClient{}
 	}
+	return &generatedTypedClient{client: client, typed: gen.NewTypedClient(client)}
+}
+
+func (g *generatedTypedClient) Handle(message telepact.Message) (telepact.Message, error) {
+	if g == nil || g.client == nil {
+		return telepact.Message{}, telepact.NewTelepactError("generated client not configured")
+	}
+
+	target, err := message.BodyTarget()
+	if err != nil {
+		return telepact.Message{}, err
+	}
+
+	payload, err := message.BodyPayload()
+	if err != nil {
+		return telepact.Message{}, err
+	}
+
+	if g.typed == nil {
+		g.typed = gen.NewTypedClient(g.client)
+	}
+
+	headers, body, handled, err := g.typed.Invoke(target, message.Headers, payload)
+	if err != nil {
+		return telepact.Message{}, err
+	}
+
+	if handled {
+		if headers == nil {
+			headers = map[string]any{}
+		}
+		if body == nil {
+			body = map[string]any{}
+		}
+		headers["@codegenc_"] = true
+		return telepact.NewMessage(headers, body), nil
+	}
+
+	response, err := g.client.Request(message)
+	if err != nil {
+		return telepact.Message{}, err
+	}
+
+	if response.Headers == nil {
+		response.Headers = map[string]any{}
+	}
+	response.Headers["@codegenc_"] = true
+
+	return response, nil
 }
