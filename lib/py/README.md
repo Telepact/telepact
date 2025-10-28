@@ -78,6 +78,17 @@ async def adapter(m: Message, s: Serializer) -> Message:
 
 options = Client.Options()
 client = Client(adapter, options)
+
+# Inside your async application code:
+request = Message({}, {'fn.greet': {'subject': 'World'}})
+response = await client.request(request)
+if response.get_body_target() == 'Ok_':
+    ok_payload = response.get_body_payload()
+    print(ok_payload['message'])
+else:
+    raise RuntimeError(
+        f"Unexpected response: {response.get_body_target()} {response.get_body_payload()}"
+    )
 ```
 
 For more concrete usage examples,

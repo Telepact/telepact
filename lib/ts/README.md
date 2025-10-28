@@ -78,6 +78,18 @@ const adapter: (m: Message, s: Serializer) => Promise<Message> = async (m, s) =>
 
 const options = new ClientOptions();
 const client = new Client(adapter, options);
+
+// Inside an async function in your application:
+const request = new Message({}, { 'fn.greet': { subject: 'World' } });
+const response = await client.request(request);
+if (response.getBodyTarget() === 'Ok_') {
+    const okPayload = response.getBodyPayload();
+    console.log(okPayload.message);
+} else {
+    throw new Error(
+        `Unexpected response: ${response.getBodyTarget()} ${JSON.stringify(response.getBodyPayload())}`
+    );
+}
 ```
 
 For more concrete usage examples, [see the tests](https://github.com/Telepact/telepact/blob/main/test/lib/ts/src/main.ts).
