@@ -5,7 +5,6 @@
 <dependency>
     <groupId>io.github.telepact</groupId>
     <artifactId>telepact</artifactId>
-    <version>1.0.0-alpha.95</version>
 </dependency>
 ```
 
@@ -30,7 +29,7 @@ API:
 Server:
 ```java
 var files = new TelepactSchemaFiles("./directory/containing/api/files");
-var schema = TelepactSchema.fromFilesJsonMap(files.filenamesToJson)
+var schema = TelepactSchema.fromFilesJsonMap(files.filenamesToJson);
 Function<Message, Message> handler = (requestMessage) -> {
     var functionName = requestMessage.body.keySet().stream().findAny();
     var arguments = (Map<String, Object>) requestMessage.body.get(functionName);
@@ -78,6 +77,18 @@ BiFunction<Message, Serializer, Future<Message>> adapter = (m, s) -> {
 };
 var options = new Client.Options();
 var client = new Client(adapter, options);
+
+var request = new Message(
+    Map.of(),
+    Map.of("fn.greet", Map.of("subject", "World"))
+);
+var response = client.request(request);
+if ("Ok_".equals(response.getBodyTarget())) {
+    var okPayload = response.getBodyPayload();
+    System.out.println(okPayload.get("message"));
+} else {
+    throw new RuntimeException("Unexpected response: " + response.body);
+}
 ```
 
 For more concrete usage examples, [see the tests](https://github.com/Telepact/telepact/blob/main/test/lib/java/src/main/java/telepacttest/Main.java).
