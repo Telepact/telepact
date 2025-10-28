@@ -86,9 +86,7 @@ if (response.getBodyTarget() === 'Ok_') {
     const okPayload = response.getBodyPayload();
     console.log(okPayload.message);
 } else {
-    throw new Error(
-        `Unexpected response: ${response.getBodyTarget()} ${JSON.stringify(response.getBodyPayload())}`
-    );
+    throw new Error(`Unexpected response: ${JSON.stringify(response.body)}`);
 }
 ```
 

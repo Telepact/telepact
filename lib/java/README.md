@@ -87,9 +87,7 @@ if ("Ok_".equals(response.getBodyTarget())) {
     var okPayload = response.getBodyPayload();
     System.out.println(okPayload.get("message"));
 } else {
-    throw new RuntimeException(
-        "Unexpected response: %s %s".formatted(response.getBodyTarget(), response.getBodyPayload())
-    );
+    throw new RuntimeException("Unexpected response: " + response.body);
 }
 ```
 

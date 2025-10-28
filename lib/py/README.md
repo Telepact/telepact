@@ -86,9 +86,7 @@ if response.get_body_target() == 'Ok_':
     ok_payload = response.get_body_payload()
     print(ok_payload['message'])
 else:
-    raise RuntimeError(
-        f"Unexpected response: {response.get_body_target()} {response.get_body_payload()}"
-    )
+    raise RuntimeError(f"Unexpected response: {response.body}")
 ```
 
 For more concrete usage examples,
