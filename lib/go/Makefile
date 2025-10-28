@@ -16,7 +16,7 @@
 
 SHELL := /bin/bash
 
-GO_SOURCES := $(shell find telepact -type f -name '*.go')
+GO_SOURCES := $(shell find . -type f -name '*.go' -not -path './target/*')
 
 .PHONY: all build test fmt tidy clean
 

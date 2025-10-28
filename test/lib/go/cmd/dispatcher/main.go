@@ -16,7 +16,7 @@ import (
 
 	nats "github.com/nats-io/nats.go"
 	"github.com/prometheus/client_golang/prometheus"
-	telepact "github.com/telepact/telepact/lib/go/telepact"
+	telepact "github.com/telepact/telepact/lib/go"
 	"github.com/vmihailenco/msgpack/v5"
 )
 
