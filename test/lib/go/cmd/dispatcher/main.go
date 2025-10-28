@@ -495,191 +495,6 @@ func parseServerConfig(cfg map[string]any) (serverConfig, error) {
 	return result, nil
 }
 
-func startTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscription, error) {
-	cfg, err := parseServerConfig(rawCfg)
-	if err != nil {
-		return nil, err
-	}
-	if cfg.APISchemaPath == "" {
-		return nil, errors.New("missing apiSchemaPath")
-	}
-	if cfg.FrontdoorTopic == "" {
-		return nil, errors.New("missing frontdoor topic")
-	}
-	if !cfg.UseCodegen && cfg.BackdoorTopic == "" {
-		return nil, errors.New("missing backdoor topic")
-	}
-
-	files, err := telepact.NewTelepactSchemaFiles(cfg.APISchemaPath)
-	if err != nil {
-		return nil, err
-	}
-
-	tele, err := telepact.TelepactSchemaFromFileJSONMap(files.FilenamesToJSON)
-	if err != nil {
-		return nil, err
-	}
-
-	alternateMap := cloneStringStringMap(files.FilenamesToJSON)
-	alternateMap["backwardsCompatibleChange"] = backwardsCompatibleChangeSchema
-	alternateTele, err := telepact.TelepactSchemaFromFileJSONMap(alternateMap)
-	if err != nil {
-		return nil, err
-	}
-
-	var serveAlternate atomic.Bool
-	codegenHandler := newCodeGenHandler(cfg.UseCodegen)
-
-	const requestTimeout = 5 * time.Second
-
-	forwardRequest := func(message telepact.Message) (telepact.Message, error) {
-		payload := []any{message.Headers, message.Body}
-		payloadBytes, err := json.Marshal(payload)
-		if err != nil {
-			return telepact.Message{}, err
-		}
-
-		ctx, cancel := context.WithTimeout(context.Background(), requestTimeout)
-		defer cancel()
-
-		reply, err := d.conn.RequestWithContext(ctx, cfg.BackdoorTopic, payloadBytes)
-		if err != nil {
-			return telepact.Message{}, err
-		}
-
-		var response []any
-		decoder := json.NewDecoder(bytes.NewReader(reply.Data))
-		decoder.UseNumber()
-		if err := decoder.Decode(&response); err != nil {
-			return telepact.Message{}, err
-		}
-		normalized := normalizeJSONNumbers(response)
-		responseSlice, ok := normalized.([]any)
-		if !ok {
-			return telepact.Message{}, fmt.Errorf("invalid backdoor response payload")
-		}
-		response = responseSlice
-		if len(response) != 2 {
-			return telepact.Message{}, errors.New("invalid backdoor response payload")
-		}
-
-		headers, err := asMap(response[0])
-		if err != nil {
-			return telepact.Message{}, err
-		}
-		body, err := asMap(response[1])
-		if err != nil {
-			return telepact.Message{}, err
-		}
-
-		return telepact.NewMessage(headers, body), nil
-	}
-
-	type handlerError struct{}
-
-	handler := func(message telepact.Message) (telepact.Message, error) {
-		reqHeaders := message.Headers
-
-		if boolValue(reqHeaders["@toggleAlternateServer_"]) {
-			serveAlternate.Store(!serveAlternate.Load())
-		}
-
-		if boolValue(reqHeaders["@throwError_"]) {
-			return telepact.Message{}, fmt.Errorf("telepact: requested server error")
-		}
-
-		var msg telepact.Message
-		var err error
-		if codegenHandler != nil {
-			msg, err = codegenHandler.Handle(message)
-			if err != nil {
-				return telepact.Message{}, err
-			}
-		} else {
-			if cfg.BackdoorTopic == "" {
-				return telepact.Message{}, fmt.Errorf("telepact: backdoor topic not configured")
-			}
-
-			msg, err = forwardRequest(message)
-			if err != nil {
-				return telepact.Message{}, err
-			}
-		}
-
-		return msg, nil
-	}
-
-	options := telepact.NewServerOptions()
-	options.AuthRequired = cfg.AuthRequired
-	options.OnError = func(err error) {
-		if err != nil {
-			d.logger.Printf("server error: %v", err)
-		}
-	}
-	options.OnRequest = func(msg telepact.Message) {
-		if boolValue(msg.Headers["@onRequestError_"]) {
-			panic(handlerError{})
-		}
-	}
-	options.OnResponse = func(msg telepact.Message) {
-		if boolValue(msg.Headers["@onResponseError_"]) {
-			panic(handlerError{})
-		}
-	}
-
-	server, err := telepact.NewServer(tele, handler, options)
-	if err != nil {
-		return nil, err
-	}
-
-	alternateOptions := telepact.NewServerOptions()
-	alternateOptions.AuthRequired = cfg.AuthRequired
-	alternateOptions.OnError = func(err error) {
-		if err != nil {
-			d.logger.Printf("alternate server error: %v", err)
-		}
-	}
-	alternateServer, err := telepact.NewServer(alternateTele, handler, alternateOptions)
-	if err != nil {
-		return nil, err
-	}
-
-	sub, err := d.conn.Subscribe(cfg.FrontdoorTopic, func(msg *nats.Msg) {
-		start := time.Now()
-		var (
-			resp telepact.Response
-			err  error
-		)
-
-		if serveAlternate.Load() {
-			resp, err = alternateServer.Process(msg.Data)
-		} else {
-			override := map[string]any{"@override": "new"}
-			resp, err = server.ProcessWithHeaders(msg.Data, override)
-		}
-
-		if err != nil {
-			d.logger.Printf("server.process error: %v", err)
-			_ = msg.Respond(buildUnknownPayload())
-			return
-		}
-
-		if d.metrics != nil {
-			d.metrics.Observe(cfg.FrontdoorTopic, time.Since(start))
-		}
-
-		if err := respondWithBytes(msg, resp.Bytes); err != nil {
-			d.logger.Printf("server respond error: %v", err)
-		}
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	d.logger.Printf("server %s listening on %s", cfg.ID, cfg.FrontdoorTopic)
-	return sub, nil
-}
-
 func startClientTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscription, error) {
 	cfg, err := parseServerConfig(rawCfg)
 	if err != nil {
@@ -895,6 +710,191 @@ func startSchemaTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscrip
 	}
 
 	d.logger.Printf("schema server %s listening on %s", cfg.ID, cfg.FrontdoorTopic)
+	return sub, nil
+}
+
+func startTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscription, error) {
+	cfg, err := parseServerConfig(rawCfg)
+	if err != nil {
+		return nil, err
+	}
+	if cfg.APISchemaPath == "" {
+		return nil, errors.New("missing apiSchemaPath")
+	}
+	if cfg.FrontdoorTopic == "" {
+		return nil, errors.New("missing frontdoor topic")
+	}
+	if !cfg.UseCodegen && cfg.BackdoorTopic == "" {
+		return nil, errors.New("missing backdoor topic")
+	}
+
+	files, err := telepact.NewTelepactSchemaFiles(cfg.APISchemaPath)
+	if err != nil {
+		return nil, err
+	}
+
+	tele, err := telepact.TelepactSchemaFromFileJSONMap(files.FilenamesToJSON)
+	if err != nil {
+		return nil, err
+	}
+
+	alternateMap := cloneStringStringMap(files.FilenamesToJSON)
+	alternateMap["backwardsCompatibleChange"] = backwardsCompatibleChangeSchema
+	alternateTele, err := telepact.TelepactSchemaFromFileJSONMap(alternateMap)
+	if err != nil {
+		return nil, err
+	}
+
+	var serveAlternate atomic.Bool
+	codegenHandler := newCodeGenHandler(cfg.UseCodegen)
+
+	const requestTimeout = 5 * time.Second
+
+	forwardRequest := func(message telepact.Message) (telepact.Message, error) {
+		payload := []any{message.Headers, message.Body}
+		payloadBytes, err := json.Marshal(payload)
+		if err != nil {
+			return telepact.Message{}, err
+		}
+
+		ctx, cancel := context.WithTimeout(context.Background(), requestTimeout)
+		defer cancel()
+
+		reply, err := d.conn.RequestWithContext(ctx, cfg.BackdoorTopic, payloadBytes)
+		if err != nil {
+			return telepact.Message{}, err
+		}
+
+		var response []any
+		decoder := json.NewDecoder(bytes.NewReader(reply.Data))
+		decoder.UseNumber()
+		if err := decoder.Decode(&response); err != nil {
+			return telepact.Message{}, err
+		}
+		normalized := normalizeJSONNumbers(response)
+		responseSlice, ok := normalized.([]any)
+		if !ok {
+			return telepact.Message{}, fmt.Errorf("invalid backdoor response payload")
+		}
+		response = responseSlice
+		if len(response) != 2 {
+			return telepact.Message{}, errors.New("invalid backdoor response payload")
+		}
+
+		headers, err := asMap(response[0])
+		if err != nil {
+			return telepact.Message{}, err
+		}
+		body, err := asMap(response[1])
+		if err != nil {
+			return telepact.Message{}, err
+		}
+
+		return telepact.NewMessage(headers, body), nil
+	}
+
+	type handlerError struct{}
+
+	handler := func(message telepact.Message) (telepact.Message, error) {
+		reqHeaders := message.Headers
+
+		if boolValue(reqHeaders["@toggleAlternateServer_"]) {
+			serveAlternate.Store(!serveAlternate.Load())
+		}
+
+		if boolValue(reqHeaders["@throwError_"]) {
+			return telepact.Message{}, fmt.Errorf("telepact: requested server error")
+		}
+
+		var msg telepact.Message
+		var err error
+		if codegenHandler != nil {
+			msg, err = codegenHandler.Handle(message)
+			if err != nil {
+				return telepact.Message{}, err
+			}
+		} else {
+			if cfg.BackdoorTopic == "" {
+				return telepact.Message{}, fmt.Errorf("telepact: backdoor topic not configured")
+			}
+
+			msg, err = forwardRequest(message)
+			if err != nil {
+				return telepact.Message{}, err
+			}
+		}
+
+		return msg, nil
+	}
+
+	options := telepact.NewServerOptions()
+	options.AuthRequired = cfg.AuthRequired
+	options.OnError = func(err error) {
+		if err != nil {
+			d.logger.Printf("server error: %v", err)
+		}
+	}
+	options.OnRequest = func(msg telepact.Message) {
+		if boolValue(msg.Headers["@onRequestError_"]) {
+			panic(handlerError{})
+		}
+	}
+	options.OnResponse = func(msg telepact.Message) {
+		if boolValue(msg.Headers["@onResponseError_"]) {
+			panic(handlerError{})
+		}
+	}
+
+	server, err := telepact.NewServer(tele, handler, options)
+	if err != nil {
+		return nil, err
+	}
+
+	alternateOptions := telepact.NewServerOptions()
+	alternateOptions.AuthRequired = cfg.AuthRequired
+	alternateOptions.OnError = func(err error) {
+		if err != nil {
+			d.logger.Printf("alternate server error: %v", err)
+		}
+	}
+	alternateServer, err := telepact.NewServer(alternateTele, handler, alternateOptions)
+	if err != nil {
+		return nil, err
+	}
+
+	sub, err := d.conn.Subscribe(cfg.FrontdoorTopic, func(msg *nats.Msg) {
+		start := time.Now()
+		var (
+			resp telepact.Response
+			err  error
+		)
+
+		if serveAlternate.Load() {
+			resp, err = alternateServer.Process(msg.Data)
+		} else {
+			override := map[string]any{"@override": "new"}
+			resp, err = server.ProcessWithHeaders(msg.Data, override)
+		}
+
+		if err != nil {
+			d.logger.Printf("server.process error: %v", err)
+			_ = msg.Respond(buildUnknownPayload())
+			return
+		}
+
+		if d.metrics != nil {
+			d.metrics.Observe(cfg.FrontdoorTopic, time.Since(start))
+		}
+
+		if err := respondWithBytes(msg, resp.Bytes); err != nil {
+			d.logger.Printf("server respond error: %v", err)
+		}
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	d.logger.Printf("server %s listening on %s", cfg.ID, cfg.FrontdoorTopic)
 	return sub, nil
 }
 
