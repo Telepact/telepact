@@ -32,5 +32,5 @@ clean:
 	rm -rf target
 	rm -rf .m2
 
-deploy:
+deploy: $(JAR_FILE)
 	mvn -P credentialed deploy -s settings.xml -Ddeploy.skipUpload=false
