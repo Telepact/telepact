@@ -46,8 +46,20 @@ declare global {
 }
 
 export const load: LayoutLoad = async ({ url, params, route, fetch }) => {
-	let schemaSource = url.searchParams.get('s') ?? '';
+	let schemaSource = (url.searchParams.get('s') ?? '').trim();
 	let showInternalApi = url.searchParams.get('i') === '1';
+	const schemaProtocolParam = url.searchParams.get('p');
+	const normalizedProtocol =
+		schemaProtocolParam === 'http' || schemaProtocolParam === 'ws'
+			? schemaProtocolParam
+			: undefined;
+	const lowerSchemaSource = schemaSource.toLowerCase();
+	const inferredProtocol = lowerSchemaSource.startsWith('ws://') || lowerSchemaSource.startsWith('wss://')
+		? 'ws'
+		: lowerSchemaSource.startsWith('http://') || lowerSchemaSource.startsWith('https://')
+			? 'http'
+			: undefined;
+	const schemaProtocol = normalizedProtocol ?? inferredProtocol;
 
 	const authManaged = window.overrideAuthHeader !== undefined;
 	const overrideDefaultSchema = window.overrideDefaultSchema !== undefined;
@@ -60,6 +72,7 @@ export const load: LayoutLoad = async ({ url, params, route, fetch }) => {
 		showInternalApi?: boolean;
 		readonlyEditor?: boolean;
 		schemaSource?: string;
+		schemaProtocol?: 'http' | 'ws';
 	} = {};
 	if (schemaSource === '') {
 		let defaultSchema = overrideDefaultSchema ? window.overrideDefaultSchema() : '[{"///": "No schema loaded.\\n\\nTry [editing the schema](/?v=ds), or loading a schema from a live running Telepact server by entering a URL in the `Live URL` text box.", "info.Example":{}}]';
@@ -88,7 +101,7 @@ export const load: LayoutLoad = async ({ url, params, route, fetch }) => {
 			showInternalApi: showInternalApi,
 			readonlyEditor: false
 		};
-	} else if (schemaSource?.startsWith('http')) {
+	} else if (schemaProtocol === 'http') {
 		let client = new Client(async (m: Message, s: Serializer) => {
 			const maybeOverrideAuthHeader = async (newAuthHeader: Record<string, object> | undefined, next: () => Promise<Message>) => {
 				if (newAuthHeader !== undefined) {
@@ -122,11 +135,12 @@ export const load: LayoutLoad = async ({ url, params, route, fetch }) => {
 
 		result = {
 			schemaSource: 'http',
+			schemaProtocol: 'http',
 			client: client,
 			showInternalApi: showInternalApi,
 			readonlyEditor: true
 		};
-	} else if (schemaSource?.startsWith('ws')) {
+	} else if (schemaProtocol === 'ws') {
 		type PendingRequest = {
 			resolve: (value: Message) => void;
 			reject: (reason?: unknown) => void;
@@ -328,6 +342,7 @@ export const load: LayoutLoad = async ({ url, params, route, fetch }) => {
 
 		result = {
 			schemaSource: 'ws',
+			schemaProtocol: 'ws',
 			client: client,
 			showInternalApi: showInternalApi,
 			readonlyEditor: true

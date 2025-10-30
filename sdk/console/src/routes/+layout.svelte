@@ -53,23 +53,54 @@
 
 	let sourceUrlInput = $state($page.url.searchParams.get('s') ?? '');
 
-	const allowedLiveUrlPrefixes = ['http://', 'https://', 'ws://', 'wss://'];
+	type ProtocolOption = 'http' | 'ws';
 
-	function validateSourceUrl(value: string): string | null {
-		if (value === '') {
-			return null;
-		}
-
+	function inferProtocolFromUrl(value: string): ProtocolOption {
 		const lowerValue = value.toLowerCase();
-
-		if (allowedLiveUrlPrefixes.some((prefix) => lowerValue.startsWith(prefix))) {
-			return null;
+		if (lowerValue.startsWith('ws://') || lowerValue.startsWith('wss://')) {
+			return 'ws';
 		}
-
-		return 'URL must start with http://, https://, ws://, or wss://';
+		return 'http';
 	}
 
-	let urlError: string | null = $derived(validateSourceUrl(sourceUrlInput));
+	const initialProtocol = (() => {
+		const param = $page.url.searchParams.get('p');
+		if (param === 'http' || param === 'ws') {
+			return param;
+		}
+		const dataProto = $page.data.schemaProtocol;
+		if (dataProto === 'http' || dataProto === 'ws') {
+			return dataProto;
+		}
+		return inferProtocolFromUrl(sourceUrlInput);
+	})();
+
+	let sourceUrlProtocol = $state<ProtocolOption>(initialProtocol);
+
+	function validateSourceUrl(value: string, protocol: ProtocolOption): string | null {
+		const trimmed = value.trim();
+		if (trimmed === '') {
+			return null;
+		}
+
+		const schemeMatch = trimmed.match(/^([a-z][a-z0-9+.-]*):/i);
+		if (!schemeMatch) {
+			return null;
+		}
+
+		const scheme = schemeMatch[1].toLowerCase();
+		const allowedSchemes = protocol === 'ws' ? ['ws', 'wss'] : ['http', 'https'];
+
+		if (allowedSchemes.includes(scheme)) {
+			return null;
+		}
+
+		return protocol === 'ws'
+			? 'URL must match selected scheme (ws:// or wss://)'
+			: 'URL must match selected scheme (http:// or https://)';
+	}
+
+	let urlError: string | null = $derived(validateSourceUrl(sourceUrlInput, sourceUrlProtocol));
 
 	let schemaSource: string = $derived($page.data.schemaSource);
 
@@ -139,26 +170,34 @@
 
 	let randomSeed = $state(1);
 
-	function handleSourceGet(e: Event) {
-			const trimmed = sourceUrlInput.trim();
-			sourceUrlInput = trimmed;
-			const validationError = validateSourceUrl(trimmed);
-			if (validationError !== null) {
-				return;
-			}
+	function handleSourceGet(_e: Event) {
+		const trimmed = sourceUrlInput.trim();
+		sourceUrlInput = trimmed;
+		const validationError = validateSourceUrl(trimmed, sourceUrlProtocol);
+		if (validationError !== null) {
+			return;
+		}
 
 		let q = new URLSearchParams($page.url.searchParams.toString());
 
-			const existingS = q.get('s');
+		const existingS = q.get('s');
 
-			if (existingS !== trimmed) {
+		if (existingS !== trimmed) {
 			q.delete('mf');
 			q.delete('mh');
 			q.delete('r');
 			q.set('v', 'd');
 		}
 
-			q.set('s', trimmed ?? '');
+		if (trimmed === '') {
+			q.delete('s');
+			q.delete('p');
+		} else {
+			q.set('s', trimmed);
+			q.set('p', sourceUrlProtocol);
+		}
+
+		closeDropdown();
 		goto(`?${q.toString()}`);
 	}
 
@@ -171,6 +210,29 @@
 				sourceUrlInput = currentUrl;
 			}
 		});
+
+	let lastSyncedProtocol: ProtocolOption | null = null;
+
+	$effect(() => {
+		const param = $page.url.searchParams.get('p');
+		let nextProtocol: ProtocolOption;
+
+		if (param === 'http' || param === 'ws') {
+			nextProtocol = param;
+		} else {
+			const dataProto = $page.data.schemaProtocol;
+			if (dataProto === 'http' || dataProto === 'ws') {
+				nextProtocol = dataProto;
+			} else {
+				nextProtocol = inferProtocolFromUrl($page.url.searchParams.get('s') ?? '');
+			}
+		}
+
+		if (nextProtocol !== lastSyncedProtocol) {
+			lastSyncedProtocol = nextProtocol;
+			sourceUrlProtocol = nextProtocol;
+		}
+	});
 
 	function thisHandleRequest() {
 		if (
@@ -285,7 +347,7 @@
 		}
 	}
 
-	let showDropdown = false;
+	let showDropdown = $state(false);
 
 	let liveUrlActive = $state(false);
 
@@ -295,6 +357,7 @@
 
 		if (!currentTarget || !relatedTarget || !currentTarget.contains(relatedTarget)) {
 			liveUrlActive = false;
+			showDropdown = false;
 		}
 	}
 
@@ -304,6 +367,18 @@
 
 	function closeDropdown() {
 		showDropdown = false;
+	}
+
+	function selectProtocol(protocol: ProtocolOption) {
+		sourceUrlProtocol = protocol;
+		closeDropdown();
+	}
+
+	function handleDropdownKeydown(event: KeyboardEvent) {
+		if (event.key === 'Escape') {
+			event.stopPropagation();
+			closeDropdown();
+		}
 	}
 </script>
 
@@ -436,11 +511,11 @@
 					onfocusout={handleLiveUrlFocusOut}
 				>
 					<div
-						class={`flex rounded-md border focus-within:ring-1 focus-within:ring-inset ${
+						class={`flex items-stretch rounded-md border focus-within:ring-1 focus-within:ring-inset ${
 							urlError
 								? 'border-red-500 focus-within:ring-red-500 ring-1 ring-inset ring-red-500 dark:border-red-400 dark:focus-within:ring-red-400'
 								: 'border-gray-300 focus-within:ring-gray-500 dark:border-gray-500 dark:focus-within:ring-gray-400'
-						} ${liveUrlActive ? 'flex-1 min-w-0' : 'w-70'}`}
+						} ${liveUrlActive ? 'flex-1 min-w-0' : 'w-80'}`}
 					>
 						<label
 							for="url"
@@ -451,6 +526,74 @@
 							}`}
 							>Live URL</label
 						>
+						<div class="relative flex content-center">
+							<button
+								type="button"
+								class={`content-center border-l border-gray-300 dark:border-gray-500 flex items-center gap-1 px-2 py-2 text-sm font-medium lowercase focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sky-500 ${
+									urlError
+										? 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300'
+										: 'bg-zinc-200 text-gray-700 dark:bg-zinc-600 dark:text-gray-200'
+								}`}
+								aria-haspopup="listbox"
+								aria-expanded={showDropdown ? 'true' : 'false'}
+								onclick={toggleDropdown}
+								onkeydown={handleDropdownKeydown}
+							>
+								<span>{sourceUrlProtocol}</span>
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									viewBox="0 0 20 20"
+									fill="currentColor"
+									class="h-4 w-4"
+								>
+									<path
+										fill-rule="evenodd"
+										d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 1 1 1.06 1.06l-4.24 4.24a.75.75 0 0 1-1.06 0L5.21 8.29a.75.75 0 0 1 .02-1.08z"
+										clip-rule="evenodd"
+								/>
+								</svg>
+							</button>
+							{#if showDropdown}
+								<div
+									class={`absolute left-0 top-full z-20 mt-1 w-28 overflow-hidden rounded-md border shadow-lg ${
+										urlError
+											? 'border-red-300 bg-red-50 dark:border-red-700 dark:bg-red-900/60'
+											: 'border-gray-200 bg-white dark:border-zinc-600 dark:bg-zinc-700'
+									}`}
+									role="listbox"
+									aria-label="Select protocol"
+									onkeydown={handleDropdownKeydown}
+									tabindex="-1"
+								>
+									<button
+										type="button"
+										onclick={() => selectProtocol('http')}
+										class={`block w-full px-3 py-2 text-left text-sm lowercase ${
+											sourceUrlProtocol === 'http'
+												? 'bg-sky-600 text-white'
+												: 'text-gray-700 hover:bg-sky-100 dark:text-gray-100 dark:hover:bg-zinc-600'
+										}`}
+										role="option"
+										aria-selected={sourceUrlProtocol === 'http' ? 'true' : 'false'}
+									>
+										http
+									</button>
+									<button
+										type="button"
+										onclick={() => selectProtocol('ws')}
+										class={`block w-full px-3 py-2 text-left text-sm lowercase ${
+											sourceUrlProtocol === 'ws'
+												? 'bg-sky-600 text-white'
+												: 'text-gray-700 hover:bg-sky-100 dark:text-gray-100 dark:hover:bg-zinc-600'
+										}`}
+										role="option"
+										aria-selected={sourceUrlProtocol === 'ws' ? 'true' : 'false'}
+									>
+										ws
+									</button>
+								</div>
+							{/if}
+						</div>
 						<div class={`${liveUrlActive ? 'flex-1 min-w-0' : ''}`}>
 							<Tooltip text={urlError ?? ''}>
 								<input
