@@ -309,8 +309,12 @@
 
 <div class="text-gray-800 dark:text-gray-200">
 	<nav class="fixed top-0 z-10 h-16 w-full border-y border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800">
-		<div class="flex h-full items-center px-4 justify-between">
-			<div class="flex shrink-0">
+		<div class="flex h-full items-center px-4">
+			<div
+				class={`flex items-center ${
+					liveUrlActive ? 'shrink-0 pr-4' : 'flex-1 min-w-0'
+				}`}
+			>
 				<div class="flex items-center rounded-md py-2">
 					<div class="text-sky-400">
 						<img src="/favicon.svg" alt="Telepact logo" class="h-8 w-8" />
@@ -320,8 +324,8 @@
 			</div>
 			<div
 				id="view-select"
-				class={`flex shrink-0 content-center justify-center space-x-2 ${
-					liveUrlActive ? 'ml-2' : 'mx-auto'
+				class={`flex shrink-0 content-center space-x-2 ${
+					liveUrlActive ? 'ml-4 mr-auto justify-start' : 'mx-auto justify-center'
 				}`}
 			>
 				<div class="inline-flex rounded-md">
@@ -422,10 +426,10 @@
 					</Tooltip>
 				</div>
 			</div>
-			<div class={`flex items-center ${liveUrlActive ? 'flex-1' : 'shrink-0'}`}>
+			<div class="flex flex-1 min-w-0 items-center justify-end">
 				<form
-					class={`flex items-center space-x-2 ${
-						liveUrlActive ? 'ml-4 flex-1' : 'ml-auto'
+					class={`flex items-center space-x-2 ml-4 ${
+						liveUrlActive ? 'w-full' : ''
 					}`}
 					onsubmit={preventDefault(handleSourceGet)}
 					onfocusin={() => (liveUrlActive = true)}
