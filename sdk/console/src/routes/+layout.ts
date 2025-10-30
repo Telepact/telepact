@@ -126,6 +126,212 @@ export const load: LayoutLoad = async ({ url, params, route, fetch }) => {
 			showInternalApi: showInternalApi,
 			readonlyEditor: true
 		};
+	} else if (schemaSource?.startsWith('ws')) {
+		type PendingRequest = {
+			resolve: (value: Message) => void;
+			reject: (reason?: unknown) => void;
+			serializer: Serializer;
+		};
+
+		const pendingRequests: PendingRequest[] = [];
+		let socket: WebSocket | null = null;
+		let connecting: Promise<void> | null = null;
+
+		const failPending = (error: Error) => {
+			while (pendingRequests.length > 0) {
+				pendingRequests.shift()?.reject(error);
+			}
+		};
+
+		const incomingDataToBytes = async (data: unknown): Promise<Uint8Array> => {
+			if (data instanceof ArrayBuffer) {
+				return new Uint8Array(data);
+			}
+			if (data instanceof Blob) {
+				const buffer = await data.arrayBuffer();
+				return new Uint8Array(buffer);
+			}
+			if (typeof data === 'string') {
+				return new TextEncoder().encode(data);
+			}
+			if (ArrayBuffer.isView(data)) {
+				const view = data as ArrayBufferView;
+				return new Uint8Array(view.buffer, view.byteOffset, view.byteLength);
+			}
+			throw new Error('Unsupported WebSocket payload type');
+		};
+
+		const ensureSocket = async () => {
+			if (socket && socket.readyState === WebSocket.OPEN) {
+				return;
+			}
+
+			if (connecting) {
+				return connecting;
+			}
+
+			const ws = new WebSocket(schemaSource);
+			ws.binaryType = 'arraybuffer';
+			socket = ws;
+			let ready = false;
+
+			const handleMessage = async (event: MessageEvent) => {
+				if (ws !== socket) {
+					return;
+				}
+				const pending = pendingRequests.shift();
+				if (!pending) {
+					console.warn('Received unexpected WebSocket message with no pending Telepact request.');
+					return;
+				}
+				try {
+					const payload = await incomingDataToBytes(event.data);
+					const response = pending.serializer.deserialize(payload);
+					pending.resolve(response);
+				} catch (err) {
+					pending.reject(err);
+				}
+			};
+
+			const handleClose = (event: CloseEvent) => {
+				if (ws !== socket) {
+					return;
+				}
+				ws.removeEventListener('message', handleMessage);
+				ws.removeEventListener('close', handleClose);
+				ws.removeEventListener('error', handleError);
+				socket = null;
+				const reason = event.reason ? ` ${event.reason}` : '';
+				const error = new Error(`WebSocket closed with code ${event.code}.${reason}`);
+				if (ready) {
+					failPending(error);
+				}
+			};
+
+			const handleError = (_event: Event) => {
+				if (ws !== socket) {
+					return;
+				}
+				if (!ready) {
+					return;
+				}
+				const error = new Error('WebSocket encountered an error');
+				failPending(error);
+				ws.close();
+			};
+
+			ws.addEventListener('message', handleMessage);
+			ws.addEventListener('close', handleClose);
+			ws.addEventListener('error', handleError);
+
+			connecting = new Promise<void>((resolve, reject) => {
+				const cleanup = () => {
+					ws.removeEventListener('open', handleOpen);
+					ws.removeEventListener('error', handleConnectError);
+					ws.removeEventListener('close', handleConnectClose);
+				};
+
+				const handleOpen = () => {
+					if (ws !== socket) {
+						cleanup();
+						return;
+					}
+					ready = true;
+					cleanup();
+					resolve();
+				};
+
+				const handleConnectError = (_event: Event) => {
+					cleanup();
+					if (ws === socket) {
+						ws.removeEventListener('message', handleMessage);
+						ws.removeEventListener('close', handleClose);
+						ws.removeEventListener('error', handleError);
+						socket = null;
+					}
+					const error = new Error('Failed to establish WebSocket connection');
+					reject(error);
+					failPending(error);
+				};
+
+				const handleConnectClose = (event: CloseEvent) => {
+					cleanup();
+					if (ws === socket) {
+						ws.removeEventListener('message', handleMessage);
+						ws.removeEventListener('close', handleClose);
+						ws.removeEventListener('error', handleError);
+						socket = null;
+					}
+					const reason = event.reason ? `: ${event.reason}` : '';
+					const error = new Error(`WebSocket closed before ready (code ${event.code}${reason})`);
+					reject(error);
+					failPending(error);
+				};
+
+				ws.addEventListener('open', handleOpen, { once: true });
+				ws.addEventListener('error', handleConnectError, { once: true });
+				ws.addEventListener('close', handleConnectClose, { once: true });
+			}).finally(() => {
+				connecting = null;
+			});
+
+			return connecting;
+		};
+
+		const sendOverSocket = async (message: Message, serializer: Serializer) => {
+			await ensureSocket();
+			const ws = socket;
+			if (!ws || ws.readyState !== WebSocket.OPEN) {
+				throw new Error('WebSocket is not open');
+			}
+
+			const payload = serializer.serialize(message);
+
+			return new Promise<Message>((resolve, reject) => {
+				const pending: PendingRequest = { resolve, reject, serializer };
+				pendingRequests.push(pending);
+				try {
+					ws.send(payload);
+				} catch (err) {
+					pendingRequests.pop();
+					if (err instanceof Error) {
+						reject(err);
+					} else {
+						reject(new Error('Failed to send message over WebSocket'));
+					}
+				}
+			});
+		};
+
+		let client = new Client(async (m: Message, s: Serializer) => {
+			const maybeOverrideAuthHeader = async (
+				newAuthHeader: Record<string, object> | undefined,
+				next: () => Promise<Message>
+			) => {
+				if (newAuthHeader !== undefined) {
+					m.headers['@auth_'] = newAuthHeader;
+				}
+
+				return next();
+			};
+
+			const finish = () => sendOverSocket(m, s);
+
+			const fn = m.getBodyTarget();
+
+			if (fn.endsWith('_') || window.overrideAuthHeader === undefined) {
+				return maybeOverrideAuthHeader(undefined, finish);
+			} else {
+				return window.overrideAuthHeader(schemaSource, (a) => maybeOverrideAuthHeader(a, finish));
+			}
+		}, new ClientOptions());
+
+		result = {
+			schemaSource: 'ws',
+			client: client,
+			showInternalApi: showInternalApi,
+			readonlyEditor: true
+		};
 	} else if (schemaSource === 'demo') {
 		let telepactSchema = TelepactSchema.fromJson(JSON.stringify(demoSchemaPseudoJson));
 

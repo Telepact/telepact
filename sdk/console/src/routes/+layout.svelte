@@ -51,7 +51,25 @@
 	let requestEditor = $state<MonacoEditor>();
 	let schemaEditor = $state<MonacoEditor>();
 
-	let sourceUrl: string = $derived($page.url.searchParams.get('s') ?? '');
+	let sourceUrlInput = $state($page.url.searchParams.get('s') ?? '');
+
+	const allowedLiveUrlPrefixes = ['http://', 'https://', 'ws://', 'wss://'];
+
+	function validateSourceUrl(value: string): string | null {
+		if (value === '') {
+			return null;
+		}
+
+		const lowerValue = value.toLowerCase();
+
+		if (allowedLiveUrlPrefixes.some((prefix) => lowerValue.startsWith(prefix))) {
+			return null;
+		}
+
+		return 'URL must start with http://, https://, ws://, or wss://';
+	}
+
+	let urlError: string | null = $derived(validateSourceUrl(sourceUrlInput));
 
 	let schemaSource: string = $derived($page.data.schemaSource);
 
@@ -122,27 +140,41 @@
 	let randomSeed = $state(1);
 
 	function handleSourceGet(e: Event) {
-		const formData = new FormData(e.target as HTMLFormElement);
-		const sourceUrl = formData.get('url') as string;
+			const trimmed = sourceUrlInput.trim();
+			sourceUrlInput = trimmed;
+			const validationError = validateSourceUrl(trimmed);
+			if (validationError !== null) {
+				return;
+			}
 
 		let q = new URLSearchParams($page.url.searchParams.toString());
 
-		const existingS = q.get('s');
+			const existingS = q.get('s');
 
-		if (existingS !== sourceUrl) {
+			if (existingS !== trimmed) {
 			q.delete('mf');
 			q.delete('mh');
 			q.delete('r');
 			q.set('v', 'd');
 		}
 
-		q.set('s', sourceUrl ?? '');
+			q.set('s', trimmed ?? '');
 		goto(`?${q.toString()}`);
 	}
 
+		let lastSyncedSourceUrl = '';
+
+		$effect(() => {
+			const currentUrl = $page.url.searchParams.get('s') ?? '';
+			if (currentUrl !== lastSyncedSourceUrl) {
+				lastSyncedSourceUrl = currentUrl;
+				sourceUrlInput = currentUrl;
+			}
+		});
+
 	function thisHandleRequest() {
 		if (
-			schemaSource === 'http' &&
+			(schemaSource === 'http' || schemaSource === 'ws') &&
 			!sessionStorage.getItem('telepact-console:live-request-acknowledge')
 		) {
 			if (!confirm('You are about to submit a request to a live server.')) {
@@ -376,21 +408,42 @@
 			</div>
 			<div class="flex basis-1/3 justify-end">
 				<form class="flex space-x-2" onsubmit={preventDefault(handleSourceGet)}>
-					<div class="flex rounded-md border border-gray-300 dark:border-gray-500">
+					<div
+						class={`flex rounded-md border focus-within:ring-1 focus-within:ring-inset ${
+							urlError
+								? 'border-red-500 focus-within:ring-red-500 ring-1 ring-inset ring-red-500 dark:border-red-400 dark:focus-within:ring-red-400'
+								: 'border-gray-300 focus-within:ring-gray-500 dark:border-gray-500 dark:focus-within:ring-gray-400'
+						}`}
+					>
 						<label
 							for="url"
-							class="content-center rounded-l-md bg-zinc-200 dark:bg-zinc-600 px-2 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 whitespace-nowrap"
+							class={`content-center rounded-l-md px-2 py-2 text-sm font-medium whitespace-nowrap ${
+								urlError
+									? 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300'
+									: 'bg-zinc-200 text-gray-700 dark:bg-zinc-600 dark:text-gray-200'
+							}`}
 							>Live URL</label
 						>
 						<div>
-							<input
-								type="text"
-								name="url"
-								id="url"
-								placeholder="None  (draft mode)"
-								value={sourceUrl}
-								class="rounded-r-md border-0 bg-zinc-100 dark:bg-zinc-700 pl-2 py-2 placeholder:text-gray-400 focus:border-gray-500 focus:ring-1 focus:ring-inset focus:ring-gray-500"
-							/>
+							<Tooltip text={urlError ?? ''}>
+								<input
+									type="text"
+									name="url"
+									id="url"
+									placeholder="None  (draft mode)"
+									bind:value={sourceUrlInput}
+									class={`rounded-r-md border-0 pl-2 py-2 placeholder:text-gray-400 focus:ring-1 focus:ring-inset ${
+										urlError
+											? 'bg-red-50 text-red-800 focus:ring-red-500 dark:bg-red-900/30 dark:text-red-200 dark:focus:ring-red-400'
+											: 'bg-zinc-100 focus:ring-gray-500 dark:bg-zinc-700 dark:focus:ring-gray-400'
+									}`}
+									aria-invalid={urlError ? 'true' : 'false'}
+									aria-describedby={urlError ? 'live-url-error' : undefined}
+								/>
+							</Tooltip>
+							{#if urlError}
+								<p id="live-url-error" class="sr-only">{urlError}</p>
+							{/if}
 						</div>
 					</div>
 					<button
