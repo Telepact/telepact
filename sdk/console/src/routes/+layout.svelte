@@ -287,6 +287,17 @@
 
 	let showDropdown = false;
 
+	let liveUrlActive = $state(false);
+
+	function handleLiveUrlFocusOut(event: FocusEvent) {
+		const currentTarget = event.currentTarget as HTMLElement | null;
+		const relatedTarget = event.relatedTarget as Node | null;
+
+		if (!currentTarget || !relatedTarget || !currentTarget.contains(relatedTarget)) {
+			liveUrlActive = false;
+		}
+	}
+
 	function toggleDropdown() {
 		showDropdown = !showDropdown;
 	}
@@ -298,8 +309,8 @@
 
 <div class="text-gray-800 dark:text-gray-200">
 	<nav class="fixed top-0 z-10 h-16 w-full border-y border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800">
-		<div class="flex h-full items-center px-4">
-			<div class="flex basis-1/3">
+		<div class="flex h-full w-full items-center gap-4 px-4">
+			<div class="flex shrink-0">
 				<div class="flex items-center rounded-md py-2">
 					<div class="text-sky-400">
 						<img src="/favicon.svg" alt="Telepact logo" class="h-8 w-8" />
@@ -307,7 +318,12 @@
 					<h1 class="px-2 text-lg font-semibold text-gray-900 dark:text-gray-100">Telepact</h1>
 				</div>
 			</div>
-			<div id="view-select" class="flex basis-1/3 content-center justify-center space-x-2">
+			<div
+				id="view-select"
+				class={`flex shrink-0 content-center justify-center space-x-2 ${
+					liveUrlActive ? 'ml-2' : 'mx-auto'
+				}`}
+			>
 				<div class="inline-flex rounded-md">
 					<Tooltip text="Schema">
 						<button
@@ -406,14 +422,21 @@
 					</Tooltip>
 				</div>
 			</div>
-			<div class="flex basis-1/3 justify-end">
-				<form class="flex space-x-2" onsubmit={preventDefault(handleSourceGet)}>
+			<div class={`flex items-center ${liveUrlActive ? 'flex-1' : 'shrink-0'}`}>
+				<form
+					class={`flex items-center space-x-2 ${
+						liveUrlActive ? 'ml-4 flex-1' : 'ml-auto'
+					}`}
+					onsubmit={preventDefault(handleSourceGet)}
+					onfocusin={() => (liveUrlActive = true)}
+					onfocusout={handleLiveUrlFocusOut}
+				>
 					<div
 						class={`flex rounded-md border focus-within:ring-1 focus-within:ring-inset ${
 							urlError
 								? 'border-red-500 focus-within:ring-red-500 ring-1 ring-inset ring-red-500 dark:border-red-400 dark:focus-within:ring-red-400'
 								: 'border-gray-300 focus-within:ring-gray-500 dark:border-gray-500 dark:focus-within:ring-gray-400'
-						}`}
+						} ${liveUrlActive ? 'flex-1 min-w-0' : 'w-72'}`}
 					>
 						<label
 							for="url"
@@ -424,7 +447,7 @@
 							}`}
 							>Live URL</label
 						>
-						<div>
+						<div class={`${liveUrlActive ? 'flex-1 min-w-0' : ''}`}>
 							<Tooltip text={urlError ?? ''}>
 								<input
 									type="text"
@@ -432,7 +455,7 @@
 									id="url"
 									placeholder="None  (draft mode)"
 									bind:value={sourceUrlInput}
-									class={`rounded-r-md border-0 pl-2 py-2 placeholder:text-gray-400 focus:ring-1 focus:ring-inset ${
+									class={`w-full rounded-r-md border-0 pl-2 py-2 placeholder:text-gray-400 focus:ring-1 focus:ring-inset ${
 										urlError
 											? 'bg-red-50 text-red-800 focus:ring-red-500 dark:bg-red-900/30 dark:text-red-200 dark:focus:ring-red-400'
 											: 'bg-zinc-100 focus:ring-gray-500 dark:bg-zinc-700 dark:focus:ring-gray-400'
@@ -448,7 +471,7 @@
 					</div>
 					<button
 						type="submit"
-						class="rounded-md bg-sky-700 px-3 py-2 text-sm font-semibold text-white active:bg-sky-800"
+						class="shrink-0 rounded-md bg-sky-700 px-3 py-2 text-sm font-semibold text-white active:bg-sky-800"
 						>Load</button
 					>
 				</form>
