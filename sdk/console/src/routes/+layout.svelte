@@ -309,7 +309,7 @@
 
 <div class="text-gray-800 dark:text-gray-200">
 	<nav class="fixed top-0 z-10 h-16 w-full border-y border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800">
-		<div class="flex h-full w-full items-center gap-4 px-4">
+		<div class="flex h-full items-center px-4 justify-between">
 			<div class="flex shrink-0">
 				<div class="flex items-center rounded-md py-2">
 					<div class="text-sky-400">
@@ -436,7 +436,7 @@
 							urlError
 								? 'border-red-500 focus-within:ring-red-500 ring-1 ring-inset ring-red-500 dark:border-red-400 dark:focus-within:ring-red-400'
 								: 'border-gray-300 focus-within:ring-gray-500 dark:border-gray-500 dark:focus-within:ring-gray-400'
-						} ${liveUrlActive ? 'flex-1 min-w-0' : 'w-72'}`}
+						} ${liveUrlActive ? 'flex-1 min-w-0' : 'w-70'}`}
 					>
 						<label
 							for="url"
