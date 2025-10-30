@@ -83,21 +83,24 @@
 			return null;
 		}
 
-		const schemeMatch = trimmed.match(/^([a-z][a-z0-9+.-]*):/i);
-		if (!schemeMatch) {
-			return null;
+		const allowedProtocols = protocol === 'ws' ? ['ws:', 'wss:'] : ['http:', 'https:'];
+
+		try {
+			const absolute = new URL(trimmed);
+			if (allowedProtocols.includes(absolute.protocol.toLowerCase())) {
+				return null;
+			}
+			return protocol === 'ws'
+				? 'URL must match selected scheme (ws:// or wss:// or a relative path)'
+				: 'URL must match selected scheme (http:// or https:// or a relative path)';
+		} catch {
+			try {
+				new URL(trimmed, 'http://placeholder.local');
+				return null;
+			} catch {
+				return 'Enter a valid URL or relative path';
+			}
 		}
-
-		const scheme = schemeMatch[1].toLowerCase();
-		const allowedSchemes = protocol === 'ws' ? ['ws', 'wss'] : ['http', 'https'];
-
-		if (allowedSchemes.includes(scheme)) {
-			return null;
-		}
-
-		return protocol === 'ws'
-			? 'URL must match selected scheme (ws:// or wss://)'
-			: 'URL must match selected scheme (http:// or https://)';
 	}
 
 	let urlError: string | null = $derived(validateSourceUrl(sourceUrlInput, sourceUrlProtocol));
@@ -507,8 +510,6 @@
 						liveUrlActive ? 'w-full' : ''
 					}`}
 					onsubmit={preventDefault(handleSourceGet)}
-					onfocusin={() => (liveUrlActive = true)}
-					onfocusout={handleLiveUrlFocusOut}
 				>
 					<div
 						class={`flex items-stretch rounded-md border focus-within:ring-1 focus-within:ring-inset ${
@@ -555,11 +556,8 @@
 							</button>
 							{#if showDropdown}
 								<div
-									class={`absolute left-0 top-full z-20 mt-1 w-28 overflow-hidden rounded-md border shadow-lg ${
-										urlError
-											? 'border-red-300 bg-red-50 dark:border-red-700 dark:bg-red-900/60'
-											: 'border-gray-200 bg-white dark:border-zinc-600 dark:bg-zinc-700'
-									}`}
+									class={'absolute left-0 top-full z-20 mt-1 w-28 overflow-hidden rounded-md border shadow-lg border-gray-200 bg-white dark:border-zinc-600 dark:bg-zinc-700'}
+									
 									role="listbox"
 									aria-label="Select protocol"
 									onkeydown={handleDropdownKeydown}
@@ -594,7 +592,11 @@
 								</div>
 							{/if}
 						</div>
-						<div class={`${liveUrlActive ? 'flex-1 min-w-0' : ''}`}>
+						<div 
+						    class={`${liveUrlActive ? 'flex-1 min-w-0' : ''}`}
+							onfocusin={() => (liveUrlActive = true)}
+							onfocusout={handleLiveUrlFocusOut}
+						>
 							<Tooltip text={urlError ?? ''}>
 								<input
 									type="text"
