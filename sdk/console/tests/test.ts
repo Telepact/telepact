@@ -11,8 +11,6 @@
 //|  distributed under the License is distributed on an "AS IS" BASIS,
 //|  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //|  See the License for the specific language governing permissions and
-//|  limitations under the License.
-//|
 
 import { expect, test, type Locator, type Page } from '@playwright/test';
 import { schema } from './constants';
@@ -44,19 +42,45 @@ async function ctrlClick(page: Page, locator: Locator) {
 	await page.keyboard.up('Control');
 }
 
-test.describe('Loading from demo server', () => {
-	test.beforeEach(async ({ page }) => {
-		await page.goto('/');
-		await expect(
-			page.getByRole('heading', { name: 'Telepact' }),
-			"Page should have a heading with the text 'Telepact'"
-		).toBeVisible();
-		
-		let source = page.getByRole('textbox', { name: 'Live URL' });
-		await source.fill('http://localhost:8085/api');
-		await page.getByRole('button', { name: 'Load'}).click();
-	});
+const transports = [
+	{
+		label: 'HTTP',
+		protocol: 'http' as const,
+		liveUrl: 'http://localhost:8085/api'
+	},
+	{
+		label: 'WebSocket',
+		protocol: 'ws' as const,
+		liveUrl: 'ws://localhost:8085/api'
+	}
+] as const;
 
+for (const transport of transports) {
+	test.describe(`Loading from demo server (${transport.label})`, () => {
+		test.beforeEach(async ({ page }) => {
+			await page.goto('/');
+			await expect(
+				page.getByRole('heading', { name: 'Telepact' }),
+				"Page should have a heading with the text 'Telepact'"
+			).toBeVisible();
+
+			const protocolButton = page.locator('button[aria-haspopup="listbox"]');
+			const currentProtocol = (await protocolButton.textContent())?.trim().toLowerCase();
+			if (currentProtocol !== transport.protocol) {
+				await protocolButton.click();
+				await page.getByRole('option', { name: transport.protocol }).click();
+			}
+
+			const source = page.getByRole('textbox', { name: 'Live URL' });
+			await source.fill(transport.liveUrl);
+			await page.getByRole('button', { name: 'Load' }).click();
+		});
+
+		defineConsoleTests();
+	});
+}
+
+function defineConsoleTests() {
 	test('Schema editor works correctly', async ({ page }) => {
 		let docButton = page.getByRole('button', { name: 'Toggle Documentation', pressed: true });
 		await expect(
@@ -94,7 +118,7 @@ test.describe('Loading from demo server', () => {
 			"Clipboard should contain the schema text"
 		).toBe(schema);
 	
-		await textAreaElement.locator("..").click();
+		await textAreaElement.locator(".." ).click();
 		await page.keyboard.press('a');
 	
 		expect(
@@ -527,5 +551,5 @@ test.describe('Loading from demo server', () => {
 		expect(promptCount).toBe(1);
 	});
 	
-});
+}
 
