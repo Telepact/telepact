@@ -64,7 +64,7 @@ for (const transport of transports) {
 				"Page should have a heading with the text 'Telepact'"
 			).toBeVisible();
 
-			const protocolButton = page.locator('button[aria-haspopup="listbox"]');
+			const protocolButton = page.getByRole('button', { name: 'Select protocol' });
 			const currentProtocol = (await protocolButton.textContent())?.trim().toLowerCase();
 			if (currentProtocol !== transport.protocol) {
 				await protocolButton.click();

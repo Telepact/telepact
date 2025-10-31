@@ -536,6 +536,7 @@
 										: 'bg-zinc-200 text-gray-700 dark:bg-zinc-600 dark:text-gray-200'
 								}`}
 								aria-haspopup="listbox"
+								aria-label="Select protocol"
 								aria-expanded={showDropdown ? 'true' : 'false'}
 								onclick={toggleDropdown}
 								onkeydown={handleDropdownKeydown}
