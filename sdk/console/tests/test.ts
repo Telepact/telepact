@@ -110,6 +110,17 @@ function defineConsoleTests() {
 			await expect(page.locator('#live-url-error')).toHaveCount(0);
 		});
 
+		test('rejects syntactically invalid URLs', async ({ page }) => {
+			const liveUrlInput = page.getByRole('textbox', { name: 'Live URL' });
+
+			await liveUrlInput.fill('%');
+			await expect(liveUrlInput).toHaveAttribute('aria-invalid', 'true');
+			await expect(liveUrlInput).toHaveAttribute('aria-describedby', 'live-url-error');
+			await expect(page.locator('#live-url-error')).toHaveText(
+				'Enter a valid URL or relative path'
+			);
+		});
+
 		test('rejects improperly encoded URLs', async ({ page }) => {
 			const liveUrlInput = page.getByRole('textbox', { name: 'Live URL' });
 			const protocolButton = page.getByRole('button', { name: 'Select protocol' });
