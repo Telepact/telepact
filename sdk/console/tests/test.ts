@@ -76,6 +76,13 @@ for (const transport of transports) {
 			const source = page.getByRole('textbox', { name: 'Live URL' });
 			await source.fill(transport.liveUrl);
 			await page.getByRole('button', { name: 'Load' }).click();
+			await page.waitForURL((url) => {
+				return (
+					url.searchParams.get('s') === transport.liveUrl &&
+					url.searchParams.get('p') === transport.protocol
+				);
+			});
+			await expect(source).toHaveValue(transport.liveUrl);
 		});
 
 		defineConsoleTests();
