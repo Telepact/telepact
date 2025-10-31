@@ -28,7 +28,8 @@ import re
 from starlette.applications import Starlette
 from starlette.requests import Request
 from starlette.responses import Response
-from starlette.routing import Route
+from starlette.routing import Route, WebSocketRoute
+from starlette.websockets import WebSocket, WebSocketDisconnect, WebSocketState
 from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
 
@@ -488,18 +489,20 @@ def get_api_from_http(http_url: str) -> str:
 @click.command()
 @click.option('--http-url', help='HTTP URL of a Telepact API', required=False, envvar='TELEPACT_HTTP_URL')
 @click.option('--dir', help='Directory of Telepact schemas', required=False, envvar='TELEPACT_DIRECTORY')
+@click.option('--port', default=8080, help='Port to run the mock server on', envvar='MOCK_SERVER_PORT')
+@click.option('--path', default='/api', help='Path to expose the mock API (default: /api)', envvar='MOCK_SERVER_PATH')
 @click.option('--generated-collection-length-min', default=0, help='Minimum length of generated collections', envvar='GENERATED_COLLECTION_LENGTH_MIN')
 @click.option('--generated-collection-length-max', default=3, help='Maximum length of generated collections', envvar='GENERATED_COLLECTION_LENGTH_MAX')
-@click.option('--port', default=8080, help='Port to run the mock server on', envvar='MOCK_SERVER_PORT')
 @click.option('--disable-optional-field-generation', is_flag=True, default=False, help='Disable generation of optional fields (enabled by default)', envvar='DISABLE_OPTIONAL_FIELD_GENERATION')
 @click.option('--disable-message-response-generation', is_flag=True, default=False, help='Disable generation of message responses (enabled by default)', envvar='DISABLE_MESSAGE_RESPONSE_GENERATION')
 @click.option('--disable-random-optional-field-generation', is_flag=True, default=False, help='Disable randomization of optional field generation (enabled by default)', envvar='DISABLE_RANDOMIZE_OPTIONAL_FIELD_GENERATION')
 def mock(
     http_url: str,
     dir: str,
+    port: int,
+    path: str,
     generated_collection_length_min: int,
     generated_collection_length_max: int,
-    port: int,
     disable_optional_field_generation: bool,
     disable_message_response_generation: bool,
     disable_random_optional_field_generation: bool
@@ -536,8 +539,53 @@ def mock(
         media_type = 'application/octet-stream' if 'bin_' in response.headers else 'application/json'
         return Response(content=response_bytes, media_type=media_type)
 
+    async def mock_ws_endpoint(websocket: WebSocket) -> None:
+        await websocket.accept()
+
+        try:
+            while True:
+                try:
+                    message = await websocket.receive()
+                except WebSocketDisconnect:
+                    break
+
+                message_type = message.get('type')
+
+                if message_type == 'websocket.receive':
+                    request_bytes: bytes | None = None
+                    payload_bytes = message.get('bytes')
+                    payload_text = message.get('text')
+
+                    if payload_bytes is not None:
+                        request_bytes = payload_bytes
+                    elif payload_text is not None:
+                        request_bytes = payload_text.encode('utf-8')
+
+                    if request_bytes is None:
+                        continue
+
+                    response = await mock_server.process(request_bytes)
+                    response_bytes: bytes = response.bytes
+
+                    if 'bin_' in response.headers:
+                        await websocket.send_bytes(response_bytes)
+                    else:
+                        await websocket.send_text(response_bytes.decode('utf-8'))
+
+                elif message_type == 'websocket.disconnect':
+                    break
+        finally:
+            if websocket.application_state != WebSocketState.DISCONNECTED:
+                try:
+                    await websocket.close(code=1000)
+                except RuntimeError:
+                    pass
+
+    normalized_path = path if path.startswith('/') else f'/{path}'
+
     routes = [
-        Route('/api', endpoint=mock_api_endpoint, methods=['POST']),
+        Route(normalized_path, endpoint=mock_api_endpoint, methods=['POST']),
+        WebSocketRoute(normalized_path, endpoint=mock_ws_endpoint),
     ]
 
     middleware = [
@@ -546,7 +594,7 @@ def mock(
 
     app = Starlette(routes=routes, middleware=middleware)
 
-    print(f"Starting mock server on port {port}...")
+    print(f"Starting mock server on port {port} at path '{normalized_path}' (HTTP & WebSocket)...")
     uvicorn.run(app, host='0.0.0.0', port=port)
 
 
@@ -616,13 +664,23 @@ def _get_original_schema_name(schema_original: list, type_name: str, field_name:
         if cleaned_type_name in entry:
             type_def = entry[cleaned_type_name] if '->' not in type_name else entry['->']
             if isinstance(type_def, dict):
-                return type_def.get(field_name)
+                value = type_def.get(field_name)
+                if isinstance(value, str):
+                    return value
+                if value is not None:
+                    return str(value)
+                return "unknown_type"
             elif isinstance(type_def, list):
                 tag_key = type_name.split('.')[-1]
                 if tag_key:
                     for tag_entry in type_def:
                         if tag_key in tag_entry:
-                            return tag_entry[tag_key].get(field_name)
+                            value = tag_entry[tag_key].get(field_name)
+                            if isinstance(value, str):
+                                return value
+                            if value is not None:
+                                return str(value)
+                            return "unknown_type"
     return "unknown_type"
 
 def _compare_structs(
