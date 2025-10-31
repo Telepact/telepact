@@ -83,6 +83,10 @@
 			return null;
 		}
 
+		if (/%(?![0-9A-Fa-f]{2})/.test(trimmed)) {
+			return 'Enter a valid URL or relative path';
+		}
+
 		const allowedProtocols = protocol === 'ws' ? ['ws:', 'wss:'] : ['http:', 'https:'];
 
 		try {

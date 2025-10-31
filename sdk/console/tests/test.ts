@@ -81,6 +81,45 @@ for (const transport of transports) {
 }
 
 function defineConsoleTests() {
+	test.describe('Live URL validation', () => {
+		test('accepts blank and relative targets without error', async ({ page }) => {
+			const liveUrlInput = page.getByRole('textbox', { name: 'Live URL' });
+
+			await liveUrlInput.fill('   ');
+			await expect(liveUrlInput).toHaveAttribute('aria-invalid', 'false');
+			await expect(page.locator('#live-url-error')).toHaveCount(0);
+
+			await liveUrlInput.fill('/telepact/api');
+			await expect(liveUrlInput).toHaveAttribute('aria-invalid', 'false');
+			await expect(page.locator('#live-url-error')).toHaveCount(0);
+		});
+
+		test('rejects syntactically invalid URLs', async ({ page }) => {
+			const liveUrlInput = page.getByRole('textbox', { name: 'Live URL' });
+
+			await liveUrlInput.fill('%');
+			await expect(liveUrlInput).toHaveAttribute('aria-invalid', 'true');
+			await expect(liveUrlInput).toHaveAttribute('aria-describedby', 'live-url-error');
+			await expect(page.locator('#live-url-error')).toHaveText(
+				'Enter a valid URL or relative path'
+			);
+		});
+
+		test('enforces the selected protocol scheme', async ({ page }) => {
+			const liveUrlInput = page.getByRole('textbox', { name: 'Live URL' });
+			const protocolButton = page.getByRole('button', { name: 'Select protocol' });
+
+			await protocolButton.click();
+			await page.getByRole('option', { name: 'ws' }).click();
+
+			await liveUrlInput.fill('http://example.com/api');
+			await expect(liveUrlInput).toHaveAttribute('aria-invalid', 'true');
+			await expect(page.locator('#live-url-error')).toHaveText(
+				'URL must match selected scheme (ws:// or wss:// or a relative path)'
+			);
+		});
+	});
+
 	test('Schema editor works correctly', async ({ page }) => {
 		let docButton = page.getByRole('button', { name: 'Toggle Documentation', pressed: true });
 		await expect(
