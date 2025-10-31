@@ -94,12 +94,42 @@ function defineConsoleTests() {
 			await expect(page.locator('#live-url-error')).toHaveCount(0);
 		});
 
+		test('accepts https URLs when the HTTP protocol is selected', async ({ page }) => {
+			const liveUrlInput = page.getByRole('textbox', { name: 'Live URL' });
+			const protocolButton = page.getByRole('button', { name: 'Select protocol' });
+
+			if ((await protocolButton.textContent())?.trim().toLowerCase() !== 'http') {
+				await protocolButton.click();
+				await page.getByRole('option', { name: 'http' }).click();
+			}
+
+			await liveUrlInput.fill('   https://example.com/api  ');
+			await expect(liveUrlInput).toHaveAttribute('aria-invalid', 'false');
+			await expect(page.locator('#live-url-error')).toHaveCount(0);
+		});
+
 		test('rejects syntactically invalid URLs', async ({ page }) => {
 			const liveUrlInput = page.getByRole('textbox', { name: 'Live URL' });
 
 			await liveUrlInput.fill('%');
 			await expect(liveUrlInput).toHaveAttribute('aria-invalid', 'true');
 			await expect(liveUrlInput).toHaveAttribute('aria-describedby', 'live-url-error');
+			await expect(page.locator('#live-url-error')).toHaveText(
+				'Enter a valid URL or relative path'
+			);
+		});
+
+		test('rejects improperly encoded URLs', async ({ page }) => {
+			const liveUrlInput = page.getByRole('textbox', { name: 'Live URL' });
+			const protocolButton = page.getByRole('button', { name: 'Select protocol' });
+
+			if ((await protocolButton.textContent())?.trim().toLowerCase() !== 'http') {
+				await protocolButton.click();
+				await page.getByRole('option', { name: 'http' }).click();
+			}
+
+			await liveUrlInput.fill('http://example.com/%zz');
+			await expect(liveUrlInput).toHaveAttribute('aria-invalid', 'true');
 			await expect(page.locator('#live-url-error')).toHaveText(
 				'Enter a valid URL or relative path'
 			);
@@ -117,6 +147,36 @@ function defineConsoleTests() {
 			await expect(page.locator('#live-url-error')).toHaveText(
 				'URL must match selected scheme (ws:// or wss:// or a relative path)'
 			);
+		});
+
+		test('enforces the HTTP scheme error messaging', async ({ page }) => {
+			const liveUrlInput = page.getByRole('textbox', { name: 'Live URL' });
+			const protocolButton = page.getByRole('button', { name: 'Select protocol' });
+
+			if ((await protocolButton.textContent())?.trim().toLowerCase() !== 'http') {
+				await protocolButton.click();
+				await page.getByRole('option', { name: 'http' }).click();
+			}
+
+			await liveUrlInput.fill('ws://example.com/api');
+			await expect(liveUrlInput).toHaveAttribute('aria-invalid', 'true');
+			await expect(page.locator('#live-url-error')).toHaveText(
+				'URL must match selected scheme (http:// or https:// or a relative path)'
+			);
+		});
+
+		test('accepts secure websocket URLs when the WebSocket protocol is selected', async ({ page }) => {
+			const liveUrlInput = page.getByRole('textbox', { name: 'Live URL' });
+			const protocolButton = page.getByRole('button', { name: 'Select protocol' });
+
+			if ((await protocolButton.textContent())?.trim().toLowerCase() !== 'ws') {
+				await protocolButton.click();
+				await page.getByRole('option', { name: 'ws' }).click();
+			}
+
+			await liveUrlInput.fill('wss://example.com/socket');
+			await expect(liveUrlInput).toHaveAttribute('aria-invalid', 'false');
+			await expect(page.locator('#live-url-error')).toHaveCount(0);
 		});
 	});
 
