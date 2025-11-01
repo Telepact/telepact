@@ -26,7 +26,6 @@ if TYPE_CHECKING:
 def parse_struct_fields(path: list[object], reference_struct: dict[str, object], is_header: bool, ctx: 'ParseContext') -> dict[str, 'TFieldDeclaration']:
     from ...TelepactSchemaParseError import TelepactSchemaParseError
     from ...internal.schema.ParseField import parse_field
-    from ...internal.schema.GetPathDocumentCoordinatesPseudoJson import get_path_document_coordinates_pseudo_json
 
     parse_failures = []
     fields: dict[str, 'TFieldDeclaration'] = {}
@@ -36,17 +35,10 @@ def parse_struct_fields(path: list[object], reference_struct: dict[str, object],
             existing_field_no_opt = existing_field.split("!")[0]
             field_no_opt = field_declaration.split("!")[0]
             if field_no_opt == existing_field_no_opt:
-                final_path = path + [field_declaration]
-                final_other_path = path + [existing_field]
-                final_other_document_json = ctx.telepact_schema_document_names_to_json[
-                    ctx.document_name]
-                final_other_location_pseudo_json = get_path_document_coordinates_pseudo_json(
-                    final_other_path, final_other_document_json)
+                struct_path = list(path)
                 parse_failures.append(SchemaParseFailure(
-                    ctx.document_name, final_path, "PathCollision", {
-                        "document": ctx.document_name,
-                        "path": final_other_path,
-                        "location": final_other_location_pseudo_json}))
+                    ctx.document_name, struct_path, "DuplicateField", {
+                        "field": field_no_opt}))
 
         try:
             parsed_field = parse_field(path,

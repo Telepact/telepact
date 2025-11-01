@@ -84,6 +84,10 @@
                 "location": "struct.JsonLocation"
             }
         }, {
+            "DuplicateField": {
+                "field": "string"
+            }
+        }, {
             "FileNamePatternInvalid": {
                 "expected": "string"
             }

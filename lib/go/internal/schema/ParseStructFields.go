@@ -36,19 +36,13 @@ func ParseStructFields(path []any, referenceStruct map[string]any, isHeader bool
 			existingFieldNoOpt := strings.Split(existingField, "!")[0]
 			fieldNoOpt := strings.Split(fieldDeclaration, "!")[0]
 			if existingFieldNoOpt == fieldNoOpt {
-				finalPath := append(append([]any{}, path...), fieldDeclaration)
-				otherPath := append(append([]any{}, path...), existingField)
-				documentJSON := ctx.TelepactSchemaDocumentNamesToJSON[ctx.DocumentName]
-				otherLocation := GetPathDocumentCoordinatesPseudoJSON(otherPath, documentJSON)
-
+				structPath := append([]any{}, path...)
 				parseFailures = append(parseFailures, NewSchemaParseFailure(
 					ctx.DocumentName,
-					finalPath,
-					"PathCollision",
+					structPath,
+					"DuplicateField",
 					map[string]any{
-						"document": ctx.DocumentName,
-						"path":     otherPath,
-						"location": otherLocation,
+						"field": fieldNoOpt,
 					},
 				))
 			}
