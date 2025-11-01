@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	telepact "github.com/telepact/telepact/lib/go/pkg"
+	telepact "github.com/telepact/telepact/lib/go"
 	gen "github.com/telepact/telepact/test/lib/go/cmd/dispatcher/gen"
 )
 

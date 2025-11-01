@@ -17,8 +17,8 @@
 package validation
 
 import (
+	telepact "github.com/telepact/telepact/lib/go"
 	"github.com/telepact/telepact/lib/go/internal/types"
-	telepact "github.com/telepact/telepact/lib/go/pkg"
 )
 
 // GetInvalidErrorMessage mirrors the Python helper for constructing an error message from validation failures.

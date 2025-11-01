@@ -3,7 +3,7 @@
 ### Installation
 
 ```bash
-go get github.com/telepact/telepact/lib/go/pkg@v1.0.0-alpha.162
+go get github.com/telepact/telepact/lib/go@v1.0.0-alpha.162
 ```
 
 ### Usage
@@ -34,7 +34,7 @@ import (
     "fmt"
     "log"
 
-    telepact "github.com/telepact/telepact/lib/go/pkg"
+    telepact "github.com/telepact/telepact/lib/go"
 )
 
 func main() {
@@ -109,7 +109,7 @@ import (
     "context"
     "log"
 
-    telepact "github.com/telepact/telepact/lib/go/pkg"
+    telepact "github.com/telepact/telepact/lib/go"
 )
 
 func main() {

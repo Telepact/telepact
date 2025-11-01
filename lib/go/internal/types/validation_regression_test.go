@@ -4,8 +4,8 @@ import (
 	"path/filepath"
 	"testing"
 
+	telepact "github.com/telepact/telepact/lib/go"
 	typ "github.com/telepact/telepact/lib/go/internal/types"
-	telepact "github.com/telepact/telepact/lib/go/pkg"
 )
 
 func TestResultValidationDetectsMissingFnRequired(t *testing.T) {
