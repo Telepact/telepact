@@ -15,6 +15,8 @@
 #|
 
 from typing import Generator
+from pathlib import Path
+import traceback
 import asyncio
 import pytest
 from click.testing import CliRunner
@@ -195,6 +197,23 @@ def test_command_ts(runner: CliRunner) -> None:
     # Assuming result.exc_info is a tuple (exc_type, exc_value, exc_traceback)
     if result.exc_info:
         # Format the traceback and print it
+        traceback_str = ''.join(traceback.format_exception(*result.exc_info))
+        print(traceback_str)
+
+    print(f'Output: {result.output}')
+
+    assert result.exit_code == 0
+
+    # open the generated file and check if it contains the expected content
+    # TODO: implement this part
+
+
+def test_command_go(runner: CliRunner) -> None:
+    output_dir = Path('tests/output/go')
+    result = runner.invoke(
+        main, ['codegen', '--schema-dir', 'tests/data', '--lang', 'go', '--out', str(output_dir), '--package', 'output'])
+
+    if result.exc_info:
         traceback_str = ''.join(traceback.format_exception(*result.exc_info))
         print(traceback_str)
 

@@ -1,0 +1,785 @@
+{%- macro go_non_nullable_simple(typ) -%}
+    {%- if typ == 'boolean' -%}bool
+    {%- elif typ == 'integer' -%}int
+    {%- elif typ == 'number' -%}float64
+    {%- elif typ == 'string' -%}string
+    {%- elif typ == 'any' -%}any
+    {%- elif typ == 'bytes' -%}[]byte
+    {%- elif typ.startswith('fn.') -%}{{ typ | regex_replace('^.*\\.', '') | to_pascal_case }}Input
+    {%- elif typ.startswith('struct.') or typ.startswith('union.') -%}{{ typ | regex_replace('^.*\\.', '') | to_pascal_case }}
+    {%- elif typ == '_ext.Select_' -%}Select
+    {%- else -%}{{ raise_error('Unsupported type: ' + typ) }}
+    {%- endif -%}
+{%- endmacro %}
+
+{%- macro go_type(t) -%}
+    {%- if t is string -%}
+        {%- set nullable = '?' in t -%}
+        {%- set typ = t | replace('?', '') -%}
+        {%- set base = go_non_nullable_simple(typ) -%}
+        {%- if nullable -%}
+            {%- if base[:2] == '[]' or base[:4] == 'map[' or base == 'any' -%}
+                {{ base }}
+            {%- else -%}
+                *{{ base }}
+            {%- endif -%}
+        {%- else -%}
+            {{ base }}
+        {%- endif -%}
+    {%- elif t is mapping -%}
+        map[string]{{ go_type(t.values() | first) }}
+    {%- elif t is sequence -%}
+        []{{ go_type(t[0]) }}
+    {%- else -%}
+        {{ raise_error('Unsupported type structure for Go generation') }}
+    {%- endif -%}
+{%- endmacro %}
+
+{%- macro go_param_type(field) -%}
+    {%- if field.optional -%}
+        Optional[{{ go_type(field.type) }}]
+    {%- else -%}
+        {{ go_type(field.type) }}
+    {%- endif -%}
+{%- endmacro %}
+
+{%- macro go_method_return_type(field) -%}
+    {%- if field.optional -%}
+        ({{ go_type(field.type) }}, bool)
+    {%- else -%}
+        {{ go_type(field.type) }}
+    {%- endif -%}
+{%- endmacro %}
+
+{%- macro go_constructor_name(typ) -%}
+    {%- if typ.startswith('struct.') -%}New{{ typ | regex_replace('^.*\\.', '') | to_pascal_case }}FromPseudoJSON
+    {%- elif typ.startswith('union.') -%}New{{ typ | regex_replace('^.*\\.', '') | to_pascal_case }}FromPseudoJSON
+    {%- elif typ.startswith('fn.') -%}New{{ typ | regex_replace('^.*\\.', '') | to_pascal_case }}InputFromPseudoJSON
+    {%- elif typ == '_ext.Select_' -%}NewSelectFromPseudoJSON
+    {%- else -%}{{ raise_error('Unsupported constructor for type: ' + typ) }}
+    {%- endif -%}
+{%- endmacro %}
+
+{%- macro doc_comment(doc, indent='') -%}
+    {%- if doc -%}
+        {%- if doc is sequence and doc is not string -%}
+            {%- for line in doc %}
+{{ indent }}// {{ line | trim }}
+            {%- endfor %}
+        {%- else -%}
+{{ indent }}// {{ doc | trim }}
+        {%- endif -%}
+    {%- endif -%}
+{%- endmacro %}
+
+{%- macro encode_expression(t, expr, depth=0) -%}
+    {%- if t is string -%}
+        {%- set nullable = '?' in t -%}
+        {%- set typ = t | replace('?', '') -%}
+        {%- set base = go_non_nullable_simple(typ) -%}
+        {%- set resolved_type = go_type(t) -%}
+        {%- if nullable -%}
+            {%- if resolved_type.startswith('*') -%}
+                {%- if typ.startswith('struct.') or typ.startswith('union.') or typ.startswith('fn.') or typ == '_ext.Select_' -%}
+                    encodeNullable({{ expr }}, func(v {{ base }}) any { return {{ encode_expression(typ, 'v', depth + 1) }} })
+                {%- else -%}
+                    encodeNullable({{ expr }}, identity[{{ base }}])
+                {%- endif -%}
+            {%- else -%}
+                {{ encode_expression(typ, expr, depth + 1) }}
+            {%- endif -%}
+        {%- else -%}
+            {%- if typ.startswith('struct.') or typ.startswith('union.') or typ.startswith('fn.') or typ == '_ext.Select_' -%}
+                {{ expr }}.PseudoJSON()
+            {%- else -%}
+                {{ expr }}
+            {%- endif -%}
+        {%- endif -%}
+    {%- elif t is mapping -%}
+        encodeMap({{ expr }}, func(v{{ depth }} {{ go_type(t.values() | first) }}) any { return {{ encode_expression(t.values() | first, 'v' ~ depth, depth + 1) }} })
+    {%- elif t is sequence -%}
+        encodeSlice({{ expr }}, func(e{{ depth }} {{ go_type(t[0]) }}) any { return {{ encode_expression(t[0], 'e' ~ depth, depth + 1) }} })
+    {%- else -%}
+        {{ raise_error('Unsupported type for encode expression') }}
+    {%- endif -%}
+{%- endmacro %}
+
+{%- macro decode_expression(t, expr, depth=0) -%}
+    {%- if t is string -%}
+        {%- set nullable = '?' in t -%}
+        {%- set typ = t | replace('?', '') -%}
+        {%- set resolved_type = go_type(t) -%}
+        {%- if nullable -%}
+            {%- if resolved_type.startswith('*') -%}
+                nullable({{ expr }}, func(v any) {{ go_non_nullable_simple(typ) }} { return {{ decode_expression(typ, 'v', depth + 1) }} })
+            {%- else -%}
+                {{ decode_expression(typ, expr, depth + 1) }}
+            {%- endif -%}
+        {%- else -%}
+            {%- if typ == 'boolean' -%}
+                asBool({{ expr }})
+            {%- elif typ == 'integer' -%}
+                asInt({{ expr }})
+            {%- elif typ == 'number' -%}
+                asFloat64({{ expr }})
+            {%- elif typ == 'string' -%}
+                asString({{ expr }})
+            {%- elif typ == 'bytes' -%}
+                asBytes({{ expr }})
+            {%- elif typ == 'any' -%}
+                {{ expr }}
+            {%- elif typ.startswith('struct.') or typ.startswith('union.') or typ.startswith('fn.') or typ == '_ext.Select_' -%}
+                {{ go_constructor_name(typ) }}(asMap({{ expr }}))
+            {%- else -%}
+                {{ raise_error('Unsupported decode type: ' + typ) }}
+            {%- endif -%}
+        {%- endif -%}
+    {%- elif t is mapping -%}
+        decodeMap({{ expr }}, func(e{{ depth }} any) {{ go_type(t.values() | first) }} { return {{ decode_expression(t.values() | first, 'e' ~ depth, depth + 1) }} })
+    {%- elif t is sequence -%}
+        decodeSlice({{ expr }}, func(e{{ depth }} any) {{ go_type(t[0]) }} { return {{ decode_expression(t[0], 'e' ~ depth, depth + 1) }} })
+    {%- else -%}
+        {{ raise_error('Unsupported type for decode expression') }}
+    {%- endif -%}
+{%- endmacro %}
+
+{%- macro struct_block(type_name, doc, fields) -%}
+{{ doc_comment(doc) }}
+type {{ type_name }} struct {
+    pseudoJSON map[string]any
+}
+
+func New{{ type_name }}FromPseudoJSON(p map[string]any) {{ type_name }} {
+    return {{ type_name }}{pseudoJSON: cloneMap(p)}
+}
+
+func (v {{ type_name }}) PseudoJSON() map[string]any {
+    return cloneMap(v.pseudoJSON)
+}
+
+{%- set required_fields = fields | selectattr('optional', 'equalto', False) | list -%}
+{%- set optional_fields = fields | selectattr('optional', 'equalto', True) | list -%}
+{%- if fields %}
+{%- set ordered_fields = required_fields + optional_fields %}
+func New{{ type_name }}({%- for field in ordered_fields %}{{- '\n    ' ~ field.param_name ~ ' ' ~ go_param_type(field) ~ ',' -}}{%- endfor %}{{- '\n' -}}) {{ type_name }} {
+    input := make(map[string]any)
+    {%- for field in fields %}
+    {%- if field.optional %}
+    if encoded{{ loop.index }}, ok := encodeOptional({{ field.param_name }}, func(v {{ go_type(field.type) }}) any { return {{ encode_expression(field.type, 'v') }} }); ok {
+        input["{{ field.json_name }}"] = encoded{{ loop.index }}
+    }
+    {%- else %}
+    input["{{ field.json_name }}"] = {{ encode_expression(field.type, field.param_name) }}
+    {%- endif %}
+    {%- endfor %}
+    return {{ type_name }}{pseudoJSON: input}
+}
+{%- else %}
+func New{{ type_name }}() {{ type_name }} {
+    return {{ type_name }}{pseudoJSON: make(map[string]any)}
+}
+{%- endif %}
+
+{%- for field in fields %}
+func (v {{ type_name }}) {{ field.method_name }}() {{ go_method_return_type(field) }} {
+    {%- if field.optional %}
+    raw, ok := v.pseudoJSON["{{ field.json_name }}"]
+    if !ok {
+        var zero {{ go_type(field.type) }}
+        return zero, false
+    }
+    return {{ decode_expression(field.type, 'raw') }}, true
+    {%- else %}
+    raw := v.pseudoJSON["{{ field.json_name }}"]
+    return {{ decode_expression(field.type, 'raw') }}
+    {%- endif %}
+}
+
+{% endfor %}
+{%- endmacro %}
+
+{%- macro emit_struct(entry) -%}
+{{ struct_block(entry.name, entry.doc, entry.fields) }}
+{%- endmacro %}
+
+{%- macro emit_union(entry) -%}
+{{ doc_comment(entry.doc) }}
+type {{ entry.name }} struct {
+    pseudoJSON map[string]any
+}
+
+func New{{ entry.name }}FromPseudoJSON(p map[string]any) {{ entry.name }} {
+    return {{ entry.name }}{pseudoJSON: cloneMap(p)}
+}
+
+func (v {{ entry.name }}) PseudoJSON() map[string]any {
+    return cloneMap(v.pseudoJSON)
+}
+
+{%- for tag in entry.tags %}
+func New{{ entry.name }}From{{ tag.name }}(payload {{ entry.name }}{{ tag.name }}) {{ entry.name }} {
+    return {{ entry.name }}{pseudoJSON: map[string]any{"{{ tag.json_name }}": payload.PseudoJSON()}}
+}
+{%- endfor %}
+
+func (v {{ entry.name }}) TaggedValue() TaggedValue[string, any] {
+    tag := firstKey(v.pseudoJSON)
+    switch tag {
+    {%- for tag in entry.tags %}
+    case "{{ tag.json_name }}":
+        return TaggedValue[string, any]{Tag: "{{ tag.json_name }}", Value: New{{ entry.name }}{{ tag.name }}FromPseudoJSON(asMap(v.pseudoJSON["{{ tag.json_name }}"]))}
+    {%- endfor %}
+    default:
+        value := map[string]any{}
+        if raw, ok := v.pseudoJSON[tag]; ok {
+            value = asMap(raw)
+        }
+        return TaggedValue[string, any]{Tag: "NoMatch_", Value: UntypedTaggedValue{Tag: tag, Value: value}}
+    }
+}
+
+{%- for tag in entry.tags %}
+{{ struct_block(entry.name ~ tag.name, tag.doc, tag.fields) }}
+{%- endfor %}
+{%- endmacro %}
+
+{%- macro emit_function(entry) -%}
+{{ doc_comment(entry.doc) }}
+type {{ entry.name }}Input struct {
+    pseudoJSON map[string]any
+}
+
+func New{{ entry.name }}InputFromPseudoJSON(p map[string]any) {{ entry.name }}Input {
+    return {{ entry.name }}Input{pseudoJSON: cloneMap(p)}
+}
+
+func (v {{ entry.name }}Input) PseudoJSON() map[string]any {
+    return cloneMap(v.pseudoJSON)
+}
+
+{%- set fields = entry.input_fields -%}
+{%- set required_fields = fields | selectattr('optional', 'equalto', False) | list -%}
+{%- set optional_fields = fields | selectattr('optional', 'equalto', True) | list -%}
+{%- if fields %}
+{%- set ordered_fields = required_fields + optional_fields %}
+func New{{ entry.name }}Input({%- for field in ordered_fields %}{{- '\n    ' ~ field.param_name ~ ' ' ~ go_param_type(field) ~ ',' -}}{%- endfor %}{{- '\n' -}}) {{ entry.name }}Input {
+    payload := make(map[string]any)
+    {%- for field in fields %}
+    {%- if field.optional %}
+    if encoded{{ loop.index }}, ok := encodeOptional({{ field.param_name }}, func(v {{ go_type(field.type) }}) any { return {{ encode_expression(field.type, 'v') }} }); ok {
+        payload["{{ field.json_name }}"] = encoded{{ loop.index }}
+    }
+    {%- else %}
+    payload["{{ field.json_name }}"] = {{ encode_expression(field.type, field.param_name) }}
+    {%- endif %}
+    {%- endfor %}
+    return {{ entry.name }}Input{pseudoJSON: map[string]any{"{{ entry.schema_key }}": payload}}
+}
+{%- else %}
+func New{{ entry.name }}Input() {{ entry.name }}Input {
+    return {{ entry.name }}Input{pseudoJSON: map[string]any{"{{ entry.schema_key }}": map[string]any{}}}
+}
+{%- endif %}
+
+func (v {{ entry.name }}Input) payload() map[string]any {
+    return asMap(v.pseudoJSON["{{ entry.schema_key }}"])
+}
+
+{%- for field in fields %}
+func (v {{ entry.name }}Input) {{ field.method_name }}() {{ go_method_return_type(field) }} {
+    payload := v.payload()
+    {%- if field.optional %}
+    raw, ok := payload["{{ field.json_name }}"]
+    if !ok {
+        var zero {{ go_type(field.type) }}
+        return zero, false
+    }
+    return {{ decode_expression(field.type, 'raw') }}, true
+    {%- else %}
+    raw := payload["{{ field.json_name }}"]
+    return {{ decode_expression(field.type, 'raw') }}
+    {%- endif %}
+}
+
+{%- endfor %}
+
+{%- set output_entry = {
+    'name': entry.name ~ 'Output',
+    'doc': entry.doc,
+    'tags': entry.output_tags
+} -%}
+{{ emit_union(output_entry) }}
+
+type {{ entry.name }}Select struct {
+    pseudoJSON map[string]any
+}
+
+func New{{ entry.name }}Select() *{{ entry.name }}Select {
+    return &{{ entry.name }}Select{pseudoJSON: map[string]any{}}
+}
+
+func (s *{{ entry.name }}Select) PseudoJSON() map[string]any {
+    return cloneMap(s.pseudoJSON)
+}
+
+{%- set select_info = entry.select -%}
+{%- for key, value in select_info.items() %}
+{%- if key.startswith('struct') -%}
+{%- set type_name = key | regex_replace('^.*\.', '') | to_pascal_case -%}
+{%- for field in value -%}
+{%- set method_name = type_name ~ (field | replace('!', '') | to_pascal_case) -%}{{- '\n' -}}
+func (s *{{ entry.name }}Select) {{ method_name }}() *{{ entry.name }}Select {
+    fields := ensureStringSlice(s.pseudoJSON["{{ key }}"])
+    fields = appendUnique(fields, "{{ field }}")
+    s.pseudoJSON["{{ key }}"] = fields
+    return s
+}
+{%- endfor -%}
+{%- elif key.startswith('union') -%}
+{%- set type_name = key | regex_replace('^.*\.', '') | to_pascal_case -%}
+{%- for tag_key, fields_list in value.items() -%}
+{%- set tag_name = tag_key | to_pascal_case -%}
+{%- for field in fields_list -%}
+{%- set method_name = type_name ~ tag_name ~ (field | replace('!', '') | to_pascal_case) -%}{{- '\n' -}}
+func (s *{{ entry.name }}Select) {{ method_name }}() *{{ entry.name }}Select {
+    tags := ensureStringMap(s.pseudoJSON["{{ key }}"])
+    fields := appendUnique(tags["{{ tag_key }}"], "{{ field }}")
+    tags["{{ tag_key }}"] = fields
+    s.pseudoJSON["{{ key }}"] = tags
+    return s
+}
+{%- endfor -%}
+{%- endfor -%}
+{%- elif key == '->' -%}
+{%- set ok_fields = value.get('Ok_', []) -%}
+{%- for field in ok_fields -%}
+{%- set method_name = 'Ok' ~ (field | replace('!', '') | to_pascal_case) -%}{{- '\n' -}}
+func (s *{{ entry.name }}Select) {{ method_name }}() *{{ entry.name }}Select {
+    result := ensureStringMap(s.pseudoJSON["->"])
+    fields := appendUnique(result["Ok_"], "{{ field }}")
+    result["Ok_"] = fields
+    s.pseudoJSON["->"] = result
+    return s
+}
+{%- endfor -%}
+{%- endif -%}
+{%- endfor %}
+
+{%- endmacro %}
+
+{%- macro emit_select_overall(functions) -%}
+type Select struct {
+    pseudoJSON map[string]any
+}
+
+func NewSelect() *Select {
+    return &Select{pseudoJSON: map[string]any{}}
+}
+
+func NewSelectFromPseudoJSON(p map[string]any) Select {
+    return Select{pseudoJSON: cloneMap(p)}
+}
+
+func (s *Select) PseudoJSON() map[string]any {
+    return cloneMap(s.pseudoJSON)
+}
+
+{%- for fn in functions %}
+func SelectFor{{ fn.name }}(selectValue *{{ fn.name }}Select) *Select {
+    if selectValue == nil {
+        return &Select{pseudoJSON: map[string]any{}}
+    }
+    return &Select{pseudoJSON: cloneMap(selectValue.pseudoJSON)}
+}
+
+{%- endfor %}
+{%- endmacro %}
+
+{%- macro emit_typed_client(functions) -%}
+type TypedClient struct {
+    client *telepact.Client
+}
+
+func NewTypedClient(client *telepact.Client) *TypedClient {
+    return &TypedClient{client: client}
+}
+
+{%- for fn in functions %}
+func (c *TypedClient) {{ fn.name }}(headers map[string]any, input {{ fn.name }}Input) (telepact.TypedMessage[{{ fn.name }}Output], error) {
+    if c == nil || c.client == nil {
+        return telepact.TypedMessage[{{ fn.name }}Output]{}, errors.New("telepact: typed client not configured")
+    }
+
+    request := telepact.NewMessage(headers, input.PseudoJSON())
+    response, err := c.client.Request(request)
+    if err != nil {
+        return telepact.TypedMessage[{{ fn.name }}Output]{}, err
+    }
+
+    return telepact.NewTypedMessage(response.Headers, New{{ fn.name }}OutputFromPseudoJSON(response.Body)), nil
+}
+
+{%- endfor %}
+func (c *TypedClient) Invoke(target string, headers map[string]any, payload map[string]any) (map[string]any, map[string]any, bool, error) {
+    if c == nil || c.client == nil {
+        return nil, nil, false, errors.New("telepact: typed client not configured")
+    }
+
+    switch target {
+    {%- for fn in functions %}
+    case "{{ fn.raw_name }}":
+        body := map[string]any{target: payload}
+        result, err := c.{{ fn.name }}(headers, New{{ fn.name }}InputFromPseudoJSON(body))
+        if err != nil {
+            return nil, nil, true, err
+        }
+        return result.Headers, result.Body.PseudoJSON(), true, nil
+    {%- endfor %}
+    default:
+        return nil, nil, false, nil
+    }
+}
+{%- endmacro %}
+
+{%- macro emit_typed_server(functions) -%}
+type TypedServer interface {
+    {%- for fn in functions %}
+    {{ fn.name }}(headers map[string]any, input {{ fn.name }}Input) (telepact.TypedMessage[{{ fn.name }}Output], error)
+    {%- endfor %}
+}
+
+type TypedServerHandler struct {
+    Impl TypedServer
+}
+
+func NewTypedServerHandler(impl TypedServer) *TypedServerHandler {
+    return &TypedServerHandler{Impl: impl}
+}
+
+func (h *TypedServerHandler) Handler(message telepact.Message) (telepact.Message, error) {
+    if h == nil || h.Impl == nil {
+        return telepact.Message{}, errors.New("telepact: typed server not configured")
+    }
+
+    target, err := message.BodyTarget()
+    if err != nil {
+        return telepact.Message{}, err
+    }
+
+    switch target {
+    {%- for fn in functions %}
+    case "{{ fn.raw_name }}":
+        result, ierr := h.Impl.{{ fn.name }}(message.Headers, New{{ fn.name }}InputFromPseudoJSON(message.Body))
+        if ierr != nil {
+            return telepact.Message{}, ierr
+        }
+        return telepact.NewMessage(result.Headers, result.Body.PseudoJSON()), nil
+    {%- endfor %}
+    default:
+        return telepact.Message{}, fmt.Errorf("telepact: unknown function %s", target)
+    }
+}
+{%- endmacro %}
+
+// Code generated by the Telepact CLI. DO NOT EDIT.
+package {{ package }}
+
+import (
+    "errors"
+    "fmt"
+
+    telepact "github.com/telepact/telepact/lib/go"
+)
+
+type Optional[T any] struct {
+    value   T
+    present bool
+}
+
+func Some[T any](value T) Optional[T] {
+    return Optional[T]{value: value, present: true}
+}
+
+func None[T any]() Optional[T] {
+    var zero T
+    return Optional[T]{value: zero, present: false}
+}
+
+func (o Optional[T]) Value() (T, bool) {
+    return o.value, o.present
+}
+
+type TaggedValue[T comparable, U any] struct {
+    Tag   T
+    Value U
+}
+
+type UntypedTaggedValue struct {
+    Tag   string
+    Value map[string]any
+}
+
+func cloneMap(src map[string]any) map[string]any {
+    if src == nil {
+        return map[string]any{}
+    }
+    dst := make(map[string]any, len(src))
+    for k, v := range src {
+        dst[k] = v
+    }
+    return dst
+}
+
+func identity[T any](value T) any {
+    return any(value)
+}
+
+func encodeOptional[T any](opt Optional[T], encode func(T) any) (any, bool) {
+    value, ok := opt.Value()
+    if !ok {
+        var zero any
+        return zero, false
+    }
+    return encode(value), true
+}
+
+func encodeNullable[T any](ptr *T, encode func(T) any) any {
+    if ptr == nil {
+        return nil
+    }
+    return encode(*ptr)
+}
+
+func encodeSlice[T any](values []T, encode func(T) any) []any {
+    if values == nil {
+        return nil
+    }
+    out := make([]any, len(values))
+    for i, v := range values {
+        out[i] = encode(v)
+    }
+    return out
+}
+
+func encodeMap[T any](values map[string]T, encode func(T) any) map[string]any {
+    if values == nil {
+        return nil
+    }
+    out := make(map[string]any, len(values))
+    for k, v := range values {
+        out[k] = encode(v)
+    }
+    return out
+}
+
+func decodeSlice[T any](value any, decode func(any) T) []T {
+    if value == nil {
+        return nil
+    }
+    src := asSlice(value)
+    out := make([]T, len(src))
+    for i, v := range src {
+        out[i] = decode(v)
+    }
+    return out
+}
+
+func decodeMap[T any](value any, decode func(any) T) map[string]T {
+    if value == nil {
+        return nil
+    }
+    src := asMap(value)
+    out := make(map[string]T, len(src))
+    for k, v := range src {
+        out[k] = decode(v)
+    }
+    return out
+}
+
+func nullable[T any](value any, decode func(any) T) *T {
+    if value == nil {
+        return nil
+    }
+    result := decode(value)
+    return &result
+}
+
+func asMap(value any) map[string]any {
+    if value == nil {
+        return map[string]any{}
+    }
+    switch typed := value.(type) {
+    case map[string]any:
+        return cloneMap(typed)
+    case map[any]any:
+        result := make(map[string]any, len(typed))
+        for k, v := range typed {
+            result[fmt.Sprint(k)] = v
+        }
+        return result
+    default:
+        panic(fmt.Sprintf("telepact: expected map[string]any, got %T", value))
+    }
+}
+
+func asSlice(value any) []any {
+    if value == nil {
+        return nil
+    }
+    switch typed := value.(type) {
+    case []any:
+        return typed
+    case []string:
+        out := make([]any, len(typed))
+        for i, v := range typed {
+            out[i] = v
+        }
+        return out
+    case []map[string]any:
+        out := make([]any, len(typed))
+        for i, v := range typed {
+            out[i] = v
+        }
+        return out
+    default:
+        panic(fmt.Sprintf("telepact: expected slice, got %T", value))
+    }
+}
+
+func asBool(value any) bool {
+    if value == nil {
+        return false
+    }
+    if typed, ok := value.(bool); ok {
+        return typed
+    }
+    panic(fmt.Sprintf("telepact: expected bool, got %T", value))
+}
+
+func asInt(value any) int {
+    switch typed := value.(type) {
+    case int:
+        return typed
+    case int64:
+        return int(typed)
+    case int32:
+        return int(typed)
+    case float64:
+        return int(typed)
+    case float32:
+        return int(typed)
+    default:
+        panic(fmt.Sprintf("telepact: expected integer, got %T", value))
+    }
+}
+
+func asFloat64(value any) float64 {
+    switch typed := value.(type) {
+    case float64:
+        return typed
+    case float32:
+        return float64(typed)
+    case int:
+        return float64(typed)
+    case int64:
+        return float64(typed)
+    case int32:
+        return float64(typed)
+    default:
+        panic(fmt.Sprintf("telepact: expected number, got %T", value))
+    }
+}
+
+func asString(value any) string {
+    if value == nil {
+        return ""
+    }
+    if typed, ok := value.(string); ok {
+        return typed
+    }
+    panic(fmt.Sprintf("telepact: expected string, got %T", value))
+}
+
+func asBytes(value any) []byte {
+    if value == nil {
+        return nil
+    }
+    if typed, ok := value.([]byte); ok {
+        return typed
+    }
+    panic(fmt.Sprintf("telepact: expected []byte, got %T", value))
+}
+
+func appendUnique(list []string, value string) []string {
+    for _, item := range list {
+        if item == value {
+            return list
+        }
+    }
+    return append(list, value)
+}
+
+func ensureStringSlice(value any) []string {
+    if value == nil {
+        return []string{}
+    }
+    switch typed := value.(type) {
+    case []string:
+        return append([]string{}, typed...)
+    case []any:
+        result := make([]string, 0, len(typed))
+        for _, v := range typed {
+            result = append(result, fmt.Sprint(v))
+        }
+        return result
+    default:
+        panic(fmt.Sprintf("telepact: expected []string, got %T", value))
+    }
+}
+
+func ensureStringMap(value any) map[string][]string {
+    if value == nil {
+        return map[string][]string{}
+    }
+    switch typed := value.(type) {
+    case map[string][]string:
+        result := make(map[string][]string, len(typed))
+        for k, v := range typed {
+            result[k] = append([]string{}, v...)
+        }
+        return result
+    case map[string]any:
+        result := make(map[string][]string, len(typed))
+        for k, v := range typed {
+            result[k] = ensureStringSlice(v)
+        }
+        return result
+    default:
+        panic(fmt.Sprintf("telepact: expected map[string][]string, got %T", value))
+    }
+}
+
+func firstKey(m map[string]any) string {
+    for k := range m {
+        return k
+    }
+    return ""
+}
+
+{%- for entry in entries if entry.kind == 'struct' %}
+{{ emit_struct(entry) }}
+{%- endfor %}
+
+{%- for entry in entries if entry.kind == 'union' %}
+{{ emit_union(entry) }}
+{%- endfor %}
+
+{%- for entry in entries if entry.kind == 'function' %}
+{{ emit_function(entry) }}
+{%- endfor %}
+
+{{ emit_select_overall(functions) }}
+
+{{ emit_typed_client(functions) }}
+
+{{ emit_typed_server(functions) }}
