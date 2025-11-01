@@ -76,6 +76,9 @@ test-go:
 test-trace-go:
 	$(MAKE) -C test/runner test-trace-go
 
+deploy-go:
+	$(MAKE) -C lib/go deploy
+
 .PHONY: test
 test:
 	$(MAKE) -C test/runner test

@@ -16,9 +16,12 @@
 
 SHELL := /bin/bash
 
+VERSION := $(shell cat ../../VERSION.txt)
+MODULE_PATH := github.com/telepact/telepact/lib/go
+
 GO_SOURCES := $(shell find . -type f -name '*.go' -not -path './target/*')
 
-.PHONY: all build test fmt tidy clean
+.PHONY: all build test fmt tidy clean deploy
 
 all: build
 
@@ -36,3 +39,6 @@ tidy:
 
 clean:
 	GO111MODULE=on go clean ./...
+
+deploy:
+	GO111MODULE=on GOPROXY=proxy.golang.org,direct go list -m $(MODULE_PATH)@v$(VERSION)
