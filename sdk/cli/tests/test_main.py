@@ -17,6 +17,7 @@
 from typing import Generator
 from pathlib import Path
 import traceback
+import asyncio
 import pytest
 from click.testing import CliRunner
 # Adjust the import path according to your project structure
@@ -24,6 +25,7 @@ from telepact_cli.cli import main
 import traceback
 import subprocess
 import requests
+import websockets
 import json
 import time
 from tests.test_data import compare_cases
@@ -51,6 +53,7 @@ def tmp_dir_manager() -> Generator[None, None, None]:
 
 def test_demo_server_and_fetch_and_mock() -> None:
     p = subprocess.Popen(['poetry', 'run', 'telepact', 'demo-server'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, cwd='tests/tmp')
+    p_mock: subprocess.Popen | None = None
 
     try:
         # Check if the server is running
@@ -83,6 +86,16 @@ def test_demo_server_and_fetch_and_mock() -> None:
 
         assert response_mock.status_code == 200
         assert response_mock.json() == [{}, {'Ok_': {'result': 0.001007557381413671}}] # result is mocked
+
+        async def websocket_request() -> list[dict[str, object]]:
+            async with websockets.connect('ws://localhost:8001/api') as websocket:
+                await websocket.send(json.dumps([{}, {'fn.add': {'x': 2, 'y': 4}}]))
+                response_text = await websocket.recv()
+                return json.loads(response_text)
+
+        ws_response = asyncio.run(websocket_request())
+        expected_ws_response = [{}, {'Ok_': {'result': 0.0014801179065742148}}]
+        assert ws_response == expected_ws_response
 
 
     except requests.exceptions.RequestException as e:

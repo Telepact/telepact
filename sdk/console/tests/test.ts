@@ -44,17 +44,149 @@ async function ctrlClick(page: Page, locator: Locator) {
 	await page.keyboard.up('Control');
 }
 
-test.describe('Loading from demo server', () => {
-	test.beforeEach(async ({ page }) => {
-		await page.goto('/');
-		await expect(
-			page.getByRole('heading', { name: 'Telepact' }),
-			"Page should have a heading with the text 'Telepact'"
-		).toBeVisible();
-		
-		let source = page.getByRole('textbox', { name: 'Live URL' });
-		await source.fill('http://localhost:8085/api');
-		await page.getByRole('button', { name: 'Load'}).click();
+const transports = [
+	{
+		label: 'HTTP',
+		protocol: 'http' as const,
+		liveUrl: 'http://localhost:8085/api'
+	},
+	{
+		label: 'WebSocket',
+		protocol: 'ws' as const,
+		liveUrl: 'ws://localhost:8085/api'
+	}
+] as const;
+
+for (const transport of transports) {
+	test.describe(`Loading from demo server (${transport.label})`, () => {
+		test.beforeEach(async ({ page }) => {
+			await page.goto('/');
+			await expect(
+				page.getByRole('heading', { name: 'Telepact' }),
+				"Page should have a heading with the text 'Telepact'"
+			).toBeVisible();
+
+			const protocolButton = page.getByRole('button', { name: 'Select protocol' });
+			const currentProtocol = (await protocolButton.textContent())?.trim().toLowerCase();
+			if (currentProtocol !== transport.protocol) {
+				await protocolButton.click();
+				await page.getByRole('option', { name: transport.protocol }).click();
+			}
+
+			const source = page.getByRole('textbox', { name: 'Live URL' });
+			await source.fill(transport.liveUrl);
+			await page.getByRole('button', { name: 'Load' }).click();
+			await page.waitForURL((url) => {
+				return (
+					url.searchParams.get('s') === transport.liveUrl &&
+					url.searchParams.get('p') === transport.protocol
+				);
+			});
+			await expect(source).toHaveValue(transport.liveUrl);
+		});
+
+		defineConsoleTests();
+	});
+}
+
+function defineConsoleTests() {
+	test.describe('Live URL validation', () => {
+		test('accepts blank and relative targets without error', async ({ page }) => {
+			const liveUrlInput = page.getByRole('textbox', { name: 'Live URL' });
+
+			await liveUrlInput.fill('   ');
+			await expect(liveUrlInput).toHaveAttribute('aria-invalid', 'false');
+			await expect(page.locator('#live-url-error')).toHaveCount(0);
+
+			await liveUrlInput.fill('/telepact/api');
+			await expect(liveUrlInput).toHaveAttribute('aria-invalid', 'false');
+			await expect(page.locator('#live-url-error')).toHaveCount(0);
+		});
+
+		test('accepts https URLs when the HTTP protocol is selected', async ({ page }) => {
+			const liveUrlInput = page.getByRole('textbox', { name: 'Live URL' });
+			const protocolButton = page.getByRole('button', { name: 'Select protocol' });
+
+			if ((await protocolButton.textContent())?.trim().toLowerCase() !== 'http') {
+				await protocolButton.click();
+				await page.getByRole('option', { name: 'http' }).click();
+			}
+
+			await liveUrlInput.fill('   https://example.com/api  ');
+			await expect(liveUrlInput).toHaveAttribute('aria-invalid', 'false');
+			await expect(page.locator('#live-url-error')).toHaveCount(0);
+		});
+
+		test('rejects syntactically invalid URLs', async ({ page }) => {
+			const liveUrlInput = page.getByRole('textbox', { name: 'Live URL' });
+
+			await liveUrlInput.fill('%');
+			await expect(liveUrlInput).toHaveAttribute('aria-invalid', 'true');
+			await expect(liveUrlInput).toHaveAttribute('aria-describedby', 'live-url-error');
+			await expect(page.locator('#live-url-error')).toHaveText(
+				'Enter a valid URL or relative path'
+			);
+		});
+
+		test('rejects improperly encoded URLs', async ({ page }) => {
+			const liveUrlInput = page.getByRole('textbox', { name: 'Live URL' });
+			const protocolButton = page.getByRole('button', { name: 'Select protocol' });
+
+			if ((await protocolButton.textContent())?.trim().toLowerCase() !== 'http') {
+				await protocolButton.click();
+				await page.getByRole('option', { name: 'http' }).click();
+			}
+
+			await liveUrlInput.fill('http://example.com/%zz');
+			await expect(liveUrlInput).toHaveAttribute('aria-invalid', 'true');
+			await expect(page.locator('#live-url-error')).toHaveText(
+				'Enter a valid URL or relative path'
+			);
+		});
+
+		test('enforces the selected protocol scheme', async ({ page }) => {
+			const liveUrlInput = page.getByRole('textbox', { name: 'Live URL' });
+			const protocolButton = page.getByRole('button', { name: 'Select protocol' });
+
+			await protocolButton.click();
+			await page.getByRole('option', { name: 'ws' }).click();
+
+			await liveUrlInput.fill('http://example.com/api');
+			await expect(liveUrlInput).toHaveAttribute('aria-invalid', 'true');
+			await expect(page.locator('#live-url-error')).toHaveText(
+				'URL must match selected scheme (ws:// or wss:// or a relative path)'
+			);
+		});
+
+		test('enforces the HTTP scheme error messaging', async ({ page }) => {
+			const liveUrlInput = page.getByRole('textbox', { name: 'Live URL' });
+			const protocolButton = page.getByRole('button', { name: 'Select protocol' });
+
+			if ((await protocolButton.textContent())?.trim().toLowerCase() !== 'http') {
+				await protocolButton.click();
+				await page.getByRole('option', { name: 'http' }).click();
+			}
+
+			await liveUrlInput.fill('ws://example.com/api');
+			await expect(liveUrlInput).toHaveAttribute('aria-invalid', 'true');
+			await expect(page.locator('#live-url-error')).toHaveText(
+				'URL must match selected scheme (http:// or https:// or a relative path)'
+			);
+		});
+
+		test('accepts secure websocket URLs when the WebSocket protocol is selected', async ({ page }) => {
+			const liveUrlInput = page.getByRole('textbox', { name: 'Live URL' });
+			const protocolButton = page.getByRole('button', { name: 'Select protocol' });
+
+			if ((await protocolButton.textContent())?.trim().toLowerCase() !== 'ws') {
+				await protocolButton.click();
+				await page.getByRole('option', { name: 'ws' }).click();
+			}
+
+			await liveUrlInput.fill('wss://example.com/socket');
+			await expect(liveUrlInput).toHaveAttribute('aria-invalid', 'false');
+			await expect(page.locator('#live-url-error')).toHaveCount(0);
+		});
 	});
 
 	test('Schema editor works correctly', async ({ page }) => {
@@ -94,7 +226,7 @@ test.describe('Loading from demo server', () => {
 			"Clipboard should contain the schema text"
 		).toBe(schema);
 	
-		await textAreaElement.locator("..").click();
+		await textAreaElement.locator(".." ).click();
 		await page.keyboard.press('a');
 	
 		expect(
@@ -527,5 +659,5 @@ test.describe('Loading from demo server', () => {
 		expect(promptCount).toBe(1);
 	});
 	
-});
+}
 
