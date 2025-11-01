@@ -19,8 +19,8 @@ package validation
 import (
 	"fmt"
 
-	telepact "github.com/telepact/telepact/lib/go"
 	"github.com/telepact/telepact/lib/go/internal/types"
+	telepact "github.com/telepact/telepact/lib/go/pkg"
 )
 
 // ValidateResult ensures the provided error result conforms to the union type definition.
