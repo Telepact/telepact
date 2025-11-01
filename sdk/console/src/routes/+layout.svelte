@@ -51,7 +51,63 @@
 	let requestEditor = $state<MonacoEditor>();
 	let schemaEditor = $state<MonacoEditor>();
 
-	let sourceUrl: string = $derived($page.url.searchParams.get('s') ?? '');
+	let sourceUrlInput = $state($page.url.searchParams.get('s') ?? '');
+
+	type ProtocolOption = 'http' | 'ws';
+
+	function inferProtocolFromUrl(value: string): ProtocolOption {
+		const lowerValue = value.toLowerCase();
+		if (lowerValue.startsWith('ws://') || lowerValue.startsWith('wss://')) {
+			return 'ws';
+		}
+		return 'http';
+	}
+
+	const initialProtocol = (() => {
+		const param = $page.url.searchParams.get('p');
+		if (param === 'http' || param === 'ws') {
+			return param;
+		}
+		const dataProto = $page.data.schemaProtocol;
+		if (dataProto === 'http' || dataProto === 'ws') {
+			return dataProto;
+		}
+		return inferProtocolFromUrl(sourceUrlInput);
+	})();
+
+	let sourceUrlProtocol = $state<ProtocolOption>(initialProtocol);
+
+	function validateSourceUrl(value: string, protocol: ProtocolOption): string | null {
+		const trimmed = value.trim();
+		if (trimmed === '') {
+			return null;
+		}
+
+		if (/%(?![0-9A-Fa-f]{2})/.test(trimmed)) {
+			return 'Enter a valid URL or relative path';
+		}
+
+		const allowedProtocols = protocol === 'ws' ? ['ws:', 'wss:'] : ['http:', 'https:'];
+
+		try {
+			const absolute = new URL(trimmed);
+			if (allowedProtocols.includes(absolute.protocol.toLowerCase())) {
+				return null;
+			}
+			return protocol === 'ws'
+				? 'URL must match selected scheme (ws:// or wss:// or a relative path)'
+				: 'URL must match selected scheme (http:// or https:// or a relative path)';
+		} catch {
+			try {
+				new URL(trimmed, 'http://placeholder.local');
+				return null;
+			} catch {
+				return 'Enter a valid URL or relative path';
+			}
+		}
+	}
+
+	let urlError: string | null = $derived(validateSourceUrl(sourceUrlInput, sourceUrlProtocol));
 
 	let schemaSource: string = $derived($page.data.schemaSource);
 
@@ -121,28 +177,73 @@
 
 	let randomSeed = $state(1);
 
-	function handleSourceGet(e: Event) {
-		const formData = new FormData(e.target as HTMLFormElement);
-		const sourceUrl = formData.get('url') as string;
+	function handleSourceGet(_e: Event) {
+		const trimmed = sourceUrlInput.trim();
+		sourceUrlInput = trimmed;
+		const validationError = validateSourceUrl(trimmed, sourceUrlProtocol);
+		if (validationError !== null) {
+			return;
+		}
 
 		let q = new URLSearchParams($page.url.searchParams.toString());
 
 		const existingS = q.get('s');
 
-		if (existingS !== sourceUrl) {
+		if (existingS !== trimmed) {
 			q.delete('mf');
 			q.delete('mh');
 			q.delete('r');
 			q.set('v', 'd');
 		}
 
-		q.set('s', sourceUrl ?? '');
+		if (trimmed === '') {
+			q.delete('s');
+			q.delete('p');
+		} else {
+			q.set('s', trimmed);
+			q.set('p', sourceUrlProtocol);
+		}
+
+		closeDropdown();
 		goto(`?${q.toString()}`);
 	}
 
+		let lastSyncedSourceUrl = '';
+
+		$effect(() => {
+			const currentUrl = $page.url.searchParams.get('s') ?? '';
+			if (currentUrl !== lastSyncedSourceUrl) {
+				lastSyncedSourceUrl = currentUrl;
+				sourceUrlInput = currentUrl;
+			}
+		});
+
+	let lastSyncedProtocol: ProtocolOption | null = null;
+
+	$effect(() => {
+		const param = $page.url.searchParams.get('p');
+		let nextProtocol: ProtocolOption;
+
+		if (param === 'http' || param === 'ws') {
+			nextProtocol = param;
+		} else {
+			const dataProto = $page.data.schemaProtocol;
+			if (dataProto === 'http' || dataProto === 'ws') {
+				nextProtocol = dataProto;
+			} else {
+				nextProtocol = inferProtocolFromUrl($page.url.searchParams.get('s') ?? '');
+			}
+		}
+
+		if (nextProtocol !== lastSyncedProtocol) {
+			lastSyncedProtocol = nextProtocol;
+			sourceUrlProtocol = nextProtocol;
+		}
+	});
+
 	function thisHandleRequest() {
 		if (
-			schemaSource === 'http' &&
+			(schemaSource === 'http' || schemaSource === 'ws') &&
 			!sessionStorage.getItem('telepact-console:live-request-acknowledge')
 		) {
 			if (!confirm('You are about to submit a request to a live server.')) {
@@ -253,7 +354,19 @@
 		}
 	}
 
-	let showDropdown = false;
+	let showDropdown = $state(false);
+
+	let liveUrlActive = $state(false);
+
+	function handleLiveUrlFocusOut(event: FocusEvent) {
+		const currentTarget = event.currentTarget as HTMLElement | null;
+		const relatedTarget = event.relatedTarget as Node | null;
+
+		if (!currentTarget || !relatedTarget || !currentTarget.contains(relatedTarget)) {
+			liveUrlActive = false;
+			showDropdown = false;
+		}
+	}
 
 	function toggleDropdown() {
 		showDropdown = !showDropdown;
@@ -262,12 +375,28 @@
 	function closeDropdown() {
 		showDropdown = false;
 	}
+
+	function selectProtocol(protocol: ProtocolOption) {
+		sourceUrlProtocol = protocol;
+		closeDropdown();
+	}
+
+	function handleDropdownKeydown(event: KeyboardEvent) {
+		if (event.key === 'Escape') {
+			event.stopPropagation();
+			closeDropdown();
+		}
+	}
 </script>
 
 <div class="text-gray-800 dark:text-gray-200">
 	<nav class="fixed top-0 z-10 h-16 w-full border-y border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800">
 		<div class="flex h-full items-center px-4">
-			<div class="flex basis-1/3">
+			<div
+				class={`flex items-center ${
+					liveUrlActive ? 'shrink-0 pr-4' : 'flex-1 min-w-0'
+				}`}
+			>
 				<div class="flex items-center rounded-md py-2">
 					<div class="text-sky-400">
 						<img src="/favicon.svg" alt="Telepact logo" class="h-8 w-8" />
@@ -275,7 +404,12 @@
 					<h1 class="px-2 text-lg font-semibold text-gray-900 dark:text-gray-100">Telepact</h1>
 				</div>
 			</div>
-			<div id="view-select" class="flex basis-1/3 content-center justify-center space-x-2">
+			<div
+				id="view-select"
+				class={`flex shrink-0 content-center space-x-2 ${
+					liveUrlActive ? 'ml-4 mr-auto justify-start' : 'mx-auto justify-center'
+				}`}
+			>
 				<div class="inline-flex rounded-md">
 					<Tooltip text="Schema">
 						<button
@@ -374,28 +508,124 @@
 					</Tooltip>
 				</div>
 			</div>
-			<div class="flex basis-1/3 justify-end">
-				<form class="flex space-x-2" onsubmit={preventDefault(handleSourceGet)}>
-					<div class="flex rounded-md border border-gray-300 dark:border-gray-500">
+			<div class="flex flex-1 min-w-0 items-center justify-end">
+				<form
+					class={`flex items-center space-x-2 ml-4 ${
+						liveUrlActive ? 'w-full' : ''
+					}`}
+					onsubmit={preventDefault(handleSourceGet)}
+				>
+					<div
+						class={`flex items-stretch rounded-md border focus-within:ring-1 focus-within:ring-inset ${
+							urlError
+								? 'border-red-500 focus-within:ring-red-500 ring-1 ring-inset ring-red-500 dark:border-red-400 dark:focus-within:ring-red-400'
+								: 'border-gray-300 focus-within:ring-gray-500 dark:border-gray-500 dark:focus-within:ring-gray-400'
+						} ${liveUrlActive ? 'flex-1 min-w-0' : 'w-80'}`}
+					>
 						<label
 							for="url"
-							class="content-center rounded-l-md bg-zinc-200 dark:bg-zinc-600 px-2 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 whitespace-nowrap"
+							class={`content-center rounded-l-md px-2 py-2 text-sm font-medium whitespace-nowrap ${
+								urlError
+									? 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300'
+									: 'bg-zinc-200 text-gray-700 dark:bg-zinc-600 dark:text-gray-200'
+							}`}
 							>Live URL</label
 						>
-						<div>
-							<input
-								type="text"
-								name="url"
-								id="url"
-								placeholder="None  (draft mode)"
-								value={sourceUrl}
-								class="rounded-r-md border-0 bg-zinc-100 dark:bg-zinc-700 pl-2 py-2 placeholder:text-gray-400 focus:border-gray-500 focus:ring-1 focus:ring-inset focus:ring-gray-500"
-							/>
+						<div class="relative flex content-center">
+							<button
+								type="button"
+								class={`content-center border-l border-gray-300 dark:border-gray-500 flex items-center gap-1 px-2 py-2 text-sm font-medium lowercase focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sky-500 ${
+									urlError
+										? 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300'
+										: 'bg-zinc-200 text-gray-700 dark:bg-zinc-600 dark:text-gray-200'
+								}`}
+								aria-haspopup="listbox"
+								aria-label="Select protocol"
+								aria-expanded={showDropdown ? 'true' : 'false'}
+								onclick={toggleDropdown}
+								onkeydown={handleDropdownKeydown}
+							>
+								<span>{sourceUrlProtocol}</span>
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									viewBox="0 0 20 20"
+									fill="currentColor"
+									class="h-4 w-4"
+								>
+									<path
+										fill-rule="evenodd"
+										d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 1 1 1.06 1.06l-4.24 4.24a.75.75 0 0 1-1.06 0L5.21 8.29a.75.75 0 0 1 .02-1.08z"
+										clip-rule="evenodd"
+								/>
+								</svg>
+							</button>
+							{#if showDropdown}
+								<div
+									class={'absolute left-0 top-full z-20 mt-1 w-28 overflow-hidden rounded-md border shadow-lg border-gray-200 bg-white dark:border-zinc-600 dark:bg-zinc-700'}
+									
+									role="listbox"
+									aria-label="Select protocol"
+									onkeydown={handleDropdownKeydown}
+									tabindex="-1"
+								>
+									<button
+										type="button"
+										onclick={() => selectProtocol('http')}
+										class={`block w-full px-3 py-2 text-left text-sm lowercase ${
+											sourceUrlProtocol === 'http'
+												? 'bg-sky-600 text-white'
+												: 'text-gray-700 hover:bg-sky-100 dark:text-gray-100 dark:hover:bg-zinc-600'
+										}`}
+										role="option"
+										aria-selected={sourceUrlProtocol === 'http' ? 'true' : 'false'}
+									>
+										http
+									</button>
+									<button
+										type="button"
+										onclick={() => selectProtocol('ws')}
+										class={`block w-full px-3 py-2 text-left text-sm lowercase ${
+											sourceUrlProtocol === 'ws'
+												? 'bg-sky-600 text-white'
+												: 'text-gray-700 hover:bg-sky-100 dark:text-gray-100 dark:hover:bg-zinc-600'
+										}`}
+										role="option"
+										aria-selected={sourceUrlProtocol === 'ws' ? 'true' : 'false'}
+									>
+										ws
+									</button>
+								</div>
+							{/if}
+						</div>
+						<div 
+						    class={`${liveUrlActive ? 'flex-1 min-w-0' : ''}`}
+							onfocusin={() => (liveUrlActive = true)}
+							onfocusout={handleLiveUrlFocusOut}
+						>
+							<Tooltip text={urlError ?? ''}>
+								<input
+									type="text"
+									name="url"
+									id="url"
+									placeholder="None  (draft mode)"
+									bind:value={sourceUrlInput}
+									class={`w-full rounded-r-md border-0 pl-2 py-2 placeholder:text-gray-400 focus:ring-1 focus:ring-inset ${
+										urlError
+											? 'bg-red-50 text-red-800 focus:ring-red-500 dark:bg-red-900/30 dark:text-red-200 dark:focus:ring-red-400'
+											: 'bg-zinc-100 focus:ring-gray-500 dark:bg-zinc-700 dark:focus:ring-gray-400'
+									}`}
+									aria-invalid={urlError ? 'true' : 'false'}
+									aria-describedby={urlError ? 'live-url-error' : undefined}
+								/>
+							</Tooltip>
+							{#if urlError}
+								<p id="live-url-error" class="sr-only">{urlError}</p>
+							{/if}
 						</div>
 					</div>
 					<button
 						type="submit"
-						class="rounded-md bg-sky-700 px-3 py-2 text-sm font-semibold text-white active:bg-sky-800"
+						class="shrink-0 rounded-md bg-sky-700 px-3 py-2 text-sm font-semibold text-white active:bg-sky-800"
 						>Load</button
 					>
 				</form>
