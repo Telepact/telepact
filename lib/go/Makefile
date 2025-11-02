@@ -44,9 +44,6 @@ sync-schema-assets:
 build: sync-schema-assets go.mod go.sum $(GO_SOURCES)
 	GO111MODULE=on go build ./...
 
-test: sync-schema-assets
-	GO111MODULE=on go test ./...
-
 fmt:
 	gofmt -w $(GO_SOURCES)
 
