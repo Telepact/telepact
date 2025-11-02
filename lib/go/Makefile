@@ -25,9 +25,8 @@ SCHEMA_SOURCE_DIR := ../../common
 SCHEMA_TARGET_DIR := internal/schema/do_not_edit
 SCHEMA_SOURCE_FILES := $(notdir $(wildcard $(SCHEMA_SOURCE_DIR)/*.json))
 SCHEMA_TARGETS := $(addprefix $(SCHEMA_TARGET_DIR)/,$(SCHEMA_SOURCE_FILES))
-TELEPACT_PROJECT_CLI_DIR := ../../tool/telepact_project_cli
 
-.PHONY: all build test fmt tidy clean deploy verify-schema-assets copy-schema-assets
+.PHONY: all build test fmt tidy clean deploy sync-schema-assets copy-common-assets
 
 all: build
 
@@ -35,13 +34,18 @@ copy-common-assets:
 	@mkdir -p $(SCHEMA_TARGET_DIR)
 	cp $(SCHEMA_SOURCE_DIR)/*.json $(SCHEMA_TARGET_DIR)/
 
-verify-schema-assets:
-	telepact-project verify-identical-directories $(abspath $(SCHEMA_SOURCE_DIR)) $(abspath $(SCHEMA_TARGET_DIR)) || (echo "TODO: Run 'make copy-common-assets'" && exit 1)
+sync-schema-assets:
+	@$(MAKE) copy-common-assets
+	@if [ -n "$$(git status --porcelain $(SCHEMA_TARGET_DIR))" ]; then \
+		echo "Schema assets updated. Please run 'make go' and commit the changes."; \
+		git status --short $(SCHEMA_TARGET_DIR); \
+		exit 1; \
+	fi
 
-build: verify-schema-assets go.mod go.sum $(GO_SOURCES)
+build: sync-schema-assets go.mod go.sum $(GO_SOURCES)
 	GO111MODULE=on go build ./...
 
-test: verify-schema-assets
+test: sync-schema-assets
 	GO111MODULE=on go test ./...
 
 fmt:
