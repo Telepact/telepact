@@ -37,8 +37,7 @@ copy-common-assets:
 sync-schema-assets:
 	@$(MAKE) copy-common-assets
 	@if [ -n "$$(git status --porcelain $(SCHEMA_TARGET_DIR))" ]; then \
-		echo "Schema assets updated. Please run 'make go' and commit the changes."; \
-		git status --short $(SCHEMA_TARGET_DIR); \
+		echo "ERROR: Schema assets updated. Please run 'make go' and commit the changes."; \
 		exit 1; \
 	fi
 
