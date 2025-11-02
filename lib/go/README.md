@@ -3,7 +3,7 @@
 ### Installation
 
 ```bash
-go get github.com/telepact/telepact/lib/go@v1.0.0-alpha.162
+go get github.com/telepact/telepact/lib/go
 ```
 
 ### Usage

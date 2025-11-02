@@ -27,6 +27,7 @@ the library and SDK docs:
 -   [Library: Typescript](./lib/ts/README.md)
 -   [Library: Python](./lib/py/README.md)
 -   [Library: Java](./lib/java/README.md)
+-   [Library: Go](./lib/go/README.md)
 
 -   [SDK: CLI](./sdk/cli/README.md)
 -   [SDK: Developer Console](./sdk/console/README.md)

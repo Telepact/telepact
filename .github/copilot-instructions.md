@@ -7,7 +7,7 @@ This document provides guidance for AI agents working within the Telepact codeba
 Telepact is a multi-language API ecosystem built around a unified schema definition. The core idea is to define your API in `.telepact.json` files, and then use language-specific libraries to implement clients and servers.
 
 The project is a monorepo containing several independent but related components:
--   **Core Libraries (`/lib`)**: Implementations of the Telepact protocol in `java`, `py` (Python), and `ts` (TypeScript). These provide the `Server` and `Client` classes.
+-   **Core Libraries (`/lib`)**: Implementations of the Telepact protocol in `go`, `java`, `py` (Python), and `ts` (TypeScript). These provide the `Server` and `Client` classes.
 -   **SDKs (`/sdk`)**: Tools built on top of the core libraries, including a `cli`, a web-based `console`, and a `prettier` plugin for formatting schema files.
 -   **Bindings (`/bind`)**: Language-specific bindings, like for `dart`.
 -   **Schema Definitions**: APIs are defined in `.telepact.json` files (e.g., `common/auth.telepact.json`). These files are the source of truth for all API interactions.
@@ -41,7 +41,7 @@ The entire project uses a hierarchical `Makefile` system. The root `Makefile` de
 ### Key Files & Directories
 
 -   `Makefile`: The entry point for all build, test, and deploy operations.
--   `lib/{java,py,ts}`: The core libraries. Changes here impact the fundamental behavior of Telepact.
+-   `lib/{go,java,py,ts}`: The core libraries. Changes here impact the fundamental behavior of Telepact.
 -   `bind/dart`: Language-specific bindings for Dart.
 -   `test/runner`: The cross-language integration test suite. This is the best place to understand how different language implementations are expected to behave and interact.
 -   `common/*.telepact.json`: The common schema files that define the internal APIs used by Telepact itself.
