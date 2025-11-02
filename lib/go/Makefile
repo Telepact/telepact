@@ -31,12 +31,12 @@ TELEPACT_PROJECT_CLI_DIR := ../../tool/telepact_project_cli
 
 all: build
 
-copy-schema-assets:
+copy-common-assets:
 	@mkdir -p $(SCHEMA_TARGET_DIR)
 	cp $(SCHEMA_SOURCE_DIR)/*.json $(SCHEMA_TARGET_DIR)/
 
 verify-schema-assets:
-	telepact-project verify-identical-directories $(abspath $(SCHEMA_SOURCE_DIR)) $(abspath $(SCHEMA_TARGET_DIR)); \
+	telepact-project verify-identical-directories $(abspath $(SCHEMA_SOURCE_DIR)) $(abspath $(SCHEMA_TARGET_DIR)) || (echo "TODO: Run 'make copy-common-assets'" && exit 1)
 
 build: verify-schema-assets go.mod go.sum $(GO_SOURCES)
 	GO111MODULE=on go build ./...
@@ -53,5 +53,5 @@ tidy:
 clean:
 	GO111MODULE=on go clean ./...
 
-deploy: verify-schema-assets
+deploy: build
 	GO111MODULE=on GOPROXY=proxy.golang.org,direct go list -m $(MODULE_PATH)@v$(VERSION)
