@@ -228,6 +228,8 @@ def bump() -> None:
             release_targets.add('py')
         if 'lib/ts' in path:
             release_targets.add('ts')
+        if 'lib/go' in path:
+            release_targets.add('go')
         if 'bind/dart' in path:
             release_targets.add('dart')
         if 'sdk/cli' in path:
@@ -367,6 +369,7 @@ def github_labels() -> None:
         "lib/java": "java",
         "lib/py": "py",
         "lib/ts": "ts",
+        "lib/go": "go",
         "bind/dart": "dart",
         "sdk/cli": "cli",
         "sdk/console": "console",
