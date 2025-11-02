@@ -1,0 +1,258 @@
+[
+    {
+        "///": " Ping the server. ",
+        "fn.ping_": {},
+        "->": [
+            {
+                "Ok_": {}
+            }
+        ],
+        "_errors": "^errors\\.Validation_$"
+    },
+    {
+        "///": " Get the telepact `schema` of this server. ",
+        "fn.api_": {},
+        "->": [
+            {
+                "Ok_": {
+                    "api": [{"string": "any"}]
+                }
+            }
+        ],
+        "_errors": "^errors\\.Validation_$"
+    },
+    {
+        "_ext.Select_": {}
+    },
+    {
+        "///": " The `@time_` header indicates the request timeout honored by the client. ",
+        "headers.Time_": {
+            "@time_": "integer"
+        },
+        "->": {}
+    },
+    {
+        "///": [
+            " If `@unsafe_` is set to `true`, response validation by the server will be       ",
+            " disabled. The server will the client-provided the value of `@unsafe_` header    ",
+            " in the response.                                                                "
+        ],
+        "headers.Unsafe_": {
+            "@unsafe_": "boolean"
+        },
+        "->": {
+            "@unsafe_": "boolean"
+        }
+    },
+    {
+        "///": " The `@select_` header is used to select fields from structs. ",
+        "headers.Select_": {
+            "@select_": "_ext.Select_"
+        },
+        "->": {}
+    },
+    {
+        "///": [
+            " The `@bin_` header indicates the valid checksums of binary encodings            ",
+            " negotiated between the client and server. If the client sends a `@bin_` header  ",
+            " with any value, the server will respond with a `@bin_` header with an array     ",
+            " containing the currently supported binary encoding checksum. If te client's     ",
+            " provided checksum does not match the server's checksum, the server will also    ",
+            " send an `@enc_` header containing the binary encoding, which is a map of field  ",
+            " names to field ids. The response body may also be encoded in binary.            ",
+            "                                                                                 ",
+            " The `@pac_` header can also be used to indicate usage of 'packed' binary        ",
+            " encoding strategy. If the client submits a `@pac_` header with a `true` value,  ",
+            " the server will respond with a `@pac_` header with a `true` value.              "
+        ],
+        "headers.Binary_": {
+            "@bin_": ["integer"],
+            "@pac_": "boolean"
+        },
+        "->": {
+            "@bin_": ["integer"],
+            "@enc_": {"string": "integer"},
+            "@pac_": "boolean"
+        }
+    },
+    {
+        "///": " The `@warn_` header is used to send warnings to the client. ",
+        "headers.Warning_": {},
+        "->": {
+            "@warn_": ["any"]
+        }
+    },
+    {
+        "///": [
+            " The `@id_` header is used to correlate requests and responses. The server will  ",
+            " reflect the client-provided `@id_` header as-is.                                "
+        ],
+        "headers.Id_": {
+            "@id_": "any"
+        },
+        "->": {
+            "@id_": "any"
+        }
+    },
+    {
+        "///": " A type. ",
+        "union.Type_": [
+            {
+                "Null": {}
+            },
+            {
+                "Boolean": {}
+            },
+            {
+                "Integer": {}
+            },
+            {
+                "Number": {}
+            },
+            {
+                "String": {}
+            },
+            {
+                "Array": {}
+            },
+            {
+                "Object": {}
+            },
+            {
+                "Any": {}
+            },
+            {
+                "Base64String": {}
+            },
+            {
+                "Bytes": {}
+            },
+            {
+                "Unknown": {}
+            }
+        ]
+    },
+    {
+        "///": " A reason for the validation failure in the body. ",
+        "union.ValidationFailureReason_": [
+            {
+                "TypeUnexpected": {
+                    "expected": "union.Type_",
+                    "actual": "union.Type_"
+                }
+            },
+            {
+                "NullDisallowed": {}
+            },
+            {
+                "ObjectKeyDisallowed": {}
+            },
+            {
+                "RequiredObjectKeyPrefixMissing": {
+                    "prefix": "string"
+                }
+            },
+            {
+                "ArrayElementDisallowed": {}
+            },
+            {
+                "NumberOutOfRange": {}
+            },
+            {
+                "ObjectSizeUnexpected": {
+                    "expected": "integer",
+                    "actual": "integer"
+                }
+            },
+            {
+                "ExtensionValidationFailed": {
+                    "reason": "string",
+                    "data!": {"string": "any"}
+                }
+            },
+            {
+                "ObjectKeyRegexMatchCountUnexpected": {
+                    "regex": "string",
+                    "expected": "integer",
+                    "actual": "integer",
+                    "keys": ["string"]
+                }
+            },
+            {
+                "RequiredObjectKeyMissing": {
+                    "key": "string"
+                }
+            },
+            {
+                "FunctionUnknown": {}
+            }
+        ]
+    },
+    {
+        "///": " A parse failure. ",
+        "union.ParseFailure_": [
+            {
+                "IncompatibleBinaryEncoding": {}
+            },
+            {
+                "///": " The binary decoder encountered a field id that could not be mapped to a key. ",
+                "BinaryDecodeFailure": {}
+            },
+            {
+                "JsonInvalid": {}
+            },
+            {
+                "ExpectedJsonArrayOfAnObjectAndAnObjectOfOneObject": {}
+            },
+            {
+                "ExpectedJsonArrayOfTwoObjects": {}
+            }
+        ]
+    },
+    {
+        "///": " A validation failure located at a `path` explained by a `reason`. ",
+        "struct.ValidationFailure_": {
+            "path": ["any"],
+            "reason": "union.ValidationFailureReason_"
+        }
+    },
+    {
+        "///": " A standard error. ",
+        "errors.Validation_": [
+            {
+                "///": " The server implementation raised an unknown error. ",
+                "ErrorUnknown_": {}
+            },
+            {
+                "///": " The headers on the request are invalid. ",
+                "ErrorInvalidRequestHeaders_": {
+                    "cases": ["struct.ValidationFailure_"]
+                }
+            },
+            {
+                "///": " The body on the request is invalid. ",
+                "ErrorInvalidRequestBody_": {
+                    "cases": ["struct.ValidationFailure_"]
+                }
+            },
+            {
+                "///": " The headers on the response are invalid. ",
+                "ErrorInvalidResponseHeaders_": {
+                    "cases": ["struct.ValidationFailure_"]
+                }
+            },
+            {
+                "///": " The body that the server attempted to put on the response is invalid. ",
+                "ErrorInvalidResponseBody_": {
+                    "cases": ["struct.ValidationFailure_"]
+                }
+            },
+            {
+                "///": " The request could not be parsed as a telepact Message. ",
+                "ErrorParseFailure_": {
+                    "reasons": ["union.ParseFailure_"]
+                }
+            }
+        ]
+    }
+]

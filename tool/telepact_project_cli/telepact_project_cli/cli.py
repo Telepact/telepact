@@ -26,6 +26,9 @@ from github import Github, GithubException
 from pathlib import Path
 
 from .commands.consolidated_readme import consolidated_readme
+from .commands.verify_identical_directories import (
+    verify_identical_directories
+)
 
 yaml = YAML()
 
@@ -680,6 +683,7 @@ main.add_command(release)
 main.add_command(automerge)
 main.add_command(gitignore)
 main.add_command(consolidated_readme)
+main.add_command(verify_identical_directories)
 
 if __name__ == "__main__":
     main()

@@ -21,14 +21,27 @@ MODULE_PATH := github.com/telepact/telepact/lib/go
 
 GO_SOURCES := $(shell find . -type f -name '*.go' -not -path './target/*')
 
-.PHONY: all build test fmt tidy clean deploy
+SCHEMA_SOURCE_DIR := ../../common
+SCHEMA_TARGET_DIR := internal/schema/do_not_edit
+SCHEMA_SOURCE_FILES := $(notdir $(wildcard $(SCHEMA_SOURCE_DIR)/*.json))
+SCHEMA_TARGETS := $(addprefix $(SCHEMA_TARGET_DIR)/,$(SCHEMA_SOURCE_FILES))
+TELEPACT_PROJECT_CLI_DIR := ../../tool/telepact_project_cli
+
+.PHONY: all build test fmt tidy clean deploy verify-schema-assets copy-schema-assets
 
 all: build
 
-build: go.mod go.sum $(GO_SOURCES)
+copy-schema-assets:
+	@mkdir -p $(SCHEMA_TARGET_DIR)
+	cp $(SCHEMA_SOURCE_DIR)/*.json $(SCHEMA_TARGET_DIR)/
+
+verify-schema-assets:
+	telepact-project verify-identical-directories $(abspath $(SCHEMA_SOURCE_DIR)) $(abspath $(SCHEMA_TARGET_DIR)); \
+
+build: verify-schema-assets go.mod go.sum $(GO_SOURCES)
 	GO111MODULE=on go build ./...
 
-test:
+test: verify-schema-assets
 	GO111MODULE=on go test ./...
 
 fmt:
@@ -40,5 +53,5 @@ tidy:
 clean:
 	GO111MODULE=on go clean ./...
 
-deploy:
+deploy: verify-schema-assets
 	GO111MODULE=on GOPROXY=proxy.golang.org,direct go list -m $(MODULE_PATH)@v$(VERSION)

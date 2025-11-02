@@ -1,0 +1,157 @@
+[
+    {
+        "///": " A stubbed result for matching input. ",
+        "_ext.Stub_": {}
+    },
+    {
+        "///": " A call of a function. ",
+        "_ext.Call_": {}
+    },
+    {
+        "///": " The number of times a function is allowed to be called. ",
+        "union.CallCountCriteria_": [
+            {
+                "Exact": {
+                    "times": "integer"
+                }
+            },
+            {
+                "AtMost": {
+                    "times": "integer"
+                }
+            },
+            {
+                "AtLeast": {
+                    "times": "integer"
+                }
+            }
+        ]
+    },
+    {
+        "///": " Possible causes for a mock verification to fail. ",
+        "union.VerificationFailure_": [
+            {
+                "TooFewMatchingCalls": {
+                    "wanted": "union.CallCountCriteria_",
+                    "found": "integer",
+                    "allCalls": ["_ext.Call_"]
+                }
+            },
+            {
+                "TooManyMatchingCalls": {
+                    "wanted": "union.CallCountCriteria_",
+                    "found": "integer",
+                    "allCalls": ["_ext.Call_"]
+                }
+            }
+        ]
+    },
+    {
+        "///": [
+            " Create a function stub that will cause the server to return the `stub` result   ",
+            " when the `stub` argument matches the function argument on a request.            ",
+            "                                                                                 ",
+            " If `ignoreMissingArgFields` is `true`, then the server will skip field          ",
+            " omission validation on the `stub` argument, and the stub will match calls       ",
+            " where the given `stub` argument is Exactly a json sub-structure of the request  ",
+            " function argument.                                                              ",
+            "                                                                                 ",
+            " If `generateMissingResultFields` is `true`, then the server will skip field     ",
+            " omission validation on the `stub` result, and the server will generate the      ",
+            " necessary data required to make the `result` pass on response validation.       "
+        ],
+        "fn.createStub_": {
+            "stub": "_ext.Stub_",
+            "strictMatch!": "boolean",
+            "count!": "integer"
+        },
+        "->": [
+            {
+                "Ok_": {}
+            }
+        ],
+        "_errors": "^errors\\.Validation_$"
+    },
+    {
+        "///": [
+            " Verify a call was made with this mock that matches the given `call` and         ",
+            " `multiplicity` criteria. If `allowPartialArgMatch` is supplied as `true`, then  ",
+            " the server will skip field omission validation, and match calls where the       ",
+            " given `call` argument is Exactly a json sub-structure of the actual argument.   "
+        ],
+        "fn.verify_": {
+            "call": "_ext.Call_",
+            "strictMatch!": "boolean",
+            "count!": "union.CallCountCriteria_"
+        },
+        "->": [
+            {
+                "Ok_": {}
+            },
+            {
+                "ErrorVerificationFailure": {
+                    "reason": "union.VerificationFailure_"
+                }
+            }
+        ],
+        "_errors": "^errors\\.Validation_$"
+    },
+    {
+        "///": [
+            " Verify that no interactions have occurred with this mock or that all            ",
+            " interactions have been verified.                                                "
+        ],
+        "fn.verifyNoMoreInteractions_": {},
+        "->": [
+            {
+                "Ok_": {}
+            },
+            {
+                "ErrorVerificationFailure": {
+                    "additionalUnverifiedCalls": ["_ext.Call_"]
+                }
+            }
+        ],
+        "_errors": "^errors\\.Validation_$"
+    },
+    {
+        "///": " Clear all stub conditions. ",
+        "fn.clearStubs_": {},
+        "->": [
+            {
+                "Ok_": {}
+            }
+        ],
+        "_errors": "^errors\\.Validation_$"
+    },
+    {
+        "///": " Clear all call data. ",
+        "fn.clearCalls_": {},
+        "->": [
+            {
+                "Ok_": {}
+            }
+        ],
+        "_errors": "^errors\\.Validation_$"
+    },
+    {
+        "///": " Set the seed of the random generator. ",
+        "fn.setRandomSeed_": {
+            "seed": "integer"
+        },
+        "->": [
+            {
+                "Ok_": {}
+            }
+        ],
+        "_errors": "^errors\\.Validation_$"
+    },
+    {
+        "errors.Mock_": [
+            {
+                "///": " The mock could not return a result due to no matching stub being available. ",
+                "ErrorNoMatchingStub_": {}
+            }
+        ]
+    }
+]
