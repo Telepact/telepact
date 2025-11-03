@@ -6,7 +6,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.github.telepact</groupId>
   <artifactId>telepact</artifactId>
-  <version>1.0.0-alpha.166</version>
+  <version>1.0.0-alpha.167</version>
   <properties>
     <maven.compiler.source>21</maven.compiler.source>
     <maven.compiler.target>21</maven.compiler.target>
@@ -38,7 +38,7 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>2.20.0</version>
+      <version>2.20.1</version>
     </dependency>
     <dependency>
       <groupId>org.msgpack</groupId>

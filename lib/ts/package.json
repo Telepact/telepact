@@ -1,6 +1,6 @@
 {
   "name": "telepact",
-  "version": "1.0.0-alpha.166",
+  "version": "1.0.0-alpha.167",
   "description": "The Typescript Telepact library",
   "type": "module",
   "license": "Apache-2.0",
@@ -34,7 +34,7 @@
     "build": "tsc && rollup -c"
   },
   "devDependencies": {
-    "@rollup/plugin-commonjs": "^28.0.6",
+    "@rollup/plugin-commonjs": "^29.0.0",
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^16.0.0",
     "@rollup/plugin-typescript": "12.3.0",
