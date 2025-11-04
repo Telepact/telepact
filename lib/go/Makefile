@@ -23,8 +23,6 @@ GO_SOURCES := $(shell find . -type f -name '*.go' -not -path './target/*')
 
 SCHEMA_SOURCE_DIR := ../../common
 SCHEMA_TARGET_DIR := internal/schema/do_not_edit
-SCHEMA_SOURCE_FILES := $(notdir $(wildcard $(SCHEMA_SOURCE_DIR)/*.json))
-SCHEMA_TARGETS := $(addprefix $(SCHEMA_TARGET_DIR)/,$(SCHEMA_SOURCE_FILES))
 
 .PHONY: all build test fmt tidy clean deploy sync-schema-assets copy-common-assets
 
