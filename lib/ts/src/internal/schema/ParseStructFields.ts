@@ -19,7 +19,6 @@ import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
 import { TelepactSchemaParseError } from '../../TelepactSchemaParseError';
 import { parseField } from '../../internal/schema/ParseField';
 import { ParseContext } from '../../internal/schema/ParseContext';
-import { getPathDocumentCoordinatesPseudoJson } from '../../internal/schema/GetPathDocumentCoordinatesPseudoJson';
 
 export function parseStructFields(
     path: any[],
@@ -35,15 +34,10 @@ export function parseStructFields(
             const existingFieldNoOpt = existingField.split('!')[0];
             const fieldNoOpt = fieldDeclaration.split('!')[0];
             if (fieldNoOpt === existingFieldNoOpt) {
-                const finalPath = [...path, fieldDeclaration];
-                const finalOtherPath = [...path, existingField];
-                const finalOtherDocumentJson = ctx.telepactSchemaDocumentNamesToJson[ctx.documentName];
-                const finalOtherLocation = getPathDocumentCoordinatesPseudoJson(finalOtherPath, finalOtherDocumentJson);
+                const structPath = [...path];
                 parseFailures.push(
-                    new SchemaParseFailure(ctx.documentName, finalPath, 'PathCollision', {
-                        document: ctx.documentName,
-                        location: finalOtherLocation,
-                        path: finalOtherPath,
+                    new SchemaParseFailure(ctx.documentName, structPath, 'DuplicateField', {
+                        field: fieldNoOpt,
                     }),
                 );
             }

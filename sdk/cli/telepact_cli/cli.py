@@ -54,9 +54,9 @@ def bump_version(version: str) -> str:
 
 def _validate_package(ctx: click.Context, param: click.Parameter, value: str) -> str:
     lang = ctx.params.get('lang')
-    if lang == 'java' and not value:
+    if lang in ('java', 'go') and not value:
         raise click.BadParameter(
-            '--package is required when --lang is java')
+            '--package is required when --lang is {}'.format(lang))
     return value
 
 
@@ -68,7 +68,7 @@ def main() -> None:
 @click.command()
 @click.option('--schema-http-url', help='telepact schema directory', required=False)
 @click.option('--schema-dir', help='telepact schema directory', required=False)
-@click.option('--lang', help='Language target (one of "java", "py", or "ts")', required=True)
+@click.option('--lang', help='Language target (one of "java", "py", "ts", or "go")', required=True)
 @click.option('--out', help='Output directory', required=True)
 @click.option('--package', help='Java package (use if --lang is "java")', callback=_validate_package)
 def codegen(schema_http_url: str, schema_dir: str, lang: str, out: str, package: str) -> None:
@@ -92,7 +92,7 @@ def codegen(schema_http_url: str, schema_dir: str, lang: str, out: str, package:
     print('Language target:', lang)
     print('Output directory:', out)
     if package:
-        print('Java package:', package)
+        print('Package:', package)
 
 
     target = lang
@@ -134,7 +134,78 @@ def _raise_error(message: str) -> None:
     raise Exception(message)
 
 
-def _generate_internal(schema_data: list[dict[str, object]], possible_fn_selects: dict[str, object], target: str, output_dir: str, java_package: str) -> None:
+def _to_pascal_case(name: str) -> str:
+    tokens = re.split(r'[^0-9A-Za-z]+', name)
+    result = ''.join(token[:1].upper() + token[1:] for token in tokens if token)
+    if not result:
+        result = name.title()
+    if result and result[0].isdigit():
+        result = f'Fn{result}'
+    return result
+
+
+_GO_RESERVED_KEYWORDS: set[str] = {
+    'break', 'default', 'func', 'interface', 'select', 'case', 'defer', 'go',
+    'map', 'struct', 'chan', 'else', 'goto', 'package', 'switch', 'const',
+    'fallthrough', 'if', 'range', 'type', 'continue', 'for', 'import', 'return',
+    'var', 'bool', 'int', 'string', 'float64', 'error', 'byte', 'rune', 'any',
+}
+
+
+def _to_camel_case(name: str) -> str:
+    pascal = _to_pascal_case(name)
+    if not pascal:
+        return name
+    return pascal[:1].lower() + pascal[1:]
+
+
+def _sanitize_go_identifier(name: str) -> str:
+    sanitized = re.sub(r'[^0-9A-Za-z_]', '', name)
+    if not sanitized:
+        sanitized = 'Field'
+    if sanitized[0].isdigit():
+        sanitized = f'Field{sanitized}'
+    lower = sanitized.lower()
+    if lower in _GO_RESERVED_KEYWORDS:
+        sanitized = f'{sanitized}_'
+    return sanitized
+
+
+def _process_go_fields(fields: dict[str, object]) -> list[dict[str, object]]:
+    processed: list[dict[str, object]] = []
+    for field_name, field_type in fields.items():
+        base_name = field_name.replace('!', '')
+        sanitized = _sanitize_go_identifier(base_name)
+        method_name = _to_pascal_case(sanitized)
+        param_name = _to_camel_case(sanitized)
+        if sanitized.endswith('_'):
+            param_name = sanitized
+        processed.append({
+            'json_name': field_name,
+            'method_name': method_name,
+            'param_name': param_name,
+            'type': field_type,
+            'optional': '!' in field_name,
+            'nullable': isinstance(field_type, str) and '?' in field_type,
+        })
+    return processed
+
+
+def _process_go_tags(tag_entries: list[dict[str, object]]) -> list[dict[str, object]]:
+    processed_tags: list[dict[str, object]] = []
+    for tag_entry in tag_entries:
+        tag_key = _find_tag_key(tag_entry)
+        tag_fields = cast(dict[str, object], tag_entry[tag_key])
+        processed_tags.append({
+            'json_name': tag_key,
+            'name': _to_pascal_case(tag_key),
+            'doc': tag_entry.get('///'),
+            'fields': _process_go_fields(tag_fields),
+        })
+    return processed_tags
+
+
+def _generate_internal(schema_data: list[dict[str, object]], possible_fn_selects: dict[str, object], target: str, output_dir: str, package_name: str) -> None:
 
     # Load jinja template from file
     # Adjust the path to your template directory if necessary
@@ -146,6 +217,8 @@ def _generate_internal(schema_data: list[dict[str, object]], possible_fn_selects
     template_env.filters['regex_replace'] = _regex_replace
     template_env.filters['find_schema_key'] = _find_schema_key
     template_env.filters['find_tag_key'] = _find_tag_key
+    template_env.filters['to_pascal_case'] = _to_pascal_case
+    template_env.filters['to_camel_case'] = _to_camel_case
     template_env.globals['raise_error'] = _raise_error
 
     # Find all errors. definitions, and append to function results
@@ -197,18 +270,18 @@ def _generate_internal(schema_data: list[dict[str, object]], possible_fn_selects
                 functions.append(schema_key)
 
             _write_java_file('java_type_2.j2', {
-                'package': java_package, 'data': schema_entry, 'possible_fn_selects': possible_fn_selects}, f"{schema_key.split('.')[1]}.java")
+                'package': package_name, 'data': schema_entry, 'possible_fn_selects': possible_fn_selects}, f"{schema_key.split('.')[1]}.java")
 
         _write_java_file('java_server.j2', {
-                         'package': java_package, 'functions': functions, 'possible_fn_selects': possible_fn_selects}, f"TypedServerHandler.java")
+                         'package': package_name, 'functions': functions, 'possible_fn_selects': possible_fn_selects}, f"TypedServerHandler.java")
 
         _write_java_file('java_client.j2', {
-                         'package': java_package, 'functions': functions, 'possible_fn_selects': possible_fn_selects}, f"TypedClient.java")
+                         'package': package_name, 'functions': functions, 'possible_fn_selects': possible_fn_selects}, f"TypedClient.java")
 
         _write_java_file('java_utility.j2', {
-                         'package': java_package}, f"Utility_.java")
+                         'package': package_name}, f"Utility_.java")
 
-        _write_java_file('java_select.j2', {'package': java_package, 'possible_fn_selects': possible_fn_selects}, f"Select_.java")
+        _write_java_file('java_select.j2', {'package': package_name, 'possible_fn_selects': possible_fn_selects}, f"Select_.java")
 
     elif target == 'py':
 
@@ -294,6 +367,77 @@ def _generate_internal(schema_data: list[dict[str, object]], possible_fn_selects
             with file_path.open("w") as f:
                 f.write(output)
 
+        else:
+            print(output)
+
+    elif target == 'go':
+
+        if not package_name:
+            raise Exception('Go code generation requires --package to be set')
+
+        go_entries: list[dict[str, object]] = []
+        go_functions: list[dict[str, object]] = []
+
+        for schema_entry in schema_data:
+            schema_key = _find_schema_key(schema_entry)
+            if schema_key.startswith('info') or schema_key.startswith('headers'):
+                continue
+
+            base_name = schema_key.split('.')[1]
+            go_name = _to_pascal_case(base_name)
+            doc = schema_entry.get('///')
+
+            if schema_key.startswith('struct'):
+                fields = cast(dict[str, object], schema_entry[schema_key])
+                go_entries.append({
+                    'kind': 'struct',
+                    'schema_key': schema_key,
+                    'name': go_name,
+                    'doc': doc,
+                    'fields': _process_go_fields(fields),
+                })
+
+            elif schema_key.startswith('union'):
+                tags = cast(list[dict[str, object]], schema_entry[schema_key])
+                go_entries.append({
+                    'kind': 'union',
+                    'schema_key': schema_key,
+                    'name': go_name,
+                    'doc': doc,
+                    'tags': _process_go_tags(tags),
+                })
+
+            elif schema_key.startswith('fn'):
+                input_fields = cast(dict[str, object], schema_entry[schema_key])
+                result_tags = cast(list[dict[str, object]], schema_entry['->'])
+                fn_entry: dict[str, object] = {
+                    'kind': 'function',
+                    'schema_key': schema_key,
+                    'name': go_name,
+                    'doc': doc,
+                    'input_fields': _process_go_fields(input_fields),
+                    'output_tags': _process_go_tags(result_tags),
+                    'select': possible_fn_selects.get(schema_key, {}),
+                    'raw_name': schema_key,
+                    'camel_name': _to_camel_case(base_name),
+                }
+                go_entries.append(fn_entry)
+                go_functions.append(fn_entry)
+
+        go_template = template_env.get_template('go_all.j2')
+        output = go_template.render({
+            'package': package_name,
+            'entries': go_entries,
+            'functions': go_functions,
+            'possible_fn_selects': possible_fn_selects,
+        })
+
+        if output_dir:
+            output_path = Path(output_dir)
+            output_path.mkdir(parents=True, exist_ok=True)
+            file_path = output_path / "generated.go"
+            with file_path.open("w") as f:
+                f.write(output)
         else:
             print(output)
 

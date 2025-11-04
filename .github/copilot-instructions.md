@@ -7,7 +7,7 @@ This document provides guidance for AI agents working within the Telepact codeba
 Telepact is a multi-language API ecosystem built around a unified schema definition. The core idea is to define your API in `.telepact.json` files, and then use language-specific libraries to implement clients and servers.
 
 The project is a monorepo containing several independent but related components:
--   **Core Libraries (`/lib`)**: Implementations of the Telepact protocol in `java`, `py` (Python), and `ts` (TypeScript). These provide the `Server` and `Client` classes.
+-   **Core Libraries (`/lib`)**: Implementations of the Telepact protocol in `go`, `java`, `py` (Python), and `ts` (TypeScript). These provide the `Server` and `Client` classes.
 -   **SDKs (`/sdk`)**: Tools built on top of the core libraries, including a `cli`, a web-based `console`, and a `prettier` plugin for formatting schema files.
 -   **Bindings (`/bind`)**: Language-specific bindings, like for `dart`.
 -   **Schema Definitions**: APIs are defined in `.telepact.json` files (e.g., `common/auth.telepact.json`). These files are the source of truth for all API interactions.
@@ -20,7 +20,6 @@ The entire project uses a hierarchical `Makefile` system. The root `Makefile` de
 
 ### Building
 
--   To build everything: `make` (though this is often not necessary).
 -   To build a specific library, navigate to its directory or use the root makefile. For example, to build the Java library:
     ```sh
     make java
@@ -31,33 +30,18 @@ The entire project uses a hierarchical `Makefile` system. The root `Makefile` de
 
 ### Testing
 
-The central test runner is located in `/test/runner`, which is a Python project. It is responsible for orchestrating tests across all language libraries to ensure they are interoperable.
-
--   To run all tests:
+-   Run tests from the `/test/runner` directory:
     ```sh
-    make test
+    poetry run python -m pytest -s -vv -k <test_name>
     ```
--   To run tests for a specific language:
-    ```sh
-    make test-java
-    make test-py
-    make test-ts
-    ```
--   When in the `/test/runner` directory, you can run tests directly with `poetry run python -m pytest`.
 
--   To run a single test case (e.g., for debugging), use `pytest`'s `-k` option to select a test by name. The `test/runner/Makefile` has `test-trace-*` targets that are good examples:
-    ```sh
-    # From the root directory
-    make test-trace-java
-
-    # Or, from the test/runner directory
-    poetry run python -m pytest -k test_client_server_case[java-0] -s -vv
-    ```
+-   NOTE: You need the `-s` flag to show all request/response payloads for debugging.
+    HOWEVER, avoid using `-s` when `-k` is not specified, as it will produce excessive output.
 
 ### Key Files & Directories
 
 -   `Makefile`: The entry point for all build, test, and deploy operations.
--   `lib/{java,py,ts}`: The core libraries. Changes here impact the fundamental behavior of Telepact.
+-   `lib/{go,java,py,ts}`: The core libraries. Changes here impact the fundamental behavior of Telepact.
 -   `bind/dart`: Language-specific bindings for Dart.
 -   `test/runner`: The cross-language integration test suite. This is the best place to understand how different language implementations are expected to behave and interact.
 -   `common/*.telepact.json`: The common schema files that define the internal APIs used by Telepact itself.

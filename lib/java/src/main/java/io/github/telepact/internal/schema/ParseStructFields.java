@@ -37,26 +37,16 @@ public class ParseStructFields {
         for (final var structEntry : referenceStruct.entrySet()) {
             final var fieldDeclaration = structEntry.getKey();
 
-            for (final var existingField : fields.keySet()) {
-                final var existingFieldNoOpt = existingField.split("!")[0];
-                final var fieldNoOpt = fieldDeclaration.split("!")[0];
-                if (fieldNoOpt.equals(existingFieldNoOpt)) {
-                    final List<Object> finalPath = new ArrayList<>(path);
-                    finalPath.add(fieldDeclaration);
-
-                    final List<Object> finalOtherPath = new ArrayList<>(path);
-                    finalOtherPath.add(existingField);
-
-                    final var finalOtherDocumentJson = ctx.telepactSchemaDocumentNamesToJson.get(ctx.documentName);
-                    final var finalOtherLocationPseudoJson = GetPathDocumentCoordinatesPseudoJson
-                            .getPathDocumentCoordinatesPseudoJson(finalOtherPath, finalOtherDocumentJson);
-
-                    parseFailures
-                            .add(new SchemaParseFailure(ctx.documentName, finalPath, "PathCollision",
-                                    Map.of("document", ctx.documentName, "path", finalOtherPath, "location",
-                                            finalOtherLocationPseudoJson)));
-                }
-            }
+        for (final var existingField : fields.keySet()) {
+        final var existingFieldNoOpt = existingField.split("!")[0];
+        final var fieldNoOpt = fieldDeclaration.split("!")[0];
+        if (fieldNoOpt.equals(existingFieldNoOpt)) {
+            final List<Object> structPath = new ArrayList<>(path);
+            parseFailures
+                .add(new SchemaParseFailure(ctx.documentName, structPath, "DuplicateField",
+                    Map.of("field", fieldNoOpt)));
+        }
+        }
 
             final var typeDeclarationValue = structEntry.getValue();
 

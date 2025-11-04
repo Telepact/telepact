@@ -1,0 +1,29 @@
+[
+    {
+        "///": [
+            " The `@auth_` header is the conventional location for sending credentials to     ",
+            " the server for the purpose of authentication and authorization.                 "
+        ],
+        "headers.Auth_": {
+            "@auth_": "struct.Auth_"
+        },
+        "->": {}
+    },
+    {
+        "///": " A standard error. ",
+        "errors.Auth_": [
+            {
+                "///": " The credentials in the `_auth` header were missing or invalid. ",
+                "ErrorUnauthenticated_": {
+                    "message!": "string"
+                }
+            },
+            {
+                "///": " The credentials in the `_auth` header were insufficient to run the function. ",
+                "ErrorUnauthorized_": {
+                    "message!": "string"
+                }
+            }
+        ]
+    }
+]
