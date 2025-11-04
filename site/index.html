@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Telepact | Unified API Ecosystem for Polyglot Teams</title>
+    <meta name="description" content="Telepact is a unified API ecosystem that lets polyglot teams design once and ship everywhere with JSON-first schemas, binary efficiency, and hypermedia-style flows." />
+    <meta name="keywords" content="Telepact, API schema, polyglot, JSON query language, binary protocol, hypermedia, developer tools, CLI, SDK" />
+    <meta name="author" content="Telepact" />
+    <meta name="robots" content="index,follow" />
+    <meta name="theme-color" content="#1f2933" />
+    <link rel="canonical" href="https://telepact.github.io/telepact/" />
+    <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg" />
+    <link rel="stylesheet" href="./styles.css" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://telepact.github.io/telepact/" />
+    <meta property="og:title" content="Telepact | Unified API Ecosystem" />
+    <meta property="og:description" content="Design transport-agnostic APIs once. Generate code, enable binary protocols, and share hypermedia-style flows across Java, Python, TypeScript, and more." />
+    <meta property="og:image" content="https://telepact.github.io/telepact/assets/social-card.svg" />
+    <meta property="og:locale" content="en_US" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Telepact | Unified API Ecosystem" />
+    <meta name="twitter:description" content="Define once, deliver anywhere. Telepact connects APIs across transports with JSON-first schemas and multi-language SDKs." />
+    <meta name="twitter:image" content="https://telepact.github.io/telepact/assets/social-card.svg" />
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "Telepact",
+        "applicationCategory": "DeveloperTool",
+        "operatingSystem": "Cross-platform",
+        "description": "Telepact is a unified API ecosystem for polyglot teams, enabling JSON-first schema authoring, dynamic binary protocols, and transport-agnostic server/client tooling.",
+        "url": "https://telepact.github.io/telepact/",
+        "image": "https://telepact.github.io/telepact/assets/social-card.svg",
+        "sameAs": [
+            "https://github.com/Telepact/telepact"
+        ],
+        "creator": {
+            "@type": "Organization",
+            "name": "Telepact"
+        },
+        "softwareHelp": "https://github.com/Telepact/telepact/tree/main/doc/schema-guide.md",
+        "featureList": [
+            "JSON as a query language",
+            "Binary protocols without build-time code generation",
+            "Hypermedia-style function links without HTTP",
+            "Multi-language client and server libraries",
+            "CLI and Console SDKs"
+        ],
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        }
+    }
+    </script>
+</head>
+<body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header" id="top">
+        <div class="container header-inner">
+            <div class="brand">
+                <img src="./assets/favicon.svg" alt="Telepact logo" class="brand-mark" />
+                <span class="brand-name">Telepact</span>
+            </div>
+            <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-nav">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="menu-icon" aria-hidden="true"></span>
+            </button>
+            <nav id="primary-nav" aria-label="Primary">
+                <ul class="nav-list">
+                    <li><a href="#overview">Overview</a></li>
+                    <li><a href="#innovations">Innovations</a></li>
+                    <li><a href="#libraries">Libraries</a></li>
+                    <li><a href="#sdks">SDKs</a></li>
+                    <li><a href="#get-started">Get Started</a></li>
+                    <li><a href="#resources">Docs</a></li>
+                </ul>
+            </nav>
+            <a class="cta" href="https://github.com/Telepact/telepact" target="_blank" rel="noopener">View on GitHub</a>
+        </div>
+    </header>
+
+    <main id="main">
+        <section class="hero" id="overview">
+            <div class="container hero-content">
+                <div class="hero-text">
+                    <h1>Design once. Ship everywhere.</h1>
+                    <p class="lead">Telepact gives polyglot teams a single JSON-first schema that powers frictionless APIs across transports, languages, and tooling.</p>
+                    <div class="hero-actions">
+                        <a class="btn primary" href="#get-started">Start building</a>
+                        <a class="btn secondary" href="https://github.com/Telepact/telepact/tree/main/README.md" target="_blank" rel="noopener">Project README</a>
+                    </div>
+                    <dl class="hero-stats" aria-label="Telepact highlights">
+                        <div>
+                            <dt>3 core innovations</dt>
+                            <dd>JSON queries · Binary handshakes · Hypermedia links</dd>
+                        </div>
+                        <div>
+                            <dt>Built for polyglot stacks</dt>
+                            <dd>Java · Python · TypeScript · Dart bindings</dd>
+                        </div>
+                        <div>
+                            <dt>Tooling included</dt>
+                            <dd>CLI · Developer Console · Prettier plugin</dd>
+                        </div>
+                    </dl>
+                </div>
+                <aside class="hero-card" aria-label="Quick start summary">
+                    <h2>Quick API handshake</h2>
+                    <ol>
+                        <li>Author schemas in <code>.telepact.json</code>.</li>
+                        <li>Serve with any transport using Telepact servers.</li>
+                        <li>Consume with generated or hand-tuned clients.</li>
+                    </ol>
+                    <p class="note">No code generation required. Binary efficiency when you need it.</p>
+                </aside>
+            </div>
+        </section>
+
+        <section class="section" id="innovations">
+            <div class="container">
+                <div class="section-heading">
+                    <h2>Three innovations that redefine APIs</h2>
+                    <p>The Telepact protocol fuses the best of JSON, binary, and hypermedia to eliminate integration friction between services and clients.</p>
+                </div>
+                <div class="card-grid">
+                    <article class="card">
+                        <h3>JSON as a query language</h3>
+                        <p>Telepact treats JSON as a first-class query mechanism. Clients express projections, filters, and selections with the tooling they already understand.</p>
+                    </article>
+                    <article class="card">
+                        <h3>Binary without build chains</h3>
+                        <p>Runtime handshakes negotiate binary encodings so you can tune bandwidth and latency without locking into heavy code generation workflows.</p>
+                    </article>
+                    <article class="card">
+                        <h3>Hypermedia beyond HTTP</h3>
+                        <p>Return callable functions with pre-filled arguments to guide consumers through flows&mdash;no HTTP required, just portable JSON payloads.</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="section alt" id="libraries">
+            <div class="container">
+                <div class="section-heading">
+                    <h2>Core libraries</h2>
+                    <p>Transport-agnostic server and client implementations ready for your runtime.</p>
+                </div>
+                <div class="card-grid three">
+                    <article class="card">
+                        <header>
+                            <h3>TypeScript</h3>
+                            <p class="subhead">Node, Bun, Deno compatible</p>
+                        </header>
+                        <p>Use Telepact in frontend or backend JavaScript environments with tight TypeScript typing and flexible transports.</p>
+                        <a class="card-link" href="https://github.com/Telepact/telepact/tree/main/lib/ts" target="_blank" rel="noopener">Read the TypeScript README</a>
+                    </article>
+                    <article class="card">
+                        <header>
+                            <h3>Python</h3>
+                            <p class="subhead">Async-first, framework-friendly</p>
+                        </header>
+                        <p>Embed Telepact servers inside FastAPI, Starlette, or any ASGI stack, or wire adapters into message queues.</p>
+                        <a class="card-link" href="https://github.com/Telepact/telepact/tree/main/lib/py" target="_blank" rel="noopener">Read the Python README</a>
+                    </article>
+                    <article class="card">
+                        <header>
+                            <h3>Java</h3>
+                            <p class="subhead">JVM-native performance</p>
+                        </header>
+                        <p>Adopt Telepact with Vert.x, Spring, or raw Netty. Leverage runtime-negotiated binary formats without build plugins.</p>
+                        <a class="card-link" href="https://github.com/Telepact/telepact/tree/main/lib/java" target="_blank" rel="noopener">Read the Java README</a>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="sdks">
+            <div class="container">
+                <div class="section-heading">
+                    <h2>SDKs and developer tooling</h2>
+                    <p>Everything you need to design, explore, and ship Telepact-powered APIs.</p>
+                </div>
+                <div class="card-grid three">
+                    <article class="card">
+                        <h3>Telepact CLI</h3>
+                        <p>Generate clients, validate schemas, and streamline pipelines from your terminal.</p>
+                        <a class="card-link" href="https://github.com/Telepact/telepact/tree/main/sdk/cli" target="_blank" rel="noopener">CLI README</a>
+                    </article>
+                    <article class="card">
+                        <h3>Developer Console</h3>
+                        <p>Visualize schemas, test endpoints, and hand off interactive reference docs to your team.</p>
+                        <a class="card-link" href="https://github.com/Telepact/telepact/tree/main/sdk/console" target="_blank" rel="noopener">Console README</a>
+                    </article>
+                    <article class="card">
+                        <h3>Prettier Plugin</h3>
+                        <p>Keep <code>.telepact.json</code> definitions formatted and linted automatically with your existing workflows.</p>
+                        <a class="card-link" href="https://github.com/Telepact/telepact/tree/main/sdk/prettier" target="_blank" rel="noopener">Prettier README</a>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="section alt" id="get-started">
+            <div class="container">
+                <div class="section-heading">
+                    <h2>Get started in minutes</h2>
+                    <p>Use your preferred language to serve and consume Telepact APIs.</p>
+                </div>
+                <div class="split">
+                    <div>
+                        <h3>Define your API</h3>
+                        <p>Author a schema file that captures the functions and shapes you want to expose.</p>
+                        <pre><code>[
+    {
+        "fn.divide": { "x": "integer", "y": "integer" },
+        "->": [ { "Ok_": { "result": "number" } }, { "ErrorCannotDivideByZero": {} } ]
+    }
+]</code></pre>
+                        <p class="note">Schemas live alongside your codebase in <code>.telepact.json</code> files.</p>
+                    </div>
+                    <div>
+                        <h3>Serve over any transport</h3>
+                        <p>Bring your preferred framework. Telepact handles schema negotiation, message parsing, and response encoding.</p>
+                        <ul class="feature-list">
+                            <li>Drop-in server adapters for HTTP, WebSockets, queues, and more</li>
+                            <li>Runtime binary handshakes for efficient payloads</li>
+                            <li>Auth strategies with shared headers and envelopes</li>
+                        </ul>
+                        <a class="deep-link" href="https://github.com/Telepact/telepact/tree/main/README.md#at-a-glance" target="_blank" rel="noopener">See the quickstart example</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="resources">
+            <div class="container">
+                <div class="section-heading">
+                    <h2>Documentation & resources</h2>
+                    <p>Dive deeper with guides that explain the design goals, schema language, and interoperability tests.</p>
+                </div>
+                <div class="resource-grid">
+                    <a class="resource" href="https://github.com/Telepact/telepact/tree/main/doc/motivation.md" target="_blank" rel="noopener">
+                        <h3>Motivation</h3>
+                        <p>Understand why Telepact brings JSON, binary, and hypermedia together.</p>
+                    </a>
+                    <a class="resource" href="https://github.com/Telepact/telepact/tree/main/doc/faq.md" target="_blank" rel="noopener">
+                        <h3>FAQ</h3>
+                        <p>Find answers about transports, auth, compatibility, and roadmap.</p>
+                    </a>
+                    <a class="resource" href="https://github.com/Telepact/telepact/tree/main/doc/schema-guide.md" target="_blank" rel="noopener">
+                        <h3>Schema Guide</h3>
+                        <p>Master the Telepact schema language with hands-on examples.</p>
+                    </a>
+                    <a class="resource" href="https://github.com/Telepact/telepact/tree/main/test/runner" target="_blank" rel="noopener">
+                        <h3>Interoperability Tests</h3>
+                        <p>See the cross-language test suite that keeps Telepact implementations aligned.</p>
+                    </a>
+                    <a class="resource" href="https://github.com/Telepact/telepact/tree/main/bind/dart" target="_blank" rel="noopener">
+                        <h3>Dart Bindings</h3>
+                        <p>Connect Flutter and Dart clients with generated code and adapters.</p>
+                    </a>
+                    <a class="resource" href="https://github.com/Telepact/telepact/tree/main/LICENSE" target="_blank" rel="noopener">
+                        <h3>Apache 2.0 License</h3>
+                        <p>Telepact is Apache-licensed for open collaboration.</p>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section class="section cta-section">
+            <div class="container">
+                <h2>Ready to Telepact?</h2>
+                <p>Join a growing ecosystem where APIs negotiate their own shape and format, letting you focus on product innovation.</p>
+                <div class="hero-actions">
+                    <a class="btn primary" href="https://github.com/Telepact/telepact" target="_blank" rel="noopener">Explore the repository</a>
+                    <a class="btn secondary" href="mailto:hello@telepact.dev">Contact the team</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <p>&copy; <span id="year"></span> Telepact. Licensed under the Apache License 2.0.</p>
+            <nav aria-label="Footer">
+                <a href="#top">Back to top</a>
+                <a href="https://github.com/Telepact/telepact/tree/main/CONTRIBUTING.md" target="_blank" rel="noopener">Contribute</a>
+                <a href="https://github.com/Telepact/telepact/tree/main/NOTICE" target="_blank" rel="noopener">Notice</a>
+            </nav>
+        </div>
+    </footer>
+    <script src="./main.js" defer></script>
+</body>
+</html>

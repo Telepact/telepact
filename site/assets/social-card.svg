@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Telepact Social Preview</title>
+  <desc id="desc">Telepact branding banner describing the unified API ecosystem.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0%" x2="100%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#1d4ed8" />
+      <stop offset="50%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#030712" />
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="100%" stop-color="#2563eb" />
+    </linearGradient>
+    <filter id="shadow" x="-15%" y="-30%" width="130%" height="160%">
+      <feDropShadow dx="0" dy="30" stdDeviation="30" flood-color="rgba(8, 29, 88, 0.5)" />
+    </filter>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)" />
+  <g transform="translate(140 150)" fill="#f8fafc">
+    <text font-family="Inter, 'Segoe UI', sans-serif" font-size="56" font-weight="600" letter-spacing="0.04em">TELEPACT</text>
+    <text y="90" font-family="Inter, 'Segoe UI', sans-serif" font-size="40" font-weight="500" fill="#cbd5f5">Unified API ecosystem for polyglot teams</text>
+    <text y="150" font-family="Inter, 'Segoe UI', sans-serif" font-size="26" fill="#e2e8f0">JSON queries · Binary handshakes · Hypermedia flows</text>
+    <g transform="translate(0 220)" font-family="Inter, 'Segoe UI', sans-serif" font-size="22" fill="#e2e8f0">
+      <text>• Define schemas once in .telepact.json</text>
+      <text y="44">• Serve across transports with language-native libraries</text>
+      <text y="88">• Ship tooling with CLI, console, and formatter SDKs</text>
+    </g>
+  </g>
+  <g transform="translate(850 120)" filter="url(#shadow)">
+    <rect width="210" height="210" rx="40" fill="#0b1220" opacity="0.8" />
+    <path fill="none" stroke="url(#accent)" stroke-width="18" stroke-linecap="round" d="M65 90h80M105 90v75c0 18-12 30-30 30" />
+    <circle cx="155" cy="165" r="22" fill="#38bdf8" />
+  </g>
+  <text x="140" y="560" font-family="Inter, 'Segoe UI', sans-serif" font-size="20" fill="#94a3b8">github.com/Telepact/telepact</text>
+</svg>
