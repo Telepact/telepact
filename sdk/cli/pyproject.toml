@@ -29,4 +29,4 @@ websockets = ">=12,<16"
 telepact = "telepact_cli.cli:main"
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^8.4"
+pytest = ">=8.4,<10.0"
