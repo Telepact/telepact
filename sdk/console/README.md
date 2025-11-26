@@ -7,7 +7,7 @@ submit live requests to your server.
 ## Installation
 
 ```
-npm install --ignore-scripts -g telepact-console
+npm install -g telepact-console
 ```
 
 ## Usage

@@ -5,7 +5,7 @@ this prettier plugin.
 
 ## Installation
 ```
-npm install --ignore-scripts prettier-plugin-telepact
+npm install prettier-plugin-telepact
 ```
 
 ## Usage
