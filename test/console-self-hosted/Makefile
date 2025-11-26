@@ -20,7 +20,7 @@ LIB_TAR_GZ := ../../sdk/console/dist-docker/*.tar.gz
 TAR_GZ := telepact-console.tar.gz
 
 all: $(TAR_GZ)
-	npm install
+	npm install --ignore-scripts
 
 	docker load < $(TAR_GZ)
 

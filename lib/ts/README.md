@@ -3,7 +3,7 @@
 ## Installation
 
 ```
-npm install telepact
+npm install --ignore-scripts telepact
 ```
 
 ## Usage
