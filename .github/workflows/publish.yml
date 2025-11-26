@@ -67,7 +67,7 @@ jobs:
       - name: Publish to npm
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NPM_INSTALL: ci
+          NPM_INSTALL: ci --ignore-scripts
         run: make deploy-ts
 
   publish-py:
@@ -131,7 +131,7 @@ jobs:
       - name: Publish to npm
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NPM_INSTALL: ci
+          NPM_INSTALL: ci --ignore-scripts
         run: make deploy-console
 
   publish-prettier:
@@ -153,5 +153,5 @@ jobs:
       - name: Publish to npm
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NPM_INSTALL: ci
+          NPM_INSTALL: ci --ignore-scripts
         run: make deploy-prettier
