@@ -14,7 +14,7 @@
 #|  limitations under the License.
 #|
 
-NPM_INSTALL ?= install
+NPM_INSTALL ?= install --ignore-scripts
 TAR_GZ := dist-tgz/*.tgz
 
 $(TAR_GZ):

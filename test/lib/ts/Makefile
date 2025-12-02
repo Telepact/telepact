@@ -19,8 +19,8 @@ TAR_GZ := telepact.tgz
 
 all: codegen $(TAR_GZ)
 	npm uninstall telepact || echo "no-op"
-	npm install ./telepact.tgz
-	npm install
+	npm install --ignore-scripts ./telepact.tgz
+	npm install --ignore-scripts
 	npm run build
 
 $(TAR_GZ): dep

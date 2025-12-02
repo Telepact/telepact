@@ -14,7 +14,7 @@
 #|  limitations under the License.
 #|
 
-NPM_INSTALL ?= install
+NPM_INSTALL ?= install --ignore-scripts
 VERSION := $(shell cat ../../VERSION.txt)
 TAR_GZ := dist-tgz/*.tgz
 DEP_LIB_DIST := ../../lib/ts/dist

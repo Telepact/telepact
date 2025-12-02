@@ -58,7 +58,7 @@ jobs:
 
       - name: Build ts
         env:
-          NPM_INSTALL: ci
+          NPM_INSTALL: ci --ignore-scripts
         run: make ts
 
       - name: Upload ts build artifacts
@@ -285,7 +285,7 @@ jobs:
 
       - name: Build console
         env:
-          NPM_INSTALL: ci
+          NPM_INSTALL: ci --ignore-scripts
         run: make console
       
       - name: Install Playwright Browsers
