@@ -9,10 +9,10 @@ python = "^3.11"
 build = "^1.2"
 msgpack = "^1.0"
 nats-py = "^2.8"
-prometheus-client = "^0.20"
+prometheus-client = "^0.23"
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^8.1"
+pytest = "^9.0"
 toml = "^0.10.2"
 
 [build-system]
