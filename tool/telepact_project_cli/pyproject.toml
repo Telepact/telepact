@@ -11,7 +11,7 @@ click = "^8.3.1"
 toml = "^0.10.2"
 lxml = "^6.0.2"
 pyyaml = "^6.0.3"
-"ruamel.yaml" = "0.18.16"
+"ruamel.yaml" = "0.19.1"
 pygithub = "^2.8"
 
 [tool.poetry.scripts]
