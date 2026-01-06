@@ -39,3 +39,4 @@ docker run -p 8080:8080 telepact-console:1.0.0-alpha.102
 
 For a more concrete usage example, see
 [self-hosting example](https://github.com/Telepact/telepact/blob/main/test/console-self-hosted/).
+

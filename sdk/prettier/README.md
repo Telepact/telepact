@@ -27,3 +27,4 @@ This plugin requires prettier configuration, for example, in the `.prettierrc` f
 
 For a real-use example, see
 [example prettier config file](https://github.com/Telepact/telepact/blob/main/.prettierrc).
+
