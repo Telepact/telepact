@@ -59,9 +59,9 @@ jobs:
           ref: ${{ github.event.release.target_commitish }}
 
       - name: Set up Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v5
         with:
-          node-version: "24"
+          node-version: "20"
           registry-url: "https://registry.npmjs.org/"
 
       - name: Publish to npm
@@ -123,9 +123,9 @@ jobs:
           ref: ${{ github.event.release.target_commitish }}
 
       - name: Set up Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v5
         with:
-          node-version: "24"
+          node-version: "20"
           registry-url: "https://registry.npmjs.org/"
 
       - name: Publish to npm
@@ -145,9 +145,9 @@ jobs:
           ref: ${{ github.event.release.target_commitish }}
 
       - name: Set up Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v5
         with:
-          node-version: "24"
+          node-version: "20"
           registry-url: "https://registry.npmjs.org/"
 
       - name: Publish to npm
