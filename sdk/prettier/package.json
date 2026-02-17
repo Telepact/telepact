@@ -1,6 +1,6 @@
 {
   "name": "prettier-plugin-telepact",
-  "version": "1.0.0-alpha.176",
+  "version": "1.0.0-alpha.177",
   "description": "Prettier plugin to format Telepact API schemas.",
   "type": "module",
   "license": "Apache-2.0",
