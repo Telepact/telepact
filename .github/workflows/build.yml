@@ -56,6 +56,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+
       - name: Build ts
         env:
           NPM_INSTALL: ci --ignore-scripts
@@ -230,6 +235,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+
       - name: Install dependencies
         env:
           NPM_INSTALL: ci --ignore-scripts
@@ -257,6 +267,11 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
 
       - name: Download ts build artifacts
         uses: actions/download-artifact@v4
@@ -312,6 +327,11 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
       
       - name: Download console build artifacts
         uses: actions/download-artifact@v4
