@@ -1,8 +1,7 @@
 ---
 name: telepact-api
-description: Reference and implementation guidance for Telepact schemas, libraries, and SDKs.
-metadata:
-  short-description: Telepact API reference
+description: Read, draft, and implement Telepact APIs.
+license: Apache-2.0
 ---
 
 # Introduction
