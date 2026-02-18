@@ -19,7 +19,7 @@ import posixpath
 import re
 import shutil
 from pathlib import Path
-from typing import Dict, Tuple
+from typing import Dict, List, Tuple
 
 SKILL_FRONTMATTER = """---
 name: telepact-api
@@ -67,6 +67,15 @@ def _to_relative_target(destination_path: str, mapped_target_path: str) -> str:
     return relative_target
 
 
+def _slugify(text: str) -> str:
+    slug = text.lower()
+    slug = slug.replace(".", "-")
+    slug = re.sub(r"[^a-z0-9\s-]", "", slug)
+    slug = re.sub(r"\s+", "-", slug)
+    slug = re.sub(r"-+", "-", slug)
+    return slug.strip("-")
+
+
 def _rewrite_links(
     content: str,
     source_path: str,
@@ -103,7 +112,64 @@ def _rewrite_links(
     return MARKDOWN_LINK_PATTERN.sub(replace, content)
 
 
-def _build_source_to_destination_map(repo_root: Path) -> Dict[str, str]:
+def _collect_common_json_files(repo_root: Path) -> List[Tuple[str, str, str]]:
+    common_files: List[Tuple[str, str, str]] = []
+    for common_file_path in sorted((repo_root / "common").glob("*.json")):
+        if common_file_path.name == "json-schema.json":
+            continue
+        repo_relative_path = f"common/{common_file_path.name}"
+        anchor = _slugify(common_file_path.name)
+        common_files.append((repo_relative_path, anchor, _read_file(common_file_path).rstrip("\n")))
+    return common_files
+
+
+def _rewrite_common_json_links_to_anchors(
+    content: str, source_path: str, common_json_anchor_map: Dict[str, str]
+) -> str:
+    def replace(match: re.Match[str]) -> str:
+        link_text = match.group(1)
+        link_target = match.group(2)
+
+        path_part, _ = _split_link_suffix(link_target)
+        if not path_part:
+            return match.group(0)
+
+        raw_match = RAW_GITHUB_PATTERN.match(path_part)
+        if raw_match:
+            repo_relative_target = posixpath.normpath(raw_match.group(1))
+        elif "://" in path_part or path_part.startswith("#"):
+            return match.group(0)
+        else:
+            repo_relative_target = _to_repo_relative(source_path, path_part)
+
+        anchor = common_json_anchor_map.get(repo_relative_target)
+        if anchor:
+            return f"[{link_text}](#{anchor})"
+
+        return match.group(0)
+
+    return MARKDOWN_LINK_PATTERN.sub(replace, content)
+
+
+def _append_common_json_appendix(content: str, source_path: str, repo_root: Path) -> str:
+    common_json_files = _collect_common_json_files(repo_root)
+    if not common_json_files:
+        return content
+
+    common_json_anchor_map = {repo_path: anchor for repo_path, anchor, _ in common_json_files}
+    rewritten_content = _rewrite_common_json_links_to_anchors(
+        content, source_path, common_json_anchor_map
+    )
+
+    appendix = "\n\n## Appendix\n\n"
+    for _, anchor, json_content in common_json_files:
+        appendix += f"### {anchor}\n\n"
+        appendix += f"```json\n{json_content}\n```\n\n"
+
+    return rewritten_content.rstrip() + appendix
+
+
+def _build_source_to_destination_map() -> Dict[str, str]:
     source_to_destination_map: Dict[str, str] = {
         "doc/motivation.md": "references/motivation.md",
         "doc/faq.md": "references/faq.md",
@@ -116,18 +182,14 @@ def _build_source_to_destination_map(repo_root: Path) -> Dict[str, str]:
         "sdk/prettier/README.md": "references/prettier.md",
         "LICENSE": "references/LICENSE",
         "NOTICE": "references/NOTICE",
+        "common/json-schema.json": "references/json-schema.json",
     }
-
-    common_dir = repo_root / "common"
-    for common_file_path in sorted(common_dir.glob("*.json")):
-        source_to_destination_map[f"common/{common_file_path.name}"] = f"references/{common_file_path.name}"
-
     return source_to_destination_map
 
 
 def _render_skill(readme_path: Path, output_dir: Path) -> None:
     repo_root = readme_path.parent
-    source_to_destination_map = _build_source_to_destination_map(repo_root)
+    source_to_destination_map = _build_source_to_destination_map()
 
     references_dir = output_dir / "references"
     if references_dir.exists():
@@ -157,6 +219,10 @@ def _render_skill(readme_path: Path, output_dir: Path) -> None:
                 destination_path=destination_path,
                 source_to_destination_map=source_to_destination_map,
             )
+            if source_path == "doc/schema-guide.md":
+                source_content = _append_common_json_appendix(
+                    source_content, source_path, repo_root
+                )
 
         _write_file(output_dir / destination_path, source_content)
 

@@ -370,7 +370,7 @@ Mock definitions include mocking functions, like `fn.createStub_` and
 served with a `MockServer` rather than a `Server` in the Telepact server-side
 library.
 
-You can find all mock defnitions
+You can find all mock definitions
 [here](https://raw.githubusercontent.com/Telepact/telepact/refs/heads/main/common/mock-internal.telepact.json).
 
 ## Full Example

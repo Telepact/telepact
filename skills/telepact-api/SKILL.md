@@ -28,16 +28,20 @@ For further reading, see [Motivation](./references/motivation.md).
 
 For explanations of various design decisions, see [the FAQ](./references/faq.md).
 
-For how-to guides, see the [API Schema Guide](./references/schema-guide.md), as well as
-the library and SDK docs:
+# Explore
 
--   [Library: Typescript](./references/ts.md)
--   [Library: Python](./references/py.md)
--   [Library: Java](./references/java.md)
+To learn how to write Telepact APIs, see the [API Schema Guide](./references/schema-guide.md).
+A [JSON Schema](./references/json-schema.json) is available for validation.
 
--   [SDK: CLI](./references/cli.md)
--   [SDK: Developer Console](./references/console.md)
--   [SDK: Prettier Plugin](./references/prettier.md)
+To learn how to serve a Telepact API, see the specific library docs:
+- [Typescript](./references/ts.md)
+- [Python](./references/py.md)
+- [Java](./references/java.md)
+
+For development assistance, see the SDK tool docs:
+- [CLI](./references/cli.md)
+- [Browser Console](./references/console.md)
+- [Prettier Plugin](./references/prettier.md)
 
 # At a glance
 

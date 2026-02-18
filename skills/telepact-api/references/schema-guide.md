@@ -347,7 +347,7 @@ errors, like `ErrorInvalidRequest` and `ErrorUnknown_`. These are always
 included and cannot be turned off.
 
 You can find all standard definitions
-[here](./internal.telepact.json).
+[here](#internal-telepact-json).
 
 ### Auth Definitions
 
@@ -361,7 +361,7 @@ standard `struct.Auth_` struct, as the `@auth_` header is treated with greater
 sensitivity throughout the Telepact ecosystem.
 
 You can find details about auth definitions
-[here](./auth.telepact.json).
+[here](#auth-telepact-json).
 
 ### Mock Definitions
 
@@ -370,8 +370,8 @@ Mock definitions include mocking functions, like `fn.createStub_` and
 served with a `MockServer` rather than a `Server` in the Telepact server-side
 library.
 
-You can find all mock defnitions
-[here](./mock-internal.telepact.json).
+You can find all mock definitions
+[here](#mock-internal-telepact-json).
 
 ## Full Example
 
@@ -565,3 +565,465 @@ You can find all mock defnitions
 -> [{}, {"fn.showExample": {}}]
 <- [{}, {"ErrorTooManyRequests": {}}]
 ```
+
+## Appendix
+
+### auth-telepact-json
+
+```json
+[
+    {
+        "///": [
+            " The `@auth_` header is the conventional location for sending credentials to     ",
+            " the server for the purpose of authentication and authorization.                 "
+        ],
+        "headers.Auth_": {
+            "@auth_": "struct.Auth_"
+        },
+        "->": {}
+    },
+    {
+        "///": " A standard error. ",
+        "errors.Auth_": [
+            {
+                "///": " The credentials in the `_auth` header were missing or invalid. ",
+                "ErrorUnauthenticated_": {
+                    "message!": "string"
+                }
+            },
+            {
+                "///": " The credentials in the `_auth` header were insufficient to run the function. ",
+                "ErrorUnauthorized_": {
+                    "message!": "string"
+                }
+            }
+        ]
+    }
+]
+```
+
+### internal-telepact-json
+
+```json
+[
+    {
+        "///": " Ping the server. ",
+        "fn.ping_": {},
+        "->": [
+            {
+                "Ok_": {}
+            }
+        ],
+        "_errors": "^errors\\.Validation_$"
+    },
+    {
+        "///": " Get the telepact `schema` of this server. ",
+        "fn.api_": {},
+        "->": [
+            {
+                "Ok_": {
+                    "api": [{"string": "any"}]
+                }
+            }
+        ],
+        "_errors": "^errors\\.Validation_$"
+    },
+    {
+        "_ext.Select_": {}
+    },
+    {
+        "///": " The `@time_` header indicates the request timeout honored by the client. ",
+        "headers.Time_": {
+            "@time_": "integer"
+        },
+        "->": {}
+    },
+    {
+        "///": [
+            " If `@unsafe_` is set to `true`, response validation by the server will be       ",
+            " disabled. The server will the client-provided the value of `@unsafe_` header    ",
+            " in the response.                                                                "
+        ],
+        "headers.Unsafe_": {
+            "@unsafe_": "boolean"
+        },
+        "->": {
+            "@unsafe_": "boolean"
+        }
+    },
+    {
+        "///": " The `@select_` header is used to select fields from structs. ",
+        "headers.Select_": {
+            "@select_": "_ext.Select_"
+        },
+        "->": {}
+    },
+    {
+        "///": [
+            " The `@bin_` header indicates the valid checksums of binary encodings            ",
+            " negotiated between the client and server. If the client sends a `@bin_` header  ",
+            " with any value, the server will respond with a `@bin_` header with an array     ",
+            " containing the currently supported binary encoding checksum. If te client's     ",
+            " provided checksum does not match the server's checksum, the server will also    ",
+            " send an `@enc_` header containing the binary encoding, which is a map of field  ",
+            " names to field ids. The response body may also be encoded in binary.            ",
+            "                                                                                 ",
+            " The `@pac_` header can also be used to indicate usage of 'packed' binary        ",
+            " encoding strategy. If the client submits a `@pac_` header with a `true` value,  ",
+            " the server will respond with a `@pac_` header with a `true` value.              "
+        ],
+        "headers.Binary_": {
+            "@bin_": ["integer"],
+            "@pac_": "boolean"
+        },
+        "->": {
+            "@bin_": ["integer"],
+            "@enc_": {"string": "integer"},
+            "@pac_": "boolean"
+        }
+    },
+    {
+        "///": " The `@warn_` header is used to send warnings to the client. ",
+        "headers.Warning_": {},
+        "->": {
+            "@warn_": ["any"]
+        }
+    },
+    {
+        "///": [
+            " The `@id_` header is used to correlate requests and responses. The server will  ",
+            " reflect the client-provided `@id_` header as-is.                                "
+        ],
+        "headers.Id_": {
+            "@id_": "any"
+        },
+        "->": {
+            "@id_": "any"
+        }
+    },
+    {
+        "///": " A type. ",
+        "union.Type_": [
+            {
+                "Null": {}
+            },
+            {
+                "Boolean": {}
+            },
+            {
+                "Integer": {}
+            },
+            {
+                "Number": {}
+            },
+            {
+                "String": {}
+            },
+            {
+                "Array": {}
+            },
+            {
+                "Object": {}
+            },
+            {
+                "Any": {}
+            },
+            {
+                "Base64String": {}
+            },
+            {
+                "Bytes": {}
+            },
+            {
+                "Unknown": {}
+            }
+        ]
+    },
+    {
+        "///": " A reason for the validation failure in the body. ",
+        "union.ValidationFailureReason_": [
+            {
+                "TypeUnexpected": {
+                    "expected": "union.Type_",
+                    "actual": "union.Type_"
+                }
+            },
+            {
+                "NullDisallowed": {}
+            },
+            {
+                "ObjectKeyDisallowed": {}
+            },
+            {
+                "RequiredObjectKeyPrefixMissing": {
+                    "prefix": "string"
+                }
+            },
+            {
+                "ArrayElementDisallowed": {}
+            },
+            {
+                "NumberOutOfRange": {}
+            },
+            {
+                "ObjectSizeUnexpected": {
+                    "expected": "integer",
+                    "actual": "integer"
+                }
+            },
+            {
+                "ExtensionValidationFailed": {
+                    "reason": "string",
+                    "data!": {"string": "any"}
+                }
+            },
+            {
+                "ObjectKeyRegexMatchCountUnexpected": {
+                    "regex": "string",
+                    "expected": "integer",
+                    "actual": "integer",
+                    "keys": ["string"]
+                }
+            },
+            {
+                "RequiredObjectKeyMissing": {
+                    "key": "string"
+                }
+            },
+            {
+                "FunctionUnknown": {}
+            }
+        ]
+    },
+    {
+        "///": " A parse failure. ",
+        "union.ParseFailure_": [
+            {
+                "IncompatibleBinaryEncoding": {}
+            },
+            {
+                "///": " The binary decoder encountered a field id that could not be mapped to a key. ",
+                "BinaryDecodeFailure": {}
+            },
+            {
+                "JsonInvalid": {}
+            },
+            {
+                "ExpectedJsonArrayOfAnObjectAndAnObjectOfOneObject": {}
+            },
+            {
+                "ExpectedJsonArrayOfTwoObjects": {}
+            }
+        ]
+    },
+    {
+        "///": " A validation failure located at a `path` explained by a `reason`. ",
+        "struct.ValidationFailure_": {
+            "path": ["any"],
+            "reason": "union.ValidationFailureReason_"
+        }
+    },
+    {
+        "///": " A standard error. ",
+        "errors.Validation_": [
+            {
+                "///": " The server implementation raised an unknown error. ",
+                "ErrorUnknown_": {}
+            },
+            {
+                "///": " The headers on the request are invalid. ",
+                "ErrorInvalidRequestHeaders_": {
+                    "cases": ["struct.ValidationFailure_"]
+                }
+            },
+            {
+                "///": " The body on the request is invalid. ",
+                "ErrorInvalidRequestBody_": {
+                    "cases": ["struct.ValidationFailure_"]
+                }
+            },
+            {
+                "///": " The headers on the response are invalid. ",
+                "ErrorInvalidResponseHeaders_": {
+                    "cases": ["struct.ValidationFailure_"]
+                }
+            },
+            {
+                "///": " The body that the server attempted to put on the response is invalid. ",
+                "ErrorInvalidResponseBody_": {
+                    "cases": ["struct.ValidationFailure_"]
+                }
+            },
+            {
+                "///": " The request could not be parsed as a telepact Message. ",
+                "ErrorParseFailure_": {
+                    "reasons": ["union.ParseFailure_"]
+                }
+            }
+        ]
+    }
+]
+```
+
+### mock-internal-telepact-json
+
+```json
+[
+    {
+        "///": " A stubbed result for matching input. ",
+        "_ext.Stub_": {}
+    },
+    {
+        "///": " A call of a function. ",
+        "_ext.Call_": {}
+    },
+    {
+        "///": " The number of times a function is allowed to be called. ",
+        "union.CallCountCriteria_": [
+            {
+                "Exact": {
+                    "times": "integer"
+                }
+            },
+            {
+                "AtMost": {
+                    "times": "integer"
+                }
+            },
+            {
+                "AtLeast": {
+                    "times": "integer"
+                }
+            }
+        ]
+    },
+    {
+        "///": " Possible causes for a mock verification to fail. ",
+        "union.VerificationFailure_": [
+            {
+                "TooFewMatchingCalls": {
+                    "wanted": "union.CallCountCriteria_",
+                    "found": "integer",
+                    "allCalls": ["_ext.Call_"]
+                }
+            },
+            {
+                "TooManyMatchingCalls": {
+                    "wanted": "union.CallCountCriteria_",
+                    "found": "integer",
+                    "allCalls": ["_ext.Call_"]
+                }
+            }
+        ]
+    },
+    {
+        "///": [
+            " Create a function stub that will cause the server to return the `stub` result   ",
+            " when the `stub` argument matches the function argument on a request.            ",
+            "                                                                                 ",
+            " If `ignoreMissingArgFields` is `true`, then the server will skip field          ",
+            " omission validation on the `stub` argument, and the stub will match calls       ",
+            " where the given `stub` argument is Exactly a json sub-structure of the request  ",
+            " function argument.                                                              ",
+            "                                                                                 ",
+            " If `generateMissingResultFields` is `true`, then the server will skip field     ",
+            " omission validation on the `stub` result, and the server will generate the      ",
+            " necessary data required to make the `result` pass on response validation.       "
+        ],
+        "fn.createStub_": {
+            "stub": "_ext.Stub_",
+            "strictMatch!": "boolean",
+            "count!": "integer"
+        },
+        "->": [
+            {
+                "Ok_": {}
+            }
+        ],
+        "_errors": "^errors\\.Validation_$"
+    },
+    {
+        "///": [
+            " Verify a call was made with this mock that matches the given `call` and         ",
+            " `multiplicity` criteria. If `allowPartialArgMatch` is supplied as `true`, then  ",
+            " the server will skip field omission validation, and match calls where the       ",
+            " given `call` argument is Exactly a json sub-structure of the actual argument.   "
+        ],
+        "fn.verify_": {
+            "call": "_ext.Call_",
+            "strictMatch!": "boolean",
+            "count!": "union.CallCountCriteria_"
+        },
+        "->": [
+            {
+                "Ok_": {}
+            },
+            {
+                "ErrorVerificationFailure": {
+                    "reason": "union.VerificationFailure_"
+                }
+            }
+        ],
+        "_errors": "^errors\\.Validation_$"
+    },
+    {
+        "///": [
+            " Verify that no interactions have occurred with this mock or that all            ",
+            " interactions have been verified.                                                "
+        ],
+        "fn.verifyNoMoreInteractions_": {},
+        "->": [
+            {
+                "Ok_": {}
+            },
+            {
+                "ErrorVerificationFailure": {
+                    "additionalUnverifiedCalls": ["_ext.Call_"]
+                }
+            }
+        ],
+        "_errors": "^errors\\.Validation_$"
+    },
+    {
+        "///": " Clear all stub conditions. ",
+        "fn.clearStubs_": {},
+        "->": [
+            {
+                "Ok_": {}
+            }
+        ],
+        "_errors": "^errors\\.Validation_$"
+    },
+    {
+        "///": " Clear all call data. ",
+        "fn.clearCalls_": {},
+        "->": [
+            {
+                "Ok_": {}
+            }
+        ],
+        "_errors": "^errors\\.Validation_$"
+    },
+    {
+        "///": " Set the seed of the random generator. ",
+        "fn.setRandomSeed_": {
+            "seed": "integer"
+        },
+        "->": [
+            {
+                "Ok_": {}
+            }
+        ],
+        "_errors": "^errors\\.Validation_$"
+    },
+    {
+        "errors.Mock_": [
+            {
+                "///": " The mock could not return a result due to no matching stub being available. ",
+                "ErrorNoMatchingStub_": {}
+            }
+        ]
+    }
+]
+```
+
