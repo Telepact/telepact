@@ -159,7 +159,7 @@ version:
 	cd sdk/console && telepact-project set-version ${VERSION}
 
 skill:
-	telepact-project consolidated-readme README.md skills/telepact-api/SKILL.md --include-skill-frontmatter
+	telepact-project skill README.md skills/telepact-api
 
 license-header:
 	telepact-project license-header NOTICE

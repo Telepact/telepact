@@ -42,10 +42,10 @@ jobs:
       - name: Check for changes
         run: |
           if git status --porcelain | grep .; then
-            echo "ERROR: Skill file is stale.\nTo fix, run 'make skill' and git commit the changes."
+            echo "ERROR: Skill files are stale.\nTo fix, run 'make skill' and git commit the changes."
             false
           else
-            echo "Skill file up-to-date."
+            echo "Skill files up-to-date."
           fi
 
   build-ts:
