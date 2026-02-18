@@ -25,8 +25,8 @@ on:
         description: 'Passphrase for the GPG private key'
 
 jobs:
-  build-consolidated-readme:
-    name: Build Consolidated README
+  check-skill:
+    name: Check Skill
     runs-on: ubuntu-latest
     timeout-minutes: 1
     steps:
@@ -36,17 +36,17 @@ jobs:
       - name: Install Project CLI
         run: make install-project-cli
 
-      - name: Build consolidated readme
-        run: |
-          mkdir -p dist
-          telepact-project consolidated-readme README.md dist/CONSOLIDATED_README.md
+      - name: Run skill check
+        run: make skill
 
-      - name: Upload consolidated readme artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-consolidated-readme
-          path: dist/CONSOLIDATED_README.md
-          retention-days: 1
+      - name: Check for changes
+        run: |
+          if git status --porcelain | grep .; then
+            echo "ERROR: Skill file is stale.\nTo fix, run 'make skill' and git commit the changes."
+            false
+          else
+            echo "Skill file up-to-date."
+          fi
 
   build-ts:
     name: Build TypeScript

@@ -64,7 +64,7 @@ test-trace-ts:
 deploy-ts:
 	$(MAKE) -C lib/ts deploy
 
-.PHONY: test
+.PHONY: test skill
 test:
 	$(MAKE) -C test/runner test
 
@@ -157,6 +157,9 @@ version:
 	cd sdk/cli && telepact-project set-version ${VERSION}
 	cd sdk/prettier && telepact-project set-version ${VERSION}
 	cd sdk/console && telepact-project set-version ${VERSION}
+
+skill:
+	telepact-project consolidated-readme README.md skills/telepact-api/SKILL.md --include-skill-frontmatter
 
 license-header:
 	telepact-project license-header NOTICE
