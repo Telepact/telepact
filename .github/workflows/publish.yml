@@ -91,6 +91,24 @@ jobs:
           POETRY_PYPI_TOKEN_PYPI: ${{ secrets.PYPI_TOKEN }}
         run: make deploy-py
 
+  publish-go:
+    runs-on: ubuntu-latest
+    if: ${{ contains(github.event.release.body, '- go') }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.target_commitish }}
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+
+      - name: Publish to Go proxy
+        run: make deploy-go
+
   publish-cli:
     runs-on: ubuntu-latest
     if: ${{ contains(github.event.release.body, '- cli') }}

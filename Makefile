@@ -64,6 +64,21 @@ test-trace-ts:
 deploy-ts:
 	$(MAKE) -C lib/ts deploy
 
+go:
+	$(MAKE) -C lib/go
+
+clean-go:
+	$(MAKE) -C lib/go clean
+
+test-go:
+	$(MAKE) -C test/runner test-go
+
+test-trace-go:
+	$(MAKE) -C test/runner test-trace-go
+
+deploy-go:
+	$(MAKE) -C lib/go deploy
+
 .PHONY: test skill
 test:
 	$(MAKE) -C test/runner test
@@ -72,6 +87,7 @@ clean-test:
 	$(MAKE) -C test/runner clean
 	$(MAKE) -C test/lib/java clean
 	$(MAKE) -C test/lib/py clean
+	$(MAKE) -C test/lib/go clean
 	$(MAKE) -C test/lib/ts clean
 
 dart:

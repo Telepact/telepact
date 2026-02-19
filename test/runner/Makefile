@@ -14,7 +14,7 @@
 #|  limitations under the License.
 #|
 
-test: setup java py ts
+test: setup java py ts go
 	poetry run python -m pytest
 
 test-java: setup java
@@ -35,6 +35,12 @@ test-ts: setup ts
 test-trace-ts: setup ts
 	poetry run python -m pytest -k test_client_server_case[ts-0] -s -vv
 
+test-go: setup go
+	poetry run python -m pytest -k [go
+
+test-trace-go: setup go
+	poetry run python -m pytest -k test_client_server_case[go-0] -s -vv
+
 setup:
 	poetry install
 
@@ -46,6 +52,9 @@ py:
 
 ts:
 	$(MAKE) -C ../lib/ts
+
+go:
+	$(MAKE) -C ../lib/go
 
 clean:
 	rm -rf .pytest_cache

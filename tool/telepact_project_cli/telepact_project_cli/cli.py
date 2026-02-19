@@ -229,6 +229,8 @@ def bump() -> None:
             release_targets.add('py')
         if 'lib/ts' in path:
             release_targets.add('ts')
+        if 'lib/go' in path:
+            release_targets.add('go')
         if 'bind/dart' in path:
             release_targets.add('dart')
         if 'sdk/cli' in path:
@@ -368,6 +370,7 @@ def github_labels() -> None:
         "lib/java": "java",
         "lib/py": "py",
         "lib/ts": "ts",
+        "lib/go": "go",
         "bind/dart": "dart",
         "sdk/cli": "cli",
         "sdk/console": "console",
@@ -504,6 +507,23 @@ def release() -> None:
     g = Github(token)
     repo = g.get_repo(repository)
     pr = repo.get_pull(pr_number)
+
+    if 'go' in release_targets:
+        go_tag_version = version if version.startswith('v') else f'v{version}'
+        go_module_tag = f'lib/go/{go_tag_version}'
+        try:
+            existing_ref = repo.get_git_ref(f"tags/{go_module_tag}")
+            existing_sha = existing_ref.object.sha
+            if existing_sha != head_commit:
+                raise RuntimeError(
+                    f"Go module tag {go_module_tag} already exists at {existing_sha}, expected {head_commit}."
+                )
+            click.echo(f"Go module tag already exists: {go_module_tag}")
+        except GithubException as e:
+            if e.status != 404:
+                raise
+            repo.create_git_ref(ref=f"refs/tags/{go_module_tag}", sha=head_commit)
+            click.echo(f"Created Go module tag: {go_module_tag}")
 
     # Create the final release body
     pr_title = pr.title

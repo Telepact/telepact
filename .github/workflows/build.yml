@@ -124,6 +124,22 @@ jobs:
           path: lib/java/target
           retention-days: 1
 
+  build-go:
+    name: Build Go
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+
+      - name: Build go
+        run: make go
+
   build-py:
     name: Build Python
     runs-on: ubuntu-latest
@@ -398,7 +414,7 @@ jobs:
     name: Test
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    needs: [build-ts, build-java, build-py, build-cli]
+    needs: [build-ts, build-java, build-go, build-py, build-cli]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
