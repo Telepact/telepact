@@ -19,9 +19,24 @@ package schema
 import "strings"
 
 // GetPathDocumentCoordinatesPseudoJSON locates the row/column coordinates in the document for the given path.
-func GetPathDocumentCoordinatesPseudoJSON(path []any, document string) map[string]any {
+func GetPathDocumentCoordinatesPseudoJSON(path []any, document string) (location map[string]any) {
+	location = defaultDocumentCoordinates()
+	defer func() {
+		if recover() != nil {
+			location = defaultDocumentCoordinates()
+		}
+	}()
+
 	reader := newRuneReader(document)
-	return findCoordinates(path, reader, nil, nil)
+	resolved := findCoordinates(path, reader, nil, nil)
+	if resolved == nil {
+		return defaultDocumentCoordinates()
+	}
+	return resolved
+}
+
+func defaultDocumentCoordinates() map[string]any {
+	return map[string]any{"row": 1, "col": 1}
 }
 
 type runeReader struct {
