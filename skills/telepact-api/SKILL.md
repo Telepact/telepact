@@ -36,7 +36,7 @@ To learn how to serve a Telepact API, see the specific library docs:
 - [Typescript](./references/ts.md)
 - [Python](./references/py.md)
 - [Java](./references/java.md)
-- [Go](./lib/go/README.md)
+- [Go](./references/go.md)
 
 For development assistance, see the SDK tool docs:
 - [CLI](./references/cli.md)

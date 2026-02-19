@@ -176,6 +176,7 @@ def _build_source_to_destination_map() -> Dict[str, str]:
         "lib/ts/README.md": "references/ts.md",
         "lib/py/README.md": "references/py.md",
         "lib/java/README.md": "references/java.md",
+        "lib/go/README.md": "references/go.md",
         "sdk/cli/README.md": "references/cli.md",
         "sdk/console/README.md": "references/console.md",
         "sdk/prettier/README.md": "references/prettier.md",
