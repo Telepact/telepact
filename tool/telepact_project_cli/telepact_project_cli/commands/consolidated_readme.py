@@ -20,6 +20,13 @@ import sys
 from pathlib import Path
 from typing import Dict, List, Tuple, Set
 
+SKILL_FRONTMATTER = """---
+name: telepact-api
+description: Reference and implementation guidance for Telepact schemas, libraries, and SDKs.
+metadata:
+  short-description: Telepact API reference
+---"""
+
 
 class SlugTracker:
     """Track generated slugs to detect duplicates."""
@@ -115,7 +122,7 @@ def read_file(file_path: Path) -> str:
         sys.exit(1)
 
 
-def consolidate_readme_impl(readme_path: Path, output_path: Path) -> None:
+def consolidate_readme_impl(readme_path: Path, output_path: Path, include_skill_frontmatter: bool) -> None:
     """
     Consolidate README with linked documents.
     
@@ -208,6 +215,9 @@ def consolidate_readme_impl(readme_path: Path, output_path: Path) -> None:
             consolidated += f"## {anchor}\n\n"
             consolidated += f"```json\n{file_content}\n```\n\n"
     
+    if include_skill_frontmatter:
+        consolidated = f"{SKILL_FRONTMATTER}\n\n{consolidated}"
+
     # Write the consolidated README
     output_path.parent.mkdir(parents=True, exist_ok=True)
     with open(output_path, 'w', encoding='utf-8') as f:
@@ -219,7 +229,12 @@ def consolidate_readme_impl(readme_path: Path, output_path: Path) -> None:
 @click.command()
 @click.argument('readme_path', type=click.Path(exists=True, path_type=Path))
 @click.argument('output_path', type=click.Path(path_type=Path))
-def consolidated_readme(readme_path: Path, output_path: Path) -> None:
+@click.option(
+    '--include-skill-frontmatter',
+    is_flag=True,
+    help='Prepend skill YAML frontmatter to the output.',
+)
+def consolidated_readme(readme_path: Path, output_path: Path, include_skill_frontmatter: bool) -> None:
     """
     Create a consolidated README by combining the main README with all linked documents.
     
@@ -229,4 +244,4 @@ def consolidated_readme(readme_path: Path, output_path: Path) -> None:
     3. Concatenates those documents inline with sensible headings
     4. Replaces cross-document links with doc-local anchor links
     """
-    consolidate_readme_impl(readme_path, output_path)
+    consolidate_readme_impl(readme_path, output_path, include_skill_frontmatter)
