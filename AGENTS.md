@@ -1,4 +1,4 @@
-# Telepact AI Coding Conventions
+# Agent Instructions
 
 This document provides guidance for AI agents working within the Telepact codebase.
 
