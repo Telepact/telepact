@@ -14,9 +14,9 @@ import (
 	"sync/atomic"
 	"time"
 
-	nats "github.com/nats-io/nats.go"
 	"github.com/prometheus/client_golang/prometheus"
 	telepact "github.com/telepact/telepact/lib/go"
+	nats "github.com/telepact/telepact/test/lib/go/internal/stdionats"
 	"github.com/vmihailenco/msgpack/v5"
 )
 
@@ -29,7 +29,7 @@ const backwardsCompatibleChangeSchema = `
 `
 
 func main() {
-	logger := log.New(os.Stdout, "[telepact-go] ", log.LstdFlags|log.Lmicroseconds)
+	logger := log.New(os.Stderr, "[telepact-go] ", log.LstdFlags|log.Lmicroseconds)
 
 	natsURL := os.Getenv("NATS_URL")
 	if natsURL == "" {

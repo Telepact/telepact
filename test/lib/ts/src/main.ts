@@ -31,7 +31,7 @@ import {
     TestClient,
     TestClientOptions,
 } from "telepact";
-import { NatsConnection, connect, Subscription } from "nats";
+import { NatsConnection, connect, Subscription } from "./stdioNats.js";
 import * as fs from "fs";
 import * as path from 'path';
 import { min, max, mean, median, quantile } from "simple-statistics";

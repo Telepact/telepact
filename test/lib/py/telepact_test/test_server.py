@@ -15,8 +15,6 @@
 #|
 
 from prometheus_client import CONTENT_TYPE_LATEST, Summary, CollectorRegistry, generate_latest, write_to_textfile
-from nats.aio.client import Client as NatsClient
-from nats.aio.msg import Msg
 from typing import List, Any
 from threading import Lock, Condition
 import csv
@@ -32,15 +30,14 @@ from typing import Dict, Any, List, Callable, Union
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 import json
-from nats.aio.client import Client as NATSClient, Subscription
 import asyncio
-import nats
 from telepact import SerializationError, Message, Serializer, Client, Server, TelepactSchema, MockTelepactSchema, MockServer, TelepactSchemaFiles, TelepactSchemaParseError, TestClient
 import traceback
 import sys
 from concurrent.futures import ThreadPoolExecutor
 from telepact_test.code_gen_handler import CodeGenHandler
 from telepact_test.gen.gen_types import TypedClient, test as fntest
+from telepact_test.stdio_nats import Client as NatsClient, Subscription, Msg, connect as stdio_connect
 import base64
 
 
@@ -422,7 +419,7 @@ async def run_dispatcher_server():
         with open(metrics_file, "w") as f:
             f.write(generate_latest(metrics).decode("utf-8"))
 
-    connection: NatsClient = await nats.connect(nats_url)
+    connection: NatsClient = await stdio_connect(nats_url)
 
     async def message_handler(msg):
         request_bytes = msg.data

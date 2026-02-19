@@ -28,8 +28,8 @@ from garbage_cases import cases as garbage_cases
 from auth_cases import cases as auth_cases
 from test_client_cases import cases as test_client_cases
 from util import increment, ping, startup_check
+from stdio_bus import StdioBus
 import json
-import nats
 import os
 
 def pytest_runtest_makereport(item, call):
@@ -52,62 +52,54 @@ def pytest_addoption(parser):
 @pytest.fixture(scope='session')
 def nats_server(loop, request):
     remote_nats = request.config.getoption('--remotenats')
-
-    print('Creating NATS fixture')
-
-    p = None
     if remote_nats:
-        print('###########################################################################')
-        print('#                                WARNING!                                 #')
-        print('#                                                                         #')
-        print('#                        Using remote NATS server                         #')
-        print('###########################################################################')
-        print('')
-        nats_url = 'nats://demo.nats.io:4222'
-    else:
-        nats_url = 'nats://127.0.0.1:4222'
-        p = subprocess.Popen(['nats-server', '-D'])
+        print('Ignoring --remotenats: test harness now uses stdio transport.')
 
-    yield nats_url
-
-    if p:
-        p.terminate()
-        p.wait()
+    print('Creating stdio transport fixture')
+    yield 'stdio://local'
 
 
 @pytest.fixture(scope='session')
-def nats_client(loop, nats_server):
-    url = nats_server
+def stdio_bus(loop):
+    bus = StdioBus(loop)
+    yield bus
+    loop.run_until_complete(bus.close())
 
-    client = None
 
-    async def f():
-        nonlocal client
-        print('NATS client connecting to {}'.format(url))
-        client = await nats.connect(url)
-
-    loop.run_until_complete(f())
-
-    print('NATS client connected!')
-
-    yield client
+@pytest.fixture(scope='session')
+def nats_client(stdio_bus):
+    print('stdio client connected!')
+    yield stdio_bus.client()
 
 
 @pytest.fixture(scope='session', params=get_lib_modules())
-def dispatcher_server(loop, nats_server, request, nats_client):
+def dispatcher_server(loop, nats_server, request, nats_client, stdio_bus):
     nats_url = nats_server
     lib_name = request.param
 
     env_vars = os.environ.copy()
-    del env_vars['VIRTUAL_ENV']
+    env_vars.pop('VIRTUAL_ENV', None)
     env_vars['NATS_URL'] = nats_url
 
     path = '../lib/' + lib_name
-    s = subprocess.Popen(['make', 'test-server'], cwd=path, env=env_vars)
+    s = subprocess.Popen(
+        ['make', 'test-server'],
+        cwd=path,
+        env=env_vars,
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        bufsize=1,
+    )
+    stdio_bus.attach_process(lib_name, s)
 
     try:
         startup_check(loop, lambda: ping(nats_client, lib_name), times=30)
     except Exception:
+        stdio_bus.detach_process(lib_name)
+        s.terminate()
+        s.wait()
         raise
 
     yield lib_name
@@ -123,6 +115,8 @@ def dispatcher_server(loop, nats_server, request, nats_client):
     except subprocess.TimeoutExpired:
         s.terminate()
         s.wait()
+    finally:
+        stdio_bus.detach_process(lib_name)
 
 
 @pytest.fixture(scope='session')

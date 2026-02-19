@@ -17,15 +17,12 @@
 import json
 from typing import Any
 import msgpack
-import nats
 import asyncio
 import subprocess
 import pytest
-import nats.aio.client
 import time
 import os
 import copy
-from nats.aio.msg import Msg
 
 should_abort = False
 
@@ -38,7 +35,7 @@ class Constants:
     auth_api_path = '../../runner/schema/auth'
     mockgen_api_path = '../../runner/schema/mockgen'
     calculator_api_path = '../../runner/schema/calculator'
-    nats_url = 'nats://127.0.0.1:4222'
+    nats_url = 'stdio://local'
     frontdoor_topic = 'frontdoor'
     intermediate_topic = 'intermediate'
     backdoor_topic = 'backdoor'
@@ -76,10 +73,10 @@ def handler(request):
         return [response_header, {'Ok_': {}}]
 
 
-async def backdoor_handler(nats_client: nats.aio.client.Client, backdoor_topic):
+async def backdoor_handler(nats_client, backdoor_topic):
     done = asyncio.get_running_loop().create_future()
     try:
-        async def nats_handler(msg: Msg):
+        async def nats_handler(msg):
             backdoor_request_bytes = msg.data
             backdoor_request_json = backdoor_request_bytes.decode()
             backdoor_request = json.loads(backdoor_request_json)
@@ -340,7 +337,7 @@ async def verify_client_case(nats_client, request, expected_response, client_fro
         assert base64_was_used == client_returned_binary
 
 
-async def send_case(nats_client: nats.aio.client.Client, request, expected_response, request_topic, just_send=False):
+async def send_case(nats_client, request, expected_response, request_topic, just_send=False):
 
     print('T->     {}'.format(request), flush=True)
 
