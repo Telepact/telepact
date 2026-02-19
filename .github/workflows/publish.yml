@@ -59,15 +59,15 @@ jobs:
           ref: ${{ github.event.release.target_commitish }}
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
-          node-version: "20"
+          node-version-file: .nvmrc
           registry-url: "https://registry.npmjs.org/"
 
       - name: Publish to npm
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NPM_INSTALL: ci
+          NPM_INSTALL: ci --ignore-scripts
         run: make deploy-ts
 
   publish-py:
@@ -141,15 +141,15 @@ jobs:
           ref: ${{ github.event.release.target_commitish }}
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
-          node-version: "20"
+          node-version-file: .nvmrc
           registry-url: "https://registry.npmjs.org/"
 
       - name: Publish to npm
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NPM_INSTALL: ci
+          NPM_INSTALL: ci --ignore-scripts
         run: make deploy-console
 
   publish-prettier:
@@ -163,13 +163,13 @@ jobs:
           ref: ${{ github.event.release.target_commitish }}
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
-          node-version: "20"
+          node-version-file: .nvmrc
           registry-url: "https://registry.npmjs.org/"
 
       - name: Publish to npm
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NPM_INSTALL: ci
+          NPM_INSTALL: ci --ignore-scripts
         run: make deploy-prettier

@@ -1,3 +1,9 @@
+---
+name: telepact-api
+description: Read, draft, and implement Telepact APIs.
+license: Apache-2.0
+---
+
 # Introduction
 
 Telepact is an API ecosystem for bridging programs across inter-process
@@ -17,25 +23,24 @@ key innovations:
    arguments, approximating a link that can be followed, all achieved with pure
    JSON abstractions
 
-For further reading, see [Motivation](./doc/motivation.md).
+For further reading, see [Motivation](./references/motivation.md).
 
-For explanations of various design decisions, see [the FAQ](./doc/faq.md).
+For explanations of various design decisions, see [the FAQ](./references/faq.md).
 
 # Explore
 
-To learn how to write Telepact APIs, see the [API Schema Guide](./doc/schema-guide.md).
-A [JSON Schema](./common/json-schema.json) is available for validation.
+To learn how to write Telepact APIs, see the [API Schema Guide](./references/schema-guide.md).
+A [JSON Schema](./references/json-schema.json) is available for validation.
 
 To learn how to serve a Telepact API, see the specific library docs:
-- [Typescript](./lib/ts/README.md)
-- [Python](./lib/py/README.md)
-- [Java](./lib/java/README.md)
-- [Go](./lib/go/README.md)
+- [Typescript](./references/ts.md)
+- [Python](./references/py.md)
+- [Java](./references/java.md)
 
 For development assistance, see the SDK tool docs:
-- [CLI](./sdk/cli/README.md)
-- [Browser Console](./sdk/console/README.md)
-- [Prettier Plugin](./sdk/prettier/README.md)
+- [CLI](./references/cli.md)
+- [Browser Console](./references/console.md)
+- [Prettier Plugin](./references/prettier.md)
 
 # At a glance
 
@@ -169,5 +174,5 @@ Or clients can also leverage telepact tooling to:
 # Licensing
 
 Telepact is licensed under the Apache License, Version 2.0. See
-[LICENSE](LICENSE) for the full license text. See [NOTICE](NOTICE) for
+[LICENSE](./references/LICENSE) for the full license text. See [NOTICE](./references/NOTICE) for
 additional information regarding copyright ownership.

@@ -25,8 +25,8 @@ on:
         description: 'Passphrase for the GPG private key'
 
 jobs:
-  build-consolidated-readme:
-    name: Build Consolidated README
+  check-skill:
+    name: Check Skill
     runs-on: ubuntu-latest
     timeout-minutes: 1
     steps:
@@ -36,17 +36,17 @@ jobs:
       - name: Install Project CLI
         run: make install-project-cli
 
-      - name: Build consolidated readme
-        run: |
-          mkdir -p dist
-          telepact-project consolidated-readme README.md dist/CONSOLIDATED_README.md
+      - name: Run skill check
+        run: make skill
 
-      - name: Upload consolidated readme artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-consolidated-readme
-          path: dist/CONSOLIDATED_README.md
-          retention-days: 1
+      - name: Check for changes
+        run: |
+          if git status --porcelain | grep .; then
+            echo "ERROR: Skill files are stale.\nTo fix, run 'make skill' and git commit the changes."
+            false
+          else
+            echo "Skill files up-to-date."
+          fi
 
   build-ts:
     name: Build TypeScript
@@ -56,9 +56,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+
       - name: Build ts
         env:
-          NPM_INSTALL: ci
+          NPM_INSTALL: ci --ignore-scripts
         run: make ts
 
       - name: Upload ts build artifacts
@@ -246,7 +251,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+
       - name: Install dependencies
+        env:
+          NPM_INSTALL: ci --ignore-scripts
         run: make prettier
 
       - name: Upload prettier build artifacts
@@ -272,17 +284,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+
       - name: Download ts build artifacts
         uses: actions/download-artifact@v4
         with:
           name: build-ts
           path: lib/ts/dist
-
-      - name: Download prettier build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: build-prettier
-          path: sdk/prettier/dist
 
       - name: Download cli build artifacts
         uses: actions/download-artifact@v4
@@ -301,7 +312,7 @@ jobs:
 
       - name: Build console
         env:
-          NPM_INSTALL: ci
+          NPM_INSTALL: ci --ignore-scripts
         run: make console
       
       - name: Install Playwright Browsers
@@ -332,6 +343,11 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
       
       - name: Download console build artifacts
         uses: actions/download-artifact@v4

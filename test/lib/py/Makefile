@@ -20,6 +20,7 @@ TAR_GZ := telepact.tar.gz
 all: codegen $(TAR_GZ)
 	poetry lock
 	poetry install
+	poetry run pip install ./telepact.tar.gz
 
 $(TAR_GZ): dep
 	cp $(LIB_TAR_GZ) telepact.tar.gz

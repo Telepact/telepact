@@ -1,6 +1,6 @@
 {
   "name": "telepact-console",
-  "version": "1.0.0-alpha.167",
+  "version": "1.0.0-alpha.180",
   "description": "A web-based interface for inspecting and testing Telepact APIs.",
   "license": "Apache-2.0",
   "repository": {
@@ -43,7 +43,7 @@
     "@tailwindcss/typography": "^0.5.19",
     "@tailwindcss/vite": "^4.1.13",
     "@types/dompurify": "^3.2.0",
-    "@types/node": "^24.6.1",
+    "@types/node": "^25.0.3",
     "autoprefixer": "^10.4.17",
     "http-proxy-middleware": "^3.0.3",
     "jsdom": "^27.0.0",
@@ -64,8 +64,8 @@
     "crc-32": "^1.2.2",
     "dompurify": "^3.2.7",
     "express": "^5.1.0",
-    "marked": "^16.3.0",
-    "monaco-editor": "^0.54.0",
+    "marked": "^17.0.0",
+    "monaco-editor": "^0.55.1",
     "msgpackr": "^1.11.5",
     "prettier": "^3.6.2"
   },

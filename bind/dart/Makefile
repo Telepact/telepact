@@ -22,7 +22,7 @@ all:
 	cp ../../LICENSE ../../NOTICE ./
 	cat LICENSE_SUB_PROJECT >> LICENSE
 
-	npm install
+	npm install --ignore-scripts
 	
 	npx rollup -c rollup.crc32.config.js
 	npx rollup -c rollup.msgpackr.config.js

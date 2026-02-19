@@ -6,7 +6,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.github.telepact</groupId>
   <artifactId>telepact</artifactId>
-  <version>1.0.0-alpha.167</version>
+  <version>1.0.0-alpha.180</version>
   <properties>
     <maven.compiler.source>21</maven.compiler.source>
     <maven.compiler.target>21</maven.compiler.target>
@@ -43,7 +43,7 @@
     <dependency>
       <groupId>org.msgpack</groupId>
       <artifactId>jackson-dataformat-msgpack</artifactId>
-      <version>0.9.10</version>
+      <version>0.9.11</version>
     </dependency>
   </dependencies>
   <build>
@@ -60,7 +60,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
-        <version>3.3.1</version>
+        <version>3.4.0</version>
         <executions>
           <execution>
             <id>attach-sources</id>
@@ -121,7 +121,7 @@
           <plugin>
             <groupId>org.sonatype.central</groupId>
             <artifactId>central-publishing-maven-plugin</artifactId>
-            <version>0.9.0</version>
+            <version>0.10.0</version>
             <extensions>true</extensions>
             <configuration>
               <publishingServerId>central</publishingServerId>
