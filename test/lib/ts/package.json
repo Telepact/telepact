@@ -11,7 +11,8 @@
   "author": "",
   "private": true,
   "dependencies": {
-    "simple-statistics": "^7.8.3"
+    "simple-statistics": "^7.8.3",
+    "telepact": "file:telepact.tgz"
   },
   "devDependencies": {
     "@types/node": "^25.0.3",

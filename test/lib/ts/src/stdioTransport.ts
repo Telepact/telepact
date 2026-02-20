@@ -138,7 +138,7 @@ export class StdioTransport {
             terminal: false,
         });
 
-        rl.on("line", (line) => {
+        rl.on("line", (line: string) => {
             this.handleLine(line);
         });
     }

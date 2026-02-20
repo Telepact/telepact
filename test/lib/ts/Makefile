@@ -16,11 +16,12 @@
 
 LIB_TAR_GZ := ../../../lib/ts/dist-tgz/*.tgz
 TAR_GZ := telepact.tgz
-NPM_ENV := NPM_CONFIG_CACHE=/tmp/telepact-npm-cache
 
-all: codegen $(TAR_GZ) link-telepact
-	@if [ ! -d node_modules ]; then $(NPM_ENV) npm install --ignore-scripts; fi
-	$(NPM_ENV) npm run build
+all: codegen $(TAR_GZ)
+	npm uninstall telepact || echo "no-op"
+	npm install --ignore-scripts ./telepact.tgz
+	npm install --ignore-scripts
+	npm run build
 
 $(TAR_GZ): dep
 	cp $(LIB_TAR_GZ) telepact.tgz
@@ -28,23 +29,11 @@ $(TAR_GZ): dep
 dep:
 	$(MAKE) -C ../../../lib/ts
 
-link-telepact:
-	mkdir -p node_modules
-	rm -rf node_modules/telepact
-	ln -s ../../../../lib/ts node_modules/telepact
-	rm -rf node_modules/crc-32
-	ln -s ../../../../lib/ts/node_modules/crc-32 node_modules/crc-32
-	rm -rf node_modules/msgpackr
-	ln -s ../../../../lib/ts/node_modules/msgpackr node_modules/msgpackr
-	rm -rf node_modules/@msgpackr-extract
-	ln -s ../../../../lib/ts/node_modules/@msgpackr-extract node_modules/@msgpackr-extract
-
 codegen:
 	telepact codegen --schema-dir ../../runner/schema/example --lang ts --out src/gen
 
-test-server: codegen link-telepact
-	$(NPM_ENV) npm run build
-	$(NPM_ENV) npm start
+test-server:
+	npm start
 
 clean:
 	rm -f telepact.tgz

@@ -32,8 +32,10 @@ import {
     TestClientOptions,
 } from "telepact";
 import { StdioTransport, openTransport, Listener } from "./stdioTransport.js";
-import * as fs from "fs";
-import * as path from 'path';
+import * as fs from "node:fs";
+import * as path from "node:path";
+import { performance } from "node:perf_hooks";
+import { TextDecoder, TextEncoder } from "node:util";
 import { min, max, mean, median, quantile } from "simple-statistics";
 import { TypedClient, test } from "./gen/genTypes.js";
 import { CodeGenHandler } from "./codeGenHandler.js";
@@ -110,7 +112,7 @@ function findUint8Array(obj: any): boolean {
 
 function uint8ArrayToBase64Replacer(key: string, value: object) {
     if (value instanceof Uint8Array) {
-      return btoa(String.fromCharCode(...value));
+      return Buffer.from(value).toString("base64");
     }
     return value;
   }
@@ -454,7 +456,7 @@ function startTestServer(
     const server: Server = new Server(telepact, handler, options);
 
     const alternateOptions = new ServerOptions();
-    alternateOptions.onError = (e) => console.error(e);
+    alternateOptions.onError = (e: unknown) => console.error(e);
     alternateOptions.authRequired = authRequired;
     const alternateServer: Server = new Server(alternateTelepact, handler, alternateOptions);
 
