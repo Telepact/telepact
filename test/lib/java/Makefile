@@ -38,7 +38,7 @@ dep:
 codegen:
 	telepact codegen --schema-dir ../../runner/schema/example --lang java --out src/gen/java/telepacttest/gen --package telepacttest.gen
 
-test-server:
+test-server: all
 	java -classpath "target/telepacttest-1.0-SNAPSHOT.jar:target/dependency/*" telepacttest.Main
 
 clean:

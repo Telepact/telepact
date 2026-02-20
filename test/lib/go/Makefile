@@ -19,6 +19,7 @@ SHELL := /bin/bash
 BIN := bin/telepact-go-dispatcher
 GO_SOURCES := $(shell find cmd -type f -name '*.go') $(shell find internal -type f -name '*.go' 2>/dev/null)
 CODEGEN_DIR := cmd/dispatcher/gen
+GO_ENV := GO111MODULE=on GOCACHE=/tmp/telepact-go-build
 
 all: codegen build
 
@@ -26,7 +27,7 @@ build: $(BIN)
 
 $(BIN): go.mod go.sum $(GO_SOURCES)
 	mkdir -p bin
-	GO111MODULE=on go build -o $(BIN) ./cmd/dispatcher
+	$(GO_ENV) go build -o $(BIN) ./cmd/dispatcher
 
 codegen:
 	rm -rf $(CODEGEN_DIR)
@@ -35,13 +36,13 @@ codegen:
 	gofmt -w $(CODEGEN_DIR)
 
 mod-tidy:
-	GO111MODULE=on go mod tidy
+	$(GO_ENV) go mod tidy
 
 run:
-	GO111MODULE=on go run ./cmd/dispatcher
+	$(GO_ENV) go run ./cmd/dispatcher
 
 test-server: codegen
-	GO111MODULE=on go run ./cmd/dispatcher
+	$(GO_ENV) go run ./cmd/dispatcher
 
 clean:
 	rm -rf bin

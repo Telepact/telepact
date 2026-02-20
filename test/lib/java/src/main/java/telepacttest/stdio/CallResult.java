@@ -14,13 +14,16 @@
 //|  limitations under the License.
 //|
 
-package io.nats.client;
+package telepacttest.stdio;
 
-import java.time.Duration;
-import java.util.concurrent.CompletableFuture;
+public class CallResult {
+    private final byte[] payload;
 
-public interface Dispatcher {
-    void subscribe(String subject);
+    public CallResult(byte[] payload) {
+        this.payload = payload;
+    }
 
-    CompletableFuture<Void> drain(Duration timeout);
+    public byte[] getPayload() {
+        return payload;
+    }
 }

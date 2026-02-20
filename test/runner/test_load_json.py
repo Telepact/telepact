@@ -21,7 +21,7 @@ from copy import deepcopy as dc
 
 
 @pytest.fixture(scope="module")
-def load_json_server_proc(loop, nats_client, dispatcher_server):
+def load_json_server_proc(loop, transport_client, dispatcher_server):
     lib_name = dispatcher_server
 
     init_topics = ['client-frontdoor', 'frontdoor']
@@ -34,23 +34,23 @@ def load_json_server_proc(loop, nats_client, dispatcher_server):
     async def t():
         req = json.dumps([{}, {'StartMockServer': {'id': server_id, 'apiSchemaPath': c.load_api_path,
                          'frontdoorTopic': topics[1], 'config!': {'minLength': 500, 'maxLength': 500, 'enableGen': True}}}])
-        await nats_client.request(lib_name, req.encode(), timeout=1)
+        await transport_client.call(lib_name, req.encode(), timeout=1)
         req2 = json.dumps([{}, {'StartClientServer': {
                           'id': cserver_id, 'clientFrontdoorTopic': topics[0], 'clientBackdoorTopic': topics[1], 'useBinary': False}}])
-        await nats_client.request(lib_name, req2.encode(), timeout=1)
+        await transport_client.call(lib_name, req2.encode(), timeout=1)
 
     loop.run_until_complete(t())
 
     try:
         startup_check(loop, lambda: verify_client_case(
-            nats_client, ping_req, None, topics[0], None, topics[1], None))
+            transport_client, ping_req, None, topics[0], None, topics[1], None))
     except Exception:
         raise
 
     try:
         async def warmup():
             request = [{}, {'fn.ping_': {}}]
-            await verify_client_case(nats_client, request, None, topics[0], None, topics[1], None)
+            await verify_client_case(transport_client, request, None, topics[0], None, topics[1], None)
 
         loop.run_until_complete(warmup())
     except Exception:
@@ -60,21 +60,21 @@ def load_json_server_proc(loop, nats_client, dispatcher_server):
 
     async def t2():
         req = json.dumps([{}, {'Stop': {'id': server_id}}])
-        await nats_client.request(lib_name, req.encode(), timeout=1)
+        await transport_client.call(lib_name, req.encode(), timeout=1)
         req2 = json.dumps([{}, {'Stop': {'id': cserver_id}}])
-        await nats_client.request(lib_name, req2.encode(), timeout=1)
+        await transport_client.call(lib_name, req2.encode(), timeout=1)
 
     loop.run_until_complete(t2())
 
     print('load_json_server_proc stopped')
 
 
-def test_load_json_case(loop, load_json_server_proc, nats_client):
+def test_load_json_case(loop, load_json_server_proc, transport_client):
     topics = load_json_server_proc
 
     async def t():
         for _ in range(50):
             req = [{}, {'fn.getData': {}}]
-            await verify_client_case(nats_client, req, None, topics[0], None, topics[1], None)
+            await verify_client_case(transport_client, req, None, topics[0], None, topics[1], None)
 
     loop.run_until_complete(t())

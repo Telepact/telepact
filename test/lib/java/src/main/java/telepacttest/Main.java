@@ -54,9 +54,10 @@ import io.github.telepact.TelepactSchemaParseError;
 import telepacttest.gen.TypedClient;
 import telepacttest.gen.test;
 import io.github.telepact.TelepactSchemaFiles;
-import io.nats.client.Dispatcher;
-import io.nats.client.Nats;
-import io.nats.client.Options;
+import telepacttest.stdio.Transport;
+import telepacttest.stdio.TransportListener;
+import telepacttest.stdio.StdioTransport;
+import telepacttest.stdio.TransportConfig;
 
 public class Main {
     public static class CustomByteArraySerializer extends JsonSerializer<byte[]> {
@@ -98,7 +99,7 @@ public class Main {
         return false;
     }    
 
-    public static Dispatcher startClientTestServer(io.nats.client.Connection connection, MetricRegistry metrics,
+    public static TransportListener startClientTestServer(Transport connection, MetricRegistry metrics,
             String clientFrontdoorTopic,
             String clientBackdoorTopic, boolean defaultBinary, boolean useCodeGen,
             boolean useTestClient)
@@ -128,14 +129,14 @@ public class Main {
                     System.out.println("   <-c  %s".formatted(new String(requestBytes)));
                     System.out.flush();
 
-                    io.nats.client.Message natsResponseMessage;
+                    telepacttest.stdio.CallResult callResult;
                     try {
-                        natsResponseMessage = connection.request(clientBackdoorTopic, requestBytes,
+                        callResult = connection.call(clientBackdoorTopic, requestBytes,
                                 Duration.ofSeconds(5));
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     }
-                    var responseBytes = natsResponseMessage.getData();
+                    var responseBytes = callResult.getPayload();
 
                     System.out.println("   ->c  %s".formatted(new String(responseBytes)));
                     System.out.flush();
@@ -159,9 +160,9 @@ public class Main {
 
         var generatedClient = new TypedClient(client);
 
-        var dispatcher = connection.createDispatcher((msg) -> {
+        var dispatcher = connection.openListener((msg) -> {
             try {
-                var requestBytes = msg.getData();
+                var requestBytes = msg.getPayload();
 
                 System.out.println("   ->C  %s".formatted(new String(requestBytes)));
                 System.out.flush();
@@ -222,18 +223,18 @@ public class Main {
                 System.out.println("   <-C  %s".formatted(new String(responseBytes)));
                 System.out.flush();
 
-                connection.publish(msg.getReplyTo(), responseBytes);
+                connection.send(msg.getReplyChannel(), responseBytes);
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new RuntimeException(e);
             }
         });
-        dispatcher.subscribe(clientFrontdoorTopic);
+        dispatcher.listen(clientFrontdoorTopic);
 
         return dispatcher;
     }
 
-    public static Dispatcher startMockTestServer(io.nats.client.Connection connection, MetricRegistry metrics,
+    public static TransportListener startMockTestServer(Transport connection, MetricRegistry metrics,
             String apiSchemaPath,
             String frontdoorTopic,
             Map<String, Object> config)
@@ -254,8 +255,8 @@ public class Main {
 
         var server = new MockServer(telepact, options);
 
-        var dispatcher = connection.createDispatcher((msg) -> {
-            var requestBytes = msg.getData();
+        var dispatcher = connection.openListener((msg) -> {
+            var requestBytes = msg.getPayload();
 
             System.out.println("    ->S %s".formatted(new String(requestBytes)));
             System.out.flush();
@@ -269,14 +270,14 @@ public class Main {
             System.out.println("    <-S %s".formatted(new String(responseBytes)));
             System.out.flush();
 
-            connection.publish(msg.getReplyTo(), responseBytes);
+            connection.send(msg.getReplyChannel(), responseBytes);
         });
-        dispatcher.subscribe(frontdoorTopic);
+        dispatcher.listen(frontdoorTopic);
 
         return dispatcher;
     }
 
-    public static Dispatcher startSchemaTestServer(io.nats.client.Connection connection, MetricRegistry metrics,
+    public static TransportListener startSchemaTestServer(Transport connection, MetricRegistry metrics,
             String apiSchemaPath,
             String frontdoorTopic)
             throws IOException, InterruptedException {
@@ -333,8 +334,8 @@ public class Main {
         options.authRequired = false;
         var server = new Server(telepact, handler, options);
 
-        var dispatcher = connection.createDispatcher((msg) -> {
-            var requestBytes = msg.getData();
+        var dispatcher = connection.openListener((msg) -> {
+            var requestBytes = msg.getPayload();
 
             System.out.println("    ->S %s".formatted(new String(requestBytes)));
             System.out.flush();
@@ -348,14 +349,14 @@ public class Main {
             System.out.println("    <-S %s".formatted(new String(responseBytes)));
             System.out.flush();
 
-            connection.publish(msg.getReplyTo(), responseBytes);
+            connection.send(msg.getReplyChannel(), responseBytes);
         });
-        dispatcher.subscribe(frontdoorTopic);
+        dispatcher.listen(frontdoorTopic);
 
         return dispatcher;
     }
 
-    public static Dispatcher startTestServer(io.nats.client.Connection connection, MetricRegistry metrics,
+    public static TransportListener startTestServer(Transport connection, MetricRegistry metrics,
             String apiSchemaPath,
             String frontdoorTopic,
             String backdoorTopic, boolean authRequired, boolean useCodeGen)
@@ -405,13 +406,13 @@ public class Main {
                     System.out.println("    <-s %s".formatted(new String(requestBytes)));
                     System.out.flush();
 
-                    io.nats.client.Message natsResponseMessage;
+                    telepacttest.stdio.CallResult callResult;
                     try {
-                        natsResponseMessage = connection.request(backdoorTopic, requestBytes, Duration.ofSeconds(5));
+                        callResult = connection.call(backdoorTopic, requestBytes, Duration.ofSeconds(5));
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     }
-                    var responseBytes = natsResponseMessage.getData();
+                    var responseBytes = callResult.getPayload();
 
                     System.out.println("    ->s %s".formatted(new String(responseBytes)));
                     System.out.flush();
@@ -468,9 +469,9 @@ public class Main {
 
         var alternateServer = new Server(alternateTelepact, handler, alternateOptions);
 
-        var dispatcher = connection.createDispatcher((msg) -> {
+        var dispatcher = connection.openListener((msg) -> {
 
-            var requestBytes = msg.getData();
+            var requestBytes = msg.getPayload();
 
             System.out.println("    ->S %s".formatted(new String(requestBytes)));
             System.out.flush();
@@ -489,10 +490,10 @@ public class Main {
             System.out.println("    <-S %s".formatted(new String(responseBytes)));
             System.out.flush();
 
-            connection.publish(msg.getReplyTo(), responseBytes);
+            connection.send(msg.getReplyChannel(), responseBytes);
         });
 
-        dispatcher.subscribe(frontdoorTopic);
+        dispatcher.listen(frontdoorTopic);
 
         System.out.println("Test server listening on " + frontdoorTopic);
 
@@ -500,13 +501,14 @@ public class Main {
     }
 
     private static void runDispatcherServer() throws InterruptedException, IOException {
-        var natsUrl = System.getenv("NATS_URL");
-        if (natsUrl == null) {
-            throw new RuntimeException("NATS_URL env var not set");
+        var transportUrl = System.getenv("TP_TRANSPORT_URL");
+        if (transportUrl == null) {
+            throw new RuntimeException("TP_TRANSPORT_URL env var not set");
         }
 
-        var natsOptionsBuilder = new Options.Builder();
-        natsOptionsBuilder.server(natsUrl);
+        var transportConfig = new TransportConfig.Builder()
+                .endpoint(transportUrl)
+                .build();
 
         var objectMapper = new ObjectMapper();
 
@@ -517,10 +519,10 @@ public class Main {
         var metricsFile = new File("./metrics/");
         var metricsReporter = CsvReporter.forRegistry(metrics).build(metricsFile);
 
-        var servers = new HashMap<String, Dispatcher>();
-        try (var connection = Nats.connect(natsOptionsBuilder.build())) {
-            var dispatcher = connection.createDispatcher((msg) -> {
-                var requestBytes = msg.getData();
+        var servers = new HashMap<String, TransportListener>();
+        try (var connection = new StdioTransport(transportConfig)) {
+            var dispatcher = connection.openListener((msg) -> {
+                var requestBytes = msg.getPayload();
 
                 System.out.println("    ->S %s".formatted(new String(requestBytes)));
                 System.out.flush();
@@ -545,7 +547,7 @@ public class Main {
                             var id = (String) payload.get("id");
                             var d = servers.get(id);
                             if (d != null) {
-                                d.drain(Duration.ofSeconds(1)).get();
+                                d.close(Duration.ofSeconds(1)).get();
                             }
                         }
                         case "StartServer" -> {
@@ -612,7 +614,7 @@ public class Main {
                 System.out.println("    <-S %s".formatted(new String(responseBytes)));
                 System.out.flush();
 
-                connection.publish(msg.getReplyTo(), responseBytes);
+                connection.send(msg.getReplyChannel(), responseBytes);
                 if (shouldExit) {
                     lock.lock();
                     try {
@@ -623,7 +625,7 @@ public class Main {
                 }
             });
 
-            dispatcher.subscribe("java");
+            dispatcher.listen("java");
 
             lock.lock();
             done.await();

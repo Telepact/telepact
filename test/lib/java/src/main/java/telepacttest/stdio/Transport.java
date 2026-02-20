@@ -14,25 +14,17 @@
 //|  limitations under the License.
 //|
 
-package io.nats.client;
+package telepacttest.stdio;
 
-public class Options {
-    public final String server;
+import java.time.Duration;
 
-    public Options(String server) {
-        this.server = server;
-    }
+public interface Transport extends AutoCloseable {
+    CallResult call(String channel, byte[] payload, Duration timeout) throws InterruptedException;
 
-    public static class Builder {
-        private String server;
+    void send(String channel, byte[] payload);
 
-        public Builder server(String server) {
-            this.server = server;
-            return this;
-        }
+    TransportListener openListener(TransportHandler handler);
 
-        public Options build() {
-            return new Options(this.server);
-        }
-    }
+    @Override
+    void close();
 }

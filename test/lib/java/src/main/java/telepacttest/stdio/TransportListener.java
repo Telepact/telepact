@@ -14,9 +14,13 @@
 //|  limitations under the License.
 //|
 
-package io.nats.client;
+package telepacttest.stdio;
 
-@FunctionalInterface
-public interface MessageHandler {
-    void onMessage(Message message);
+import java.time.Duration;
+import java.util.concurrent.CompletableFuture;
+
+public interface TransportListener {
+    void listen(String channel);
+
+    CompletableFuture<Void> close(Duration timeout);
 }

@@ -14,22 +14,25 @@
 //|  limitations under the License.
 //|
 
-package io.nats.client;
+package telepacttest.stdio;
 
-public class Message {
-    private final byte[] data;
-    private final String replyTo;
+public class TransportConfig {
+    public final String endpoint;
 
-    public Message(byte[] data, String replyTo) {
-        this.data = data;
-        this.replyTo = replyTo;
+    public TransportConfig(String endpoint) {
+        this.endpoint = endpoint;
     }
 
-    public byte[] getData() {
-        return data;
-    }
+    public static class Builder {
+        private String endpoint;
 
-    public String getReplyTo() {
-        return replyTo;
+        public Builder endpoint(String endpoint) {
+            this.endpoint = endpoint;
+            return this;
+        }
+
+        public TransportConfig build() {
+            return new TransportConfig(this.endpoint);
+        }
     }
 }

@@ -14,12 +14,9 @@
 //|  limitations under the License.
 //|
 
-package io.nats.client;
+package telepacttest.stdio;
 
-public final class Nats {
-    private Nats() {}
-
-    public static Connection connect(Options options) {
-        return new StdioConnection(options);
-    }
+@FunctionalInterface
+public interface TransportHandler {
+    void onMessage(TransportMessage message);
 }

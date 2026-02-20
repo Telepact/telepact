@@ -46,14 +46,14 @@ def get_lib_modules():
 
 
 def pytest_addoption(parser):
-    parser.addoption('--remotenats', action='store', default=None)
+    parser.addoption('--remote-transport', action='store', default=None)
 
 
 @pytest.fixture(scope='session')
-def nats_server(loop, request):
-    remote_nats = request.config.getoption('--remotenats')
-    if remote_nats:
-        print('Ignoring --remotenats: test harness now uses stdio transport.')
+def transport_url(loop, request):
+    remote_transport = request.config.getoption('--remote-transport')
+    if remote_transport:
+        print('Ignoring --remote-transport: test harness now uses stdio transport.')
 
     print('Creating stdio transport fixture')
     yield 'stdio://local'
@@ -67,19 +67,18 @@ def stdio_bus(loop):
 
 
 @pytest.fixture(scope='session')
-def nats_client(stdio_bus):
+def transport_client(stdio_bus):
     print('stdio client connected!')
     yield stdio_bus.client()
 
 
 @pytest.fixture(scope='session', params=get_lib_modules())
-def dispatcher_server(loop, nats_server, request, nats_client, stdio_bus):
-    nats_url = nats_server
+def dispatcher_server(loop, transport_url, request, transport_client, stdio_bus):
     lib_name = request.param
 
     env_vars = os.environ.copy()
     env_vars.pop('VIRTUAL_ENV', None)
-    env_vars['NATS_URL'] = nats_url
+    env_vars['TP_TRANSPORT_URL'] = transport_url
 
     path = '../lib/' + lib_name
     s = subprocess.Popen(
@@ -95,7 +94,7 @@ def dispatcher_server(loop, nats_server, request, nats_client, stdio_bus):
     stdio_bus.attach_process(lib_name, s)
 
     try:
-        startup_check(loop, lambda: ping(nats_client, lib_name), times=30)
+        startup_check(loop, lambda: ping(transport_client, lib_name), times=30)
     except Exception:
         stdio_bus.detach_process(lib_name)
         s.terminate()
@@ -106,7 +105,7 @@ def dispatcher_server(loop, nats_server, request, nats_client, stdio_bus):
 
     async def t2():
         req = json.dumps([{}, {'End': {}}])
-        await nats_client.request(lib_name, req.encode(), timeout=1)
+        await transport_client.call(lib_name, req.encode(), timeout=1)
 
     loop.run_until_complete(t2())
 

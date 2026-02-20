@@ -37,7 +37,7 @@ import sys
 from concurrent.futures import ThreadPoolExecutor
 from telepact_test.code_gen_handler import CodeGenHandler
 from telepact_test.gen.gen_types import TypedClient, test as fntest
-from telepact_test.stdio_nats import Client as NatsClient, Subscription, Msg, connect as stdio_connect
+from telepact_test.stdio_transport import Transport as StdioTransport, Listener, TransportMessage, CallResult, connect as stdio_connect
 import base64
 
 
@@ -72,12 +72,12 @@ def find_bytes(obj):
   return False
 
 
-async def start_client_test_server(connection: NatsClient, metrics: CollectorRegistry,
+async def start_client_test_server(connection: StdioTransport, metrics: CollectorRegistry,
                                    client_frontdoor_topic: str,
                                    client_backdoor_topic: str,
                                    default_binary: bool,
                                    use_codegen: bool,
-                                   use_test_client: bool) -> Subscription:
+                                   use_test_client: bool) -> Listener:
 
     timers = Summary(client_frontdoor_topic.replace(
         '.', '_').replace('-', '_'), '', registry=metrics)
@@ -92,18 +92,18 @@ async def start_client_test_server(connection: NatsClient, metrics: CollectorReg
                 raise
 
         print(f"   <-c  {request_bytes}")
-        await connection.flush()
+        await connection.sync()
 
         try:
-            nats_response_message = await connection.request(client_backdoor_topic, request_bytes, 5)
+            call_result_message = await connection.call(client_backdoor_topic, request_bytes, 5)
         except asyncio.TimeoutError:
             raise RuntimeError(
-                "Timeout occurred while waiting for NATS response.")
+                "Timeout occurred while waiting for transport response.")
 
-        response_bytes = nats_response_message.data
+        response_bytes = call_result_message.payload
 
         print(f"   ->c  {response_bytes}")
-        await connection.flush()
+        await connection.sync()
 
         response_message = s.deserialize(response_bytes)
         return response_message
@@ -118,11 +118,11 @@ async def start_client_test_server(connection: NatsClient, metrics: CollectorReg
 
     generated_client = TypedClient(client)
 
-    async def message_handler(msg: Msg) -> None:
-        request_bytes = msg.data
+    async def message_handler(msg: TransportMessage) -> None:
+        request_bytes = msg.payload
 
         print(f"   ->C  {request_bytes}")
-        await connection.flush()
+        await connection.sync()
 
         request_pseudo_json = json.loads(request_bytes)
         request_headers, request_body = request_pseudo_json
@@ -167,13 +167,13 @@ async def start_client_test_server(connection: NatsClient, metrics: CollectorReg
         response_bytes = json.dumps(response_pseudo_json, default=custom_converter).encode()
 
         print(f"   <-C  {response_bytes}")
-        await connection.publish(msg.reply, response_bytes)
+        await connection.send(msg.reply_channel, response_bytes)
 
-    return await connection.subscribe(client_frontdoor_topic, cb=message_handler)
+    return await connection.listen(client_frontdoor_topic, cb=message_handler)
 
 
-async def start_mock_test_server(connection: NatsClient, metrics: Any, api_schema_path: str,
-                                 frontdoor_topic: str, config: Dict[str, Any]) -> Subscription:
+async def start_mock_test_server(connection: StdioTransport, metrics: Any, api_schema_path: str,
+                                 frontdoor_topic: str, config: Dict[str, Any]) -> Listener:
     telepact = MockTelepactSchema.from_directory(api_schema_path)
 
     options = MockServer.Options()
@@ -190,14 +190,14 @@ async def start_mock_test_server(connection: NatsClient, metrics: Any, api_schem
         '.', '_').replace('-', '_'), '', registry=metrics)
     server = MockServer(telepact, options)
 
-    async def message_handler(msg: Msg) -> None:
+    async def message_handler(msg: TransportMessage) -> None:
         nonlocal server
         nonlocal connection
 
-        request_bytes = msg.data
+        request_bytes = msg.payload
 
         print(f"    ->S {request_bytes}")
-        await connection.flush()
+        await connection.sync()
 
         @timers.time()
         async def s():
@@ -207,12 +207,12 @@ async def start_mock_test_server(connection: NatsClient, metrics: Any, api_schem
         response_bytes = await s()
 
         print(f"    <-S {response_bytes}")
-        await connection.publish(msg.reply, response_bytes)
+        await connection.send(msg.reply_channel, response_bytes)
 
-    return await connection.subscribe(frontdoor_topic, cb=message_handler)
+    return await connection.listen(frontdoor_topic, cb=message_handler)
 
 
-async def start_schema_test_server(connection: NatsClient, metrics: CollectorRegistry, api_schema_path: str, frontdoor_topic: str) -> Subscription:
+async def start_schema_test_server(connection: StdioTransport, metrics: CollectorRegistry, api_schema_path: str, frontdoor_topic: str) -> Listener:
     telepact = TelepactSchema.from_directory(api_schema_path)
 
     timers = Summary(frontdoor_topic.replace(
@@ -258,10 +258,10 @@ async def start_schema_test_server(connection: NatsClient, metrics: CollectorReg
     options.auth_required = False
     server = Server(telepact, handler, options)
 
-    async def handle_message(msg: Msg) -> None:
+    async def handle_message(msg: TransportMessage) -> None:
         nonlocal server
         nonlocal connection
-        request_bytes = msg.data
+        request_bytes = msg.payload
 
         print(f"    ->S {request_bytes}")
 
@@ -273,14 +273,14 @@ async def start_schema_test_server(connection: NatsClient, metrics: CollectorReg
         response_bytes = await s()
 
         print(f"    <-S {response_bytes}")
-        await connection.publish(msg.reply, response_bytes)
+        await connection.send(msg.reply_channel, response_bytes)
 
-    dispatcher = await connection.subscribe(frontdoor_topic, cb=handle_message)
+    dispatcher = await connection.listen(frontdoor_topic, cb=handle_message)
 
     return dispatcher
 
 
-async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, api_schema_path: str, frontdoor_topic: str, backdoor_topic: str, auth_required: bool, use_codegen: bool) -> Subscription:
+async def start_test_server(connection: StdioTransport, metrics: CollectorRegistry, api_schema_path: str, frontdoor_topic: str, backdoor_topic: str, auth_required: bool, use_codegen: bool) -> Listener:
     files = TelepactSchemaFiles(api_schema_path)
     alternate_map = files.filenames_to_json.copy()
     alternate_map["backwardsCompatibleChange"] = """
@@ -328,10 +328,10 @@ async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, 
         else:
             print(f"    <-s {request_bytes}")
 
-            nats_response_message: Msg = await connection.request(
+            call_result_message: CallResult = await connection.call(
                 backdoor_topic, request_bytes, timeout=5)
 
-            response_bytes = nats_response_message.data
+            response_bytes = call_result_message.payload
 
             print(f"    ->s {response_bytes}")
 
@@ -367,12 +367,12 @@ async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, 
     alternate_server = Server(
         alternate_telepact, handler, alternate_options)
 
-    async def handle_test_message(msg: Msg) -> None:
+    async def handle_test_message(msg: TransportMessage) -> None:
         nonlocal serve_alternate_server
         nonlocal alternate_server
         nonlocal server
         nonlocal connection
-        request_bytes = msg.data
+        request_bytes = msg.payload
 
         print(f"    ->S {request_bytes}")
 
@@ -386,16 +386,16 @@ async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, 
                 response = await alternate_server.process(request_bytes)
                 return response.bytes
             else:
-                override_headers = {'@override': 'old'}
+                override_headers = {'@override': 'new'}
                 response = await server.process(request_bytes, override_headers)
                 return response.bytes
 
         response_bytes = await s()
 
         print(f"    <-S {response_bytes}")
-        await connection.publish(msg.reply, response_bytes)
+        await connection.send(msg.reply_channel, response_bytes)
 
-    dispatcher = await connection.subscribe(frontdoor_topic, cb=handle_test_message)
+    dispatcher = await connection.listen(frontdoor_topic, cb=handle_test_message)
 
     print(f"Test server listening on {frontdoor_topic}")
 
@@ -404,25 +404,25 @@ async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, 
 
 async def run_dispatcher_server():
     print('Starting dispatcher')
-    nats_url = os.getenv("NATS_URL")
-    if nats_url is None:
-        raise RuntimeError("NATS_URL env var not set")
+    transport_url = os.getenv("TP_TRANSPORT_URL")
+    if transport_url is None:
+        raise RuntimeError("TP_TRANSPORT_URL env var not set")
 
     done = asyncio.get_running_loop().create_future()
 
     metrics = CollectorRegistry()
     metrics_file = "./metrics.txt"
 
-    servers: dict[str, Subscription] = {}
+    servers: dict[str, Listener] = {}
 
     def publish_metrics():
         with open(metrics_file, "w") as f:
             f.write(generate_latest(metrics).decode("utf-8"))
 
-    connection: NatsClient = await stdio_connect(nats_url)
+    connection: StdioTransport = await stdio_connect(transport_url)
 
     async def message_handler(msg):
-        request_bytes = msg.data
+        request_bytes = msg.payload
 
         print(f"    ->S {request_bytes.decode('utf-8')}")
         response_bytes = b""
@@ -442,13 +442,13 @@ async def run_dispatcher_server():
                 server_id = payload["id"]
                 server = servers.get(server_id)
                 if server:
-                    await server.drain()
+                    await server.close(limit=1)
             elif target == "StartServer":
                 server_id = payload["id"]
                 api_schema_path = payload["apiSchemaPath"]
                 frontdoor_topic = payload["frontdoorTopic"]
                 backdoor_topic = payload["backdoorTopic"]
-                auth_required = payload.get('authRequired', False)
+                auth_required = payload.get('authRequired!', payload.get('authRequired', False))
                 use_codegen = payload.get('useCodeGen', False)
                 server = await start_test_server(
                     connection, metrics, api_schema_path, frontdoor_topic, backdoor_topic, auth_required, use_codegen)
@@ -492,9 +492,9 @@ async def run_dispatcher_server():
                 raise
 
         print(f"    <-S {response_bytes.decode('utf-8')}")
-        await connection.publish(msg.reply, response_bytes)
+        await connection.send(msg.reply_channel, response_bytes)
 
-    dispatcher = await connection.subscribe("py", cb=message_handler)
+    dispatcher = await connection.listen("py", cb=message_handler)
 
     await done
 
