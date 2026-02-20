@@ -210,16 +210,6 @@ public class Main {
                 var responsePseudoJson = List.of(response.headers, response.body);
 
                 System.out.println("   <-C  %s".formatted(responsePseudoJson));
-                try {
-                    var body = (Map<String, Object>) responsePseudoJson.get(1);
-                    var ok = (Map<String, Object>) body.get("Ok_");
-                    var value = (Map<String, Object>) ok.get("value!");
-                    var bytes = value.get("bytes!");
-                    System.out.println("bytes: %s".formatted(bytes));
-                    System.out.println("bytes class: " + bytes.getClass());
-                } catch (Exception e) {
-                    // ignore
-                }
 
                 var clientReturnedBinary = containsBytesArray(responsePseudoJson);
 
@@ -536,6 +526,7 @@ public class Main {
                 System.out.flush();
 
                 byte[] responseBytes;
+                boolean shouldExit = false;
                 try {
                     var request = (List<Object>) objectMapper.readValue(requestBytes, List.class);
                     var body = (Map<String, Object>) request.get(1);
@@ -548,9 +539,7 @@ public class Main {
 
                         }
                         case "End" -> {
-                            lock.lock();
-                            done.signalAll();
-                            lock.unlock();
+                            shouldExit = true;
                         }
                         case "Stop" -> {
                             var id = (String) payload.get("id");
@@ -624,6 +613,14 @@ public class Main {
                 System.out.flush();
 
                 connection.publish(msg.getReplyTo(), responseBytes);
+                if (shouldExit) {
+                    lock.lock();
+                    try {
+                        done.signalAll();
+                    } finally {
+                        lock.unlock();
+                    }
+                }
             });
 
             dispatcher.subscribe("java");
