@@ -84,6 +84,10 @@ class Registry {
     }
 }
 
+function logError(error: unknown): void {
+    console.log(error);
+}
+
 function findUint8Array(obj: any): boolean {
   if (obj instanceof Uint8Array) {
     return true;
@@ -150,7 +154,7 @@ function startClientTestServer(
             const responseMessage = s.deserialize(responseBytes);
             return responseMessage;
         } catch (e) {
-            console.error(e);
+            logError(e);
             throw e;
         }
     };
@@ -195,7 +199,7 @@ function startClientTestServer(
                         const expectMatch = requestHeaders["@expectMatch"] ?? true;
                         response = await testClient.assertRequest(request, expectedPseudoJsonBody, expectMatch);
                     } catch (e) {
-                        console.error(e);
+                        logError(e);
                         const responseHeaders: Record<string, any> = {};
                         if (e instanceof Error && e.message.includes("Expected response body")) {
                             responseHeaders["@assertionError"] = true;
@@ -243,7 +247,7 @@ function startMockTestServer(
     const telepact = MockTelepactSchema.fromDirectory(apiSchemaPath, fs, path);
 
     const options: MockServerOptions = new MockServerOptions();
-    options.onError = (e: Error) => console.error(e);
+    options.onError = (e: Error) => logError(e);
     options.enableMessageResponseGeneration = false;
 
     if (config) {
@@ -323,7 +327,7 @@ function startSchemaTestServer(
                 throw new Error("Invalid input tag");
             }
         } catch (e) {
-            console.error(e);
+            logError(e);
             return new Message(
                 {},
                 {
@@ -338,7 +342,7 @@ function startSchemaTestServer(
     };
 
     const options: ServerOptions = new ServerOptions();
-    options.onError = (e: Error) => console.error(e);
+    options.onError = (e: Error) => logError(e);
     options.authRequired = false;
 
     const server: Server = new Server(telepact, handler, options);
@@ -436,7 +440,7 @@ function startTestServer(
 
     const options: ServerOptions = new ServerOptions();
     options.onError = (e: Error) => {
-        console.error(e);
+        logError(e);
         if (e instanceof ThisError) {
             throw new Error();
         }
@@ -456,7 +460,7 @@ function startTestServer(
     const server: Server = new Server(telepact, handler, options);
 
     const alternateOptions = new ServerOptions();
-    alternateOptions.onError = (e: unknown) => console.error(e);
+    alternateOptions.onError = (e: unknown) => logError(e);
     alternateOptions.authRequired = authRequired;
     const alternateServer: Server = new Server(alternateTelepact, handler, alternateOptions);
 
@@ -611,7 +615,7 @@ async function runDispatcherServer(): Promise<void> {
                 const responseJson = JSON.stringify([{}, { Ok_: {} }]);
                 responseBytes = new TextEncoder().encode(responseJson);
             } catch (e) {
-                console.error(e);
+                logError(e);
                 try {
                     const responseJson = JSON.stringify([{}, { ErrorUnknown: {} }]);
                     responseBytes = new TextEncoder().encode(responseJson);
