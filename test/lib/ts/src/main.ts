@@ -31,9 +31,11 @@ import {
     TestClient,
     TestClientOptions,
 } from "telepact";
-import { NatsConnection, connect, Subscription } from "nats";
-import * as fs from "fs";
-import * as path from 'path';
+import { StdioTransport, openTransport, Listener } from "./stdioTransport.js";
+import * as fs from "node:fs";
+import * as path from "node:path";
+import { performance } from "node:perf_hooks";
+import { TextDecoder, TextEncoder } from "node:util";
 import { min, max, mean, median, quantile } from "simple-statistics";
 import { TypedClient, test } from "./gen/genTypes.js";
 import { CodeGenHandler } from "./codeGenHandler.js";
@@ -82,6 +84,10 @@ class Registry {
     }
 }
 
+function logError(error: unknown): void {
+    console.log(error);
+}
+
 function findUint8Array(obj: any): boolean {
   if (obj instanceof Uint8Array) {
     return true;
@@ -110,20 +116,20 @@ function findUint8Array(obj: any): boolean {
 
 function uint8ArrayToBase64Replacer(key: string, value: object) {
     if (value instanceof Uint8Array) {
-      return btoa(String.fromCharCode(...value));
+      return Buffer.from(value).toString("base64");
     }
     return value;
   }
 
 function startClientTestServer(
-    connection: NatsConnection,
+    connection: StdioTransport,
     registry: Registry,
     clientFrontdoorTopic: string,
     clientBackdoorTopic: string,
     defaultBinary: boolean,
     useCodegen: boolean,
     useTestClient: boolean,
-): Subscription {
+): Listener {
     const timer = registry.createTimer(clientBackdoorTopic);
 
     const adapter: (m: Message, s: Serializer) => Promise<Message> = async (m, s) => {
@@ -140,15 +146,15 @@ function startClientTestServer(
             }
 
             console.log(`   <-c  ${new TextDecoder().decode(requestBytes)}`);
-            const natsResponseMessage = await connection.request(clientBackdoorTopic, requestBytes, { timeout: 5000 });
-            const responseBytes = natsResponseMessage.data;
+            const callResultMessage = await connection.call(clientBackdoorTopic, requestBytes, { timeout: 5000 });
+            const responseBytes = callResultMessage.payload;
 
             console.log(`   ->c  ${new TextDecoder().decode(responseBytes)}`);
 
             const responseMessage = s.deserialize(responseBytes);
             return responseMessage;
         } catch (e) {
-            console.error(e);
+            logError(e);
             throw e;
         }
     };
@@ -164,11 +170,11 @@ function startClientTestServer(
 
     const genClient = new TypedClient(client); 
 
-    const sub: Subscription = connection.subscribe(clientFrontdoorTopic);
+    const sub: Listener = connection.listen(clientFrontdoorTopic);
 
     (async () => {
         for await (const msg of sub) {
-            const requestBytes = msg.data;
+            const requestBytes = msg.payload;
             const requestJson = new TextDecoder().decode(requestBytes);
 
             console.log(`   ->C  ${requestJson}`);
@@ -193,7 +199,7 @@ function startClientTestServer(
                         const expectMatch = requestHeaders["@expectMatch"] ?? true;
                         response = await testClient.assertRequest(request, expectedPseudoJsonBody, expectMatch);
                     } catch (e) {
-                        console.error(e);
+                        logError(e);
                         const responseHeaders: Record<string, any> = {};
                         if (e instanceof Error && e.message.includes("Expected response body")) {
                             responseHeaders["@assertionError"] = true;
@@ -232,16 +238,16 @@ function startClientTestServer(
 }
 
 function startMockTestServer(
-    connection: NatsConnection,
+    connection: StdioTransport,
     registry: Registry,
     apiSchemaPath: string,
     frontdoorTopic: string,
     config: Record<string, any>,
-): Subscription {
+): Listener {
     const telepact = MockTelepactSchema.fromDirectory(apiSchemaPath, fs, path);
 
     const options: MockServerOptions = new MockServerOptions();
-    options.onError = (e: Error) => console.error(e);
+    options.onError = (e: Error) => logError(e);
     options.enableMessageResponseGeneration = false;
 
     if (config) {
@@ -254,10 +260,10 @@ function startMockTestServer(
 
     const server: MockServer = new MockServer(telepact, options); // Assuming MockServer constructor requires telepact and options
 
-    const subscription: Subscription = connection.subscribe(frontdoorTopic);
+    const subscription: Listener = connection.listen(frontdoorTopic);
     (async () => {
         for await (const msg of subscription) {
-            const requestBytes = msg.data;
+            const requestBytes = msg.payload;
 
             console.log(`    ->S ${new TextDecoder().decode(requestBytes)}`);
 
@@ -280,12 +286,12 @@ function startMockTestServer(
 }
 
 function startSchemaTestServer(
-    connection: NatsConnection,
+    connection: StdioTransport,
     registry: Registry,
     apiSchemaPath: string,
     frontdoorTopic: string,
     config?: Record<string, any>,
-): Subscription {
+): Listener {
     const telepact: TelepactSchema = TelepactSchema.fromDirectory(apiSchemaPath, fs, path);
 
     const timer = registry.createTimer(frontdoorTopic);
@@ -321,7 +327,7 @@ function startSchemaTestServer(
                 throw new Error("Invalid input tag");
             }
         } catch (e) {
-            console.error(e);
+            logError(e);
             return new Message(
                 {},
                 {
@@ -336,15 +342,15 @@ function startSchemaTestServer(
     };
 
     const options: ServerOptions = new ServerOptions();
-    options.onError = (e: Error) => console.error(e);
+    options.onError = (e: Error) => logError(e);
     options.authRequired = false;
 
     const server: Server = new Server(telepact, handler, options);
 
-    const sub: Subscription = connection.subscribe(frontdoorTopic);
+    const sub: Listener = connection.listen(frontdoorTopic);
     (async () => {
         for await (const msg of sub) {
-            const requestBytes = msg.data;
+            const requestBytes = msg.payload;
 
             console.log(`    ->S ${new TextDecoder().decode(requestBytes)}`);
 
@@ -367,14 +373,14 @@ function startSchemaTestServer(
 }
 
 function startTestServer(
-    connection: NatsConnection,
+    connection: StdioTransport,
     registry: Registry,
     apiSchemaPath: string,
     frontdoorTopic: string,
     backdoorTopic: string,
     authRequired: boolean,
     useCodegen: boolean
-): Subscription {
+): Listener {
     const files = new TelepactSchemaFiles(apiSchemaPath, fs, path);
     const alternateMap: Record<string, string> = { ...files.filenamesToJson };
     alternateMap['backwardsCompatibleChange'] = `
@@ -409,11 +415,11 @@ function startTestServer(
             message.headers["@codegens_"] = true;
         } else {
             console.log(`    <-s ${new TextDecoder().decode(requestBytes)}`);
-            const natsResponseMessage = await connection.request(backdoorTopic, requestBytes, { timeout: 5000 });
+            const callResultMessage = await connection.call(backdoorTopic, requestBytes, { timeout: 5000 });
 
-            console.log(`    ->s ${new TextDecoder().decode(natsResponseMessage.data)}`);
+            console.log(`    ->s ${new TextDecoder().decode(callResultMessage.payload)}`);
 
-            const responseJson = new TextDecoder().decode(natsResponseMessage.data);
+            const responseJson = new TextDecoder().decode(callResultMessage.payload);
             const responsePseudoJson = JSON.parse(responseJson);
             const responseHeaders = responsePseudoJson[0] as { [key: string]: any };
             const responseBody = responsePseudoJson[1] as { [key: string]: any };
@@ -434,7 +440,7 @@ function startTestServer(
 
     const options: ServerOptions = new ServerOptions();
     options.onError = (e: Error) => {
-        console.error(e);
+        logError(e);
         if (e instanceof ThisError) {
             throw new Error();
         }
@@ -454,14 +460,14 @@ function startTestServer(
     const server: Server = new Server(telepact, handler, options);
 
     const alternateOptions = new ServerOptions();
-    alternateOptions.onError = (e) => console.error(e);
+    alternateOptions.onError = (e: unknown) => logError(e);
     alternateOptions.authRequired = authRequired;
     const alternateServer: Server = new Server(alternateTelepact, handler, alternateOptions);
 
-    const subscription: Subscription = connection.subscribe(frontdoorTopic);
+    const subscription: Listener = connection.listen(frontdoorTopic);
     (async () => {
         for await (const msg of subscription) {
-            const requestBytes = msg.data;
+            const requestBytes = msg.payload;
 
             console.log(`    ->S ${new TextDecoder().decode(requestBytes)}`);
             let responseBytes: Uint8Array;
@@ -491,27 +497,27 @@ function startTestServer(
 }
 
 async function runDispatcherServer(): Promise<void> {
-    const natsUrl = process.env.NATS_URL;
-    if (!natsUrl) {
-        throw new Error("NATS_URL env var not set");
+    const transportUrl = process.env.TP_TRANSPORT_URL;
+    if (!transportUrl) {
+        throw new Error("TP_TRANSPORT_URL env var not set");
     }
 
     const registry = new Registry();
 
-    const servers: Record<string, Subscription> = {};
+    const servers: Record<string, Listener> = {};
 
-    const connection = await connect({ servers: natsUrl });
+    const connection = await openTransport({ endpoint: transportUrl });
 
     let finish: (value: void | PromiseLike<void>) => void;
     const done = new Promise<void>((resolve) => {
         finish = resolve;
     });
 
-    const subscription = connection.subscribe("ts");
+    const subscription = connection.listen("ts");
 
     (async () => {
         for await (const msg of subscription) {
-            const requestBytes = msg.data;
+            const requestBytes = msg.payload;
             const requestJson = new TextDecoder().decode(requestBytes);
 
             console.log(`    ->S ${requestJson}`);
@@ -536,7 +542,7 @@ async function runDispatcherServer(): Promise<void> {
                         const id = payload["id"] as string;
                         const s = servers[id];
                         if (s != null) {
-                            s.drain();
+                            s.close();
                         }
                         break;
                     }
@@ -606,12 +612,12 @@ async function runDispatcherServer(): Promise<void> {
                     }
                 }
 
-                const responseJson = JSON.stringify([new Map(), new Map([["Ok_", new Map()]])]);
+                const responseJson = JSON.stringify([{}, { Ok_: {} }]);
                 responseBytes = new TextEncoder().encode(responseJson);
             } catch (e) {
-                console.error(e);
+                logError(e);
                 try {
-                    const responseJson = JSON.stringify([new Map(), new Map([["ErrorUnknown", new Map()]])]);
+                    const responseJson = JSON.stringify([{}, { ErrorUnknown: {} }]);
                     responseBytes = new TextEncoder().encode(responseJson);
                 } catch (e1) {
                     throw new Error();

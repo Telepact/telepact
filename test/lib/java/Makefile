@@ -38,8 +38,8 @@ dep:
 codegen:
 	telepact codegen --schema-dir ../../runner/schema/example --lang java --out src/gen/java/telepacttest/gen --package telepacttest.gen
 
-test-server:
-	mvn verify -s settings.xml | grep -v "from central"
+test-server: all
+	java -classpath "target/telepacttest-1.0-SNAPSHOT.jar:target/dependency/*" telepacttest.Main
 
 clean:
 	rm -rf target

@@ -8,7 +8,6 @@ package-mode = false
 python = "^3.11"
 build = "^1.2"
 msgpack = "^1.0"
-nats-py = "^2.8"
 prometheus-client = "^0.20"
 
 [tool.poetry.group.dev.dependencies]

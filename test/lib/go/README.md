@@ -11,7 +11,7 @@ make
 ### Run the dispatcher locally
 
 ```sh
-NATS_URL=nats://127.0.0.1:4222 make test-server
+TP_TRANSPORT_URL=stdio://local make test-server
 ```
 
 The harness writes Prometheus metrics to `metrics.txt` when it shuts down.
