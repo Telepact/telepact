@@ -173,6 +173,7 @@ def _build_source_to_destination_map() -> Dict[str, str]:
         "doc/motivation.md": "references/motivation.md",
         "doc/faq.md": "references/faq.md",
         "doc/schema-guide.md": "references/schema-guide.md",
+        "doc/example.md": "references/example.md",
         "lib/ts/README.md": "references/ts.md",
         "lib/py/README.md": "references/py.md",
         "lib/java/README.md": "references/java.md",

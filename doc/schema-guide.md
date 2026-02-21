@@ -174,9 +174,9 @@ Errors definitions are similar to unions, except that the tags are automatically
 added to the result union of all user-defined functions. Errors definitions
 cannot be used in type expressions.
 
-API designers should be careful to avoid using errors definitions to abstract
+(**NOTE**: API designers should be careful to avoid using errors definitions to abstract
 "reusable" errors. Errors definitions are only intended for systemic server
-errors that could be encountered by any function.
+errors that could be encountered by any function.)
 
 ```json
 [
