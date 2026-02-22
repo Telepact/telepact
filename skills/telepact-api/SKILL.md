@@ -29,6 +29,23 @@ giving clients the option to enrich the consumer experience by:
 - Generating code to increase type safety
 - Using binary serialization to reduce request/response sizes
 
+# JSON in, JSON out
+
+Schema:
+```json
+[{"fn.helloWorld": {}, "->": [{"Ok_": {"msg": "string"}}]}]
+```
+Request:
+```json
+[{}, {"fn.helloWorld":{}}]
+```
+Response:
+```json
+[{}, {"Ok_": {"msg": "Hello world!"}}]
+```
+
+Check out the [full-stack example](./references/example.md).
+
 # Explore
 
 To learn how to write Telepact APIs, see the [API Schema Guide](./references/schema-guide.md).
@@ -38,18 +55,19 @@ To learn how to serve a Telepact API, see the specific library docs:
 - [Typescript](./references/ts.md)
 - [Python](./references/py.md)
 - [Java](./references/java.md)
-- [Go](./references/go.md)
+- [Go](./lib/go/README.md)
 
 For development assistance, see the SDK tool docs:
 - [CLI](./references/cli.md)
-    - Conveniently run mock servers and fetch schemas all from the command line
+    - Conveniently retreive API schemas from running live Telepact servers, and
+      use schemas to create mock servers and generate code bindings, all from
+      the command line
 - [Browser Console](./references/console.md)
     - Develop against a live Telepact server by reading rendered docs, drafting
       requests, and submitting live requests with json-friendly editors
 - [Prettier Plugin](./references/prettier.md)
     - Consistently format your Telepact api schemas, especially the doc-strings
 
-For a high-level understanding, see the [full-stack example](./references/example.md).
 
 For further reading, see [Motivation](./references/motivation.md).
 
