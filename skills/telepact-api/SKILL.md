@@ -32,7 +32,7 @@ giving clients the option to enrich the consumer experience by:
 # It's just JSON
 No query params. No binary field ids. No required client libraries.
 
-It just JSON in, and JSON out.
+It's just JSON in, and JSON out.
 
 Schema:
 ```json
