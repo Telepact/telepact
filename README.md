@@ -68,7 +68,8 @@ For development assistance, see the SDK tool docs:
 
 For further reading, see [Motivation](./doc/motivation.md).
 
-For explanations of various design decisions, see [the FAQ](./doc/faq.md).
+Telepact does have a few unorthodox design decisions. To be best informed,
+you should read the explanations in [the FAQ](./doc/faq.md).
 
 # Licensing
 
