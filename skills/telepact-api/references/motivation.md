@@ -78,30 +78,29 @@ with limited coverage across the gRPC ecosystem.
 GraphQL is a unique API technology that features a custom query language to
 dynamically build data payloads from a pre-crafted set of server-side functions.
 GraphQL itself is transport-agnostic, but in practice it is most commonly used
-over HTTP and WebSockets.
-While consumption of the "graph" is extremely expressive for clients,
-construction of the graph's backing functions places a modest burden on
-server-side development to properly and efficiently integrate the query engine
-with the backing database. GraphQL also has limited accessibility as clients
-largely rely on GraphQL libraries to construct the query strings so as to
-minimize parse error risk. GraphQL does feature a rich data model, but it lacks
-support for common programming idioms, such as dictionaries. While binary
-serialization is technically possible through manual configuration, it is
-largely not observed in practice due to the accessibility tax it would incur on
-both servers and clients.
+over HTTP and WebSockets. While consumption of the "graph" is extremely
+expressive for clients, construction of the graph's backing functions places a
+modest burden on server-side development to safely and efficiently integrate
+the query engine with the backing database. GraphQL also has limited
+accessibility as clients largely rely on GraphQL libraries to construct the
+query strings so as to minimize parse error risk. GraphQL does feature a rich
+data model, but it lacks support for common programming idioms, such as
+dictionaries. While binary serialization is technically possible through manual
+configuration, it is largely not observed in practice due to the accessibility
+tax it would incur on both servers and clients.
 
 ## Why Telepact?
 
-Telepact takes all of the strengths of REST, gRPC, and GraphQL and combines them
-into a simple but careful design. It is built, first and foremost, on JSON with
-transport agnosticism to maximize accessibility to clients that want to
-integrate using only the native JSON and networking capabilities of their
-preferred programming language and/or industry standard library. It achieves
-type safety through built-in server-side validation against a server-defined API
-schema, complete with typing options that allow for modeling all common
-programming data types. And then from that baseline, Telepact critically allows
-clients to upgrade their experience as deemed appropriate by the client,
-optionally using:
+Telepact takes all of the strengths of REST, JSON-RPC, gRPC, and GraphQL and
+combines them into a simple but careful design. It is built, first and foremost,
+on JSON with transport agnosticism to maximize accessibility to clients that
+want to integrate using only the native JSON and networking capabilities of
+their preferred programming language and/or industry standard library. It
+achieves type safety through built-in server-side validation against a
+server-defined API schema, complete with typing options that allow for modeling
+all common programming data types. And then from that baseline, Telepact
+critically allows clients to upgrade their experience as deemed appropriate by
+the client, optionally using:
 
 -   Telepact client libraries that help facilitate crafting of Telepact messages
 -   Generated code for further increased type safety
