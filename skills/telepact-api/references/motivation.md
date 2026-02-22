@@ -20,7 +20,7 @@
 
 | Capability                                        | OpenAPI | JSON-RPC | gRPC | GraphQL | Telepact |
 | ------------------------------------------------- | ------- | -------- | ---- | ------- | -------- |
-| No transport restrictions                         | ❌      | ✅       | ❌   | 🤔      | ✅       |
+| No transport restrictions                         | ❌      | 🤔       | ❌   | 🤔      | ✅       |
 | No transport details leaked into API              | ❌      | ✅       | ✅   | ✅      | ✅       |
 | Out-of-band headers/metadata                      | ✅      | ❌       | ✅   | 🤔      | ✅       |
 | No string parsing/splicing                        | ❌      | ✅       | ✅   | ✅      | ✅       |
