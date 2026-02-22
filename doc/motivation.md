@@ -51,11 +51,10 @@ limitations.
 
 JSON-RPC is an approachable RPC style because it keeps requests and responses
 in plain JSON and can be layered on top of almost any transport. However,
-JSON-RPC itself only standardizes the JSON request/response body (e.g.
-`method`, `params`, `id`) and does not define a standardized header/metadata
-mechanism; any "headers" are transport-specific (such as HTTP headers).
-JSON-RPC intentionally does not define a schema/IDL, so type validation,
-documentation, code completion, code generation, mocking, and
+JSON-RPC has no standard pattern for metadata, so integrations that require
+metadata are restricted to transports that support it (e.g. http has headers,
+websockets do not). JSON-RPC intentionally does not define a schema/IDL, so
+type validation, documentation, code completion, code generation, mocking, and
 backwards-compatible evolution are typically handled by separate tools or ad-hoc
 conventions that drift over time. JSON-RPC also does not provide built-in
 mechanisms for binary serialization or dynamic response shaping, so performance
