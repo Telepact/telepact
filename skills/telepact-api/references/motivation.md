@@ -18,21 +18,22 @@
 
 ## Summary
 
-| Capability                                        | OpenAPI | gRPC | GraphQL | Telepact |
-| ------------------------------------------------- | ------- | ---- | ------- | -------- |
-| No transport restrictions                         | ❌      | ❌   | ❌      | ✅       |
-| No transport details leaked into API              | ❌      | ✅   | ✅      | ✅       |
-| No string parsing/splicing                        | ❌      | ✅   | ✅      | ✅       |
-| Low development burden for servers                | ✅      | ✅   | ❌      | ✅       |
-| No required libraries for clients                 | ✅      | ❌   | ❌      | ✅       |
-| Type-safe generated code                          | 🤔      | ✅   | ✅      | ✅       |
-| Human-editable wire-format                        | ✅      | ❌   | 🤔      | ✅       |
-| Built-in binary data serialization protocol       | ❌      | ✅   | ❌      | ✅       |
-| Built-in dynamic response shaping                 | ❌      | ❌   | ✅      | ✅       |
-| No required ABI                                   | ✅      | ❌   | ✅      | ✅       |
-| Expressive distinction between null and undefined | ❌      | ❌   | ❌      | ✅       |
-| Built-in API documentation distribution           | 🤔      | ❌   | ✅      | ✅       |
-| Built-in mocking for tests                        | ❌      | ❌   | ❌      | ✅       |
+| Capability                                        | OpenAPI | JSON-RPC | gRPC | GraphQL | Telepact |
+| ------------------------------------------------- | ------- | -------- | ---- | ------- | -------- |
+| No transport restrictions                         | ❌      | ✅       | ❌   | 🤔      | ✅       |
+| No transport details leaked into API              | ❌      | ✅       | ✅   | ✅      | ✅       |
+| Out-of-band headers/metadata                      | ✅      | ❌       | ✅   | 🤔      | ✅       |
+| No string parsing/splicing                        | ❌      | ✅       | ✅   | ✅      | ✅       |
+| Low development burden for servers                | ✅      | ✅       | ✅   | ❌      | ✅       |
+| No required libraries for clients                 | ✅      | ✅       | ❌   | ❌      | ✅       |
+| Type-safe generated code                          | 🤔      | ❌       | ✅   | ✅      | ✅       |
+| Human-editable wire-format                        | ✅      | ✅       | ❌   | 🤔      | ✅       |
+| Built-in binary data serialization protocol       | ❌      | ❌       | ✅   | ❌      | ✅       |
+| Built-in dynamic response shaping                 | ❌      | ❌       | ❌   | ✅      | ✅       |
+| No required ABI                                   | ✅      | ✅       | ❌   | ✅      | ✅       |
+| Expressive distinction between null and undefined | ❌      | ❌       | ❌   | ❌      | ✅       |
+| Built-in API documentation distribution           | 🤔      | ❌       | ❌   | ✅      | ✅       |
+| Built-in mocking for tests                        | ❌      | ❌       | ❌   | ❌      | ✅       |
 
 ## Why not RESTful APIs?
 
@@ -45,6 +46,20 @@ HTTP-specific questions, such as determining the right url structure, query
 parameters, HTTP method, HTTP status code, etc. Type-safe code generation for
 RESTful APIs is in development with OAS and is generally available with
 limitations.
+
+## Why not JSON-RPC?
+
+JSON-RPC is an approachable RPC style because it keeps requests and responses
+in plain JSON and can be layered on top of almost any transport. However,
+JSON-RPC itself only standardizes the JSON request/response body (e.g.
+`method`, `params`, `id`) and does not define a standardized header/metadata
+mechanism; any "headers" are transport-specific (such as HTTP headers).
+JSON-RPC intentionally does not define a schema/IDL, so type validation,
+documentation, code completion, code generation, mocking, and
+backwards-compatible evolution are typically handled by separate tools or ad-hoc
+conventions that drift over time. JSON-RPC also does not provide built-in
+mechanisms for binary serialization or dynamic response shaping, so performance
+optimizations often reintroduce custom protocol work at the application layer.
 
 ## Why not gRPC?
 
@@ -62,6 +77,8 @@ with limited coverage across the gRPC ecosystem.
 
 GraphQL is a unique API technology that features a custom query language to
 dynamically build data payloads from a pre-crafted set of server-side functions.
+GraphQL itself is transport-agnostic, but in practice it is most commonly used
+over HTTP and WebSockets.
 While consumption of the "graph" is extremely expressive for clients,
 construction of the graph's backing functions places a modest burden on
 server-side development to properly and efficiently integrate the query engine

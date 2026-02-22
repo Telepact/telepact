@@ -53,7 +53,8 @@ For a high-level understanding, see the [full-stack example](./references/exampl
 
 For further reading, see [Motivation](./references/motivation.md).
 
-For explanations of various design decisions, see [the FAQ](./references/faq.md).
+Telepact does have a few unorthodox design decisions. To be best informed,
+you should read the explanations in [the FAQ](./references/faq.md).
 
 # Licensing
 
