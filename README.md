@@ -23,6 +23,26 @@ giving clients the option to enrich the consumer experience by:
 - Generating code to increase type safety
 - Using binary serialization to reduce request/response sizes
 
+# It's just JSON
+No query params. No binary field ids. No required client libraries.
+
+It's just JSON in, and JSON out.
+
+Schema:
+```json
+[{"fn.helloWorld": {}, "->": [{"Ok_": {"msg": "string"}}]}]
+```
+Request:
+```json
+[{}, {"fn.helloWorld":{}}]
+```
+Response:
+```json
+[{}, {"Ok_": {"msg": "Hello world!"}}]
+```
+
+Check out the [full-stack example](./doc/example.md).
+
 # Explore
 
 To learn how to write Telepact APIs, see the [API Schema Guide](./doc/schema-guide.md).
@@ -36,14 +56,15 @@ To learn how to serve a Telepact API, see the specific library docs:
 
 For development assistance, see the SDK tool docs:
 - [CLI](./sdk/cli/README.md)
-    - Conveniently run mock servers and fetch schemas all from the command line
+    - Conveniently retreive API schemas from running live Telepact servers, and
+      use schemas to create mock servers and generate code bindings, all from
+      the command line
 - [Browser Console](./sdk/console/README.md)
     - Develop against a live Telepact server by reading rendered docs, drafting
       requests, and submitting live requests with json-friendly editors
 - [Prettier Plugin](./sdk/prettier/README.md)
     - Consistently format your Telepact api schemas, especially the doc-strings
 
-For a high-level understanding, see the [full-stack example](./doc/example.md).
 
 For further reading, see [Motivation](./doc/motivation.md).
 
