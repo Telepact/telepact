@@ -20,7 +20,7 @@
 
 | Capability                                        | OpenAPI | JSON-RPC | gRPC | GraphQL | Telepact |
 | ------------------------------------------------- | ------- | -------- | ---- | ------- | -------- |
-| No transport restrictions                         | ❌      | ✅       | ❌   | 🤔      | ✅       |
+| No transport restrictions                         | ❌      | 🤔       | ❌   | 🤔      | ✅       |
 | No transport details leaked into API              | ❌      | ✅       | ✅   | ✅      | ✅       |
 | Out-of-band headers/metadata                      | ✅      | ❌       | ✅   | 🤔      | ✅       |
 | No string parsing/splicing                        | ❌      | ✅       | ✅   | ✅      | ✅       |
@@ -78,10 +78,9 @@ with limited coverage across the gRPC ecosystem.
 GraphQL is a unique API technology that features a custom query language to
 dynamically build data payloads from a pre-crafted set of server-side functions.
 GraphQL itself is transport-agnostic, but in practice it is most commonly used
-over HTTP and WebSockets.
-While consumption of the "graph" is extremely expressive for clients,
-construction of the graph's backing functions places a modest burden on
-server-side development to properly and efficiently integrate the query engine
+over HTTP and WebSockets. While consumption of the "graph" is extremely expressive
+for clients, construction of the graph's backing functions places a modest burden
+on server-side development to properly and efficiently integrate the query engine
 with the backing database. GraphQL also has limited accessibility as clients
 largely rely on GraphQL libraries to construct the query strings so as to
 minimize parse error risk. GraphQL does feature a rich data model, but it lacks
