@@ -29,7 +29,10 @@ giving clients the option to enrich the consumer experience by:
 - Generating code to increase type safety
 - Using binary serialization to reduce request/response sizes
 
-# JSON in, JSON out
+# It's just JSON
+No query params. No binary field ids. No required client libraries.
+
+It just JSON in, and JSON out.
 
 Schema:
 ```json
