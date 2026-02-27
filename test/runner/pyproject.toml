@@ -9,9 +9,9 @@ python = "^3.11"
 
 [tool.poetry.group.dev.dependencies]
 msgpack = "^1.1"
-nats-py = "^2.12"
+nats-py = "^2.13"
 pytest = "^9.0"
-prometheus-client = "^0.23"
+prometheus-client = "^0.24"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
