@@ -250,7 +250,7 @@ definition at schema load time; the original schema is not re-written.)
 "reusable" errors. Errors definitions are only intended for systemic server
 errors that could be encountered by any function.
 
-For instance, in Telepact, there is not standard "Not found" error, because Telepact
+For instance, in Telepact, there is no standard "Not found" error, because Telepact
 favors expressive data, such as using an empty optional field to replace conventional
 "Not found" patterns.
 
