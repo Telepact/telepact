@@ -29,8 +29,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "playwright test",
-    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+    "check": "svelte-kit sync && tsc --noEmit",
+    "check:watch": "svelte-kit sync && tsc --noEmit --watch",
     "lint": "prettier --check .",
     "format": "prettier --write ."
   },
@@ -51,7 +51,6 @@
     "prettier-plugin-svelte": "^3.4.0",
     "prettier-plugin-tailwindcss": "^0.7.1",
     "svelte": "^5.39.7",
-    "svelte-check": "^4.3.2",
     "tailwindcss": "^4.1.13",
     "tslib": "^2.4.1",
     "typescript": "^5.9.3",
