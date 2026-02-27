@@ -27,14 +27,14 @@ for the Console from the release assets.
 Example:
 
 ```
-curl -L -o telepact-docker.tar.gz https://github.com/Telepact/telepact/releases/download/1.0.0-alpha.102/docker-image-telepact-console-1.0.0-alpha.102.tar.gz
+curl -L -o telepact-docker.tar.gz https://github.com/Telepact/telepact/releases/download/{version}/docker-image-telepact-console-{version}.tar.gz
 docker load < telepact-docker.tar.gz
 ```
 
 Starting the docker container:
 
 ```
-docker run -p 8080:8080 telepact-console:1.0.0-alpha.102
+docker run -p 8080:8080 telepact-console:{version}
 ```
 
 For a more concrete usage example, see
