@@ -31,6 +31,11 @@ RAW_GITHUB_PATTERN = re.compile(
     r"^https://raw\.githubusercontent\.com/Telepact/telepact/refs/heads/main/([^\?#]+)(.*)$"
 )
 MARKDOWN_LINK_PATTERN = re.compile(r"\[([^\]]+)\]\(([^)]+)\)")
+FIRST_HEADING_PATTERN = re.compile(r"^\s*#\s+(.+?)\s*$", re.MULTILINE)
+INLINED_DOC_SOURCE_PATHS = (
+    "doc/schema-guide.md",
+    "doc/faq.md",
+)
 
 
 def _read_file(file_path: Path) -> str:
@@ -111,6 +116,51 @@ def _rewrite_links(
     return MARKDOWN_LINK_PATTERN.sub(replace, content)
 
 
+def _extract_first_heading_anchor(content: str, fallback: str) -> str:
+    heading_match = FIRST_HEADING_PATTERN.search(content)
+    if heading_match:
+        anchor = _slugify(heading_match.group(1))
+        if anchor:
+            return anchor
+    return fallback
+
+
+def _rewrite_inlined_doc_links(
+    content: str,
+    source_path: str,
+    destination_path: str,
+    inlined_doc_anchor_map: Dict[str, str],
+) -> str:
+    def replace(match: re.Match[str]) -> str:
+        link_text = match.group(1)
+        link_target = match.group(2)
+
+        path_part, suffix = _split_link_suffix(link_target)
+        if not path_part:
+            return match.group(0)
+
+        raw_match = RAW_GITHUB_PATTERN.match(path_part)
+        if raw_match:
+            repo_relative_target = posixpath.normpath(raw_match.group(1))
+        elif "://" in path_part or path_part.startswith("#"):
+            return match.group(0)
+        else:
+            repo_relative_target = _to_repo_relative(source_path, path_part)
+
+        doc_anchor = inlined_doc_anchor_map.get(repo_relative_target)
+        if not doc_anchor:
+            return match.group(0)
+
+        anchor_or_suffix = suffix if suffix else f"#{doc_anchor}"
+        if destination_path == "SKILL.md":
+            return f"[{link_text}]({anchor_or_suffix})"
+
+        skill_relative_target = _to_relative_target(destination_path, "SKILL.md")
+        return f"[{link_text}]({skill_relative_target}{anchor_or_suffix})"
+
+    return MARKDOWN_LINK_PATTERN.sub(replace, content)
+
+
 def _collect_common_json_files(repo_root: Path) -> List[Tuple[str, str, str]]:
     common_files: List[Tuple[str, str, str]] = []
     for common_file_path in sorted((repo_root / "common").glob("*.json")):
@@ -171,8 +221,6 @@ def _append_common_json_appendix(content: str, source_path: str, repo_root: Path
 def _build_source_to_destination_map() -> Dict[str, str]:
     source_to_destination_map: Dict[str, str] = {
         "doc/motivation.md": "references/motivation.md",
-        "doc/faq.md": "references/faq.md",
-        "doc/schema-guide.md": "references/schema-guide.md",
         "doc/example.md": "references/example.md",
         "lib/ts/README.md": "references/ts.md",
         "lib/py/README.md": "references/py.md",
@@ -191,6 +239,19 @@ def _build_source_to_destination_map() -> Dict[str, str]:
 def _render_skill(readme_path: Path, output_dir: Path) -> None:
     repo_root = readme_path.parent
     source_to_destination_map = _build_source_to_destination_map()
+    inlined_docs: List[Tuple[str, str]] = []
+    inlined_doc_anchor_map: Dict[str, str] = {}
+
+    for inlined_doc_source_path in INLINED_DOC_SOURCE_PATHS:
+        inlined_doc_file_path = repo_root / inlined_doc_source_path
+        if not inlined_doc_file_path.exists():
+            raise click.ClickException(f"Source file not found: {inlined_doc_source_path}")
+
+        inlined_doc_content = _read_file(inlined_doc_file_path)
+        inlined_docs.append((inlined_doc_source_path, inlined_doc_content))
+        inlined_doc_anchor_map[inlined_doc_source_path] = _extract_first_heading_anchor(
+            inlined_doc_content, _slugify(posixpath.basename(inlined_doc_source_path))
+        )
 
     references_dir = output_dir / "references"
     if references_dir.exists():
@@ -204,7 +265,34 @@ def _render_skill(readme_path: Path, output_dir: Path) -> None:
         destination_path="SKILL.md",
         source_to_destination_map=source_to_destination_map,
     )
-    skill_content = f"{SKILL_FRONTMATTER}\n\n{rewritten_readme}"
+    rewritten_readme = _rewrite_inlined_doc_links(
+        rewritten_readme,
+        source_path="README.md",
+        destination_path="SKILL.md",
+        inlined_doc_anchor_map=inlined_doc_anchor_map,
+    )
+    skill_content = f"{SKILL_FRONTMATTER}\n\n{rewritten_readme.rstrip()}"
+
+    for inlined_doc_source_path, inlined_doc_content in inlined_docs:
+        rewritten_inlined_doc = _rewrite_links(
+            inlined_doc_content,
+            source_path=inlined_doc_source_path,
+            destination_path="SKILL.md",
+            source_to_destination_map=source_to_destination_map,
+        )
+        rewritten_inlined_doc = _rewrite_inlined_doc_links(
+            rewritten_inlined_doc,
+            source_path=inlined_doc_source_path,
+            destination_path="SKILL.md",
+            inlined_doc_anchor_map=inlined_doc_anchor_map,
+        )
+        if inlined_doc_source_path == "doc/schema-guide.md":
+            rewritten_inlined_doc = _append_common_json_appendix(
+                rewritten_inlined_doc, inlined_doc_source_path, repo_root
+            )
+
+        skill_content += f"\n\n{rewritten_inlined_doc.rstrip()}"
+
     _write_file(output_dir / "SKILL.md", skill_content)
 
     for source_path, destination_path in source_to_destination_map.items():
@@ -220,10 +308,12 @@ def _render_skill(readme_path: Path, output_dir: Path) -> None:
                 destination_path=destination_path,
                 source_to_destination_map=source_to_destination_map,
             )
-            if source_path == "doc/schema-guide.md":
-                source_content = _append_common_json_appendix(
-                    source_content, source_path, repo_root
-                )
+            source_content = _rewrite_inlined_doc_links(
+                source_content,
+                source_path=source_path,
+                destination_path=destination_path,
+                inlined_doc_anchor_map=inlined_doc_anchor_map,
+            )
 
         _write_file(output_dir / destination_path, source_content)
 
