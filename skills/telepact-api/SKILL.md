@@ -1160,6 +1160,18 @@ You can find all mock definitions
 
 # FAQ
 
+## Who exactly needs to use Telepact libraries?
+
+Telepact boasts a flexible development environment for clients, who are
+allowed to bring as much or as little Telepact tooling as they like, including
+no tooling at all in favor of industry standard JSON and network libraries.
+
+The server, however, MUST use a Telepact library to serve its Telepact API.
+Doing so ensures a rich Telepact ecosystem for developers and clients,
+including features such as automatic API retrieval for mocking, documentation
+browsing using the console, request validation, opt-in binary, and response
+field selection.
+
 ## Why have both optional and nullable fields?
 
 Telepact allows API designers to mark a field as optional (the field might be
