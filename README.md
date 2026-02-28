@@ -65,6 +65,7 @@ For development assistance, see the SDK tool docs:
 - [Prettier Plugin](./sdk/prettier/README.md)
     - Consistently format your Telepact api schemas, especially the doc-strings
 
+Find the latest versions of all libraries and sdks [here](./doc/versions.md).
 
 For further reading, see [Motivation](./doc/motivation.md).
 

@@ -19,6 +19,10 @@ VERSION := $(shell cat VERSION.txt)
 noop:
 	@echo "No-op. Specify a target."
 
+.PHONY: doc-versions
+doc-versions:
+	telepact-project doc-versions
+
 java:
 	$(MAKE) -C lib/java
 
@@ -173,6 +177,7 @@ version:
 	cd sdk/cli && telepact-project set-version ${VERSION}
 	cd sdk/prettier && telepact-project set-version ${VERSION}
 	cd sdk/console && telepact-project set-version ${VERSION}
+	$(MAKE) doc-versions
 
 skill:
 	telepact-project skill README.md skills/telepact-api
