@@ -14,8 +14,8 @@
 //|  limitations under the License.
 //|
 
-import { findSchemaKey } from '$lib';
-import type { TelepactSchema } from './telepact/index.esm';
+import { findSchemaKey } from './console';
+import type { TelepactSchema } from './telepact/index.esm.js';
 
 export function createJsonSchema(telepact: TelepactSchema): Record<string, any> {
 	let original = telepact.full;

@@ -14,26 +14,24 @@
 //|  limitations under the License.
 //|
 
-import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
 import tailwindcss from '@tailwindcss/vite';
+import react from '@vitejs/plugin-react';
 
 export default defineConfig({
+	base: './',
+	publicDir: 'static',
     plugins: [
 		tailwindcss(),
-        sveltekit()
+		react()
     ],
 	build: {
+		outDir: 'build',
 		commonjsOptions: {
 			include: [/lib/, /node_modules/]
 		}
 	},
 	resolve: {
 		alias: { fs: 'data:text/javascript,export default {};' }
-	},
-	server: {
-		fs: {
-			allow: ['stub.js']
-		}
 	},
 });

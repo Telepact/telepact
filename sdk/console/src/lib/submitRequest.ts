@@ -14,16 +14,23 @@
 //|  limitations under the License.
 //|
 
-// See https://kit.svelte.dev/docs/types#app
-// for information about these interfaces
-declare global {
-	namespace App {
-		// interface Error {}
-		// interface Locals {}
-		// interface PageData {}
-		// interface PageState {}
-		// interface Platform {}
-	}
+import { Client, Message } from './telepact/index.esm.js';
+
+export function submitRequest(client: Client, requestJson: string): Promise<string> {
+	const requestPseudoJson = JSON.parse(requestJson);
+	const requestMessage = new Message(requestPseudoJson[0], requestPseudoJson[1]);
+
+	const startTime = Date.now();
+
+	return new Promise<string>((resolve, reject) => {
+		setTimeout(async () => {
+			try {
+				const rs = await client.request(requestMessage);
+				resolve(JSON.stringify([rs.headers, rs.body], null, 2));
+			} catch (error) {
+				reject(error);
+			}
+		}, Math.max(0, 500 - (Date.now() - startTime)));
+	});
 }
 
-export {};

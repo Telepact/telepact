@@ -14,20 +14,9 @@
 //|  limitations under the License.
 //|
 
-/** @type {import('tailwindcss').Config} */
-export default {
-	darkMode: 'class',
-	content: ['./index.html', './src/**/*.{html,js,jsx,ts,tsx}'],
-	theme: {
-		extend: {
-			colors: {
-				vsBackground: '#1e1e1e'
-			},
-			flexGrow: {
-				4: '4',
-				8: '8'
-			}
-		}
-	},
-	plugins: [require('@tailwindcss/forms'), require('@tailwindcss/typography')]
-};
+// Optional override point for self-hosting.
+//
+// Examples:
+// - window.overrideDefaultSchema = () => '[{"info.MyApi":{}}]';
+// - window.overrideAuthHeader = async (schemaSource, next) => next({ token: '...' });
+
