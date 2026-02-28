@@ -35,6 +35,7 @@ FIRST_HEADING_PATTERN = re.compile(r"^\s*#\s+(.+?)\s*$", re.MULTILINE)
 INLINED_DOC_SOURCE_PATHS = (
     "doc/schema-guide.md",
     "doc/faq.md",
+    "doc/versions.md",
 )
 
 

@@ -71,6 +71,7 @@ For development assistance, see the SDK tool docs:
 - [Prettier Plugin](./references/prettier.md)
     - Consistently format your Telepact api schemas, especially the doc-strings
 
+Find the latest versions of all libraries and sdks [here](#versions).
 
 For further reading, see [Motivation](./references/motivation.md).
 
@@ -1320,3 +1321,15 @@ Telepact console specifically utilizes this technique to allow end-users to
 Omitting fields in the argument struct disrupts the API provider's ability to
 established well-defined links, and consequently, the `"@select_"` header is
 disallowed from omitting fields in function argument structs.
+
+# Versions
+
+| Kind | Package | Registry | Version |
+|---|---|---|---|
+| Library (Go) | `github.com/telepact/telepact/lib/go` | Go module (proxy.golang.org) | `v1.0.0-alpha.181` |
+| Library (Java) | `io.github.telepact:telepact` | Maven Central | `1.0.0-alpha.185` |
+| Library (Python) | `telepact` | PyPI | `1.0.0-alpha.185` |
+| Library (TypeScript) | `telepact` | npm | `1.0.0-alpha.185` |
+| SDK (CLI) | `telepact-cli` | PyPI | `1.0.0-alpha.185` |
+| SDK (Console) | `telepact-console` | npm | `1.0.0-alpha.187` |
+| SDK (Prettier) | `prettier-plugin-telepact` | npm | `1.0.0-alpha.185` |
