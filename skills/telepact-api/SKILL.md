@@ -61,7 +61,7 @@ To learn how to serve a Telepact API, see the specific library docs:
 - [Go](./references/go.md)
 
 For development assistance, see the SDK tool docs:
-- [CLI](./references/cli.md)
+- [CLI](#telepact-cli)
     - Conveniently retreive API schemas from running live Telepact servers, and
       use schemas to create mock servers and generate code bindings, all from
       the command line
@@ -1188,6 +1188,17 @@ to erase just one field of a model, where null can be used to indicate the
 erasure of data, and optionality can be used to omit all fields except the one
 field you want to erase.
 
+## Why do optional fields keep the `!` symbol in the request/response payloads?
+
+If a field is marked as optional in the schema, such as `"field!": "integer"`,
+it will keep that `!` symbol on live payloads, such as `"field!": 42`.
+
+This pattern serves two purposes (1) to keep the schema and live payloads as
+similar as possible, and (2) to alert code writers of the optional edge case.
+If a client encounters something like `response['field!']` in code, the `!`
+immediately alerts the code reader that an `undefined`-like value might be
+returned from the code expression.
+
 ## Why can I not define nullable arrays or objects?
 
 Nullability is indicated on base types by appending type strings with `?`, but
@@ -1345,3 +1356,104 @@ disallowed from omitting fields in function argument structs.
 | SDK (CLI) | `telepact-cli` | PyPI | `1.0.0-alpha.185` |
 | SDK (Console) | `telepact-console` | npm | `1.0.0-alpha.187` |
 | SDK (Prettier) | `prettier-plugin-telepact` | npm | `1.0.0-alpha.185` |
+
+# Telepact CLI
+
+The CLI is a tool for various development jobs, such as fetching API schemas,
+generating code, and starting up mock servers for testing purposes.
+
+## Installation
+
+```
+pipx install telepact-cli
+```
+
+## Usage
+
+### `telepact --help`
+```
+Usage: telepact [OPTIONS] COMMAND [ARGS]...
+
+Options:
+  --help  Show this message and exit.
+
+Commands:
+  codegen      Generate code bindings for a Telepact API schema.
+  compare      Compare two Telepact API schemas for backwards compatibility.
+  demo-server  Start a demo Telepact server.
+  fetch        Fetch a Telepact API schema to store locally.
+  mock         Start a mock server for a Telepact API schema.
+```
+
+### `telepact codegen --help`
+```
+Usage: telepact codegen [OPTIONS]
+
+  Generate code bindings for a Telepact API schema.
+
+Options:
+  --schema-http-url TEXT  telepact schema directory
+  --schema-dir TEXT       telepact schema directory
+  --lang TEXT             Language target (one of "java", "py", "ts", or "go")
+                          [required]
+  --out TEXT              Output directory  [required]
+  --package TEXT          Java package (use if --lang is "java")
+  --help                  Show this message and exit.
+```
+
+### `telepact compare --help`
+```
+Usage: telepact compare [OPTIONS]
+
+  Compare two Telepact API schemas for backwards compatibility.
+
+Options:
+  --new-schema-dir TEXT  New telepact schema directory  [required]
+  --old-schema-dir TEXT  Old telepact schema directory  [required]
+  --help                 Show this message and exit.
+```
+
+### `telepact fetch --help`
+```
+Usage: telepact fetch [OPTIONS]
+
+  Fetch a Telepact API schema to store locally.
+
+Options:
+  --http-url TEXT    HTTP URL of a Telepact API  [required]
+  --output-dir TEXT  Directory of Telepact schemas  [required]
+  --help             Show this message and exit.
+```
+
+### `telepact mock --help`
+```
+Usage: telepact mock [OPTIONS]
+
+  Start a mock server for a Telepact API schema.
+
+Options:
+  --http-url TEXT                 HTTP URL of a Telepact API
+  --dir TEXT                      Directory of Telepact schemas
+  --port INTEGER                  Port to run the mock server on
+  --path TEXT                     Path to expose the mock API (default: /api)
+  --generated-collection-length-min INTEGER
+                                  Minimum length of generated collections
+  --generated-collection-length-max INTEGER
+                                  Maximum length of generated collections
+  --disable-optional-field-generation
+                                  Disable generation of optional fields
+                                  (enabled by default)
+  --disable-message-response-generation
+                                  Disable generation of message responses
+                                  (enabled by default)
+  --disable-random-optional-field-generation
+                                  Disable randomization of optional field
+                                  generation (enabled by default)
+  --help                          Show this message and exit.
+```
+
+NOTE: The `mock` command is an empowering development tool for clients. You do
+not need to develop against a live server; you can use the `mock` command to
+set up a "middle-man" server that will validate requests for schema compliance
+and return schema-compliant auto-generated responses (which can be overrideen
+with manual stubs if desired.)
