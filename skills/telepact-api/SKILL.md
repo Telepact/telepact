@@ -1188,6 +1188,17 @@ to erase just one field of a model, where null can be used to indicate the
 erasure of data, and optionality can be used to omit all fields except the one
 field you want to erase.
 
+## Why do optional fields keep the `!` symbol in the request/response payloads?
+
+If a field is marked as optional in the schema, such as `"field!": "integer"`,
+it will keep that `!` symbol on live payloads, such as `"field!": 42`.
+
+This pattern serves two purposes (1) to keep the schema and live payloads as
+similar as possible, and (2) to alert code writers of the optional edge case.
+If a client encounters something like `response['field!']` in code, the `!`
+immediately alerts the code reader that an `undefined`-like value might be
+returned from the code expression.
+
 ## Why can I not define nullable arrays or objects?
 
 Nullability is indicated on base types by appending type strings with `?`, but
