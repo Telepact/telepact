@@ -36,6 +36,7 @@ INLINED_DOC_SOURCE_PATHS = (
     "doc/schema-guide.md",
     "doc/faq.md",
     "doc/versions.md",
+    "sdk/cli/README.md",
 )
 
 
@@ -260,32 +261,32 @@ def _render_skill(readme_path: Path, output_dir: Path) -> None:
     references_dir.mkdir(parents=True, exist_ok=True)
 
     readme_content = _read_file(readme_path)
-    rewritten_readme = _rewrite_links(
-        readme_content,
-        source_path="README.md",
-        destination_path="SKILL.md",
-        source_to_destination_map=source_to_destination_map,
-    )
     rewritten_readme = _rewrite_inlined_doc_links(
-        rewritten_readme,
+        readme_content,
         source_path="README.md",
         destination_path="SKILL.md",
         inlined_doc_anchor_map=inlined_doc_anchor_map,
     )
+    rewritten_readme = _rewrite_links(
+        rewritten_readme,
+        source_path="README.md",
+        destination_path="SKILL.md",
+        source_to_destination_map=source_to_destination_map,
+    )
     skill_content = f"{SKILL_FRONTMATTER}\n\n{rewritten_readme.rstrip()}"
 
     for inlined_doc_source_path, inlined_doc_content in inlined_docs:
-        rewritten_inlined_doc = _rewrite_links(
+        rewritten_inlined_doc = _rewrite_inlined_doc_links(
             inlined_doc_content,
             source_path=inlined_doc_source_path,
             destination_path="SKILL.md",
-            source_to_destination_map=source_to_destination_map,
+            inlined_doc_anchor_map=inlined_doc_anchor_map,
         )
-        rewritten_inlined_doc = _rewrite_inlined_doc_links(
+        rewritten_inlined_doc = _rewrite_links(
             rewritten_inlined_doc,
             source_path=inlined_doc_source_path,
             destination_path="SKILL.md",
-            inlined_doc_anchor_map=inlined_doc_anchor_map,
+            source_to_destination_map=source_to_destination_map,
         )
         if inlined_doc_source_path == "doc/schema-guide.md":
             rewritten_inlined_doc = _append_common_json_appendix(
@@ -303,17 +304,17 @@ def _render_skill(readme_path: Path, output_dir: Path) -> None:
 
         source_content = _read_file(source_file_path)
         if source_file_path.suffix.lower() == ".md":
-            source_content = _rewrite_links(
-                source_content,
-                source_path=source_path,
-                destination_path=destination_path,
-                source_to_destination_map=source_to_destination_map,
-            )
             source_content = _rewrite_inlined_doc_links(
                 source_content,
                 source_path=source_path,
                 destination_path=destination_path,
                 inlined_doc_anchor_map=inlined_doc_anchor_map,
+            )
+            source_content = _rewrite_links(
+                source_content,
+                source_path=source_path,
+                destination_path=destination_path,
+                source_to_destination_map=source_to_destination_map,
             )
 
         _write_file(output_dir / destination_path, source_content)
