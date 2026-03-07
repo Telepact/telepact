@@ -114,11 +114,11 @@ const handler = async (requestMessage: Message): Promise<Message> => {
     return new Message({}, { Ok_: {} });
 };
 
-const server = new Server(schema, handler, new ServerOptions());
+const telepactServer = new Server(schema, handler, new ServerOptions());
 
 // Assuming `transport` is defined elsewhere
 transport.receive(async (requestBytes: Uint8Array): Promise<Uint8Array> => {
-    const response = await server.process(requestBytes);
+    const response = await telepactServer.process(requestBytes);
     return response.bytes;
 });
 ```
@@ -139,11 +139,11 @@ async def handler(request_message: 'Message') -> 'Message':
     return Message({}, {'Ok_': {}})
 
 options = Server.Options()
-server = Server(schema, handler, options)
+telepactServer = Server(schema, handler, options)
 
 # Assuming `transport` is defined elsewhere
 async def transport_handler(request_bytes: bytes) -> bytes:
-    response = await server.process(request_bytes)
+    response = await telepactServer.process(request_bytes)
     return response.bytes
 
 transport.receive(transport_handler)
@@ -164,11 +164,11 @@ Function<Message, Message> handler = (requestMessage) -> {
 };
 
 var options = new Server.Options();
-var server = new Server(schema, handler, options);
+var telepactServer = new Server(schema, handler, options);
 
 // Assuming `transport` is defined elsewhere
 transport.receive((requestBytes) -> {
-    var response = server.process(requestBytes);
+    var response = telepactServer.process(requestBytes);
     return response.bytes;
 });
 ```
@@ -208,14 +208,14 @@ handler := func(request telepact.Message) (telepact.Message, error) {
     ), nil
 }
 
-server, err := telepact.NewServer(schema, handler, telepact.NewServerOptions())
+telepactServer, err := telepact.NewServer(schema, handler, telepact.NewServerOptions())
 if err != nil {
     return err
 }
 
 // Assuming `transport` is defined elsewhere
 transport.Receive(func(requestBytes []byte) ([]byte, error) {
-    response, err := server.Process(requestBytes)
+    response, err := telepactServer.Process(requestBytes)
     if err != nil {
         return nil, err
     }
@@ -327,7 +327,7 @@ const app = express();
 
 app.post('/api/telepact', express.raw({ type: '*/*' }), async (req, res) => {
     const requestBytes = new Uint8Array(req.body as Buffer);
-    const response = await server.process(requestBytes);
+    const response = await telepactServer.process(requestBytes);
     const mediaType = '@bin_' in response.headers
         ? 'application/octet-stream'
         : 'application/json';
@@ -347,7 +347,7 @@ app = FastAPI()
 @app.post('/api/telepact')
 async def telepact_http(request: Request) -> Response:
     request_bytes = await request.body()
-    telepact_response = await server.process(request_bytes)
+    telepact_response = await telepactServer.process(request_bytes)
     media_type = (
         'application/octet-stream'
         if '@bin_' in telepact_response.headers
@@ -361,7 +361,7 @@ Java with Spring:
 ```java
 @PostMapping("/api/telepact")
 public ResponseEntity<byte[]> telepact(@RequestBody byte[] requestBytes) {
-    var response = server.process(requestBytes);
+    var response = telepactServer.process(requestBytes);
     var mediaType = response.headers.containsKey("@bin_")
         ? MediaType.APPLICATION_OCTET_STREAM
         : MediaType.APPLICATION_JSON;
@@ -383,7 +383,7 @@ http.HandleFunc("/api/telepact", func(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    response, err := server.Process(requestBytes)
+    response, err := telepactServer.Process(requestBytes)
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
         return
@@ -526,10 +526,10 @@ define handler(message):
     run business logic
     return Message(headers, resultUnion)
 
-server = Server(schema, handler, options)
+telepactServer = Server(schema, handler, options)
 
 transport.on_request(requestBytes):
-    response = server.process(requestBytes)
+    response = telepactServer.process(requestBytes)
     return response.bytes
 ```
 
