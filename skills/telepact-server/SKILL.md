@@ -117,7 +117,7 @@ const handler = async (requestMessage: Message): Promise<Message> => {
 const server = new Server(schema, handler, new ServerOptions());
 
 // Assuming `transport` is defined elsewhere
-transport.receive(async (requestBytes): Promise<Uint8Array> => {
+transport.receive(async (requestBytes: Uint8Array): Promise<Uint8Array> => {
     const response = await server.process(requestBytes);
     return response.bytes;
 });
@@ -146,7 +146,7 @@ async def transport_handler(request_bytes: bytes) -> bytes:
     response = await server.process(request_bytes)
     return response.bytes
 
-transport(transport_handler)
+transport.receive(transport_handler)
 ```
 
 ### Java
@@ -155,7 +155,7 @@ Schema loading and server setup:
 
 ```java
 var files = new TelepactSchemaFiles("/path/to/schema/dir");
-var schema = TelepactSchema.fromFilesJsonMap(files.filenamesToJson);
+var schema = TelepactSchema.fromFileJsonMap(files.filenamesToJson);
 
 Function<Message, Message> handler = (requestMessage) -> {
     var functionName = requestMessage.body.keySet().stream().findAny().orElseThrow();
