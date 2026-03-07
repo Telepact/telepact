@@ -557,7 +557,7 @@ def demo_server(port: int) -> None:
     uvicorn.run(app, host='0.0.0.0', port=port)
 
 
-def get_api_from_http(http_url: str) -> str:
+def get_api_from_http(http_url: str, include_internal: bool = False) -> str:
     url: str = http_url
 
     async def adapter(m: Message, s: Serializer) -> Message:
@@ -599,7 +599,10 @@ def get_api_from_http(http_url: str) -> str:
     for attempt in range(retries):
         try:
             # Ensure the async function is run correctly
-            response_message = asyncio.run(telepact_client.request(Message({}, {'fn.api_': {}})))
+            request_body: dict[str, dict[str, object]] = {'fn.api_': {}}
+            if include_internal:
+                request_body = {'fn.api_': {'includeInternal': True}}
+            response_message = asyncio.run(telepact_client.request(Message({}, request_body)))
             if 'Ok_' in response_message.body or 'Error' in next(iter(response_message.body.keys()), ""): # Check for valid Telepact response structure
                 break
             else:
@@ -745,20 +748,22 @@ def mock(
 @click.command()
 @click.option('--http-url', help='HTTP URL of a Telepact API', required=True)
 @click.option('--output-dir', help='Directory of Telepact schemas', required=True)
+@click.option('--include-internal', is_flag=True, default=False, help='Include internal Telepact definitions in the fetched schema')
 def fetch(
     http_url: str,
-    output_dir: str
+    output_dir: str,
+    include_internal: bool
 ) -> None:
     """
     Fetch a Telepact API schema to store locally.
     """
 
-    api_json = get_api_from_http(http_url)
+    api_json = get_api_from_http(http_url, include_internal=include_internal)
     schema = MockTelepactSchema.from_json(api_json)      
 
     filepath = os.path.join(output_dir, 'api.telepact.json')
 
-    final_api_json = json.dumps(schema.original)
+    final_api_json = json.dumps(schema.full if include_internal else schema.original)
 
     os.makedirs(output_dir, exist_ok=True)
     with open(filepath, 'w') as file:

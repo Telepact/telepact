@@ -402,8 +402,9 @@ export const load: LayoutLoad = async ({ url, params, route, fetch }) => {
 
 	if (result.client !== undefined) {
 		console.log(`Getting schema from ${schemaSource}`);
+		const apiRequest = result.showInternalApi ? { includeInternal: true } : {};
 		const schemaPseudoJson: Promise<any[]> = result.client
-			.request(new Message({}, { 'fn.api_': {} }))
+			.request(new Message({}, { 'fn.api_': apiRequest }))
 			.then((schemaResponse) => schemaResponse.body['Ok_']['api'])
 			.catch((e) => {
 				console.log(`Failed to get schema: ${e}`);

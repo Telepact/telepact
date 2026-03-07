@@ -16,7 +16,10 @@
 
 package schema
 
-import "regexp"
+import (
+	"encoding/json"
+	"regexp"
+)
 
 // CreateTelepactSchemaFromFileJSONMap constructs a Telepact schema from the supplied JSON documents map.
 func CreateTelepactSchemaFromFileJSONMap(jsonDocuments map[string]string) (*ParsedSchemaResult, error) {
@@ -25,15 +28,66 @@ func CreateTelepactSchemaFromFileJSONMap(jsonDocuments map[string]string) (*Pars
 		finalDocuments[key] = value
 	}
 
-	finalDocuments["internal_"] = GetInternalTelepactJSON()
+	internalJSON := GetInternalTelepactJSON()
+	if !hasBundledDefinitions(jsonDocuments, "internal_", internalJSON) {
+		finalDocuments["internal_"] = internalJSON
+	}
 
 	authPattern := regexp.MustCompile(`"struct\.Auth_"\s*:`)
+	authJSON := GetAuthTelepactJSON()
 	for _, document := range jsonDocuments {
 		if authPattern.MatchString(document) {
-			finalDocuments["auth_"] = GetAuthTelepactJSON()
+			if !hasBundledDefinitions(jsonDocuments, "auth_", authJSON) {
+				finalDocuments["auth_"] = authJSON
+			}
 			break
 		}
 	}
 
 	return ParseTelepactSchema(finalDocuments)
+}
+
+func hasBundledDefinitions(jsonDocuments map[string]string, bundledDocumentName, bundledJSON string) bool {
+	bundledKeys, ok := collectSchemaKeys(map[string]string{bundledDocumentName: bundledJSON})
+	if !ok {
+		return false
+	}
+
+	providedKeys, ok := collectSchemaKeys(jsonDocuments)
+	if !ok {
+		return false
+	}
+
+	for key := range bundledKeys {
+		if _, ok := providedKeys[key]; !ok {
+			return false
+		}
+	}
+	return true
+}
+
+func collectSchemaKeys(jsonDocuments map[string]string) (map[string]struct{}, bool) {
+	schemaKeys := make(map[string]struct{})
+
+	for documentName, documentJSON := range jsonDocuments {
+		var pseudoJSON []any
+		if err := json.Unmarshal([]byte(documentJSON), &pseudoJSON); err != nil {
+			return nil, false
+		}
+
+		for index, definitionRaw := range pseudoJSON {
+			definition, ok := definitionRaw.(map[string]any)
+			if !ok {
+				continue
+			}
+
+			schemaKey, err := FindSchemaKey(documentName, definition, index, jsonDocuments)
+			if err != nil {
+				return nil, false
+			}
+			schemaKeys[schemaKey] = struct{}{}
+		}
+	}
+
+	return schemaKeys, true
 }

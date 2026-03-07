@@ -160,7 +160,15 @@ func HandleMessage(
 	case "fn.ping_":
 		resultMessage = ServerMessage{Headers: make(map[string]any), Body: map[string]any{"Ok_": map[string]any{}}}
 	case "fn.api_":
-		resultMessage = ServerMessage{Headers: make(map[string]any), Body: map[string]any{"Ok_": map[string]any{"api": schema.OriginalDefinitions()}}}
+		includeInternal := false
+		if requestMap, ok := requestPayload.(map[string]any); ok {
+			includeInternal = boolValue(requestMap["includeInternal"])
+		}
+		apiDefinitions := schema.OriginalDefinitions()
+		if includeInternal {
+			apiDefinitions = schema.FullDefinitions()
+		}
+		resultMessage = ServerMessage{Headers: make(map[string]any), Body: map[string]any{"Ok_": map[string]any{"api": apiDefinitions}}}
 	default:
 		resp, err := handler(callMessage)
 		if err != nil {

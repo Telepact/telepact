@@ -146,7 +146,8 @@ async def handle_message(
     if function_name == "fn.ping_":
         result_message = Message({}, {"Ok_": {}})
     elif function_name == "fn.api_":
-        result_message = Message({}, {"Ok_": {"api": telepact_schema.original}})
+        include_internal = isinstance(request_payload, dict) and request_payload.get("includeInternal") is True
+        result_message = Message({}, {"Ok_": {"api": telepact_schema.full if include_internal else telepact_schema.original}})
     else:
         try:
             result_message = await handler(call_message)
