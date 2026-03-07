@@ -44,6 +44,10 @@ The entire project uses a hierarchical `Makefile` system. The root `Makefile` de
 -   If you change `lib/<lang>`, prefer running the matching root target such as `make test-py`, `make test-ts`, `make test-java`, or `make test-go` before trusting `test/runner` results.
     These targets rebuild the library artifact, refresh the corresponding `test/lib/<lang>` consumer, and then run the matching runner shard.
 
+-   If you only need to refresh the per-language test consumer without running pytest, use `make prepare-test-py`, `make prepare-test-ts`, `make prepare-test-java`, or `make prepare-test-go`.
+
+-   If you only need to run the matching runner shard without rebuilding the consumer first, use `make test-py-run`, `make test-ts-run`, `make test-java-run`, or `make test-go-run`.
+
 -   If test environments may be stale, run `make clean-test` first, then rerun the appropriate `make test-<lang>` target.
 
 -   Be careful running `poetry run python -m pytest ...` directly in `test/runner` after a library change.
