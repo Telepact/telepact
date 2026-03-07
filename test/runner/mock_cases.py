@@ -15,9 +15,32 @@
 #|
 
 from typing import Any
+import json
+from pathlib import Path
 
 from cases import get_values, skipped_collection_fields
 from cases import additional_union_cases, additional_fn_cases, additional_integer_cases, additional_number_cases, additional_struct_cases
+
+
+def _schema_key(definition: dict[str, object]) -> str:
+    return next(key for key in definition.keys() if key not in {'///', '->', '_errors'})
+
+
+def _load_sorted_schema(*relative_paths: str) -> list[dict[str, object]]:
+    root = Path(__file__).resolve().parents[2]
+    definitions: list[dict[str, object]] = []
+
+    for relative_path in relative_paths:
+        definitions.extend(json.loads((root / relative_path).read_text()))
+
+    return sorted(definitions, key=lambda definition: (not _schema_key(definition).startswith('info.'), _schema_key(definition)))
+
+
+_MOCK_FULL_SCHEMA = _load_sorted_schema(
+    'test/runner/schema/example/example.telepact.json',
+    'common/internal.telepact.json',
+    'common/mock-internal.telepact.json',
+)
 
 
 def generate_mock_cases(given_field: str, the_type, correct_values, additional_incorrect_values = []):
@@ -66,6 +89,9 @@ invalid_cases = {
 }
 
 cases = {
+    'api': [
+        [[{}, {'fn.api_': {'includeInternal!': True}}], [{}, {'Ok_': {'api': _MOCK_FULL_SCHEMA}}]],
+    ],
     'emptyPartialMatchStub': [
         [[{}, {'fn.clearStubs_': {}}], [{}, {'Ok_': {}}]],
         [[{}, {'fn.clearCalls_': {}}], [{}, {'Ok_': {}}]],

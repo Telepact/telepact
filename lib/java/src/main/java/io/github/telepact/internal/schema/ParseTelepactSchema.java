@@ -53,6 +53,7 @@ public class ParseTelepactSchema {
                 return k1.compareTo(k2);
             }
         });
+        final var fullSchema = new TreeMap<String, Object>(originalSchema.comparator());
         final var parsedTypes = new HashMap<String, TType>();
         final var parseFailures = new ArrayList<SchemaParseFailure>();
         final var fnErrorRegexes = new HashMap<String, String>();
@@ -136,6 +137,7 @@ public class ParseTelepactSchema {
                     if ("auto_".equals(documentName) || "auth_".equals(documentName) || !documentName.endsWith("_")) {
                         originalSchema.put(schemaKey, def);
                     }
+                    fullSchema.put(schemaKey, def);
                 } catch (TelepactSchemaParseError e) {
                     parseFailures.addAll(e.schemaParseFailures);
                 }
@@ -299,9 +301,11 @@ public class ParseTelepactSchema {
         }
 
         final var finalOriginalSchema = new ArrayList<>(originalSchema.values());
+        final var finalFullSchema = new ArrayList<>(fullSchema.values());
 
         return new TelepactSchema(
                 finalOriginalSchema,
+                finalFullSchema,
                 parsedTypes,
                 requestHeaders,
                 responseHeaders);

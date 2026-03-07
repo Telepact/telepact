@@ -101,7 +101,7 @@ public class MockServer {
         serverOptions.onError = options.onError;
         serverOptions.authRequired = false;
 
-        final var telepactSchema = new TelepactSchema(mockTelepactSchema.original, mockTelepactSchema.parsed,
+        final var telepactSchema = new TelepactSchema(mockTelepactSchema.original, mockTelepactSchema.full, mockTelepactSchema.parsed,
                 mockTelepactSchema.parsedRequestHeaders, mockTelepactSchema.parsedResponseHeaders);
 
         this.server = new Server(telepactSchema, this::handle, serverOptions);

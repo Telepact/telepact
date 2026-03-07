@@ -41,7 +41,7 @@
 	{
 		"///": "Save a set of variables as a dynamic map of variable names to their value.",
 		"fn.saveVariables": {
-			"variables": {"string": "number"}
+			"variables": { "string": "number" }
 		},
 		"->": [
 			{
@@ -115,3 +115,4 @@
 		]
 	}
 ]
+

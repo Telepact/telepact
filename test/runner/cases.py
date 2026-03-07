@@ -16,6 +16,8 @@
 
 from typing import Any
 import base64
+import json
+from pathlib import Path
 
 default_values = [False, 0, 0.1, '', [], {}]
 
@@ -52,6 +54,32 @@ def cap(s: str):
 
 def b64(b: bytes):
     return base64.b64encode(b).decode('utf-8')
+
+
+def _schema_key(definition: dict[str, object]) -> str:
+    for key in definition:
+        if key not in {'///', '->', '_errors'}:
+            return key
+    raise AssertionError(f'No schema key found in {definition}')
+
+
+def _load_sorted_schema(*relative_paths: str) -> list[dict[str, object]]:
+    root = Path(__file__).resolve().parents[2]
+    definitions: list[dict[str, object]] = []
+    for relative_path in relative_paths:
+        with (root / relative_path).open() as stream:
+            definitions.extend(json.load(stream))
+
+    return sorted(
+        definitions,
+        key=lambda definition: (not _schema_key(definition).startswith('info.'), _schema_key(definition)),
+    )
+
+
+_EXAMPLE_FULL_SCHEMA = _load_sorted_schema(
+    'test/runner/schema/example/example.telepact.json',
+    'common/internal.telepact.json',
+)
 
 def get_values(given_field: str, the_type, given_correct_values, additional_incorrect_values):
     default_incorrect_values = list(filter(lambda n: type(n) not in (int, float) if the_type == float else type(n) not in (Base64String, str) if the_type == Base64String else False if the_type == Any else type(n) != the_type, default_values))
@@ -330,6 +358,7 @@ cases = {
     ],
     'api': [
         [[{}, {'fn.api_': {}}], [{}, {'Ok_': {'api': [{'///': [' This is the example schema. It is focussed on outlining type edge cases for     ', ' use in tests.                                                                   ', '                                                                                 ', ' As a reminder:                                                                  ', '                                                                                 ', ' - ! means optional field                                                        ', ' - ? means nullable type                                                         '], 'info.Example': {}}, {'errors.ExampleErrors': [{'ErrorExample2': {'field1': 'string'}}]}, {'fn.circularLink1': {'field1': 'boolean'}, '->': [{'Ok_': {'follow': 'fn.circularLink2'}}]}, {'fn.circularLink2': {'field2': 'boolean'}, '->': [{'Ok_': {'follow': 'fn.circularLink1'}}]}, {'///': ' An example function. ', 'fn.example': {'required': 'boolean', 'optional!': 'boolean'}, '->': [{'Ok_': {'required': 'boolean', 'optional!': 'boolean'}}]}, {'fn.getBigList': {}, '->': [{'Ok_': {'items': ['struct.Big']}}]}, {'fn.selfLink': {'required': 'boolean', 'optional!': 'boolean'}, '->': [{'Ok_': {'followSelf': 'fn.selfLink'}}]}, {'fn.test': {'value!': 'struct.Value'}, '->': [{'Ok_': {'value!': 'struct.Value'}}, {'ErrorExample': {'property': 'string'}}]}, {'headers.ExampleHeaders': {'@in': 'boolean'}, '->': {'@out': 'boolean'}}, {'struct.Big': {'aF': 'boolean', 'cF': 'boolean', 'bF': 'boolean', 'dF': 'boolean'}}, {'///': [' The main struct example.                                                        ', '                                                                                 ', ' The [required] field must be supplied. The optional field does not need to be   ', ' supplied.                                                                       '], 'struct.ExStruct': {'required': 'boolean', 'optional!': 'boolean', 'optional2!': 'integer'}}, {'///': ' A struct value demonstrating all common type permutations. ', 'struct.Value': {'bool!': 'boolean', 'nullBool!': 'boolean?', 'arrBool!': ['boolean'], 'arrNullBool!': ['boolean?'], 'objBool!': {'string': 'boolean'}, 'objNullBool!': {'string': 'boolean?'}, 'int!': 'integer', 'nullInt!': 'integer?', 'arrInt!': ['integer'], 'arrNullInt!': ['integer?'], 'objInt!': {'string': 'integer'}, 'objNullInt!': {'string': 'integer?'}, 'num!': 'number', 'nullNum!': 'number?', 'arrNum!': ['number'], 'arrNullNum!': ['number?'], 'objNum!': {'string': 'number'}, 'objNullNum!': {'string': 'number?'}, 'str!': 'string', 'nullStr!': 'string?', 'arrStr!': ['string'], 'arrNullStr!': ['string?'], 'objStr!': {'string': 'string'}, 'objNullStr!': {'string': 'string?'}, 'any!': 'any', 'nullAny!': 'any?', 'arrAny!': ['any'], 'arrNullAny!': ['any?'], 'objAny!': {'string': 'any'}, 'objNullAny!': {'string': 'any?'}, 'bytes!': 'bytes', 'nullBytes!': 'bytes?', 'arrBytes!': ['bytes'], 'arrNullBytes!': ['bytes?'], 'objBytes!': {'string': 'bytes'}, 'objNullBytes!': {'string': 'bytes?'}, 'arr!': ['any'], 'arrArr!': [['any']], 'objArr!': {'string': ['any']}, 'obj!': {'string': 'any'}, 'arrObj!': [{'string': 'any'}], 'objObj!': {'string': {'string': 'any'}}, 'struct!': 'struct.ExStruct', 'nullStruct!': 'struct.ExStruct?', 'arrStruct!': ['struct.ExStruct'], 'arrNullStruct!': ['struct.ExStruct?'], 'objStruct!': {'string': 'struct.ExStruct'}, 'objNullStruct!': {'string': 'struct.ExStruct?'}, 'union!': 'union.ExUnion', 'nullUnion!': 'union.ExUnion?', 'arrUnion!': ['union.ExUnion'], 'arrNullUnion!': ['union.ExUnion?'], 'objUnion!': {'string': 'union.ExUnion'}, 'objNullUnion!': {'string': 'union.ExUnion?'}, 'fn!': 'fn.example', 'nullFn!': 'fn.example?', 'arrFn!': ['fn.example'], 'arrNullFn!': ['fn.example?'], 'objFn!': {'string': 'fn.example'}, 'objNullFn!': {'string': 'fn.example?'}, 'sel!': '_ext.Select_', 'nullSel!': '_ext.Select_?', 'arrSel!': ['_ext.Select_'], 'arrNullSel!': ['_ext.Select_?'], 'objSel!': {'string': '_ext.Select_'}, 'objNullSel!': {'string': '_ext.Select_?'}}}, {'union.ExUnion': [{'One': {}}, {'Two': {'required': 'boolean', 'optional!': 'boolean'}}]}]}}]],
+        [[{}, {'fn.api_': {'includeInternal!': True}}], [{}, {'Ok_': {'api': _EXAMPLE_FULL_SCHEMA}}]],
     ],
     'serverHooks': [
         [[{'@ok_': {}, '@onRequestError_': True}, {'fn.test': {}}], [{}, {'Ok_': {}}]],

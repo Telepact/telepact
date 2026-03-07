@@ -20,6 +20,7 @@ import json
 import re
 import subprocess
 from pathlib import Path
+from typing import Iterable
 
 import click
 from lxml import etree as ET
@@ -154,9 +155,19 @@ def _extract_release_targets(commit_body: str) -> list[str]:
     return targets
 
 
-def _latest_released_versions(repo_root: Path, targets: list[str]) -> dict[str, str]:
+def _latest_released_versions(
+    repo_root: Path,
+    targets: list[str],
+    pending_version: str | None = None,
+    pending_targets: Iterable[str] = (),
+) -> dict[str, str]:
     found: dict[str, str] = {}
     needed = set(targets)
+
+    if pending_version:
+        for target in pending_targets:
+            if target in needed:
+                found[target] = pending_version
 
     for _, subject, body in _iter_git_commits(repo_root):
         match = _BUMP_VERSION_RE.match(subject)
@@ -175,24 +186,19 @@ def _latest_released_versions(repo_root: Path, targets: list[str]) -> dict[str, 
     return found
 
 
-@click.command()
-@click.option(
-    "--repo-root",
-    type=click.Path(exists=True, file_okay=False, path_type=Path),
-    default=".",
-    help="Path within the repo; the actual root is auto-detected by VERSION.txt.",
-)
-@click.option(
-    "--output",
-    type=click.Path(path_type=Path),
-    default=None,
-    help="Where to write the markdown file (default: doc/versions.md at repo root).",
-)
-def doc_versions(repo_root: Path, output: Path | None) -> None:
+def write_doc_versions(
+    repo_root: Path,
+    output: Path | None,
+    pending_version: str | None = None,
+    pending_targets: Iterable[str] = (),
+) -> Path:
     repo_root = _find_repo_root(repo_root)
 
     version_by_target = _latest_released_versions(
-        repo_root, targets=["go", "java", "py", "ts", "cli", "console", "prettier"]
+        repo_root,
+        targets=["go", "java", "py", "ts", "cli", "console", "prettier"],
+        pending_version=pending_version,
+        pending_targets=pending_targets,
     )
 
     go_module = _read_go_module_path(repo_root / "lib/go/go.mod")
@@ -235,3 +241,21 @@ def doc_versions(repo_root: Path, output: Path | None) -> None:
     out_path = (output.resolve() if output is not None else (repo_root / "doc" / "versions.md"))
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text("\n".join(out_lines), encoding="utf-8")
+    return out_path
+
+
+@click.command()
+@click.option(
+    "--repo-root",
+    type=click.Path(exists=True, file_okay=False, path_type=Path),
+    default=".",
+    help="Path within the repo; the actual root is auto-detected by VERSION.txt.",
+)
+@click.option(
+    "--output",
+    type=click.Path(path_type=Path),
+    default=None,
+    help="Where to write the markdown file (default: doc/versions.md at repo root).",
+)
+def doc_versions(repo_root: Path, output: Path | None) -> None:
+    write_doc_versions(repo_root, output)

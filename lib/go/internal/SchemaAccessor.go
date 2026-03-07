@@ -24,4 +24,5 @@ type SchemaAccessor interface {
 	RequestHeaderDeclarations() map[string]*types.TFieldDeclaration
 	ResponseHeaderDeclarations() map[string]*types.TFieldDeclaration
 	OriginalDefinitions() []any
+	FullDefinitions() []any
 }
