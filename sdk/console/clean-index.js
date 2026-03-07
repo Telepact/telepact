@@ -57,8 +57,8 @@ async function extractAppRootScript() {
         const scriptElement = appRootDiv?.querySelector('script');
 
         if (!scriptElement) {
-            console.warn('No script found under #app-root');
-            process.exit(1);
+            console.warn('No inline script found under #app-root; skipping extraction.');
+            return;
         }
 
         // Extract the script content

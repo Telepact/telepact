@@ -21,7 +21,7 @@
     var hasMatchMedia = typeof window !== 'undefined' && !!window.matchMedia;
     var prefersDark = hasMatchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
     var prefersLight = hasMatchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
-    var theme = prefersDark ? 'dark' : (prefersLight ? 'light' : 'dark');
+    var theme = prefersDark ? 'dark' : prefersLight ? 'light' : 'dark';
 
     if (theme === 'dark') {
       docEl.classList.add('dark');
@@ -33,8 +33,8 @@
 
     if (hasMatchMedia) {
       var mql = window.matchMedia('(prefers-color-scheme: dark)');
-  /** @param {MediaQueryListEvent} e */
-  var onChange = function (e) {
+      /** @param {MediaQueryListEvent} e */
+      var onChange = function (e) {
         if (e.matches) {
           docEl.classList.add('dark');
           docEl.setAttribute('data-theme', 'dark');
@@ -58,3 +58,4 @@
     el.setAttribute('data-theme', 'dark');
   }
 })();
+
