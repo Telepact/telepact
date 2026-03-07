@@ -135,7 +135,10 @@ public class HandleMessage {
         if (functionName.equals("fn.ping_")) {
             resultMessage = new Message(Map.of(), Map.of("Ok_", Map.of()));
         } else if (functionName.equals("fn.api_")) {
-            resultMessage = new Message(Map.of(), Map.of("Ok_", Map.of("api", telepactSchema.original)));
+            final var includeInternal = requestPayload instanceof Map<?, ?>
+                    && Objects.equals(true, ((Map<?, ?>) requestPayload).get("includeInternal!"));
+            resultMessage = new Message(Map.of(),
+                    Map.of("Ok_", Map.of("api", includeInternal ? telepactSchema.full : telepactSchema.original)));
         } else {
             try {
                 resultMessage = handler.apply(callMessage);

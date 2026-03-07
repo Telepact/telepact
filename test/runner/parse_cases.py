@@ -14,10 +14,30 @@
 #|  limitations under the License.
 #|
 
+import json
+from pathlib import Path
+
+
+def _load_full_example_schema() -> list[dict[str, object]]:
+    root = Path(__file__).resolve().parents[2]
+    definitions: list[dict[str, object]] = []
+    for relative_path in (
+        'test/runner/schema/example/example.telepact.json',
+        'common/internal.telepact.json',
+    ):
+        with (root / relative_path).open() as stream:
+            definitions.extend(json.load(stream))
+    return definitions
+
+
+_FULL_EXAMPLE_SCHEMA = _load_full_example_schema()
+
+
 cases = {
     'schema': [
         [[{}, {'fn.validateSchema': {'input': {'PseudoJson': {'schema': [{'struct.Example': {}}, {'struct.Example': {}}]}}}}], [{}, {'ErrorValidationFailure': {'cases': [{'document': 'auto_', 'location': {'row': 1, 'col': 27}, 'path': [1, 'struct.Example'], 'reason': {'PathCollision': {'document': 'auto_', 'location': {'row': 1, 'col': 3}, 'location': {'row': 1, 'col': 3}, 'path': [0, 'struct.Example']}}}]}}]],
         [[{}, {'fn.validateSchema': {'input': {'PseudoJson': {'schema': [{'struct.Example': {}}], 'extend!': [{'struct.Example': {}}]}}}}], [{}, {'ErrorValidationFailure': {'cases': [{'document': 'extend', 'location': {'row': 1, 'col': 3}, 'path': [0, 'struct.Example'], 'reason': {'PathCollision': {'document': 'default', 'location': {'row': 1, 'col': 3}, 'path': [0, 'struct.Example']}}}]}}]],
+        [[{}, {'fn.validateSchema': {'input': {'PseudoJson': {'schema': _FULL_EXAMPLE_SCHEMA}}}}], [{}, {'Ok_': {}}]],
     [[{}, {'fn.validateSchema': {'input': {'PseudoJson': {'schema': [{'struct.Example': {'field': ['boolean'], 'field!': ['integer']}}]}}}}], [{}, {'ErrorValidationFailure': {'cases': [{'document': 'auto_', 'location': {'row': 1, 'col': 3}, 'path': [0, 'struct.Example'], 'reason': {'DuplicateField': {'field': 'field'}}}]}}]],
     [[{}, {'fn.validateSchema': {'input': {'PseudoJson': {'schema': [{'struct.Example': {'field!': ['boolean'], 'field': ['integer']}}]}}}}], [{}, {'ErrorValidationFailure': {'cases': [{'document': 'auto_', 'location': {'row': 1, 'col': 3}, 'path': [0, 'struct.Example'], 'reason': {'DuplicateField': {'field': 'field'}}}]}}]],
         [[{}, {'fn.validateSchema': {'input': {'PseudoJson': {'schema': [{'invalid.Example': {}}]}}}}], [{}, {'ErrorValidationFailure': {'cases': [{'document': 'auto_', 'location': {'row': 1, 'col': 2}, 'path': [0], 'reason': {'ObjectKeyRegexMatchCountUnexpected': {'regex': '^(((fn|errors|headers|info)|((struct|union|_ext)(<[0-2]>)?))\\..*)', 'actual': 0, 'expected': 1, 'keys': ['invalid.Example']}}}]}}]],

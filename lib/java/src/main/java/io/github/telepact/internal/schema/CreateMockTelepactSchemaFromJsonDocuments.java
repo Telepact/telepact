@@ -32,7 +32,7 @@ public class CreateMockTelepactSchemaFromJsonDocuments {
 
         var telepactSchema = createTelepactSchemaFromFileJsonMap(finalJsonDocuments);
 
-        return new MockTelepactSchema(telepactSchema.original, telepactSchema.parsed, telepactSchema.parsedRequestHeaders,
+        return new MockTelepactSchema(telepactSchema.original, telepactSchema.full, telepactSchema.parsed, telepactSchema.parsedRequestHeaders,
                 telepactSchema.parsedResponseHeaders);
     }
 }

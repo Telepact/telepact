@@ -30,7 +30,14 @@ clean-java:
 	$(MAKE) -C lib/java clean
 
 test-java:
-	$(MAKE) -C test/runner test-java
+	$(MAKE) prepare-test-java
+	$(MAKE) test-java-run
+
+prepare-test-java:
+	$(MAKE) -C test/lib/java
+
+test-java-run:
+	$(MAKE) -C test/runner test-java-run
 
 test-trace-java:
 	$(MAKE) -C test/runner test-trace-java
@@ -45,7 +52,14 @@ clean-py:
 	$(MAKE) -C lib/py clean
 
 test-py:
-	$(MAKE) -C test/runner test-py
+	$(MAKE) prepare-test-py
+	$(MAKE) test-py-run
+
+prepare-test-py:
+	$(MAKE) -C test/lib/py
+
+test-py-run:
+	$(MAKE) -C test/runner test-py-run
 
 test-trace-py:
 	$(MAKE) -C test/runner test-trace-py
@@ -60,7 +74,14 @@ clean-ts:
 	$(MAKE) -C lib/ts clean
 
 test-ts:
-	$(MAKE) -C test/runner test-ts
+	$(MAKE) prepare-test-ts
+	$(MAKE) test-ts-run
+
+prepare-test-ts:
+	$(MAKE) -C test/lib/ts
+
+test-ts-run:
+	$(MAKE) -C test/runner test-ts-run
 
 test-trace-ts:
 	$(MAKE) -C test/runner test-trace-ts
@@ -75,7 +96,14 @@ clean-go:
 	$(MAKE) -C lib/go clean
 
 test-go:
-	$(MAKE) -C test/runner test-go
+	$(MAKE) prepare-test-go
+	$(MAKE) test-go-run
+
+prepare-test-go:
+	$(MAKE) -C test/lib/go
+
+test-go-run:
+	$(MAKE) -C test/runner test-go-run
 
 test-trace-go:
 	$(MAKE) -C test/runner test-trace-go
@@ -83,7 +111,7 @@ test-trace-go:
 deploy-go:
 	$(MAKE) -C lib/go deploy
 
-.PHONY: test skill
+.PHONY: test skill prepare-test-java test-java-run prepare-test-py test-py-run prepare-test-ts test-ts-run prepare-test-go test-go-run
 test:
 	$(MAKE) -C test/runner test
 

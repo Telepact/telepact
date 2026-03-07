@@ -24,6 +24,7 @@ import (
 // MockTelepactSchema represents a schema prepared for mock usage.
 type MockTelepactSchema struct {
 	Original              []any
+	Full                  []any
 	Parsed                map[string]types.TType
 	ParsedRequestHeaders  map[string]*types.TFieldDeclaration
 	ParsedResponseHeaders map[string]*types.TFieldDeclaration
@@ -32,12 +33,14 @@ type MockTelepactSchema struct {
 // NewMockTelepactSchema constructs a MockTelepactSchema with the supplied values.
 func NewMockTelepactSchema(
 	original []any,
+	full []any,
 	parsed map[string]types.TType,
 	parsedRequestHeaders map[string]*types.TFieldDeclaration,
 	parsedResponseHeaders map[string]*types.TFieldDeclaration,
 ) *MockTelepactSchema {
 	return &MockTelepactSchema{
 		Original:              cloneAnySlice(original),
+		Full:                  cloneAnySlice(full),
 		Parsed:                parsed,
 		ParsedRequestHeaders:  parsedRequestHeaders,
 		ParsedResponseHeaders: parsedResponseHeaders,
@@ -110,6 +113,14 @@ func (m *MockTelepactSchema) OriginalDefinitions() []any {
 	return m.Original
 }
 
+// FullDefinitions returns the complete schema definitions slice, including Telepact internals.
+func (m *MockTelepactSchema) FullDefinitions() []any {
+	if m == nil {
+		return nil
+	}
+	return m.Full
+}
+
 func cloneAnySlice(values []any) []any {
 	if values == nil {
 		return nil
@@ -123,5 +134,5 @@ func mockTelepactSchemaFromParsed(result *schema.ParsedSchemaResult) *MockTelepa
 	if result == nil {
 		return nil
 	}
-	return NewMockTelepactSchema(result.Original, result.Parsed, result.ParsedRequestHeaders, result.ParsedResponseHeaders)
+	return NewMockTelepactSchema(result.Original, result.Full, result.Parsed, result.ParsedRequestHeaders, result.ParsedResponseHeaders)
 }

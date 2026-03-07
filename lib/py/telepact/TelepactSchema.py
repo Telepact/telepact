@@ -26,9 +26,10 @@ class TelepactSchema:
     A parsed telepact schema.
     """
 
-    def __init__(self, original: list[object], parsed: dict[str, 'TType'], parsed_request_headers: dict[str, 'TFieldDeclaration'],
+    def __init__(self, original: list[object], full: list[object], parsed: dict[str, 'TType'], parsed_request_headers: dict[str, 'TFieldDeclaration'],
                  parsed_response_headers: dict[str, 'TFieldDeclaration']):
         self.original = original
+        self.full = full
         self.parsed = parsed
         self.parsed_request_headers = parsed_request_headers
         self.parsed_response_headers = parsed_response_headers

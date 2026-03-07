@@ -36,6 +36,11 @@ public class MockTelepactSchema {
     public final List<Object> original;
 
     /**
+     * The complete schema objects, including Telepact internals.
+     */
+    public final List<Object> full;
+
+    /**
      * The parsed schema types.
      */
     public final Map<String, TType> parsed;
@@ -54,15 +59,18 @@ public class MockTelepactSchema {
      * Constructs a MockTelepactSchema with the given original objects and parsed data.
      *
      * @param original the original list of objects
+     * @param full the complete list of objects
      * @param parsed the parsed map of TType objects
      * @param parsedRequestHeaders the parsed request headers
      * @param parsedResponseHeaders the parsed response headers
      */
     public MockTelepactSchema(List<Object> original,
+            List<Object> full,
             Map<String, TType> parsed,
             Map<String, TFieldDeclaration> parsedRequestHeaders,
             Map<String, TFieldDeclaration> parsedResponseHeaders) {
         this.original = original;
+        this.full = full;
         this.parsed = parsed;
         this.parsedRequestHeaders = parsedRequestHeaders;
         this.parsedResponseHeaders = parsedResponseHeaders;
