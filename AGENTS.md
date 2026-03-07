@@ -52,3 +52,19 @@ The entire project uses a hierarchical `Makefile` system. The root `Makefile` de
 ## Schema Authoring (`.telepact.json`)
 
 Telepact schemas are defined in `.telepact.json` files. These files are the single source of truth for API definitions. A schema is a JSON array of definitions. The full guide can be found in `doc/schema-guide.md`.
+
+## Skills
+
+Repo-local skills live under `skills/` and should be used when the task matches them closely.
+
+### Available skills
+
+-   `telepact-schema-writing`: Convert a plain-English API description into a correct Telepact `.telepact.json` schema. (file: `/Users/brendanbartels/workspace/telepact/skills/telepact-schema-writing/SKILL.md`)
+-   `telepact-server`: Implement a Telepact server for an already-drafted schema using the Telepact server library in Go, Java, Python, or TypeScript. (file: `/Users/brendanbartels/workspace/telepact/skills/telepact-server/SKILL.md`)
+-   `telepact-client`: Implement a Telepact client for an already-drafted schema using either raw Telepact JSON over a transport or the Telepact client library in Go, Java, Python, or TypeScript. (file: `/Users/brendanbartels/workspace/telepact/skills/telepact-client/SKILL.md`)
+
+### How to use skills
+
+-   If the user names one of these skills, or the task clearly matches one, open its `SKILL.md` and follow it.
+-   Keep context small: read only the skill plus the repo files needed for the active task.
+-   If a skill does not fit cleanly, state that briefly and continue with the closest sensible approach.

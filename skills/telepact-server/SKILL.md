@@ -15,8 +15,6 @@ This skill is for building the server side of a Telepact API with one of the Tel
 
 The server must use a Telepact library. Clients may use as much or as little Telepact tooling as they want, but a Telepact server is expected to run through the library so the ecosystem stays interoperable.
 
-This skill is intentionally self-contained. Do not assume you can open this repo's README files or internal schema files while using it.
-
 ## First Step
 
 Classify the target stack first:
