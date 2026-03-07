@@ -111,7 +111,7 @@ test-trace-go:
 deploy-go:
 	$(MAKE) -C lib/go deploy
 
-.PHONY: test skill prepare-test-java test-java-run prepare-test-py test-py-run prepare-test-ts test-ts-run prepare-test-go test-go-run
+.PHONY: test prepare-test-java test-java-run prepare-test-py test-py-run prepare-test-ts test-ts-run prepare-test-go test-go-run
 test:
 	$(MAKE) -C test/runner test
 
@@ -206,9 +206,6 @@ version:
 	cd sdk/prettier && telepact-project set-version ${VERSION}
 	cd sdk/console && telepact-project set-version ${VERSION}
 	$(MAKE) doc-versions
-
-skill:
-	telepact-project skill README.md skills/telepact-api
 
 license-header:
 	telepact-project license-header NOTICE
