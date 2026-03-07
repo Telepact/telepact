@@ -2,10 +2,10 @@
 
 | Kind | Package | Registry | Version |
 |---|---|---|---|
-| Library (Go) | `github.com/telepact/telepact/lib/go` | Go module (proxy.golang.org) | `v1.0.0-alpha.181` |
-| Library (Java) | `io.github.telepact:telepact` | Maven Central | `1.0.0-alpha.185` |
-| Library (Python) | `telepact` | PyPI | `1.0.0-alpha.185` |
-| Library (TypeScript) | `telepact` | npm | `1.0.0-alpha.185` |
-| SDK (CLI) | `telepact-cli` | PyPI | `1.0.0-alpha.191` |
+| Library (Go) | `github.com/telepact/telepact/lib/go` | Go module (proxy.golang.org) | `—` |
+| Library (Java) | `io.github.telepact:telepact` | Maven Central | `—` |
+| Library (Python) | `telepact` | PyPI | `—` |
+| Library (TypeScript) | `telepact` | npm | `—` |
+| SDK (CLI) | `telepact-cli` | PyPI | `—` |
 | SDK (Console) | `telepact-console` | npm | `1.0.0-alpha.192` |
-| SDK (Prettier) | `prettier-plugin-telepact` | npm | `1.0.0-alpha.185` |
+| SDK (Prettier) | `prettier-plugin-telepact` | npm | `—` |
