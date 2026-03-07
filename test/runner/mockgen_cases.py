@@ -14,8 +14,34 @@
 #|  limitations under the License.
 #|
 
+import json
+from pathlib import Path
+
+
+def _schema_key(definition: dict[str, object]) -> str:
+    return next(key for key in definition.keys() if key not in {'///', '->', '_errors'})
+
+
+def _load_sorted_schema(*relative_paths: str) -> list[dict[str, object]]:
+    root = Path(__file__).resolve().parents[2]
+    definitions: list[dict[str, object]] = []
+
+    for relative_path in relative_paths:
+        definitions.extend(json.loads((root / relative_path).read_text()))
+
+    return sorted(definitions, key=lambda definition: (not _schema_key(definition).startswith('info.'), _schema_key(definition)))
+
+
+_MOCKGEN_FULL_SCHEMA = _load_sorted_schema(
+    'test/runner/schema/mockgen/mockgen.telepact.json',
+    'common/internal.telepact.json',
+    'common/mock-internal.telepact.json',
+)
+
+
 cases = {
     'simple': [
+        [[{}, {'fn.api_': {'includeInternal!': True}}], [{}, {'Ok_': {'api': _MOCKGEN_FULL_SCHEMA}}]],
         [[{}, {'fn.setRandomSeed_': {'seed': 4}}], [{}, {'Ok_': {}}]],
         [[{}, {'fn.clearStubs_': {}}], [{}, {'Ok_': {}}]],
         [[{}, {'fn.clearCalls_': {}}], [{}, {'Ok_': {}}]],
