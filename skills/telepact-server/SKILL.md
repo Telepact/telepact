@@ -86,9 +86,9 @@ Do not manually re-implement those behaviors in your transport or business logic
 
 ## Language Quick Reference
 
-Use these library patterns directly for schema loading, handler definition, and server construction.
+Use these library patterns directly for schema loading, handler definition, server construction, and a minimal request/reply transport hookup.
 
-Do not treat the following snippets as the transport layer. The actual call to `server.process(...)` belongs in your HTTP, WebSocket, NATS, or other request/reply transport wrapper.
+These are intentionally small end-to-end examples. In a real application, the transport wrapper is usually defined elsewhere and can be more elaborate, but the core request-bytes to response-bytes flow should stay the same.
 
 ### TypeScript
 
@@ -384,6 +384,9 @@ import "github.com/nats-io/nats.go"
 _, err = nc.Subscribe("api.telepact", func(msg *nats.Msg) {
     response, err := telepactServer.Process(msg.Data)
     if err != nil {
+        if msg.Reply != "" {
+            _ = nc.Publish(msg.Reply, []byte(`[{},{"ErrorUnknown_":{}}]`))
+        }
         return
     }
 
