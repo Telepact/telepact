@@ -26,7 +26,7 @@ from github import Github, GithubException
 from pathlib import Path
 
 from .commands.consolidated_readme import consolidated_readme
-from .commands.doc_versions import doc_versions
+from .commands.doc_versions import doc_versions, write_doc_versions
 from .commands.skill import skill
 
 yaml = YAML()
@@ -259,11 +259,21 @@ def bump() -> None:
     else:
         release_string = "No release targets"
 
+    doc_versions_path = write_doc_versions(
+        Path("."),
+        None,
+        pending_version=new_version,
+        pending_targets=sorted_release_targets,
+    )
+    repo_relative_doc_versions_path = os.path.relpath(doc_versions_path, Path.cwd())
+    edited_files.append(repo_relative_doc_versions_path)
+    click.echo(f"Updated {repo_relative_doc_versions_path}")
+
     # Create the new commit message
     new_commit_msg = f"Bump version to {new_version} (#{pr_number})\n\n" + release_string
 
     # Add and commit the changes
-    subprocess.run(['git', 'add'] + edited_files)
+    subprocess.run(['git', 'add'] + list(dict.fromkeys(edited_files)))
     subprocess.run(['git', 'commit', '-m', new_commit_msg])
 
 
