@@ -309,12 +309,95 @@ This pattern works for:
 
 Typical HTTP shape:
 
-1. Read raw request body bytes
+1. Read raw request body bytes from a POST request
 2. Call `server.process(requestBytes)`
 3. Write `response.bytes` to the HTTP response body
 4. Set content type based on response headers only if your framework requires it
 
 If your stack needs a media type, send JSON by default, and send octet-stream when the response indicates binary transport.
+
+The following examples are illustrative only. Express, FastAPI, Spring, and `net/http` are just common ways to wire up an HTTP transport. Any framework is fine if it preserves the same raw-bytes request/reply boundary.
+
+TypeScript with Express:
+
+```ts
+import express from 'express';
+
+const app = express();
+
+app.post('/api/telepact', express.raw({ type: '*/*' }), async (req, res) => {
+    const requestBytes = new Uint8Array(req.body as Buffer);
+    const response = await server.process(requestBytes);
+    const mediaType = '@bin_' in response.headers
+        ? 'application/octet-stream'
+        : 'application/json';
+
+    res.type(mediaType);
+    res.send(Buffer.from(response.bytes));
+});
+```
+
+Python with FastAPI or Starlette:
+
+```py
+from fastapi import FastAPI, Request, Response
+
+app = FastAPI()
+
+@app.post('/api/telepact')
+async def telepact_http(request: Request) -> Response:
+    request_bytes = await request.body()
+    telepact_response = await server.process(request_bytes)
+    media_type = (
+        'application/octet-stream'
+        if '@bin_' in telepact_response.headers
+        else 'application/json'
+    )
+    return Response(content=telepact_response.bytes, media_type=media_type)
+```
+
+Java with Spring:
+
+```java
+@PostMapping("/api/telepact")
+public ResponseEntity<byte[]> telepact(@RequestBody byte[] requestBytes) {
+    var response = server.process(requestBytes);
+    var mediaType = response.headers.containsKey("@bin_")
+        ? MediaType.APPLICATION_OCTET_STREAM
+        : MediaType.APPLICATION_JSON;
+
+    return ResponseEntity
+        .ok()
+        .contentType(mediaType)
+        .body(response.bytes);
+}
+```
+
+Go with `net/http`:
+
+```go
+http.HandleFunc("/api/telepact", func(w http.ResponseWriter, r *http.Request) {
+    requestBytes, err := io.ReadAll(r.Body)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusBadRequest)
+        return
+    }
+
+    response, err := server.Process(requestBytes)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+
+    if _, ok := response.Headers["@bin_"]; ok {
+        w.Header().Set("Content-Type", "application/octet-stream")
+    } else {
+        w.Header().Set("Content-Type", "application/json")
+    }
+
+    _, _ = w.Write(response.Bytes)
+})
+```
 
 ### WebSockets
 
