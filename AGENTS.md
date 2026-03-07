@@ -62,6 +62,7 @@ Repo-local skills live under `skills/` and should be used when the task matches 
 -   `telepact-schema-writing`: Convert a plain-English API description into a correct Telepact `.telepact.json` schema. (file: `/Users/brendanbartels/workspace/telepact/skills/telepact-schema-writing/SKILL.md`)
 -   `telepact-server`: Implement a Telepact server for an already-drafted schema using the Telepact server library in Go, Java, Python, or TypeScript. (file: `/Users/brendanbartels/workspace/telepact/skills/telepact-server/SKILL.md`)
 -   `telepact-client`: Implement a Telepact client for an already-drafted schema using either raw Telepact JSON over a transport or the Telepact client library in Go, Java, Python, or TypeScript. (file: `/Users/brendanbartels/workspace/telepact/skills/telepact-client/SKILL.md`)
+-   `telepact-downstream-testing`: Test code that consumes an external Telepact API by fetching the downstream schema and running a Telepact CLI mock server, with optional stubbing and request verification. (file: `/Users/brendanbartels/workspace/telepact/skills/telepact-downstream-testing/SKILL.md`)
 
 ### How to use skills
 
