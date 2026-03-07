@@ -24,6 +24,7 @@ import (
 // TelepactSchema represents a parsed Telepact schema.
 type TelepactSchema struct {
 	Original              []any
+	Full                  []any
 	Parsed                map[string]types.TType
 	ParsedRequestHeaders  map[string]*types.TFieldDeclaration
 	ParsedResponseHeaders map[string]*types.TFieldDeclaration
@@ -32,12 +33,14 @@ type TelepactSchema struct {
 // NewTelepactSchema constructs a TelepactSchema with the supplied values.
 func NewTelepactSchema(
 	original []any,
+	full []any,
 	parsed map[string]types.TType,
 	parsedRequestHeaders map[string]*types.TFieldDeclaration,
 	parsedResponseHeaders map[string]*types.TFieldDeclaration,
 ) *TelepactSchema {
 	return &TelepactSchema{
 		Original:              cloneAnySlice(original),
+		Full:                  cloneAnySlice(full),
 		Parsed:                parsed,
 		ParsedRequestHeaders:  parsedRequestHeaders,
 		ParsedResponseHeaders: parsedResponseHeaders,
@@ -110,11 +113,19 @@ func (t *TelepactSchema) OriginalDefinitions() []any {
 	return t.Original
 }
 
+// FullDefinitions returns the complete schema definitions slice, including Telepact internals.
+func (t *TelepactSchema) FullDefinitions() []any {
+	if t == nil {
+		return nil
+	}
+	return t.Full
+}
+
 func telepactSchemaFromParsed(result *schema.ParsedSchemaResult) *TelepactSchema {
 	if result == nil {
 		return nil
 	}
-	return NewTelepactSchema(result.Original, result.Parsed, result.ParsedRequestHeaders, result.ParsedResponseHeaders)
+	return NewTelepactSchema(result.Original, result.Full, result.Parsed, result.ParsedRequestHeaders, result.ParsedResponseHeaders)
 }
 
 func wrapParseError(err error) error {

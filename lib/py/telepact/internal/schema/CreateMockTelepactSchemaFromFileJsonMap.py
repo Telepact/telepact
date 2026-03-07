@@ -28,4 +28,4 @@ def create_mock_telepact_schema_from_file_json_map(json_documents: dict[str, str
     telepact_schema = create_telepact_schema_from_file_json_map(
         final_json_documents)
 
-    return MockTelepactSchema(telepact_schema.original, telepact_schema.parsed, telepact_schema.parsed_request_headers, telepact_schema.parsed_response_headers)
+    return MockTelepactSchema(telepact_schema.original, telepact_schema.full, telepact_schema.parsed, telepact_schema.parsed_request_headers, telepact_schema.parsed_response_headers)

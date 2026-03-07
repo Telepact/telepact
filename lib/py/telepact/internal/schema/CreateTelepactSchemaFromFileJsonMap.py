@@ -15,6 +15,7 @@
 #|
 
 from typing import TYPE_CHECKING
+import json
 import re
 
 if TYPE_CHECKING:
@@ -27,14 +28,56 @@ def create_telepact_schema_from_file_json_map(json_documents: dict[str, str]) ->
     from .GetAuthTelepactJson import get_auth_telepact_json
 
     final_json_documents = json_documents.copy()
-    final_json_documents["internal_"] = get_internal_telepact_json()
+    internal_json = get_internal_telepact_json()
+    if not _has_bundled_definitions(json_documents, "internal_", internal_json):
+        final_json_documents["internal_"] = internal_json
 
     # Determine if we need to add the auth schema
+    auth_json = get_auth_telepact_json()
     for json in json_documents.values():
         regex = re.compile(r'"struct\.Auth_"\s*:')
         matcher = regex.search(json)
         if matcher:
-            final_json_documents["auth_"] = get_auth_telepact_json()
+            if not _has_bundled_definitions(json_documents, "auth_", auth_json):
+                final_json_documents["auth_"] = auth_json
             break
 
     return parse_telepact_schema(final_json_documents)
+
+
+def _has_bundled_definitions(json_documents: dict[str, str], bundled_document_name: str, bundled_json: str) -> bool:
+    bundled_keys = _collect_schema_keys({bundled_document_name: bundled_json})
+    if bundled_keys is None:
+        return False
+
+    provided_keys = _collect_schema_keys(json_documents)
+    if provided_keys is None:
+        return False
+
+    return bundled_keys.issubset(provided_keys)
+
+
+def _collect_schema_keys(json_documents: dict[str, str]) -> set[str] | None:
+    from .FindSchemaKey import find_schema_key
+
+    schema_keys: set[str] = set()
+
+    for document_name, document_json in json_documents.items():
+        try:
+            pseudo_json = json.loads(document_json)
+        except json.JSONDecodeError:
+            return None
+
+        if not isinstance(pseudo_json, list):
+            return None
+
+        for index, definition in enumerate(pseudo_json):
+            if not isinstance(definition, dict):
+                continue
+
+            try:
+                schema_keys.add(find_schema_key(document_name, definition, index, json_documents))
+            except Exception:
+                return None
+
+    return schema_keys
