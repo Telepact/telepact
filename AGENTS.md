@@ -38,6 +38,17 @@ The entire project uses a hierarchical `Makefile` system. The root `Makefile` de
 -   NOTE: You need the `-s` flag to show all request/response payloads for debugging.
     HOWEVER, avoid using `-s` when `-k` is not specified, as it will produce excessive output.
 
+-   The `test/runner` suite uses per-language test consumers in `test/lib/{go,java,py,ts}`.
+    Those directories often install or package artifacts built from `lib/{lang}`, so they are not always reading `lib/{lang}` source files directly at test time.
+
+-   If you change `lib/<lang>`, prefer running the matching root target such as `make test-py`, `make test-ts`, `make test-java`, or `make test-go` before trusting `test/runner` results.
+    These targets rebuild the library artifact, refresh the corresponding `test/lib/<lang>` consumer, and then run the matching runner shard.
+
+-   If test environments may be stale, run `make clean-test` first, then rerun the appropriate `make test-<lang>` target.
+
+-   Be careful running `poetry run python -m pytest ...` directly in `test/runner` after a library change.
+    That is only reliable if the corresponding `test/lib/<lang>` consumer has already been rebuilt.
+
 ### Key Files & Directories
 
 -   `Makefile`: The entry point for all build, test, and deploy operations.
