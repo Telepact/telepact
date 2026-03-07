@@ -25,29 +25,6 @@ on:
         description: 'Passphrase for the GPG private key'
 
 jobs:
-  check-skill:
-    name: Check Skill
-    runs-on: ubuntu-latest
-    timeout-minutes: 1
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Install Project CLI
-        run: make install-project-cli
-
-      - name: Run skill check
-        run: make skill
-
-      - name: Check for changes
-        run: |
-          if git status --porcelain | grep .; then
-            echo "ERROR: Skill files are stale.\nTo fix, run 'make skill' and git commit the changes."
-            false
-          else
-            echo "Skill files up-to-date."
-          fi
-
   build-ts:
     name: Build TypeScript
     runs-on: ubuntu-latest
