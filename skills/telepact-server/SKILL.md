@@ -215,10 +215,7 @@ if err != nil {
 
 // Assuming `transport` is defined elsewhere
 transport.Receive(func(requestBytes []byte) ([]byte, error) {
-    response, err := telepactServer.Process(requestBytes)
-    if err != nil {
-        return nil, err
-    }
+    response, _ := telepactServer.Process(requestBytes)
     return response.Bytes, nil
 })
 ```
@@ -382,13 +379,7 @@ Illustrative Go example with NATS request/reply:
 import "github.com/nats-io/nats.go"
 
 _, err = nc.Subscribe("api.telepact", func(msg *nats.Msg) {
-    response, err := telepactServer.Process(msg.Data)
-    if err != nil {
-        if msg.Reply != "" {
-            _ = nc.Publish(msg.Reply, []byte(`[{},{"ErrorUnknown_":{}}]`))
-        }
-        return
-    }
+    response, _ := telepactServer.Process(msg.Data)
 
     if msg.Reply != "" {
         _ = nc.Publish(msg.Reply, response.Bytes)
