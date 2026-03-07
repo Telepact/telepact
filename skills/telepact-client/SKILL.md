@@ -85,6 +85,28 @@ Every Telepact API includes standard built-ins such as:
 - `fn.ping_` for connectivity checks
 - `fn.api_` for fetching the served schema
 
+Recommended discovery flow before integrating:
+
+1. call `fn.ping_` to confirm the server is reachable
+2. call `fn.api_` with `{}` to inspect the user-facing API surface
+3. call `fn.api_` with `{"includeInternal!": true}` when you need the full schema including Telepact internal definitions
+
+Examples:
+
+```json
+[{}, {"fn.ping_": {}}]
+```
+
+```json
+[{}, {"fn.api_": {}}]
+```
+
+```json
+[{}, {"fn.api_": {"includeInternal!": true}}]
+```
+
+Use the default `fn.api_` call for normal integration work. Use `includeInternal!` when you need to see the complete set of functions and built-in definitions available on that Telepact server.
+
 Common client-facing headers include:
 
 - `@time_`: request timeout in milliseconds
@@ -409,11 +431,12 @@ response, err := client.Request(
 ## Standard Workflow
 
 1. Inspect the schema for the target `fn.*`, result union, and any relevant headers.
-2. Decide whether the client should be raw JSON or Telepact-library based.
-3. Implement a smoke test with `fn.ping_` or `fn.api_`.
-4. Implement the real function calls with exact Telepact message envelopes.
-5. Add optional headers such as `@id_`, `@auth_`, or `@select_` only when they are actually needed.
-6. Reach for binary only after the JSON path is already working.
+2. Use `fn.ping_` and then `fn.api_` to confirm connectivity and inspect the server before wiring real calls.
+3. Use `{"includeInternal!": true}` with `fn.api_` when you need the full available function surface, including Telepact internal definitions.
+4. Decide whether the client should be raw JSON or Telepact-library based.
+5. Implement the real function calls with exact Telepact message envelopes.
+6. Add optional headers such as `@id_`, `@auth_`, or `@select_` only when they are actually needed.
+7. Reach for binary only after the JSON path is already working.
 
 ## Client Authoring Rules
 
@@ -421,7 +444,8 @@ response, err := client.Request(
 - Build messages with one request target and one response result tag.
 - Keep transport code thin: send bytes, receive bytes, deserialize if needed.
 - Inspect response tags like `Ok_` or `ErrorSomething`, not only transport status.
-- Use `fn.ping_` for connectivity checks and `fn.api_` when schema discovery is useful.
+- Use `fn.ping_` for connectivity checks and `fn.api_` for schema discovery.
+- Use `fn.api_` with `includeInternal!` when you need to inspect the complete server surface before or during integration.
 - For raw clients, prefer JSON first and add manual binary only with a clear need.
 - For library clients, let the serializer and client handle bytes/base64 and binary negotiation rather than duplicating that logic in application code.
 

@@ -14,6 +14,11 @@ The default approach should be:
 3. point your code under test at the mock instead of the live dependency
 4. use the mock to validate requests and produce schema-compliant responses
 
+Important boundary:
+
+- the CLI may contact the live downstream server to fetch its schema
+- your test code should send downstream requests only to the mock
+
 This is the preferred path because the mock server will:
 
 - validate incoming requests against the downstream schema
@@ -82,6 +87,14 @@ In tests, replace the downstream base URL so every downstream call hits the mock
 
 Do not split confidence across separate hand-written validators and fake payload generators if the Telepact mock can do both for you.
 
+After the mock is running, use the mock itself for discovery:
+
+1. call `fn.ping_` on the mock to confirm your test target is reachable
+2. call `fn.api_` on the mock with `{}` to inspect the user-facing downstream schema
+3. call `fn.api_` on the mock with `{"includeInternal!": true}` to inspect the full schema including the mock control functions
+
+That full `fn.api_` view should come from the mock, not the live downstream server.
+
 ## Why The Mock Matters
 
 The Telepact CLI mock is stronger than a generic fake server because it is schema-driven.
@@ -100,6 +113,12 @@ That means your tests can catch:
 - invalid headers
 - incompatible response assumptions in your consumer
 
+To inspect those mock controls from the mock itself, call:
+
+```json
+[{}, {"fn.api_": {"includeInternal!": true}}]
+```
+
 ## Standard Workflow
 
 1. Confirm the downstream API is actually Telepact.
@@ -107,9 +126,11 @@ That means your tests can catch:
 3. Otherwise use `telepact mock --http-url` for a quick schema-backed mock.
 4. Start the mock server on a local port.
 5. Configure your code under test to call the mock URL.
-6. Run consumer tests against the mock.
-7. Add stubs and verification calls for scenario-specific tests.
-8. Keep one or two live smoke tests if needed, but do not rely on the live dependency for the main integration suite.
+6. Use `fn.ping_` and `fn.api_` against the mock to confirm connectivity and inspect the API surface your tests will target.
+7. Use `fn.api_` with `{"includeInternal!": true}` against the mock when you want the full available definitions, including mock control functions.
+8. Run consumer tests against the mock.
+9. Add stubs and verification calls for scenario-specific tests.
+10. Keep one or two live smoke tests if needed, but do not rely on the live dependency for the main integration suite.
 
 ## Mock Controls
 
@@ -153,6 +174,7 @@ The key is that the mock is validating what your consumer actually sends and ret
 
 - Prefer `telepact fetch` when you want schema changes to be explicit in version control.
 - Prefer `telepact mock --http-url` when you are exploring quickly or debugging against the current live schema.
+- Use `fn.api_` with `includeInternal!` against the mock when you want to enumerate all mock control functions available for testing.
 - Keep the downstream mock running over HTTP or WebSocket at the same path shape your app already expects.
 - Use stubs for named business scenarios, not as a blanket replacement for the mock's generated responses.
 - Verify calls explicitly when the test needs to prove that the consumer sent the right request.
@@ -182,6 +204,8 @@ http://localhost:8081/api
 
 - Default to the Telepact CLI mock instead of a hand-written fake downstream server.
 - Use the real downstream schema, fetched through `fn.api_`, whenever possible.
+- Send test traffic to the mock, not to the live downstream service.
+- Inspect mock capabilities such as `fn.createStub_` and `fn.verify_` by calling `fn.api_` with `{"includeInternal!": true}` on the mock.
 - Treat request validation failures from the mock as real integration failures in your consumer code.
 - Prefer schema-driven generated responses first, then add explicit stubs only where necessary.
 - Verify downstream interactions when request shape or call count matters.
