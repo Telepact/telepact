@@ -78,22 +78,23 @@ This still fetches the schema through `fn.api_`, but it does so at mock startup 
 
 Point the code under test at the mock server, not at the live downstream service.
 
-Example:
-
-- real downstream: `http://downstream.example/api`
-- local mock: `http://localhost:8081/api`
-
-In tests, replace the downstream base URL so every downstream call hits the mock.
+In tests, replace the downstream base URL so every downstream call hits the mock URL.
 
 Do not split confidence across separate hand-written validators and fake payload generators if the Telepact mock can do both for you.
+
+For example, if the real downstream is `http://downstream.example/api` and your mock is running at `http://localhost:8081/api`, test traffic should go to the mock:
+
+```sh
+curl http://localhost:8081/api \
+  -H 'content-type: application/json' \
+  --data '[{}, {"fn.ping_": {}}]'
+```
 
 After the mock is running, use the mock itself for discovery:
 
 1. call `fn.ping_` on the mock to confirm your test target is reachable
 2. call `fn.api_` on the mock with `{}` to inspect the user-facing downstream schema
-3. call `fn.api_` on the mock with `{"includeInternal!": true}` to inspect the full schema including the mock control functions
-
-That full `fn.api_` view should come from the mock, not the live downstream server.
+3. call `fn.api_` on the mock with `{"includeInternal!": true}` to inspect the full schema including the mock control functions (e.g. `[{}, {"fn.api_": {"includeInternal!": true}}]`)
 
 ## Why The Mock Matters
 
@@ -112,12 +113,6 @@ That means your tests can catch:
 - missing required fields
 - invalid headers
 - incompatible response assumptions in your consumer
-
-To inspect those mock controls from the mock itself, call:
-
-```json
-[{}, {"fn.api_": {"includeInternal!": true}}]
-```
 
 ## Standard Workflow
 
