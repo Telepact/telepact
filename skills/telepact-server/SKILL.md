@@ -316,7 +316,7 @@ Typical HTTP shape:
 
 If your stack needs a media type, send JSON by default, and send octet-stream when the response indicates binary transport.
 
-The following examples are illustrative only. Express, FastAPI, Spring, and `net/http` are just common ways to wire up an HTTP transport. Any framework is fine if it preserves the same raw-bytes request/reply boundary.
+The following example is illustrative only. Express is just one common way to wire up an HTTP transport. Any framework is fine if it preserves the same raw-bytes request/reply boundary.
 
 TypeScript with Express:
 
@@ -337,68 +337,6 @@ app.post('/api/telepact', express.raw({ type: '*/*' }), async (req, res) => {
 });
 ```
 
-Python with FastAPI or Starlette:
-
-```py
-from fastapi import FastAPI, Request, Response
-
-app = FastAPI()
-
-@app.post('/api/telepact')
-async def telepact_http(request: Request) -> Response:
-    request_bytes = await request.body()
-    telepact_response = await telepactServer.process(request_bytes)
-    media_type = (
-        'application/octet-stream'
-        if '@bin_' in telepact_response.headers
-        else 'application/json'
-    )
-    return Response(content=telepact_response.bytes, media_type=media_type)
-```
-
-Java with Spring:
-
-```java
-@PostMapping("/api/telepact")
-public ResponseEntity<byte[]> telepact(@RequestBody byte[] requestBytes) {
-    var response = telepactServer.process(requestBytes);
-    var mediaType = response.headers.containsKey("@bin_")
-        ? MediaType.APPLICATION_OCTET_STREAM
-        : MediaType.APPLICATION_JSON;
-
-    return ResponseEntity
-        .ok()
-        .contentType(mediaType)
-        .body(response.bytes);
-}
-```
-
-Go with `net/http`:
-
-```go
-http.HandleFunc("/api/telepact", func(w http.ResponseWriter, r *http.Request) {
-    requestBytes, err := io.ReadAll(r.Body)
-    if err != nil {
-        http.Error(w, err.Error(), http.StatusBadRequest)
-        return
-    }
-
-    response, err := telepactServer.Process(requestBytes)
-    if err != nil {
-        http.Error(w, err.Error(), http.StatusInternalServerError)
-        return
-    }
-
-    if _, ok := response.Headers["@bin_"]; ok {
-        w.Header().Set("Content-Type", "application/octet-stream")
-    } else {
-        w.Header().Set("Content-Type", "application/json")
-    }
-
-    _, _ = w.Write(response.Bytes)
-})
-```
-
 ### WebSockets
 
 Typical WebSocket shape:
@@ -409,6 +347,25 @@ Typical WebSocket shape:
 
 Do not try to interpret the WebSocket payload as function-specific JSON outside the Telepact library.
 
+Illustrative Python example with the `websockets` library:
+
+```py
+import asyncio
+import websockets
+
+async def telepact_websocket(websocket) -> None:
+    async for request_bytes in websocket:
+        if isinstance(request_bytes, str):
+            request_bytes = request_bytes.encode('utf-8')
+
+        telepact_response = await telepactServer.process(request_bytes)
+        await websocket.send(telepact_response.bytes)
+
+async def main() -> None:
+    async with websockets.serve(telepact_websocket, '0.0.0.0', 8765):
+        await asyncio.Future()
+```
+
 ### Other Request/Reply Transports
 
 For NATS, AMQP RPC, local IPC, or custom transports:
@@ -418,6 +375,26 @@ For NATS, AMQP RPC, local IPC, or custom transports:
 3. Return the response bytes on the paired reply channel
 
 If the transport is synchronous request/reply, the integration is usually a very thin wrapper.
+
+Illustrative Go example with NATS request/reply:
+
+```go
+import "github.com/nats-io/nats.go"
+
+_, err = nc.Subscribe("api.telepact", func(msg *nats.Msg) {
+    response, err := telepactServer.Process(msg.Data)
+    if err != nil {
+        return
+    }
+
+    if msg.Reply != "" {
+        _ = nc.Publish(msg.Reply, response.Bytes)
+    }
+})
+if err != nil {
+    return err
+}
+```
 
 ## Built-In Telepact Server Behavior
 
