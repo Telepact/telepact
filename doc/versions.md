@@ -8,4 +8,4 @@
 | Library (TypeScript) | `telepact` | npm | `1.0.0-alpha.194` |
 | SDK (CLI) | `telepact-cli` | PyPI | `1.0.0-alpha.194` |
 | SDK (Console) | `telepact-console` | npm | `1.0.0-alpha.194` |
-| SDK (Prettier) | `prettier-plugin-telepact` | npm | `—` |
+| SDK (Prettier) | `prettier-plugin-telepact` | npm | `1.0.0-alpha.185` |
