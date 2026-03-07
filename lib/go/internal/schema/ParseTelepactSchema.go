@@ -31,6 +31,7 @@ func ParseTelepactSchema(telepactSchemaDocumentNamesToJSON map[string]string) (*
 	}
 
 	originalSchema := make(map[string]any)
+	fullSchema := make(map[string]any)
 	parsedTypes := make(map[string]types.TType)
 	fnErrorRegexes := make(map[string]string)
 	parseFailures := make([]*SchemaParseFailure, 0)
@@ -114,6 +115,7 @@ func ParseTelepactSchema(telepactSchemaDocumentNamesToJSON map[string]string) (*
 			if documentName == "auto_" || documentName == "auth_" || !strings.HasSuffix(documentName, "_") {
 				originalSchema[schemaKey] = definition
 			}
+			fullSchema[schemaKey] = definition
 		}
 	}
 
@@ -329,8 +331,27 @@ func ParseTelepactSchema(telepactSchemaDocumentNamesToJSON map[string]string) (*
 		finalOriginal = append(finalOriginal, originalSchema[key])
 	}
 
+	fullKeys := make([]string, 0, len(fullSchema))
+	for key := range fullSchema {
+		fullKeys = append(fullKeys, key)
+	}
+	sort.Slice(fullKeys, func(i, j int) bool {
+		iInfo := strings.HasPrefix(fullKeys[i], "info.")
+		jInfo := strings.HasPrefix(fullKeys[j], "info.")
+		if iInfo != jInfo {
+			return iInfo && !jInfo
+		}
+		return fullKeys[i] < fullKeys[j]
+	})
+
+	finalFull := make([]any, 0, len(fullKeys))
+	for _, key := range fullKeys {
+		finalFull = append(finalFull, fullSchema[key])
+	}
+
 	return &ParsedSchemaResult{
 		Original:              finalOriginal,
+		Full:                  finalFull,
 		Parsed:                parsedTypes,
 		ParsedRequestHeaders:  requestHeaders,
 		ParsedResponseHeaders: responseHeaders,

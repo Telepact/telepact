@@ -10,8 +10,10 @@
         "_errors": "^errors\\.Validation_$"
     },
     {
-        "///": " Get the telepact `schema` of this server. ",
-        "fn.api_": {},
+        "///": " Get the telepact `schema` of this server. Set `includeInternal` to `true` to include Telepact internal definitions. ",
+        "fn.api_": {
+            "includeInternal!": "boolean"
+        },
         "->": [
             {
                 "Ok_": {

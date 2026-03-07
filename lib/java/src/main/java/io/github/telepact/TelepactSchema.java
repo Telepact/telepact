@@ -36,6 +36,11 @@ public class TelepactSchema {
     public final List<Object> original;
 
     /**
+     * The complete schema objects, including Telepact internals.
+     */
+    public final List<Object> full;
+
+    /**
      * The parsed schema types.
      */
     public final Map<String, TType> parsed;
@@ -54,15 +59,18 @@ public class TelepactSchema {
      * Constructs a new TelepactSchema with the specified parameters.
      *
      * @param original the original schema objects
+     * @param full the complete schema objects
      * @param parsed the parsed schema types
      * @param parsedRequestHeaders the parsed request headers
      * @param parsedResponseHeaders the parsed response headers
      */
     public TelepactSchema(List<Object> original,
+            List<Object> full,
             Map<String, TType> parsed,
             Map<String, TFieldDeclaration> parsedRequestHeaders,
             Map<String, TFieldDeclaration> parsedResponseHeaders) {
         this.original = original;
+        this.full = full;
         this.parsed = parsed;
         this.parsedRequestHeaders = parsedRequestHeaders;
         this.parsedResponseHeaders = parsedResponseHeaders;

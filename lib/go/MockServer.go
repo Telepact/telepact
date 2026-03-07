@@ -82,6 +82,7 @@ func NewMockServer(mockSchema *MockTelepactSchema, options *MockServerOptions) (
 
 	telepactSchema := NewTelepactSchema(
 		mockSchema.Original,
+		mockSchema.Full,
 		mockSchema.Parsed,
 		mockSchema.ParsedRequestHeaders,
 		mockSchema.ParsedResponseHeaders,

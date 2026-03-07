@@ -370,7 +370,8 @@ export async function loadConsoleData(url: URL): Promise<LoadedConsoleData> {
 		return { schemaSource: 'unknown', showInternalApi, readonlyEditor: true, authManaged };
 	}
 
-	const schemaResponse = await client.request(new Message({}, { 'fn.api_': {} }));
+	const apiRequest = showInternalApi ? { 'includeInternal!': true } : {};
+	const schemaResponse = await client.request(new Message({}, { 'fn.api_': apiRequest }));
 	const schemaPseudoJson = schemaResponse?.body?.Ok_?.api;
 
 	if (!Array.isArray(schemaPseudoJson)) {

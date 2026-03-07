@@ -91,7 +91,7 @@ void main() {
       final exampleLocalStorageData = {
         "-1337": {"lol": 1, "notreal": 2}
       };
-      //final exampleLocalStorageData = {"-2064039486":{"Ok_":0,"api":1,"fn.add":2,"fn.api_":3,"fn.ping_":4,"result":5,"x":6,"y":7}};
+      //final exampleLocalStorageData = {"-1443216067":{"Ok_":0,"api":1,"fn.add":2,"fn.api_":3,"fn.ping_":4,"includeInternal!":5,"result":6,"x":7,"y":8}};
       web.window.localStorage.setItem(
           'telepact-api-encoding:test', jsonEncode(exampleLocalStorageData));
 
@@ -113,11 +113,12 @@ void main() {
             'fn.add': 2,
             'fn.api_': 3,
             'fn.ping_': 4,
-            'result': 5,
-            'x': 6,
-            'y': 7
+            'includeInternal!': 5,
+            'result': 6,
+            'x': 7,
+            'y': 8
           },
-          '@bin_': [-2064039486]
+          '@bin_': [-1443216067]
         }, {
           "Ok_": {}
         });
@@ -137,7 +138,7 @@ void main() {
         print('response: ${response.body}');
 
         Message expectedResponse = Message({
-          '@bin_': [-2064039486]
+          '@bin_': [-1443216067]
         }, {
           "Ok_": {'result': 3}
         });

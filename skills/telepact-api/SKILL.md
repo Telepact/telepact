@@ -477,6 +477,11 @@ Standard definitions include utility functions, like `fn.ping_`, and common
 errors, like `ErrorInvalidRequest` and `ErrorUnknown_`. These are always
 included and cannot be turned off.
 
+The `fn.api_` helper returns the user-facing schema by default. Pass
+`{"includeInternal!": true}` to include these standard Telepact definitions in
+the response. For mock servers, this expanded response also includes the
+bundled mock schema definitions.
+
 You can find all standard definitions
 [here](#internal-telepact-json).
 
@@ -748,8 +753,10 @@ You can find all mock definitions
         "_errors": "^errors\\.Validation_$"
     },
     {
-        "///": " Get the telepact `schema` of this server. ",
-        "fn.api_": {},
+        "///": " Get the telepact `schema` of this server. Set `includeInternal` to `true` to include Telepact internal definitions. ",
+        "fn.api_": {
+            "includeInternal!": "boolean"
+        },
         "->": [
             {
                 "Ok_": {

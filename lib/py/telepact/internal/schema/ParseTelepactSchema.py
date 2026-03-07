@@ -47,6 +47,7 @@ def parse_telepact_schema(
     from .CatchHeaderCollisions import catch_header_collisions
 
     original_schema: dict[str, object] = {}
+    full_schema: dict[str, object] = {}
     parsed_types: dict[str, TType] = {}
     fn_error_regexes: dict[str, str] = {}
     parse_failures: list[SchemaParseFailure] = []
@@ -123,6 +124,7 @@ def parse_telepact_schema(
                 schema_keys_to_document_names[schema_key] = document_name
                 if document_name == 'auto_' or document_name == 'auth_' or not document_name.endswith('_'):
                     original_schema[schema_key] = def_
+                full_schema[schema_key] = def_
 
             except TelepactSchemaParseError as e:
                 parse_failures.extend(e.schema_parse_failures)
@@ -276,9 +278,12 @@ def parse_telepact_schema(
 
     final_original_schema = [original_schema[k]
                              for k in sorted(original_schema.keys(), key=lambda k: (not k.startswith("info."), k))]
+    final_full_schema = [full_schema[k]
+                         for k in sorted(full_schema.keys(), key=lambda k: (not k.startswith("info."), k))]
 
     return TelepactSchema(
         final_original_schema,
+        final_full_schema,
         parsed_types,
         request_headers,
         response_headers

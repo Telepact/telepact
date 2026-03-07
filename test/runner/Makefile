@@ -17,28 +17,52 @@
 test: setup java py ts go
 	poetry run python -m pytest
 
-test-java: setup java
+test-java:
+	$(MAKE) prepare-java
+	$(MAKE) test-java-run
+
+prepare-java: setup java
+
+test-java-run: setup
 	poetry run python -m pytest -k [java
 
-test-trace-java: setup java
+test-trace-java: prepare-java
 	poetry run python -m pytest -k test_client_server_case[java-0] -s -vv
 
-test-py: setup py
+test-py:
+	$(MAKE) prepare-py
+	$(MAKE) test-py-run
+
+prepare-py: setup py
+
+test-py-run: setup
 	poetry run python -m pytest -k [py
 
-test-trace-py: setup py
+test-trace-py: prepare-py
 	poetry run python -m pytest -k test_client_server_case[py-0] -s -vv
 
-test-ts: setup ts
+test-ts:
+	$(MAKE) prepare-ts
+	$(MAKE) test-ts-run
+
+prepare-ts: setup ts
+
+test-ts-run: setup
 	poetry run python -m pytest -k [ts
 
-test-trace-ts: setup ts
+test-trace-ts: prepare-ts
 	poetry run python -m pytest -k test_client_server_case[ts-0] -s -vv
 
-test-go: setup go
+test-go:
+	$(MAKE) prepare-go
+	$(MAKE) test-go-run
+
+prepare-go: setup go
+
+test-go-run: setup
 	poetry run python -m pytest -k [go
 
-test-trace-go: setup go
+test-trace-go: prepare-go
 	poetry run python -m pytest -k test_client_server_case[go-0] -s -vv
 
 setup:
@@ -60,3 +84,5 @@ clean:
 	rm -rf .pytest_cache
 	rm -rf __pycache__
 	poetry env remove --all
+
+.PHONY: test test-java prepare-java test-java-run test-trace-java test-py prepare-py test-py-run test-trace-py test-ts prepare-ts test-ts-run test-trace-ts test-go prepare-go test-go-run test-trace-go setup java py ts go clean
