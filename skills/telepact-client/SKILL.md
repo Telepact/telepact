@@ -92,9 +92,55 @@ Common client-facing headers include:
 - `@select_`: response field selection
 - `@auth_`: auth data when the schema defines `struct.Auth_`
 - `@warn_`: warnings returned by the server
-- `@bin_`, `@enc_`, `@pac_`: binary negotiation headers
+- `@bin_`, `@enc_`, `@pac_`: binary negotiation headers (though should not use directly)
 
-For JSON mode, `bytes` values travel as base64 strings. Do not send raw byte arrays in JSON requests unless the surrounding transport is already using Telepact binary encoding.
+For JSON mode, API schema fields that have the `bytes` type travel as base64 strings.
+
+## Auth
+
+If the server schema defines `struct.Auth_`, send credentials in the `@auth_` header. The fields inside `@auth_` must match `struct.Auth_` exactly.
+
+For example, if the schema includes:
+
+```json
+{
+    "struct.Auth_": {
+        "token": "string"
+    }
+}
+```
+
+then a client request should look like:
+
+```json
+[
+    {
+        "@auth_": {
+            "token": "secret-token"
+        }
+    },
+    {
+        "fn.getProfile": {}
+    }
+]
+```
+
+Using the Telepact library, that becomes:
+
+```ts
+const request = new Message(
+    {
+        '@auth_': {
+            token: 'secret-token',
+        },
+    },
+    {
+        'fn.getProfile': {},
+    },
+);
+```
+
+If the API does not use auth, omit `@auth_`.
 
 ## Path A: Raw Client
 

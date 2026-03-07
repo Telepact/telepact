@@ -82,6 +82,27 @@ The library handles:
 
 Do not manually re-implement those behaviors in your transport or business logic.
 
+## Auth
+
+If the API uses credentials, always model them as `struct.Auth_` and flow them through the `@auth_` header.
+
+Do not invent alternate credential channels such as:
+
+- custom headers like `@token`, `@session`, or `Authorization`
+- request body fields on ordinary functions
+- transport-specific side channels that bypass the Telepact message
+
+The Telepact ecosystem expects credentials to move through `struct.Auth_` and `@auth_`. That path is treated with greater sensitivity. Outside it, Telepact has no equivalent guardrails, and credentials are easier to leak accidentally through logs, copied payloads, examples, or tooling.
+
+Server rule:
+
+- define `struct.Auth_` in the schema when the API is authenticated
+- declare `@auth_` as `struct.Auth_` in the schema's headers definition
+- read credentials from the request headers, not from ordinary function arguments
+- keep auth handling inside the Telepact message flow rather than transport-specific side channels
+
+If the API does not need authentication, omit `struct.Auth_` and `@auth_` entirely. Do not create custom credential placeholders.
+
 ## Language Quick Reference
 
 Use these library patterns directly for schema loading, handler definition, server construction, and a minimal request/reply transport hookup.
