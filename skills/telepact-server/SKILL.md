@@ -26,6 +26,21 @@ Classify the target stack first:
 - Java
 - Go
 
+Install the matching Telepact library first:
+
+- TypeScript: `npm install telepact`
+- Python: `pip install telepact`
+- Java (Maven):
+
+```xml
+<dependency>
+    <groupId>io.github.telepact</groupId>
+    <artifactId>telepact</artifactId>
+</dependency>
+```
+
+- Go: `go get github.com/telepact/telepact/lib/go`
+
 Then implement the same four-part pattern in that language:
 
 1. Load the existing Telepact schema
@@ -71,7 +86,9 @@ Do not manually re-implement those behaviors in your transport or business logic
 
 ## Language Quick Reference
 
-Use these library patterns directly when writing code.
+Use these library patterns directly for schema loading, handler definition, and server construction.
+
+Do not treat the following snippets as the transport layer. The actual call to `server.process(...)` belongs in your HTTP, WebSocket, NATS, or other request/reply transport wrapper.
 
 ### TypeScript
 
@@ -98,8 +115,12 @@ const handler = async (requestMessage: Message): Promise<Message> => {
 };
 
 const server = new Server(schema, handler, new ServerOptions());
-const response = await server.process(requestBytes);
-const responseBytes = response.bytes;
+
+// Assuming `transport` is defined elsewhere
+transport.receive(async (requestBytes): Promise<Uint8Array> => {
+    const response = await server.process(requestBytes);
+    return response.bytes;
+});
 ```
 
 ### Python
@@ -119,8 +140,13 @@ async def handler(request_message: 'Message') -> 'Message':
 
 options = Server.Options()
 server = Server(schema, handler, options)
-response = await server.process(request_bytes)
-response_bytes = response.bytes
+
+# Assuming `transport` is defined elsewhere
+async def transport_handler(request_bytes: bytes) -> bytes:
+    response = await server.process(request_bytes)
+    return response.bytes
+
+transport(transport_handler)
 ```
 
 ### Java
@@ -139,8 +165,12 @@ Function<Message, Message> handler = (requestMessage) -> {
 
 var options = new Server.Options();
 var server = new Server(schema, handler, options);
-var response = server.process(requestBytes);
-var responseBytes = response.bytes;
+
+// Assuming `transport` is defined elsewhere
+transport.receive((requestBytes) -> {
+    var response = server.process(requestBytes);
+    return response.bytes;
+});
 ```
 
 ### Go
@@ -183,11 +213,14 @@ if err != nil {
     return err
 }
 
-response, err := server.Process(requestBytes)
-if err != nil {
-    return err
-}
-responseBytes := response.Bytes
+// Assuming `transport` is defined elsewhere
+transport.Receive(func(requestBytes []byte) ([]byte, error) {
+    response, err := server.Process(requestBytes)
+    if err != nil {
+        return nil, err
+    }
+    return response.Bytes, nil
+})
 ```
 
 ## Server Authoring Rules
