@@ -136,7 +136,7 @@ public class HandleMessage {
             resultMessage = new Message(Map.of(), Map.of("Ok_", Map.of()));
         } else if (functionName.equals("fn.api_")) {
             final var includeInternal = requestPayload instanceof Map<?, ?>
-                    && Objects.equals(true, ((Map<?, ?>) requestPayload).get("includeInternal"));
+                    && Objects.equals(true, ((Map<?, ?>) requestPayload).get("includeInternal!"));
             resultMessage = new Message(Map.of(),
                     Map.of("Ok_", Map.of("api", includeInternal ? telepactSchema.full : telepactSchema.original)));
         } else {

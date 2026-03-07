@@ -162,7 +162,7 @@ func HandleMessage(
 	case "fn.api_":
 		includeInternal := false
 		if requestMap, ok := requestPayload.(map[string]any); ok {
-			includeInternal = boolValue(requestMap["includeInternal"])
+			includeInternal = boolValue(requestMap["includeInternal!"])
 		}
 		apiDefinitions := schema.OriginalDefinitions()
 		if includeInternal {

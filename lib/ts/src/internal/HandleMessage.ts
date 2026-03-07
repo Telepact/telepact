@@ -162,7 +162,7 @@ export async function handleMessage(
     if (functionName === 'fn.ping_') {
         resultMessage = new Message({}, { Ok_: {} });
     } else if (functionName === 'fn.api_') {
-        const includeInternal = requestPayload['includeInternal'] === true;
+        const includeInternal = requestPayload['includeInternal!'] === true;
         resultMessage = new Message({}, { Ok_: { api: includeInternal ? telepactSchema.full : telepactSchema.original } });
     } else {
         try {

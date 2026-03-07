@@ -14,9 +14,10 @@
 #|  limitations under the License.
 #|
 
-from util import verify_client_case, ping_req, startup_check, send_case, Constants as c
+from util import verify_client_case, ping_req, startup_check, send_case, client_backdoor_handler, backdoor_handler, Constants as c
 import pytest
 import json
+import asyncio
 from copy import deepcopy as dc
 
 
@@ -74,12 +75,25 @@ def test_client_server_api_includes_internal_when_requested(loop, client_server_
     topics = client_server_proc
 
     async def t():
-        response = await send_case(
-            nats_client,
-            [{}, {'fn.api_': {'includeInternal': True}}],
-            None,
-            topics[0],
+        client_handling_task = asyncio.create_task(
+            client_backdoor_handler(nats_client, topics[1], topics[2]),
         )
+        backdoor_handling_task = asyncio.create_task(
+            backdoor_handler(nats_client, topics[3]),
+        )
+
+        try:
+            response = await send_case(
+                nats_client,
+                [{}, {'fn.api_': {'includeInternal!': True}}],
+                None,
+                topics[0],
+            )
+        finally:
+            backdoor_handling_task.cancel()
+            await backdoor_handling_task
+            client_handling_task.cancel()
+            await client_handling_task
 
         api = response[1]['Ok_']['api']
         schema_keys = {

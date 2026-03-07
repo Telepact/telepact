@@ -14,7 +14,7 @@
 #|  limitations under the License.
 #|
 
-from util import verify_server_case, ping_req, startup_check, Constants as c
+from util import verify_server_case, ping_req, startup_check, send_case, Constants as c
 import pytest
 import json
 from copy import deepcopy as dc
@@ -58,5 +58,31 @@ def test_auth_case(loop, auth_server_proc, nats_client, name, req, res):
 
     async def t():
         await verify_server_case(nats_client, dc(req), dc(res), *topics)
+
+    loop.run_until_complete(t())
+
+
+def test_auth_api_includes_internal_when_requested(loop, auth_server_proc, nats_client):
+    topics = auth_server_proc
+
+    async def t():
+        response = await send_case(
+            nats_client,
+            [{}, {'fn.api_': {'includeInternal!': True}}],
+            None,
+            topics[0],
+        )
+
+        api = response[1]['Ok_']['api']
+        schema_keys = {
+            next(key for key in definition.keys() if key not in {'///', '->', '_errors'})
+            for definition in api
+            if isinstance(definition, dict)
+        }
+
+        assert 'fn.api_' in schema_keys
+        assert 'fn.ping_' in schema_keys
+        assert 'headers.Auth_' in schema_keys
+        assert 'headers.Time_' in schema_keys
 
     loop.run_until_complete(t())

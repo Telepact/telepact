@@ -601,7 +601,7 @@ def get_api_from_http(http_url: str, include_internal: bool = False) -> str:
             # Ensure the async function is run correctly
             request_body: dict[str, dict[str, object]] = {'fn.api_': {}}
             if include_internal:
-                request_body = {'fn.api_': {'includeInternal': True}}
+                request_body = {'fn.api_': {'includeInternal!': True}}
             response_message = asyncio.run(telepact_client.request(Message({}, request_body)))
             if 'Ok_' in response_message.body or 'Error' in next(iter(response_message.body.keys()), ""): # Check for valid Telepact response structure
                 break

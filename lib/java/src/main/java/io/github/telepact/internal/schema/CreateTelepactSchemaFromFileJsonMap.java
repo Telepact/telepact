@@ -81,11 +81,15 @@ public class CreateTelepactSchemaFromFileJsonMap {
         final var schemaKeys = new HashSet<String>();
 
         for (var entry : jsonDocuments.entrySet()) {
-            final List<Object> pseudoJson;
+            final Object pseudoJsonValue;
             try {
-                pseudoJson = objectMapper.readValue(entry.getValue(), new TypeReference<>() {
+                pseudoJsonValue = objectMapper.readValue(entry.getValue(), new TypeReference<>() {
                 });
             } catch (IOException e) {
+                return null;
+            }
+
+            if (!(pseudoJsonValue instanceof List<?> pseudoJson)) {
                 return null;
             }
 

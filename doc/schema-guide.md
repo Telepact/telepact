@@ -392,7 +392,7 @@ errors, like `ErrorInvalidRequest` and `ErrorUnknown_`. These are always
 included and cannot be turned off.
 
 The `fn.api_` helper returns the user-facing schema by default. Pass
-`{"includeInternal": true}` to include these standard Telepact definitions in
+`{"includeInternal!": true}` to include these standard Telepact definitions in
 the response.
 
 You can find all standard definitions
