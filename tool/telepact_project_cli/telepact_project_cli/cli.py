@@ -27,7 +27,6 @@ from pathlib import Path
 
 from .commands.consolidated_readme import consolidated_readme
 from .commands.doc_versions import doc_versions
-from .commands.skill import skill
 
 yaml = YAML()
 
@@ -691,7 +690,6 @@ main.add_command(automerge)
 main.add_command(gitignore)
 main.add_command(consolidated_readme)
 main.add_command(doc_versions)
-main.add_command(skill)
 
 if __name__ == "__main__":
     main()
