@@ -41,6 +41,16 @@ Use it when:
 
 Do not default to ad hoc fake JSON servers when the dependency is already Telepact. Prefer the Telepact CLI mock path first.
 
+## Install The CLI
+
+Install the Telepact CLI first:
+
+```sh
+pipx install telepact-cli
+```
+
+Latest CLI versions can be found at [doc/versions.md](https://github.com/Telepact/telepact/blob/main/doc/versions.md).
+
 ## First Step
 
 Classify which of these two setup modes fits better:

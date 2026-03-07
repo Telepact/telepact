@@ -39,6 +39,8 @@ Install the matching Telepact library first:
 
 - Go: `go get github.com/telepact/telepact/lib/go`
 
+Latest library versions can be found at [doc/versions.md](https://github.com/Telepact/telepact/blob/main/doc/versions.md).
+
 Then implement the same four-part pattern in that language:
 
 1. Load the existing Telepact schema

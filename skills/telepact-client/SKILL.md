@@ -266,6 +266,8 @@ Install the matching library first:
 
 - Go: `go get github.com/telepact/telepact/lib/go`
 
+Latest library versions can be found at [doc/versions.md](https://github.com/Telepact/telepact/blob/main/doc/versions.md).
+
 Then implement the same three-part pattern in that language:
 
 1. Build a transport adapter over request and response bytes
