@@ -49,7 +49,7 @@ export class Server {
 
         if (!('struct.Auth_' in this.telepactSchema.parsed) && options.authRequired) {
             throw new Error(
-                'Unauthenticated server. Either define a `struct.Auth_` in your schema or set `options.authRequired` to `false`.',
+                'Unauthenticated server. Either define a non-empty `struct.Auth_` in your schema or set `options.authRequired` to `false`.',
             );
         }
     }
