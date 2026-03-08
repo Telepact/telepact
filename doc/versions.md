@@ -6,6 +6,6 @@
 | Library (Java) | `io.github.telepact:telepact` | Maven Central | `1.0.0-alpha.198` |
 | Library (Python) | `telepact` | PyPI | `1.0.0-alpha.198` |
 | Library (TypeScript) | `telepact` | npm | `1.0.0-alpha.198` |
-| SDK (CLI) | `telepact-cli` | PyPI | `1.0.0-alpha.198` |
+| SDK (CLI) | `telepact-cli` | PyPI | `1.0.0-alpha.199` |
 | SDK (Console) | `telepact-console` | npm | `1.0.0-alpha.198` |
 | SDK (Prettier) | `prettier-plugin-telepact` | npm | `1.0.0-alpha.198` |
