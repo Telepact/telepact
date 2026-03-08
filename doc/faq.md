@@ -43,7 +43,13 @@ returned from the code expression.
 
 Headers definitions resemble structs, but unlike ordinary structs, all headers
 are already optional by default. As a result, header names never take the `!`
-suffix. Use names like `"@requestId"` or `"@servedAt"`, not `"@requestId!"`.
+suffix.
+
+This design constraint helps distinguish header fields from struct fields.
+Headers are much different than structs in that any undeclared header is valid
+at runtime, something strictly disallowed with normal structs. When users see
+the `@` prefix, they know they are working with headers, a psuedo-struct where
+everything is optional, and new runtime fields are not disallowed.
 
 ## Why does my unauthenticated server fail to start?
 
