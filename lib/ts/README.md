@@ -28,6 +28,7 @@ Server:
 ```ts
 import * as fs from 'fs';
 import * as path from 'path';
+import { Message, Server, ServerOptions, TelepactSchema, TelepactSchemaFiles } from 'telepact';
 
 const files = new TelepactSchemaFiles('/directory/containing/api/files', fs, path);
 const schema = TelepactSchema.fromFileJsonMap(files.filenamesToJson);
@@ -56,10 +57,12 @@ const handler = async (requestMessage: Message): Promise<Message> => {
 };
 
 const options = new ServerOptions();
+// Set this to false when your schema does not define struct.Auth_.
+options.authRequired = false;
 const server = new Server(schema, handler, options);
 
 // Wire up request/response bytes from your transport of choice
-transport.receive(async (requestBytes): Promise<Message> => {
+transport.receive(async (requestBytes: Uint8Array): Promise<Uint8Array> => {
     const response = await server.process(requestBytes);
     return response.bytes;
 });
@@ -67,6 +70,8 @@ transport.receive(async (requestBytes): Promise<Message> => {
 
 Client:
 ```ts
+import { Client, ClientOptions, Message, Serializer } from 'telepact';
+
 const adapter: (m: Message, s: Serializer) => Promise<Message> = async (m, s) => {
     const requestBytes = s.serialize(m);
 
@@ -92,3 +97,5 @@ if (response.getBodyTarget() === 'Ok_') {
 
 For more concrete usage examples, [see the tests](https://github.com/Telepact/telepact/blob/main/test/lib/ts/src/main.ts).
 
+For browser clients calling a Telepact server over HTTP, see the
+[browser transport guide](https://github.com/Telepact/telepact/blob/main/doc/browser-http.md).

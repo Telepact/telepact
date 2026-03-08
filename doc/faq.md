@@ -39,6 +39,26 @@ If a client encounters something like `response['field!']` in code, the `!`
 immediately alerts the code reader that an `undefined`-like value might be
 returned from the code expression.
 
+## Why can't header fields use the `!` symbol?
+
+Headers definitions resemble structs, but unlike ordinary structs, all headers
+are already optional by default. As a result, header names never take the `!`
+suffix. Use names like `"@requestId"` or `"@servedAt"`, not `"@requestId!"`.
+
+## Why does my unauthenticated server fail to start?
+
+Telepact server libraries default to requiring the standard `struct.Auth_`
+definition. If your API does not use Telepact auth, set the server option that
+disables auth enforcement instead:
+
+- TypeScript: `options.authRequired = false`
+- Python: `options.auth_required = False`
+- Java: `options.authRequired = false`
+- Go: `options.AuthRequired = false`
+
+If your API does use auth, keep the default and define `struct.Auth_` in the
+schema so Telepact can validate the `@auth_` header.
+
 ## Why can I not define nullable arrays or objects?
 
 Nullability is indicated on base types by appending type strings with `?`, but

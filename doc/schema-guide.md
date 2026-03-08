@@ -302,8 +302,12 @@ struct definitions, with a few exceptions:
 
 -   all header fields must be prepended with `@`
 -   all header fields are implicitly optional
+-   header fields must not use the `!` suffix because optionality is already
+    implied for all headers
 -   additional header fields not specified in the definition will be allowed
     during validation
+
+Header names therefore follow the pattern `^@[a-z][a-zA-Z0-9_]*$`.
 
 Headers definitions cannot be used in type expressions.
 

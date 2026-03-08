@@ -3,8 +3,11 @@
 ### Installation
 
 ```
-pip install telepact
+pip install --pre telepact
 ```
+
+Published PyPI releases are currently prereleases. To pin a specific release,
+use the exact version from [doc/versions.md](https://github.com/Telepact/telepact/blob/main/doc/versions.md).
 
 ### Usage
 
@@ -28,12 +31,13 @@ API:
 Server:
 
 ```py
+from telepact import Client, Message, Serializer, Server, TelepactSchema, TelepactSchemaFiles
 
 files = TelepactSchemaFiles('/directory/containing/api/files')
 schema = TelepactSchema.from_file_json_map(files.filenames_to_json)
 
 async def handler(request_message: 'Message') -> 'Message':
-    function_name = request_message.body.keys[0]
+    function_name = next(iter(request_message.body.keys()))
     arguments = request_message.body[function_name]
 
     try:
@@ -54,6 +58,8 @@ async def handler(request_message: 'Message') -> 'Message':
 
 
 options = Server.Options()
+# Set this to False when your schema does not define struct.Auth_.
+options.auth_required = False
 server = Server(schema, handler, options)
 
 
@@ -91,3 +97,6 @@ else:
 
 For more concrete usage examples,
 [see the tests](https://github.com/Telepact/telepact/blob/main/test/lib/py/telepact_test/test_server.py).
+
+For browser clients calling a Telepact server over HTTP, see the
+[browser transport guide](https://github.com/Telepact/telepact/blob/main/doc/browser-http.md).

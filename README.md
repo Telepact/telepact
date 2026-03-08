@@ -42,6 +42,7 @@ Response:
 ```
 
 Check out the [full-stack example](./doc/example.md).
+For browser clients over HTTP, see the [browser transport guide](./doc/browser-http.md).
 
 # Explore
 
@@ -66,6 +67,8 @@ For development assistance, see the SDK tool docs:
     - Consistently format your Telepact api schemas, especially the doc-strings
 
 Find the latest versions of all libraries and sdks [here](./doc/versions.md).
+That page tracks published registry versions, which may lag the source tree
+between releases.
 
 For further reading, see [Motivation](./doc/motivation.md).
 

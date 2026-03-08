@@ -28,10 +28,17 @@ API:
 
 Server:
 ```java
+import io.github.telepact.Client;
+import io.github.telepact.Message;
+import io.github.telepact.Serializer;
+import io.github.telepact.Server;
+import io.github.telepact.TelepactSchema;
+import io.github.telepact.TelepactSchemaFiles;
+
 var files = new TelepactSchemaFiles("./directory/containing/api/files");
-var schema = TelepactSchema.fromFilesJsonMap(files.filenamesToJson);
+var schema = TelepactSchema.fromFileJsonMap(files.filenamesToJson);
 Function<Message, Message> handler = (requestMessage) -> {
-    var functionName = requestMessage.body.keySet().stream().findAny();
+    var functionName = requestMessage.body.keySet().stream().findAny().orElseThrow();
     var arguments = (Map<String, Object>) requestMessage.body.get(functionName);
 
     try {
@@ -53,6 +60,8 @@ Function<Message, Message> handler = (requestMessage) -> {
     }
 };
 var options = new Server.Options();
+// Set this to false when your schema does not define struct.Auth_.
+options.authRequired = false;
 var server = new Server(schema, handler, options);
 
 
@@ -92,3 +101,6 @@ if ("Ok_".equals(response.getBodyTarget())) {
 ```
 
 For more concrete usage examples, [see the tests](https://github.com/Telepact/telepact/blob/main/test/lib/java/src/main/java/telepacttest/Main.java).
+
+For browser clients calling a Telepact server over HTTP, see the
+[browser transport guide](https://github.com/Telepact/telepact/blob/main/doc/browser-http.md).
