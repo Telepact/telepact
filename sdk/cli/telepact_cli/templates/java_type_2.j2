@@ -247,13 +247,11 @@ public final class {{ display_name }} {
 
         public Select_ {{ name }}{{ tag }}{{ field | replace('!', '') }}() {
             final var theseTags = (Map<String, Object>) this.pseudoJson.getOrDefault("{{ key }}", new HashMap<>());
-            if (!theseTags.containsKey("{{tag}}")) {
-                final var theseFields = (List<Object>) theseTags.getOrDefault("{{ tag }}", new ArrayList<>());
-                if (!theseFields.contains("{{field}}")) {
-                    theseFields.add("{{field}}");
-                }
-                theseTags.put("{{ tag }}", theseFields);
+            final var theseFields = (List<Object>) theseTags.getOrDefault("{{ tag }}", new ArrayList<>());
+            if (!theseFields.contains("{{field}}")) {
+                theseFields.add("{{field}}");
             }
+            theseTags.put("{{ tag }}", theseFields);
             this.pseudoJson.put("{{ key }}", theseTags);
 
             return this;
@@ -269,13 +267,11 @@ public final class {{ display_name }} {
         public Select_ ok{{ okField | replace('!', '') }}() {
             final var resultUnion = (Map<String, Object>) this.pseudoJson.getOrDefault("->", new HashMap<>());
 
-            if (!resultUnion.containsKey("Ok_")) {
-                final var theseFields = (List<Object>) resultUnion.getOrDefault("Ok_", new ArrayList<>());
-                if (!theseFields.contains("{{okField}}")) {
-                    theseFields.add("{{okField}}");
-                }
-                resultUnion.put("Ok_", theseFields);
+            final var theseFields = (List<Object>) resultUnion.getOrDefault("Ok_", new ArrayList<>());
+            if (!theseFields.contains("{{okField}}")) {
+                theseFields.add("{{okField}}");
             }
+            resultUnion.put("Ok_", theseFields);
             this.pseudoJson.put("->", resultUnion);
             return this;
         }
@@ -300,4 +296,3 @@ public final class {{ display_name }} {
     {%- set fn_selects = possible_fn_selects[schema_key] -%}
     {{ function(java_name, data, schema_key, fn_selects) }}
 {%- endif %}
-

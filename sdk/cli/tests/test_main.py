@@ -162,8 +162,13 @@ def test_command_java(runner: CliRunner) -> None:
 
     assert result.exit_code == 0
 
-    # open the generated file and check if it contains the expected content
-    # TODO: implement this part
+    generated = Path('tests/output/java/test.java').read_text()
+    generated_nested = Path('tests/output/java/selectNested.java').read_text()
+    assert 'if (!resultUnion.containsKey("Ok_"))' not in generated
+    assert 'final var theseFields = (List<Object>) resultUnion.getOrDefault("Ok_", new ArrayList<>());' in generated
+    assert 'final var theseFields = (List<Object>) this.pseudoJson.getOrDefault("struct.ResultCard", new ArrayList<>());' in generated_nested
+    assert 'final var theseTags = (Map<String, Object>) this.pseudoJson.getOrDefault("union.ResultItem", new HashMap<>());' in generated_nested
+    assert 'final var theseFields = (List<Object>) theseTags.getOrDefault("Card", new ArrayList<>());' in generated_nested
 
 
 def test_command_py(runner: CliRunner) -> None:
@@ -183,8 +188,11 @@ def test_command_py(runner: CliRunner) -> None:
 
     assert result.exit_code == 0
 
-    # open the generated file and check if it contains the expected content
-    # TODO: implement this part
+    generated = Path('tests/output/py/gen_types.py').read_text()
+    assert "if 'Ok_' not in result_union:" not in generated
+    assert 'these_fields = cast(list[object], result_union.get("Ok_", []))' in generated
+    assert 'these_fields = cast(list[object], self.pseudo_json.get("struct.ResultCard", []))' in generated
+    assert 'these_fields = cast(list[object], these_tags.get("Card", []))' in generated
 
 
 def test_command_ts(runner: CliRunner) -> None:
@@ -204,8 +212,14 @@ def test_command_ts(runner: CliRunner) -> None:
 
     assert result.exit_code == 0
 
-    # open the generated file and check if it contains the expected content
-    # TODO: implement this part
+    generated = Path('tests/output/ts/genTypes.ts').read_text()
+    assert '}static ' not in generated
+    assert '}ok' not in generated
+    assert "const theseFields = resultUnion[\"Ok_\"] ?? [];" in generated
+    assert "if (!theseFields.includes('field1')) {" in generated
+    assert "const theseFields = this.pseudoJson[\"struct.ResultCard\"] ?? [];" in generated
+    assert "const theseTags = this.pseudoJson[\"union.ResultItem\"] ?? {};" in generated
+    assert "const theseFields = theseTags[\"Card\"] ?? [];" in generated
 
 
 def test_command_go(runner: CliRunner) -> None:
