@@ -276,12 +276,11 @@ class {{ type_display }}:
 
         def {{ name }}_{{ tag }}_{{ field | replace('!', '') }}(self) -> '{{type_display}}.Select_':
             these_tags = cast(dict[str, object], self.pseudo_json.get("{{ key }}", {}))
-            if '{{tag}}' not in these_tags:
-                these_fields = cast(list[object], these_tags.get("{{ tag }}", []))
-                if '{{field}}' not in these_fields:
-                    these_fields.append('{{field}}')
+            these_fields = cast(list[object], these_tags.get("{{ tag }}", []))
+            if '{{field}}' not in these_fields:
+                these_fields.append('{{field}}')
 
-                these_tags["{{ tag }}"] = these_fields
+            these_tags["{{ tag }}"] = these_fields
 
             self.pseudo_json["{{ key }}"] = these_tags
 
@@ -297,12 +296,11 @@ class {{ type_display }}:
         def ok_{{ okField | replace('!', '') }}(self) -> '{{type_display}}.Select_':
             result_union = cast(dict[str, object], self.pseudo_json.get("->", {}))
 
-            if 'Ok_' not in result_union:
-                these_fields = cast(list[object], result_union.get("Ok_", []))
-                if '{{okField}}' not in these_fields:
-                    these_fields.append('{{okField}}')
+            these_fields = cast(list[object], result_union.get("Ok_", []))
+            if '{{okField}}' not in these_fields:
+                these_fields.append('{{okField}}')
 
-                result_union["Ok_"] = these_fields
+            result_union["Ok_"] = these_fields
 
             self.pseudo_json["->"] = result_union
             return self
