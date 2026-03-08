@@ -96,6 +96,3 @@ if (response.getBodyTarget() === 'Ok_') {
 ```
 
 For more concrete usage examples, [see the tests](https://github.com/Telepact/telepact/blob/main/test/lib/ts/src/main.ts).
-
-For browser clients calling a Telepact server over HTTP, see the
-[browser transport guide](https://github.com/Telepact/telepact/blob/main/doc/browser-http.md).

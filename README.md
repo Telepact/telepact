@@ -42,7 +42,6 @@ Response:
 ```
 
 Check out the [full-stack example](./doc/example.md).
-For browser clients over HTTP, see the [browser transport guide](./doc/browser-http.md).
 
 # Explore
 

@@ -97,6 +97,3 @@ else:
 
 For more concrete usage examples,
 [see the tests](https://github.com/Telepact/telepact/blob/main/test/lib/py/telepact_test/test_server.py).
-
-For browser clients calling a Telepact server over HTTP, see the
-[browser transport guide](https://github.com/Telepact/telepact/blob/main/doc/browser-http.md).

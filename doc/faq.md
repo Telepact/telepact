@@ -59,6 +59,17 @@ disables auth enforcement instead:
 If your API does use auth, keep the default and define `struct.Auth_` in the
 schema so Telepact can validate the `@auth_` header.
 
+## What does transport-agnostic mean in practice?
+
+Telepact defines the message format, schema, validation, and ecosystem
+features, but it does not define the transport itself. If you choose HTTP,
+WebSockets, NATS, stdio, or something else, that transport remains yours to
+implement and operate.
+
+This is intentional. Telepact's goal is bring-your-own-transport, not
+transport abstraction. So implementers keep both the freedom and the
+responsibility that come with their chosen transport.
+
 ## Why can I not define nullable arrays or objects?
 
 Nullability is indicated on base types by appending type strings with `?`, but

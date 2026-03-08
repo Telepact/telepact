@@ -153,6 +153,3 @@ func main() {
 ```
 
 For more concrete usage examples, [see the tests](https://github.com/Telepact/telepact/tree/main/test/lib/go).
-
-For browser clients calling a Telepact server over HTTP, see the
-[browser transport guide](https://github.com/Telepact/telepact/blob/main/doc/browser-http.md).
