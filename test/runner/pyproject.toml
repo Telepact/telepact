@@ -9,7 +9,7 @@ python = "^3.11"
 
 [tool.poetry.group.dev.dependencies]
 msgpack = "^1.1"
-nats-py = "^2.13"
+nats-py = "^2.14"
 pytest = "^9.0"
 prometheus-client = "^0.24"
 
