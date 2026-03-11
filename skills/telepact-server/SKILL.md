@@ -40,6 +40,8 @@ Install the matching Telepact library first:
 - Go: `go get github.com/telepact/telepact/lib/go`
 
 Latest library versions can be found at [doc/versions.md](https://github.com/Telepact/telepact/blob/main/doc/versions.md).
+For Telepact design decisions around auth, optional headers, and transport
+ownership, see the [FAQ](https://github.com/Telepact/telepact/blob/main/doc/faq.md).
 
 Then implement the same four-part pattern in that language:
 
@@ -135,7 +137,9 @@ const handler = async (requestMessage: Message): Promise<Message> => {
     return new Message({}, { Ok_: {} });
 };
 
-const telepactServer = new Server(schema, handler, new ServerOptions());
+const options = new ServerOptions();
+options.authRequired = false;
+const telepactServer = new Server(schema, handler, options);
 
 // Assuming `transport` is defined elsewhere
 transport.receive(async (requestBytes: Uint8Array): Promise<Uint8Array> => {
@@ -160,6 +164,7 @@ async def handler(request_message: 'Message') -> 'Message':
     return Message({}, {'Ok_': {}})
 
 options = Server.Options()
+options.auth_required = False
 telepactServer = Server(schema, handler, options)
 
 # Assuming `transport` is defined elsewhere
@@ -185,6 +190,7 @@ Function<Message, Message> handler = (requestMessage) -> {
 };
 
 var options = new Server.Options();
+options.authRequired = false;
 var telepactServer = new Server(schema, handler, options);
 
 // Assuming `transport` is defined elsewhere
@@ -229,7 +235,9 @@ handler := func(request telepact.Message) (telepact.Message, error) {
     ), nil
 }
 
-telepactServer, err := telepact.NewServer(schema, handler, telepact.NewServerOptions())
+telepactOptions := telepact.NewServerOptions()
+telepactOptions.AuthRequired = false
+telepactServer, err := telepact.NewServer(schema, handler, telepactOptions)
 if err != nil {
     return err
 }

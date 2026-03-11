@@ -66,6 +66,8 @@ For development assistance, see the SDK tool docs:
     - Consistently format your Telepact api schemas, especially the doc-strings
 
 Find the latest versions of all libraries and sdks [here](./doc/versions.md).
+That page tracks published registry versions, which may lag the source tree
+between releases.
 
 For further reading, see [Motivation](./doc/motivation.md).
 

@@ -83,10 +83,12 @@ func main() {
         return telepact.Message{}, telepact.NewTelepactError("function not found")
     }
 
-    serverOptions := telepact.NewServerOptions()
-    server, err := telepact.NewServer(schema, handler, serverOptions)
-    if err != nil {
-        log.Fatal(err)
+	serverOptions := telepact.NewServerOptions()
+	// Set this to false when your schema does not define struct.Auth_.
+	serverOptions.AuthRequired = false
+	server, err := telepact.NewServer(schema, handler, serverOptions)
+	if err != nil {
+		log.Fatal(err)
     }
 
     // Wire up request/response bytes from your transport of choice

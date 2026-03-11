@@ -457,6 +457,7 @@ Before returning the schema, verify:
 - Every union has at least one tag.
 - Every header field begins with `@`.
 - `errors.*` is used only for cross-cutting failures.
+- DO NOT define your own "404 Not Found" or "400 Bad Request." Telepact handles those types of errors for you.
 - No built-in Telepact definitions were redundantly re-declared.
 - The schema matches the user's API description without inventing unnecessary features.
 
