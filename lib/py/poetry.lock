@@ -268,14 +268,14 @@ files = [
 
 [[package]]
 name = "nats-py"
-version = "2.13.1"
+version = "2.14.0"
 description = "NATS client for Python"
 optional = false
 python-versions = ">=3.7"
 groups = ["dev"]
 files = [
-    {file = "nats_py-2.13.1-py3-none-any.whl", hash = "sha256:838590cd4d3fae141fb3332c16c9861e0831b053a29cd844d51d1104dfc5b4d9"},
-    {file = "nats_py-2.13.1.tar.gz", hash = "sha256:68a0afe018bdaa12740e0ae8c5a94e1937126d4901ae656afc382e2b3ab40005"},
+    {file = "nats_py-2.14.0-py3-none-any.whl", hash = "sha256:4116f5d2233ce16e63c3d5538fa40a5e207f75fcf42a741773929ddf1e29d19d"},
+    {file = "nats_py-2.14.0.tar.gz", hash = "sha256:4ed02cb8e3b55c68074a063aa2687087115d805d1513297da90cb2068fb07bed"},
 ]
 
 [package.extras]
