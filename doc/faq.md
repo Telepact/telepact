@@ -54,16 +54,12 @@ everything is optional, and new runtime fields are not disallowed.
 ## Why does my unauthenticated server fail to start?
 
 Telepact server libraries default to requiring the standard `struct.Auth_`
-definition. If your API does not use Telepact auth, set the server option that
-disables auth enforcement instead:
+definition. If a non-empty `struct.Auth_` is not defined, the server will
+error on startup, prompting the implementer to either define `struct.Auth_`
+or use the server options to indicate auth is not required.
 
-- TypeScript: `options.authRequired = false`
-- Python: `options.auth_required = False`
-- Java: `options.authRequired = false`
-- Go: `options.AuthRequired = false`
-
-If your API does use auth, keep the default and define `struct.Auth_` in the
-schema so Telepact can validate the `@auth_` header.
+This startup check forces the implementer to make conscientious decisions
+about the auth configuration of their server.
 
 ## What does transport-agnostic mean in practice?
 
