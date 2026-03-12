@@ -393,8 +393,9 @@ included and cannot be turned off.
 
 The `fn.api_` helper returns the user-facing schema by default. Pass
 `{"includeInternal!": true}` to include these standard Telepact definitions in
-the response. For mock servers, this expanded response also includes the
-bundled mock schema definitions.
+the response. Pass `{"includeExamples!": true}` to attach deterministic example
+payloads to each returned schema entry. For mock servers, the expanded response
+also includes the bundled mock schema definitions.
 
 You can find all standard definitions
 [here](https://raw.githubusercontent.com/Telepact/telepact/refs/heads/main/common/internal.telepact.json).
@@ -422,6 +423,8 @@ library.
 
 You can find all mock definitions
 [here](https://raw.githubusercontent.com/Telepact/telepact/refs/heads/main/common/mock-internal.telepact.json).
+There is also a practical guide to the mock control API
+[here](https://github.com/Telepact/telepact/blob/main/doc/mocking.md).
 
 ## Full Example
 

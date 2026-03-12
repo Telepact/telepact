@@ -27,6 +27,7 @@ import { validateResult } from '../internal/validation/ValidateResult';
 import { mapValidationFailuresToInvalidFieldCases } from './validation/MapValidationFailuresToInvalidFieldCases';
 import { ValidateContext } from './validation/ValidateContext';
 import { serverBase64Decode } from './binary/ServerBase64Decode';
+import { getApiDefinitionsWithExamples } from './GetApiDefinitionsWithExamples';
 
 export async function handleMessage(
     requestMessage: Message,
@@ -163,7 +164,13 @@ export async function handleMessage(
         resultMessage = new Message({}, { Ok_: {} });
     } else if (functionName === 'fn.api_') {
         const includeInternal = requestPayload['includeInternal!'] === true;
-        resultMessage = new Message({}, { Ok_: { api: includeInternal ? telepactSchema.full : telepactSchema.original } });
+        const includeExamples = requestPayload['includeExamples!'] === true;
+        const apiDefinitions = includeExamples
+            ? getApiDefinitionsWithExamples(telepactSchema, includeInternal)
+            : includeInternal
+                ? telepactSchema.full
+                : telepactSchema.original;
+        resultMessage = new Message({}, { Ok_: { api: apiDefinitions } });
     } else {
         try {
             resultMessage = await handler(callMessage);

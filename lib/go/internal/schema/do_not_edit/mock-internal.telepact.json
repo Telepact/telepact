@@ -1,10 +1,18 @@
 [
     {
-        "///": " A stubbed result for matching input. ",
+        "///": [
+            " A stubbed result for matching input. See                                       ",
+            " https://github.com/telepact/telepact/blob/main/doc/mocking.md for control      ",
+            " API details and payload examples.                                              "
+        ],
         "_ext.Stub_": {}
     },
     {
-        "///": " A call of a function. ",
+        "///": [
+            " A call of a function. See                                                      ",
+            " https://github.com/telepact/telepact/blob/main/doc/mocking.md for control      ",
+            " API details and payload examples.                                              "
+        ],
         "_ext.Call_": {}
     },
     {
