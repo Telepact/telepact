@@ -18,8 +18,8 @@ from typing import Any
 import json
 from pathlib import Path
 
-from cases import get_values, skipped_collection_fields
-from cases import additional_union_cases, additional_fn_cases, additional_integer_cases, additional_number_cases, additional_struct_cases
+from parameters.cases import get_values, skipped_collection_fields
+from parameters.cases import additional_union_cases, additional_fn_cases, additional_integer_cases, additional_number_cases, additional_struct_cases
 
 
 def _schema_key(definition: dict[str, object]) -> str:
@@ -27,7 +27,7 @@ def _schema_key(definition: dict[str, object]) -> str:
 
 
 def _load_sorted_schema(*relative_paths: str) -> list[dict[str, object]]:
-    root = Path(__file__).resolve().parents[2]
+    root = Path(__file__).resolve().parents[3]
     definitions: list[dict[str, object]] = []
 
     for relative_path in relative_paths:

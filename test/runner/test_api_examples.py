@@ -14,19 +14,10 @@
 #|  limitations under the License.
 #|
 
-import json
-
+from util import verify_flat_case, verify_server_case, ping_req, startup_check, Constants as c
 import pytest
-
-from util import send_case, startup_check, verify_flat_case, verify_server_case, ping_req, Constants as c
-
-
-def _find_definition(api: list[object], schema_key: str) -> dict[str, object]:
-    for definition in api:
-        definition_map = dict(definition)
-        if schema_key in definition_map:
-            return definition_map
-    raise AssertionError(f'Missing schema entry: {schema_key}')
+import json
+from copy import deepcopy as dc
 
 
 @pytest.fixture(scope="module")
@@ -70,7 +61,7 @@ def api_examples_mock_server_proc(loop, nats_client, dispatcher_server):
 
     async def t():
         req = json.dumps([{}, {'StartMockServer': {
-                         'id': server_id, 'apiSchemaPath': c.example_api_path, 'frontdoorTopic': topics[0]}}])
+                         'id': server_id, 'apiSchemaPath': c.api_examples_mock_api_path, 'frontdoorTopic': topics[0]}}])
         await nats_client.request(lib_name, req.encode(), timeout=1)
 
     loop.run_until_complete(t())
@@ -90,81 +81,19 @@ def api_examples_mock_server_proc(loop, nats_client, dispatcher_server):
     loop.run_until_complete(t2())
 
 
-def test_api_examples_auth(loop, api_examples_auth_server_proc, nats_client):
-    frontdoor_topic = api_examples_auth_server_proc[0]
+def test_api_examples_auth_case(loop, api_examples_auth_server_proc, nats_client, name, req, res):
+    topics = api_examples_auth_server_proc
 
     async def t():
-        response = await send_case(
-            nats_client,
-            [{}, {'fn.api_': {'includeExamples!': True}}],
-            None,
-            frontdoor_topic,
-        )
-        api = response[1]['Ok_']['api']
-
-        assert [next(key for key in definition if key not in {'///', '->', '_errors', 'example', 'inputExample', 'outputExample'}) for definition in api] == [
-            'info.AuthExample',
-            'errors.Auth_',
-            'fn.test',
-            'headers.Auth_',
-            'struct.Auth_',
-        ]
-
-        assert _find_definition(api, 'info.AuthExample')['example'] == {}
-        assert _find_definition(api, 'errors.Auth_')['example'] == {
-            'ErrorUnauthorized_': {
-                'message!': 'sigma',
-            },
-        }
-        assert _find_definition(api, 'fn.test')['inputExample'] == {'fn.test': {}}
-        assert _find_definition(api, 'fn.test')['outputExample'] == {'Ok_': {}}
-        assert _find_definition(api, 'headers.Auth_')['inputExample'] == {
-            '@auth_': {
-                'token': 'sigma',
-            },
-        }
-        assert _find_definition(api, 'headers.Auth_')['outputExample'] == {}
-        assert _find_definition(api, 'struct.Auth_')['example'] == {
-            'token': 'sigma',
-        }
+        await verify_server_case(nats_client, dc(req), dc(res), *topics)
 
     loop.run_until_complete(t())
 
 
-def test_api_examples_mock(loop, api_examples_mock_server_proc, nats_client):
-    frontdoor_topic = api_examples_mock_server_proc[0]
+def test_api_examples_mock_case(loop, api_examples_mock_server_proc, nats_client, name, req, res):
+    topics = api_examples_mock_server_proc
 
     async def t():
-        response = await send_case(
-            nats_client,
-            [{}, {'fn.api_': {'includeInternal!': True, 'includeExamples!': True}}],
-            None,
-            frontdoor_topic,
-        )
-        api = response[1]['Ok_']['api']
-
-        stub_definition = _find_definition(api, '_ext.Stub_')
-        call_definition = _find_definition(api, '_ext.Call_')
-        verify_definition = _find_definition(api, 'fn.verify_')
-        value_definition = _find_definition(api, 'struct.Value')
-
-        assert 'https://github.com/telepact/telepact/blob/main/doc/mocking.md' in ' '.join(stub_definition['///'])
-        assert 'https://github.com/telepact/telepact/blob/main/doc/mocking.md' in ' '.join(call_definition['///'])
-
-        assert set(stub_definition['example'].keys()) == {'fn.test', '->'}
-        assert set(call_definition['example'].keys()) == {'fn.test'}
-        assert set(verify_definition['inputExample']['fn.verify_']['call'].keys()) == {'fn.test'}
-        assert verify_definition['inputExample']['fn.verify_']['count!'] == {
-            'AtLeast': {
-                'times': 139347212,
-            },
-        }
-        assert verify_definition['inputExample']['fn.verify_']['strictMatch!'] is False
-        assert isinstance(stub_definition['example']['fn.test']['value!']['bytes!'], str)
-        assert isinstance(call_definition['example']['fn.test']['value!']['bytes!'], str)
-        assert isinstance(verify_definition['inputExample']['fn.verify_']['call']['fn.test']['value!']['bytes!'], str)
-        assert isinstance(value_definition['example']['bytes!'], str)
-        assert value_definition['example']['bytes!'] == 'RH/hBg=='
-        assert value_definition['example']['sel!'] == {}
+        await verify_flat_case(nats_client, dc(req), dc(res), *topics)
 
     loop.run_until_complete(t())

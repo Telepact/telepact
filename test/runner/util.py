@@ -32,6 +32,7 @@ should_abort = False
 
 class Constants:
     example_api_path = '../../runner/schema/example'
+    api_examples_mock_api_path = '../../runner/schema/api_examples_mock'
     binary_api_path = '../../runner/schema/binary'
     schema_api_path = '../../runner/schema/parse'
     load_api_path = '../../runner/schema/load'
