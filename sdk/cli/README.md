@@ -6,8 +6,12 @@ generating code, and starting up mock servers for testing purposes.
 ## Installation
 
 ```
-pipx install telepact-cli
+pipx install --pip-args=--pre telepact-cli
 ```
+
+Published PyPI releases are currently prereleases. To pin a specific CLI
+release, use the exact version from
+[doc/versions.md](https://github.com/Telepact/telepact/blob/main/doc/versions.md).
 
 ## Usage
 

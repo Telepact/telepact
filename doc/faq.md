@@ -39,6 +39,39 @@ If a client encounters something like `response['field!']` in code, the `!`
 immediately alerts the code reader that an `undefined`-like value might be
 returned from the code expression.
 
+## Why can't header fields use the `!` symbol?
+
+Headers definitions resemble structs, but unlike ordinary structs, all headers
+are already optional by default. As a result, header names never take the `!`
+suffix.
+
+This design constraint helps distinguish header fields from struct fields.
+Headers significantly differ from structs in that any undeclared field is valid
+at runtime, something strictly disallowed with normal structs. When users see
+the `@` prefix, they know they are working with headers, a psuedo-struct where
+everything is optional, and new runtime fields are not disallowed.
+
+## Why does my unauthenticated server fail to start?
+
+Telepact server libraries default to requiring the standard `struct.Auth_`
+definition. If a non-empty `struct.Auth_` is not defined, the server will
+error on startup, prompting the implementer to either define `struct.Auth_`
+or use the server options to indicate auth is not required.
+
+This startup check forces the implementer to make conscientious decisions
+about the auth configuration of their server.
+
+## What does transport-agnostic mean in practice?
+
+Telepact defines the message format, schema, validation, and ecosystem
+features, but it does not define the transport itself. If you choose HTTP,
+WebSockets, NATS, stdio, or something else, that transport remains yours to
+implement and operate.
+
+This is intentional. Telepact's goal is bring-your-own-transport, not
+transport abstraction. So implementers keep both the freedom and the
+responsibility that come with their chosen transport.
+
 ## Why can I not define nullable arrays or objects?
 
 Nullability is indicated on base types by appending type strings with `?`, but
