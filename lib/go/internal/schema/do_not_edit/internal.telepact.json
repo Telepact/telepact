@@ -11,9 +11,9 @@
     },
     {
         "///": [
-            " Get the telepact `schema` of this server. Set `includeInternal` to `true` to ",
-            " include Telepact internal definitions. Set `includeExamples` to `true` to add  ",
-            " deterministic example payloads to each schema entry.                           "
+            " Get the telepact `schema` of this server. Set `includeInternal` to `true` to    ",
+            " include Telepact internal definitions. Set `includeExamples` to `true` to add   ",
+            " deterministic example payloads to each schema entry.                            "
         ],
         "fn.api_": {
             "includeInternal!": "boolean",
