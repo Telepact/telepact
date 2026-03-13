@@ -7,7 +7,7 @@ Repository source versions may be ahead of these values between releases.
 
 | Kind | Package | Registry | Version |
 |---|---|---|---|
-| Library (Go) | `github.com/telepact/telepact/lib/go` | Go module (proxy.golang.org) | `v1.0.0-alpha.202` |
+| Library (Go) | `github.com/telepact/telepact/lib/go` | Go module (proxy.golang.org) | `v1.0.0-alpha.203` |
 | Library (Java) | `io.github.telepact:telepact` | Maven Central | `1.0.0-alpha.202` |
 | Library (Python) | `telepact` | PyPI | `1.0.0a202` |
 | Library (TypeScript) | `telepact` | npm | `1.0.0-alpha.202` |
