@@ -1,0 +1,52 @@
+{
+    "struct.User": {
+        "///": " A struct representing a user with a name and age. ",
+        "name": "string",
+        "age": "integer"
+    },
+    "fn.helloWorld": {
+        "///": " A simple function that returns a greeting message. ",
+        "arg1": "string",
+        "arg2": "integer",
+        ".return": {
+            "Ok_": {
+                "message": "string"
+            }
+        }
+    },
+    "union.Option": {
+        "///": " A union type representing different options. ",
+        "OptionA": {
+            "value": "string"
+        },
+        "OptionB": {
+            "value": "integer"
+        }
+    },
+    "fn.getUserInfo": {
+        "///": " A function that retrieves user information based on a user ID. ",
+        "userId": "string",
+        ".return": {
+            "Ok_": {
+                "user": "struct.User"
+            },
+            "ErrorTimeout": {}
+        }
+    },
+    "fn.getOption": {
+        "///": " A function that retrieves available options. ",
+        ".return": {
+            "Ok_": {
+                "option": "union.Option"
+            }
+        }
+    },
+    "fn.getNumbers": {
+        "///": " A function that returns a list of numbers. ",
+        ".return": {
+            "Ok_": {
+                "numbers": ["integer"]
+            }
+        }
+    }
+}

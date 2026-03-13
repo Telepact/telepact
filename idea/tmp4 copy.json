@@ -1,0 +1,18 @@
+[
+    {
+        "fn": [
+            {
+                "helloWorld": {
+                    "subject": "string"
+                },
+                "->": [
+                    {
+                        "Ok_": {
+                            "message": "string"
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+]
