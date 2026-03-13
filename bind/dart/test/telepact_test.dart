@@ -113,12 +113,13 @@ void main() {
             'fn.add': 2,
             'fn.api_': 3,
             'fn.ping_': 4,
-            'includeInternal!': 5,
-            'result': 6,
-            'x': 7,
-            'y': 8
+            'includeExamples!': 5,
+            'includeInternal!': 6,
+            'result': 7,
+            'x': 8,
+            'y': 9
           },
-          '@bin_': [-1443216067]
+          '@bin_': [-260261837]
         }, {
           "Ok_": {}
         });
@@ -138,7 +139,7 @@ void main() {
         print('response: ${response.body}');
 
         Message expectedResponse = Message({
-          '@bin_': [-1443216067]
+          '@bin_': [-260261837]
         }, {
           "Ok_": {'result': 3}
         });
