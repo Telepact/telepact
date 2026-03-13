@@ -425,10 +425,14 @@ Mock definitions include mocking functions, like `fn.createStub_` and
 served with a `MockServer` rather than a `Server` in the Telepact server-side
 library.
 
+These schemas also include reserved `_ext.*_` extension types. Unlike ordinary
+schema definitions, extension types are placeholders whose actual validation
+rules come from Telepact runtime behavior and surrounding schema context.
+
 You can find all mock definitions
 [here](https://raw.githubusercontent.com/Telepact/telepact/refs/heads/main/common/mock-internal.telepact.json).
-There is also a practical guide to the mock control API
-[here](https://github.com/Telepact/telepact/blob/main/doc/mocking.md).
+There is also a guide to Telepact extension types, including mock extensions,
+[here](https://raw.githubusercontent.com/Telepact/telepact/main/doc/extensions.md).
 
 ## Full Example
 

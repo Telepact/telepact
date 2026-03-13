@@ -29,6 +29,10 @@
         "_errors": "^errors\\.Validation_$"
     },
     {
+        "///": [
+            " See https://raw.githubusercontent.com/Telepact/telepact/main/doc/        ",
+            " extensions.md for `_ext.Select_` documentation.                           "
+        ],
         "_ext.Select_": {}
     },
     {

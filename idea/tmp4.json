@@ -1,0 +1,64 @@
+{
+    "struct.User": {
+        "///": " A struct representing a user with a name and age. ",
+        ".fields": {
+            "name": "string",
+            "age": "integer"
+        }
+    },
+    "fn.helloWorld": {
+        "///": " A simple function that returns a greeting message. ",
+        ".argFields": {
+            "arg1": "string",
+            "arg2": "integer"
+        },
+        ".resultCases": {
+            "Ok_": {
+                "message": "string"
+            }
+        }
+    },
+    "union.Option": {
+        "///": " A union type representing different options. ",
+        ".cases": {
+            "OptionA": {
+                "value": "string"
+            },
+            "OptionB": {
+                "value": "integer"
+            }
+        }
+    },
+    "fn.getUserInfo": {
+        "///": " A function that retrieves user information based on a user ID. ",
+        ".argFields": {
+            "userId": "string"
+        },
+        ".resultCases": {
+            "Ok_": {
+                "user": "struct.User"
+            },
+            "ErrorTimeout": {}
+        }
+    },
+    "fn.getOption": {
+        "///": " A function that retrieves available options. ",
+        ".argFields": {
+            "arg1": "string"
+        },
+        ".resultCases": {
+            "Ok_": {
+                "option": "union.Option"
+            }
+        }
+    },
+    "fn.getNumbers": {
+        "///": " A function that returns a list of numbers. ",
+        ".argFields": {},
+        ".resultCases": {
+            "Ok_": {
+                "numbers": ["integer"]
+            }
+        }
+    }
+}

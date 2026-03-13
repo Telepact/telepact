@@ -1,0 +1,185 @@
+# Extensions
+
+Telepact reserves `_ext.*_` names for internal extension types. These are not
+normal schema definitions for API authors to invent freely; they are built-in
+placeholders that Telepact libraries interpret with custom validation and
+example-generation logic.
+
+## Why Extensions Exist
+
+Normal Telepact definitions are self-describing:
+
+- `struct.*` says exactly which fields are valid.
+- `union.*` says exactly which tags and payloads are valid.
+- `fn.*` says exactly which argument and result payloads are valid.
+
+Extension types exist for the cases where that is not enough. Their valid JSON
+shape depends on surrounding schema context rather than only on the definition
+body itself.
+
+That is why internal schemas define these types as empty objects like:
+
+```json
+{
+  "_ext.Select_": {}
+}
+```
+
+That does not mean "any empty object". It means "Telepact runtime provides the
+real validation rules for this reserved type name".
+
+## How Extensions Deviate From Normal Patterns
+
+- Their definitions are placeholders, not full declarative schemas.
+- Their valid shape is derived from nearby schema content or the active
+  function, not only from the `_ext.*_` entry itself.
+- They are implemented by Telepact libraries directly.
+- They are intended for internal and mock-control workflows, not as a general
+  schema authoring pattern.
+
+If you need ordinary API data modeling, use `struct.*`, `union.*`, `fn.*`,
+`headers.*`, and `errors.*`.
+
+## Discovering Them
+
+Call `fn.api_` with `{"includeInternal!": true}` to include internal schemas,
+including `_ext.*_` definitions. Add `{"includeExamples!": true}` to get
+deterministic example payloads for those types.
+
+## `_ext.Select_`
+
+`_ext.Select_` is the type behind the `@select_` header and any payload field
+that wants the same "select fields from a result graph" behavior.
+
+### Why It Is An Extension
+
+The allowed shape is derived from the active function's `Ok_` result payload and
+the nested structs and unions reachable from that result. That makes it
+context-sensitive in a way that a single static `struct.*` definition cannot
+express.
+
+### Shape
+
+`_ext.Select_` is always an object. Its keys are selection targets:
+
+- `->` means "the active function result union".
+- `struct.SomeType` means a reachable struct type.
+- `union.SomeType` means a reachable union type.
+
+Struct targets map to arrays of allowed field names:
+
+```json
+{
+  "struct.Profile": ["displayName", "avatarUrl"]
+}
+```
+
+Union targets map tag names to arrays of allowed field names for that tag:
+
+```json
+{
+  "union.SearchResult": {
+    "User": ["profile"],
+    "Team": ["name"]
+  }
+}
+```
+
+The active result union can be selected through `->`:
+
+```json
+{
+  "->": {
+    "Ok_": ["profile", "summary"]
+  },
+  "struct.Profile": ["displayName"]
+}
+```
+
+### How To Use It
+
+- Send it in the `@select_` header to trim fields from response payloads.
+- You only need to specify the parts you want to narrow; omitted selections
+  default to the full reachable shape.
+- It applies recursively through arrays and objects when the nested value type
+  is a selected struct or union.
+- It does not let you omit function argument fields. Selection is for response
+  graphs, not for changing request-link shapes.
+
+## `_ext.Call_`
+
+`_ext.Call_` represents one call made to a mocked non-internal function.
+
+### Why It Is An Extension
+
+The top-level key must be one concrete function name from the mocked schema, and
+the value must validate against that specific function's argument struct. That
+is a "choose one key, then switch schema based on that key" rule derived from
+the mocked API, not a fixed static union written inline once.
+
+### Shape
+
+```json
+{
+  "fn.getUser": {
+    "id": "user-1"
+  }
+}
+```
+
+Only non-internal mocked functions are valid. Mock control functions such as
+`fn.createStub_` are not valid `_ext.Call_` payloads.
+
+### How To Use It
+
+- Pass it to `fn.verify_` to assert that a matching call happened.
+- Read it back from verification failures like `allCalls` or
+  `additionalUnverifiedCalls`.
+- The matching behavior such as strict versus partial matching is controlled by
+  the mock API function that consumes the call, not by `_ext.Call_` itself.
+
+## `_ext.Stub_`
+
+`_ext.Stub_` represents a mock stub: a call matcher plus the result the mock
+server should return.
+
+### Why It Is An Extension
+
+It combines two schema-dependent pieces:
+
+- one concrete non-internal `fn.*` argument payload
+- the matching `->` result payload for that same function
+
+That cross-links two dynamic choices from the mocked schema, so it is also not a
+single closed `struct.*` definition.
+
+### Shape
+
+```json
+{
+  "fn.getUser": {
+    "id": "user-1"
+  },
+  "->": {
+    "Ok_": {
+      "name": "Ada"
+    }
+  }
+}
+```
+
+### How To Use It
+
+- Pass it to `fn.createStub_` to install a stub on a mock server.
+- The `fn.*` part is the matcher.
+- The `->` part must be a valid result payload for that same function.
+- Stub lifetime and matching behavior such as `strictMatch!` and `count!` are
+  configured on `fn.createStub_`, not inside `_ext.Stub_`.
+
+## Practical Guidance
+
+- Prefer ordinary Telepact definitions unless you are intentionally integrating
+  with Telepact internal or mock schemas.
+- Treat `_ext.*_` types as reserved names with runtime-defined behavior.
+- When in doubt, inspect `fn.api_` with internal definitions and examples
+  enabled to see the exact shape the current schema exposes.
