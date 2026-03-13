@@ -38,8 +38,7 @@ real validation rules for this reserved type name".
   schema authoring pattern.
 
 If you need ordinary API data modeling, use `struct.*`, `union.*`, `fn.*`,
-`headers.*`, and `errors.*`. Use `_ext.*_` only when you are intentionally
-working with Telepact's bundled internal behavior.
+`headers.*`, and `errors.*`.
 
 ## Discovering Them
 
