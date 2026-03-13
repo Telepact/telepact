@@ -22,7 +22,6 @@ import static io.github.telepact.internal.schema.GetInternalTelepactJson.getInte
 import static io.github.telepact.internal.schema.ParseTelepactSchema.parseTelepactSchema;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -33,11 +32,11 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.github.telepact.TelepactSchema;
+import io.github.telepact.internal.schema.DocumentLocators.SchemaDocumentMap;
 
 public class CreateTelepactSchemaFromFileJsonMap {
     public static TelepactSchema createTelepactSchemaFromFileJsonMap(Map<String, String> jsonDocuments) {
-        var finalJsonDocuments = new HashMap<String, String>();
-        finalJsonDocuments.putAll(jsonDocuments);
+        var finalJsonDocuments = new SchemaDocumentMap(jsonDocuments);
         final var internalJson = getInternalTelepactJson();
         if (!hasBundledDefinitions(jsonDocuments, "internal_", internalJson)) {
             finalJsonDocuments.put("internal_", internalJson);

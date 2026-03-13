@@ -19,9 +19,11 @@ import { getAuthTelepactJson } from './GetAuthTelepactJson';
 import { TelepactSchema } from '../../TelepactSchema';
 import { parseTelepactSchema } from './ParseTelepactSchema';
 import { findSchemaKey } from './FindSchemaKey';
+import { copyDocumentLocators } from './DocumentLocators';
 
 export function createTelepactSchemaFromFileJsonMap(jsonDocuments: Record<string, string>): TelepactSchema {
     const finalJsonDocuments = { ...jsonDocuments };
+    copyDocumentLocators(jsonDocuments, finalJsonDocuments);
     const internalTelepactJson = getInternalTelepactJson();
     if (!hasBundledDefinitions(jsonDocuments, 'internal_', internalTelepactJson)) {
         finalJsonDocuments['internal_'] = internalTelepactJson;

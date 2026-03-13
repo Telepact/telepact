@@ -118,9 +118,8 @@ public class ParseTelepactSchema {
                         var finalPath = new ArrayList<>(loopPath);
                         finalPath.add(schemaKey);
                         List<Object> finalOtherPath = new ArrayList<>(List.of(otherPathIndex, matchingSchemaKey));
-                        var finalOtherDocumentJson = telepactSchemaNameToJson.get(otherDocumentName);
-                        var finalOtherLocationPseudoJson = GetPathDocumentCoordinatesPseudoJson
-                                .getPathDocumentCoordinatesPseudoJson(finalOtherPath, finalOtherDocumentJson);
+                        var finalOtherLocationPseudoJson = DocumentLocators
+                                .resolveDocumentCoordinates(finalOtherPath, otherDocumentName, telepactSchemaNameToJson);
 
                         parseFailures.add(new SchemaParseFailure(
                                 documentName,

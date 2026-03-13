@@ -15,7 +15,7 @@
 //|
 
 import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
-import { getPathDocumentCoordinatesPseudoJson } from './GetPathDocumentCoordinatesPseudoJson';
+import { resolveDocumentCoordinates } from './DocumentLocators';
 
 export function mapSchemaParseFailuresToPseudoJson(
     schemaParseFailures: SchemaParseFailure[],
@@ -23,8 +23,7 @@ export function mapSchemaParseFailuresToPseudoJson(
 ): any[] {
     const pseudoJsonList: any[] = [];
     for (const f of schemaParseFailures) {
-        const documentJson = documentNamesToJson[f.documentName];
-        const location = getPathDocumentCoordinatesPseudoJson(f.path, documentJson);
+        const location = resolveDocumentCoordinates(f.path, f.documentName, documentNamesToJson);
         const pseudoJson: any = {};
         pseudoJson.document = f.documentName;
         pseudoJson.location = location;

@@ -108,8 +108,7 @@ func CatchErrorCollisions(
 						finalPath := []any{index, defKey, k, thisErrorKey}
 						otherPath := []any{otherIndex, otherDefKey, l, otherErrorKey}
 
-						otherDocumentJSON := documentNamesToJSON[documentName]
-						otherLocation := GetPathDocumentCoordinatesPseudoJSON(finalPath, otherDocumentJSON)
+						otherLocation := ResolveDocumentCoordinates(finalPath, documentName, documentNamesToJSON)
 
 						parseFailures = append(parseFailures, NewSchemaParseFailure(
 							otherDocumentName,

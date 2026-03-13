@@ -40,7 +40,7 @@ def parse_telepact_schema(
     from .ParseErrorType import parse_error_type
     from .ParseHeadersType import parse_headers_type
     from .ParseContext import ParseContext
-    from .GetPathDocumentCoordinatesPseudoJson import get_path_document_coordinates_pseudo_json
+    from .DocumentLocators import resolve_document_coordinates
     from ..types.TError import TError
     from collections import OrderedDict
     from ..types.THeaders import THeaders
@@ -105,9 +105,8 @@ def parse_telepact_schema(
                     other_document_name = schema_keys_to_document_names[matching_schema_key]
                     final_path = loop_path + [schema_key]
                     final_other_path = [other_path_index, matching_schema_key]
-                    document_json = telepact_schema_document_names_to_json[other_document_name]
-                    other_location_pseudo_json = get_path_document_coordinates_pseudo_json(
-                        final_other_path, document_json)
+                    other_location_pseudo_json = resolve_document_coordinates(
+                        final_other_path, other_document_name, telepact_schema_document_names_to_json)
                     parse_failures.append(
                         SchemaParseFailure(
                             document_name, cast(list[object], final_path),

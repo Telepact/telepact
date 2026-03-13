@@ -23,8 +23,7 @@ func MapSchemaParseFailuresToPseudoJSON(schemaParseFailures []*SchemaParseFailur
 		if failure == nil {
 			continue
 		}
-		document := telepactDocumentNameToJSON[failure.DocumentName]
-		location := GetPathDocumentCoordinatesPseudoJSON(append([]any{}, failure.Path...), document)
+		location := ResolveDocumentCoordinates(append([]any{}, failure.Path...), failure.DocumentName, telepactDocumentNameToJSON)
 		pseudoJSON := map[string]any{
 			"document": failure.DocumentName,
 			"location": location,

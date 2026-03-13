@@ -18,7 +18,7 @@ import { TError } from '../types/TError';
 import { TType } from '../types/TType';
 import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
 import { TelepactSchemaParseError } from '../../TelepactSchemaParseError';
-import { getPathDocumentCoordinatesPseudoJson } from '../../internal/schema/GetPathDocumentCoordinatesPseudoJson';
+import { resolveDocumentCoordinates } from '../../internal/schema/DocumentLocators';
 import { TUnion } from '../types/TUnion';
 
 export function applyErrorToParsedTypes(
@@ -67,8 +67,7 @@ export function applyErrorToParsedTypes(
                 const otherDocumentName = schemaKeysToDocumentNames[fnName];
                 const fnErrorTagIndex = f.tagIndices[newKey];
                 const otherPath = [otherPathIndex, '->', fnErrorTagIndex, newKey];
-                const otherDocumentJson = documentNamesToJson[otherDocumentName];
-                const otherLocation = getPathDocumentCoordinatesPseudoJson(otherPath, otherDocumentJson);
+                const otherLocation = resolveDocumentCoordinates(otherPath, otherDocumentName, documentNamesToJson);
                 parseFailures.push(
                     new SchemaParseFailure(
                         documentName,

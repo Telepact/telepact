@@ -26,6 +26,7 @@ import (
 // GetSchemaFileMap reads Telepact schema resources beneath directory and returns their contents, along with any schema parse failures.
 func GetSchemaFileMap(directory string) (map[string]string, []*SchemaParseFailure, error) {
 	finalJSONDocuments := make(map[string]string)
+	documentLocators := make(map[string]DocumentLocator)
 	parseFailures := make([]*SchemaParseFailure, 0)
 
 	err := filepath.WalkDir(directory, func(path string, d fs.DirEntry, walkErr error) error {
@@ -52,11 +53,22 @@ func GetSchemaFileMap(directory string) (map[string]string, []*SchemaParseFailur
 			return err
 		}
 
-		if !strings.HasSuffix(relativePath, ".telepact.json") {
-			parseFailures = append(parseFailures, NewSchemaParseFailure(relativePath, nil, "FileNamePatternInvalid", map[string]any{"expected": "*.telepact.json"}))
+		switch {
+		case strings.HasSuffix(relativePath, ".telepact.json"):
+			finalJSONDocuments[relativePath] = string(content)
+		case strings.HasSuffix(relativePath, ".telepact.yaml"):
+			canonicalJSON, locator, err := ParseTelepactYAML(string(content))
+			if err != nil {
+				finalJSONDocuments[relativePath] = "[]"
+				parseFailures = append(parseFailures, NewSchemaParseFailure(relativePath, nil, "JsonInvalid", map[string]any{}))
+			} else {
+				finalJSONDocuments[relativePath] = canonicalJSON
+				documentLocators[relativePath] = locator
+			}
+		default:
+			parseFailures = append(parseFailures, NewSchemaParseFailure(relativePath, nil, "FileNamePatternInvalid", map[string]any{"expected": "*.telepact.json|*.telepact.yaml"}))
+			finalJSONDocuments[relativePath] = string(content)
 		}
-
-		finalJSONDocuments[relativePath] = string(content)
 		return nil
 	})
 
@@ -64,5 +76,6 @@ func GetSchemaFileMap(directory string) (map[string]string, []*SchemaParseFailur
 		return nil, nil, err
 	}
 
+	SetDocumentLocators(finalJSONDocuments, documentLocators)
 	return finalJSONDocuments, parseFailures, nil
 }

@@ -16,7 +16,7 @@
 
 import { TelepactSchemaParseError } from '../../TelepactSchemaParseError';
 import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
-import { getPathDocumentCoordinatesPseudoJson } from '../../internal/schema/GetPathDocumentCoordinatesPseudoJson';
+import { resolveDocumentCoordinates } from '../../internal/schema/DocumentLocators';
 
 export function catchErrorCollisions(
     telepactSchemaNameToPseudoJson: Record<string, any[]>,
@@ -78,8 +78,7 @@ export function catchErrorCollisions(
                         const thisErrorDefKey = thisErrDefKeys.values().next().value as string;
                         const thisOtherErrorDefKey = thisOtherErrDefKeys.values().next().value as string;
                         const thisPath = [index, defKey, k, thisErrorDefKey];
-                        const thisDocumentJson = documentNamesToJson[documentName];
-                        const thisLocation = getPathDocumentCoordinatesPseudoJson(thisPath, thisDocumentJson);
+                        const thisLocation = resolveDocumentCoordinates(thisPath, documentName, documentNamesToJson);
                         parseFailures.push(
                             new SchemaParseFailure(
                                 otherDocumentName,

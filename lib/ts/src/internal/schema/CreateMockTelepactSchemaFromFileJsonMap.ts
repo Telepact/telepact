@@ -17,9 +17,11 @@
 import { MockTelepactSchema } from '../../MockTelepactSchema';
 import { createTelepactSchemaFromFileJsonMap } from './CreateTelepactSchemaFromFileJsonMap';
 import { getMockTelepactJson } from './GetMockTelepactJson';
+import { copyDocumentLocators } from './DocumentLocators';
 
 export function createMockTelepactSchemaFromFileJsonMap(jsonDocuments: Record<string, string>): MockTelepactSchema {
     const finalJsonDocuments = { ...jsonDocuments };
+    copyDocumentLocators(jsonDocuments, finalJsonDocuments);
     finalJsonDocuments['mock_'] = getMockTelepactJson();
 
     const telepactSchema = createTelepactSchemaFromFileJsonMap(finalJsonDocuments);

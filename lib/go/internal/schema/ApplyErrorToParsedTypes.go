@@ -80,8 +80,7 @@ func ApplyErrorToParsedTypes(
 				otherDocumentName := schemaKeysToDocumentNames[fnName]
 				fnErrorTagIndex := fnUnion.TagIndices[errorTagName]
 				otherFinalPath := []any{otherPathIndex, "->", fnErrorTagIndex, errorTagName}
-				otherDocumentJSON := documentNamesToJSON[otherDocumentName]
-				otherLocation := GetPathDocumentCoordinatesPseudoJSON(otherFinalPath, otherDocumentJSON)
+				otherLocation := ResolveDocumentCoordinates(otherFinalPath, otherDocumentName, documentNamesToJSON)
 
 				failurePath := []any{errorIndex, errorKey, errorTagIndex, errorTagName}
 				parseFailures = append(parseFailures, NewSchemaParseFailure(

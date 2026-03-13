@@ -17,9 +17,12 @@
 import { FsModule, PathModule } from '../../fileSystem';
 import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
 import { TelepactSchemaParseError } from '../../TelepactSchemaParseError';
+import { DocumentLocator, setDocumentLocators } from './DocumentLocators';
+import { parseTelepactYaml } from './ParseTelepactYaml';
 
 export function getSchemaFileMap(directory: string, fs: FsModule, path: PathModule): Record<string, string> {
     const finalJsonDocuments: Record<string, string> = {};
+    const documentLocators: Record<string, DocumentLocator> = {};
 
     const schemaParseFailures: SchemaParseFailure[] = [];
 
@@ -33,11 +36,24 @@ export function getSchemaFileMap(directory: string, fs: FsModule, path: PathModu
         }
 
         const content = fs.readFileSync(filePath, 'utf-8');
-        finalJsonDocuments[relativePath] = content;
-        if (!filePath.endsWith('.telepact.json')) {
-            schemaParseFailures.push(new SchemaParseFailure(relativePath, [], 'FileNamePatternInvalid', { expected: '*.telepact.json' }));
+        if (filePath.endsWith('.telepact.json')) {
+            finalJsonDocuments[relativePath] = content;
+        } else if (filePath.endsWith('.telepact.yaml')) {
+            try {
+                const parsed = parseTelepactYaml(content);
+                finalJsonDocuments[relativePath] = parsed.canonicalJsonText;
+                documentLocators[relativePath] = parsed.locator;
+            } catch {
+                finalJsonDocuments[relativePath] = '[]';
+                schemaParseFailures.push(new SchemaParseFailure(relativePath, [], 'JsonInvalid', {}));
+            }
+        } else {
+            finalJsonDocuments[relativePath] = content;
+            schemaParseFailures.push(new SchemaParseFailure(relativePath, [], 'FileNamePatternInvalid', { expected: '*.telepact.json|*.telepact.yaml' }));
         }
     }
+
+    setDocumentLocators(finalJsonDocuments, documentLocators);
 
     if (schemaParseFailures.length > 0) {
         throw new TelepactSchemaParseError(schemaParseFailures, finalJsonDocuments);

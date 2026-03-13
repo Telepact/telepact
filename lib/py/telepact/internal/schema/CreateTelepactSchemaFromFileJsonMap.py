@@ -26,8 +26,9 @@ def create_telepact_schema_from_file_json_map(json_documents: dict[str, str]) ->
     from .ParseTelepactSchema import parse_telepact_schema
     from .GetInternalTelepactJson import get_internal_telepact_json
     from .GetAuthTelepactJson import get_auth_telepact_json
+    from .DocumentLocators import copy_document_locators
 
-    final_json_documents = json_documents.copy()
+    final_json_documents = copy_document_locators(json_documents, dict(json_documents))
     internal_json = get_internal_telepact_json()
     if not _has_bundled_definitions(json_documents, "internal_", internal_json):
         final_json_documents["internal_"] = internal_json

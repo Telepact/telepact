@@ -1,0 +1,6 @@
+- "///": |
+    Example schema.
+
+    More text.
+  "struct.Example":
+    field: number

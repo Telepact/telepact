@@ -16,8 +16,6 @@
 
 package io.github.telepact.internal.schema;
 
-import static io.github.telepact.internal.schema.GetPathDocumentCoordinatesPseudoJson.getPathDocumentCoordinatesPseudoJson;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -75,8 +73,7 @@ public class CatchHeaderCollisions {
                 headerCollisions.retainAll(otherHeaderDef.keySet());
                 for (String headerCollision : headerCollisions) {
                     List<Object> thisPath = Arrays.asList(index, defKey, headerCollision);
-                    String thisDocumentJson = documentNamesToJson.get(documentName);
-                    Object thisLocation = getPathDocumentCoordinatesPseudoJson(thisPath, thisDocumentJson);
+                    Object thisLocation = DocumentLocators.resolveDocumentCoordinates(thisPath, documentName, documentNamesToJson);
                     parseFailures.add(new SchemaParseFailure(
                             otherDocumentName,
                             Arrays.asList(otherIndex, otherDefKey, headerCollision),
@@ -91,8 +88,7 @@ public class CatchHeaderCollisions {
                 resHeaderCollisions.retainAll(otherResHeaderDef.keySet());
                 for (String resHeaderCollision : resHeaderCollisions) {
                     List<Object> thisPath = Arrays.asList(index, "->", resHeaderCollision);
-                    String thisDocumentJson = documentNamesToJson.get(documentName);
-                    Object thisLocation = getPathDocumentCoordinatesPseudoJson(thisPath, thisDocumentJson);
+                    Object thisLocation = DocumentLocators.resolveDocumentCoordinates(thisPath, documentName, documentNamesToJson);
                     parseFailures.add(new SchemaParseFailure(
                             otherDocumentName,
                             Arrays.asList(otherIndex, "->", resHeaderCollision),

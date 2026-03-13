@@ -78,9 +78,8 @@ public class CatchErrorCollisions {
                             String thisErrorDefKey = thisErrDefKeys.iterator().next();
                             String thisOtherErrorDefKey = thisOtherErrDefKeys.iterator().next();
                             List<Object> finalThisPath = List.of(index, defKey, k, thisErrorDefKey);
-                            var finalThisDocument = documentNamesToJson.get(documentName);
-                            var finalThisLocation = GetPathDocumentCoordinatesPseudoJson
-                                    .getPathDocumentCoordinatesPseudoJson(finalThisPath, finalThisDocument);
+                            var finalThisLocation = DocumentLocators
+                                    .resolveDocumentCoordinates(finalThisPath, documentName, documentNamesToJson);
                             parseFailures.add(new SchemaParseFailure(
                                     otherDocumentName,
                                     List.of(otherIndex, otherDefKey, l, thisOtherErrorDefKey),
