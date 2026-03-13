@@ -1,0 +1,23 @@
+[
+    {
+        "info.ApiExamplesMock": {}
+    },
+    {
+        "fn.test": {
+            "value": "struct.Payload"
+        },
+        "->": [
+            {
+                "Ok_": {
+                    "value": "struct.Payload"
+                }
+            }
+        ]
+    },
+    {
+        "struct.Payload": {
+            "bytes!": "bytes",
+            "sel!": "_ext.Select_"
+        }
+    }
+]

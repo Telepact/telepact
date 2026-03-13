@@ -14,35 +14,3 @@
 #|  limitations under the License.
 #|
 
-NPM_INSTALL ?= install --ignore-scripts
-SRC_FILES := $(shell find src -type f)
-COMMON_JSON_FILES := $(shell find ../../common -type f -name '*.json')
-TAR_GZ := dist-tgz/*.tgz
-
-.PHONY: clean
-
-$(TAR_GZ): $(SRC_FILES) $(COMMON_JSON_FILES)
-	rm -rf inc
-	mkdir -p inc
-	cp ../../common/*.json inc
-
-	rm -rf dist
-	mkdir -p dist
-	cp ../../LICENSE ../../NOTICE dist
-
-	rm -rf dist-tgz
-	mkdir -p dist-tgz
-
-	npm $(NPM_INSTALL)
-	npm run build
-	npm pack --pack-destination ./dist-tgz
-
-clean:
-	rm -rf inc
-	rm -rf dist
-	rm -rf dist-tgz
-	rm -rf node_modules
-	rm -f dist/LICENSE dist/NOTICE
-
-deploy: $(TAR_GZ)
-	npm publish

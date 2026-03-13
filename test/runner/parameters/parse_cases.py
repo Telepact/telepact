@@ -19,7 +19,7 @@ from pathlib import Path
 
 
 def _load_full_example_schema() -> list[dict[str, object]]:
-    root = Path(__file__).resolve().parents[2]
+    root = Path(__file__).resolve().parents[3]
     definitions: list[dict[str, object]] = []
     for relative_path in (
         'test/runner/schema/example/example.telepact.json',

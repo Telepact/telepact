@@ -18,9 +18,10 @@ SHELL := /bin/bash
 
 MVN_BUILD ?= install
 SRC_FILES := $(shell find src -type f)
+COMMON_JSON_FILES := $(shell find ../../common -type f -name '*.json')
 JAR_FILE := target/telepact-$(shell cat ../../VERSION.txt).jar
 
-$(JAR_FILE): $(SRC_FILES)
+$(JAR_FILE): $(SRC_FILES) $(COMMON_JSON_FILES)
 	mkdir -p src/main/resources
 	cp ../../common/*.json src/main/resources
 	cp ../../LICENSE ../../NOTICE src/main/resources

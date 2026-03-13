@@ -10,9 +10,14 @@
         "_errors": "^errors\\.Validation_$"
     },
     {
-        "///": " Get the telepact `schema` of this server. Set `includeInternal` to `true` to include Telepact internal definitions. ",
+        "///": [
+            " Get the telepact `schema` of this server. Set `includeInternal` to `true` to    ",
+            " include Telepact internal definitions. Set `includeExamples` to `true` to add   ",
+            " deterministic example payloads to each schema entry.                            "
+        ],
         "fn.api_": {
-            "includeInternal!": "boolean"
+            "includeInternal!": "boolean",
+            "includeExamples!": "boolean"
         },
         "->": [
             {

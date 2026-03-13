@@ -161,12 +161,17 @@ func HandleMessage(
 		resultMessage = ServerMessage{Headers: make(map[string]any), Body: map[string]any{"Ok_": map[string]any{}}}
 	case "fn.api_":
 		includeInternal := false
+		includeExamples := false
 		if requestMap, ok := requestPayload.(map[string]any); ok {
 			includeInternal = boolValue(requestMap["includeInternal!"])
+			includeExamples = boolValue(requestMap["includeExamples!"])
 		}
 		apiDefinitions := schema.OriginalDefinitions()
 		if includeInternal {
 			apiDefinitions = schema.FullDefinitions()
+		}
+		if includeExamples {
+			apiDefinitions = GetAPIDefinitionsWithExamples(schema, includeInternal)
 		}
 		resultMessage = ServerMessage{Headers: make(map[string]any), Body: map[string]any{"Ok_": map[string]any{"api": apiDefinitions}}}
 	default:

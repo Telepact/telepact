@@ -64,7 +64,7 @@ def _schema_key(definition: dict[str, object]) -> str:
 
 
 def _load_sorted_schema(*relative_paths: str) -> list[dict[str, object]]:
-    root = Path(__file__).resolve().parents[2]
+    root = Path(__file__).resolve().parents[3]
     definitions: list[dict[str, object]] = []
     for relative_path in relative_paths:
         with (root / relative_path).open() as stream:

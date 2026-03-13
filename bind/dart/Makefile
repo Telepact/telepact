@@ -15,22 +15,13 @@
 #|
 
 VERSION := $(shell cat ../../VERSION.txt)
+JS_ASSETS := lib/js/telepact.js lib/js/crc32.js lib/js/msgpackr.js
 
-.PHONY: all
+.PHONY: all prepare-js-assets test
 
-all:
+all: prepare-js-assets
 	cp ../../LICENSE ../../NOTICE ./
 	cat LICENSE_SUB_PROJECT >> LICENSE
-
-	npm install --ignore-scripts
-	
-	npx rollup -c rollup.crc32.config.js
-	npx rollup -c rollup.msgpackr.config.js
-
-	mkdir -p lib/js
-	cp ../../lib/ts/dist/index.iife.js lib/js/telepact.js
-	cp rollup/crc32.iife.js lib/js/crc32.js
-	cp rollup/msgpackr.iife.js lib/js/msgpackr.js	
 
 	dart pub get
 
@@ -38,6 +29,23 @@ all:
 
 	mkdir -p dist
 	tar -czvf dist/telepact-${VERSION}.tar.gz lib test pubspec.yaml README.md LICENSE NOTICE
+
+prepare-js-assets: $(JS_ASSETS)
+
+lib/js/telepact.js: ../../lib/ts/dist/index.iife.js
+	mkdir -p lib/js
+	cp ../../lib/ts/dist/index.iife.js lib/js/telepact.js
+
+lib/js/crc32.js lib/js/msgpackr.js &: package-lock.json package.json rollup.crc32.config.js rollup.msgpackr.config.js
+	npm install --ignore-scripts
+	npx rollup -c rollup.crc32.config.js
+	npx rollup -c rollup.msgpackr.config.js
+	mkdir -p lib/js
+	cp rollup/crc32.iife.js lib/js/crc32.js
+	cp rollup/msgpackr.iife.js lib/js/msgpackr.js
+
+../../lib/ts/dist/index.iife.js:
+	$(MAKE) -C ../../lib/ts
 
 dep:
 	$(MAKE) -C ../../lib/ts
@@ -52,4 +60,6 @@ clean:
 
 .PHONY: test
 test:
+	$(MAKE) prepare-js-assets
+	dart pub get
 	dart test -p chrome --chain-stack-traces
