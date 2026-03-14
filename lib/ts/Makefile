@@ -16,12 +16,13 @@
 
 NPM_INSTALL ?= install --ignore-scripts
 SRC_FILES := $(shell find src -type f)
+BUILD_FILES := package.json package-lock.json tsconfig.json rollup.config.js
 COMMON_JSON_FILES := $(shell find ../../common -type f -name '*.json')
 TAR_GZ := dist-tgz/*.tgz
 
 .PHONY: clean
 
-$(TAR_GZ): $(SRC_FILES) $(COMMON_JSON_FILES)
+$(TAR_GZ): $(SRC_FILES) $(BUILD_FILES) $(COMMON_JSON_FILES)
 	rm -rf inc
 	mkdir -p inc
 	cp ../../common/*.json inc
