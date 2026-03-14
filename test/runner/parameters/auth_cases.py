@@ -14,8 +14,9 @@
 #|  limitations under the License.
 #|
 
-import json
 from pathlib import Path
+
+from parameters.schema_loader import load_schema_definitions
 
 
 def _schema_key(definition: dict[str, object]) -> str:
@@ -29,8 +30,7 @@ def _load_sorted_schema(*relative_paths: str) -> list[dict[str, object]]:
     root = Path(__file__).resolve().parents[3]
     definitions: list[dict[str, object]] = []
     for relative_path in relative_paths:
-        with (root / relative_path).open() as stream:
-            definitions.extend(json.load(stream))
+        definitions.extend(load_schema_definitions(root / relative_path))
 
     return sorted(
         definitions,
@@ -40,8 +40,13 @@ def _load_sorted_schema(*relative_paths: str) -> list[dict[str, object]]:
 
 _AUTH_FULL_SCHEMA = _load_sorted_schema(
     'test/runner/schema/auth/auth.telepact.json',
-    'common/auth.telepact.json',
-    'common/internal.telepact.json',
+    'common/auth.telepact.yaml',
+    'common/internal.telepact.yaml',
+)
+
+_AUTH_PUBLIC_SCHEMA = _load_sorted_schema(
+    'test/runner/schema/auth/auth.telepact.json',
+    'common/auth.telepact.yaml',
 )
 
 
@@ -50,7 +55,7 @@ cases = {
         [[{'@ok_': {}}, {'fn.test': {}}], [{}, {'Ok_': {}}]],
         [[{'@result': {'ErrorUnauthenticated_': {'message!': 'a'}}}, {'fn.test': {}}], [{}, {'ErrorUnauthenticated_': {'message!': 'a'}}]],
         [[{'@result': {'ErrorUnauthorized_': {'message!': 'a'}}}, {'fn.test': {}}], [{}, {'ErrorUnauthorized_': {'message!': 'a'}}]],
-        [[{}, {'fn.api_': {}}], [{}, {'Ok_': {'api': [{'info.AuthExample': {}}, {'///': ' A standard error. ', 'errors.Auth_': [{'///': ' The credentials in the `_auth` header were missing or invalid. ', 'ErrorUnauthenticated_': {'message!': 'string'}}, {'///': ' The credentials in the `_auth` header were insufficient to run the function. ', 'ErrorUnauthorized_': {'message!': 'string'}}]}, {'fn.test': {}, '->': [{'Ok_': {}}]}, {'///': [' The `@auth_` header is the conventional location for sending credentials to     ', ' the server for the purpose of authentication and authorization.                 '], 'headers.Auth_': {'@auth_': 'struct.Auth_'}, '->': {}}, {'struct.Auth_': {'token': 'string'}}]}}]],
+        [[{}, {'fn.api_': {}}], [{}, {'Ok_': {'api': _AUTH_PUBLIC_SCHEMA}}]],
         [[{}, {'fn.api_': {'includeInternal!': True}}], [{}, {'Ok_': {'api': _AUTH_FULL_SCHEMA}}]],
    ]
 }

@@ -14,8 +14,9 @@
 #|  limitations under the License.
 #|
 
-import json
 from pathlib import Path
+
+from parameters.schema_loader import load_schema_definitions
 
 
 def _load_full_example_schema() -> list[dict[str, object]]:
@@ -23,10 +24,9 @@ def _load_full_example_schema() -> list[dict[str, object]]:
     definitions: list[dict[str, object]] = []
     for relative_path in (
         'test/runner/schema/example/example.telepact.json',
-        'common/internal.telepact.json',
+        'common/internal.telepact.yaml',
     ):
-        with (root / relative_path).open() as stream:
-            definitions.extend(json.load(stream))
+        definitions.extend(load_schema_definitions(root / relative_path))
     return definitions
 
 

@@ -30,7 +30,7 @@ all: build
 
 copy-common-assets:
 	@mkdir -p $(SCHEMA_TARGET_DIR)
-	cp $(SCHEMA_SOURCE_DIR)/*.json $(SCHEMA_TARGET_DIR)/
+	ruby ../../tool/render_common_schema_json.rb $(SCHEMA_SOURCE_DIR) $(SCHEMA_TARGET_DIR)
 
 sync-schema-assets:
 	@$(MAKE) copy-common-assets

@@ -402,7 +402,7 @@ payloads to each returned schema entry. For mock servers, the expanded response
 also includes the bundled mock schema definitions.
 
 You can find all standard definitions
-[here](https://raw.githubusercontent.com/Telepact/telepact/refs/heads/main/common/internal.telepact.json).
+[here](https://raw.githubusercontent.com/Telepact/telepact/refs/heads/main/common/internal.telepact.yaml).
 
 ### Auth Definitions
 
@@ -416,7 +416,7 @@ standard `struct.Auth_` struct, as the `@auth_` header is treated with greater
 sensitivity throughout the Telepact ecosystem.
 
 You can find details about auth definitions
-[here](https://raw.githubusercontent.com/Telepact/telepact/refs/heads/main/common/auth.telepact.json).
+[here](https://raw.githubusercontent.com/Telepact/telepact/refs/heads/main/common/auth.telepact.yaml).
 
 ### Mock Definitions
 
@@ -430,7 +430,7 @@ schema definitions, extension types are placeholders whose actual validation
 rules come from Telepact runtime behavior and surrounding schema context.
 
 You can find all mock definitions
-[here](https://raw.githubusercontent.com/Telepact/telepact/refs/heads/main/common/mock-internal.telepact.json).
+[here](https://raw.githubusercontent.com/Telepact/telepact/refs/heads/main/common/mock-internal.telepact.yaml).
 There is also a guide to Telepact extension types, including mock extensions,
 [here](https://raw.githubusercontent.com/Telepact/telepact/main/doc/extensions.md).
 
