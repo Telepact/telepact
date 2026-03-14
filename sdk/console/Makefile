@@ -17,8 +17,8 @@
 NPM_INSTALL ?= install --ignore-scripts
 VERSION := $(shell cat ../../VERSION.txt)
 TAR_GZ := dist-tgz/*.tgz
-DEP_LIB_DIST := ../../lib/ts/dist $(shell find ../../lib/ts/dist -type f 2>/dev/null)
-DEP_PRETTIER_DIST := ../../sdk/prettier/dist $(shell find ../../sdk/prettier/dist -type f 2>/dev/null)
+DEP_LIB_DIST := ../../lib/ts/dist
+DEP_PRETTIER_DIST := ../../sdk/prettier/dist
 
 $(TAR_GZ): $(DEP_LIB_DIST) $(DEP_PRETTIER_DIST)
 	cp ../../LICENSE ../../NOTICE ./
@@ -44,10 +44,10 @@ $(TAR_GZ): $(DEP_LIB_DIST) $(DEP_PRETTIER_DIST)
 	docker build --progress=plain --no-cache -f Dockerfile -t telepact-console:${VERSION} .
 	docker save telepact-console:${VERSION} | gzip > dist-docker/docker-image-telepact-console-${VERSION}.tar.gz
 
-../../lib/ts/dist:
+$(DEP_LIB_DIST):
 	$(MAKE) -C ../../lib/ts
 
-../../sdk/prettier/dist:
+$(DEP_PRETTIER_DIST):
 	$(MAKE) -C ../../sdk/prettier
 
 dev:
