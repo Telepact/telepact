@@ -17,8 +17,6 @@
 import json
 import math
 
-import yaml
-
 from .GetPathDocumentYamlCoordinatesPseudoJson import create_path_document_yaml_coordinates_pseudo_json_locator
 
 
@@ -46,6 +44,8 @@ def _normalize_json_compatible_value(value: object) -> object:
 
 
 def parse_telepact_yaml(text: str) -> tuple[str, callable]:
+    import yaml
+
     try:
         parsed = yaml.safe_load(text)
     except yaml.YAMLError as e:
