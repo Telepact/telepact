@@ -374,7 +374,7 @@ Telepact console.
 Prefer YAML when multi-line docstrings are desired.
 
 ```yaml
-- "///": |
+- ///: |
     A struct that contains a field.
 
     Fields:

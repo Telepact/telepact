@@ -16,4 +16,4 @@
 
 - headers.Example:
     "@field": 0
-  "->": {}
+  ->: {}

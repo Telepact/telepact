@@ -10,12 +10,12 @@ $ cat ./api/math.telepact.yaml
 ```
 
 ```yaml
-- "///": |
+- ///: |
     Divide two integers, `x` and `y`.
   fn.divide:
     x: integer
     y: integer
-  "->":
+  ->:
     - Ok_:
         result: number
     - ErrorCannotDivideByZero: {}

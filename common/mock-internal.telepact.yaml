@@ -14,17 +14,17 @@
 #|  limitations under the License.
 #|
 
-- "///": |-
+- ///: |-
     See https://raw.githubusercontent.com/Telepact/telepact/main/doc/extensions.md
     for `_ext.Stub_` documentation.
   _ext.Stub_: {}
 
-- "///": |-
+- ///: |-
     See https://raw.githubusercontent.com/Telepact/telepact/main/doc/extensions.md
     for `_ext.Call_` documentation.
   _ext.Call_: {}
 
-- "///": |-
+- ///: |-
     The number of times a function is allowed to be called.
   union.CallCountCriteria_:
     - Exact:
@@ -34,7 +34,7 @@
     - AtLeast:
         times: integer
 
-- "///": |-
+- ///: |-
     Possible causes for a mock verification to fail.
   union.VerificationFailure_:
     - TooFewMatchingCalls:
@@ -48,7 +48,7 @@
         allCalls:
           - _ext.Call_
 
-- "///": |-
+- ///: |-
     Create a function stub that will cause the server to return the `stub`
     result when the `stub` argument matches the function argument on a request.
 
@@ -64,11 +64,11 @@
     stub: _ext.Stub_
     strictMatch!: boolean
     count!: integer
-  "->":
+  ->:
     - Ok_: {}
   _errors: '^errors\.Validation_$'
 
-- "///": |-
+- ///: |-
     Verify a call was made with this mock that matches the given `call` and
     `multiplicity` criteria. If `allowPartialArgMatch` is supplied as `true`,
     then the server will skip field omission validation, and match calls where
@@ -78,47 +78,47 @@
     call: _ext.Call_
     strictMatch!: boolean
     count!: union.CallCountCriteria_
-  "->":
+  ->:
     - Ok_: {}
     - ErrorVerificationFailure:
         reason: union.VerificationFailure_
   _errors: '^errors\.Validation_$'
 
-- "///": |-
+- ///: |-
     Verify that no interactions have occurred with this mock or that all
     interactions have been verified.
   fn.verifyNoMoreInteractions_: {}
-  "->":
+  ->:
     - Ok_: {}
     - ErrorVerificationFailure:
         additionalUnverifiedCalls:
           - _ext.Call_
   _errors: '^errors\.Validation_$'
 
-- "///": |-
+- ///: |-
     Clear all stub conditions.
   fn.clearStubs_: {}
-  "->":
+  ->:
     - Ok_: {}
   _errors: '^errors\.Validation_$'
 
-- "///": |-
+- ///: |-
     Clear all call data.
   fn.clearCalls_: {}
-  "->":
+  ->:
     - Ok_: {}
   _errors: '^errors\.Validation_$'
 
-- "///": |-
+- ///: |-
     Set the seed of the random generator.
   fn.setRandomSeed_:
     seed: integer
-  "->":
+  ->:
     - Ok_: {}
   _errors: '^errors\.Validation_$'
 
 - errors.Mock_:
-    - "///": |-
+    - ///: |-
         The mock could not return a result due to no matching stub being
         available.
       ErrorNoMatchingStub_: {}
