@@ -1,13 +1,13 @@
 ---
 name: telepact-schema-writing
-description: Convert a plain-English API description into a correct Telepact `.telepact.json` schema. Use when Codex needs to design or revise Telepact schema files, choose between structs, unions, functions, errors, and headers, and emit valid Telepact type expressions and docstrings similar to `calculator.telepact.json`.
+description: Convert a plain-English API description into a correct Telepact schema, usually authored as `.telepact.yaml`. Use when agent needs to design or revise Telepact schema files, choose between structs, unions, functions, errors, and headers, and emit valid Telepact type expressions and docstrings.
 ---
 
 # Telepact Schema Writing
 
 Use this skill when the task is: "Here is the API I want; write the Telepact schema."
 
-The goal is to turn a plain-English description into a valid `.telepact.json` file with minimal assumptions, good naming, and correct Telepact semantics.
+The goal is to turn a plain-English description into a valid Telepact schema file with minimal assumptions, good naming, and correct Telepact semantics.
 
 ## Workflow
 
@@ -16,29 +16,24 @@ The goal is to turn a plain-English description into a valid `.telepact.json` fi
 3. Extract shared data models next: reusable records become `struct.*`; closed variants become `union.*`.
 4. Decide whether any cross-cutting headers or systemic errors are needed.
 5. Emit a schema array with one top-level definition object per item.
-6. Add concise docstrings when they improve readability.
+6. Add concise docstrings when they improve readability. Prefer YAML block scalars for multi-line docstrings.
 7. Before finishing, validate the schema against the checklist in this file.
 
 If the description is underspecified, prefer one short clarifying question only when the ambiguity changes the contract materially. Otherwise make the narrowest reasonable assumption and state it briefly.
 
 ## Output Shape
 
-A Telepact schema is a JSON array:
+By default, write checked-in schemas as `.telepact.yaml`. Use `.telepact.json`
+only when the user explicitly asks for JSON or when an inline JSON example is
+more precise for the explanation.
 
-```json
-[
-    {
-        "info.Example": {}
-    },
-    {
-        "fn.doThing": {},
-        "->": [
-            {
-                "Ok_": {}
-            }
-        ]
-    }
-]
+A Telepact schema is semantically a JSON-shaped array:
+
+```yaml
+- info.Example: {}
+- fn.doThing: {}
+  "->":
+    - Ok_: {}
 ```
 
 Each array item is one top-level definition object.
@@ -330,31 +325,24 @@ Top-level definitions and union tags may include a `///` docstring.
 
 Single-line:
 
-```json
-{
-    "///": " A user record. ",
-    "struct.User": {
-        "id": "string"
-    }
-}
+```yaml
+"///": " A user record. "
+struct.User:
+  id: string
 ```
 
 Multi-line:
 
-```json
-{
-    "///": [
-        " A user record.          ",
-        "                         ",
-        " Used in account flows.  "
-    ],
-    "struct.User": {
-        "id": "string"
-    }
-}
+```yaml
+"///": |
+  A user record.
+
+  Used in account flows.
+struct.User:
+  id: string
 ```
 
-Use docstrings when the schema will be read by humans in the Telepact console or checked into the repo long term. Keep them short and factual.
+Use docstrings when the schema will be read by humans in the Telepact console or checked into the repo long term. Keep them short and factual. In real schema files, prefer YAML for docstring-heavy definitions.
 
 ## Automatic Definitions
 
@@ -412,40 +400,26 @@ Use these translation rules when converting a description into schema:
 
 Use this template when drafting from scratch:
 
-```json
-[
-    {
-        "///": " One-line API summary. ",
-        "info.ApiName": {}
-    },
-    {
-        "///": " One-line function summary. ",
-        "fn.example": {
-            "requiredField": "string",
-            "optionalField!": "integer"
-        },
-        "->": [
-            {
-                "Ok_": {
-                    "result": "struct.Result"
-                }
-            }
-        ]
-    },
-    {
-        "///": " One-line shared type summary. ",
-        "struct.Result": {
-            "id": "string"
-        }
-    }
-]
+```yaml
+- "///": " One-line API summary. "
+  info.ApiName: {}
+- "///": " One-line function summary. "
+  fn.example:
+    requiredField: string
+    optionalField!: integer
+  "->":
+    - Ok_:
+        result: struct.Result
+- "///": " One-line shared type summary. "
+  struct.Result:
+    id: string
 ```
 
 ## Final Validation Checklist
 
 Before returning the schema, verify:
 
-- The file is a JSON array.
+- The file is a schema array semantically, even if authored in YAML.
 - Every top-level entry is one valid definition object.
 - All type strings are valid Telepact types.
 - Optional fields use `!` on the field name.
@@ -461,4 +435,4 @@ Before returning the schema, verify:
 - No built-in Telepact definitions were redundantly re-declared.
 - The schema matches the user's API description without inventing unnecessary features.
 
-When the user asks for the finished schema, return the complete `.telepact.json` content, and include only brief assumptions outside the JSON.
+When the user asks for the finished schema, return the complete `.telepact.yaml` content by default, and include only brief assumptions outside the schema. Use `.telepact.json` only when the user explicitly asks for JSON.

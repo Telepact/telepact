@@ -1,6 +1,6 @@
 ---
 name: telepact-client
-description: Implement a Telepact client for an already-drafted Telepact API schema in Go, Java, Python, TypeScript, or a raw transport stack. Use when Codex needs to call `fn.*` endpoints by constructing Telepact request messages, handling `Ok_` or error result unions, wiring a transport adapter into a Telepact `Client`, or manually sending Telepact JSON over HTTP, WebSockets, NATS, or another request/reply channel.
+description: Implement a Telepact client for an already-drafted Telepact API schema in Go, Java, Python, TypeScript, or a raw transport stack. Use when agent needs to call `fn.*` endpoints by constructing Telepact request messages, handling `Ok_` or error result unions, wiring a transport adapter into a Telepact `Client`, or manually sending Telepact JSON over HTTP, WebSockets, NATS, or another request/reply channel.
 ---
 
 # Telepact Client

@@ -1,6 +1,6 @@
 ---
 name: telepact-downstream-testing
-description: Test code that consumes an external Telepact API by standing up a Telepact CLI mock server from the downstream schema. Use when Codex needs to validate a client integration against a downstream Telepact service, fetch `fn.api_` from a live server, run `telepact mock`, stub downstream behavior, or verify that requests are schema-correct before pointing code at the real dependency.
+description: Test code that consumes an external Telepact API by standing up a Telepact CLI mock server from the downstream schema. Use when agent needs to validate a client integration against a downstream Telepact service, fetch `fn.api_` from a live server, run `telepact mock`, stub downstream behavior, or verify that requests are schema-correct before pointing code at the real dependency.
 ---
 
 # Telepact Downstream Testing

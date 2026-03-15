@@ -6,29 +6,19 @@ Telepact API schema,and serving it using one of the Telepact libraries.
 Specify your API:
 
 ```sh
-$ cat ./api/math.telepact.json
+$ cat ./api/math.telepact.yaml
 ```
 
-```json
-[
-    {
-        "///": " Divide two integers, `x` and `y`. ",
-        "fn.divide": {
-            "x": "integer",
-            "y": "integer"
-        },
-        "->": [
-            {
-                "Ok_": {
-                    "result": "number"
-                }
-            },
-            {
-                "ErrorCannotDivideByZero": {}
-            }
-        ]
-    }
-]
+```yaml
+- "///": |
+    Divide two integers, `x` and `y`.
+  fn.divide:
+    x: integer
+    y: integer
+  "->":
+    - Ok_:
+        result: number
+    - ErrorCannotDivideByZero: {}
 ```
 
 Serve it with one of the Telepact libraries over a transport of your choice:
@@ -123,4 +113,3 @@ console.log(`Response: ${JSON.stringify(await response.json())}`);
 $ node ./client.js
 Response: [{},{"Ok_":{"result":2}}]
 ```
-
