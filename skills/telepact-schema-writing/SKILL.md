@@ -326,7 +326,7 @@ Top-level definitions and union tags may include a `///` docstring.
 Single-line:
 
 ```yaml
-///: " A user record. "
+///: A user record.
 struct.User:
   id: string
 ```
@@ -401,16 +401,16 @@ Use these translation rules when converting a description into schema:
 Use this template when drafting from scratch:
 
 ```yaml
-- ///: " One-line API summary. "
+- ///: One-line API summary.
   info.ApiName: {}
-- ///: " One-line function summary. "
+- ///: One-line function summary.
   fn.example:
     requiredField: string
     optionalField!: integer
   ->:
     - Ok_:
         result: struct.Result
-- ///: " One-line shared type summary. "
+- ///: One-line shared type summary.
   struct.Result:
     id: string
 ```

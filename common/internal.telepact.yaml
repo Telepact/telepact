@@ -14,14 +14,13 @@
 #|  limitations under the License.
 #|
 
-- ///: |-
-    Ping the server.
+- ///: Ping the server.
   fn.ping_: {}
   ->:
     - Ok_: {}
   _errors: '^errors\.Validation_$'
 
-- ///: |-
+- ///: |
     Get the telepact `schema` of this server.
 
     Set `includeInternal` to `true` to include Telepact internal definitions.
@@ -36,18 +35,17 @@
           - string: any
   _errors: '^errors\.Validation_$'
 
-- ///: |-
+- ///: |
     See https://raw.githubusercontent.com/Telepact/telepact/main/doc/
     extensions.md for `_ext.Select_` documentation.
   _ext.Select_: {}
 
-- ///: |-
-    The `@time_` header indicates the request timeout honored by the client.
+- ///: The `@time_` header indicates the request timeout honored by the client.
   headers.Time_:
     "@time_": integer
   ->: {}
 
-- ///: |-
+- ///: |
     If `@unsafe_` is set to `true`, response validation by the server will be
     disabled. The server will reflect the client-provided value of the
     `@unsafe_` header in the response.
@@ -56,13 +54,12 @@
   ->:
     "@unsafe_": boolean
 
-- ///: |-
-    The `@select_` header is used to select fields from structs.
+- ///: The `@select_` header is used to select fields from structs.
   headers.Select_:
     "@select_": _ext.Select_
   ->: {}
 
-- ///: |-
+- ///: |
     The `@bin_` header indicates the valid checksums of binary encodings
     negotiated between the client and server. If the client sends a `@bin_`
     header with any value, the server will respond with a `@bin_` header with an
@@ -86,14 +83,13 @@
       string: integer
     "@pac_": boolean
 
-- ///: |-
-    The `@warn_` header is used to send warnings to the client.
+- ///: The `@warn_` header is used to send warnings to the client.
   headers.Warning_: {}
   ->:
     "@warn_":
       - any
 
-- ///: |-
+- ///: |
     The `@id_` header is used to correlate requests and responses. The server
     will reflect the client-provided `@id_` header as-is.
   headers.Id_:
@@ -101,8 +97,7 @@
   ->:
     "@id_": any
 
-- ///: |-
-    A type.
+- ///: A type.
   union.Type_:
     - "Null": {}
     - Boolean: {}
@@ -116,8 +111,7 @@
     - Bytes: {}
     - Unknown: {}
 
-- ///: |-
-    A reason for the validation failure in the body.
+- ///: A reason for the validation failure in the body.
   union.ValidationFailureReason_:
     - TypeUnexpected:
         expected: union.Type_
@@ -145,11 +139,10 @@
         key: string
     - FunctionUnknown: {}
 
-- ///: |-
-    A parse failure.
+- ///: A parse failure.
   union.ParseFailure_:
     - IncompatibleBinaryEncoding: {}
-    - ///: |-
+    - ///: |
         The binary decoder encountered a field id that could not be mapped to a
         key.
       BinaryDecodeFailure: {}
@@ -157,41 +150,33 @@
     - ExpectedJsonArrayOfAnObjectAndAnObjectOfOneObject: {}
     - ExpectedJsonArrayOfTwoObjects: {}
 
-- ///: |-
-    A validation failure located at a `path` explained by a `reason`.
+- ///: A validation failure located at a `path` explained by a `reason`.
   struct.ValidationFailure_:
     path:
       - any
     reason: union.ValidationFailureReason_
 
-- ///: |-
-    A standard error.
+- ///: A standard error.
   errors.Validation_:
-    - ///: |-
-        The server implementation raised an unknown error.
+    - ///: The server implementation raised an unknown error.
       ErrorUnknown_: {}
-    - ///: |-
-        The headers on the request are invalid.
+    - ///: The headers on the request are invalid.
       ErrorInvalidRequestHeaders_:
         cases:
           - struct.ValidationFailure_
-    - ///: |-
-        The body on the request is invalid.
+    - ///: The body on the request is invalid.
       ErrorInvalidRequestBody_:
         cases:
           - struct.ValidationFailure_
-    - ///: |-
-        The headers on the response are invalid.
+    - ///: The headers on the response are invalid.
       ErrorInvalidResponseHeaders_:
         cases:
           - struct.ValidationFailure_
-    - ///: |-
-        The body that the server attempted to put on the response is invalid.
+    - ///: The body that the server attempted to put on the response is invalid.
       ErrorInvalidResponseBody_:
         cases:
           - struct.ValidationFailure_
-    - ///: |-
-        The request could not be parsed as a telepact Message.
+    - ///: The request could not be parsed as a telepact Message.
       ErrorParseFailure_:
         reasons:
           - union.ParseFailure_
