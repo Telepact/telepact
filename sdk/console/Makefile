@@ -19,6 +19,11 @@ VERSION := $(shell cat ../../VERSION.txt)
 TAR_GZ := dist-tgz/*.tgz
 DEP_LIB_FILE := ../../lib/ts/dist/index.esm.js
 DEP_PRETTIER_FILE := ../../sdk/prettier/dist/index.esm.js
+NPM_STAMP := node_modules/.package-lock.stamp
+
+.PHONY: all prepare-local-deps dev playwright clean test dev-proxy deploy
+
+all: $(TAR_GZ)
 
 prepare-local-deps: $(DEP_LIB_FILE) $(DEP_PRETTIER_FILE)
 	cp ../../LICENSE ../../NOTICE ./
@@ -31,11 +36,15 @@ prepare-local-deps: $(DEP_LIB_FILE) $(DEP_PRETTIER_FILE)
 	mkdir -p src/lib/prettier-plugin-telepact
 	cp -r ../../sdk/prettier/dist/* src/lib/prettier-plugin-telepact
 
-$(TAR_GZ): prepare-local-deps
+$(NPM_STAMP): package.json package-lock.json
+	npm $(NPM_INSTALL)
+	mkdir -p node_modules
+	touch $(NPM_STAMP)
+
+$(TAR_GZ): prepare-local-deps $(NPM_STAMP)
 	rm -rf dist-tgz
 	mkdir -p dist-tgz	
 
-	npm $(NPM_INSTALL)
 	npm run build
 	node clean-index.js
 	npm pack --pack-destination ./dist-tgz
@@ -54,7 +63,7 @@ $(DEP_PRETTIER_FILE):
 dev:
 	npm run dev
 
-playwright:
+playwright: $(NPM_STAMP)
 	npx playwright install --with-deps --force
 
 clean:
@@ -67,7 +76,7 @@ clean:
 	rm -rf LICENSE
 	rm -rf NOTICE
 
-test: prepare-local-deps
+test: prepare-local-deps $(NPM_STAMP)
 	npm run test
 
 dev-proxy:
