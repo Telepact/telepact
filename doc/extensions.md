@@ -46,6 +46,20 @@ Call `fn.api_` with `{"includeInternal!": true}` to include internal schemas,
 including `_ext.*_` definitions. Add `{"includeExamples!": true}` to get
 deterministic example payloads for those types.
 
+The examples below are illustrative request and response messages. They use the
+normal Telepact two-object message format:
+
+```json
+[
+  {
+    "@header_": "value"
+  },
+  {
+    "fn.someCall": {}
+  }
+]
+```
+
 ## `_ext.Select_`
 
 `_ext.Select_` is the type behind the `@select_` header and any payload field
@@ -106,6 +120,109 @@ The active result union can be selected through `->`:
 - It does not let you omit function argument fields. Selection is for response
   graphs, not for changing request-link shapes.
 
+### End-To-End Example
+
+Suppose the schema contains:
+
+```json
+[
+  {
+    "struct.ResultCard": {
+      "title": "string",
+      "done!": "boolean"
+    }
+  },
+  {
+    "union.ResultItem": [
+      {
+        "Card": {
+          "title": "string"
+        }
+      },
+      {
+        "Note": {
+          "body": "string"
+        }
+      }
+    ]
+  },
+  {
+    "fn.selectNested": {},
+    "->": [
+      {
+        "Ok_": {
+          "card": "struct.ResultCard",
+          "item": "union.ResultItem"
+        }
+      }
+    ]
+  }
+]
+```
+
+If the server implementation would normally return:
+
+```json
+[
+  {},
+  {
+    "Ok_": {
+      "card": {
+        "title": "Ship docs",
+        "done!": false
+      },
+      "item": {
+        "Card": {
+          "title": "Ship docs"
+        }
+      }
+    }
+  }
+]
+```
+
+then this request:
+
+```json
+[
+  {
+    "@select_": {
+      "->": {
+        "Ok_": ["card", "item"]
+      },
+      "struct.ResultCard": ["title"],
+      "union.ResultItem": {
+        "Card": []
+      }
+    }
+  },
+  {
+    "fn.selectNested": {}
+  }
+]
+```
+
+changes the response shape to:
+
+```json
+[
+  {},
+  {
+    "Ok_": {
+      "card": {
+        "title": "Ship docs"
+      },
+      "item": {
+        "Card": {}
+      }
+    }
+  }
+]
+```
+
+The data values did not change. Only the reachable fields selected by the
+header remained in the encoded response.
+
 ## `_ext.Call_`
 
 `_ext.Call_` represents one call made to a mocked non-internal function.
@@ -137,6 +254,59 @@ Only non-internal mocked functions are valid. Mock control functions such as
   `additionalUnverifiedCalls`.
 - The matching behavior such as strict versus partial matching is controlled by
   the mock API function that consumes the call, not by `_ext.Call_` itself.
+
+### End-To-End Example
+
+Suppose the mocked API contains:
+
+```json
+[
+  {
+    "struct.User": {
+      "id": "string",
+      "name": "string",
+      "admin!": "boolean"
+    }
+  },
+  {
+    "fn.getUser": {
+      "id": "string",
+      "expand!": "boolean"
+    },
+    "->": [
+      {
+        "Ok_": {
+          "user": "struct.User"
+        }
+      }
+    ]
+  }
+]
+```
+
+Then `_ext.Call_` values look like:
+
+```json
+{
+  "fn.getUser": {
+    "id": "user-1"
+  }
+}
+```
+
+or:
+
+```json
+{
+  "fn.getUser": {
+    "id": "user-1",
+    "expand!": true
+  }
+}
+```
+
+You send one of those objects to `fn.verify_`, and Telepact validates the inner
+payload against the argument schema for the specific function key you chose.
 
 ## `_ext.Stub_`
 
@@ -175,6 +345,266 @@ single closed `struct.*` definition.
 - The `->` part must be a valid result payload for that same function.
 - Stub lifetime and matching behavior such as `strictMatch!` and `count!` are
   configured on `fn.createStub_`, not inside `_ext.Stub_`.
+
+### End-To-End Example
+
+Using the same mocked `fn.getUser` schema as above, create a stub with:
+
+```json
+[
+  {},
+  {
+    "fn.createStub_": {
+      "stub": {
+        "fn.getUser": {
+          "id": "user-1"
+        },
+        "->": {
+          "Ok_": {
+            "user": {
+              "id": "user-1",
+              "name": "Ada"
+            }
+          }
+        }
+      }
+    }
+  }
+]
+```
+
+The control call succeeds immediately:
+
+```json
+[
+  {},
+  {
+    "Ok_": {}
+  }
+]
+```
+
+After that, the mock changes behavior for matching API calls. This request:
+
+```json
+[
+  {},
+  {
+    "fn.getUser": {
+      "id": "user-1",
+      "expand!": true
+    }
+  }
+]
+```
+
+returns:
+
+```json
+[
+  {},
+  {
+    "Ok_": {
+      "user": {
+        "id": "user-1",
+        "name": "Ada"
+      }
+    }
+  }
+]
+```
+
+because `fn.createStub_` defaults to partial argument matching. The extra
+`expand!` field does not prevent the stub from matching.
+
+A non-matching call still behaves like an unstubbed mock call:
+
+```json
+[
+  {},
+  {
+    "fn.getUser": {
+      "id": "user-2"
+    }
+  }
+]
+```
+
+```json
+[
+  {},
+  {
+    "ErrorNoMatchingStub_": {}
+  }
+]
+```
+
+If you need exact argument equality instead, set `strictMatch!` to `true` on
+`fn.createStub_`.
+
+## `fn.verify_` With `_ext.Call_`
+
+`fn.verify_` consumes an `_ext.Call_`, not an ordinary free-form object. The
+chosen function name determines which argument schema Telepact validates
+against, and the call shape you pass affects whether verification succeeds.
+
+Continuing the previous example, suppose the mock has already recorded these two
+calls:
+
+```json
+[
+  {
+    "fn.getUser": {
+      "id": "user-1",
+      "expand!": true
+    }
+  },
+  {
+    "fn.getUser": {
+      "id": "user-2"
+    }
+  }
+]
+```
+
+This verification request succeeds:
+
+```json
+[
+  {},
+  {
+    "fn.verify_": {
+      "call": {
+        "fn.getUser": {
+          "id": "user-1"
+        }
+      }
+    }
+  }
+]
+```
+
+```json
+[
+  {},
+  {
+    "Ok_": {}
+  }
+]
+```
+
+because verification defaults to partial matching and `count!` defaults to
+`{"AtLeast": {"times": 1}}`.
+
+The same logical function can fail if you change the verification call:
+
+```json
+[
+  {},
+  {
+    "fn.verify_": {
+      "call": {
+        "fn.getUser": {
+          "id": "user-1"
+        }
+      },
+      "strictMatch!": true
+    }
+  }
+]
+```
+
+```json
+[
+  {},
+  {
+    "ErrorVerificationFailure": {
+      "reason": {
+        "TooFewMatchingCalls": {
+          "wanted": {
+            "AtLeast": {
+              "times": 1
+            }
+          },
+          "found": 0,
+          "allCalls": [
+            {
+              "fn.getUser": {
+                "id": "user-1",
+                "expand!": true
+              }
+            },
+            {
+              "fn.getUser": {
+                "id": "user-2"
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+]
+```
+
+because exact matching now requires the recorded argument to equal the given
+argument exactly.
+
+Changing only `count!` can also change the result:
+
+```json
+[
+  {},
+  {
+    "fn.verify_": {
+      "call": {
+        "fn.getUser": {}
+      },
+      "count!": {
+        "AtMost": {
+          "times": 1
+        }
+      }
+    }
+  }
+]
+```
+
+```json
+[
+  {},
+  {
+    "ErrorVerificationFailure": {
+      "reason": {
+        "TooManyMatchingCalls": {
+          "wanted": {
+            "AtMost": {
+              "times": 1
+            }
+          },
+          "found": 2,
+          "allCalls": [
+            {
+              "fn.getUser": {
+                "id": "user-1",
+                "expand!": true
+              }
+            },
+            {
+              "fn.getUser": {
+                "id": "user-2"
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+]
+```
+
+because the empty argument object partially matches both recorded `fn.getUser`
+calls.
 
 ## Practical Guidance
 
