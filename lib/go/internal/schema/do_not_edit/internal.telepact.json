@@ -12,7 +12,7 @@
     "_errors": "^errors\\.Validation_$"
   },
   {
-    "///": "Get the telepact `schema` of this server.\n\nSet `includeInternal` to `true` to include Telepact internal definitions.\nSet `includeExamples` to `true` to add deterministic example payloads to\neach schema entry.",
+    "///": "Get the telepact `schema` of this server.\n\nSet `includeInternal` to `true` to include Telepact internal definitions.\nSet `includeExamples` to `true` to add deterministic example payloads to\neach schema entry.\n",
     "fn.api_": {
       "includeInternal!": "boolean",
       "includeExamples!": "boolean"
@@ -31,7 +31,7 @@
     "_errors": "^errors\\.Validation_$"
   },
   {
-    "///": "See https://raw.githubusercontent.com/Telepact/telepact/main/doc/\nextensions.md for `_ext.Select_` documentation.",
+    "///": "See https://raw.githubusercontent.com/Telepact/telepact/main/doc/\nextensions.md for `_ext.Select_` documentation.\n",
     "_ext.Select_": {
     }
   },
@@ -44,7 +44,7 @@
     }
   },
   {
-    "///": "If `@unsafe_` is set to `true`, response validation by the server will be\ndisabled. The server will reflect the client-provided value of the\n`@unsafe_` header in the response.",
+    "///": "If `@unsafe_` is set to `true`, response validation by the server will be\ndisabled. The server will reflect the client-provided value of the\n`@unsafe_` header in the response.\n",
     "headers.Unsafe_": {
       "@unsafe_": "boolean"
     },
@@ -61,7 +61,7 @@
     }
   },
   {
-    "///": "The `@bin_` header indicates the valid checksums of binary encodings\nnegotiated between the client and server. If the client sends a `@bin_`\nheader with any value, the server will respond with a `@bin_` header with an\narray containing the currently supported binary encoding checksum. If the\nclient's provided checksum does not match the server's checksum, the server\nwill also send an `@enc_` header containing the binary encoding, which is a\nmap of field names to field ids. The response body may also be encoded in\nbinary.\n\nThe `@pac_` header can also be used to indicate usage of 'packed' binary\nencoding strategy. If the client submits a `@pac_` header with a `true`\nvalue, the server will respond with a `@pac_` header with a `true` value.",
+    "///": "The `@bin_` header indicates the valid checksums of binary encodings\nnegotiated between the client and server. If the client sends a `@bin_`\nheader with any value, the server will respond with a `@bin_` header with an\narray containing the currently supported binary encoding checksum. If the\nclient's provided checksum does not match the server's checksum, the server\nwill also send an `@enc_` header containing the binary encoding, which is a\nmap of field names to field ids. The response body may also be encoded in\nbinary.\n\nThe `@pac_` header can also be used to indicate usage of 'packed' binary\nencoding strategy. If the client submits a `@pac_` header with a `true`\nvalue, the server will respond with a `@pac_` header with a `true` value.\n",
     "headers.Binary_": {
       "@bin_": [
         "integer"
@@ -89,7 +89,7 @@
     }
   },
   {
-    "///": "The `@id_` header is used to correlate requests and responses. The server\nwill reflect the client-provided `@id_` header as-is.",
+    "///": "The `@id_` header is used to correlate requests and responses. The server\nwill reflect the client-provided `@id_` header as-is.\n",
     "headers.Id_": {
       "@id_": "any"
     },
@@ -219,7 +219,7 @@
         }
       },
       {
-        "///": "The binary decoder encountered a field id that could not be mapped to a\nkey.",
+        "///": "The binary decoder encountered a field id that could not be mapped to a\nkey.\n",
         "BinaryDecodeFailure": {
         }
       },
