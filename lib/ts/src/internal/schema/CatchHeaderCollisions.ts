@@ -16,7 +16,7 @@
 
 import { TelepactSchemaParseError } from '../../TelepactSchemaParseError';
 import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
-import { getPathDocumentCoordinatesPseudoJson } from '../../internal/schema/GetPathDocumentCoordinatesPseudoJson';
+import { resolveDocumentCoordinates } from '../../internal/schema/DocumentLocators';
 
 export function catchHeaderCollisions(
     telepactSchemaNameToPseudoJson: Record<string, any[]>,
@@ -64,8 +64,7 @@ export function catchHeaderCollisions(
             const headerCollisions = Object.keys(headerDef).filter((k) => k in otherHeaderDef);
             for (const headerCollision of headerCollisions) {
                 const thisPath = [index, defKey, headerCollision];
-                const thisDocumentJson = documentNamesToJson[documentName];
-                const thisLocation = getPathDocumentCoordinatesPseudoJson(thisPath, thisDocumentJson);
+                const thisLocation = resolveDocumentCoordinates(thisPath, documentName, documentNamesToJson);
                 parseFailures.push(
                     new SchemaParseFailure(
                         otherDocumentName,
@@ -82,8 +81,7 @@ export function catchHeaderCollisions(
             const resHeaderCollisions = Object.keys(resHeaderDef).filter((k) => k in otherResHeaderDef);
             for (const resHeaderCollision of resHeaderCollisions) {
                 const thisPath = [index, '->', resHeaderCollision];
-                const thisDocumentJson = documentNamesToJson[documentName];
-                const thisLocation = getPathDocumentCoordinatesPseudoJson(thisPath, thisDocumentJson);
+                const thisLocation = resolveDocumentCoordinates(thisPath, documentName, documentNamesToJson);
                 parseFailures.push(
                     new SchemaParseFailure(otherDocumentName, [otherIndex, '->', resHeaderCollision], 'PathCollision', {
                         document: documentName,

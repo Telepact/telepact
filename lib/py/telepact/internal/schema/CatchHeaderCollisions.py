@@ -26,7 +26,7 @@ def catch_header_collisions(
 ) -> None:
     from ...TelepactSchemaParseError import TelepactSchemaParseError
     from ...internal.schema.SchemaParseFailure import SchemaParseFailure
-    from ...internal.schema.GetPathDocumentCoordinatesPseudoJson import get_path_document_coordinates_pseudo_json
+    from ...internal.schema.DocumentLocators import resolve_document_coordinates
 
     parse_failures = []
 
@@ -61,9 +61,8 @@ def catch_header_collisions(
                 k for k in header_def if k in other_header_def]
             for header_collision in header_collisions:
                 this_path = [index, def_key, header_collision]
-                this_document_json = document_names_to_json[document_name]
-                this_location = get_path_document_coordinates_pseudo_json(
-                    this_path, this_document_json)
+                this_location = resolve_document_coordinates(
+                    this_path, document_name, document_names_to_json)
                 parse_failures.append(
                     SchemaParseFailure(
                         other_document_name,
@@ -81,9 +80,8 @@ def catch_header_collisions(
                 k for k in res_header_def if k in other_res_header_def]
             for res_header_collision in res_header_collisions:
                 this_path = [index, '->', res_header_collision]
-                this_document_json = document_names_to_json[document_name]
-                this_location = get_path_document_coordinates_pseudo_json(
-                    this_path, this_document_json)
+                this_location = resolve_document_coordinates(
+                    this_path, document_name, document_names_to_json)
                 parse_failures.append(
                     SchemaParseFailure(
                         other_document_name,

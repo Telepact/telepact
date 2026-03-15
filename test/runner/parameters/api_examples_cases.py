@@ -14,6 +14,51 @@
 #|  limitations under the License.
 #|
 
+from parameters.schema_loader import normalize_schema_docstrings
+from parameters.schema_loader import load_schema_definitions
+from pathlib import Path
+
+
+def _schema_key(definition: dict[str, object]) -> str:
+    return next(
+        key
+        for key in definition.keys()
+        if key not in {'///', '->', '_errors', 'example', 'inputExample', 'outputExample'}
+    )
+
+
+def _load_sorted_schema(*relative_paths: str) -> list[dict[str, object]]:
+    root = Path(__file__).resolve().parents[3]
+    definitions: list[dict[str, object]] = []
+    for relative_path in relative_paths:
+        definitions.extend(load_schema_definitions(root / relative_path))
+
+    return sorted(
+        definitions,
+        key=lambda definition: (not _schema_key(definition).startswith('info.'), _schema_key(definition)),
+    )
+
+
+def _canonicalize_examples(*relative_paths: str, api: list[dict[str, object]]) -> list[dict[str, object]]:
+    canonical_api = _load_sorted_schema(*relative_paths)
+    examples_by_key = {
+        _schema_key(definition): {
+            key: value
+            for key, value in definition.items()
+            if key in {'example', 'inputExample', 'outputExample'}
+        }
+        for definition in api
+    }
+
+    return [
+        {
+            **definition,
+            **examples_by_key.get(_schema_key(definition), {}),
+        }
+        for definition in canonical_api
+    ]
+
+
 auth_cases = {
     'api_examples_auth': [
         [
@@ -28,6 +73,13 @@ auth_cases = {
         ],
     ],
 }
+
+auth_cases = normalize_schema_docstrings(auth_cases)
+auth_cases['api_examples_auth'][0][1][1]['Ok_']['api'] = _canonicalize_examples(
+    'test/runner/schema/auth/auth.telepact.json',
+    'common/auth.telepact.yaml',
+    api=auth_cases['api_examples_auth'][0][1][1]['Ok_']['api'],
+)
 
 mock_cases = {'api_examples_mock': [[[{}, {'fn.api_': {'includeInternal!': True, 'includeExamples!': True}}],
                                      [{},
@@ -219,3 +271,11 @@ mock_cases = {'api_examples_mock': [[[{}, {'fn.api_': {'includeInternal!': True,
                                                         'union.VerificationFailure_': [{'TooFewMatchingCalls': {'wanted': 'union.CallCountCriteria_', 'found': 'integer', 'allCalls': ['_ext.Call_']}},
                                                                                        {'TooManyMatchingCalls': {'wanted': 'union.CallCountCriteria_', 'found': 'integer', 'allCalls': ['_ext.Call_']}}],
                                                         'example': {'TooManyMatchingCalls': {'allCalls': [{'fn.test': {}}, {'fn.test': {}}], 'found': 326552725, 'wanted': {'Exact': {'times': 1074759177}}}}}]}}]]]}
+
+mock_cases = normalize_schema_docstrings(mock_cases)
+mock_cases['api_examples_mock'][0][1][1]['Ok_']['api'] = _canonicalize_examples(
+    'test/runner/schema/api_examples_mock/api_examples_mock.telepact.json',
+    'common/internal.telepact.yaml',
+    'common/mock-internal.telepact.yaml',
+    api=mock_cases['api_examples_mock'][0][1][1]['Ok_']['api'],
+)

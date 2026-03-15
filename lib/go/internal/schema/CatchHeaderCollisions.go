@@ -84,8 +84,7 @@ func CatchHeaderCollisions(
 			headerCollisions := intersectKeys(headerDef, otherHeaderDef)
 			for _, collision := range headerCollisions {
 				thisPath := []any{index, defKey, collision}
-				thisDocJSON := documentNamesToJSON[documentName]
-				location := GetPathDocumentCoordinatesPseudoJSON(thisPath, thisDocJSON)
+				location := ResolveDocumentCoordinates(thisPath, documentName, documentNamesToJSON)
 				parseFailures = append(parseFailures, NewSchemaParseFailure(
 					otherDocumentName,
 					[]any{otherIndex, otherDefKey, collision},
@@ -110,8 +109,7 @@ func CatchHeaderCollisions(
 			resCollisions := intersectKeys(resHeaderDef, otherResHeaderDef)
 			for _, collision := range resCollisions {
 				thisPath := []any{index, "->", collision}
-				thisDocJSON := documentNamesToJSON[documentName]
-				location := GetPathDocumentCoordinatesPseudoJSON(thisPath, thisDocJSON)
+				location := ResolveDocumentCoordinates(thisPath, documentName, documentNamesToJSON)
 				parseFailures = append(parseFailures, NewSchemaParseFailure(
 					otherDocumentName,
 					[]any{otherIndex, "->", collision},

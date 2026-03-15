@@ -22,6 +22,7 @@ func CreateMockTelepactSchemaFromFileJSONMap(jsonDocuments map[string]string) (*
 	for key, value := range jsonDocuments {
 		finalDocuments[key] = value
 	}
+	CopyDocumentLocators(jsonDocuments, finalDocuments)
 
 	finalDocuments["mock_"] = GetMockTelepactJSON()
 

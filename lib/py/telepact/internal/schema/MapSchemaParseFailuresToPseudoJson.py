@@ -20,11 +20,11 @@ if TYPE_CHECKING:
 
 
 def map_schema_parse_failures_to_pseudo_json(schema_parse_failures: list['SchemaParseFailure'], telepact_document_name_to_json: dict[str, str]) -> list[dict[str, object]]:
-    from ...internal.schema.GetPathDocumentCoordinatesPseudoJson import get_path_document_coordinates_pseudo_json
+    from ...internal.schema.DocumentLocators import resolve_document_coordinates
     pseudo_json_list = []
     for f in schema_parse_failures:
-        location = get_path_document_coordinates_pseudo_json(
-            f.path, telepact_document_name_to_json[f.document_name])
+        location = resolve_document_coordinates(
+            f.path, f.document_name, telepact_document_name_to_json)
         pseudo_json: dict[str, object] = {}
         pseudo_json["document"] = f.document_name
         pseudo_json["location"] = location

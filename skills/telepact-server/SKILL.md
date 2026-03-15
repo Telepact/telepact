@@ -1,6 +1,6 @@
 ---
 name: telepact-server
-description: Implement a Telepact server for an already-drafted Telepact API schema using a Telepact server library in Go, Java, Python, or TypeScript. Use when Codex needs to load an existing `.telepact.json` schema, construct a `Server`, write handler dispatch code, and wire raw request/response bytes into a transport such as HTTP, WebSockets, NATS, or another request/reply channel.
+description: Implement a Telepact server for an already-drafted Telepact API schema using a Telepact server library in Go, Java, Python, or TypeScript. Use when agent needs to load an existing `.telepact.yaml` or `.telepact.json` schema, construct a `Server`, write handler dispatch code, and wire raw request/response bytes into a transport such as HTTP, WebSockets, NATS, or another request/reply channel.
 ---
 
 # Telepact Server
@@ -252,7 +252,7 @@ transport.Receive(func(requestBytes []byte) ([]byte, error) {
 ## Server Authoring Rules
 
 - Assume the schema is the source of truth.
-- Load the schema from `.telepact.json` files before constructing the server.
+- Load the schema from `.telepact.yaml` or `.telepact.json` files before constructing the server. Prefer YAML for checked-in schema authoring.
 - Keep transport code thin: receive bytes, call `server.process`, return bytes.
 - Keep business logic in the handler, not in the transport.
 - Return schema-valid `Message` objects from the handler.

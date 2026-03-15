@@ -14,8 +14,9 @@
 #|  limitations under the License.
 #|
 
-import json
 from pathlib import Path
+
+from parameters.schema_loader import load_schema_definitions
 
 
 def _load_full_example_schema() -> list[dict[str, object]]:
@@ -23,10 +24,9 @@ def _load_full_example_schema() -> list[dict[str, object]]:
     definitions: list[dict[str, object]] = []
     for relative_path in (
         'test/runner/schema/example/example.telepact.json',
-        'common/internal.telepact.json',
+        'common/internal.telepact.yaml',
     ):
-        with (root / relative_path).open() as stream:
-            definitions.extend(json.load(stream))
+        definitions.extend(load_schema_definitions(root / relative_path))
     return definitions
 
 
@@ -177,7 +177,16 @@ cases = {
         [[{}, {'fn.validateSchema': {'input': {'Directory': {'schemaDirectory': '../../runner/schema/parse2'}}}}], [{}, {'ErrorValidationFailure': {'cases': [{'document': 'schema.telepact.json', 'location': {'row': 1, 'col': 1}, 'path': [], 'reason': {'JsonInvalid': {}}}]}}]],
         [[{}, {'fn.validateSchema': {'input': {'Directory': {'schemaDirectory': '../../runner/schema/parse3'}}}}], [{}, {'Ok_': {}}]],
         [[{}, {'fn.validateSchema': {'input': {'Directory': {'schemaDirectory': '../../runner/schema/parse4'}}}}], [{'@assert_': {'setCompare': True}}, {'ErrorValidationFailure': {'cases': [{'document': 'schema1.telepact.json', 'location': {'row': 4, 'col': 13}, 'path': [0, 'struct.Example', 'field1'], 'reason': {'StringRegexMatchFailed': {'regex': '^(boolean|integer|number|string|any|bytes)|((fn|(union|struct|_ext))\\.([a-zA-Z_]\\w*))$'}}},{'document': 'schema2.telepact.json', 'location': {'row': 7, 'col': 17}, 'path': [0, '->', 0, 'Ok_', 'extra'], 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'StringOrArrayOrObject': {}}}}}]}}]],
-        [[{}, {'fn.validateSchema': {'input': {'Directory': {'schemaDirectory': '../../runner/schema/parse5'}}}}], [{}, {'ErrorValidationFailure': {'cases': [{'document': 'schema.wrong.json', 'location': {'row': 1, 'col': 1}, 'path': [], 'reason': {'FileNamePatternInvalid': {'expected': '*.telepact.json'}}}]}}]],
+        [[{}, {'fn.validateSchema': {'input': {'Directory': {'schemaDirectory': '../../runner/schema/parse5'}}}}], [{}, {'ErrorValidationFailure': {'cases': [{'document': 'schema.wrong.json', 'location': {'row': 1, 'col': 1}, 'path': [], 'reason': {'FileNamePatternInvalid': {'expected': '*.telepact.json|*.telepact.yaml'}}}]}}]],
         [[{}, {'fn.validateSchema': {'input': {'Directory': {'schemaDirectory': '../../runner/schema/parse6'}}}}], [{}, {'ErrorValidationFailure': {'cases': [{'document': 'disallowedDir', 'location': {'row': 1, 'col': 1}, 'path': [], 'reason': {'DirectoryDisallowed': {}}}]}}]],
+        [[{}, {'fn.validateSchema': {'input': {'Directory': {'schemaDirectory': '../../runner/schema/parse7'}}}}], [{}, {'Ok_': {}}]],
+        [[{}, {'fn.validateSchema': {'input': {'Directory': {'schemaDirectory': '../../runner/schema/parse8'}}}}], [{}, {'ErrorValidationFailure': {'cases': [{'document': 'schema.telepact.yaml', 'location': {'row': 18, 'col': 5}, 'path': [0, 'struct.Example', 'field'], 'reason': {'StringRegexMatchFailed': {'regex': '^(boolean|integer|number|string|any|bytes)|((fn|(union|struct|_ext))\\.([a-zA-Z_]\\w*))$'}}}]}}]],
+        [[{}, {'fn.validateSchema': {'input': {'Directory': {'schemaDirectory': '../../runner/schema/parse9'}}}}], [{}, {'ErrorValidationFailure': {'cases': [{'document': 'schema.telepact.yaml', 'location': {'row': 1, 'col': 1}, 'path': [], 'reason': {'JsonInvalid': {}}}]}}]],
+        [[{}, {'fn.validateSchema': {'input': {'Directory': {'schemaDirectory': '../../runner/schema/parse10'}}}}], [{}, {'ErrorValidationFailure': {'cases': [{'document': 'schema.telepact.yaml', 'location': {'row': 18, 'col': 5}, 'path': [0, 'errors.Broken', 0], 'reason': {'ObjectKeyRegexMatchCountUnexpected': {'actual': 0, 'expected': 1, 'regex': '^([A-Z][a-zA-Z0-9_]*)$', 'keys': []}}}]}}]],
+        [[{}, {'fn.validateSchema': {'input': {'Directory': {'schemaDirectory': '../../runner/schema/parse11'}}}}], [{}, {'ErrorValidationFailure': {'cases': [{'document': 'schema.telepact.yaml', 'location': {'row': 17, 'col': 1}, 'path': [0], 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]],
+        [[{}, {'fn.validateSchema': {'input': {'Directory': {'schemaDirectory': '../../runner/schema/parse12'}}}}], [{}, {'ErrorValidationFailure': {'cases': [{'document': 'schema.telepact.yaml', 'location': {'row': 22, 'col': 5}, 'path': [0, 'struct.Example', 'field'], 'reason': {'StringRegexMatchFailed': {'regex': '^(boolean|integer|number|string|any|bytes)|((fn|(union|struct|_ext))\\.([a-zA-Z_]\\w*))$'}}}]}}]],
+        [[{}, {'fn.validateSchema': {'input': {'Directory': {'schemaDirectory': '../../runner/schema/parse13'}}}}], [{}, {'ErrorValidationFailure': {'cases': [{'document': 'schema.telepact.yaml', 'location': {'row': 18, 'col': 5}, 'path': [0, 'headers.Example', '@field'], 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'StringOrArrayOrObject': {}}}}}]}}]],
+        [[{}, {'fn.validateSchema': {'input': {'Directory': {'schemaDirectory': '../../runner/schema/parse14'}}}}], [{}, {'ErrorValidationFailure': {'cases': [{'document': 'schema.telepact.yaml', 'location': {'row': 1, 'col': 1}, 'path': [], 'reason': {'JsonInvalid': {}}}]}}]],
+        [[{}, {'fn.validateSchema': {'input': {'Directory': {'schemaDirectory': '../../runner/schema/parse15'}}}}], [{}, {'ErrorValidationFailure': {'cases': [{'document': 'schema.telepact.yaml', 'location': {'row': 1, 'col': 1}, 'path': [], 'reason': {'JsonInvalid': {}}}]}}]],
     ]
 }

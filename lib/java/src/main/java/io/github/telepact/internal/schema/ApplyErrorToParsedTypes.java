@@ -69,10 +69,8 @@ public class ApplyErrorToParsedTypes {
                     var otherDocumentName = schemaKeysToDocumentNames.get(fnName);
                     var fnErrorTagIndex = f.tagIndices.get(newKey);
                     List<Object> otherFinalPath = List.of(otherPathIndex, "->", fnErrorTagIndex, newKey);
-                    var otherDocumentJson = documentNamesToJson.get(otherDocumentName);
-                    var otherLocationPseudoJson = GetPathDocumentCoordinatesPseudoJson
-                            .getPathDocumentCoordinatesPseudoJson(
-                                    otherFinalPath, otherDocumentJson);
+                    var otherLocationPseudoJson = DocumentLocators
+                            .resolveDocumentCoordinates(otherFinalPath, otherDocumentName, documentNamesToJson);
                     parseFailures.add(new SchemaParseFailure(documentName,
                             List.of(errorIndex, errorKey, errorTagIndex, newKey),
                             "PathCollision",

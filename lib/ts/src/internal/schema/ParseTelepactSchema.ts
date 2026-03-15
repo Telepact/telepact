@@ -29,7 +29,7 @@ import { parseErrorType } from './ParseErrorType';
 import { parseHeadersType } from './ParseHeadersType';
 import { TError } from '../types/TError';
 import { ParseContext } from './ParseContext';
-import { getPathDocumentCoordinatesPseudoJson } from './GetPathDocumentCoordinatesPseudoJson';
+import { resolveDocumentCoordinates } from './DocumentLocators';
 import { THeaders } from '../types/THeaders';
 import { catchHeaderCollisions } from './CatchHeaderCollisions';
 
@@ -103,10 +103,10 @@ export function parseTelepactSchema(telepactSchemaDocumentNamesToJson: Record<st
                     const otherDocumentName = schemaKeysToDocumentName[matchingSchemaKey];
                     const finalPath = [...loopPath, schemaKey];
                     const otherFinalPath = [otherPathIndex, matchingSchemaKey];
-                    const otherDocumentJson = telepactSchemaDocumentNamesToJson[otherDocumentName];
-                    const otherLocationPseudoJson = getPathDocumentCoordinatesPseudoJson(
+                    const otherLocationPseudoJson = resolveDocumentCoordinates(
                         otherFinalPath,
-                        otherDocumentJson,
+                        otherDocumentName,
+                        telepactSchemaDocumentNamesToJson,
                     );
                     parseFailures.push(
                         new SchemaParseFailure(documentName, finalPath as any[], 'PathCollision', {

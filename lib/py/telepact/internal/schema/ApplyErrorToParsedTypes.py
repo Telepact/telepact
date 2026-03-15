@@ -32,7 +32,7 @@ def apply_error_to_parsed_types(error: 'TError',
                                 fn_error_regexes: dict[str, str]) -> None:
     from ...internal.schema.SchemaParseFailure import SchemaParseFailure
     from ...TelepactSchemaParseError import TelepactSchemaParseError
-    from ...internal.schema.GetPathDocumentCoordinatesPseudoJson import get_path_document_coordinates_pseudo_json
+    from ...internal.schema.DocumentLocators import resolve_document_coordinates
     from ..types.TUnion import TUnion
 
     parse_failures = []
@@ -71,9 +71,8 @@ def apply_error_to_parsed_types(error: 'TError',
                 fn_error_tag_index = f.tag_indices[new_key]
                 other_final_path = [other_path_index,
                                     "->", fn_error_tag_index, new_key]
-                other_document_json = document_names_to_json[other_document_name]
-                other_location_pseudo_json = get_path_document_coordinates_pseudo_json(
-                    other_final_path, other_document_json)
+                other_location_pseudo_json = resolve_document_coordinates(
+                    other_final_path, other_document_name, document_names_to_json)
                 parse_failures.append(SchemaParseFailure(
                     document_name,
                     [error_index, error_key,

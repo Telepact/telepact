@@ -15,11 +15,11 @@
 #|
 
 from typing import Any
-import json
 from pathlib import Path
 
 from parameters.cases import get_values, skipped_collection_fields
 from parameters.cases import additional_union_cases, additional_fn_cases, additional_integer_cases, additional_number_cases, additional_struct_cases
+from parameters.schema_loader import load_schema_definitions
 
 
 def _schema_key(definition: dict[str, object]) -> str:
@@ -31,15 +31,15 @@ def _load_sorted_schema(*relative_paths: str) -> list[dict[str, object]]:
     definitions: list[dict[str, object]] = []
 
     for relative_path in relative_paths:
-        definitions.extend(json.loads((root / relative_path).read_text()))
+        definitions.extend(load_schema_definitions(root / relative_path))
 
     return sorted(definitions, key=lambda definition: (not _schema_key(definition).startswith('info.'), _schema_key(definition)))
 
 
 _MOCK_FULL_SCHEMA = _load_sorted_schema(
     'test/runner/schema/example/example.telepact.json',
-    'common/internal.telepact.json',
-    'common/mock-internal.telepact.json',
+    'common/internal.telepact.yaml',
+    'common/mock-internal.telepact.yaml',
 )
 
 

@@ -27,8 +27,7 @@ public class MapSchemaParseFailuresToPseudoJson {
                 .map(f -> (Object) new TreeMap<>() {
                     {
                         put("document", f.documentName);
-                        put("location", GetPathDocumentCoordinatesPseudoJson
-                                .getPathDocumentCoordinatesPseudoJson(f.path, documentNamesToJson.get(f.documentName)));
+                        put("location", DocumentLocators.resolveDocumentCoordinates(f.path, f.documentName, documentNamesToJson));
                         put("path", f.path);
                         put("reason", Map.of(f.reason, f.data));
                     }

@@ -92,8 +92,7 @@ func ParseTelepactSchema(telepactSchemaDocumentNamesToJSON map[string]string) (*
 				otherDocumentName := schemaKeysToDocumentNames[matchingKey]
 				finalPath := append(append([]any{}, loopPath...), schemaKey)
 				otherFinalPath := []any{otherIndex, matchingKey}
-				otherDocumentJSON := telepactSchemaDocumentNamesToJSON[otherDocumentName]
-				otherLocation := GetPathDocumentCoordinatesPseudoJSON(otherFinalPath, otherDocumentJSON)
+				otherLocation := ResolveDocumentCoordinates(otherFinalPath, otherDocumentName, telepactSchemaDocumentNamesToJSON)
 
 				parseFailures = append(parseFailures, NewSchemaParseFailure(
 					documentName,

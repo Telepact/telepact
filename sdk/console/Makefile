@@ -17,10 +17,15 @@
 NPM_INSTALL ?= install --ignore-scripts
 VERSION := $(shell cat ../../VERSION.txt)
 TAR_GZ := dist-tgz/*.tgz
-DEP_LIB_DIST := ../../lib/ts/dist
-DEP_PRETTIER_DIST := ../../sdk/prettier/dist
+DEP_LIB_FILE := ../../lib/ts/dist/index.esm.js
+DEP_PRETTIER_FILE := ../../sdk/prettier/dist/index.esm.js
+NPM_STAMP := node_modules/.package-lock.stamp
 
-$(TAR_GZ): $(DEP_LIB_DIST) $(DEP_PRETTIER_DIST)
+.PHONY: all prepare-local-deps dev playwright clean test dev-proxy deploy
+
+all: $(TAR_GZ)
+
+prepare-local-deps: $(DEP_LIB_FILE) $(DEP_PRETTIER_FILE)
 	cp ../../LICENSE ../../NOTICE ./
 	
 	rm -rf src/lib/telepact
@@ -31,10 +36,15 @@ $(TAR_GZ): $(DEP_LIB_DIST) $(DEP_PRETTIER_DIST)
 	mkdir -p src/lib/prettier-plugin-telepact
 	cp -r ../../sdk/prettier/dist/* src/lib/prettier-plugin-telepact
 
+$(NPM_STAMP): package.json package-lock.json
+	npm $(NPM_INSTALL)
+	mkdir -p node_modules
+	touch $(NPM_STAMP)
+
+$(TAR_GZ): prepare-local-deps $(NPM_STAMP)
 	rm -rf dist-tgz
 	mkdir -p dist-tgz	
 
-	npm $(NPM_INSTALL)
 	npm run build
 	node clean-index.js
 	npm pack --pack-destination ./dist-tgz
@@ -44,16 +54,16 @@ $(TAR_GZ): $(DEP_LIB_DIST) $(DEP_PRETTIER_DIST)
 	docker build --progress=plain --no-cache -f Dockerfile -t telepact-console:${VERSION} .
 	docker save telepact-console:${VERSION} | gzip > dist-docker/docker-image-telepact-console-${VERSION}.tar.gz
 
-$(DEP_LIB_DIST):
+$(DEP_LIB_FILE):
 	$(MAKE) -C ../../lib/ts
 
-$(DEP_PRETTIER_DIST):
+$(DEP_PRETTIER_FILE):
 	$(MAKE) -C ../../sdk/prettier
 
 dev:
 	npm run dev
 
-playwright:
+playwright: $(NPM_STAMP)
 	npx playwright install --with-deps --force
 
 clean:
@@ -66,7 +76,7 @@ clean:
 	rm -rf LICENSE
 	rm -rf NOTICE
 
-test:
+test: prepare-local-deps $(NPM_STAMP)
 	npm run test
 
 dev-proxy:

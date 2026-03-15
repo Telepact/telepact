@@ -1,6 +1,14 @@
 # Schema Writing Guide
 
-This guide will explain how to understand and write `*.telepact.json` files.
+This guide explains how to understand and write Telepact schema files.
+
+For normal checked-in authoring, prefer `*.telepact.yaml`. YAML is easier to
+read at rest, especially for multi-line `///` docstrings. `*.telepact.json` is
+still valid and remains the canonical lowered and wire-aligned representation.
+
+The schema itself is still JSON-shaped. Many examples in this guide use JSON
+syntax when the goal is to show exact type-expression structure. Real-world
+schema files will usually prefer YAML.
 
 ## Type Expression
 
@@ -363,26 +371,16 @@ Telepact console.
 ]
 ```
 
-#### Multi-line
+Prefer YAML when multi-line docstrings are desired.
 
-Multi-line docstrings are supported. For readability and ease of writing, schema
-writers are encouraged to use the Telepact Prettier plugin. (The Telepact
-console uses the prettier plugin in draft mode.)
+```yaml
+- ///: |
+    A struct that contains a field.
 
-```json
-[
-    {
-        "///": [
-            " A struct that contains a field.                     ",
-            "                                                     ",
-            " Fields:                                             ",
-            "  - `field` (type: `boolean`)                        "
-        ],
-        "struct.ExampleStruct": {
-            "field": "boolean"
-        }
-    }
-]
+    Fields:
+      - `field` (type: `boolean`)
+  struct.ExampleStruct:
+    field: boolean
 ```
 
 ## Automatic Definitions
@@ -402,7 +400,7 @@ payloads to each returned schema entry. For mock servers, the expanded response
 also includes the bundled mock schema definitions.
 
 You can find all standard definitions
-[here](https://raw.githubusercontent.com/Telepact/telepact/refs/heads/main/common/internal.telepact.json).
+[here](https://raw.githubusercontent.com/Telepact/telepact/refs/heads/main/common/internal.telepact.yaml).
 
 ### Auth Definitions
 
@@ -416,7 +414,7 @@ standard `struct.Auth_` struct, as the `@auth_` header is treated with greater
 sensitivity throughout the Telepact ecosystem.
 
 You can find details about auth definitions
-[here](https://raw.githubusercontent.com/Telepact/telepact/refs/heads/main/common/auth.telepact.json).
+[here](https://raw.githubusercontent.com/Telepact/telepact/refs/heads/main/common/auth.telepact.yaml).
 
 ### Mock Definitions
 
@@ -430,7 +428,7 @@ schema definitions, extension types are placeholders whose actual validation
 rules come from Telepact runtime behavior and surrounding schema context.
 
 You can find all mock definitions
-[here](https://raw.githubusercontent.com/Telepact/telepact/refs/heads/main/common/mock-internal.telepact.json).
+[here](https://raw.githubusercontent.com/Telepact/telepact/refs/heads/main/common/mock-internal.telepact.yaml).
 There is also a guide to Telepact extension types, including mock extensions,
 [here](https://raw.githubusercontent.com/Telepact/telepact/main/doc/extensions.md).
 

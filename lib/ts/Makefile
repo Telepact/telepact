@@ -16,15 +16,16 @@
 
 NPM_INSTALL ?= install --ignore-scripts
 SRC_FILES := $(shell find src -type f)
-COMMON_JSON_FILES := $(shell find ../../common -type f -name '*.json')
+BUILD_FILES := package.json package-lock.json tsconfig.json rollup.config.js
+COMMON_SCHEMA_FILES := $(shell find ../../common -type f \( -name '*.json' -o -name '*.yaml' \))
 TAR_GZ := dist-tgz/*.tgz
 
 .PHONY: clean
 
-$(TAR_GZ): $(SRC_FILES) $(COMMON_JSON_FILES)
+$(TAR_GZ): $(SRC_FILES) $(BUILD_FILES) $(COMMON_SCHEMA_FILES)
 	rm -rf inc
 	mkdir -p inc
-	cp ../../common/*.json inc
+	ruby ../../tool/render_common_schema_json.rb ../../common inc
 
 	rm -rf dist
 	mkdir -p dist

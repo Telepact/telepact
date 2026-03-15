@@ -27,6 +27,7 @@ func CreateTelepactSchemaFromFileJSONMap(jsonDocuments map[string]string) (*Pars
 	for key, value := range jsonDocuments {
 		finalDocuments[key] = value
 	}
+	CopyDocumentLocators(jsonDocuments, finalDocuments)
 
 	internalJSON := GetInternalTelepactJSON()
 	if !hasBundledDefinitions(jsonDocuments, "internal_", internalJSON) {

@@ -20,7 +20,7 @@ from typing import cast
 def catch_error_collisions(telepact_schema_name_to_pseudo_json: dict[str, list[object]], error_keys: set[str], keys_to_index: dict[str, int], schema_keys_to_document_name: dict[str, str], document_names_to_json: dict[str, str]) -> None:
     from ...TelepactSchemaParseError import TelepactSchemaParseError
     from ...internal.schema.SchemaParseFailure import SchemaParseFailure
-    from ...internal.schema.GetPathDocumentCoordinatesPseudoJson import get_path_document_coordinates_pseudo_json
+    from ...internal.schema.DocumentLocators import resolve_document_coordinates
 
     parse_failures = []
     error_keys_list = list(error_keys)
@@ -65,9 +65,8 @@ def catch_error_collisions(telepact_schema_name_to_pseudo_json: dict[str, list[o
                             iter(this_other_err_def_keys))
                         final_this_path = [
                             index, def_key, k, this_error_def_key]
-                        final_this_document_json = document_names_to_json[document_name]
-                        final_this_location_pseudo_json = get_path_document_coordinates_pseudo_json(
-                            final_this_path, final_this_document_json)
+                        final_this_location_pseudo_json = resolve_document_coordinates(
+                            final_this_path, document_name, document_names_to_json)
                         parse_failures.append(SchemaParseFailure(
                             other_document_name,
                             [other_index, other_def_key, l,

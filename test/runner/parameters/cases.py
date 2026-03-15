@@ -16,8 +16,9 @@
 
 from typing import Any
 import base64
-import json
 from pathlib import Path
+
+from parameters.schema_loader import load_schema_definitions
 
 default_values = [False, 0, 0.1, '', [], {}]
 
@@ -67,8 +68,7 @@ def _load_sorted_schema(*relative_paths: str) -> list[dict[str, object]]:
     root = Path(__file__).resolve().parents[3]
     definitions: list[dict[str, object]] = []
     for relative_path in relative_paths:
-        with (root / relative_path).open() as stream:
-            definitions.extend(json.load(stream))
+        definitions.extend(load_schema_definitions(root / relative_path))
 
     return sorted(
         definitions,
@@ -78,7 +78,7 @@ def _load_sorted_schema(*relative_paths: str) -> list[dict[str, object]]:
 
 _EXAMPLE_FULL_SCHEMA = _load_sorted_schema(
     'test/runner/schema/example/example.telepact.json',
-    'common/internal.telepact.json',
+    'common/internal.telepact.yaml',
 )
 
 def get_values(given_field: str, the_type, given_correct_values, additional_incorrect_values):

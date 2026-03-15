@@ -14,8 +14,9 @@
 #|  limitations under the License.
 #|
 
-import json
 from pathlib import Path
+
+from parameters.schema_loader import load_schema_definitions
 
 
 def _schema_key(definition: dict[str, object]) -> str:
@@ -27,15 +28,15 @@ def _load_sorted_schema(*relative_paths: str) -> list[dict[str, object]]:
     definitions: list[dict[str, object]] = []
 
     for relative_path in relative_paths:
-        definitions.extend(json.loads((root / relative_path).read_text()))
+        definitions.extend(load_schema_definitions(root / relative_path))
 
     return sorted(definitions, key=lambda definition: (not _schema_key(definition).startswith('info.'), _schema_key(definition)))
 
 
 _MOCKGEN_FULL_SCHEMA = _load_sorted_schema(
     'test/runner/schema/mockgen/mockgen.telepact.json',
-    'common/internal.telepact.json',
-    'common/mock-internal.telepact.json',
+    'common/internal.telepact.yaml',
+    'common/mock-internal.telepact.yaml',
 )
 
 
