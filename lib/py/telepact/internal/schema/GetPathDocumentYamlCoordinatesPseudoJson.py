@@ -123,6 +123,8 @@ def _parse_key_token(text: str) -> str:
     trimmed = text.strip()
     if (trimmed.startswith('"') and trimmed.endswith('"')) or (trimmed.startswith("'") and trimmed.endswith("'")):
         return _decode_quoted_string(trimmed)
+    if trimmed in ('///', '->'):
+        return trimmed
     if not re.match(r'^[A-Za-z][A-Za-z0-9_.!]*$', trimmed):
         raise ValueError('Invalid YAML key')
     return trimmed

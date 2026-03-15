@@ -169,6 +169,9 @@ function parseKeyToken(text: string): string {
     if ((trimmed.startsWith('"') && trimmed.endsWith('"')) || (trimmed.startsWith("'") && trimmed.endsWith("'"))) {
         return decodeQuotedString(trimmed);
     }
+    if (trimmed === '///' || trimmed === '->') {
+        return trimmed;
+    }
     if (!/^[A-Za-z][A-Za-z0-9_.!]*$/.test(trimmed)) {
         throw new Error('Invalid YAML key');
     }

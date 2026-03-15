@@ -398,6 +398,9 @@ func parseYAMLKeyToken(text string) (string, error) {
 	if (strings.HasPrefix(trimmed, `"`) && strings.HasSuffix(trimmed, `"`)) || (strings.HasPrefix(trimmed, `'`) && strings.HasSuffix(trimmed, `'`)) {
 		return decodeYAMLQuotedString(trimmed)
 	}
+	if trimmed == "///" || trimmed == "->" {
+		return trimmed, nil
+	}
 	if !regexp.MustCompile(`^[A-Za-z][A-Za-z0-9_.!]*$`).MatchString(trimmed) {
 		return "", fmt.Errorf("invalid YAML key")
 	}

@@ -254,6 +254,9 @@ public class GetPathDocumentYamlCoordinatesPseudoJson {
         if ((trimmed.startsWith("\"") && trimmed.endsWith("\"")) || (trimmed.startsWith("'") && trimmed.endsWith("'"))) {
             return decodeQuotedString(trimmed);
         }
+        if (trimmed.equals("///") || trimmed.equals("->")) {
+            return trimmed;
+        }
         if (!trimmed.matches("^[A-Za-z][A-Za-z0-9_.!]*$")) {
             throw new IllegalArgumentException("Invalid YAML key");
         }
