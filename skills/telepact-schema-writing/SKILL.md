@@ -78,7 +78,7 @@ These type strings refer to other definitions:
 - `union.Name`
 - `fn.name`
 
-Telepact also has internal `_ext.*` types such as `_ext.Select_`, but do not author them unless the task explicitly requires Telepact internal or mock-selection behavior.
+Telepact also has internal `_ext.*` types such as `_ext.Select_`, but do not author them unless the task explicitly requires Telepact internal or mock-selection behavior. When they are required, use the extension guide as the source of truth for shape and behavior: https://raw.githubusercontent.com/Telepact/telepact/main/doc/extensions.md
 
 ### Arrays
 

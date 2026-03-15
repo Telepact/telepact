@@ -1,11 +1,11 @@
 [
   {
-    "///": "See https://raw.githubusercontent.com/Telepact/telepact/main/doc/extensions.md\nfor `_ext.Stub_` documentation.\n",
+    "///": "`_ext.Stub_` is the mock stub object consumed by `fn.createStub_`. It\ncontains exactly one non-internal `fn.*` matcher plus a matching `->`\nresult payload that the mock should return.\n\nSee https://raw.githubusercontent.com/Telepact/telepact/main/doc/extensions.md\nfor full `_ext.Stub_` rules and end-to-end examples.\n",
     "_ext.Stub_": {
     }
   },
   {
-    "///": "See https://raw.githubusercontent.com/Telepact/telepact/main/doc/extensions.md\nfor `_ext.Call_` documentation.\n",
+    "///": "`_ext.Call_` is the mock call object used by `fn.verify_` and verification\nfailures. It contains exactly one non-internal `fn.*` key whose value is\nthat function's argument object.\n\nSee https://raw.githubusercontent.com/Telepact/telepact/main/doc/extensions.md\nfor full `_ext.Call_` rules and end-to-end examples.\n",
     "_ext.Call_": {
     }
   },
@@ -53,7 +53,7 @@
     ]
   },
   {
-    "///": "Create a function stub that will cause the server to return the `stub`\nresult when the `stub` argument matches the function argument on a request.\n\nIf `ignoreMissingArgFields` is `true`, then the server will skip field\nomission validation on the `stub` argument, and the stub will match calls\nwhere the given `stub` argument is exactly a JSON sub-structure of the\nrequest function argument.\n\nIf `generateMissingResultFields` is `true`, then the server will skip field\nomission validation on the `stub` result, and the server will generate the\nnecessary data required to make the `result` pass on response validation.\n",
+    "///": "Create a mock stub from an `_ext.Stub_`.\n\nBy default the stub matcher is partial, so extra fields on the actual\nrequest argument are allowed. Set `strictMatch!` to `true` to require exact\nargument equality instead.\n\nSet `count!` to limit how many matching calls consume this stub before it\nstops matching.\n",
     "fn.createStub_": {
       "stub": "_ext.Stub_",
       "strictMatch!": "boolean",
@@ -68,7 +68,7 @@
     "_errors": "^errors\\.Validation_$"
   },
   {
-    "///": "Verify a call was made with this mock that matches the given `call` and\n`multiplicity` criteria. If `allowPartialArgMatch` is supplied as `true`,\nthen the server will skip field omission validation, and match calls where\nthe given `call` argument is exactly a JSON sub-structure of the actual\nargument.\n",
+    "///": "Verify that the mock received a call matching the given `_ext.Call_`.\n\nBy default verification is partial and succeeds if at least one recorded\ncall contains the given argument as a JSON sub-structure. Set\n`strictMatch!` to `true` to require exact argument equality.\n\nSet `count!` to require `Exact`, `AtLeast`, or `AtMost` matching call\ncounts. Matching calls are marked as verified, which affects\n`fn.verifyNoMoreInteractions_`.\n",
     "fn.verify_": {
       "call": "_ext.Call_",
       "strictMatch!": "boolean",

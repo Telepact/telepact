@@ -15,13 +15,21 @@
 #|
 
 - ///: |
+    `_ext.Stub_` is the mock stub object consumed by `fn.createStub_`. It
+    contains exactly one non-internal `fn.*` matcher plus a matching `->`
+    result payload that the mock should return.
+
     See https://raw.githubusercontent.com/Telepact/telepact/main/doc/extensions.md
-    for `_ext.Stub_` documentation.
+    for full `_ext.Stub_` rules and end-to-end examples.
   _ext.Stub_: {}
 
 - ///: |
+    `_ext.Call_` is the mock call object used by `fn.verify_` and verification
+    failures. It contains exactly one non-internal `fn.*` key whose value is
+    that function's argument object.
+
     See https://raw.githubusercontent.com/Telepact/telepact/main/doc/extensions.md
-    for `_ext.Call_` documentation.
+    for full `_ext.Call_` rules and end-to-end examples.
   _ext.Call_: {}
 
 - ///: The number of times a function is allowed to be called.
@@ -47,17 +55,14 @@
           - _ext.Call_
 
 - ///: |
-    Create a function stub that will cause the server to return the `stub`
-    result when the `stub` argument matches the function argument on a request.
+    Create a mock stub from an `_ext.Stub_`.
 
-    If `ignoreMissingArgFields` is `true`, then the server will skip field
-    omission validation on the `stub` argument, and the stub will match calls
-    where the given `stub` argument is exactly a JSON sub-structure of the
-    request function argument.
+    By default the stub matcher is partial, so extra fields on the actual
+    request argument are allowed. Set `strictMatch!` to `true` to require exact
+    argument equality instead.
 
-    If `generateMissingResultFields` is `true`, then the server will skip field
-    omission validation on the `stub` result, and the server will generate the
-    necessary data required to make the `result` pass on response validation.
+    Set `count!` to limit how many matching calls consume this stub before it
+    stops matching.
   fn.createStub_:
     stub: _ext.Stub_
     strictMatch!: boolean
@@ -67,11 +72,15 @@
   _errors: '^errors\.Validation_$'
 
 - ///: |
-    Verify a call was made with this mock that matches the given `call` and
-    `multiplicity` criteria. If `allowPartialArgMatch` is supplied as `true`,
-    then the server will skip field omission validation, and match calls where
-    the given `call` argument is exactly a JSON sub-structure of the actual
-    argument.
+    Verify that the mock received a call matching the given `_ext.Call_`.
+
+    By default verification is partial and succeeds if at least one recorded
+    call contains the given argument as a JSON sub-structure. Set
+    `strictMatch!` to `true` to require exact argument equality.
+
+    Set `count!` to require `Exact`, `AtLeast`, or `AtMost` matching call
+    counts. Matching calls are marked as verified, which affects
+    `fn.verifyNoMoreInteractions_`.
   fn.verify_:
     call: _ext.Call_
     strictMatch!: boolean

@@ -149,6 +149,10 @@ The most important ones are:
 - `fn.clearStubs_`: clear configured stubs
 - `fn.clearCalls_`: clear recorded invocations
 
+The exact `_ext.Stub_`, `_ext.Call_`, and `@select_` shapes used by these mock
+controls are documented here:
+https://raw.githubusercontent.com/Telepact/telepact/main/doc/extensions.md
+
 Use generated responses by default. Add explicit stubs only when the test needs a very specific downstream behavior.
 
 ### Typical Pattern

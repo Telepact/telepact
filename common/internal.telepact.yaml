@@ -36,8 +36,12 @@
   _errors: '^errors\.Validation_$'
 
 - ///: |
+    `_ext.Select_` is the selection object used by the `@select_` header. Use
+    `->` to narrow fields on the active result union, `struct.*` keys to narrow
+    struct fields, and `union.*` keys to narrow fields for specific union tags.
+
     See https://raw.githubusercontent.com/Telepact/telepact/main/doc/
-    extensions.md for `_ext.Select_` documentation.
+    extensions.md for full `_ext.Select_` rules and end-to-end examples.
   _ext.Select_: {}
 
 - ///: The `@time_` header indicates the request timeout honored by the client.
@@ -54,7 +58,9 @@
   ->:
     "@unsafe_": boolean
 
-- ///: The `@select_` header is used to select fields from structs.
+- ///: |
+    The `@select_` header applies an `_ext.Select_` selection to the response
+    result graph, removing omitted struct fields and union payload fields.
   headers.Select_:
     "@select_": _ext.Select_
   ->: {}

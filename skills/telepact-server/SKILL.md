@@ -459,6 +459,10 @@ A Telepact client can opt into ecosystem features using headers. The server libr
 
 Clients may request struct field selection using `@select_`.
 
+For the full `_ext.Select_` shape and worked examples of how selection changes
+response payloads, see:
+https://raw.githubusercontent.com/Telepact/telepact/main/doc/extensions.md
+
 Your server code should not implement custom pruning logic. Return the full schema-valid response and let the Telepact runtime shape the response according to the selection header.
 
 Important:
