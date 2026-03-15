@@ -1,11 +1,11 @@
 [
   {
-    "///": "See https://raw.githubusercontent.com/Telepact/telepact/main/doc/\nextensions.md for `_ext.Stub_` documentation.",
+    "///": "See https://raw.githubusercontent.com/Telepact/telepact/main/doc/extensions.md\nfor `_ext.Stub_` documentation.",
     "_ext.Stub_": {
     }
   },
   {
-    "///": "See https://raw.githubusercontent.com/Telepact/telepact/main/doc/\nextensions.md for `_ext.Call_` documentation.",
+    "///": "See https://raw.githubusercontent.com/Telepact/telepact/main/doc/extensions.md\nfor `_ext.Call_` documentation.",
     "_ext.Call_": {
     }
   },
