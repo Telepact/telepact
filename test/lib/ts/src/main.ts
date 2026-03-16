@@ -115,6 +115,19 @@ function uint8ArrayToBase64Replacer(key: string, value: object) {
     return value;
   }
 
+function isNumberTooBigError(error: Error): boolean {
+    const message = error.message.toLowerCase();
+    return (
+        message.includes("range") ||
+        message.includes("too large") ||
+        message.includes("overflow") ||
+        message.includes("non-finite") ||
+        message.includes("not representable") ||
+        message.includes("cannot serialize") ||
+        message.includes("value must")
+    );
+}
+
 function startClientTestServer(
     connection: NatsConnection,
     registry: Registry,
@@ -132,7 +145,7 @@ function startClientTestServer(
             try {
                 requestBytes = s.serialize(m);
             } catch (e) {
-                if (e instanceof SerializationError) {
+                if (e instanceof SerializationError && isNumberTooBigError(e)) {
                     return new Message({ numberTooBig: true }, { ErrorUnknown_: {} });
                 } else {
                     throw e;
@@ -208,6 +221,13 @@ function startClientTestServer(
                 } else {
                     response = await client.request(request);
                 }
+            } catch (e) {
+                console.error(e);
+                const responseHeaders: Record<string, any> = {};
+                if (e instanceof Error && e.message.includes("Expected response body")) {
+                    responseHeaders["@assertionError"] = true;
+                }
+                response = new Message(responseHeaders, { ErrorUnknown_: {} });
             } finally {
                 time();
             }
