@@ -155,7 +155,14 @@ async def start_client_test_server(connection: NatsClient, metrics: CollectorReg
             else:
                 return await client.request(Message(request_headers, request_body))
 
-        response = await c()
+        try:
+            response = await c()
+        except Exception as e:
+            on_err(e)
+            response_headers = {}
+            if isinstance(e, AssertionError):
+                response_headers["@assertionError"] = True
+            response = Message(response_headers, {"ErrorUnknown_": {}})
 
         if find_bytes(response.body):
             response.headers['@clientReturnedBinary'] = True
