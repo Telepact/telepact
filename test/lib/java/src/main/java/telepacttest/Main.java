@@ -112,6 +112,8 @@ public class Main {
             var lower = message.toLowerCase();
             if (lower.contains("range")
                     || lower.contains("too large")
+                    || lower.contains("larger than")
+                    || lower.contains("smaller than")
                     || lower.contains("overflow")
                     || lower.contains("non-finite")
                     || lower.contains("not representable")) {
