@@ -10,6 +10,23 @@ The schema itself is still JSON-shaped. Many examples in this guide use JSON
 syntax when the goal is to show exact type-expression structure. Real-world
 schema files will usually prefer YAML.
 
+## Schema Directories
+
+When a Telepact runtime or tool accepts a schema directory, it loads the
+immediate files in that directory as one schema.
+
+Rules:
+
+- supported file names are `*.telepact.yaml` and `*.telepact.json`
+- YAML and JSON files may be mixed in the same directory
+- subdirectories are not part of the schema and are rejected with `DirectoryDisallowed`
+- file order does not affect schema semantics
+- cross-file collisions are handled exactly as if all definitions had been
+  authored in one file
+
+In practice, you can think of a schema directory as an unordered union of the
+supported schema files directly inside that directory.
+
 ## Type Expression
 
 Types are expressed with a string, which may be contained within conventional
