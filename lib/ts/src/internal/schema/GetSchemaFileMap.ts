@@ -26,7 +26,9 @@ export function getSchemaFileMap(directory: string, fs: FsModule, path: PathModu
 
     const schemaParseFailures: SchemaParseFailure[] = [];
 
-    const paths = fs.readdirSync(directory).map((file) => path.join(directory, file));
+    const paths = fs.readdirSync(directory)
+        .sort()
+        .map((file) => path.join(directory, file));
     for (const filePath of paths) {
         const relativePath = path.relative(directory, filePath);
         if (fs.statSync(filePath).isDirectory()) {
