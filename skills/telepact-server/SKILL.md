@@ -130,6 +130,8 @@ import {
 
 const files = new TelepactSchemaFiles('/path/to/schema/dir', fs, path);
 const schema = TelepactSchema.fromFileJsonMap(files.filenamesToJson);
+// A schema directory is the immediate *.telepact.yaml and
+// *.telepact.json files in that directory. Subdirectories are rejected.
 
 const handler = async (requestMessage: Message): Promise<Message> => {
     const functionName = Object.keys(requestMessage.body)[0];
@@ -157,6 +159,8 @@ from telepact import Message, Server, TelepactSchema, TelepactSchemaFiles
 
 files = TelepactSchemaFiles('/path/to/schema/dir')
 schema = TelepactSchema.from_file_json_map(files.filenames_to_json)
+# A schema directory is the immediate *.telepact.yaml and
+# *.telepact.json files in that directory. Subdirectories are rejected.
 
 async def handler(request_message: 'Message') -> 'Message':
     function_name = next(iter(request_message.body))
@@ -182,6 +186,8 @@ Schema loading and server setup:
 ```java
 var files = new TelepactSchemaFiles("/path/to/schema/dir");
 var schema = TelepactSchema.fromFileJsonMap(files.filenamesToJson);
+// A schema directory is the immediate *.telepact.yaml and
+// *.telepact.json files in that directory. Subdirectories are rejected.
 
 Function<Message, Message> handler = (requestMessage) -> {
     var functionName = requestMessage.body.keySet().stream().findAny().orElseThrow();
@@ -209,6 +215,8 @@ files, err := telepact.NewTelepactSchemaFiles("/path/to/schema/dir")
 if err != nil {
     return err
 }
+// A schema directory is the immediate *.telepact.yaml and
+// *.telepact.json files in that directory. Subdirectories are rejected.
 
 schema, err := telepact.TelepactSchemaFromFileJSONMap(files.FilenamesToJSON)
 if err != nil {
@@ -253,6 +261,7 @@ transport.Receive(func(requestBytes []byte) ([]byte, error) {
 
 - Assume the schema is the source of truth.
 - Load the schema from `.telepact.yaml` or `.telepact.json` files before constructing the server. Prefer YAML for checked-in schema authoring.
+- When loading a schema directory, treat it as the unordered union of the immediate `*.telepact.yaml` and `*.telepact.json` files in that directory. Do not rely on file order. Subdirectories are rejected.
 - Keep transport code thin: receive bytes, call `server.process`, return bytes.
 - Keep business logic in the handler, not in the transport.
 - Return schema-valid `Message` objects from the handler.
@@ -278,6 +287,11 @@ The common pattern is:
 2. Build a `TelepactSchemaFiles` or equivalent helper
 3. Build `TelepactSchema` from the discovered file JSON map
 4. Pass that schema into the `Server`
+
+If the input is a schema directory, the helper should read only the immediate
+supported schema files in that directory. Mixed YAML and JSON is fine.
+Collisions across files should be treated the same way they would be in a
+single-file schema.
 
 Use the constructor names shown in this skill. Do not invent alternate schema loaders if the library already provides one.
 

@@ -27,6 +27,11 @@ By default, write checked-in schemas as `.telepact.yaml`. Use `.telepact.json`
 only when the user explicitly asks for JSON or when an inline JSON example is
 more precise for the explanation.
 
+When a schema is split across multiple files, treat the schema directory as an
+unordered union of the immediate `*.telepact.yaml` and `*.telepact.json` files
+in that directory. Collisions across files behave exactly as if the definitions
+had been authored in one file.
+
 A Telepact schema is semantically a JSON-shaped array:
 
 ```yaml
