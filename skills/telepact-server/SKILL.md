@@ -130,8 +130,6 @@ import {
 
 const files = new TelepactSchemaFiles('/path/to/schema/dir', fs, path);
 const schema = TelepactSchema.fromFileJsonMap(files.filenamesToJson);
-// A schema directory is the immediate *.telepact.yaml and
-// *.telepact.json files in that directory. Subdirectories are rejected.
 
 const handler = async (requestMessage: Message): Promise<Message> => {
     const functionName = Object.keys(requestMessage.body)[0];
@@ -159,8 +157,6 @@ from telepact import Message, Server, TelepactSchema, TelepactSchemaFiles
 
 files = TelepactSchemaFiles('/path/to/schema/dir')
 schema = TelepactSchema.from_file_json_map(files.filenames_to_json)
-# A schema directory is the immediate *.telepact.yaml and
-# *.telepact.json files in that directory. Subdirectories are rejected.
 
 async def handler(request_message: 'Message') -> 'Message':
     function_name = next(iter(request_message.body))
@@ -186,8 +182,6 @@ Schema loading and server setup:
 ```java
 var files = new TelepactSchemaFiles("/path/to/schema/dir");
 var schema = TelepactSchema.fromFileJsonMap(files.filenamesToJson);
-// A schema directory is the immediate *.telepact.yaml and
-// *.telepact.json files in that directory. Subdirectories are rejected.
 
 Function<Message, Message> handler = (requestMessage) -> {
     var functionName = requestMessage.body.keySet().stream().findAny().orElseThrow();
@@ -215,8 +209,6 @@ files, err := telepact.NewTelepactSchemaFiles("/path/to/schema/dir")
 if err != nil {
     return err
 }
-// A schema directory is the immediate *.telepact.yaml and
-// *.telepact.json files in that directory. Subdirectories are rejected.
 
 schema, err := telepact.TelepactSchemaFromFileJSONMap(files.FilenamesToJSON)
 if err != nil {
