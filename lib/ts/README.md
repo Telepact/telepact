@@ -33,6 +33,9 @@ import { Message, Server, ServerOptions, TelepactSchema, TelepactSchemaFiles } f
 const files = new TelepactSchemaFiles('/directory/containing/api/files', fs, path);
 const schema = TelepactSchema.fromFileJsonMap(files.filenamesToJson);
 
+// The schema directory may contain multiple *.telepact.yaml and
+// *.telepact.json files. Subdirectories are rejected.
+
 const handler = async (requestMessage: Message): Promise<Message> => {
     const functionName = Object.keys(requestMessage.body)[0];
     const arguments = requestMessage.body[functionName];

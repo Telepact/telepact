@@ -1,0 +1,36 @@
+services:
+  bff:
+    build:
+      context: .
+      dockerfile: apps/bff/Dockerfile
+    environment:
+      PORT: "3000"
+      TODO_SERVICE_URL: http://todo-python:7001/api
+      PLANNER_SERVICE_URL: http://planner-java:7002/api
+    ports:
+      - "3000:3000"
+    depends_on:
+      - todo-python
+      - planner-java
+
+  todo-python:
+    build:
+      context: .
+      dockerfile: services/todo-python/Dockerfile
+    environment:
+      PORT: "7001"
+      SCHEMA_DIR: /app/schemas/todo
+      PLANNER_SERVICE_URL: http://planner-java:7002/api
+    ports:
+      - "7001:7001"
+
+  planner-java:
+    build:
+      context: .
+      dockerfile: services/planner-java/Dockerfile
+    environment:
+      PORT: "7002"
+      SCHEMA_DIR: /app/schemas/planner
+      TODO_SERVICE_URL: http://todo-python:7001/api
+    ports:
+      - "7002:7002"

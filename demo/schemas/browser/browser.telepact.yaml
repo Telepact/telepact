@@ -1,0 +1,137 @@
+- info.BrowserApi: {}
+- struct.Todo:
+    id: "string"
+    title: "string"
+    description: "string"
+    project: "string"
+    priority: "string"
+    dueDate: "string?"
+    tags:
+      - "string"
+    estimateMinutes: "integer"
+    completed: "boolean"
+    completedAt: "string?"
+    focusScore: "integer"
+    focusLane: "string"
+    plannerReason: "string"
+    createdAt: "string"
+    updatedAt: "string"
+- struct.PlannerTodoCard:
+    id: "string"
+    title: "string"
+    project: "string"
+    priority: "string"
+    dueDate: "string?"
+    estimateMinutes: "integer"
+    focusScore: "integer"
+    focusLane: "string"
+    plannerReason: "string"
+- struct.FocusLaneGroup:
+    lane: "string"
+    label: "string"
+    accent: "string"
+    todos:
+      - "struct.PlannerTodoCard"
+- struct.ProjectSnapshot:
+    project: "string"
+    openCount: "integer"
+    completedCount: "integer"
+    criticalCount: "integer"
+- struct.DashboardSummary:
+    openCount: "integer"
+    completedCount: "integer"
+    overdueCount: "integer"
+    todayCount: "integer"
+    totalEstimatedMinutes: "integer"
+- struct.FocusSession:
+    id: "string"
+    todoId: "string"
+    title: "string"
+    project: "string"
+    lane: "string"
+    minutes: "integer"
+    startedAt: "string"
+    finishedAt: "string"
+- struct.PlannerDashboard:
+    generatedAt: "string"
+    summary: "struct.DashboardSummary"
+    lanes:
+      - "struct.FocusLaneGroup"
+    projectSnapshots:
+      - "struct.ProjectSnapshot"
+    recentSessions:
+      - "struct.FocusSession"
+- struct.HomeData:
+    todos:
+      - "struct.Todo"
+    dashboard: "struct.PlannerDashboard"
+- errors.Common:
+    - ErrorInternal:
+        message: "string"
+- fn.getHomeData: {}
+  ->:
+    - Ok_:
+        home: "struct.HomeData"
+- fn.listTodos:
+    status: "string"
+    search: "string"
+    project: "string"
+    tag: "string"
+  ->:
+    - Ok_:
+        todos:
+          - "struct.Todo"
+- fn.createTodo:
+    title: "string"
+    description: "string"
+    project: "string"
+    priority: "string"
+    dueDate: "string?"
+    tags:
+      - "string"
+    estimateMinutes: "integer"
+  ->:
+    - Ok_:
+        todo: "struct.Todo"
+- fn.updateTodo:
+    id: "string"
+    title: "string"
+    description: "string"
+    project: "string"
+    priority: "string"
+    dueDate: "string?"
+    tags:
+      - "string"
+    estimateMinutes: "integer"
+  ->:
+    - Ok_:
+        todo: "struct.Todo"
+    - ErrorTodoNotFound:
+        id: "string"
+- fn.toggleTodoCompletion:
+    id: "string"
+    completed: "boolean"
+  ->:
+    - Ok_:
+        todo: "struct.Todo"
+    - ErrorTodoNotFound:
+        id: "string"
+- fn.deleteTodo:
+    id: "string"
+  ->:
+    - Ok_: {}
+    - ErrorTodoNotFound:
+        id: "string"
+- fn.getPlannerDashboard: {}
+  ->:
+    - Ok_:
+        dashboard: "struct.PlannerDashboard"
+- fn.startFocusSession:
+    todoId: "string"
+    minutes: "integer"
+  ->:
+    - Ok_:
+        session: "struct.FocusSession"
+        dashboard: "struct.PlannerDashboard"
+    - ErrorTodoNotFound:
+        id: "string"

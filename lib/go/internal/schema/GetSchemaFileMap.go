@@ -17,9 +17,9 @@
 package schema
 
 import (
-	"io/fs"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 )
 
@@ -29,28 +29,28 @@ func GetSchemaFileMap(directory string) (map[string]string, []*SchemaParseFailur
 	documentLocators := make(map[string]DocumentLocator)
 	parseFailures := make([]*SchemaParseFailure, 0)
 
-	err := filepath.WalkDir(directory, func(path string, d fs.DirEntry, walkErr error) error {
-		if walkErr != nil {
-			return walkErr
-		}
+	entries, err := os.ReadDir(directory)
+	if err != nil {
+		return nil, nil, err
+	}
 
-		relativePath, err := filepath.Rel(directory, path)
-		if err != nil {
-			return err
-		}
+	sort.Slice(entries, func(i, j int) bool {
+		return entries[i].Name() < entries[j].Name()
+	})
 
-		if d.IsDir() {
-			if relativePath == "." {
-				return nil
-			}
+	for _, entry := range entries {
+		relativePath := entry.Name()
+		path := filepath.Join(directory, relativePath)
+
+		if entry.IsDir() {
 			parseFailures = append(parseFailures, NewSchemaParseFailure(relativePath, nil, "DirectoryDisallowed", map[string]any{}))
 			finalJSONDocuments[relativePath] = "[]"
-			return nil
+			continue
 		}
 
 		content, err := os.ReadFile(path)
 		if err != nil {
-			return err
+			return nil, nil, err
 		}
 
 		switch {
@@ -69,11 +69,6 @@ func GetSchemaFileMap(directory string) (map[string]string, []*SchemaParseFailur
 			parseFailures = append(parseFailures, NewSchemaParseFailure(relativePath, nil, "FileNamePatternInvalid", map[string]any{"expected": "*.telepact.json|*.telepact.yaml"}))
 			finalJSONDocuments[relativePath] = string(content)
 		}
-		return nil
-	})
-
-	if err != nil {
-		return nil, nil, err
 	}
 
 	SetDocumentLocators(finalJSONDocuments, documentLocators)

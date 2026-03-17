@@ -1,0 +1,21 @@
+[project]
+name = "telepact-demo-todo-service"
+version = "0.1.0"
+description = "Python Telepact todo service for the Telepact demo"
+requires-python = ">=3.13"
+dependencies = [
+  "fastapi>=0.135,<1.0",
+  "httpx>=0.28,<1.0",
+  "telepact==1.0.0a204",
+  "uvicorn>=0.41,<1.0",
+]
+
+[build-system]
+requires = ["setuptools>=80"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]

@@ -1,0 +1,76 @@
+- info.PlannerService: {}
+- struct.PlannerTodoCard:
+    id: "string"
+    title: "string"
+    project: "string"
+    priority: "string"
+    dueDate: "string?"
+    estimateMinutes: "integer"
+    focusScore: "integer"
+    focusLane: "string"
+    plannerReason: "string"
+- struct.FocusLaneGroup:
+    lane: "string"
+    label: "string"
+    accent: "string"
+    todos:
+      - "struct.PlannerTodoCard"
+- struct.ProjectSnapshot:
+    project: "string"
+    openCount: "integer"
+    completedCount: "integer"
+    criticalCount: "integer"
+- struct.DashboardSummary:
+    openCount: "integer"
+    completedCount: "integer"
+    overdueCount: "integer"
+    todayCount: "integer"
+    totalEstimatedMinutes: "integer"
+- struct.FocusSession:
+    id: "string"
+    todoId: "string"
+    title: "string"
+    project: "string"
+    lane: "string"
+    minutes: "integer"
+    startedAt: "string"
+    finishedAt: "string"
+- struct.PlannerDashboard:
+    generatedAt: "string"
+    summary: "struct.DashboardSummary"
+    lanes:
+      - "struct.FocusLaneGroup"
+    projectSnapshots:
+      - "struct.ProjectSnapshot"
+    recentSessions:
+      - "struct.FocusSession"
+- errors.Common:
+    - ErrorInternal:
+        message: "string"
+- fn.scoreTodoDraft:
+    title: "string"
+    description: "string"
+    project: "string"
+    priority: "string"
+    dueDate: "string?"
+    tags:
+      - "string"
+    estimateMinutes: "integer"
+  ->:
+    - Ok_:
+        score: "integer"
+        lane: "string"
+        reason: "string"
+- fn.getPlannerDashboard: {}
+  ->:
+    - Ok_:
+        dashboard: "struct.PlannerDashboard"
+- fn.startFocusSession:
+    todoId: "string"
+    minutes: "integer"
+  ->:
+    - Ok_:
+        session: "struct.FocusSession"
+        dashboard: "struct.PlannerDashboard"
+    - ErrorTodoNotFound:
+        id: "string"

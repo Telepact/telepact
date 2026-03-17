@@ -1,0 +1,71 @@
+- info.TodoService: {}
+- struct.Todo:
+    id: "string"
+    title: "string"
+    description: "string"
+    project: "string"
+    priority: "string"
+    dueDate: "string?"
+    tags:
+      - "string"
+    estimateMinutes: "integer"
+    completed: "boolean"
+    completedAt: "string?"
+    focusScore: "integer"
+    focusLane: "string"
+    plannerReason: "string"
+    createdAt: "string"
+    updatedAt: "string"
+- errors.Common:
+    - ErrorInternal:
+        message: "string"
+- fn.listTodos:
+    status: "string"
+    search: "string"
+    project: "string"
+    tag: "string"
+  ->:
+    - Ok_:
+        todos:
+          - "struct.Todo"
+- fn.createTodo:
+    title: "string"
+    description: "string"
+    project: "string"
+    priority: "string"
+    dueDate: "string?"
+    tags:
+      - "string"
+    estimateMinutes: "integer"
+  ->:
+    - Ok_:
+        todo: "struct.Todo"
+- fn.updateTodo:
+    id: "string"
+    title: "string"
+    description: "string"
+    project: "string"
+    priority: "string"
+    dueDate: "string?"
+    tags:
+      - "string"
+    estimateMinutes: "integer"
+  ->:
+    - Ok_:
+        todo: "struct.Todo"
+    - ErrorTodoNotFound:
+        id: "string"
+- fn.toggleTodoCompletion:
+    id: "string"
+    completed: "boolean"
+  ->:
+    - Ok_:
+        todo: "struct.Todo"
+    - ErrorTodoNotFound:
+        id: "string"
+- fn.deleteTodo:
+    id: "string"
+  ->:
+    - Ok_: {}
+    - ErrorTodoNotFound:
+        id: "string"

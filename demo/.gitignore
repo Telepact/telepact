@@ -1,0 +1,11 @@
+node_modules
+.venv
+apps/bff/dist
+apps/bff/static
+playwright-report
+test-results
+services/planner-java/target
+services/todo-python/.pytest_cache
+services/todo-python/__pycache__
+services/todo-python/src/todo_service/__pycache__
+.cache
