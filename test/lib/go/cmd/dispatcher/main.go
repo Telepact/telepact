@@ -1192,16 +1192,8 @@ func isNumberTooBigError(err error) bool {
 	if errors.As(err, &unsupported) {
 		return true
 	}
-	var invalid *json.InvalidUTF8Error
-	if errors.As(err, &invalid) {
-		return true
-	}
-	var marshaler *json.MarshalerError
-	if errors.As(err, &marshaler) {
-		return true
-	}
 	msg := err.Error()
-	return strings.Contains(msg, "range") || strings.Contains(msg, "too large") || strings.Contains(msg, "overflow") || strings.Contains(msg, "non-finite") || strings.Contains(msg, "not representable") || strings.Contains(msg, "cannot serialize") || strings.Contains(msg, "value must")
+	return strings.Contains(msg, "range") || strings.Contains(msg, "too large") || strings.Contains(msg, "overflow") || strings.Contains(msg, "non-finite") || strings.Contains(msg, "not representable")
 }
 
 func schemaValidationFailureMessage(err error) telepact.Message {
