@@ -16,6 +16,7 @@
 
 import json
 import math
+from typing import Callable
 
 from .GetPathDocumentYamlCoordinatesPseudoJson import create_path_document_yaml_coordinates_pseudo_json_locator
 
@@ -43,7 +44,7 @@ def _normalize_json_compatible_value(value: object) -> object:
     raise ValueError('YAML values must be JSON-compatible')
 
 
-def parse_telepact_yaml(text: str) -> tuple[str, callable]:
+def parse_telepact_yaml(text: str) -> tuple[str, Callable[[list[object]], dict[str, object]] | None]:
     import yaml
 
     try:

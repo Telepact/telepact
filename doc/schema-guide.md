@@ -10,6 +10,16 @@ The schema itself is still JSON-shaped. Many examples in this guide use JSON
 syntax when the goal is to show exact type-expression structure. Real-world
 schema files will usually prefer YAML.
 
+## YAML Subset
+
+JSON-ish flow collections are also supported when they are clearer:
+
+```yaml
+- struct.Example: { tags: ["string"], counts: {"string": "integer"} }
+```
+
+YAML features that diverge from JSON are rejected, such as anchors, aliases, tags, and merge keys.
+
 ## Type Expression
 
 Types are expressed with a string, which may be contained within conventional

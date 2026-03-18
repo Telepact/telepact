@@ -69,24 +69,6 @@ def _reject_unsupported_yaml(line: str) -> None:
         raise ValueError('YAML tags are not supported')
     if '<<:' in trimmed:
         raise ValueError('YAML merge keys are not supported')
-    if _has_unsupported_flow_value(trimmed):
-        raise ValueError('Non-empty flow collections are not supported')
-
-
-def _has_unsupported_flow_value(text: str) -> bool:
-    if (text.startswith('[') and text != '[]') or (text.startswith('{') and text != '{}'):
-        return True
-
-    if text.startswith('- '):
-        return _has_unsupported_flow_value(text[2:].lstrip())
-
-    colon_index = _find_mapping_colon(text)
-    if colon_index >= 0:
-        return _has_unsupported_flow_value(text[colon_index + 1:].lstrip())
-
-    return False
-
-
 def _decode_quoted_string(text: str) -> str:
     if text.startswith('"'):
         return json.loads(text)
@@ -148,12 +130,112 @@ def _parse_inline_entry(text: str, base_column: int) -> dict[str, object]:
     if colon_index < 0:
         raise ValueError('Expected YAML mapping entry')
     key_text = trimmed[:colon_index].rstrip()
-    value_text = trimmed[colon_index + 1:].lstrip()
+    remainder = trimmed[colon_index + 1:]
+    value_text = remainder.lstrip()
+    spaces_before_value = len(remainder) - len(value_text)
     return {
         'key': _parse_key_token(key_text),
         'key_column': base_column + leading_spaces,
         'value_text': value_text,
+        'value_column': base_column + leading_spaces + colon_index + 1 + spaces_before_value,
     }
+
+
+def _starts_flow_collection(text: str) -> bool:
+    return text.startswith('{') or text.startswith('[')
+
+
+def _skip_flow_whitespace(text: str, index: int) -> int:
+    current = index
+    while current < len(text) and text[current] == ' ':
+        current += 1
+    return current
+
+
+def _find_flow_delimiter(text: str, start_index: int, delimiter: str) -> int:
+    quote: str | None = None
+    for index in range(start_index, len(text)):
+        char = text[index]
+        if char in ('"', "'"):
+            quote = None if quote == char else (char if quote is None else quote)
+            continue
+        if quote is None and char == delimiter:
+            return index
+    return -1
+
+
+def _find_flow_scalar_end(text: str, start_index: int) -> int:
+    quote: str | None = None
+    for index in range(start_index, len(text)):
+        char = text[index]
+        if char in ('"', "'"):
+            quote = None if quote == char else (char if quote is None else quote)
+            continue
+        if quote is None and char in (',', ']', '}'):
+            return index
+    return len(text)
+
+
+def _parse_flow_node(text: str, start_index: int, row: int, base_column: int, path: list[object], locations: dict[str, dict[str, object]]) -> dict[str, object]:
+    index = _skip_flow_whitespace(text, start_index)
+    if index >= len(text):
+        raise ValueError('Unexpected end of YAML flow collection')
+
+    if text[index] == '[':
+        value: list[object] = []
+        current = _skip_flow_whitespace(text, index + 1)
+        if current < len(text) and text[current] == ']':
+            return {'value': value, 'next_index': current + 1}
+
+        while current < len(text):
+            item_path = list(path) + [len(value)]
+            locations[_serialize_path(item_path)] = {'row': row, 'col': base_column + current}
+            parsed = _parse_flow_node(text, current, row, base_column, item_path, locations)
+            value.append(parsed['value'])
+            current = _skip_flow_whitespace(text, int(parsed['next_index']))
+            if current < len(text) and text[current] == ',':
+                current = _skip_flow_whitespace(text, current + 1)
+                continue
+            if current < len(text) and text[current] == ']':
+                return {'value': value, 'next_index': current + 1}
+            break
+
+        raise ValueError('Invalid YAML flow collection')
+
+    if text[index] == '{':
+        value: dict[str, object] = {}
+        current = _skip_flow_whitespace(text, index + 1)
+        if current < len(text) and text[current] == '}':
+            return {'value': value, 'next_index': current + 1}
+
+        while current < len(text):
+            key_start = current
+            colon_index = _find_flow_delimiter(text, key_start, ':')
+            if colon_index < 0:
+                raise ValueError('Expected YAML mapping entry')
+            key_text = text[key_start:colon_index].rstrip()
+            key = _parse_key_token(key_text)
+            key_path = list(path) + [key]
+            serialized_path = _serialize_path(key_path)
+            if serialized_path in locations or key in value:
+                raise ValueError('Duplicate YAML key')
+            locations[serialized_path] = {'row': row, 'col': base_column + key_start}
+
+            current = _skip_flow_whitespace(text, colon_index + 1)
+            parsed = _parse_flow_node(text, current, row, base_column, key_path, locations)
+            value[key] = parsed['value']
+            current = _skip_flow_whitespace(text, int(parsed['next_index']))
+            if current < len(text) and text[current] == ',':
+                current = _skip_flow_whitespace(text, current + 1)
+                continue
+            if current < len(text) and text[current] == '}':
+                return {'value': value, 'next_index': current + 1}
+            break
+
+        raise ValueError('Invalid YAML flow collection')
+
+    end_index = _find_flow_scalar_end(text, index)
+    return {'value': _parse_scalar(text[index:end_index].strip()), 'next_index': end_index}
 
 
 def _parse_block_scalar(lines: list[str], start_index: int, parent_indent: int, folded: bool) -> dict[str, object]:
@@ -192,7 +274,7 @@ def _parse_block_scalar(lines: list[str], start_index: int, parent_indent: int, 
     return {'value': value, 'next_index': index}
 
 
-def _parse_value_text(lines: list[str], info: dict[str, object], current_indent: int, path: list[object], value_text: str, locations: dict[str, dict[str, object]]) -> dict[str, object]:
+def _parse_value_text(lines: list[str], info: dict[str, object], current_indent: int, path: list[object], value_text: str, value_column: int, locations: dict[str, dict[str, object]]) -> dict[str, object]:
     if value_text == '{}':
         return {'value': {}, 'next_index': info['index'] + 1}
     if value_text == '[]':
@@ -206,6 +288,11 @@ def _parse_value_text(lines: list[str], info: dict[str, object], current_indent:
         if next_info is None or next_info['indent'] <= current_indent:
             return {'value': None, 'next_index': info['index'] + 1}
         return _parse_node(lines, next_info['index'], next_info['indent'], path, locations)
+    if _starts_flow_collection(value_text):
+        parsed = _parse_flow_node(value_text, 0, int(info['index']) + 1, value_column, path, locations)
+        if _skip_flow_whitespace(value_text, int(parsed['next_index'])) != len(value_text):
+            raise ValueError('Invalid YAML flow collection')
+        return {'value': parsed['value'], 'next_index': info['index'] + 1}
     return {'value': _parse_scalar(value_text), 'next_index': info['index'] + 1}
 
 
@@ -234,7 +321,7 @@ def _parse_map_entries(lines: list[str], start_index: int, indent: int, path: li
             raise ValueError('Duplicate YAML key')
         locations[serialized_path] = {'row': info['index'] + 1, 'col': entry['key_column']}
 
-        parsed_value = _parse_value_text(lines, info, indent, key_path, str(entry['value_text']), locations)
+        parsed_value = _parse_value_text(lines, info, indent, key_path, str(entry['value_text']), int(entry['value_column']), locations)
         value[str(entry['key'])] = parsed_value['value']
         line_index = int(parsed_value['next_index'])
         first_entry = None
@@ -272,7 +359,8 @@ def _parse_sequence(lines: list[str], start_index: int, indent: int, path: list[
             line_index = int(parsed_node['next_index'])
             continue
 
-        if _find_mapping_colon(value_text) >= 0:
+        value_column = indent + 2 + (len(after_dash) - len(value_text))
+        if not _starts_flow_collection(value_text) and _find_mapping_colon(value_text) >= 0:
             parsed_node = _parse_map_entries(lines, info['index'] + 1, indent + 2, item_path, locations, {
                 'info': info,
                 'text': after_dash,
@@ -282,7 +370,7 @@ def _parse_sequence(lines: list[str], start_index: int, indent: int, path: list[
             line_index = int(parsed_node['next_index'])
             continue
 
-        parsed_value = _parse_value_text(lines, info, indent, item_path, value_text, locations)
+        parsed_value = _parse_value_text(lines, info, indent, item_path, value_text, value_column, locations)
         value.append(parsed_value['value'])
         line_index = int(parsed_value['next_index'])
 

@@ -50,7 +50,8 @@ def get_schema_file_map(directory: str) -> Dict[str, str]:
                 try:
                     canonical_json, locator = parse_telepact_yaml(content)
                     final_json_documents[relative_path] = canonical_json
-                    final_json_documents.document_locators[relative_path] = locator
+                    if locator is not None:
+                        final_json_documents.document_locators[relative_path] = locator
                 except ValueError:
                     final_json_documents[relative_path] = '[]'
                     schema_parse_failures.append(SchemaParseFailure(relative_path, [], "JsonInvalid", {}))

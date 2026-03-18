@@ -27,6 +27,7 @@ type ParsedInlineEntry = {
     key: string;
     keyColumn: number;
     valueText: string;
+    valueColumn: number;
 };
 
 function serializePath(path: Path): string {
@@ -102,26 +103,6 @@ function rejectUnsupportedYaml(line: string): void {
     if (trimmed.includes('<<:')) {
         throw new Error('YAML merge keys are not supported');
     }
-    if (hasUnsupportedFlowValue(trimmed)) {
-        throw new Error('Non-empty flow collections are not supported');
-    }
-}
-
-function hasUnsupportedFlowValue(text: string): boolean {
-    if ((text.startsWith('[') && text !== '[]') || (text.startsWith('{') && text !== '{}')) {
-        return true;
-    }
-
-    if (text.startsWith('- ')) {
-        return hasUnsupportedFlowValue(text.slice(2).trimStart());
-    }
-
-    const colonIndex = findMappingColon(text);
-    if (colonIndex >= 0) {
-        return hasUnsupportedFlowValue(text.slice(colonIndex + 1).trimStart());
-    }
-
-    return false;
 }
 
 function decodeQuotedString(text: string): string {
@@ -208,13 +189,146 @@ function parseInlineEntry(text: string, baseColumn: number): ParsedInlineEntry {
         throw new Error('Expected YAML mapping entry');
     }
     const keyText = trimmed.slice(0, colonIndex).trimEnd();
-    const valueText = trimmed.slice(colonIndex + 1).trimStart();
+    const remainder = trimmed.slice(colonIndex + 1);
+    const valueText = remainder.trimStart();
+    const spacesBeforeValue = remainder.length - valueText.length;
 
     return {
         key: parseKeyToken(keyText),
         keyColumn: baseColumn + leadingSpaces,
         valueText,
+        valueColumn: baseColumn + leadingSpaces + colonIndex + 1 + spacesBeforeValue,
     };
+}
+
+function startsFlowCollection(text: string): boolean {
+    return text.startsWith('{') || text.startsWith('[');
+}
+
+function skipFlowWhitespace(text: string, index: number): number {
+    let current = index;
+    while (current < text.length && text[current] === ' ') {
+        current += 1;
+    }
+    return current;
+}
+
+function findFlowDelimiter(text: string, startIndex: number, delimiter: string): number {
+    let quote: '"' | "'" | null = null;
+    for (let index = startIndex; index < text.length; index += 1) {
+        const c = text[index];
+        if (c === '"' || c === "'") {
+            if (quote === c) {
+                quote = null;
+            } else if (quote === null) {
+                quote = c;
+            }
+            continue;
+        }
+        if (quote === null && c === delimiter) {
+            return index;
+        }
+    }
+    return -1;
+}
+
+function findFlowScalarEnd(text: string, startIndex: number): number {
+    let quote: '"' | "'" | null = null;
+    for (let index = startIndex; index < text.length; index += 1) {
+        const c = text[index];
+        if (c === '"' || c === "'") {
+            if (quote === c) {
+                quote = null;
+            } else if (quote === null) {
+                quote = c;
+            }
+            continue;
+        }
+        if (quote === null && (c === ',' || c === ']' || c === '}')) {
+            return index;
+        }
+    }
+    return text.length;
+}
+
+function parseFlowNode(
+    text: string,
+    startIndex: number,
+    row: number,
+    baseColumn: number,
+    path: Path,
+    locations: Record<string, Coordinates>,
+): { value: any; nextIndex: number } {
+    const index = skipFlowWhitespace(text, startIndex);
+    if (index >= text.length) {
+        throw new Error('Unexpected end of YAML flow collection');
+    }
+
+    if (text[index] === '[') {
+        const value: any[] = [];
+        let current = skipFlowWhitespace(text, index + 1);
+        if (text[current] === ']') {
+            return { value, nextIndex: current + 1 };
+        }
+
+        while (current < text.length) {
+            const itemPath = [...path, value.length];
+            locations[serializePath(itemPath)] = { row, col: baseColumn + current };
+            const parsed = parseFlowNode(text, current, row, baseColumn, itemPath, locations);
+            value.push(parsed.value);
+            current = skipFlowWhitespace(text, parsed.nextIndex);
+            if (text[current] === ',') {
+                current = skipFlowWhitespace(text, current + 1);
+                continue;
+            }
+            if (text[current] === ']') {
+                return { value, nextIndex: current + 1 };
+            }
+            break;
+        }
+        throw new Error('Invalid YAML flow collection');
+    }
+
+    if (text[index] === '{') {
+        const value: Record<string, any> = {};
+        let current = skipFlowWhitespace(text, index + 1);
+        if (text[current] === '}') {
+            return { value, nextIndex: current + 1 };
+        }
+
+        while (current < text.length) {
+            const keyStart = current;
+            const colonIndex = findFlowDelimiter(text, keyStart, ':');
+            if (colonIndex < 0) {
+                throw new Error('Expected YAML mapping entry');
+            }
+            const keyText = text.slice(keyStart, colonIndex).trimEnd();
+            const key = parseKeyToken(keyText);
+            const keyPath = [...path, key];
+            const serializedPath = serializePath(keyPath);
+            if (serializedPath in locations || Object.prototype.hasOwnProperty.call(value, key)) {
+                throw new Error('Duplicate YAML key');
+            }
+            locations[serializedPath] = { row, col: baseColumn + keyStart };
+
+            current = skipFlowWhitespace(text, colonIndex + 1);
+            const parsed = parseFlowNode(text, current, row, baseColumn, keyPath, locations);
+            value[key] = parsed.value;
+            current = skipFlowWhitespace(text, parsed.nextIndex);
+            if (text[current] === ',') {
+                current = skipFlowWhitespace(text, current + 1);
+                continue;
+            }
+            if (text[current] === '}') {
+                return { value, nextIndex: current + 1 };
+            }
+            break;
+        }
+        throw new Error('Invalid YAML flow collection');
+    }
+
+    const endIndex = findFlowScalarEnd(text, index);
+    return { value: parseScalar(text.slice(index, endIndex).trim()), nextIndex: endIndex };
 }
 
 function parseBlockScalar(
@@ -271,6 +385,7 @@ function parseValueText(
     currentIndent: number,
     path: Path,
     valueText: string,
+    valueColumn: number,
     locations: Record<string, Coordinates>,
 ): ParsedNode {
     if (valueText === '{}') {
@@ -291,6 +406,13 @@ function parseValueText(
             return { value: null, nextIndex: info.index + 1 };
         }
         return parseNode(lines, nextInfo.index, nextInfo.indent, path, locations);
+    }
+    if (startsFlowCollection(valueText)) {
+        const parsed = parseFlowNode(valueText, 0, info.index + 1, valueColumn, path, locations);
+        if (skipFlowWhitespace(valueText, parsed.nextIndex) !== valueText.length) {
+            throw new Error('Invalid YAML flow collection');
+        }
+        return { value: parsed.value, nextIndex: info.index + 1 };
     }
     return { value: parseScalar(valueText), nextIndex: info.index + 1 };
 }
@@ -332,7 +454,7 @@ function parseMapEntries(
         }
         locations[serializedPath] = { row: info.index + 1, col: entry.keyColumn };
 
-        const parsedValue = parseValueText(lines, info, indent, keyPath, entry.valueText, locations);
+        const parsedValue = parseValueText(lines, info, indent, keyPath, entry.valueText, entry.valueColumn, locations);
         value[entry.key] = parsedValue.value;
         lineIndex = parsedValue.nextIndex;
         firstEntry = undefined;
@@ -381,7 +503,8 @@ function parseSequence(
             continue;
         }
 
-        if (findMappingColon(valueText) >= 0) {
+        const valueColumn = indent + 2 + (afterDash.length - valueText.length);
+        if (!startsFlowCollection(valueText) && findMappingColon(valueText) >= 0) {
             const parsedNode = parseMapEntries(lines, info.index + 1, indent + 2, itemPath, locations, {
                 info,
                 text: afterDash,
@@ -392,7 +515,7 @@ function parseSequence(
             continue;
         }
 
-        const parsedValue = parseValueText(lines, info, indent, itemPath, valueText, locations);
+        const parsedValue = parseValueText(lines, info, indent, itemPath, valueText, valueColumn, locations);
         value.push(parsedValue.value);
         lineIndex = parsedValue.nextIndex;
     }

@@ -42,7 +42,9 @@ export function getSchemaFileMap(directory: string, fs: FsModule, path: PathModu
             try {
                 const parsed = parseTelepactYaml(content);
                 finalJsonDocuments[relativePath] = parsed.canonicalJsonText;
-                documentLocators[relativePath] = parsed.locator;
+                if (parsed.locator !== undefined) {
+                    documentLocators[relativePath] = parsed.locator;
+                }
             } catch {
                 finalJsonDocuments[relativePath] = '[]';
                 schemaParseFailures.push(new SchemaParseFailure(relativePath, [], 'JsonInvalid', {}));

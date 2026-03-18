@@ -50,7 +50,7 @@ function normalizeJsonCompatibleValue(value: any): any {
     throw new Error('YAML values must be JSON-compatible');
 }
 
-export function parseTelepactYaml(text: string): { canonicalJsonText: string; locator: DocumentLocator } {
+export function parseTelepactYaml(text: string): { canonicalJsonText: string; locator?: DocumentLocator } {
     const document = parseDocument(text, {
         merge: false,
         prettyErrors: false,
