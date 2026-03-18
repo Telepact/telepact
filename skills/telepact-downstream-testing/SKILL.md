@@ -63,6 +63,10 @@ Use this when you want a checked-in or repeatable local schema snapshot.
 2. store it locally
 3. run a mock from the saved schema directory
 
+Treat that saved schema directory as the immediate `*.telepact.yaml` and
+`*.telepact.json` files in the directory. Mixed YAML and JSON is fine.
+Subdirectories are not part of the schema.
+
 Commands:
 
 ```sh

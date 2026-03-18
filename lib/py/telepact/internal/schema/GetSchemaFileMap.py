@@ -15,7 +15,6 @@
 #|
 
 import os
-from pathlib import Path
 from typing import Dict
 
 from ...internal.schema.SchemaParseFailure import SchemaParseFailure
@@ -30,7 +29,10 @@ def get_schema_file_map(directory: str) -> Dict[str, str]:
     schema_parse_failures = []
 
     try:
-        paths = [str(p) for p in Path(directory).rglob('*')]
+        paths = [
+            os.path.join(directory, entry)
+            for entry in sorted(os.listdir(directory))
+        ]
 
         for path in paths:
             relative_path = os.path.relpath(path, directory)
