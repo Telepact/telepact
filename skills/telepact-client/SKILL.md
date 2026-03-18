@@ -124,12 +124,9 @@ If the server schema defines `struct.Auth_`, send credentials in the `@auth_` he
 
 For example, if the schema includes:
 
-```json
-{
-    "struct.Auth_": {
-        "token": "string"
-    }
-}
+```yaml
+struct.Auth_:
+  token: string
 ```
 
 then a client request should look like:

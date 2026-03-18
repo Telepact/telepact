@@ -50,7 +50,9 @@ public class GetSchemaFileMap {
                     try {
                         var parsed = ParseTelepactYaml.parseTelepactYaml(content);
                         finalJsonDocuments.put(relativePath, parsed.canonicalJson);
-                        finalJsonDocuments.documentLocators.put(relativePath, parsed.locator);
+                        if (parsed.locator != null) {
+                            finalJsonDocuments.documentLocators.put(relativePath, parsed.locator);
+                        }
                     } catch (Exception e) {
                         finalJsonDocuments.put(relativePath, "[]");
                         schemaParseFailures.add(new SchemaParseFailure(relativePath, new java.util.ArrayList<>(), "JsonInvalid", Map.of()));

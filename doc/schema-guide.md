@@ -6,9 +6,9 @@ For normal checked-in authoring, prefer `*.telepact.yaml`. YAML is easier to
 read at rest, especially for multi-line `///` docstrings. `*.telepact.json` is
 still valid and remains the canonical lowered and wire-aligned representation.
 
-The schema itself is still JSON-shaped. Many examples in this guide use JSON
-syntax when the goal is to show exact type-expression structure. Real-world
-schema files will usually prefer YAML.
+The schema itself is still JSON-shaped. In this guide, checked-in schema-file
+examples use YAML, while exact type-expression fragments and wire examples may
+still use JSON syntax where that is more precise.
 
 ## Schema Directories
 
@@ -77,21 +77,13 @@ definitions may be used in any type expression.
 
 The `!` symbol can be appended to a field name to indicate that it is optional.
 
-```json
-[
-    {
-        "struct.ExampleStruct1": {
-            "field": "boolean",
-            "anotherField": ["string"]
-        }
-    },
-    {
-        "struct.ExampleStruct2": {
-            "optionalField!": "boolean",
-            "anotherOptionalField!": "integer"
-        }
-    }
-]
+```yaml
+- struct.ExampleStruct1:
+    field: boolean
+    anotherField: ["string"]
+- struct.ExampleStruct2:
+    optionalField!: boolean
+    anotherOptionalField!: integer
 ```
 
 | Type Expression             | Example allowed JSON values                           | Example disallowed JSON values     |
@@ -107,30 +99,14 @@ may be used in any type expression.
 
 At least one tag is required.
 
-```json
-[
-    {
-        "union.ExampleUnion1": [
-            {
-                "Tag": {
-                    "field": "integer"
-                }
-            },
-            {
-                "EmptyTag": {}
-            }
-        ]
-    },
-    {
-        "union.ExampleUnion2": [
-            {
-                "Tag": {
-                    "optionalField!": "string"
-                }
-            }
-        ]
-    }
-]
+```yaml
+- union.ExampleUnion1:
+    - Tag:
+        field: integer
+    - EmptyTag: {}
+- union.ExampleUnion2:
+    - Tag:
+        optionalField!: string
 ```
 
 | Type Expression         | Example allowed JSON values                          | Example disallowed JSON values                |
@@ -152,35 +128,18 @@ When referenced as a type in type expressions, the result union is unused.
 Functions cannot be used in type expressions that extend down from a top-level
 function argument.
 
-```json
-[
-    {
-        "fn.exampleFunction1": {
-            "field": "integer",
-            "optionalField!": "string"
-        },
-        "->": [
-            {
-                "Ok_": {
-                    "field": "boolean"
-                }
-            }
-        ]
-    },
-    {
-        "fn.exampleFunction2": {},
-        "->": [
-            {
-                "Ok_": {}
-            },
-            {
-                "Error": {
-                    "field": "string"
-                }
-            }
-        ]
-    }
-]
+```yaml
+- fn.exampleFunction1:
+    field: integer
+    optionalField!: string
+  ->:
+    - Ok_:
+        field: boolean
+- fn.exampleFunction2: {}
+  ->:
+    - Ok_: {}
+    - Error:
+        field: string
 ```
 
 | Example Request                               | Example Response                     |
@@ -199,21 +158,11 @@ Errors definitions are similar to unions, except that the tags are automatically
 added to the result union of all user-defined functions. Errors definitions
 cannot be used in type expressions.
 
-```json
-[
-    {
-        "errors.ExampleErrors1": [
-            {
-                "Error1": {
-                    "field": "integer"
-                }
-            },
-            {
-                "Error2": {}
-            }
-        ]
-    }
-]
+```yaml
+- errors.ExampleErrors1:
+    - Error1:
+        field: integer
+    - Error2: {}
 ```
 
 For example, if placed in the same schema, the above error definition would
@@ -222,51 +171,24 @@ apply the errors `Error1` and `Error2` to both the `fn.exampleFunction1` and
 (Note, the following example only illustrates the effect of the errors
 definition at schema load time; the original schema is not re-written.)
 
-```json
-[
-    {
-        "fn.exampleFunction1": {
-            "field": "integer",
-            "optionalField!": "string"
-        },
-        "->": [
-            {
-                "Ok_": {
-                    "field": "boolean"
-                }
-            },
-            {
-                "Error1": {
-                    "field": "integer"
-                }
-            },
-            {
-                "Error2": {}
-            }
-        ]
-    },
-    {
-        "fn.exampleFunction2": {},
-        "->": [
-            {
-                "Ok_": {}
-            },
-            {
-                "Error": {
-                    "field": "string"
-                }
-            },
-            {
-                "Error1": {
-                    "field": "integer"
-                }
-            },
-            {
-                "Error2": {}
-            }
-        ]
-    }
-]
+```yaml
+- fn.exampleFunction1:
+    field: integer
+    optionalField!: string
+  ->:
+    - Ok_:
+        field: boolean
+    - Error1:
+        field: integer
+    - Error2: {}
+- fn.exampleFunction2: {}
+  ->:
+    - Ok_: {}
+    - Error:
+        field: string
+    - Error1:
+        field: integer
+    - Error2: {}
 ```
 
 #### Don't over-error
@@ -280,42 +202,21 @@ favors expressive data, such as using an empty optional field to replace convent
 "Not found" patterns.
 
 ❌ Bad:
-```json
-[
-    {
-        "errors.GeneralErrors": [
-            {
-                "NotFound": {}
-            }
-        ]
-    },
-    {
-        "fn.exampleFunction": {},
-        "->": [
-            {
-                "Ok_": {
-                    "result": "string"
-                }
-            }
-        ]
-    }
-]
+```yaml
+- errors.GeneralErrors:
+    - NotFound: {}
+- fn.exampleFunction: {}
+  ->:
+    - Ok_:
+        result: string
 ```
 
 ✅ Good:
-```json
-[
-    {
-        "fn.exampleFunction": {},
-        "->": [
-            {
-                "Ok_": {
-                    "result!": "string"
-                }
-            }
-        ]
-    }
-]
+```yaml
+- fn.exampleFunction: {}
+  ->:
+    - Ok_:
+        result!: string
 ```
 
 ### Headers
@@ -336,18 +237,12 @@ Header names therefore follow the pattern `^@[a-z][a-zA-Z0-9_]*$`.
 
 Headers definitions cannot be used in type expressions.
 
-```json
-[
-    {
-        "headers.Example": {
-            "@requestHeader": "boolean",
-            "@anotherRequestHeader": "integer"
-        },
-        "->": {
-            "@responseHeader": "string"
-        }
-    }
-]
+```yaml
+- headers.Example:
+    "@requestHeader": boolean
+    "@anotherRequestHeader": integer
+  ->:
+    "@responseHeader": string
 ```
 
 | Example Request                                       | Example Response                              |
@@ -367,25 +262,14 @@ Telepact console.
 
 #### Single-line
 
-```json
-[
-    {
-        "///": " A struct that contains a `field`. ",
-        "struct.ExampleStruct": {
-            "field": "boolean"
-        }
-    },
-    {
-        "struct.ExampleUnion": [
-            {
-                "///": " The default `Tag` that contains a `field`. ",
-                "Tag": {
-                    "field": "integer"
-                }
-            }
-        ]
-    }
-]
+```yaml
+- ///: A struct that contains a `field`.
+  struct.ExampleStruct:
+    field: boolean
+- struct.ExampleUnion:
+    - ///: The default `Tag` that contains a `field`.
+      Tag:
+        field: integer
 ```
 
 Prefer YAML when multi-line docstrings are desired.
@@ -453,153 +337,74 @@ There is also a guide to Telepact extension types, including mock extensions,
 
 ### Schema
 
-```json
-[
-    {
-        "///": " A calculator app that provides basic math computation capabilities. ",
-        "info.Calculator": {}
-    },
-    {
-        "///": " A function that adds two numbers. ",
-        "fn.add": {
-            "x": "number",
-            "y": "number"
-        },
-        "->": [
-            {
-                "Ok_": {
-                    "result": "number"
-                }
-            }
-        ]
-    },
-    {
-        "///": " A value for computation that can take either a constant or variable form. ",
-        "union.Value": [
-            {
-                "Constant": {
-                    "value": "number"
-                }
-            },
-            {
-                "Variable": {
-                    "name": "string"
-                }
-            }
-        ]
-    },
-    {
-        "///": " A basic mathematical operation. ",
-        "union.Operation": [
-            {
-                "Add": {}
-            },
-            {
-                "Sub": {}
-            },
-            {
-                "Mul": {}
-            },
-            {
-                "Div": {}
-            }
-        ]
-    },
-    {
-        "///": " A mathematical variable represented by a `name` that holds a certain `value`. ",
-        "struct.Variable": {
-            "name": "string",
-            "value": "number"
-        }
-    },
-    {
-        "///": " Save a set of variables as a dynamic map of variable names to their value. ",
-        "fn.saveVariables": {
-            "variables": { "string": "number" }
-        },
-        "->": [
-            {
-                "Ok_": {}
-            }
-        ]
-    },
-    {
-        "///": " Compute the `result` of the given `x` and `y` values. ",
-        "fn.compute": {
-            "x": "union.Value",
-            "y": "union.Value",
-            "op": "union.Operation"
-        },
-        "->": [
-            {
-                "Ok_": {
-                    "result": "number"
-                }
-            },
-            {
-                "ErrorCannotDivideByZero": {}
-            }
-        ]
-    },
-    {
-        "///": " Export all saved variables, up to an optional `limit`. ",
-        "fn.exportVariables": {
-            "limit!": "integer"
-        },
-        "->": [
-            {
-                "Ok_": {
-                    "variables": ["struct.Variable"]
-                }
-            }
-        ]
-    },
-    {
-        "///": " A function template. ",
-        "fn.getPaperTape": {},
-        "->": [
-            {
-                "Ok_": {
-                    "tape": ["struct.Computation"]
-                }
-            }
-        ]
-    },
-    {
-        "///": " A computation. ",
-        "struct.Computation": {
-            "user": "string?",
-            "firstOperand": "union.Value",
-            "secondOperand": "union.Value",
-            "operation": "union.Operation",
-            "result": "number?",
-            "successful": "boolean"
-        }
-    },
-    {
-        "fn.showExample": {},
-        "->": [
-            {
-                "Ok_": {
-                    "link": "fn.compute"
-                }
-            }
-        ]
-    },
-    {
-        "errors.RateLimit": [
-            {
-                "ErrorTooManyRequests": {}
-            }
-        ]
-    },
-    {
-        "headers.Identity": {
-            "@user": "string"
-        },
-        "->": {}
-    }
-]
+```yaml
+- ///: A calculator app that provides basic math computation capabilities.
+  info.Calculator: {}
+- ///: A function that adds two numbers.
+  fn.add:
+    x: number
+    y: number
+  ->:
+    - Ok_:
+        result: number
+- ///: A value for computation that can take either a constant or variable form.
+  union.Value:
+    - Constant:
+        value: number
+    - Variable:
+        name: string
+- ///: A basic mathematical operation.
+  union.Operation:
+    - Add: {}
+    - Sub: {}
+    - Mul: {}
+    - Div: {}
+- ///: A mathematical variable represented by a `name` that holds a certain `value`.
+  struct.Variable:
+    name: string
+    value: number
+- ///: Save a set of variables as a dynamic map of variable names to their value.
+  fn.saveVariables:
+    variables: {"string": "number"}
+  ->:
+    - Ok_: {}
+- ///: Compute the `result` of the given `x` and `y` values.
+  fn.compute:
+    x: union.Value
+    y: union.Value
+    op: union.Operation
+  ->:
+    - Ok_:
+        result: number
+    - ErrorCannotDivideByZero: {}
+- ///: Export all saved variables, up to an optional `limit`.
+  fn.exportVariables:
+    limit!: integer
+  ->:
+    - Ok_:
+        variables: ["struct.Variable"]
+- ///: A function template.
+  fn.getPaperTape: {}
+  ->:
+    - Ok_:
+        tape: ["struct.Computation"]
+- ///: A computation.
+  struct.Computation:
+    user: string?
+    firstOperand: union.Value
+    secondOperand: union.Value
+    operation: union.Operation
+    result: number?
+    successful: boolean
+- fn.showExample: {}
+  ->:
+    - Ok_:
+        link: fn.compute
+- errors.RateLimit:
+    - ErrorTooManyRequests: {}
+- headers.Identity:
+    "@user": string
+  ->: {}
 ```
 
 ### Valid Client/Server Interactions

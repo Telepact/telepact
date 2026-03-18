@@ -29,8 +29,11 @@ No query params. No binary field ids. No required client libraries.
 It's just JSON in, and JSON out.
 
 Schema:
-```json
-[{"fn.helloWorld": {}, "->": [{"Ok_": {"msg": "string"}}]}]
+```yaml
+- fn.helloWorld: {}
+  ->:
+    - Ok_:
+        msg: string
 ```
 Request:
 ```json

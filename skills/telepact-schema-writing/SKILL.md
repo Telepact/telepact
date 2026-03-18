@@ -145,11 +145,9 @@ Use one `info.*` definition near the top of the schema as a simple schema identi
 
 Pattern:
 
-```json
-{
-    "///": " A calculator app that provides basic math computation capabilities. ",
-    "info.Calculator": {}
-}
+```yaml
+///: A calculator app that provides basic math computation capabilities.
+info.Calculator: {}
 ```
 
 Keep it empty: `{}`.
@@ -160,15 +158,12 @@ A struct is a product type: a JSON object with named fields.
 
 Pattern:
 
-```json
-{
-    "struct.User": {
-        "id": "string",
-        "email": "string",
-        "displayName!": "string",
-        "avatarUrl!": "string?"
-    }
-}
+```yaml
+struct.User:
+  id: string
+  email: string
+  displayName!: string
+  avatarUrl!: string?
 ```
 
 Rules:
@@ -190,24 +185,13 @@ A union is a tagged sum type. It is a JSON array of tag objects. Each tag has on
 
 Pattern:
 
-```json
-{
-    "union.PaymentMethod": [
-        {
-            "Card": {
-                "last4": "string"
-            }
-        },
-        {
-            "BankAccount": {
-                "bankName": "string"
-            }
-        },
-        {
-            "Cash": {}
-        }
-    ]
-}
+```yaml
+union.PaymentMethod:
+  - Card:
+      last4: string
+  - BankAccount:
+      bankName: string
+  - Cash: {}
 ```
 
 Rules:
@@ -225,23 +209,14 @@ A function defines a request struct and a response union.
 
 Pattern:
 
-```json
-{
-    "fn.createUser": {
-        "email": "string",
-        "displayName!": "string"
-    },
-    "->": [
-        {
-            "Ok_": {
-                "user": "struct.User"
-            }
-        },
-        {
-            "ErrorEmailTaken": {}
-        }
-    ]
-}
+```yaml
+fn.createUser:
+  email: string
+  displayName!: string
+->:
+  - Ok_:
+      user: struct.User
+  - ErrorEmailTaken: {}
 ```
 
 Rules:
@@ -267,21 +242,12 @@ An `errors.*` definition adds the same error tags to every user-defined function
 
 Pattern:
 
-```json
-{
-    "errors.General": [
-        {
-            "ErrorRateLimited": {
-                "retryAfterSeconds!": "integer"
-            }
-        },
-        {
-            "ErrorInternal": {
-                "message!": "string"
-            }
-        }
-    ]
-}
+```yaml
+errors.General:
+  - ErrorRateLimited:
+      retryAfterSeconds!: integer
+  - ErrorInternal:
+      message!: string
 ```
 
 Rules:
@@ -302,16 +268,12 @@ Headers definitions describe request and response headers.
 
 Pattern:
 
-```json
-{
-    "headers.Auth": {
-        "@requestId": "string",
-        "@traceId": "string"
-    },
-    "->": {
-        "@ratelimitRemaining": "integer"
-    }
-}
+```yaml
+headers.Auth:
+  "@requestId": string
+  "@traceId": string
+->:
+  "@ratelimitRemaining": integer
 ```
 
 Rules:
@@ -363,12 +325,9 @@ If the API needs Telepact-standard auth, define a non empty `struct.Auth_`.
 
 Example:
 
-```json
-{
-    "struct.Auth_": {
-        "token": "string"
-    }
-}
+```yaml
+struct.Auth_:
+  token: string
 ```
 
 This enables Telepact auth definitions such as the `@auth_` header and auth-related errors. Put auth-related credential data inside `struct.Auth_`.
