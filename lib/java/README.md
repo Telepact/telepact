@@ -11,19 +11,12 @@
 ### Usage
 
 API:
-```json
-[
-    {
-        "fn.greet": {
-            "subject": "string"
-        },
-        "->": {
-            "Ok_": {
-                "message": "string"
-            }
-        }
-    }
-]
+```yaml
+- fn.greet:
+    subject: string
+  ->:
+    Ok_:
+      message: string
 ```
 
 Server:

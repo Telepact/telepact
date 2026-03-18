@@ -13,19 +13,12 @@ use the exact version from [doc/versions.md](https://github.com/Telepact/telepac
 
 API:
 
-```json
-[
-    {
-        "fn.greet": {
-            "subject": "string"
-        },
-        "->": {
-            "Ok_": {
-                "message": "string"
-            }
-        }
-    }
-]
+```yaml
+- fn.greet:
+    subject: string
+  ->:
+    Ok_:
+      message: string
 ```
 
 Server:
