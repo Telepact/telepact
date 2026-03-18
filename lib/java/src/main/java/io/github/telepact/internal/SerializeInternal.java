@@ -56,7 +56,10 @@ public class SerializeInternal {
                 return serializer.toJson(base64EncodedMessage);
             }
         } catch (Throwable e) {
-            throw new SerializationError(e);
+            throw new SerializationError(
+                    e,
+                    serializeAsBinary ? "encoding Telepact message as binary or JSON fallback"
+                            : "encoding Telepact message as JSON");
         }
     }
 }

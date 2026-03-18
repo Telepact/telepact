@@ -18,6 +18,7 @@ package internal
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/telepact/telepact/lib/go/internal/binary"
 	"github.com/telepact/telepact/lib/go/internal/types"
@@ -36,7 +37,7 @@ func ParseRequestMessage(
 		return message, nil
 	}
 
-	invokeOnError(onError, err)
+	invokeOnError(onError, fmt.Errorf("telepact request parsing failed while decoding the incoming message: %w", err))
 
 	reason := "ExpectedJsonArrayOfTwoObjects"
 

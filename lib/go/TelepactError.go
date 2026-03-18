@@ -19,11 +19,18 @@ package telepact
 // TelepactError indicates a critical failure in Telepact processing logic.
 type TelepactError struct {
 	message string
+	kind    string
+	cause   error
 }
 
 // NewTelepactError constructs a new TelepactError with the given message.
 func NewTelepactError(message string) *TelepactError {
 	return &TelepactError{message: message}
+}
+
+// NewTelepactErrorWithCause constructs a new TelepactError with a category and wrapped cause.
+func NewTelepactErrorWithCause(message string, kind string, cause error) *TelepactError {
+	return &TelepactError{message: message, kind: kind, cause: cause}
 }
 
 // Error implements the error interface.
@@ -32,7 +39,29 @@ func (e *TelepactError) Error() string {
 		return "<nil>"
 	}
 	if e.message == "" {
+		if e.cause != nil {
+			return e.cause.Error()
+		}
 		return "telepact error"
 	}
+	if e.cause != nil {
+		return e.message + ": " + e.cause.Error()
+	}
 	return e.message
+}
+
+// Unwrap exposes the wrapped cause for errors.Is/errors.As.
+func (e *TelepactError) Unwrap() error {
+	if e == nil {
+		return nil
+	}
+	return e.cause
+}
+
+// Kind returns the broad diagnostic category for this error, if set.
+func (e *TelepactError) Kind() string {
+	if e == nil {
+		return ""
+	}
+	return e.kind
 }

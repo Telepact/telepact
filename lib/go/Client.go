@@ -113,7 +113,41 @@ func (c *Client) RequestWithContext(ctx context.Context, request Message) (Messa
 		c.alwaysSendJSON,
 	)
 	if err != nil {
-		return Message{}, NewTelepactError(fmt.Sprintf("client request failed: %v", err))
+		timeoutMS := c.timeoutMSDefault
+		if value, ok := internalRequest.Headers["@time_"]; ok {
+			switch typed := value.(type) {
+			case int:
+				timeoutMS = typed
+			case int32:
+				timeoutMS = int(typed)
+			case int64:
+				timeoutMS = int(typed)
+			case float32:
+				timeoutMS = int(typed)
+			case float64:
+				timeoutMS = int(typed)
+			}
+		}
+		var serializationErr *SerializationError
+		if errors.As(err, &serializationErr) {
+			return Message{}, NewTelepactErrorWithCause(
+				"telepact client serialization or deserialization failed",
+				"serialization",
+				err,
+			)
+		}
+		if errors.Is(err, context.DeadlineExceeded) {
+			return Message{}, NewTelepactErrorWithCause(
+				fmt.Sprintf("telepact client transport timed out after %dms", timeoutMS),
+				"transport",
+				err,
+			)
+		}
+		return Message{}, NewTelepactErrorWithCause(
+			"telepact client transport failed",
+			"transport",
+			err,
+		)
 	}
 
 	return Message{Headers: internalResponse.Headers, Body: internalResponse.Body}, nil

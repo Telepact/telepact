@@ -26,6 +26,8 @@ import java.util.function.Function;
 
 import io.github.telepact.Message;
 import io.github.telepact.Response;
+import io.github.telepact.SerializationError;
+import io.github.telepact.TelepactError;
 import io.github.telepact.TelepactSchema;
 import io.github.telepact.Serializer;
 
@@ -49,11 +51,34 @@ public class ProcessBytes {
             } catch (Throwable ignored) {
             }
 
-            final var responseBytes = serializer.serialize(responseMessage);
+            final byte[] responseBytes;
+            try {
+                responseBytes = serializer.serialize(responseMessage);
+            } catch (Throwable e) {
+                final var wrapped = e instanceof SerializationError
+                        ? new TelepactError("telepact response serialization failed", "serialization", e)
+                        : new TelepactError(
+                                "telepact server processing failed while serializing the response",
+                                "serialization",
+                                e);
+                try {
+                    onError.accept(wrapped);
+                } catch (Throwable ignored) {
+                }
+
+                final var unknownResponseBytes = serializer
+                        .serialize(new Message(new HashMap<>(), Map.of("ErrorUnknown_", Map.of())));
+                return new Response(unknownResponseBytes, Map.of());
+            }
             return new Response(responseBytes, responseMessage.headers);
         } catch (Throwable e) {
+            final var wrapped = e instanceof TelepactError
+                    ? e
+                    : e instanceof SerializationError
+                            ? new TelepactError("telepact response serialization failed", "serialization", e)
+                            : new TelepactError("telepact server processing failed", null, e);
             try {
-                onError.accept(e);
+                onError.accept(wrapped);
             } catch (Throwable ignored) {
             }
 

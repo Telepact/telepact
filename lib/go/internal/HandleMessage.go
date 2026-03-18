@@ -177,7 +177,7 @@ func HandleMessage(
 	default:
 		resp, err := handler(callMessage)
 		if err != nil {
-			invokeOnError(onError, err)
+			invokeOnError(onError, fmt.Errorf("telepact handler failed while handling %s: %w", functionName, err))
 			return ServerMessage{Headers: cloneStringAnyMap(responseHeaders), Body: map[string]any{"ErrorUnknown_": map[string]any{}}}, nil
 		}
 		resultMessage = resp
@@ -203,9 +203,7 @@ func HandleMessage(
 	resultValidationFailures := resultUnionType.Validate(resultUnion, nil, resultValidateCtx)
 	if len(resultValidationFailures) > 0 && !skipResultValidation {
 		invalidMessage, err := buildInvalidErrorMessage("ErrorInvalidResponseBody_", resultValidationFailures, resultUnionType, finalResponseHeaders)
-		if err == nil {
-			invokeOnError(onError, fmt.Errorf("Response validation failed: %v. Actual response: %v", resultValidationFailures, resultUnion))
-		}
+		invokeOnError(onError, fmt.Errorf("telepact response validation failed for %s: %v", functionName, types.MapValidationFailuresToInvalidFieldCases(resultValidationFailures)))
 		return invalidMessage, err
 	}
 
@@ -220,6 +218,7 @@ func HandleMessage(
 
 	responseHeaderFailures := types.ValidateHeaders(finalResponseHeaders, schema.ResponseHeaderDeclarations(), functionName)
 	if len(responseHeaderFailures) > 0 {
+		invokeOnError(onError, fmt.Errorf("telepact response header validation failed for %s: %v", functionName, types.MapValidationFailuresToInvalidFieldCases(responseHeaderFailures)))
 		invalidMessage, err := buildInvalidErrorMessage("ErrorInvalidResponseHeaders_", responseHeaderFailures, resultUnionType, responseHeaders)
 		return invalidMessage, err
 	}
