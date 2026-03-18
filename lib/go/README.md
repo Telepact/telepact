@@ -48,6 +48,9 @@ func main() {
         log.Fatal(err)
     }
 
+    // The schema directory may contain multiple *.telepact.yaml and
+    // *.telepact.json files. Subdirectories are rejected.
+
     handler := func(request telepact.Message) (telepact.Message, error) {
         functionName, err := request.BodyTarget()
         if err != nil {

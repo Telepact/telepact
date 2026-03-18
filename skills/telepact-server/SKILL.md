@@ -253,6 +253,7 @@ transport.Receive(func(requestBytes []byte) ([]byte, error) {
 
 - Assume the schema is the source of truth.
 - Load the schema from `.telepact.yaml` or `.telepact.json` files before constructing the server. Prefer YAML for checked-in schema authoring.
+- When loading a schema directory, treat it as the unordered union of the immediate `*.telepact.yaml` and `*.telepact.json` files in that directory. Do not rely on file order. Subdirectories are rejected.
 - Keep transport code thin: receive bytes, call `server.process`, return bytes.
 - Keep business logic in the handler, not in the transport.
 - Return schema-valid `Message` objects from the handler.
@@ -278,6 +279,11 @@ The common pattern is:
 2. Build a `TelepactSchemaFiles` or equivalent helper
 3. Build `TelepactSchema` from the discovered file JSON map
 4. Pass that schema into the `Server`
+
+If the input is a schema directory, the helper should read only the immediate
+supported schema files in that directory. Mixed YAML and JSON is fine.
+Collisions across files should be treated the same way they would be in a
+single-file schema.
 
 Use the constructor names shown in this skill. Do not invent alternate schema loaders if the library already provides one.
 
