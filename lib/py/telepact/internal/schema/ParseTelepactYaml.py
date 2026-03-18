@@ -18,7 +18,7 @@ import json
 import math
 from typing import Callable
 
-from .GetPathDocumentYamlCoordinatesPseudoJson import create_path_document_yaml_coordinates_pseudo_json_locator
+from .BuildDocumentLocatorFromYamlAst import create_document_locator_from_yaml_text
 
 
 def _normalize_json_compatible_value(value: object) -> object:
@@ -56,4 +56,4 @@ def parse_telepact_yaml(text: str) -> tuple[str, Callable[[list[object]], dict[s
     if not isinstance(normalized, list):
         raise ValueError('Telepact YAML root must be a sequence')
 
-    return json.dumps(normalized, separators=(',', ':')), create_path_document_yaml_coordinates_pseudo_json_locator(text)
+    return json.dumps(normalized, separators=(',', ':')), create_document_locator_from_yaml_text(text)

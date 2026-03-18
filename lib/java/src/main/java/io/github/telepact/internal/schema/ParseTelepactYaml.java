@@ -55,7 +55,7 @@ public class ParseTelepactYaml {
 
         return new ParsedTelepactYaml(
                 OBJECT_MAPPER.writeValueAsString(rootList),
-                GetPathDocumentYamlCoordinatesPseudoJson.createPathDocumentYamlCoordinatesPseudoJsonLocator(text));
+                BuildDocumentLocatorFromYamlAst.createDocumentLocatorFromYamlText(text));
     }
 
     private static Object normalizeJsonCompatibleValue(Object value) {
