@@ -1,0 +1,71 @@
+- ///: " A calculator app that provides basic math computation capabilities. "
+  info.Calculator: {}
+
+- ///: " A function that adds two numbers. "
+  fn.add:
+    x: "number"
+    y: "number"
+  ->:
+    - Ok_:
+        result: "number"
+
+- ///: " A value for computation that can take either a constant or variable form. "
+  union.Value:
+    - Constant:
+        value: "number"
+    - Variable:
+        name: "string"
+
+- ///: " A basic mathematical operation. "
+  union.Operation:
+    - Add: {}
+    - Sub: {}
+    - Mul: {}
+    - Div: {}
+
+- ///: " A mathematical variable represented by a `name` that holds a certain `value`. "
+  struct.Variable:
+    name: "string"
+    value: "number"
+
+- ///: " Save a set of variables as a dynamic map of variable names to their value. "
+  fn.saveVariables:
+    variables: {"string": "number"}
+  ->:
+    - Ok_: {}
+
+- ///: " Compute the `result` of the given `x` and `y` values. "
+  fn.compute:
+    x: "union.Value"
+    y: "union.Value"
+    op: "union.Operation"
+  ->:
+    - Ok_:
+        result: "number"
+    - ErrorCannotDivideByZero: {}
+
+- ///: " Export all saved variables, up to an optional `limit`. "
+  fn.exportVariables:
+    limit!: "integer"
+  ->:
+    - Ok_:
+        variables: ["struct.Variable"]
+
+- ///: " A function template. "
+  fn.getPaperTape: {}
+  ->:
+    - Ok_:
+        tape: ["struct.Computation"]
+
+- ///: " A computation. "
+  struct.Computation:
+    firstOperand: "union.Value"
+    secondOperand: "union.Value"
+    operation: "union.Operation"
+    timestamp: "integer"
+    successful: "boolean"
+
+- fn.showExample: {}
+  ->:
+    - Ok_:
+        link: "fn.compute"
