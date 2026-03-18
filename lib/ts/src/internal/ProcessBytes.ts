@@ -20,6 +20,8 @@ import { Message } from '../Message';
 import { handleMessage } from '../internal/HandleMessage';
 import { parseRequestMessage } from '../internal/ParseRequestMessage';
 import { Response } from '../Response';
+import { SerializationError } from '../SerializationError';
+import { TelepactError } from '../TelepactError';
 
 export type ErrorHandler = (error: any) => void;
 export type RequestHandler = (message: Message) => void;
@@ -53,12 +55,31 @@ export async function processBytes(
             // Handle error
         }
 
-        const responseBytes = serializer.serialize(responseMessage);
+        let responseBytes: Uint8Array;
+        try {
+            responseBytes = serializer.serialize(responseMessage);
+        } catch (error) {
+            const wrapped = error instanceof SerializationError
+                ? new TelepactError('telepact response serialization failed', 'serialization', error)
+                : new TelepactError('telepact server processing failed while serializing the response', 'serialization', error);
+            try {
+                onError(wrapped);
+            } catch (error) {
+                // Handle error
+            }
+            const unknownResponseBytes = serializer.serialize(new Message({}, { ErrorUnknown_: {} }));
+            return { bytes: unknownResponseBytes, headers: {} };
+        }
 
         return { bytes: responseBytes, headers: responseMessage.headers };
     } catch (error) {
+        const wrapped = error instanceof TelepactError
+            ? error
+            : error instanceof SerializationError
+                ? new TelepactError('telepact response serialization failed', 'serialization', error)
+                : new TelepactError('telepact server processing failed', undefined, error);
         try {
-            onError(error);
+            onError(wrapped);
         } catch (error) {
             // Handle error
         }

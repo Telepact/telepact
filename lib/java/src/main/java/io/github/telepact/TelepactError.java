@@ -20,6 +20,7 @@ package io.github.telepact;
  * Indicates critical failure in telepact processing logic.
  */
 public class TelepactError extends RuntimeException {
+    private final String kind;
 
     /**
      * Constructs a new TelepactError with the specified detail message.
@@ -28,6 +29,7 @@ public class TelepactError extends RuntimeException {
      */
     public TelepactError(String message) {
         super(message);
+        this.kind = null;
     }
 
     /**
@@ -37,5 +39,20 @@ public class TelepactError extends RuntimeException {
      */
     public TelepactError(Throwable cause) {
         super(cause);
+        this.kind = null;
+    }
+
+    public TelepactError(String message, String kind, Throwable cause) {
+        super(message, cause);
+        this.kind = kind;
+    }
+
+    public TelepactError(String message, String kind) {
+        super(message);
+        this.kind = kind;
+    }
+
+    public String getKind() {
+        return this.kind;
     }
 }

@@ -18,6 +18,7 @@ import { Message } from '../Message';
 import { Serializer } from '../Serializer';
 import { TelepactError } from '../TelepactError';
 import { objectsAreEqual } from './ObjectsAreEqual';
+import { SerializationError } from '../SerializationError';
 
 function timeoutPromise(timeoutMs: number): Promise<never> {
     return new Promise((_resolve, reject) => {
@@ -67,6 +68,23 @@ export async function clientHandleMessage(
 
         return responseMessage;
     } catch (e) {
-        throw new TelepactError(e as Error);
+        if (e instanceof TelepactError) {
+            throw e;
+        }
+        if (e instanceof SerializationError) {
+            throw new TelepactError(
+                'telepact client serialization or deserialization failed',
+                'serialization',
+                e,
+            );
+        }
+        if (e instanceof Error && e.message === 'Promise timed out') {
+            throw new TelepactError(
+                `telepact client transport timed out after ${header['@time_']}ms`,
+                'transport',
+                e,
+            );
+        }
+        throw new TelepactError('telepact client transport failed', 'transport', e);
     }
 }

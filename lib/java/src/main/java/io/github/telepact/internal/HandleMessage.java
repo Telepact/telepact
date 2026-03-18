@@ -18,6 +18,7 @@ package io.github.telepact.internal;
 
 import static io.github.telepact.internal.SelectStructFields.selectStructFields;
 import static io.github.telepact.internal.validation.GetInvalidErrorMessage.getInvalidErrorMessage;
+import static io.github.telepact.internal.validation.MapValidationFailuresToInvalidFieldCases.mapValidationFailuresToInvalidFieldCases;
 import static io.github.telepact.internal.validation.ValidateHeaders.validateHeaders;
 import static io.github.telepact.internal.validation.ValidateResult.validateResult;
 import static io.github.telepact.internal.binary.ServerBase64Decode.serverBase64Decode;
@@ -31,6 +32,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import io.github.telepact.Message;
+import io.github.telepact.TelepactError;
 import io.github.telepact.TelepactSchema;
 import io.github.telepact.internal.types.TType;
 import io.github.telepact.internal.types.TTypeDeclaration;
@@ -148,7 +150,10 @@ public class HandleMessage {
                 resultMessage = handler.apply(callMessage);
             } catch (Throwable e) {
                 try {
-                    onError.accept(e);
+                    onError.accept(new TelepactError(
+                            "telepact handler failed while handling %s".formatted(functionName),
+                            "handler",
+                            e));
                 } catch (Throwable ignored) {
 
                 }
@@ -168,6 +173,14 @@ public class HandleMessage {
         
         final var resultValidationFailures = resultUnionType.validate(resultUnion, List.of(), resultValidateCtx);
         if (!resultValidationFailures.isEmpty() && !skipResultValidation) {
+            try {
+                onError.accept(new TelepactError(
+                        "telepact response validation failed for %s: %s".formatted(
+                                functionName,
+                                mapValidationFailuresToInvalidFieldCases(resultValidationFailures)),
+                        "validation"));
+            } catch (Throwable ignored) {
+            }
             return getInvalidErrorMessage("ErrorInvalidResponseBody_", resultValidationFailures, resultUnionType,
                     finalResponseHeaders);
         }
@@ -183,6 +196,14 @@ public class HandleMessage {
         final List<ValidationFailure> responseHeaderValidationFailures = validateHeaders(finalResponseHeaders,
                 telepactSchema.parsedResponseHeaders, functionName);
         if (!responseHeaderValidationFailures.isEmpty()) {
+            try {
+                onError.accept(new TelepactError(
+                        "telepact response header validation failed for %s: %s".formatted(
+                                functionName,
+                                mapValidationFailuresToInvalidFieldCases(responseHeaderValidationFailures)),
+                        "validation"));
+            } catch (Throwable ignored) {
+            }
             return getInvalidErrorMessage("ErrorInvalidResponseHeaders_", responseHeaderValidationFailures,
                     resultUnionType,
                     responseHeaders);

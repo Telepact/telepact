@@ -24,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.BiFunction;
 
 import io.github.telepact.Message;
+import io.github.telepact.SerializationError;
 import io.github.telepact.TelepactError;
 import io.github.telepact.Serializer;
 
@@ -63,7 +64,23 @@ public class ClientHandleMessage {
 
             return responseMessage;
         } catch (Exception e) {
-            throw new TelepactError(e);
+            if (e instanceof TelepactError telepactError) {
+                throw telepactError;
+            }
+            if (e instanceof SerializationError serializationError) {
+                throw new TelepactError(
+                        "telepact client serialization or deserialization failed",
+                        "serialization",
+                        serializationError);
+            }
+            final var cause = e.getCause() != null ? e.getCause() : e;
+            if (cause instanceof java.util.concurrent.TimeoutException) {
+                throw new TelepactError(
+                        "telepact client transport timed out after %sms".formatted(header.get("@time_")),
+                        "transport",
+                        cause);
+            }
+            throw new TelepactError("telepact client transport failed", "transport", cause);
         }
     }
 }

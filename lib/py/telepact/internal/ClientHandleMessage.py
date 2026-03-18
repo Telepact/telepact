@@ -28,6 +28,7 @@ async def client_handle_message(request_message: 'Message',
                                  timeout_ms_default: int,
                                  use_binary_default: bool,
                                  always_send_json: bool) -> 'Message':
+    from ..SerializationError import SerializationError
     from ..TelepactError import TelepactError
 
     header: dict[str, object] = request_message.headers
@@ -56,4 +57,22 @@ async def client_handle_message(request_message: 'Message',
 
         return response_message
     except Exception as e:
-        raise TelepactError() from e
+        if isinstance(e, TelepactError):
+            raise
+        if isinstance(e, SerializationError):
+            raise TelepactError(
+                "telepact client serialization or deserialization failed",
+                kind="serialization",
+                cause=e,
+            ) from e
+        if isinstance(e, TimeoutError):
+            raise TelepactError(
+                f"telepact client transport timed out after {timeout_ms}ms",
+                kind="transport",
+                cause=e,
+            ) from e
+        raise TelepactError(
+            "telepact client transport failed",
+            kind="transport",
+            cause=e,
+        ) from e

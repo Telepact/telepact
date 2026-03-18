@@ -52,4 +52,9 @@ def serialize_internal(message: 'Message', binary_encoder: 'BinaryEncoder',
             base_64_encoded_message = base64_encoder.encode(message_as_pseudo_json)
             return serializer.to_json(base_64_encoded_message)
     except Exception as e:
-        raise SerializationError() from e
+        context = (
+            "encoding Telepact message as binary or JSON fallback"
+            if serialize_as_binary
+            else "encoding Telepact message as JSON"
+        )
+        raise SerializationError(context=context, cause=e) from e

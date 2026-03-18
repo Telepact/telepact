@@ -21,6 +21,7 @@ from ..internal.binary.BinaryEncoderUnavailableError import BinaryEncoderUnavail
 from ..internal.binary.BinaryEncodingMissing import BinaryEncodingMissing
 from ..internal.validation.InvalidMessage import InvalidMessage
 from ..internal.validation.InvalidMessageBody import InvalidMessageBody
+from ..TelepactError import TelepactError
 
 if TYPE_CHECKING:
     from ..Serializer import Serializer
@@ -32,7 +33,13 @@ def parse_request_message(request_message_bytes: bytes, serializer: 'Serializer'
     try:
         return serializer.deserialize(request_message_bytes)
     except Exception as e:
-        on_error(e)
+        on_error(
+            TelepactError(
+                "telepact request parsing failed while decoding the incoming message",
+                kind="parse",
+                cause=e,
+            )
+        )
 
         if isinstance(e, BinaryEncoderUnavailableError):
             reason = "IncompatibleBinaryEncoding"

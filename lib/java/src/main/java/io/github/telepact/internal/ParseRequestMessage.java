@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import io.github.telepact.Message;
+import io.github.telepact.TelepactError;
 import io.github.telepact.TelepactSchema;
 import io.github.telepact.Serializer;
 import io.github.telepact.internal.binary.BinaryEncoderUnavailableError;
@@ -35,7 +36,10 @@ public class ParseRequestMessage {
         try {
             return serializer.deserialize(requestMessageBytes);
         } catch (Exception e) {
-            onError.accept(e);
+            onError.accept(new TelepactError(
+                    "telepact request parsing failed while decoding the incoming message",
+                    "parse",
+                    e));
 
             String reason;
             if (e instanceof BinaryEncoderUnavailableError) {

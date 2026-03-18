@@ -28,6 +28,7 @@ import { mapValidationFailuresToInvalidFieldCases } from './validation/MapValida
 import { ValidateContext } from './validation/ValidateContext';
 import { serverBase64Decode } from './binary/ServerBase64Decode';
 import { getApiDefinitionsWithExamples } from './GetApiDefinitionsWithExamples';
+import { TelepactError } from '../TelepactError';
 
 export async function handleMessage(
     requestMessage: Message,
@@ -176,7 +177,7 @@ export async function handleMessage(
             resultMessage = await handler(callMessage);
         } catch (e) {
             try {
-                onError(e);
+                onError(new TelepactError(`telepact handler failed while handling ${functionName}`, 'handler', e));
             } catch (error) {
                 // Ignore error
             }
@@ -204,6 +205,16 @@ export async function handleMessage(
     }
 
     if (resultValidationFailures.length > 0 && !skipResultValidation) {
+        try {
+            onError(
+                new TelepactError(
+                    `telepact response validation failed for ${functionName}: ${JSON.stringify(mapValidationFailuresToInvalidFieldCases(resultValidationFailures))}`,
+                    'validation',
+                ),
+            );
+        } catch (error) {
+            // Ignore error
+        }
         return getInvalidErrorMessage(
             'ErrorInvalidResponseBody_',
             resultValidationFailures,
@@ -226,6 +237,16 @@ export async function handleMessage(
         functionName
     );
     if (responseHeaderValidationFailures.length > 0) {
+        try {
+            onError(
+                new TelepactError(
+                    `telepact response header validation failed for ${functionName}: ${JSON.stringify(mapValidationFailuresToInvalidFieldCases(responseHeaderValidationFailures))}`,
+                    'validation',
+                ),
+            );
+        } catch (error) {
+            // Ignore error
+        }
         return getInvalidErrorMessage(
             'ErrorInvalidResponseHeaders_',
             responseHeaderValidationFailures,
