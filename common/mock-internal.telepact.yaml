@@ -35,24 +35,22 @@
 - ///: The number of times a function is allowed to be called.
   union.CallCountCriteria_:
     - Exact:
-        times: integer
+        times: "integer"
     - AtMost:
-        times: integer
+        times: "integer"
     - AtLeast:
-        times: integer
+        times: "integer"
 
 - ///: Possible causes for a mock verification to fail.
   union.VerificationFailure_:
     - TooFewMatchingCalls:
-        wanted: union.CallCountCriteria_
-        found: integer
-        allCalls:
-          - _ext.Call_
+        wanted: "union.CallCountCriteria_"
+        found: "integer"
+        allCalls: ["_ext.Call_"]
     - TooManyMatchingCalls:
-        wanted: union.CallCountCriteria_
-        found: integer
-        allCalls:
-          - _ext.Call_
+        wanted: "union.CallCountCriteria_"
+        found: "integer"
+        allCalls: ["_ext.Call_"]
 
 - ///: |
     Create a mock stub from an `_ext.Stub_`.
@@ -64,9 +62,9 @@
     Set `count!` to limit how many matching calls consume this stub before it
     stops matching.
   fn.createStub_:
-    stub: _ext.Stub_
-    strictMatch!: boolean
-    count!: integer
+    stub: "_ext.Stub_"
+    strictMatch!: "boolean"
+    count!: "integer"
   ->:
     - Ok_: {}
   _errors: '^errors\.Validation_$'
@@ -82,13 +80,13 @@
     counts. Matching calls are marked as verified, which affects
     `fn.verifyNoMoreInteractions_`.
   fn.verify_:
-    call: _ext.Call_
-    strictMatch!: boolean
-    count!: union.CallCountCriteria_
+    call: "_ext.Call_"
+    strictMatch!: "boolean"
+    count!: "union.CallCountCriteria_"
   ->:
     - Ok_: {}
     - ErrorVerificationFailure:
-        reason: union.VerificationFailure_
+        reason: "union.VerificationFailure_"
   _errors: '^errors\.Validation_$'
 
 - ///: |
@@ -98,8 +96,7 @@
   ->:
     - Ok_: {}
     - ErrorVerificationFailure:
-        additionalUnverifiedCalls:
-          - _ext.Call_
+        additionalUnverifiedCalls: ["_ext.Call_"]
   _errors: '^errors\.Validation_$'
 
 - ///: Clear all stub conditions.
@@ -116,7 +113,7 @@
 
 - ///: Set the seed of the random generator.
   fn.setRandomSeed_:
-    seed: integer
+    seed: "integer"
   ->:
     - Ok_: {}
   _errors: '^errors\.Validation_$'
