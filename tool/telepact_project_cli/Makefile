@@ -17,9 +17,10 @@
 .PHONY: all clean
 
 all:
-	poetry install
-	poetry build
+	uv sync
+	uv build
 
 clean:
 	rm -rf dist
-	poetry env remove --all
+	rm -rf .venv
+	rm -f uv.lock

@@ -30,6 +30,29 @@ from .commands.doc_versions import doc_versions, write_doc_versions
 
 yaml = YAML()
 
+
+def _load_pyproject() -> dict:
+    with open("pyproject.toml", "r") as f:
+        return toml.load(f)
+
+
+def _project_version(data: dict) -> str:
+    project = data.get("project", {})
+    if "version" in project:
+        return project["version"]
+    return data["tool"]["poetry"]["version"]
+
+
+def _set_project_version(data: dict, version: str) -> dict:
+    project = data.get("project")
+    if isinstance(project, dict) and "version" in project:
+        project["version"] = version
+        return data
+
+    data["tool"]["poetry"]["version"] = version
+    return data
+
+
 def bump_version(version: str) -> str:
     major, minor, patch = map(int, version.split('.'))
     patch += 1
@@ -55,9 +78,8 @@ def get() -> None:
         version = data["version"]
         click.echo(version, nl=False)
     elif os.path.exists("pyproject.toml"):
-        with open("pyproject.toml", "r") as f:
-            data = toml.load(f)
-        version = data["tool"]['poetry']["version"]
+        data = _load_pyproject()
+        version = _project_version(data)
         click.echo(version, nl=False)
     elif os.path.exists("pubspec.yaml"):
         with open("pubspec.yaml", "r") as f:
@@ -92,9 +114,7 @@ def set_version(version: str) -> None:
         updated = True
 
     if os.path.exists("pyproject.toml"):
-        with open("pyproject.toml", "r") as f:
-            data = toml.load(f)
-        data["tool"]['poetry']["version"] = version
+        data = _set_project_version(_load_pyproject(), version)
         with open("pyproject.toml", "w") as f:
             toml.dump(data, f)
         click.echo(f"Set pyproject.toml to version {version}")
@@ -185,7 +205,7 @@ def bump() -> None:
             elif project_file.endswith("pyproject.toml"):
                 with open(project_file, 'r') as f:
                     data = toml.load(f)
-                data["tool"]['poetry']["version"] = new_version
+                data = _set_project_version(data, new_version)
                 with open(project_file, 'w') as f:
                     toml.dump(data, f)
                 click.echo(f"Updated {project_file} to version {new_version}")
@@ -210,10 +230,10 @@ def bump() -> None:
             edited_files.append(os.path.join(os.path.dirname(project_file), "package-lock.json"))
             click.echo(f"Updated package-lock.json in {os.path.dirname(project_file)}")
 
-        if project_file.endswith("pyproject.toml") and os.path.exists(os.path.join(os.path.dirname(project_file), "poetry.lock")):
-            subprocess.run(["poetry", "lock"], cwd=os.path.dirname(project_file), check=True)
-            edited_files.append(os.path.join(os.path.dirname(project_file), "poetry.lock"))
-            click.echo(f"Updated poetry.lock in {os.path.dirname(project_file)}")
+        if project_file.endswith("pyproject.toml") and os.path.exists(os.path.join(os.path.dirname(project_file), "uv.lock")):
+            subprocess.run(["uv", "lock"], cwd=os.path.dirname(project_file), check=True)
+            edited_files.append(os.path.join(os.path.dirname(project_file), "uv.lock"))
+            click.echo(f"Updated uv.lock in {os.path.dirname(project_file)}")
 
         if project_file.endswith("pubspec.yaml") and os.path.exists(os.path.join(os.path.dirname(project_file), "pubspec.lock")):
             subprocess.run(["dart", "pub", "get"], cwd=os.path.dirname(project_file), check=True)
@@ -538,10 +558,11 @@ def release() -> None:
     # Create the final release body
     pr_title = pr.title
     pr_url = pr.html_url
+    released_projects = ''.join(f'- {target}\n' for target in release_targets) if release_targets else '(None)'
     final_release_body = (
         f"## {pr_title} [(#{pr_number})]({pr_url})\n\n"
         f"### Released Projects\n"
-        f"{''.join(f'- {target}\n' for target in release_targets) if release_targets else '(None)'}"
+        f"{released_projects}"
     ).strip()
 
     try:
@@ -596,13 +617,13 @@ def automerge():
         "bind/dart/pubspec.lock",
         "bind/dart/pubspec.yaml",
         "lib/java/pom.xml",
-        "lib/py/poetry.lock",
+        "lib/py/uv.lock",
         "lib/py/pyproject.toml",
         "lib/ts/package-lock.json",
         "lib/ts/package.json",
         "package-lock.json",
         "package.json",
-        "sdk/cli/poetry.lock",
+        "sdk/cli/uv.lock",
         "sdk/cli/pyproject.toml",
         "sdk/console/package-lock.json",
         "sdk/console/package.json",
@@ -612,9 +633,9 @@ def automerge():
         "test/lib/java/pom.xml",
         "test/lib/py/pyproject.toml",
         "test/lib/ts/package.json",
-        "test/runner/poetry.lock",
+        "test/runner/uv.lock",
         "test/runner/pyproject.toml",
-        "tool/telepact_project_cli/poetry.lock",
+        "tool/telepact_project_cli/uv.lock",
         "tool/telepact_project_cli/pyproject.toml"
     ]
 

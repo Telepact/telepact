@@ -61,15 +61,19 @@ def _read_package_json_name(path: Path) -> str:
     return name
 
 
-def _read_poetry_name(pyproject_path: Path) -> str:
+def _read_pyproject_name(pyproject_path: Path) -> str:
     try:
         data = toml.loads(_read_text(pyproject_path))
     except toml.TomlDecodeError as e:
         raise click.ClickException(f"Invalid TOML in {pyproject_path}: {e}")
-    poetry = data.get("tool", {}).get("poetry", {})
-    name = poetry.get("name")
+
+    project = data.get("project", {})
+    name = project.get("name")
     if not isinstance(name, str) or not name:
-        raise click.ClickException(f"Missing/invalid [tool.poetry].name in {pyproject_path}")
+        poetry = data.get("tool", {}).get("poetry", {})
+        name = poetry.get("name")
+    if not isinstance(name, str) or not name:
+        raise click.ClickException(f"Missing/invalid project name in {pyproject_path}")
     return name
 
 
@@ -214,10 +218,10 @@ def write_doc_versions(
 
     go_module = _read_go_module_path(repo_root / "lib/go/go.mod")
     java_package, _ = _read_maven_gav(repo_root / "lib/java/pom.xml")
-    py_package = _read_poetry_name(repo_root / "lib/py/pyproject.toml")
+    py_package = _read_pyproject_name(repo_root / "lib/py/pyproject.toml")
     ts_package = _read_package_json_name(repo_root / "lib/ts/package.json")
 
-    cli_package = _read_poetry_name(repo_root / "sdk/cli/pyproject.toml")
+    cli_package = _read_pyproject_name(repo_root / "sdk/cli/pyproject.toml")
     console_package = _read_package_json_name(repo_root / "sdk/console/package.json")
     prettier_package = _read_package_json_name(repo_root / "sdk/prettier/package.json")
 
