@@ -77,8 +77,8 @@ uvicorn.run(app, host='0.0.0.0', port=8000)
 ```
 
 ```sh
-$ poetry add uvicorn starlette telepact
-$ poetry run python ./server.py
+$ uv add uvicorn starlette telepact
+$ uv run python ./server.py
 ```
 
 Then tell your clients about your transport, and they can consume your API with

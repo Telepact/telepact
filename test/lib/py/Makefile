@@ -18,9 +18,8 @@ LIB_TAR_GZ := ../../../lib/py/dist/*.tar.gz
 TAR_GZ := telepact.tar.gz
 
 all: codegen $(TAR_GZ)
-	poetry lock
-	poetry install
-	poetry run pip install ./telepact.tar.gz
+	uv sync --all-groups
+	uv pip install --python .venv/bin/python ./telepact.tar.gz
 
 $(TAR_GZ): dep
 	cp $(LIB_TAR_GZ) telepact.tar.gz
@@ -32,11 +31,11 @@ codegen:
 	telepact codegen --schema-dir ../../runner/schema/example --lang py --out telepact_test/gen
 
 test-server:
-	poetry run python -m telepact_test
+	uv run python -m telepact_test
 
 clean:
 	rm -f telepact.tar.gz
 	rm -rf telepact_test/gen
 	rm -rf telepact_test/__pycache__
-	rm -f poetry.lock
-	poetry env remove --all
+	rm -f uv.lock
+	rm -rf .venv

@@ -32,7 +32,7 @@ The entire project uses a hierarchical `Makefile` system. The root `Makefile` de
 
 -   Run tests from the `/test/runner` directory:
     ```sh
-    poetry run python -m pytest -s -vv -k <test_name>
+    uv run python -m pytest -s -vv -k <test_name>
     ```
 
 -   NOTE: You need the `-s` flag to show all request/response payloads for debugging.
@@ -50,7 +50,7 @@ The entire project uses a hierarchical `Makefile` system. The root `Makefile` de
 
 -   If test environments may be stale, run `make clean-test` first, then rerun the appropriate `make test-<lang>` target.
 
--   Be careful running `poetry run python -m pytest ...` directly in `test/runner` after a library change.
+-   Be careful running `uv run python -m pytest ...` directly in `test/runner` after a library change.
     That is only reliable if the corresponding `test/lib/<lang>` consumer has already been rebuilt.
 
 ### Key Files & Directories
@@ -61,7 +61,7 @@ The entire project uses a hierarchical `Makefile` system. The root `Makefile` de
 -   `test/runner`: The cross-language integration test suite. This is the best place to understand how different language implementations are expected to behave and interact.
 -   `common/*.telepact.yaml`: The common schema files that define the internal APIs used by Telepact itself.
 -   `sdk/console`: A SvelteKit and TypeScript project for the developer console.
--   `sdk/cli`: A Python/Poetry project for the command-line interface.
+-   `sdk/cli`: A Python/uv project for the command-line interface.
 -   `sdk/prettier`: A project for the Prettier plugin.
 
 ## Schema Authoring (`.telepact.yaml`)

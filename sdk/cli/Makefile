@@ -32,12 +32,11 @@ $(TAR_GZ): $(DEP_TAR_GZ) $(SRC_FILES)
 	rm -rf tmp
 
 	rm -rf dist
-	poetry lock
-	poetry install
+	uv sync --all-groups
 
 	# TODO: Get "include" to work in pyproject.toml
 	telepact-project gitignore --remove telepact_cli/telepact
-	poetry build
+	uv build
 	telepact-project gitignore --add telepact_cli/telepact
 
 	mkdir tmp
@@ -60,18 +59,19 @@ clean:
 	rm -rf telepact_cli/telepact
 	rm -rf tmp
 	rm -f LICENSE NOTICE
-	poetry env remove --all
+	rm -rf .venv
+	rm -f uv.lock
 
 test:
-	poetry run python -m pytest -s -vv
+	uv run python -m pytest -s -vv
 
 old-test:
-	poetry run telepact codegen --schema-dir tests/data --lang java --out tests/output/java --package output
-	poetry run telepact codegen --schema-dir tests/data --lang py --out tests/output/py
-	poetry run telepact codegen --schema-dir tests/data --lang ts --out tests/output/ts
+	uv run telepact codegen --schema-dir tests/data --lang java --out tests/output/java --package output
+	uv run telepact codegen --schema-dir tests/data --lang py --out tests/output/py
+	uv run telepact codegen --schema-dir tests/data --lang ts --out tests/output/ts
 
 deploy: $(TAR_GZ)
 	# TODO: Get "include" to work in pyproject.toml
 	telepact-project gitignore --remove telepact_cli/telepact
-	poetry publish
+	uv publish
 	telepact-project gitignore --add telepact_cli/telepact

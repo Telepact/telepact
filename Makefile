@@ -144,10 +144,10 @@ deploy-cli:
 	$(MAKE) -C sdk/cli deploy
 
 install-cli:
-	pipx install $(wildcard sdk/cli/dist/telepact_cli-*.whl)
+	uv tool install --force $(wildcard sdk/cli/dist/telepact_cli-*.whl)
 
 uninstall-cli:
-	pipx uninstall telepact-cli
+	uv tool uninstall telepact-cli
 
 prettier:
 	$(MAKE) -C sdk/prettier
@@ -192,10 +192,10 @@ clean-project-cli:
 	$(MAKE) -C tool/telepact_project_cli clean
 
 install-project-cli:
-	pipx install tool/telepact_project_cli
+	uv tool install --force tool/telepact_project_cli
 
 uninstall-project-cli:
-	pipx uninstall telepact-project-cli
+	uv tool uninstall telepact-project-cli
 
 version:
 	cd lib/java && telepact-project set-version ${VERSION}

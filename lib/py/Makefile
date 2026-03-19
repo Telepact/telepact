@@ -27,18 +27,19 @@ $(TAR_GZ): $(SRC_FILES) $(COMMON_SCHEMA_FILES)
 	cp ../../LICENSE ../../NOTICE ./
 
 	rm -rf dist
-	poetry install
+	uv sync --all-groups
 
 	# TODO: Get "include" to work in pyproject.toml
 	telepact-project gitignore --remove telepact/json
-	poetry build
+	uv build
 	telepact-project gitignore --add telepact/json
 
 clean:
 	rm -rf dist
 	rm -rf telepact/json
 	rm -f ./LICENSE ./NOTICE
-	poetry env remove --all
+	rm -rf .venv
+	rm -f uv.lock
 
 deploy: $(TAR_GZ)
-	poetry publish
+	uv publish

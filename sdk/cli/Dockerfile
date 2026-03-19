@@ -16,14 +16,14 @@
 
 FROM python:3.11-slim
 
-RUN pip install --no-cache-dir pipx
+RUN pip install --no-cache-dir uv
 ENV PATH="/root/.local/bin:${PATH}"
 
 WORKDIR /app
 
 COPY tmp/telepact_cli.tar.gz telepact_cli.tar.gz
 
-RUN pipx install telepact_cli.tar.gz
+RUN uv tool install telepact_cli.tar.gz
 
 USER nobody
 

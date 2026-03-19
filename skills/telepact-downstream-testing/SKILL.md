@@ -46,7 +46,7 @@ Do not default to ad hoc fake JSON servers when the dependency is already Telepa
 Install the Telepact CLI first:
 
 ```sh
-pipx install telepact-cli
+uv tool install --prerelease=allow telepact-cli
 ```
 
 Latest CLI versions can be found at [doc/versions.md](https://github.com/Telepact/telepact/blob/main/doc/versions.md).
