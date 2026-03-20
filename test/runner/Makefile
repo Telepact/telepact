@@ -15,7 +15,7 @@
 #|
 
 test: setup java py ts go
-	poetry run python -m pytest
+	uv run python -m pytest
 
 test-java:
 	$(MAKE) prepare-java
@@ -24,10 +24,10 @@ test-java:
 prepare-java: setup java
 
 test-java-run: setup
-	poetry run python -m pytest -k [java
+	uv run python -m pytest -k [java
 
 test-trace-java: prepare-java
-	poetry run python -m pytest -k test_client_server_case[java-0] -s -vv
+	uv run python -m pytest -k test_client_server_case[java-0] -s -vv
 
 test-py:
 	$(MAKE) prepare-py
@@ -36,10 +36,10 @@ test-py:
 prepare-py: setup py
 
 test-py-run: setup
-	poetry run python -m pytest -k [py
+	uv run python -m pytest -k [py
 
 test-trace-py: prepare-py
-	poetry run python -m pytest -k test_client_server_case[py-0] -s -vv
+	uv run python -m pytest -k test_client_server_case[py-0] -s -vv
 
 test-ts:
 	$(MAKE) prepare-ts
@@ -48,10 +48,10 @@ test-ts:
 prepare-ts: setup ts
 
 test-ts-run: setup
-	poetry run python -m pytest -k [ts
+	uv run python -m pytest -k [ts
 
 test-trace-ts: prepare-ts
-	poetry run python -m pytest -k test_client_server_case[ts-0] -s -vv
+	uv run python -m pytest -k test_client_server_case[ts-0] -s -vv
 
 test-go:
 	$(MAKE) prepare-go
@@ -60,13 +60,13 @@ test-go:
 prepare-go: setup go
 
 test-go-run: setup
-	poetry run python -m pytest -k [go
+	uv run python -m pytest -k [go
 
 test-trace-go: prepare-go
-	poetry run python -m pytest -k test_client_server_case[go-0] -s -vv
+	uv run python -m pytest -k test_client_server_case[go-0] -s -vv
 
 setup:
-	poetry install
+	uv sync --all-groups
 
 java:
 	$(MAKE) -C ../lib/java
@@ -83,6 +83,7 @@ go:
 clean:
 	rm -rf .pytest_cache
 	rm -rf __pycache__
-	poetry env remove --all
+	rm -rf .venv
+	rm -f uv.lock
 
 .PHONY: test test-java prepare-java test-java-run test-trace-java test-py prepare-py test-py-run test-trace-py test-ts prepare-ts test-ts-run test-trace-ts test-go prepare-go test-go-run test-trace-go setup java py ts go clean

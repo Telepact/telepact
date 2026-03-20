@@ -6,7 +6,7 @@ generating code, and starting up mock servers for testing purposes.
 ## Installation
 
 ```
-pipx install --pip-args=--pre telepact-cli
+uv tool install --prerelease=allow telepact-cli
 ```
 
 Published PyPI releases are currently prereleases. To pin a specific CLI
