@@ -50,13 +50,11 @@ jobs:
     needs: [check-version-change]
     if: needs.check-version-change.outputs.version-changed == 'true'
     uses: ./.github/workflows/build.yml
-    secrets:
-      MVN_GPG_PRIVATE_KEY: ${{ secrets.MVN_GPG_PRIVATE_KEY }}
-      MVN_GPG_PASSPHRASE: ${{ secrets.MVN_GPG_PASSPHRASE }}
     
   create-release:
     name: Create release
     runs-on: ubuntu-latest
+    environment: bot
     needs: [build-release]
     timeout-minutes: 2
     steps:
