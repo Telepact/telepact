@@ -47,7 +47,6 @@ jobs:
 
   build-release:
     name: Build release
-    runs-on: ubuntu-latest
     needs: [check-version-change]
     if: needs.check-version-change.outputs.version-changed == 'true'
     uses: ./.github/workflows/build.yml
