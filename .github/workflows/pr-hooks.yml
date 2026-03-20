@@ -53,6 +53,7 @@ jobs:
   automerge-pr:
     name: Auto-merge PR
     runs-on: ubuntu-latest
+    environment: bot
     needs: [get-pr-info]
     if: needs.get-pr-info.outputs.pr_author == 'dependabot[bot]'
     timeout-minutes: 2

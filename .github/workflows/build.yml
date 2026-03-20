@@ -18,11 +18,6 @@ name: Build
 
 on:
   workflow_call:
-    secrets:
-      MVN_GPG_PRIVATE_KEY:
-        description: 'GPG private key for Maven signing'
-      MVN_GPG_PASSPHRASE:
-        description: 'Passphrase for the GPG private key'
 
 jobs:
   build-ts:
@@ -79,19 +74,7 @@ jobs:
       #     restore-keys: |
       #       ${{ runner.os }}-lib-maven-
 
-      - name: Configure GPG
-        if: github.event_name == 'push'
-        run: echo "${{ secrets.MVN_GPG_PRIVATE_KEY }}" | gpg --batch --import --yes
-
-      - name: Build java (push)
-        if: github.event_name == 'push'
-        env:
-          GPG_PASSPHRASE: ${{ secrets.MVN_GPG_PASSPHRASE }}
-          MVN_BUILD: deploy -P credentialed
-        run: make java
-
       - name: Build java
-        if: github.event_name != 'push'
         run: make java
 
       - name: Upload java build artifacts
