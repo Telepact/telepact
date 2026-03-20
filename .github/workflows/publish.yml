@@ -22,10 +22,71 @@ on:
       - published
 
 jobs:
+  resolve-release-plan:
+    runs-on: ubuntu-latest
+    outputs:
+      publish_java: ${{ steps.resolve.outputs.publish_java }}
+      publish_ts: ${{ steps.resolve.outputs.publish_ts }}
+      publish_py: ${{ steps.resolve.outputs.publish_py }}
+      publish_go: ${{ steps.resolve.outputs.publish_go }}
+      publish_cli: ${{ steps.resolve.outputs.publish_cli }}
+      publish_console: ${{ steps.resolve.outputs.publish_console }}
+      publish_prettier: ${{ steps.resolve.outputs.publish_prettier }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.target_commitish }}
+
+      - name: Resolve release manifest
+        id: resolve
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          RELEASE_BODY: ${{ github.event.release.body }}
+        run: |
+          python3 <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          manifest_path = Path('.release/release-manifest.json')
+          if manifest_path.exists():
+              data = json.loads(manifest_path.read_text(encoding='utf-8'))
+              targets = set(data.get('targets', []))
+              version = data.get('version')
+              if version != os.environ['RELEASE_TAG']:
+                  raise SystemExit(
+                      f"Release manifest version {version!r} does not match release tag {os.environ['RELEASE_TAG']!r}"
+                  )
+          else:
+              release_body = os.environ.get('RELEASE_BODY', '')
+              targets = {
+                  target
+                  for target in ['java', 'ts', 'py', 'go', 'cli', 'console', 'prettier']
+                  if f'- {target}' in release_body
+              }
+
+          outputs = {
+              'publish_java': 'java' in targets,
+              'publish_ts': 'ts' in targets,
+              'publish_py': 'py' in targets,
+              'publish_go': 'go' in targets,
+              'publish_cli': 'cli' in targets,
+              'publish_console': 'console' in targets,
+              'publish_prettier': 'prettier' in targets,
+          }
+
+          github_output = Path(os.environ['GITHUB_OUTPUT'])
+          with github_output.open('a', encoding='utf-8') as fh:
+              for key, value in outputs.items():
+                  fh.write(f"{key}={'true' if value else 'false'}\\n")
+          PY
+
   publish-java:
     runs-on: ubuntu-latest
     environment: publish
-    if: ${{ contains(github.event.release.body, '- java') }}
+    needs: [resolve-release-plan]
+    if: ${{ needs.resolve-release-plan.outputs.publish_java == 'true' }}
 
     steps:
       - name: Checkout code
@@ -52,7 +113,8 @@ jobs:
   publish-ts:
     runs-on: ubuntu-latest
     environment: publish
-    if: ${{ contains(github.event.release.body, '- ts') }}
+    needs: [resolve-release-plan]
+    if: ${{ needs.resolve-release-plan.outputs.publish_ts == 'true' }}
 
     steps:
       - name: Checkout code
@@ -75,7 +137,8 @@ jobs:
   publish-py:
     runs-on: ubuntu-latest
     environment: publish
-    if: ${{ contains(github.event.release.body, '- py') }}
+    needs: [resolve-release-plan]
+    if: ${{ needs.resolve-release-plan.outputs.publish_py == 'true' }}
 
     steps:
       - name: Checkout code
@@ -97,7 +160,8 @@ jobs:
   publish-go:
     runs-on: ubuntu-latest
     environment: publish
-    if: ${{ contains(github.event.release.body, '- go') }}
+    needs: [resolve-release-plan]
+    if: ${{ needs.resolve-release-plan.outputs.publish_go == 'true' }}
 
     steps:
       - name: Checkout code
@@ -116,7 +180,8 @@ jobs:
   publish-cli:
     runs-on: ubuntu-latest
     environment: publish
-    if: ${{ contains(github.event.release.body, '- cli') }}
+    needs: [resolve-release-plan]
+    if: ${{ needs.resolve-release-plan.outputs.publish_cli == 'true' }}
 
     steps:
       - name: Checkout code
@@ -138,7 +203,8 @@ jobs:
   publish-console:
     runs-on: ubuntu-latest
     environment: publish
-    if: ${{ contains(github.event.release.body, '- console') }}
+    needs: [resolve-release-plan]
+    if: ${{ needs.resolve-release-plan.outputs.publish_console == 'true' }}
 
     steps:
       - name: Checkout code
@@ -161,7 +227,8 @@ jobs:
   publish-prettier:
     runs-on: ubuntu-latest
     environment: publish
-    if: ${{ contains(github.event.release.body, '- prettier') }}
+    needs: [resolve-release-plan]
+    if: ${{ needs.resolve-release-plan.outputs.publish_prettier == 'true' }}
 
     steps:
       - name: Checkout code

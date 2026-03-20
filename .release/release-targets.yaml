@@ -1,0 +1,32 @@
+projects:
+  java:
+    paths:
+      - lib/java
+  py:
+    paths:
+      - lib/py
+    expands_to:
+      - cli
+  ts:
+    paths:
+      - lib/ts
+    expands_to:
+      - dart
+      - console
+  go:
+    paths:
+      - lib/go
+  dart:
+    paths:
+      - bind/dart
+  cli:
+    paths:
+      - sdk/cli
+  console:
+    paths:
+      - sdk/console
+  prettier:
+    paths:
+      - sdk/prettier
+    expands_to:
+      - console

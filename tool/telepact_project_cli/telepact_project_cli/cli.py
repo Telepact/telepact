@@ -27,6 +27,12 @@ from pathlib import Path
 
 from .commands.consolidated_readme import consolidated_readme
 from .commands.doc_versions import doc_versions, write_doc_versions
+from .release_plan import (
+    compute_release_manifest,
+    load_release_manifest,
+    parse_legacy_release_info,
+    write_release_manifest,
+)
 
 yaml = YAML()
 
@@ -240,43 +246,24 @@ def bump() -> None:
             edited_files.append(os.path.join(os.path.dirname(project_file), "pubspec.lock"))
             click.echo(f"Updated pubspec.lock in {os.path.dirname(project_file)}")
 
-    # Determine release targets based on the paths
-    release_targets = set()
-    for path in prev_commit_paths:
-        if 'lib/java' in path:
-            release_targets.add('java')
-        if 'lib/py' in path:
-            release_targets.add('py')
-        if 'lib/ts' in path:
-            release_targets.add('ts')
-        if 'lib/go' in path:
-            release_targets.add('go')
-        if 'bind/dart' in path:
-            release_targets.add('dart')
-        if 'sdk/cli' in path:
-            release_targets.add('cli')
-        if 'sdk/console' in path:
-            release_targets.add('console')
-        if 'sdk/prettier' in path:
-            release_targets.add('prettier')
-
-    # Also respect project dependencies
-    if 'py' in release_targets:
-        release_targets.add('cli')
-    if 'ts' in release_targets:
-        release_targets.add('dart')
-        release_targets.add('console')
-    if 'prettier' in release_targets:
-        release_targets.add('console')
-
-    sorted_release_targets = sorted(release_targets)
-
+    release_manifest = compute_release_manifest(
+        Path("."),
+        changed_paths=prev_commit_paths,
+        version=new_version,
+        pr_number=pr_number,
+    )
+    sorted_release_targets = list(release_manifest.targets)
     print(f'release_targets: {sorted_release_targets}')
 
     if sorted_release_targets:
         release_string = "Release targets:\n" + "\n".join(sorted_release_targets)
     else:
         release_string = "No release targets"
+
+    manifest_path = write_release_manifest(Path("."), release_manifest)
+    repo_relative_manifest_path = os.path.relpath(manifest_path, Path.cwd())
+    edited_files.append(repo_relative_manifest_path)
+    click.echo(f"Updated {repo_relative_manifest_path}")
 
     doc_versions_path = write_doc_versions(
         Path("."),
@@ -498,34 +485,35 @@ def release() -> None:
         click.echo("GITHUB_TOKEN and GITHUB_REPOSITORY environment variables must be set.")
         return
 
-    # Extract version string and release targets from the last git commit message
-    commit_message = subprocess.run(
-        ['git', 'show', '-s', '--format=%s%n%b', 'HEAD'],
-        stdout=subprocess.PIPE, text=True, check=True
-    ).stdout.strip()
-
     head_commit = subprocess.run(
         ['git', 'rev-parse', 'HEAD'],
         stdout=subprocess.PIPE, text=True, check=True
     ).stdout.strip()
 
-    print(f'commit_message: {commit_message}')
     print(f'head_commit: {head_commit}')
 
-    lines = commit_message.splitlines()
-    if not lines[0].startswith("Bump version to"):
-        click.echo("The last commit message does not match the expected format.")
-        return
-    line_tokens = lines[0].split(" ")
-    version = line_tokens[3]
-    pr_string_in_paran = line_tokens[4]
-    pr_string = pr_string_in_paran[2:-1]
-    pr_number = int(pr_string)
-
-    if len(lines) > 1 and lines[1] == 'Release targets:':
-        release_targets = lines[2:]
+    manifest_file = Path(".release/release-manifest.json")
+    if manifest_file.exists():
+        release_manifest = load_release_manifest(Path("."))
+        version = release_manifest["version"]
+        pr_number = int(release_manifest["pr_number"])
+        release_targets = list(release_manifest.get("targets", []))
+        click.echo("Loaded release metadata from .release/release-manifest.json")
     else:
-        release_targets = []
+        commit_message = subprocess.run(
+            ['git', 'show', '-s', '--format=%s%n%b', 'HEAD'],
+            stdout=subprocess.PIPE, text=True, check=True
+        ).stdout.strip()
+        print(f'commit_message: {commit_message}')
+        lines = commit_message.splitlines()
+        legacy_info = parse_legacy_release_info(lines[0] if lines else "", "\n".join(lines[1:]))
+        if legacy_info is None:
+            click.echo("No release manifest found and the last commit message does not match the expected legacy format.")
+            return
+        version, release_targets = legacy_info
+        pr_number_str = lines[0].rsplit("(#", 1)[-1].rstrip(")") if lines else ""
+        pr_number = int(pr_number_str)
+        click.echo("Loaded release metadata from legacy bump commit message")
 
     print(f'release_targets: {release_targets}')
     print(f'version: {version}')
