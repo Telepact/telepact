@@ -14,10 +14,10 @@
 //|  limitations under the License.
 //|
 
-import { parseDocument } from 'yaml';
+import { LineCounter, parseDocument } from 'yaml';
 
 import { DocumentLocator } from './DocumentLocators';
-import { createPathDocumentYamlCoordinatesPseudoJsonLocator } from './GetPathDocumentYamlCoordinatesPseudoJson';
+import { createDocumentLocatorFromYamlDocument } from './BuildDocumentLocatorFromYamlAst';
 
 function normalizeJsonCompatibleValue(value: any): any {
     if (value === null || typeof value === 'string' || typeof value === 'boolean') {
@@ -50,8 +50,10 @@ function normalizeJsonCompatibleValue(value: any): any {
     throw new Error('YAML values must be JSON-compatible');
 }
 
-export function parseTelepactYaml(text: string): { canonicalJsonText: string; locator: DocumentLocator } {
+export function parseTelepactYaml(text: string): { canonicalJsonText: string; locator?: DocumentLocator } {
+    const lineCounter = new LineCounter();
     const document = parseDocument(text, {
+        lineCounter,
         merge: false,
         prettyErrors: false,
         strict: true,
@@ -67,6 +69,6 @@ export function parseTelepactYaml(text: string): { canonicalJsonText: string; lo
 
     return {
         canonicalJsonText: JSON.stringify(parsed),
-        locator: createPathDocumentYamlCoordinatesPseudoJsonLocator(text),
+        locator: createDocumentLocatorFromYamlDocument(document as unknown as { contents?: unknown; errors?: { message: string }[] }, lineCounter, text),
     };
 }

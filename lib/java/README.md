@@ -11,19 +11,12 @@
 ### Usage
 
 API:
-```json
-[
-    {
-        "fn.greet": {
-            "subject": "string"
-        },
-        "->": {
-            "Ok_": {
-                "message": "string"
-            }
-        }
-    }
-]
+```yaml
+- fn.greet:
+    subject: string
+  ->:
+    Ok_:
+      message: string
 ```
 
 Server:
@@ -37,6 +30,8 @@ import io.github.telepact.TelepactSchemaFiles;
 
 var files = new TelepactSchemaFiles("./directory/containing/api/files");
 var schema = TelepactSchema.fromFileJsonMap(files.filenamesToJson);
+// The schema directory may contain multiple *.telepact.yaml and
+// *.telepact.json files. Subdirectories are rejected.
 Function<Message, Message> handler = (requestMessage) -> {
     var functionName = requestMessage.body.keySet().stream().findAny().orElseThrow();
     var arguments = (Map<String, Object>) requestMessage.body.get(functionName);

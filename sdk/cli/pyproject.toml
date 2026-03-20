@@ -1,32 +1,31 @@
 [build-system]
-requires = [ "poetry-core>=1.0.0",]
-build-backend = "poetry.core.masonry.api"
+requires = [ "setuptools>=77", "wheel",]
+build-backend = "setuptools.build_meta"
 
-[tool.poetry]
+[project]
 name = "telepact-cli"
-version = "1.0.0-alpha.205"
+version = "1.0.0-alpha.213"
 description = "A CLI tool for various local Telepact operations."
-authors = [ "Telepact Authors <telepact@googlegroups.com>",]
 readme = "README.md"
+requires-python = ">=3.11"
 license = "Apache-2.0"
 keywords = [ "cli", "telepact",]
-classifiers = [ "Programming Language :: Python :: 3", "Programming Language :: Python :: 3.11", "License :: OSI Approved :: Apache Software License", "Operating System :: OS Independent", "Topic :: Utilities",]
-include = [ "telepact_cli/telepact/**/*", "LICENSE", "NOTICE",]
-[[tool.poetry.packages]]
-include = "telepact_cli"
+classifiers = [ "Programming Language :: Python :: 3", "Programming Language :: Python :: 3.11", "Operating System :: OS Independent", "Topic :: Utilities",]
+dependencies = [ "click>=8.2.1,<9", "jinja2>=3.1,<4", "msgpack>=1.1.1,<2", "uvicorn>=0.35,<0.42", "requests>=2.32,<3", "starlette>=0.47.3,<0.53.0", "websockets>=12,<17", "PyYAML>=6.0.2,<7",]
+license-files = [ "LICENSE", "NOTICE",]
+[[project.authors]]
+name = "Telepact Authors"
+email = "telepact@googlegroups.com"
 
-[tool.poetry.dependencies]
-python = ">=3.11"
-click = "^8.2.1"
-jinja2 = "^3.1"
-msgpack = "^1.1.1"
-uvicorn = ">=0.35,<0.42"
-requests = "^2.32"
-starlette = ">=0.47.3,<0.53.0"
-websockets = ">=12,<17"
+[dependency-groups]
+dev = [ "pytest>=8.4,<10.0",]
 
-[tool.poetry.scripts]
+[project.scripts]
 telepact = "telepact_cli.cli:main"
 
-[tool.poetry.group.dev.dependencies]
-pytest = ">=8.4,<10.0"
+[tool.setuptools.package-data]
+telepact_cli = [ "templates/*.j2", "*.telepact.yaml",]
+"telepact_cli.telepact" = [ "json/*.json", "json/*.yaml",]
+
+[tool.setuptools.packages.find]
+include = [ "telepact_cli*",]

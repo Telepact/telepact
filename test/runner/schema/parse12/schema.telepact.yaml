@@ -19,4 +19,4 @@
 
     More text.
   struct.Example:
-    field: wrong
+    field: "wrong"

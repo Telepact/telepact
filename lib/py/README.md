@@ -13,19 +13,12 @@ use the exact version from [doc/versions.md](https://github.com/Telepact/telepac
 
 API:
 
-```json
-[
-    {
-        "fn.greet": {
-            "subject": "string"
-        },
-        "->": {
-            "Ok_": {
-                "message": "string"
-            }
-        }
-    }
-]
+```yaml
+- fn.greet:
+    subject: string
+  ->:
+    Ok_:
+      message: string
 ```
 
 Server:
@@ -35,6 +28,9 @@ from telepact import Client, Message, Serializer, Server, TelepactSchema, Telepa
 
 files = TelepactSchemaFiles('/directory/containing/api/files')
 schema = TelepactSchema.from_file_json_map(files.filenames_to_json)
+
+# The schema directory may contain multiple *.telepact.yaml and
+# *.telepact.json files. Subdirectories are rejected.
 
 async def handler(request_message: 'Message') -> 'Message':
     function_name = next(iter(request_message.body.keys()))

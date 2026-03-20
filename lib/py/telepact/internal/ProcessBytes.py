@@ -17,6 +17,8 @@
 from typing import Callable, TYPE_CHECKING, Awaitable
 
 from ..Message import Message
+from ..SerializationError import SerializationError
+from ..TelepactError import TelepactError
 
 if TYPE_CHECKING:
     from ..Serializer import Serializer
@@ -49,12 +51,37 @@ async def process_bytes(request_message_bytes: bytes, override_headers: dict[str
         except Exception:
             pass
 
-        response_bytes = serializer.serialize(response_message)
+        try:
+            response_bytes = serializer.serialize(response_message)
+        except Exception as e:
+            wrapped = (
+                TelepactError(
+                    "telepact response serialization failed",
+                    kind="serialization",
+                    cause=e,
+                )
+                if isinstance(e, SerializationError)
+                else TelepactError(
+                    "telepact server processing failed while serializing the response",
+                    kind="serialization",
+                    cause=e,
+                )
+            )
+            try:
+                on_error(wrapped)
+            except Exception:
+                pass
+            response_bytes = serializer.serialize(Message({}, {"ErrorUnknown_": {}}))
+            return Response(response_bytes, {})
 
         return Response(response_bytes, response_message.headers)
     except Exception as e:
+        wrapped = e if isinstance(e, TelepactError) else TelepactError(
+            "telepact server processing failed",
+            cause=e,
+        )
         try:
-            on_error(e)
+            on_error(wrapped)
         except Exception:
             pass
 

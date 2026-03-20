@@ -52,7 +52,7 @@ def tmp_dir_manager() -> Generator[None, None, None]:
         shutil.rmtree(tmp_dir)
 
 def test_demo_server_and_fetch_and_mock() -> None:
-    p = subprocess.Popen(['poetry', 'run', 'telepact', 'demo-server'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, cwd='tests/tmp')
+    p = subprocess.Popen(['uv', 'run', 'telepact', 'demo-server'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, cwd='tests/tmp')
     p_mock: subprocess.Popen | None = None
 
     try:
@@ -63,7 +63,7 @@ def test_demo_server_and_fetch_and_mock() -> None:
         assert response.json() == [{}, {'Ok_': {}}]
 
         # Assert that we can fetch the schema using the cli
-        result = subprocess.run(['poetry', 'run', 'telepact', 'fetch', '--http-url', 'http://localhost:8000/api', '--output-dir', 'api'], capture_output=True, text=True, cwd='tests/tmp')
+        result = subprocess.run(['uv', 'run', 'telepact', 'fetch', '--http-url', 'http://localhost:8000/api', '--output-dir', 'api'], capture_output=True, text=True, cwd='tests/tmp')
 
         assert result.returncode == 0, f"Schema command failed with output: {result.stdout} and error: {result.stderr}"
 
@@ -79,7 +79,7 @@ def test_demo_server_and_fetch_and_mock() -> None:
         assert schema_json == reference_json, "Fetched schema does not match the reference schema"
 
         # Assert that we can start the mock server using the fetched schema
-        p_mock = subprocess.Popen(['poetry', 'run', 'telepact', 'mock', '--http-url', 'http://localhost:8000/api', '--port', '8001'])
+        p_mock = subprocess.Popen(['uv', 'run', 'telepact', 'mock', '--http-url', 'http://localhost:8000/api', '--port', '8001'])
         time.sleep(1)
 
         response_mock = requests.post('http://localhost:8001/api', data=json.dumps([{}, {'fn.add': {'x': 5, 'y': 3}}]))
@@ -102,14 +102,22 @@ def test_demo_server_and_fetch_and_mock() -> None:
         print(f"Request failed: {e}")
         assert False, "Demo server is not running or not reachable"
     finally:
-        p.kill()
-        stdout, stderr = p.communicate(timeout=1)
+        p.terminate()
+        try:
+            stdout, stderr = p.communicate(timeout=5)
+        except subprocess.TimeoutExpired:
+            p.kill()
+            stdout, stderr = p.communicate(timeout=5)
         print(f"stdout: {stdout}")
         print(f"stderr: {stderr}")
 
         if p_mock:
-            p_mock.kill()
-            stdout_mock, stderr_mock = p_mock.communicate(timeout=1)
+            p_mock.terminate()
+            try:
+                stdout_mock, stderr_mock = p_mock.communicate(timeout=5)
+            except subprocess.TimeoutExpired:
+                p_mock.kill()
+                stdout_mock, stderr_mock = p_mock.communicate(timeout=5)
             print(f"Mock server stdout: {stdout_mock}")
             print(f"Mock server stderr: {stderr_mock}")
 

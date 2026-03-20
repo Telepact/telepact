@@ -3,4 +3,4 @@ telepact_test/gen/
 .venv/
 .built
 telepact.tar.gz
-poetry.lock
+uv.lock

@@ -14,14 +14,42 @@
 //|  limitations under the License.
 //|
 
-export class TelepactError extends Error {
-    constructor(message: string);
-    constructor(cause: Error);
-    constructor(arg: string | Error) {
-        super(typeof arg === 'string' ? arg : arg.message);
+export type TelepactErrorKind = 'parse' | 'validation' | 'serialization' | 'transport' | 'handler';
 
-        if (typeof arg !== 'string') {
-            this.stack = arg.stack;
+function toError(error: unknown): Error | undefined {
+    if (error instanceof Error) {
+        return error;
+    }
+    if (typeof error === 'string') {
+        return new Error(error);
+    }
+    if (error === undefined || error === null) {
+        return undefined;
+    }
+    return new Error(String(error));
+}
+
+export class TelepactError extends Error {
+    kind?: TelepactErrorKind;
+    override cause?: Error;
+
+    constructor(message: string, kind?: TelepactErrorKind, cause?: unknown);
+    constructor(cause: unknown, kind?: TelepactErrorKind);
+    constructor(arg: string | unknown, kind?: TelepactErrorKind, cause?: unknown) {
+        const resolvedCause = typeof arg === 'string' ? toError(cause) : toError(arg);
+        const message = typeof arg === 'string'
+            ? arg
+            : resolvedCause?.message ?? 'telepact error';
+
+        super(message);
+        Object.setPrototypeOf(this, TelepactError.prototype);
+
+        this.name = 'TelepactError';
+        this.kind = kind;
+        this.cause = resolvedCause;
+
+        if (resolvedCause?.stack) {
+            this.stack = resolvedCause.stack;
         }
     }
 }

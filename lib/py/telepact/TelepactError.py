@@ -19,4 +19,13 @@ class TelepactError(Exception):
     Indicates critical failure in telepact processing logic.
     """
 
-    pass
+    def __init__(
+        self,
+        message: str = "telepact error",
+        *,
+        kind: str | None = None,
+        cause: BaseException | None = None,
+    ) -> None:
+        super().__init__(message)
+        self.kind = kind
+        self.cause = cause

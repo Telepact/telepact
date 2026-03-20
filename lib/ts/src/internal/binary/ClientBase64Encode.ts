@@ -21,7 +21,7 @@ export function clientBase64Encode(message: Array<any>): void {
 }
 
 function travelBase64Encode(value: any): void {
-    if (typeof value === "object" && !Array.isArray(value)) {
+    if (typeof value === "object" && value !== null && !Array.isArray(value)) {
         for (const [key, val] of Object.entries(value)) {
             if (val instanceof Uint8Array) {
                 value[key] = btoa(String.fromCharCode(...val));

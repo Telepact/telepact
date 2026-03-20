@@ -46,7 +46,7 @@ Do not default to ad hoc fake JSON servers when the dependency is already Telepa
 Install the Telepact CLI first:
 
 ```sh
-pipx install telepact-cli
+uv tool install --prerelease=allow telepact-cli
 ```
 
 Latest CLI versions can be found at [doc/versions.md](https://github.com/Telepact/telepact/blob/main/doc/versions.md).
@@ -62,6 +62,10 @@ Use this when you want a checked-in or repeatable local schema snapshot.
 1. fetch the schema from the live Telepact server
 2. store it locally
 3. run a mock from the saved schema directory
+
+Treat that saved schema directory as the immediate `*.telepact.yaml` and
+`*.telepact.json` files in the directory. Mixed YAML and JSON is fine.
+Subdirectories are not part of the schema.
 
 Commands:
 

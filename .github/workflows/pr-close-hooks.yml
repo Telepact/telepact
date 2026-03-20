@@ -52,6 +52,7 @@ jobs:
     if: needs.get-pr-close-info.outputs.pr_merged == 'true'
     needs: [get-pr-close-info]
     runs-on: ubuntu-latest
+    environment: bot
     timeout-minutes: 2
     steps:
       - name: Generate GitHub App token
@@ -74,8 +75,8 @@ jobs:
           sdk: 3.6
 
       # Required for bumping lock files
-      - name: Install Poetry
-        run: pipx install poetry
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
 
       - name: Install Project CLI
         run: make install-project-cli

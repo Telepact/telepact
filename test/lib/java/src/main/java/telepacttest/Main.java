@@ -96,7 +96,33 @@ public class Main {
         }
 
         return false;
-    }    
+    }
+
+    private static boolean isNumberTooBigError(Throwable error) {
+        for (Throwable current = error; current != null; current = current.getCause()) {
+            if (current instanceof ArithmeticException) {
+                return true;
+            }
+
+            var message = current.getMessage();
+            if (message == null) {
+                continue;
+            }
+
+            var lower = message.toLowerCase();
+            if (lower.contains("range")
+                    || lower.contains("too large")
+                    || lower.contains("larger than")
+                    || lower.contains("smaller than")
+                    || lower.contains("overflow")
+                    || lower.contains("non-finite")
+                    || lower.contains("not representable")) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     public static Dispatcher startClientTestServer(io.nats.client.Connection connection, MetricRegistry metrics,
             String clientFrontdoorTopic,
@@ -118,7 +144,7 @@ public class Main {
                     try {
                         requestBytes = s.serialize(m);
                     } catch (SerializationError e) {
-                        if (e.getCause() instanceof IllegalArgumentException) {
+                        if (isNumberTooBigError(e)) {
                             return new Message(Map.of("numberTooBig", true), Map.of("ErrorUnknown_", Map.of()));
                         } else {
                             throw e;
@@ -176,35 +202,41 @@ public class Main {
 
                 Message response;
 
-                if (useTestClient) {
-                    try {
-                        var resetSeed = (Integer) requestHeaders.get("@setSeed");
-                        if (resetSeed != null) {
-                            testClient.setSeed(resetSeed);
+                try {
+                    if (useTestClient) {
+                        try {
+                            var resetSeed = (Integer) requestHeaders.get("@setSeed");
+                            if (resetSeed != null) {
+                                testClient.setSeed(resetSeed);
+                            }
+                            var expectedPseudoJsonBody = (Map<String, Object>) requestHeaders.get("@expectedPseudoJsonBody");
+                            var expectMatch = (Boolean) requestHeaders.getOrDefault("@expectMatch", true);
+                            response = testClient.assertRequest(request, expectedPseudoJsonBody, expectMatch);
+                        } catch (Throwable e) {
+                            e.printStackTrace();
+                            var responseHeaders = new HashMap<String, Object>();
+                            if (e instanceof AssertionError) {
+                                responseHeaders.put("@assertionError", true);
+                            }
+                            response = new Message(responseHeaders, Map.of("ErrorUnknown_", Map.of()));
                         }
-                        var expectedPseudoJsonBody = (Map<String, Object>) requestHeaders.get("@expectedPseudoJsonBody");
-                        var expectMatch = (Boolean) requestHeaders.getOrDefault("@expectMatch", true);
-                        response = testClient.assertRequest(request, expectedPseudoJsonBody, expectMatch);
-                    } catch (Throwable e) {
-                        e.printStackTrace();
-                        var responseHeaders = new HashMap<String, Object>();
-                        if (e instanceof AssertionError) {
-                            responseHeaders.put("@assertionError", true);
-                        }
-                        response = new Message(responseHeaders, Map.of("ErrorUnknown_", Map.of()));
-                    }
-                } else {
-                    if (useCodeGen && "fn.test".equals(functionName)) {
+                    } else if (useCodeGen && "fn.test".equals(functionName)) {
                         var outputMessage = generatedClient.test(requestHeaders, new test.Input(requestBody));
                         var responseHeaders = outputMessage.headers;
                         responseHeaders.put("@codegenc_", true);
                         response = new Message(responseHeaders, outputMessage.body.pseudoJson);
                     } else {
-
                         try (var time = timers.time()) {
                             response = client.request(request);
                         }
                     }
+                } catch (Throwable e) {
+                    e.printStackTrace();
+                    var responseHeaders = new HashMap<String, Object>();
+                    if (e instanceof AssertionError) {
+                        responseHeaders.put("@assertionError", true);
+                    }
+                    response = new Message(responseHeaders, Map.of("ErrorUnknown_", Map.of()));
                 }
 
                 var responsePseudoJson = List.of(response.headers, response.body);

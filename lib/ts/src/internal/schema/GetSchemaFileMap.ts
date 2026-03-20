@@ -26,7 +26,9 @@ export function getSchemaFileMap(directory: string, fs: FsModule, path: PathModu
 
     const schemaParseFailures: SchemaParseFailure[] = [];
 
-    const paths = fs.readdirSync(directory).map((file) => path.join(directory, file));
+    const paths = fs.readdirSync(directory)
+        .sort()
+        .map((file) => path.join(directory, file));
     for (const filePath of paths) {
         const relativePath = path.relative(directory, filePath);
         if (fs.statSync(filePath).isDirectory()) {
@@ -42,7 +44,9 @@ export function getSchemaFileMap(directory: string, fs: FsModule, path: PathModu
             try {
                 const parsed = parseTelepactYaml(content);
                 finalJsonDocuments[relativePath] = parsed.canonicalJsonText;
-                documentLocators[relativePath] = parsed.locator;
+                if (parsed.locator !== undefined) {
+                    documentLocators[relativePath] = parsed.locator;
+                }
             } catch {
                 finalJsonDocuments[relativePath] = '[]';
                 schemaParseFailures.push(new SchemaParseFailure(relativePath, [], 'JsonInvalid', {}));

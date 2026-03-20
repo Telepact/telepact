@@ -10,19 +10,12 @@ go get github.com/telepact/telepact/lib/go
 
 API:
 
-```json
-[
-    {
-        "fn.greet": {
-            "subject": "string"
-        },
-        "->": {
-            "Ok_": {
-                "message": "string"
-            }
-        }
-    }
-]
+```yaml
+- fn.greet:
+    subject: string
+  ->:
+    Ok_:
+      message: string
 ```
 
 Server:
@@ -47,6 +40,9 @@ func main() {
     if err != nil {
         log.Fatal(err)
     }
+
+    // The schema directory may contain multiple *.telepact.yaml and
+    // *.telepact.json files. Subdirectories are rejected.
 
     handler := func(request telepact.Message) (telepact.Message, error) {
         functionName, err := request.BodyTarget()

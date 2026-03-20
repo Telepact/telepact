@@ -53,6 +53,6 @@ export function serializeInternal(
             return serializer.toJson(base64EncodedMessage);
         }
     } catch (error) {
-        throw new SerializationError(error as Error);
+        throw new SerializationError(error, serializeAsBinary ? 'encoding Telepact message as binary or JSON fallback' : 'encoding Telepact message as JSON');
     }
 }

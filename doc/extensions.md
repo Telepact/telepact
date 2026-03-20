@@ -19,10 +19,8 @@ body itself.
 
 That is why internal schemas define these types as empty objects like:
 
-```json
-{
-  "_ext.Select_": {}
-}
+```yaml
+_ext.Select_: {}
 ```
 
 That does not mean "any empty object". It means "Telepact runtime provides the
@@ -124,40 +122,20 @@ The active result union can be selected through `->`:
 
 Suppose the schema contains:
 
-```json
-[
-  {
-    "struct.ResultCard": {
-      "title": "string",
-      "done!": "boolean"
-    }
-  },
-  {
-    "union.ResultItem": [
-      {
-        "Card": {
-          "title": "string"
-        }
-      },
-      {
-        "Note": {
-          "body": "string"
-        }
-      }
-    ]
-  },
-  {
-    "fn.selectNested": {},
-    "->": [
-      {
-        "Ok_": {
-          "card": "struct.ResultCard",
-          "item": "union.ResultItem"
-        }
-      }
-    ]
-  }
-]
+```yaml
+- struct.ResultCard:
+    title: string
+    done!: boolean
+- union.ResultItem:
+    - Card:
+        title: string
+    - Note:
+        body: string
+- fn.selectNested: {}
+  ->:
+    - Ok_:
+        card: struct.ResultCard
+        item: union.ResultItem
 ```
 
 If the server implementation would normally return:
@@ -259,29 +237,17 @@ Only non-internal mocked functions are valid. Mock control functions such as
 
 Suppose the mocked API contains:
 
-```json
-[
-  {
-    "struct.User": {
-      "id": "string",
-      "name": "string",
-      "admin!": "boolean"
-    }
-  },
-  {
-    "fn.getUser": {
-      "id": "string",
-      "expand!": "boolean"
-    },
-    "->": [
-      {
-        "Ok_": {
-          "user": "struct.User"
-        }
-      }
-    ]
-  }
-]
+```yaml
+- struct.User:
+    id: string
+    name: string
+    admin!: boolean
+- fn.getUser:
+    id: string
+    expand!: boolean
+  ->:
+    - Ok_:
+        user: struct.User
 ```
 
 Then `_ext.Call_` values look like:

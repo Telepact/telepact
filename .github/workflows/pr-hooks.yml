@@ -53,12 +53,16 @@ jobs:
   automerge-pr:
     name: Auto-merge PR
     runs-on: ubuntu-latest
+    environment: bot
     needs: [get-pr-info]
     if: needs.get-pr-info.outputs.pr_author == 'dependabot[bot]'
     timeout-minutes: 2
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
 
       - name: Generate GitHub App token
         id: generate-token

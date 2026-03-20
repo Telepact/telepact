@@ -1,22 +1,29 @@
-[tool.poetry]
-name = "telepact_project_cli"
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "telepact-project-cli"
 version = "1.0.0"
 description = "A CLI tool for developing the Telepact project."
-authors = [ "Telepact Authors <telepact@googlegroups.com>",]
+readme = "README.md"
+requires-python = ">=3.11"
 license = "Apache-2.0"
+authors = [
+    { name = "Telepact Authors", email = "telepact@googlegroups.com" },
+]
+dependencies = [
+    "click>=8.3.1,<9",
+    "toml>=0.10.2,<0.11",
+    "lxml>=6.0.2,<7",
+    "pyyaml>=6.0.3,<7",
+    "ruamel.yaml==0.19.1",
+    "pygithub>=2.8,<3",
+]
 
-[tool.poetry.dependencies]
-python = "^3.11"
-click = "^8.3.1"
-toml = "^0.10.2"
-lxml = "^6.0.2"
-pyyaml = "^6.0.3"
-"ruamel.yaml" = "0.19.1"
-pygithub = "^2.8"
-
-[tool.poetry.scripts]
+[project.scripts]
 telepact-project = "telepact_project_cli.cli:main"
 
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+[tool.setuptools.packages.find]
+include = ["telepact_project_cli*"]
+namespaces = true

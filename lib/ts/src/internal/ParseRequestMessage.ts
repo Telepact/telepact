@@ -21,6 +21,7 @@ import { BinaryEncoderUnavailableError } from '../internal/binary/BinaryEncoderU
 import { BinaryEncodingMissing } from '../internal/binary/BinaryEncodingMissing';
 import { InvalidMessage } from '../internal/validation/InvalidMessage';
 import { InvalidMessageBody } from '../internal/validation/InvalidMessageBody';
+import { TelepactError } from '../TelepactError';
 
 export function parseRequestMessage(
     requestMessageBytes: Uint8Array,
@@ -31,7 +32,7 @@ export function parseRequestMessage(
     try {
         return serializer.deserialize(requestMessageBytes);
     } catch (e) {
-        onError(e);
+        onError(new TelepactError('telepact request parsing failed while decoding the incoming message', 'parse', e));
 
         let reason: string;
         if (e instanceof BinaryEncoderUnavailableError) {

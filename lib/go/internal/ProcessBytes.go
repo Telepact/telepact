@@ -16,6 +16,8 @@
 
 package internal
 
+import "fmt"
+
 func ProcessBytes(
 	requestMessageBytes []byte,
 	overrideHeaders map[string]any,
@@ -44,7 +46,7 @@ func ProcessBytes(
 
 	responseBytes, err := serialize(responseMessage)
 	if err != nil {
-		invokeOnError(onError, err)
+		invokeOnError(onError, fmt.Errorf("telepact response serialization failed: %w", err))
 		return buildUnknownResponse(serialize)
 	}
 

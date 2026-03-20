@@ -19,6 +19,7 @@ from typing import Callable, TYPE_CHECKING, cast, Awaitable
 from ..internal.binary.ServerBase64Decode import server_base64_decode
 
 from ..Message import Message
+from ..TelepactError import TelepactError
 from .GetApiDefinitionsWithExamples import get_api_definitions_with_examples
 from .types.TTypeDeclaration import TTypeDeclaration
 
@@ -37,6 +38,7 @@ async def handle_message(
 ) -> 'Message':
     from ..internal.SelectStructFields import select_struct_fields
     from ..internal.validation.GetInvalidErrorMessage import get_invalid_error_message
+    from ..internal.validation.MapValidationFailuresToInvalidFieldCases import map_validation_failures_to_invalid_field_cases
     from ..internal.validation.ValidateHeaders import validate_headers
     from ..internal.validation.ValidateResult import validate_result
     from .types.TUnion import TUnion
@@ -161,7 +163,13 @@ async def handle_message(
             result_message = await handler(call_message)
         except Exception as e:
             try:
-                on_error(e)
+                on_error(
+                    TelepactError(
+                        f"telepact handler failed while handling {function_name}",
+                        kind="handler",
+                        cause=e,
+                    )
+                )
             except Exception:
                 pass
             return Message(response_headers, {"ErrorUnknown_": {}})
@@ -179,14 +187,21 @@ async def handle_message(
         result_union, [], result_validate_ctx)
     
     if result_validation_failures and not skip_result_validation:
+        try:
+            on_error(
+                TelepactError(
+                    f"telepact response validation failed for {function_name}: {map_validation_failures_to_invalid_field_cases(result_validation_failures)}",
+                    kind="validation",
+                )
+            )
+        except Exception:
+            pass
         res = get_invalid_error_message(
             "ErrorInvalidResponseBody_",
             result_validation_failures,
             result_union_type,
             final_response_headers,
         )
-        on_error(Exception(
-            f"Response validation failed: {result_validation_failures}. Actual response: {result_union}"))
         return res
     
     if result_validate_ctx.base64_coercions:
@@ -199,6 +214,15 @@ async def handle_message(
         final_response_headers, telepact_schema.parsed_response_headers, function_name
     )
     if response_header_validation_failures:
+        try:
+            on_error(
+                TelepactError(
+                    f"telepact response header validation failed for {function_name}: {map_validation_failures_to_invalid_field_cases(response_header_validation_failures)}",
+                    kind="validation",
+                )
+            )
+        except Exception:
+            pass
         return get_invalid_error_message(
             "ErrorInvalidResponseHeaders_",
             response_header_validation_failures,

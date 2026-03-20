@@ -33,13 +33,11 @@ public class GetSchemaFileMap {
         var schemaParseFailures = new java.util.ArrayList<SchemaParseFailure>();
 
         try {
-            var paths = Files.walk(Paths.get(directory)).toArray(Path[]::new);
+            var paths = Files.list(Paths.get(directory))
+                    .sorted()
+                    .toArray(Path[]::new);
             for (Path path : paths) {
                 String relativePath = Paths.get(directory).relativize(path).toString();
-                if (relativePath.isEmpty()) {
-                    // Skip root directory
-                    continue;
-                }
                 if (!Files.isRegularFile(path)) {
                     schemaParseFailures.add(new SchemaParseFailure(relativePath, new java.util.ArrayList<>(), "DirectoryDisallowed", Map.of()));
                     finalJsonDocuments.put(relativePath, "[]");
@@ -52,7 +50,9 @@ public class GetSchemaFileMap {
                     try {
                         var parsed = ParseTelepactYaml.parseTelepactYaml(content);
                         finalJsonDocuments.put(relativePath, parsed.canonicalJson);
-                        finalJsonDocuments.documentLocators.put(relativePath, parsed.locator);
+                        if (parsed.locator != null) {
+                            finalJsonDocuments.documentLocators.put(relativePath, parsed.locator);
+                        }
                     } catch (Exception e) {
                         finalJsonDocuments.put(relativePath, "[]");
                         schemaParseFailures.add(new SchemaParseFailure(relativePath, new java.util.ArrayList<>(), "JsonInvalid", Map.of()));

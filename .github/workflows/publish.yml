@@ -24,6 +24,7 @@ on:
 jobs:
   publish-java:
     runs-on: ubuntu-latest
+    environment: publish
     if: ${{ contains(github.event.release.body, '- java') }}
 
     steps:
@@ -50,6 +51,7 @@ jobs:
 
   publish-ts:
     runs-on: ubuntu-latest
+    environment: publish
     if: ${{ contains(github.event.release.body, '- ts') }}
 
     steps:
@@ -72,6 +74,7 @@ jobs:
 
   publish-py:
     runs-on: ubuntu-latest
+    environment: publish
     if: ${{ contains(github.event.release.body, '- py') }}
 
     steps:
@@ -80,19 +83,20 @@ jobs:
         with:
           ref: ${{ github.event.release.target_commitish }}
 
-      - name: Install Poetry
-        run: pipx install poetry
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
 
       - name: Install Project CLI
         run: make install-project-cli
 
       - name: Publish to PyPI
         env:
-          POETRY_PYPI_TOKEN_PYPI: ${{ secrets.PYPI_TOKEN }}
+          UV_PUBLISH_TOKEN: ${{ secrets.PYPI_TOKEN }}
         run: make deploy-py
 
   publish-go:
     runs-on: ubuntu-latest
+    environment: publish
     if: ${{ contains(github.event.release.body, '- go') }}
 
     steps:
@@ -111,6 +115,7 @@ jobs:
 
   publish-cli:
     runs-on: ubuntu-latest
+    environment: publish
     if: ${{ contains(github.event.release.body, '- cli') }}
 
     steps:
@@ -119,19 +124,20 @@ jobs:
         with:
           ref: ${{ github.event.release.target_commitish }}
 
-      - name: Install Poetry
-        run: pipx install poetry
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
 
       - name: Install Project CLI
         run: make install-project-cli
 
       - name: Publish to PyPI
         env:
-          POETRY_PYPI_TOKEN_PYPI: ${{ secrets.PYPI_TOKEN }}
+          UV_PUBLISH_TOKEN: ${{ secrets.PYPI_TOKEN }}
         run: make deploy-cli
 
   publish-console:
     runs-on: ubuntu-latest
+    environment: publish
     if: ${{ contains(github.event.release.body, '- console') }}
 
     steps:
@@ -154,6 +160,7 @@ jobs:
 
   publish-prettier:
     runs-on: ubuntu-latest
+    environment: publish
     if: ${{ contains(github.event.release.body, '- prettier') }}
 
     steps:
