@@ -192,12 +192,7 @@ clean-project-cli:
 	$(MAKE) -C tool/telepact_project_cli clean
 
 install-project-cli:
-	tmpdir=$$(mktemp -d); \
-	trap 'rm -rf "$$tmpdir"' EXIT; \
-	mkdir -p "$$tmpdir/src" "$$tmpdir/dist"; \
-	git archive HEAD tool/telepact_project_cli | tar -x -C "$$tmpdir/src"; \
-	uv build --wheel --out-dir "$$tmpdir/dist" "$$tmpdir/src/tool/telepact_project_cli"; \
-	uv tool install --force "$$tmpdir"/dist/telepact_project_cli-*.whl
+	uv tool install --force tool/telepact_project_cli
 
 uninstall-project-cli:
 	uv tool uninstall telepact-project-cli
