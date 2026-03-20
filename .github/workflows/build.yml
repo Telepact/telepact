@@ -108,8 +108,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install Poetry
-        run: pipx install poetry
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
 
       - name: Install Project CLI
         run: make install-project-cli
@@ -133,8 +133,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install Poetry
-        run: pipx install poetry
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
 
       - name: Download py build artifacts
         uses: actions/download-artifact@v4
@@ -244,6 +244,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+
       - name: Set up Node.js
         uses: actions/setup-node@v5
         with:
@@ -332,6 +335,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+
       - name: Install Project CLI
         run: make install-project-cli
 
@@ -357,6 +363,9 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+
       - name: Install Project CLI
         run: make install-project-cli
 
@@ -381,8 +390,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install Poetry
-        run: pipx install poetry
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
 
       - name: Set up Java
         uses: actions/setup-java@v4
