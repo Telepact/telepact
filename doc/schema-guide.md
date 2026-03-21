@@ -147,10 +147,10 @@ function argument.
 | `[{}, {"fn.exampleFunction1": {"field": 1}}]` | `[{}, {"Ok_": {"field": true}}]`     |
 | `[{}, {"fn.exampleFunction2": {}}]`           | `[{}, {"Error": {"field": "text"}}]` |
 
-| Type Expression         | Example allowed JSON values                              | Example disallowed JSON values |
-| ----------------------- | -------------------------------------------------------- | ------------------------------ |
-| `"fn.exampleFunction1"` | `{"field": 0}`, `{"field": 1, "optionalField!": "text"}` | `null`, `{}`                   |
-| `"fn.exampleFunction2"` | `{}`                                                     | `null`, `{"wrongField": 0}`    |
+| Type Expression         | Example allowed JSON values                                                          | Example disallowed JSON values                 |
+| ----------------------- | ------------------------------------------------------------------------------------ | ---------------------------------------------- |
+| `"fn.exampleFunction1"` | `{"fn.exampleFunction1": {"field": 0}}`, `{"fn.exampleFunction1": {"field": 1, "optionalField!": "text"}}` | `null`, `{}`, `{"field": 0}`                 |
+| `"fn.exampleFunction2"` | `{"fn.exampleFunction2": {}}`                                                       | `null`, `{"wrongField": 0}`, `{}`            |
 
 ### Errors
 
