@@ -26,8 +26,8 @@ import click
 from lxml import etree as ET
 import toml
 
-_BUMP_VERSION_RE = re.compile(r"^Bump version to (\S+)")
-_RELEASE_TARGETS_HEADER = "Release targets:"
+from ..release_plan import load_release_manifest_at_commit, parse_legacy_release_info
+
 _PYPI_PRERELEASE_RE = re.compile(r"^(\d+\.\d+\.\d+)-(alpha|beta|rc)\.(\d+)$")
 
 
@@ -146,20 +146,6 @@ def _iter_git_commits(repo_root: Path) -> list[tuple[str, str, str]]:
     return commits
 
 
-def _extract_release_targets(commit_body: str) -> list[str]:
-    lines = [line.strip() for line in commit_body.splitlines()]
-    try:
-        header_index = lines.index(_RELEASE_TARGETS_HEADER)
-    except ValueError:
-        return []
-    targets: list[str] = []
-    for line in lines[header_index + 1 :]:
-        if not line:
-            break
-        targets.append(line)
-    return targets
-
-
 def _latest_released_versions(
     repo_root: Path,
     targets: list[str],
@@ -174,12 +160,19 @@ def _latest_released_versions(
             if target in needed:
                 found[target] = pending_version
 
-    for _, subject, body in _iter_git_commits(repo_root):
-        match = _BUMP_VERSION_RE.match(subject)
-        if not match:
-            continue
-        version = match.group(1)
-        release_targets = _extract_release_targets(body)
+    for sha, subject, body in _iter_git_commits(repo_root):
+        manifest_data = load_release_manifest_at_commit(repo_root, sha)
+        if manifest_data is not None:
+            version = manifest_data.get("version")
+            release_targets = manifest_data.get("targets", [])
+            if not isinstance(version, str) or not isinstance(release_targets, list):
+                raise click.ClickException(f"Invalid release manifest data at commit {sha}")
+        else:
+            legacy_info = parse_legacy_release_info(subject, body)
+            if legacy_info is None:
+                continue
+            version, release_targets = legacy_info
+
         if not release_targets:
             continue
         for target in release_targets:

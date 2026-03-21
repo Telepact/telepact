@@ -22,10 +22,41 @@ on:
       - published
 
 jobs:
+  resolve-release-plan:
+    runs-on: ubuntu-latest
+    outputs:
+      publish_java: ${{ steps.resolve.outputs.publish_java }}
+      publish_ts: ${{ steps.resolve.outputs.publish_ts }}
+      publish_py: ${{ steps.resolve.outputs.publish_py }}
+      publish_go: ${{ steps.resolve.outputs.publish_go }}
+      publish_cli: ${{ steps.resolve.outputs.publish_cli }}
+      publish_console: ${{ steps.resolve.outputs.publish_console }}
+      publish_prettier: ${{ steps.resolve.outputs.publish_prettier }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.target_commitish }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Install Project CLI
+        run: make install-project-cli
+
+      - name: Resolve release manifest
+        id: resolve
+        run: |
+          telepact-project publish-targets \
+            --release-tag "${{ github.event.release.tag_name }}" \
+            --release-body "${{ github.event.release.body }}" \
+            --github-output "$GITHUB_OUTPUT"
+
   publish-java:
     runs-on: ubuntu-latest
     environment: publish
-    if: ${{ contains(github.event.release.body, '- java') }}
+    needs: [resolve-release-plan]
+    if: ${{ needs.resolve-release-plan.outputs.publish_java == 'true' }}
 
     steps:
       - name: Checkout code
@@ -52,7 +83,8 @@ jobs:
   publish-ts:
     runs-on: ubuntu-latest
     environment: publish
-    if: ${{ contains(github.event.release.body, '- ts') }}
+    needs: [resolve-release-plan]
+    if: ${{ needs.resolve-release-plan.outputs.publish_ts == 'true' }}
 
     steps:
       - name: Checkout code
@@ -75,7 +107,8 @@ jobs:
   publish-py:
     runs-on: ubuntu-latest
     environment: publish
-    if: ${{ contains(github.event.release.body, '- py') }}
+    needs: [resolve-release-plan]
+    if: ${{ needs.resolve-release-plan.outputs.publish_py == 'true' }}
 
     steps:
       - name: Checkout code
@@ -97,7 +130,8 @@ jobs:
   publish-go:
     runs-on: ubuntu-latest
     environment: publish
-    if: ${{ contains(github.event.release.body, '- go') }}
+    needs: [resolve-release-plan]
+    if: ${{ needs.resolve-release-plan.outputs.publish_go == 'true' }}
 
     steps:
       - name: Checkout code
@@ -116,7 +150,8 @@ jobs:
   publish-cli:
     runs-on: ubuntu-latest
     environment: publish
-    if: ${{ contains(github.event.release.body, '- cli') }}
+    needs: [resolve-release-plan]
+    if: ${{ needs.resolve-release-plan.outputs.publish_cli == 'true' }}
 
     steps:
       - name: Checkout code
@@ -138,7 +173,8 @@ jobs:
   publish-console:
     runs-on: ubuntu-latest
     environment: publish
-    if: ${{ contains(github.event.release.body, '- console') }}
+    needs: [resolve-release-plan]
+    if: ${{ needs.resolve-release-plan.outputs.publish_console == 'true' }}
 
     steps:
       - name: Checkout code
@@ -161,7 +197,8 @@ jobs:
   publish-prettier:
     runs-on: ubuntu-latest
     environment: publish
-    if: ${{ contains(github.event.release.body, '- prettier') }}
+    needs: [resolve-release-plan]
+    if: ${{ needs.resolve-release-plan.outputs.publish_prettier == 'true' }}
 
     steps:
       - name: Checkout code
