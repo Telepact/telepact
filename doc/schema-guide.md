@@ -128,6 +128,16 @@ When referenced as a type in type expressions, the result union is unused.
 Functions cannot be used in type expressions that extend down from a top-level
 function argument.
 
+Important rules:
+
+- The function body under `->` is always an array of tagged result cases, even
+  if there is only one case.
+- Each result tag payload is always an inline struct payload.
+- A result tag like `Ok_` cannot point directly to a named struct such as
+  `struct.Result`.
+- A function may still reference named structs and unions inside that inline
+  payload.
+
 ```yaml
 - fn.exampleFunction1:
     field: integer
@@ -140,6 +150,44 @@ function argument.
     - Ok_: {}
     - Error:
         field: string
+- struct.Result:
+    field: boolean
+- fn.exampleFunction3:
+    field: integer
+  ->:
+    - Ok_:
+        result: struct.Result
+```
+
+#### Common mistakes
+
+✅ Valid:
+
+```yaml
+- fn.getThing:
+    id: string
+  ->:
+    - Ok_:
+        thing: struct.Thing
+```
+
+❌ Invalid — `->` must be an array:
+
+```yaml
+- fn.getThing:
+    id: string
+  ->:
+    Ok_:
+      thing: struct.Thing
+```
+
+❌ Invalid — result tags cannot point directly at a named struct:
+
+```yaml
+- fn.getThing:
+    id: string
+  ->:
+    - Ok_: struct.Thing
 ```
 
 | Example Request                               | Example Response                     |

@@ -214,6 +214,21 @@ be copied and pasted verbatim into the body a new message. Tooling like the
 Telepact console specifically utilizes this technique to allow end-users to
 "click through" graphs designed by the API provider.
 
+For example, if a function-valued field appears in a response as:
+
+```json
+{
+  "detailCall": {
+    "fn.getThing": {
+      "id": "thing-1"
+    }
+  }
+}
+```
+
+then that entire `{"fn.getThing": {"id": "thing-1"}}` value is the link-like
+payload. It is not just the inner argument struct by itself.
+
 Omitting fields in the argument struct disrupts the API provider's ability to
 established well-defined links, and consequently, the `"@select_"` header is
 disallowed from omitting fields in function argument structs.
