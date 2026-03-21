@@ -14,38 +14,10 @@
 #|  limitations under the License.
 #|
 
-force_all_if_changed:
-  - .release/force-all.md
+# Force-all release trigger
 
-projects:
-  java:
-    paths:
-      - lib/java
-  py:
-    paths:
-      - lib/py
-    is_dependency_for:
-      - cli
-  ts:
-    paths:
-      - lib/ts
-    is_dependency_for:
-      - dart
-      - console
-  go:
-    paths:
-      - lib/go
-  dart:
-    paths:
-      - bind/dart
-  cli:
-    paths:
-      - sdk/cli
-  console:
-    paths:
-      - sdk/console
-  prettier:
-    paths:
-      - sdk/prettier
-    is_dependency_for:
-      - console
+Editing this file in a PR forces the release planner to mark all release targets
+for that PR's version bump.
+
+The file is intentionally persistent; only changes to this path trigger the
+force-all behavior.

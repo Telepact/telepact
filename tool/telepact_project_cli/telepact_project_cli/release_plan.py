@@ -40,6 +40,12 @@ class ReleaseProjectRule:
 
 
 @dataclass(frozen=True)
+class ReleaseTargetConfig:
+    projects: dict[str, ReleaseProjectRule]
+    force_all_if_changed: tuple[str, ...]
+
+
+@dataclass(frozen=True)
 class ReleaseManifest:
     version: str
     pr_number: int
@@ -89,7 +95,7 @@ def _load_release_target_config_data(repo_root: Path) -> dict:
     return data
 
 
-def load_release_target_rules(repo_root: Path | str = ".") -> dict[str, ReleaseProjectRule]:
+def load_release_target_rules(repo_root: Path | str = ".") -> ReleaseTargetConfig:
     repo_root = find_repo_root(repo_root)
     data = _load_release_target_config_data(repo_root)
     projects = data.get("projects")
@@ -128,7 +134,16 @@ def load_release_target_rules(repo_root: Path | str = ".") -> dict[str, ReleaseP
                     f"Release target '{name}' names unknown dependent target '{dependent_target}'."
                 )
 
-    return rules
+    raw_force_all_paths = data.get("force_all_if_changed", [])
+    if not isinstance(raw_force_all_paths, list) or not all(
+        isinstance(item, str) and item.strip() for item in raw_force_all_paths
+    ):
+        raise click.ClickException("Release target config 'force_all_if_changed' must be a string list.")
+
+    return ReleaseTargetConfig(
+        projects=rules,
+        force_all_if_changed=tuple(sorted({_normalize_repo_path(item) for item in raw_force_all_paths})),
+    )
 
 
 def _matches_any_prefix(path: str, prefixes: Iterable[str]) -> bool:
@@ -157,14 +172,18 @@ def compute_release_manifest(
     pr_number: int,
 ) -> ReleaseManifest:
     repo_root = find_repo_root(repo_root)
-    rules = load_release_target_rules(repo_root)
+    config = load_release_target_rules(repo_root)
+    rules = config.projects
     normalized_changed_paths = sorted({_normalize_repo_path(path) for path in changed_paths if _normalize_repo_path(path)})
 
-    direct_targets = sorted(
-        target
-        for target, rule in rules.items()
-        if any(_matches_any_prefix(path, rule.paths) for path in normalized_changed_paths)
-    )
+    if any(_matches_any_prefix(path, config.force_all_if_changed) for path in normalized_changed_paths):
+        direct_targets = sorted(rules)
+    else:
+        direct_targets = sorted(
+            target
+            for target, rule in rules.items()
+            if any(_matches_any_prefix(path, rule.paths) for path in normalized_changed_paths)
+        )
     expanded_targets = _expand_targets(direct_targets, rules) if direct_targets else []
 
     return ReleaseManifest(
