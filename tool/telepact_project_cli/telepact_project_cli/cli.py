@@ -31,6 +31,7 @@ from .release_plan import (
     compute_release_manifest,
     load_release_manifest,
     parse_legacy_release_info,
+    resolve_publish_targets,
     write_release_manifest,
 )
 
@@ -590,6 +591,24 @@ def release() -> None:
     except Exception as e:
         click.echo(f"Failed to create release or upload assets: {e}")
 
+@click.command(name="publish-targets")
+@click.option("--release-tag", default=None, help="Expected release tag/version for validation.")
+@click.option("--release-body", default=None, help="Legacy fallback release body when no manifest exists.")
+@click.option("--github-output", default=None, type=click.Path(dir_okay=False, path_type=Path), help="Write key=value lines for GitHub Actions outputs.")
+def publish_targets(release_tag: str | None, release_body: str | None, github_output: Path | None) -> None:
+    outputs = resolve_publish_targets(
+        Path("."),
+        release_tag=release_tag,
+        release_body=release_body,
+    )
+
+    lines = [f"{key}={'true' if value else 'false'}" for key, value in outputs.items()]
+    if github_output is not None:
+        github_output.parent.mkdir(parents=True, exist_ok=True)
+        github_output.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    else:
+        click.echo("\n".join(lines))
+
 @click.command()
 def automerge():
     """
@@ -705,6 +724,7 @@ main.add_command(bump)
 main.add_command(license_header)
 main.add_command(github_labels)
 main.add_command(release)
+main.add_command(publish_targets)
 main.add_command(automerge)
 main.add_command(gitignore)
 main.add_command(consolidated_readme)

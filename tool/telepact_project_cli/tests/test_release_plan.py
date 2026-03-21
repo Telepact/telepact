@@ -14,7 +14,9 @@
 #|  limitations under the License.
 #|
 
+import contextlib
 import json
+import os
 import subprocess
 import sys
 import tempfile
@@ -22,15 +24,28 @@ import textwrap
 import unittest
 from pathlib import Path
 
+from click.testing import CliRunner
+
 PACKAGE_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PACKAGE_ROOT))
 
+from telepact_project_cli.cli import main
 from telepact_project_cli.commands.doc_versions import _latest_released_versions
 from telepact_project_cli.release_plan import (
     compute_release_manifest,
     load_release_manifest,
     write_release_manifest,
 )
+
+
+@contextlib.contextmanager
+def _pushd(path: Path):
+    old_cwd = Path.cwd()
+    os.chdir(path)
+    try:
+        yield
+    finally:
+        os.chdir(old_cwd)
 
 
 class ReleasePlanTests(unittest.TestCase):
@@ -45,10 +60,10 @@ class ReleasePlanTests(unittest.TestCase):
                     projects:
                       py:
                         paths: [lib/py]
-                        expands_to: [cli]
+                        is_dependency_for: [cli]
                       ts:
                         paths: [lib/ts]
-                        expands_to: [dart, console]
+                        is_dependency_for: [dart, console]
                       cli:
                         paths: [sdk/cli]
                       console:
@@ -57,7 +72,7 @@ class ReleasePlanTests(unittest.TestCase):
                         paths: [bind/dart]
                       prettier:
                         paths: [sdk/prettier]
-                        expands_to: [console]
+                        is_dependency_for: [console]
                     """
                 ).strip()
                 + "\n",
@@ -85,6 +100,54 @@ class ReleasePlanTests(unittest.TestCase):
                 "sdk/prettier/package.json",
             ])
             self.assertEqual(manifest_path.resolve(), (repo_root / ".release" / "release-manifest.json").resolve())
+
+    def test_publish_targets_command_writes_github_outputs(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            repo_root = Path(tmp_dir)
+            (repo_root / "VERSION.txt").write_text("1.0.0-alpha.214", encoding="utf-8")
+            (repo_root / ".release").mkdir()
+            (repo_root / ".release" / "release-manifest.json").write_text(
+                json.dumps(
+                    {
+                        "version": "1.0.0-alpha.214",
+                        "pr_number": 7,
+                        "changed_paths": ["lib/py/pyproject.toml"],
+                        "direct_targets": ["py"],
+                        "targets": ["cli", "py"],
+                    },
+                    indent=2,
+                    sort_keys=True,
+                ) + "\n",
+                encoding="utf-8",
+            )
+
+            output_path = repo_root / "github-output.txt"
+            runner = CliRunner()
+            with _pushd(repo_root):
+                result = runner.invoke(
+                    main,
+                    [
+                        "publish-targets",
+                        "--release-tag",
+                        "1.0.0-alpha.214",
+                        "--github-output",
+                        str(output_path),
+                    ],
+                )
+
+            self.assertEqual(result.exit_code, 0, msg=result.output)
+            self.assertEqual(
+                output_path.read_text(encoding="utf-8").splitlines(),
+                [
+                    "publish_cli=true",
+                    "publish_console=false",
+                    "publish_go=false",
+                    "publish_java=false",
+                    "publish_prettier=false",
+                    "publish_py=true",
+                    "publish_ts=false",
+                ],
+            )
 
     def test_latest_released_versions_prefers_manifest_history_and_falls_back_to_legacy_commits(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:

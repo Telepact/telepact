@@ -29,11 +29,14 @@ RELEASE_CONFIG_RELATIVE_PATH = Path(".release/release-targets.yaml")
 RELEASE_MANIFEST_RELATIVE_PATH = Path(".release/release-manifest.json")
 
 
+PUBLISH_TARGETS = ("java", "ts", "py", "go", "cli", "console", "prettier")
+
+
 @dataclass(frozen=True)
 class ReleaseProjectRule:
     name: str
     paths: tuple[str, ...]
-    expands_to: tuple[str, ...]
+    is_dependency_for: tuple[str, ...]
 
 
 @dataclass(frozen=True)
@@ -104,21 +107,25 @@ def load_release_target_rules(repo_root: Path | str = ".") -> dict[str, ReleaseP
         if not isinstance(raw_paths, list) or not raw_paths or not all(isinstance(item, str) and item.strip() for item in raw_paths):
             raise click.ClickException(f"Release target '{name}' must define a non-empty string list for 'paths'.")
 
-        raw_expands_to = raw_rule.get("expands_to", [])
-        if not isinstance(raw_expands_to, list) or not all(isinstance(item, str) and item.strip() for item in raw_expands_to):
-            raise click.ClickException(f"Release target '{name}' must define a string list for 'expands_to'.")
+        raw_is_dependency_for = raw_rule.get("is_dependency_for", [])
+        if not isinstance(raw_is_dependency_for, list) or not all(
+            isinstance(item, str) and item.strip() for item in raw_is_dependency_for
+        ):
+            raise click.ClickException(
+                f"Release target '{name}' must define a string list for 'is_dependency_for'."
+            )
 
         rules[name] = ReleaseProjectRule(
             name=name,
             paths=tuple(sorted({_normalize_repo_path(item) for item in raw_paths})),
-            expands_to=tuple(sorted({item.strip() for item in raw_expands_to})),
+            is_dependency_for=tuple(sorted({item.strip() for item in raw_is_dependency_for})),
         )
 
     for name, rule in rules.items():
-        for expanded_target in rule.expands_to:
-            if expanded_target not in rules:
+        for dependent_target in rule.is_dependency_for:
+            if dependent_target not in rules:
                 raise click.ClickException(
-                    f"Release target '{name}' expands to unknown target '{expanded_target}'."
+                    f"Release target '{name}' names unknown dependent target '{dependent_target}'."
                 )
 
     return rules
@@ -136,10 +143,10 @@ def _expand_targets(direct_targets: Iterable[str], rules: dict[str, ReleaseProje
     queue = list(direct_targets)
     while queue:
         target = queue.pop(0)
-        for expanded_target in rules[target].expands_to:
-            if expanded_target not in expanded_targets:
-                expanded_targets.add(expanded_target)
-                queue.append(expanded_target)
+        for dependent_target in rules[target].is_dependency_for:
+            if dependent_target not in expanded_targets:
+                expanded_targets.add(dependent_target)
+                queue.append(dependent_target)
     return sorted(expanded_targets)
 
 
@@ -234,3 +241,28 @@ def parse_legacy_release_info(subject: str, body: str) -> tuple[str, list[str]] 
             break
         targets.append(line)
     return version, targets
+
+
+def resolve_publish_targets(
+    repo_root: Path | str = ".",
+    release_tag: str | None = None,
+    release_body: str | None = None,
+) -> dict[str, bool]:
+    targets: set[str]
+    manifest_path = release_manifest_path(repo_root)
+    if manifest_path.exists():
+        data = load_release_manifest(repo_root)
+        version = data.get("version")
+        if release_tag and version != release_tag:
+            raise click.ClickException(
+                f"Release manifest version {version!r} does not match release tag {release_tag!r}"
+            )
+        targets = set(data.get("targets", []))
+    else:
+        release_body = release_body or ""
+        targets = {target for target in PUBLISH_TARGETS if f"- {target}" in release_body}
+
+    return {
+        f"publish_{target}": target in targets
+        for target in sorted(PUBLISH_TARGETS)
+    }

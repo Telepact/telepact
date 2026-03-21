@@ -38,49 +38,19 @@ jobs:
         with:
           ref: ${{ github.event.release.target_commitish }}
 
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Install Project CLI
+        run: make install-project-cli
+
       - name: Resolve release manifest
         id: resolve
-        env:
-          RELEASE_TAG: ${{ github.event.release.tag_name }}
-          RELEASE_BODY: ${{ github.event.release.body }}
         run: |
-          python3 <<'PY'
-          import json
-          import os
-          from pathlib import Path
-
-          manifest_path = Path('.release/release-manifest.json')
-          if manifest_path.exists():
-              data = json.loads(manifest_path.read_text(encoding='utf-8'))
-              targets = set(data.get('targets', []))
-              version = data.get('version')
-              if version != os.environ['RELEASE_TAG']:
-                  raise SystemExit(
-                      f"Release manifest version {version!r} does not match release tag {os.environ['RELEASE_TAG']!r}"
-                  )
-          else:
-              release_body = os.environ.get('RELEASE_BODY', '')
-              targets = {
-                  target
-                  for target in ['java', 'ts', 'py', 'go', 'cli', 'console', 'prettier']
-                  if f'- {target}' in release_body
-              }
-
-          outputs = {
-              'publish_java': 'java' in targets,
-              'publish_ts': 'ts' in targets,
-              'publish_py': 'py' in targets,
-              'publish_go': 'go' in targets,
-              'publish_cli': 'cli' in targets,
-              'publish_console': 'console' in targets,
-              'publish_prettier': 'prettier' in targets,
-          }
-
-          github_output = Path(os.environ['GITHUB_OUTPUT'])
-          with github_output.open('a', encoding='utf-8') as fh:
-              for key, value in outputs.items():
-                  fh.write(f"{key}={'true' if value else 'false'}\\n")
-          PY
+          telepact-project publish-targets \
+            --release-tag "${{ github.event.release.tag_name }}" \
+            --release-body "${{ github.event.release.body }}" \
+            --github-output "$GITHUB_OUTPUT"
 
   publish-java:
     runs-on: ubuntu-latest

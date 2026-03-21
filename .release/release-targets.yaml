@@ -21,12 +21,12 @@ projects:
   py:
     paths:
       - lib/py
-    expands_to:
+    is_dependency_for:
       - cli
   ts:
     paths:
       - lib/ts
-    expands_to:
+    is_dependency_for:
       - dart
       - console
   go:
@@ -44,5 +44,5 @@ projects:
   prettier:
     paths:
       - sdk/prettier
-    expands_to:
+    is_dependency_for:
       - console
