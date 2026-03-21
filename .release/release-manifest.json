@@ -1,14 +1,9 @@
 {
   "changed_paths": [
-    "sdk/cli/telepact_cli/cli.py",
-    "sdk/cli/tests/test_main.py"
+    "doc/schema-guide.md"
   ],
-  "direct_targets": [
-    "cli"
-  ],
-  "pr_number": 300,
-  "targets": [
-    "cli"
-  ],
-  "version": "1.0.0-alpha.217"
+  "direct_targets": [],
+  "pr_number": 302,
+  "targets": [],
+  "version": "1.0.0-alpha.218"
 }
