@@ -21,7 +21,7 @@ import asyncio
 import pytest
 from click.testing import CliRunner
 # Adjust the import path according to your project structure
-from telepact_cli.cli import main
+from telepact_cli.cli import main, get_api_from_http
 import traceback
 import subprocess
 import requests
@@ -31,6 +31,8 @@ import time
 from tests.test_data import compare_cases
 import os
 import shutil
+import threading
+from http.server import BaseHTTPRequestHandler, HTTPServer
 
 
 
@@ -120,6 +122,43 @@ def test_demo_server_and_fetch_and_mock() -> None:
                 stdout_mock, stderr_mock = p_mock.communicate(timeout=5)
             print(f"Mock server stdout: {stdout_mock}")
             print(f"Mock server stderr: {stderr_mock}")
+
+
+def test_fetch_sets_content_type_header() -> None:
+    expected_request = b'[{"@time_": 5000}, {"fn.api_": {}}]'
+    ok_response = b'[{},{"Ok_":{"api":[]}}]'
+    requests_seen: list[tuple[str | None, bytes]] = []
+
+    class Handler(BaseHTTPRequestHandler):
+        def do_POST(self) -> None:  # noqa: N802
+            body = self.rfile.read(int(self.headers.get('Content-Length', '0')))
+            requests_seen.append((self.headers.get('Content-Type'), body))
+            if self.headers.get('Content-Type') != 'application/json':
+                payload = b'[{},{"ErrorParseFailure_":{"reasons":[{"ExpectedJsonArrayOfTwoObjects":{}}]}}]'
+            elif body != expected_request:
+                payload = b'[{},{"ErrorUnknown_":{}}]'
+            else:
+                payload = ok_response
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+            self.wfile.write(payload)
+
+        def log_message(self, format: str, *args: object) -> None:
+            return
+
+    server = HTTPServer(('127.0.0.1', 0), Handler)
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+
+    try:
+        api_json = get_api_from_http(f'http://127.0.0.1:{server.server_port}/api')
+        assert json.loads(api_json) == []
+        assert requests_seen == [('application/json', expected_request)]
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=5)
 
 
 @pytest.mark.parametrize("assertion, old, new, expected, expected_code", compare_cases)

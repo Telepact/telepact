@@ -577,7 +577,15 @@ def get_api_from_http(http_url: str, include_internal: bool = False) -> str:
 
         try:
             # Use a timeout for the request
-            response = requests.post(url, data=request_bytes, timeout=10) # 10 second timeout
+            response = requests.post(
+                url,
+                data=request_bytes,
+                timeout=10,
+                headers={
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json, application/octet-stream',
+                },
+            )
             response.raise_for_status() # Raise an exception for bad status codes (4xx or 5xx)
             response_bytes = response.content
             response_message = s.deserialize(response_bytes)
