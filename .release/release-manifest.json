@@ -1,14 +1,30 @@
 {
   "changed_paths": [
-    ".github/workflows/publish.yml",
+    ".release/force-all.md",
     ".release/release-targets.yaml",
-    "tool/telepact_project_cli/telepact_project_cli/cli.py",
-    "tool/telepact_project_cli/telepact_project_cli/commands/doc_versions.py",
     "tool/telepact_project_cli/telepact_project_cli/release_plan.py",
     "tool/telepact_project_cli/tests/test_release_plan.py"
   ],
-  "direct_targets": [],
-  "pr_number": 298,
-  "targets": [],
-  "version": "1.0.0-alpha.215"
+  "direct_targets": [
+    "cli",
+    "console",
+    "dart",
+    "go",
+    "java",
+    "prettier",
+    "py",
+    "ts"
+  ],
+  "pr_number": 299,
+  "targets": [
+    "cli",
+    "console",
+    "dart",
+    "go",
+    "java",
+    "prettier",
+    "py",
+    "ts"
+  ],
+  "version": "1.0.0-alpha.216"
 }
