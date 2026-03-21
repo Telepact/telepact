@@ -101,6 +101,55 @@ class ReleasePlanTests(unittest.TestCase):
             ])
             self.assertEqual(manifest_path.resolve(), (repo_root / ".release" / "release-manifest.json").resolve())
 
+    def test_compute_release_manifest_marks_all_targets_when_force_all_file_changes(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            repo_root = Path(tmp_dir)
+            (repo_root / "VERSION.txt").write_text("1.0.0-alpha.214", encoding="utf-8")
+            (repo_root / ".release").mkdir()
+            (repo_root / ".release" / "release-targets.yaml").write_text(
+                textwrap.dedent(
+                    """
+                    projects:
+                      java:
+                        paths: [lib/java]
+                      py:
+                        paths: [lib/py]
+                        is_dependency_for: [cli]
+                      ts:
+                        paths: [lib/ts]
+                        is_dependency_for: [dart, console]
+                      go:
+                        paths: [lib/go]
+                      dart:
+                        paths: [bind/dart]
+                      cli:
+                        paths: [sdk/cli]
+                      console:
+                        paths: [sdk/console]
+                      prettier:
+                        paths: [sdk/prettier]
+                        is_dependency_for: [console]
+                    force_all_if_changed:
+                      - .release/force-all.md
+                    """
+                ).strip()
+                + "\n",
+                encoding="utf-8",
+            )
+
+            manifest = compute_release_manifest(
+                repo_root,
+                changed_paths=[".release/force-all.md"],
+                version="1.0.0-alpha.215",
+                pr_number=301,
+            )
+
+            self.assertEqual(
+                manifest.direct_targets,
+                ("cli", "console", "dart", "go", "java", "prettier", "py", "ts"),
+            )
+            self.assertEqual(manifest.targets, manifest.direct_targets)
+
     def test_publish_targets_command_writes_github_outputs(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             repo_root = Path(tmp_dir)
