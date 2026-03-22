@@ -86,6 +86,10 @@ The `!` symbol can be appended to a field name to indicate that it is optional.
     anotherOptionalField!: integer
 ```
 
+#### As a type expression
+
+A struct definition itself can be used as a type reference.
+
 | Type Expression             | Example allowed JSON values                           | Example disallowed JSON values     |
 | --------------------------- | ----------------------------------------------------- | ---------------------------------- |
 | `"struct.ExampleStruct1"`   | `{"field": true, "anotherField": ["text1", "text2"]}` | `null`, `{}`                       |
@@ -109,6 +113,10 @@ At least one tag is required.
         optionalField!: string
 ```
 
+#### As a type expression
+
+A union definition itself can be used a type reference.
+
 | Type Expression         | Example allowed JSON values                          | Example disallowed JSON values                |
 | ----------------------- | ---------------------------------------------------- | --------------------------------------------- |
 | `"union.ExampleUnion1"` | `{"Tag": {"field": 0}}`, `{"EmptyTag": {}}`          | `null`, `{}`, `{"Tag": {"wrongField": true}}` |
@@ -123,10 +131,6 @@ at least the `Ok_` tag. By convention, all non-`Ok_` tags are considered errors.
 Clients interact with servers through functions. The client submits JSON data
 valid against the function argument struct definition, and the server responds
 with JSON data valid against the function result union.
-
-When referenced as a type in type expressions, the result union is unused.
-Functions cannot be used in type expressions that extend down from a top-level
-function argument.
 
 ```yaml
 - fn.exampleFunction1:
@@ -146,6 +150,17 @@ function argument.
 | --------------------------------------------- | ------------------------------------ |
 | `[{}, {"fn.exampleFunction1": {"field": 1}}]` | `[{}, {"Ok_": {"field": true}}]`     |
 | `[{}, {"fn.exampleFunction2": {}}]`           | `[{}, {"Error": {"field": "text"}}]` |
+
+#### As a type expression
+
+A function definition itself can be used as a type reference in order to
+approximate "links" across the API interface, which take the form of a
+prepopulated function call.
+
+Note that when referenced as a type in type expressions, the result union is unused.
+
+Functions cannot be used in type expressions that extend down from a top-level
+function argument.
 
 | Type Expression         | Example allowed JSON values                                                          | Example disallowed JSON values                 |
 | ----------------------- | ------------------------------------------------------------------------------------ | ---------------------------------------------- |
@@ -272,7 +287,7 @@ Telepact console.
         field: integer
 ```
 
-Prefer YAML when multi-line docstrings are desired.
+#### Multi-line
 
 ```yaml
 - ///: |
