@@ -15,5 +15,5 @@
 #|
 
 - struct.Example:
-    field: number
-    field: string
+    field: "number"
+    field: "string"

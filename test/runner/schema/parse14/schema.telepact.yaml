@@ -15,4 +15,4 @@
 #|
 
 - "struct.Example:
-    field: number
+    field: "number"
