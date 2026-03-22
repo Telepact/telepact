@@ -33,514 +33,249 @@ Types are expressed with a string, which may be contained within conventional
 JSON collection types. When using JSON objects in type expressions, the only
 allowed key type is `"string"`.
 
-The examples in this guide use a repeated XML-like pattern intended to be easy
-for both humans and LLMs to scan:
+The examples in this guide use a repeated renderer-safe markdown pattern:
 
-- `<type-expression>` names the type expression being illustrated
-- `<schema>` shows the relevant YAML definition when one exists
-- `<valid>` contains accepted values, one per `<value>` tag
-- `<invalid>` contains rejected values, one per `<value>` tag
-- `<request>` and `<response>` show Telepact wire messages when relevant
-- `<notes>` highlights the main rule to remember
+- a heading names the type expression or definition being illustrated
+- **Schema** shows the relevant YAML definition when one exists
+- **Valid** lists accepted values, one per bullet
+- **Invalid** lists rejected values, one per bullet
+- **Request** and **Response** show Telepact wire messages when relevant
+- **Notes** highlights the main rule to remember
 
 ### Primitive and Collection Examples
 
-<example kind="type-expression">
-<type-expression>
-`"boolean"`
-</type-expression>
-<valid>
-✅
-<value>
-`true`
-</value>
-<value>
-`false`
-</value>
-</valid>
-<invalid>
-❌
-<value>
-`null`
-</value>
-<value>
-`0`
-</value>
-</invalid>
-<notes>
-Only JSON booleans are valid.
-</notes>
-</example>
+#### `"boolean"`
 
-<example kind="type-expression">
-<type-expression>
-`"integer"`
-</type-expression>
-<valid>
-✅
-<value>
-`1`
-</value>
-<value>
-`0`
-</value>
-<value>
-`-1`
-</value>
-</valid>
-<invalid>
-❌
-<value>
-`null`
-</value>
-<value>
-`0.1`
-</value>
-</invalid>
-<notes>
-Only whole-number JSON values are valid.
-</notes>
-</example>
+**Valid**
+- `true`
+- `false`
 
-<example kind="type-expression">
-<type-expression>
-`"number"`
-</type-expression>
-<valid>
-✅
-<value>
-`0.1`
-</value>
-<value>
-`-0.1`
-</value>
-<value>
-`1`
-</value>
-</valid>
-<invalid>
-❌
-<value>
-`null`
-</value>
-<value>
-`"0"`
-</value>
-</invalid>
-<notes>
-JSON numbers are valid, including integers.
-</notes>
-</example>
+**Invalid**
+- `null`
+- `0`
 
-<example kind="type-expression">
-<type-expression>
-`"string"`
-</type-expression>
-<valid>
-✅
-<value>
-`""`
-</value>
-<value>
-`"text"`
-</value>
-</valid>
-<invalid>
-❌
-<value>
-`null`
-</value>
-<value>
-`0`
-</value>
-</invalid>
-<notes>
-Only JSON strings are valid.
-</notes>
-</example>
+**Notes**
+- Only JSON booleans are valid.
 
-<example kind="type-expression">
-<type-expression>
-`["boolean"]`
-</type-expression>
-<valid>
-✅
-<value>
-`[]`
-</value>
-<value>
-`[true, false]`
-</value>
-</valid>
-<invalid>
-❌
-<value>
-`null`
-</value>
-<value>
-`0`
-</value>
-<value>
-`[null]`
-</value>
-<value>
-`{}`
-</value>
-</invalid>
-<notes>
-The array itself is allowed, but every element must be a non-null boolean.
-</notes>
-</example>
+#### `"integer"`
 
-<example kind="type-expression">
-<type-expression>
-`{"string": "integer"}`
-</type-expression>
-<valid>
-✅
-<value>
-`{}`
-</value>
-<value>
-`{"k1": 0, "k2": 1}`
-</value>
-</valid>
-<invalid>
-❌
-<value>
-`null`
-</value>
-<value>
-`0`
-</value>
-<value>
-`{"k": null}`
-</value>
-<value>
-`[]`
-</value>
-</invalid>
-<notes>
-Keys may be any JSON strings. Every value must be a non-null integer.
-</notes>
-</example>
+**Valid**
+- `1`
+- `0`
+- `-1`
 
-<example kind="type-expression">
-<type-expression>
-`[{"string": "boolean"}]`
-</type-expression>
-<valid>
-✅
-<value>
-`[{}]`
-</value>
-<value>
-`[{"k1": true, "k2": false}]`
-</value>
-</valid>
-<invalid>
-❌
-<value>
-`[{"k1": null}]`
-</value>
-<value>
-`[{"k1": 0}]`
-</value>
-<value>
-`[null]`
-</value>
-<value>
-`[0]`
-</value>
-</invalid>
-<notes>
-This is an array of objects whose values must all be non-null booleans.
-</notes>
-</example>
+**Invalid**
+- `null`
+- `0.1`
 
-<example kind="type-expression">
-<type-expression>
-`"any"`
-</type-expression>
-<valid>
-✅
-<value>
-`false`
-</value>
-<value>
-`0`
-</value>
-<value>
-`0.1`
-</value>
-<value>
-`""`
-</value>
-<value>
-`[]`
-</value>
-<value>
-`{}`
-</value>
-</valid>
-<invalid>
-❌
-<value>
-`null`
-</value>
-</invalid>
-<notes>
-`"any"` accepts any non-null JSON value.
-</notes>
-</example>
+**Notes**
+- Only whole-number JSON values are valid.
+
+#### `"number"`
+
+**Valid**
+- `0.1`
+- `-0.1`
+- `1`
+
+**Invalid**
+- `null`
+- `"0"`
+
+**Notes**
+- JSON numbers are valid, including integers.
+
+#### `"string"`
+
+**Valid**
+- `""`
+- `"text"`
+
+**Invalid**
+- `null`
+- `0`
+
+**Notes**
+- Only JSON strings are valid.
+
+#### `["boolean"]`
+
+**Valid**
+- `[]`
+- `[true, false]`
+
+**Invalid**
+- `null`
+- `0`
+- `[null]`
+- `{}`
+
+**Notes**
+- The array itself is allowed, but every element must be a non-null boolean.
+
+#### `{"string": "integer"}`
+
+**Valid**
+- `{}`
+- `{"k1": 0, "k2": 1}`
+
+**Invalid**
+- `null`
+- `0`
+- `{"k": null}`
+- `[]`
+
+**Notes**
+- Keys may be any JSON strings. Every value must be a non-null integer.
+
+#### `[{"string": "boolean"}]`
+
+**Valid**
+- `[{}]`
+- `[{"k1": true, "k2": false}]`
+
+**Invalid**
+- `[{"k1": null}]`
+- `[{"k1": 0}]`
+- `[null]`
+- `[0]`
+
+**Notes**
+- This is an array of objects whose values must all be non-null booleans.
+
+#### `"any"`
+
+**Valid**
+- `false`
+- `0`
+- `0.1`
+- `""`
+- `[]`
+- `{}`
+
+**Invalid**
+- `null`
+
+**Notes**
+- `"any"` accepts any non-null JSON value.
 
 ### Nullability
 
 The `?` symbol can be appended to type strings to indicate nullability. Note
 that it is not possible to express nullable arrays or objects.
 
-<example kind="type-expression">
-<type-expression>
-`"boolean?"`
-</type-expression>
-<valid>
-✅
-<value>
-`null`
-</value>
-<value>
-`true`
-</value>
-<value>
-`false`
-</value>
-</valid>
-<invalid>
-❌
-<value>
-`0`
-</value>
-</invalid>
-<notes>
-A nullable boolean is either `null` or a JSON boolean.
-</notes>
-</example>
+#### `"boolean?"`
 
-<example kind="type-expression">
-<type-expression>
-`"integer?"`
-</type-expression>
-<valid>
-✅
-<value>
-`null`
-</value>
-<value>
-`1`
-</value>
-<value>
-`0`
-</value>
-<value>
-`-1`
-</value>
-</valid>
-<invalid>
-❌
-<value>
-`0.1`
-</value>
-</invalid>
-<notes>
-A nullable integer is either `null` or a whole-number JSON value.
-</notes>
-</example>
+**Valid**
+- `null`
+- `true`
+- `false`
 
-<example kind="type-expression">
-<type-expression>
-`"number?"`
-</type-expression>
-<valid>
-✅
-<value>
-`null`
-</value>
-<value>
-`0.1`
-</value>
-<value>
-`-0.1`
-</value>
-<value>
-`1`
-</value>
-</valid>
-<invalid>
-❌
-<value>
-`"0"`
-</value>
-</invalid>
-<notes>
-A nullable number is either `null` or a JSON number.
-</notes>
-</example>
+**Invalid**
+- `0`
 
-<example kind="type-expression">
-<type-expression>
-`"string?"`
-</type-expression>
-<valid>
-✅
-<value>
-`null`
-</value>
-<value>
-`""`
-</value>
-<value>
-`"text"`
-</value>
-</valid>
-<invalid>
-❌
-<value>
-`0`
-</value>
-</invalid>
-<notes>
-A nullable string is either `null` or a JSON string.
-</notes>
-</example>
+**Notes**
+- A nullable boolean is either `null` or a JSON boolean.
 
-<example kind="type-expression">
-<type-expression>
-`["boolean?"]`
-</type-expression>
-<valid>
-✅
-<value>
-`[]`
-</value>
-<value>
-`[true, false, null]`
-</value>
-</valid>
-<invalid>
-❌
-<value>
-`null`
-</value>
-<value>
-`0`
-</value>
-<value>
-`{}`
-</value>
-</invalid>
-<notes>
-The elements may be `null`, but the array itself is still not nullable.
-</notes>
-</example>
+#### `"integer?"`
 
-<example kind="type-expression">
-<type-expression>
-`{"string": "integer?"}`
-</type-expression>
-<valid>
-✅
-<value>
-`{}`
-</value>
-<value>
-`{"k1": 0, "k2": 1, "k3": null}`
-</value>
-</valid>
-<invalid>
-❌
-<value>
-`null`
-</value>
-<value>
-`0`
-</value>
-<value>
-`[]`
-</value>
-</invalid>
-<notes>
-The object values may be integers or `null`, but the object itself is not nullable.
-</notes>
-</example>
+**Valid**
+- `null`
+- `1`
+- `0`
+- `-1`
 
-<example kind="type-expression">
-<type-expression>
-`[{"string": "boolean?"}]`
-</type-expression>
-<valid>
-✅
-<value>
-`[{}]`
-</value>
-<value>
-`[{"k1": null, "k2": false}]`
-</value>
-</valid>
-<invalid>
-❌
-<value>
-`[{"k1": 0}]`
-</value>
-<value>
-`[null]`
-</value>
-<value>
-`[0]`
-</value>
-</invalid>
-<notes>
-This is an array of objects whose values may be booleans or `null`.
-</notes>
-</example>
+**Invalid**
+- `0.1`
 
-<example kind="type-expression">
-<type-expression>
-`"any?"`
-</type-expression>
-<valid>
-✅
-<value>
-`null`
-</value>
-<value>
-`false`
-</value>
-<value>
-`0`
-</value>
-<value>
-`0.1`
-</value>
-<value>
-`""`
-</value>
-<value>
-`[]`
-</value>
-<value>
-`{}`
-</value>
-</valid>
-<invalid>
-❌
-<value>
-`(none)`
-</value>
-</invalid>
-<notes>
-`"any?"` accepts every JSON value, including `null`.
-</notes>
-</example>
+**Notes**
+- A nullable integer is either `null` or a whole-number JSON value.
+
+#### `"number?"`
+
+**Valid**
+- `null`
+- `0.1`
+- `-0.1`
+- `1`
+
+**Invalid**
+- `"0"`
+
+**Notes**
+- A nullable number is either `null` or a JSON number.
+
+#### `"string?"`
+
+**Valid**
+- `null`
+- `""`
+- `"text"`
+
+**Invalid**
+- `0`
+
+**Notes**
+- A nullable string is either `null` or a JSON string.
+
+#### `["boolean?"]`
+
+**Valid**
+- `[]`
+- `[true, false, null]`
+
+**Invalid**
+- `null`
+- `0`
+- `{}`
+
+**Notes**
+- The elements may be `null`, but the array itself is still not nullable.
+
+#### `{"string": "integer?"}`
+
+**Valid**
+- `{}`
+- `{"k1": 0, "k2": 1, "k3": null}`
+
+**Invalid**
+- `null`
+- `0`
+- `[]`
+
+**Notes**
+- The object values may be integers or `null`, but the object itself is not nullable.
+
+#### `[{"string": "boolean?"}]`
+
+**Valid**
+- `[{}]`
+- `[{"k1": null, "k2": false}]`
+
+**Invalid**
+- `[{"k1": 0}]`
+- `[null]`
+- `[0]`
+
+**Notes**
+- This is an array of objects whose values may be booleans or `null`.
+
+#### `"any?"`
+
+**Valid**
+- `null`
+- `false`
+- `0`
+- `0.1`
+- `""`
+- `[]`
+- `{}`
+
+**Invalid**
+- None.
+
+**Notes**
+- `"any?"` accepts every JSON value, including `null`.
 
 ## Definitions
 
@@ -559,8 +294,7 @@ definitions may be used in any type expression.
 
 The `!` symbol can be appended to a field name to indicate that it is optional.
 
-<example kind="definition">
-<schema>
+**Schema**
 ```yaml
 - struct.ExampleStruct1:
     field: boolean
@@ -569,104 +303,64 @@ The `!` symbol can be appended to a field name to indicate that it is optional.
     optionalField!: boolean
     anotherOptionalField!: integer
 ```
-</schema>
-</example>
 
-<example kind="type-expression">
-<schema>
+#### `"struct.ExampleStruct1"`
+
+**Schema**
 ```yaml
 - struct.ExampleStruct1:
     field: boolean
     anotherField: ["string"]
 ```
-</schema>
-<type-expression>
-`"struct.ExampleStruct1"`
-</type-expression>
-<valid>
-✅
-<value>
-`{"field": true, "anotherField": ["text1", "text2"]}`
-</value>
-</valid>
-<invalid>
-❌
-<value>
-`null`
-</value>
-<value>
-`{}`
-</value>
-</invalid>
-<notes>
-`field` and `anotherField` are both required.
-</notes>
-</example>
 
-<example kind="type-expression">
-<schema>
+**Valid**
+- `{"field": true, "anotherField": ["text1", "text2"]}`
+
+**Invalid**
+- `null`
+- `{}`
+
+**Notes**
+- `field` and `anotherField` are both required.
+
+#### `"struct.ExampleStruct2"`
+
+**Schema**
 ```yaml
 - struct.ExampleStruct2:
     optionalField!: boolean
     anotherOptionalField!: integer
 ```
-</schema>
-<type-expression>
-`"struct.ExampleStruct2"`
-</type-expression>
-<valid>
-✅
-<value>
-`{"optionalField!": true}`
-</value>
-<value>
-`{}`
-</value>
-</valid>
-<invalid>
-❌
-<value>
-`null`
-</value>
-<value>
-`{"wrongField": true}`
-</value>
-</invalid>
-<notes>
-Both fields are optional because their names end with `!`.
-</notes>
-</example>
 
-<example kind="type-expression">
-<schema>
+**Valid**
+- `{"optionalField!": true}`
+- `{}`
+
+**Invalid**
+- `null`
+- `{"wrongField": true}`
+
+**Notes**
+- Both fields are optional because their names end with `!`.
+
+#### `["struct.ExampleStruct2"]`
+
+**Schema**
 ```yaml
 - struct.ExampleStruct2:
     optionalField!: boolean
     anotherOptionalField!: integer
 ```
-</schema>
-<type-expression>
-`["struct.ExampleStruct2"]`
-</type-expression>
-<valid>
-✅
-<value>
-`[{"optionalField!": true}]`
-</value>
-</valid>
-<invalid>
-❌
-<value>
-`[null]`
-</value>
-<value>
-`[{"wrongField": true}]`
-</value>
-</invalid>
-<notes>
-The array elements must each validate as `struct.ExampleStruct2`.
-</notes>
-</example>
+
+**Valid**
+- `[{"optionalField!": true}]`
+
+**Invalid**
+- `[null]`
+- `[{"wrongField": true}]`
+
+**Notes**
+- The array elements must each validate as `struct.ExampleStruct2`.
 
 ### Union
 
@@ -675,8 +369,7 @@ may be used in any type expression.
 
 At least one tag is required.
 
-<example kind="definition">
-<schema>
+**Schema**
 ```yaml
 - union.ExampleUnion1:
     - Tag:
@@ -686,80 +379,48 @@ At least one tag is required.
     - Tag:
         optionalField!: string
 ```
-</schema>
-</example>
 
-<example kind="type-expression">
-<schema>
+#### `"union.ExampleUnion1"`
+
+**Schema**
 ```yaml
 - union.ExampleUnion1:
     - Tag:
         field: integer
     - EmptyTag: {}
 ```
-</schema>
-<type-expression>
-`"union.ExampleUnion1"`
-</type-expression>
-<valid>
-✅
-<value>
-`{"Tag": {"field": 0}}`
-</value>
-<value>
-`{"EmptyTag": {}}`
-</value>
-</valid>
-<invalid>
-❌
-<value>
-`null`
-</value>
-<value>
-`{}`
-</value>
-<value>
-`{"Tag": {"wrongField": true}}`
-</value>
-</invalid>
-<notes>
-A union value must choose exactly one declared tag and supply a payload valid for that tag.
-</notes>
-</example>
 
-<example kind="type-expression">
-<schema>
+**Valid**
+- `{"Tag": {"field": 0}}`
+- `{"EmptyTag": {}}`
+
+**Invalid**
+- `null`
+- `{}`
+- `{"Tag": {"wrongField": true}}`
+
+**Notes**
+- A union value must choose exactly one declared tag and supply a payload valid for that tag.
+
+#### `"union.ExampleUnion2"`
+
+**Schema**
 ```yaml
 - union.ExampleUnion2:
     - Tag:
         optionalField!: string
 ```
-</schema>
-<type-expression>
-`"union.ExampleUnion2"`
-</type-expression>
-<valid>
-✅
-<value>
-`{"Tag": {"optionalField!": "text"}}`
-</value>
-<value>
-`{"Tag": {}}`
-</value>
-</valid>
-<invalid>
-❌
-<value>
-`null`
-</value>
-<value>
-`{}`
-</value>
-</invalid>
-<notes>
-The selected tag payload is still validated as a struct, including optional fields.
-</notes>
-</example>
+
+**Valid**
+- `{"Tag": {"optionalField!": "text"}}`
+- `{"Tag": {}}`
+
+**Invalid**
+- `null`
+- `{}`
+
+**Notes**
+- The selected tag payload is still validated as a struct, including optional fields.
 
 ### Function
 
@@ -775,8 +436,7 @@ When referenced as a type in type expressions, the result union is unused.
 Functions cannot be used in type expressions that extend down from a top-level
 function argument.
 
-<example kind="definition">
-<schema>
+**Schema**
 ```yaml
 - fn.exampleFunction1:
     field: integer
@@ -790,11 +450,10 @@ function argument.
     - Error:
         field: string
 ```
-</schema>
-</example>
 
-<example kind="function-interaction">
-<schema>
+#### `fn.exampleFunction1`
+
+**Schema**
 ```yaml
 - fn.exampleFunction1:
     field: integer
@@ -803,29 +462,19 @@ function argument.
     - Ok_:
         field: boolean
 ```
-</schema>
-<function>
-`fn.exampleFunction1`
-</function>
-<request>
-✅
-<value>
-`[{}, {"fn.exampleFunction1": {"field": 1}}]`
-</value>
-</request>
-<response>
-✅
-<value>
-`[{}, {"Ok_": {"field": true}}]`
-</value>
-</response>
-<notes>
-The client sends a Telepact message pair: headers object first, then the function payload.
-</notes>
-</example>
 
-<example kind="function-interaction">
-<schema>
+**Request**
+- `[{}, {"fn.exampleFunction1": {"field": 1}}]`
+
+**Response**
+- `[{}, {"Ok_": {"field": true}}]`
+
+**Notes**
+- The client sends a Telepact message pair: headers object first, then the function payload.
+
+#### `fn.exampleFunction2`
+
+**Schema**
 ```yaml
 - fn.exampleFunction2: {}
   ->:
@@ -833,29 +482,19 @@ The client sends a Telepact message pair: headers object first, then the functio
     - Error:
         field: string
 ```
-</schema>
-<function>
-`fn.exampleFunction2`
-</function>
-<request>
-✅
-<value>
-`[{}, {"fn.exampleFunction2": {}}]`
-</value>
-</request>
-<response>
-✅
-<value>
-`[{}, {"Error": {"field": "text"}}]`
-</value>
-</response>
-<notes>
-A function result is a tagged union whose tags always include `Ok_` and may include error tags.
-</notes>
-</example>
 
-<example kind="type-expression">
-<schema>
+**Request**
+- `[{}, {"fn.exampleFunction2": {}}]`
+
+**Response**
+- `[{}, {"Error": {"field": "text"}}]`
+
+**Notes**
+- A function result is a tagged union whose tags always include `Ok_` and may include error tags.
+
+#### `"fn.exampleFunction1"`
+
+**Schema**
 ```yaml
 - fn.exampleFunction1:
     field: integer
@@ -864,38 +503,22 @@ A function result is a tagged union whose tags always include `Ok_` and may incl
     - Ok_:
         field: boolean
 ```
-</schema>
-<type-expression>
-`"fn.exampleFunction1"`
-</type-expression>
-<valid>
-✅
-<value>
-`{"fn.exampleFunction1": {"field": 0}}`
-</value>
-<value>
-`{"fn.exampleFunction1": {"field": 1, "optionalField!": "text"}}`
-</value>
-</valid>
-<invalid>
-❌
-<value>
-`null`
-</value>
-<value>
-`{}`
-</value>
-<value>
-`{"field": 0}`
-</value>
-</invalid>
-<notes>
-When a function appears in a type expression, the value is wrapped under the function name.
-</notes>
-</example>
 
-<example kind="type-expression">
-<schema>
+**Valid**
+- `{"fn.exampleFunction1": {"field": 0}}`
+- `{"fn.exampleFunction1": {"field": 1, "optionalField!": "text"}}`
+
+**Invalid**
+- `null`
+- `{}`
+- `{"field": 0}`
+
+**Notes**
+- When a function appears in a type expression, the value is wrapped under the function name.
+
+#### `"fn.exampleFunction2"`
+
+**Schema**
 ```yaml
 - fn.exampleFunction2: {}
   ->:
@@ -903,32 +526,17 @@ When a function appears in a type expression, the value is wrapped under the fun
     - Error:
         field: string
 ```
-</schema>
-<type-expression>
-`"fn.exampleFunction2"`
-</type-expression>
-<valid>
-✅
-<value>
-`{"fn.exampleFunction2": {}}`
-</value>
-</valid>
-<invalid>
-❌
-<value>
-`null`
-</value>
-<value>
-`{"wrongField": 0}`
-</value>
-<value>
-`{}`
-</value>
-</invalid>
-<notes>
-Function type-expression values still use the function-name wrapper, even for empty arguments.
-</notes>
-</example>
+
+**Valid**
+- `{"fn.exampleFunction2": {}}`
+
+**Invalid**
+- `null`
+- `{"wrongField": 0}`
+- `{}`
+
+**Notes**
+- Function type-expression values still use the function-name wrapper, even for empty arguments.
 
 ### Errors
 
@@ -936,19 +544,16 @@ Errors definitions are similar to unions, except that the tags are automatically
 added to the result union of all user-defined functions. Errors definitions
 cannot be used in type expressions.
 
-<example kind="definition">
-<schema>
+**Schema**
 ```yaml
 - errors.ExampleErrors1:
     - Error1:
         field: integer
     - Error2: {}
 ```
-</schema>
-<notes>
-These tags are appended to every user-defined function result union in the same schema.
-</notes>
-</example>
+
+**Notes**
+- These tags are appended to every user-defined function result union in the same schema.
 
 For example, if placed in the same schema, the above error definition would
 apply the errors `Error1` and `Error2` to both the `fn.exampleFunction1` and
@@ -956,8 +561,7 @@ apply the errors `Error1` and `Error2` to both the `fn.exampleFunction1` and
 (Note, the following example only illustrates the effect of the errors
 definition at schema load time; the original schema is not re-written.)
 
-<example kind="expanded-definition">
-<schema>
+**Expanded schema**
 ```yaml
 - fn.exampleFunction1:
     field: integer
@@ -977,8 +581,6 @@ definition at schema load time; the original schema is not re-written.)
         field: integer
     - Error2: {}
 ```
-</schema>
-</example>
 
 #### Don't over-error
 
@@ -991,8 +593,6 @@ favors expressive data, such as using an empty optional field to replace convent
 "Not found" patterns.
 
 ❌ Bad:
-<example kind="error-design">
-<schema>
 ```yaml
 - errors.GeneralErrors:
     - NotFound: {}
@@ -1001,20 +601,14 @@ favors expressive data, such as using an empty optional field to replace convent
     - Ok_:
         result: string
 ```
-</schema>
-</example>
 
 ✅ Good:
-<example kind="error-design">
-<schema>
 ```yaml
 - fn.exampleFunction: {}
   ->:
     - Ok_:
         result!: string
 ```
-</schema>
-</example>
 
 ### Headers
 
@@ -1034,8 +628,7 @@ Header names therefore follow the pattern `^@[a-z][a-zA-Z0-9_]*$`.
 
 Headers definitions cannot be used in type expressions.
 
-<example kind="definition">
-<schema>
+**Schema**
 ```yaml
 - headers.Example:
     "@requestHeader": boolean
@@ -1043,38 +636,10 @@ Headers definitions cannot be used in type expressions.
   ->:
     "@responseHeader": string
 ```
-</schema>
-</example>
 
-<example kind="headers-interaction">
-<schema>
-```yaml
-- headers.Example:
-    "@requestHeader": boolean
-    "@anotherRequestHeader": integer
-  ->:
-    "@responseHeader": string
-```
-</schema>
-<request>
-✅
-<value>
-`[{"@requestHeader": true}, {"fn.ping_": {}}]`
-</value>
-</request>
-<response>
-✅
-<value>
-`[{"@responseHeader": "text"}, {"Ok_": {}}]`
-</value>
-</response>
-<notes>
-Specified request and response headers validate against the header definition.
-</notes>
-</example>
+#### Valid header interaction
 
-<example kind="headers-interaction">
-<schema>
+**Schema**
 ```yaml
 - headers.Example:
     "@requestHeader": boolean
@@ -1082,26 +647,19 @@ Specified request and response headers validate against the header definition.
   ->:
     "@responseHeader": string
 ```
-</schema>
-<request>
-✅
-<value>
-`[{"@anotherRequestHeader": true}, {"fn.ping_": {}}]`
-</value>
-</request>
-<response>
-✅
-<value>
-`[{"@unspecifiedHeader": true}, {"Ok_": {}}]`
-</value>
-</response>
-<notes>
-Unspecified header names are allowed, but declared header names must still match their declared types.
-</notes>
-</example>
 
-<example kind="headers-interaction">
-<schema>
+**Request**
+- `[{"@requestHeader": true}, {"fn.ping_": {}}]`
+
+**Response**
+- `[{"@responseHeader": "text"}, {"Ok_": {}}]`
+
+**Notes**
+- Specified request and response headers validate against the header definition.
+
+#### Valid interaction with unspecified header
+
+**Schema**
 ```yaml
 - headers.Example:
     "@requestHeader": boolean
@@ -1109,23 +667,35 @@ Unspecified header names are allowed, but declared header names must still match
   ->:
     "@responseHeader": string
 ```
-</schema>
-<invalid-request>
-❌
-<value>
-`[{"@requestHeader": 1}, {"fn.ping_": {}}]`
-</value>
-</invalid-request>
-<invalid-response>
-❌
-<value>
-`[{"@responseHeader": 1}, {"Ok_": {}}]`
-</value>
-</invalid-response>
-<notes>
-Declared header values must validate against their declared types.
-</notes>
-</example>
+
+**Request**
+- `[{"@anotherRequestHeader": true}, {"fn.ping_": {}}]`
+
+**Response**
+- `[{"@unspecifiedHeader": true}, {"Ok_": {}}]`
+
+**Notes**
+- Unspecified header names are allowed, but declared header names must still match their declared types.
+
+#### Invalid header interaction
+
+**Schema**
+```yaml
+- headers.Example:
+    "@requestHeader": boolean
+    "@anotherRequestHeader": integer
+  ->:
+    "@responseHeader": string
+```
+
+**Invalid request**
+- `[{"@requestHeader": 1}, {"fn.ping_": {}}]`
+
+**Invalid response**
+- `[{"@responseHeader": 1}, {"Ok_": {}}]`
+
+**Notes**
+- Declared header values must validate against their declared types.
 
 ### Docstrings
 
