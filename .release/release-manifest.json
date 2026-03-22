@@ -1,9 +1,13 @@
 {
   "changed_paths": [
-    "doc/schema-guide.md"
+    "doc/example.md",
+    "doc/schema-guide.md",
+    "test/runner/schema/parse14/schema.telepact.yaml",
+    "test/runner/schema/parse15/schema.telepact.yaml",
+    "test/runner/schema/parse16/schema1.telepact.yaml"
   ],
   "direct_targets": [],
-  "pr_number": 304,
+  "pr_number": 305,
   "targets": [],
-  "version": "1.0.0-alpha.219"
+  "version": "1.0.0-alpha.220"
 }
