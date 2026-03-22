@@ -132,10 +132,6 @@ Clients interact with servers through functions. The client submits JSON data
 valid against the function argument struct definition, and the server responds
 with JSON data valid against the function result union.
 
-When referenced as a type in type expressions, the result union is unused.
-Functions cannot be used in type expressions that extend down from a top-level
-function argument.
-
 ```yaml
 - fn.exampleFunction1:
     field: integer
