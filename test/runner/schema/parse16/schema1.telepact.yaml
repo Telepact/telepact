@@ -15,4 +15,4 @@
 #|
 
 - "struct.Example":
-    field: string
+    field: "string"

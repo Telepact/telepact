@@ -30,8 +30,9 @@ supported schema files directly inside that directory.
 ## Type Expression
 
 Types are expressed with a string, which may be contained within conventional
-JSON collection types. When using JSON objects in type expressions, the only
-allowed key type is `"string"`.
+JSON collection types. In checked-in YAML examples, scalar type expressions stay
+quoted so they continue to look like JSON values. When using JSON objects in
+type expressions, the only allowed key type is `"string"`.
 
 | Type Expression           | Example allowed JSON values           | Example disallowed JSON values                  |
 | ------------------------- | ------------------------------------- | ----------------------------------------------- |
@@ -79,11 +80,11 @@ The `!` symbol can be appended to a field name to indicate that it is optional.
 
 ```yaml
 - struct.ExampleStruct1:
-    field: boolean
+    field: "boolean"
     anotherField: ["string"]
 - struct.ExampleStruct2:
-    optionalField!: boolean
-    anotherOptionalField!: integer
+    optionalField!: "boolean"
+    anotherOptionalField!: "integer"
 ```
 
 #### As a type expression
@@ -106,11 +107,11 @@ At least one tag is required.
 ```yaml
 - union.ExampleUnion1:
     - Tag:
-        field: integer
+        field: "integer"
     - EmptyTag: {}
 - union.ExampleUnion2:
     - Tag:
-        optionalField!: string
+        optionalField!: "string"
 ```
 
 #### As a type expression
@@ -134,16 +135,16 @@ with JSON data valid against the function result union.
 
 ```yaml
 - fn.exampleFunction1:
-    field: integer
-    optionalField!: string
+    field: "integer"
+    optionalField!: "string"
   ->:
     - Ok_:
-        field: boolean
+        field: "boolean"
 - fn.exampleFunction2: {}
   ->:
     - Ok_: {}
     - Error:
-        field: string
+        field: "string"
 ```
 
 | Example Request                               | Example Response                     |
@@ -176,7 +177,7 @@ cannot be used in type expressions.
 ```yaml
 - errors.ExampleErrors1:
     - Error1:
-        field: integer
+        field: "integer"
     - Error2: {}
 ```
 
@@ -188,21 +189,21 @@ definition at schema load time; the original schema is not re-written.)
 
 ```yaml
 - fn.exampleFunction1:
-    field: integer
-    optionalField!: string
+    field: "integer"
+    optionalField!: "string"
   ->:
     - Ok_:
-        field: boolean
+        field: "boolean"
     - Error1:
-        field: integer
+        field: "integer"
     - Error2: {}
 - fn.exampleFunction2: {}
   ->:
     - Ok_: {}
     - Error:
-        field: string
+        field: "string"
     - Error1:
-        field: integer
+        field: "integer"
     - Error2: {}
 ```
 
@@ -223,7 +224,7 @@ favors expressive data, such as using an empty optional field to replace convent
 - fn.exampleFunction: {}
   ->:
     - Ok_:
-        result: string
+        result: "string"
 ```
 
 ✅ Good:
@@ -231,7 +232,7 @@ favors expressive data, such as using an empty optional field to replace convent
 - fn.exampleFunction: {}
   ->:
     - Ok_:
-        result!: string
+        result!: "string"
 ```
 
 ### Headers
@@ -254,10 +255,10 @@ Headers definitions cannot be used in type expressions.
 
 ```yaml
 - headers.Example:
-    "@requestHeader": boolean
-    "@anotherRequestHeader": integer
+    "@requestHeader": "boolean"
+    "@anotherRequestHeader": "integer"
   ->:
-    "@responseHeader": string
+    "@responseHeader": "string"
 ```
 
 | Example Request                                       | Example Response                              |
@@ -280,11 +281,11 @@ Telepact console.
 ```yaml
 - ///: A struct that contains a `field`.
   struct.ExampleStruct:
-    field: boolean
+    field: "boolean"
 - struct.ExampleUnion:
     - ///: The default `Tag` that contains a `field`.
       Tag:
-        field: integer
+        field: "integer"
 ```
 
 #### Multi-line
@@ -296,7 +297,7 @@ Telepact console.
     Fields:
       - `field` (type: `boolean`)
   struct.ExampleStruct:
-    field: boolean
+    field: "boolean"
 ```
 
 ## Automatic Definitions
@@ -357,17 +358,17 @@ There is also a guide to Telepact extension types, including mock extensions,
   info.Calculator: {}
 - ///: A function that adds two numbers.
   fn.add:
-    x: number
-    y: number
+    x: "number"
+    y: "number"
   ->:
     - Ok_:
-        result: number
+        result: "number"
 - ///: A value for computation that can take either a constant or variable form.
   union.Value:
     - Constant:
-        value: number
+        value: "number"
     - Variable:
-        name: string
+        name: "string"
 - ///: A basic mathematical operation.
   union.Operation:
     - Add: {}
@@ -376,8 +377,8 @@ There is also a guide to Telepact extension types, including mock extensions,
     - Div: {}
 - ///: A mathematical variable represented by a `name` that holds a certain `value`.
   struct.Variable:
-    name: string
-    value: number
+    name: "string"
+    value: "number"
 - ///: Save a set of variables as a dynamic map of variable names to their value.
   fn.saveVariables:
     variables: {"string": "number"}
@@ -385,16 +386,16 @@ There is also a guide to Telepact extension types, including mock extensions,
     - Ok_: {}
 - ///: Compute the `result` of the given `x` and `y` values.
   fn.compute:
-    x: union.Value
-    y: union.Value
-    op: union.Operation
+    x: "union.Value"
+    y: "union.Value"
+    op: "union.Operation"
   ->:
     - Ok_:
-        result: number
+        result: "number"
     - ErrorCannotDivideByZero: {}
 - ///: Export all saved variables, up to an optional `limit`.
   fn.exportVariables:
-    limit!: integer
+    limit!: "integer"
   ->:
     - Ok_:
         variables: ["struct.Variable"]
@@ -405,20 +406,20 @@ There is also a guide to Telepact extension types, including mock extensions,
         tape: ["struct.Computation"]
 - ///: A computation.
   struct.Computation:
-    user: string?
-    firstOperand: union.Value
-    secondOperand: union.Value
-    operation: union.Operation
-    result: number?
-    successful: boolean
+    user: "string?"
+    firstOperand: "union.Value"
+    secondOperand: "union.Value"
+    operation: "union.Operation"
+    result: "number?"
+    successful: "boolean"
 - fn.showExample: {}
   ->:
     - Ok_:
-        link: fn.compute
+        link: "fn.compute"
 - errors.RateLimit:
     - ErrorTooManyRequests: {}
 - headers.Identity:
-    "@user": string
+    "@user": "string"
   ->: {}
 ```
 
