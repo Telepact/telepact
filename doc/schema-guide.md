@@ -33,32 +33,406 @@ Types are expressed with a string, which may be contained within conventional
 JSON collection types. When using JSON objects in type expressions, the only
 allowed key type is `"string"`.
 
-| Type Expression           | Example allowed JSON values           | Example disallowed JSON values                  |
-| ------------------------- | ------------------------------------- | ----------------------------------------------- |
-| `"boolean"`               | `true`, `false`                       | `null`, `0`                                     |
-| `"integer"`               | `1`, `0`, `-1`                        | `null`, `0.1`                                   |
-| `"number"`                | `0.1`, `-0.1`                         | `null`, `"0"`                                   |
-| `"string"`                | `""`, `"text"`                        | `null`, `0`                                     |
-| `["boolean"]`             | `[]`, `[true, false]`                 | `null`, `0`, `[null]` `{}`                      |
-| `{"string": "integer"}`   | `{}`, `{"k1": 0, "k2": 1}`            | `null`, `0`, `{"k": null}`, `[]`                |
-| `[{"string": "boolean"}]` | `[{}]`, `[{"k1": true, "k2": false}]` | `[{"k1": null}]`, `[{"k1": 0}]`, `[null]` `[0]` |
-| `"any"`                   | `false`, `0`, `0.1`, `""`, `[]`, `{}` | `null`                                          |
+The examples in this guide use a repeated pattern intended to be easy for both
+humans and LLMs to scan:
+
+- `<type-expression>` names the type expression being illustrated
+- `<valid>` shows JSON values accepted by that type expression
+- `<invalid>` shows JSON values rejected by that type expression
+- `<notes>` highlights the main rule to remember
+
+### Primitive and Collection Examples
+
+<example kind="type-expression">
+<type-expression>`"boolean"`</type-expression>
+<valid>
+
+```json
+true
+false
+```
+
+</valid>
+<invalid>
+
+```json
+null
+0
+```
+
+</invalid>
+<notes>
+Only JSON booleans are valid.
+</notes>
+</example>
+
+<example kind="type-expression">
+<type-expression>`"integer"`</type-expression>
+<valid>
+
+```json
+1
+0
+-1
+```
+
+</valid>
+<invalid>
+
+```json
+null
+0.1
+```
+
+</invalid>
+<notes>
+Only whole-number JSON values are valid.
+</notes>
+</example>
+
+<example kind="type-expression">
+<type-expression>`"number"`</type-expression>
+<valid>
+
+```json
+0.1
+-0.1
+1
+```
+
+</valid>
+<invalid>
+
+```json
+null
+"0"
+```
+
+</invalid>
+<notes>
+JSON numbers are valid, including integers.
+</notes>
+</example>
+
+<example kind="type-expression">
+<type-expression>`"string"`</type-expression>
+<valid>
+
+```json
+""
+"text"
+```
+
+</valid>
+<invalid>
+
+```json
+null
+0
+```
+
+</invalid>
+<notes>
+Only JSON strings are valid.
+</notes>
+</example>
+
+<example kind="type-expression">
+<type-expression>`["boolean"]`</type-expression>
+<valid>
+
+```json
+[]
+[true, false]
+```
+
+</valid>
+<invalid>
+
+```json
+null
+0
+[null]
+{}
+```
+
+</invalid>
+<notes>
+The array itself is allowed, but every element must be a non-null boolean.
+</notes>
+</example>
+
+<example kind="type-expression">
+<type-expression>`{"string": "integer"}`</type-expression>
+<valid>
+
+```json
+{}
+{"k1": 0, "k2": 1}
+```
+
+</valid>
+<invalid>
+
+```json
+null
+0
+{"k": null}
+[]
+```
+
+</invalid>
+<notes>
+Keys may be any JSON strings. Every value must be a non-null integer.
+</notes>
+</example>
+
+<example kind="type-expression">
+<type-expression>`[{"string": "boolean"}]`</type-expression>
+<valid>
+
+```json
+[{}]
+[{"k1": true, "k2": false}]
+```
+
+</valid>
+<invalid>
+
+```json
+[{"k1": null}]
+[{"k1": 0}]
+[null]
+[0]
+```
+
+</invalid>
+<notes>
+This is an array of objects whose values must all be non-null booleans.
+</notes>
+</example>
+
+<example kind="type-expression">
+<type-expression>`"any"`</type-expression>
+<valid>
+
+```json
+false
+0
+0.1
+""
+[]
+{}
+```
+
+</valid>
+<invalid>
+
+```json
+null
+```
+
+</invalid>
+<notes>
+`"any"` accepts any non-null JSON value.
+</notes>
+</example>
 
 ### Nullability
 
 The `?` symbol can be appended to type strings to indicate nullability. Note
 that it is not possible to express nullable arrays or objects.
 
-| Type Expression            | Example allowed JSON values                   | Example disallowed JSON values |
-| -------------------------- | --------------------------------------------- | ------------------------------ |
-| `"boolean?"`               | `null`, `true`, `false`                       | `0`                            |
-| `"integer?"`               | `null`, `1`, `0`, `-1`                        | `0.1`                          |
-| `"number?"`                | `null`, `0.1`, `-0.1`                         | `"0"`                          |
-| `"string?"`                | `null`, `""`, `"text"`                        | `0`                            |
-| `["boolean?"]`             | `[]`, `[true, false, null]`                   | `null`, `0`, `{}`              |
-| `{"string": "integer?"}`   | `{}`, `{"k1": 0, "k2": 1, "k3": null}`        | `null`, `0`, `[]`              |
-| `[{"string": "boolean?"}]` | `[{}]`, `[{"k1": null, "k2": false}]`         | `[{"k1": 0}]`, `[null]` `[0]`  |
-| `"any?"`                   | `null`, `false`, `0`, `0.1`, `""`, `[]`, `{}` | (none)                         |
+<example kind="type-expression">
+<type-expression>`"boolean?"`</type-expression>
+<valid>
+
+```json
+null
+true
+false
+```
+
+</valid>
+<invalid>
+
+```json
+0
+```
+
+</invalid>
+<notes>
+A nullable boolean is either `null` or a JSON boolean.
+</notes>
+</example>
+
+<example kind="type-expression">
+<type-expression>`"integer?"`</type-expression>
+<valid>
+
+```json
+null
+1
+0
+-1
+```
+
+</valid>
+<invalid>
+
+```json
+0.1
+```
+
+</invalid>
+<notes>
+A nullable integer is either `null` or a whole-number JSON value.
+</notes>
+</example>
+
+<example kind="type-expression">
+<type-expression>`"number?"`</type-expression>
+<valid>
+
+```json
+null
+0.1
+-0.1
+1
+```
+
+</valid>
+<invalid>
+
+```json
+"0"
+```
+
+</invalid>
+<notes>
+A nullable number is either `null` or a JSON number.
+</notes>
+</example>
+
+<example kind="type-expression">
+<type-expression>`"string?"`</type-expression>
+<valid>
+
+```json
+null
+""
+"text"
+```
+
+</valid>
+<invalid>
+
+```json
+0
+```
+
+</invalid>
+<notes>
+A nullable string is either `null` or a JSON string.
+</notes>
+</example>
+
+<example kind="type-expression">
+<type-expression>`["boolean?"]`</type-expression>
+<valid>
+
+```json
+[]
+[true, false, null]
+```
+
+</valid>
+<invalid>
+
+```json
+null
+0
+{}
+```
+
+</invalid>
+<notes>
+The elements may be `null`, but the array itself is still not nullable.
+</notes>
+</example>
+
+<example kind="type-expression">
+<type-expression>`{"string": "integer?"}`</type-expression>
+<valid>
+
+```json
+{}
+{"k1": 0, "k2": 1, "k3": null}
+```
+
+</valid>
+<invalid>
+
+```json
+null
+0
+[]
+```
+
+</invalid>
+<notes>
+The object values may be integers or `null`, but the object itself is not nullable.
+</notes>
+</example>
+
+<example kind="type-expression">
+<type-expression>`[{"string": "boolean?"}]`</type-expression>
+<valid>
+
+```json
+[{}]
+[{"k1": null, "k2": false}]
+```
+
+</valid>
+<invalid>
+
+```json
+[{"k1": 0}]
+[null]
+[0]
+```
+
+</invalid>
+<notes>
+This is an array of objects whose values may be booleans or `null`.
+</notes>
+</example>
+
+<example kind="type-expression">
+<type-expression>`"any?"`</type-expression>
+<valid>
+
+```json
+null
+false
+0
+0.1
+""
+[]
+{}
+```
+
+</valid>
+<invalid>
+
+None.
+
+</invalid>
+<notes>
+`"any?"` accepts every JSON value, including `null`.
+</notes>
+</example>
 
 ## Definitions
 
@@ -86,11 +460,72 @@ The `!` symbol can be appended to a field name to indicate that it is optional.
     anotherOptionalField!: integer
 ```
 
-| Type Expression             | Example allowed JSON values                           | Example disallowed JSON values     |
-| --------------------------- | ----------------------------------------------------- | ---------------------------------- |
-| `"struct.ExampleStruct1"`   | `{"field": true, "anotherField": ["text1", "text2"]}` | `null`, `{}`                       |
-| `"struct.ExampleStruct2"`   | `{"optionalField!": true}`, `{}`                      | `null`, `{"wrongField": true}`     |
-| `["struct.ExampleStruct2"]` | `[{"optionalField!": true}]`                          | `[null]`, `[{"wrongField": true}]` |
+<example kind="type-expression">
+<type-expression>`"struct.ExampleStruct1"`</type-expression>
+<valid>
+
+```json
+{"field": true, "anotherField": ["text1", "text2"]}
+```
+
+</valid>
+<invalid>
+
+```json
+null
+{}
+```
+
+</invalid>
+<notes>
+`field` and `anotherField` are both required.
+</notes>
+</example>
+
+<example kind="type-expression">
+<type-expression>`"struct.ExampleStruct2"`</type-expression>
+<valid>
+
+```json
+{"optionalField!": true}
+{}
+```
+
+</valid>
+<invalid>
+
+```json
+null
+{"wrongField": true}
+```
+
+</invalid>
+<notes>
+Both fields are optional because their names end with `!`.
+</notes>
+</example>
+
+<example kind="type-expression">
+<type-expression>`["struct.ExampleStruct2"]`</type-expression>
+<valid>
+
+```json
+[{"optionalField!": true}]
+```
+
+</valid>
+<invalid>
+
+```json
+[null]
+[{"wrongField": true}]
+```
+
+</invalid>
+<notes>
+The array elements must each validate as `struct.ExampleStruct2`.
+</notes>
+</example>
 
 ### Union
 
@@ -109,14 +544,56 @@ At least one tag is required.
         optionalField!: string
 ```
 
-| Type Expression         | Example allowed JSON values                          | Example disallowed JSON values                |
-| ----------------------- | ---------------------------------------------------- | --------------------------------------------- |
-| `"union.ExampleUnion1"` | `{"Tag": {"field": 0}}`, `{"EmptyTag": {}}`          | `null`, `{}`, `{"Tag": {"wrongField": true}}` |
-| `"union.ExampleUnion2"` | `{"Tag": {"optionalField!": "text"}}`, `{"Tag": {}}` | `null`, `{}`                                  |
+<example kind="type-expression">
+<type-expression>`"union.ExampleUnion1"`</type-expression>
+<valid>
+
+```json
+{"Tag": {"field": 0}}
+{"EmptyTag": {}}
+```
+
+</valid>
+<invalid>
+
+```json
+null
+{}
+{"Tag": {"wrongField": true}}
+```
+
+</invalid>
+<notes>
+A union value must choose exactly one declared tag and supply a payload valid for that tag.
+</notes>
+</example>
+
+<example kind="type-expression">
+<type-expression>`"union.ExampleUnion2"`</type-expression>
+<valid>
+
+```json
+{"Tag": {"optionalField!": "text"}}
+{"Tag": {}}
+```
+
+</valid>
+<invalid>
+
+```json
+null
+{}
+```
+
+</invalid>
+<notes>
+The selected tag payload is still validated as a struct, including optional fields.
+</notes>
+</example>
 
 ### Function
 
-Request-Response semantics can be defined with functions. A function is a
+Request-response semantics can be defined with functions. A function is a
 combination of an argument struct and a result union. The result union requires
 at least the `Ok_` tag. By convention, all non-`Ok_` tags are considered errors.
 
@@ -142,15 +619,94 @@ function argument.
         field: string
 ```
 
-| Example Request                               | Example Response                     |
-| --------------------------------------------- | ------------------------------------ |
-| `[{}, {"fn.exampleFunction1": {"field": 1}}]` | `[{}, {"Ok_": {"field": true}}]`     |
-| `[{}, {"fn.exampleFunction2": {}}]`           | `[{}, {"Error": {"field": "text"}}]` |
+<example kind="function-interaction">
+<function>`fn.exampleFunction1`</function>
+<request>
 
-| Type Expression         | Example allowed JSON values                                                          | Example disallowed JSON values                 |
-| ----------------------- | ------------------------------------------------------------------------------------ | ---------------------------------------------- |
-| `"fn.exampleFunction1"` | `{"fn.exampleFunction1": {"field": 0}}`, `{"fn.exampleFunction1": {"field": 1, "optionalField!": "text"}}` | `null`, `{}`, `{"field": 0}`                 |
-| `"fn.exampleFunction2"` | `{"fn.exampleFunction2": {}}`                                                       | `null`, `{"wrongField": 0}`, `{}`            |
+```json
+[{}, {"fn.exampleFunction1": {"field": 1}}]
+```
+
+</request>
+<response>
+
+```json
+[{}, {"Ok_": {"field": true}}]
+```
+
+</response>
+<notes>
+The client sends a Telepact message pair: headers object first, then the function payload.
+</notes>
+</example>
+
+<example kind="function-interaction">
+<function>`fn.exampleFunction2`</function>
+<request>
+
+```json
+[{}, {"fn.exampleFunction2": {}}]
+```
+
+</request>
+<response>
+
+```json
+[{}, {"Error": {"field": "text"}}]
+```
+
+</response>
+<notes>
+A function result is a tagged union whose tags always include `Ok_` and may include error tags.
+</notes>
+</example>
+
+<example kind="type-expression">
+<type-expression>`"fn.exampleFunction1"`</type-expression>
+<valid>
+
+```json
+{"fn.exampleFunction1": {"field": 0}}
+{"fn.exampleFunction1": {"field": 1, "optionalField!": "text"}}
+```
+
+</valid>
+<invalid>
+
+```json
+null
+{}
+{"field": 0}
+```
+
+</invalid>
+<notes>
+When a function appears in a type expression, the value is wrapped under the function name.
+</notes>
+</example>
+
+<example kind="type-expression">
+<type-expression>`"fn.exampleFunction2"`</type-expression>
+<valid>
+
+```json
+{"fn.exampleFunction2": {}}
+```
+
+</valid>
+<invalid>
+
+```json
+null
+{"wrongField": 0}
+{}
+```
+
+</invalid>
+<notes>
+Function type-expression values still use the function-name wrapper, even for empty arguments.
+</notes>
+</example>
 
 ### Errors
 
@@ -245,14 +801,65 @@ Headers definitions cannot be used in type expressions.
     "@responseHeader": string
 ```
 
-| Example Request                                       | Example Response                              |
-| ----------------------------------------------------- | --------------------------------------------- |
-| `[{"@requestHeader": true}, {"fn.ping_": {}}]`        | `[{"@responseHeader": "text"}, {"Ok_": {}}]`  |
-| `[{"@anotherRequestHeader": true}, {"fn.ping_": {}}]` | `[{"@unspecifiedHeader": true}, {"Ok_": {}}]` |
+<example kind="headers-interaction">
+<request>
 
-| Example Invalid Request                     | Example Invalid Response                |
-| ------------------------------------------- | --------------------------------------- |
-| `[{"@requestHeader": 1}, {"fn.ping_": {}}]` | `[{"@responseHeader": 1}, {"Ok_": {}}]` |
+```json
+[{"@requestHeader": true}, {"fn.ping_": {}}]
+```
+
+</request>
+<response>
+
+```json
+[{"@responseHeader": "text"}, {"Ok_": {}}]
+```
+
+</response>
+<notes>
+Specified request and response headers validate against the header definition.
+</notes>
+</example>
+
+<example kind="headers-interaction">
+<request>
+
+```json
+[{"@anotherRequestHeader": true}, {"fn.ping_": {}}]
+```
+
+</request>
+<response>
+
+```json
+[{"@unspecifiedHeader": true}, {"Ok_": {}}]
+```
+
+</response>
+<notes>
+Unspecified header names are allowed, but declared header names must still match their declared types.
+</notes>
+</example>
+
+<example kind="headers-interaction">
+<invalid-request>
+
+```json
+[{"@requestHeader": 1}, {"fn.ping_": {}}]
+```
+
+</invalid-request>
+<invalid-response>
+
+```json
+[{"@responseHeader": 1}, {"Ok_": {}}]
+```
+
+</invalid-response>
+<notes>
+Declared header values must validate against their declared types.
+</notes>
+</example>
 
 ### Docstrings
 
@@ -310,7 +917,7 @@ Auth definitions include the `@auth_` header and the `ErrorUnauthenticated_` and
 defines a `struct.Auth_` definition in their schema, for the auth header
 definition data type references it, as in `"@auth_": "struct.Auth_"`.
 
-API writiers are strongly encouraged to place all auth-related data into the
+API writers are strongly encouraged to place all auth-related data into the
 standard `struct.Auth_` struct, as the `@auth_` header is treated with greater
 sensitivity throughout the Telepact ecosystem.
 
