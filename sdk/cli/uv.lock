@@ -428,7 +428,7 @@ wheels = [
 
 [[package]]
 name = "telepact-cli"
-version = "1.0.0a220"
+version = "1.0.0a221"
 source = { editable = "." }
 dependencies = [
     { name = "click" },
@@ -453,8 +453,8 @@ requires-dist = [
     { name = "msgpack", specifier = ">=1.1.1,<2" },
     { name = "pyyaml", specifier = ">=6.0.2,<7" },
     { name = "requests", specifier = ">=2.32,<3" },
-    { name = "starlette", specifier = ">=0.47.3,<0.53.0" },
-    { name = "uvicorn", specifier = ">=0.35,<0.42" },
+    { name = "starlette", specifier = ">=0.47.3,<1.1.0" },
+    { name = "uvicorn", specifier = ">=0.35,<0.43" },
     { name = "websockets", specifier = ">=12,<17" },
 ]
 

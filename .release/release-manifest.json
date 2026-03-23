@@ -1,13 +1,32 @@
 {
   "changed_paths": [
-    "doc/example.md",
-    "doc/schema-guide.md",
-    "test/runner/schema/parse14/schema.telepact.yaml",
-    "test/runner/schema/parse15/schema.telepact.yaml",
-    "test/runner/schema/parse16/schema1.telepact.yaml"
+    "bind/dart/package-lock.json",
+    "bind/dart/package.json",
+    "bind/dart/pubspec.lock",
+    "lib/java/pom.xml",
+    "lib/ts/package-lock.json",
+    "lib/ts/package.json",
+    "sdk/cli/pyproject.toml",
+    "sdk/console/package-lock.json",
+    "sdk/prettier/package-lock.json",
+    "test/lib/java/pom.xml"
   ],
-  "direct_targets": [],
-  "pr_number": 305,
-  "targets": [],
-  "version": "1.0.0-alpha.220"
+  "direct_targets": [
+    "cli",
+    "console",
+    "dart",
+    "java",
+    "prettier",
+    "ts"
+  ],
+  "pr_number": 306,
+  "targets": [
+    "cli",
+    "console",
+    "dart",
+    "java",
+    "prettier",
+    "ts"
+  ],
+  "version": "1.0.0-alpha.221"
 }
