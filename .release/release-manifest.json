@@ -1,32 +1,22 @@
 {
   "changed_paths": [
-    "bind/dart/package-lock.json",
-    "bind/dart/package.json",
-    "bind/dart/pubspec.lock",
-    "lib/java/pom.xml",
-    "lib/ts/package-lock.json",
-    "lib/ts/package.json",
-    "sdk/cli/pyproject.toml",
-    "sdk/console/package-lock.json",
-    "sdk/prettier/package-lock.json",
-    "test/lib/java/pom.xml"
+    "Makefile",
+    "lib/ts/src/fileSystem.ts",
+    "test/lib/ts-browser-safe/.gitignore",
+    "test/lib/ts-browser-safe/Makefile",
+    "test/lib/ts-browser-safe/package-lock.json",
+    "test/lib/ts-browser-safe/package.json",
+    "test/lib/ts-browser-safe/src/main.ts",
+    "test/lib/ts-browser-safe/tsconfig.json"
   ],
   "direct_targets": [
-    "cli",
-    "console",
-    "dart",
-    "java",
-    "prettier",
     "ts"
   ],
-  "pr_number": 306,
+  "pr_number": 307,
   "targets": [
-    "cli",
     "console",
     "dart",
-    "java",
-    "prettier",
     "ts"
   ],
-  "version": "1.0.0-alpha.221"
+  "version": "1.0.0-alpha.222"
 }
