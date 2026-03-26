@@ -79,6 +79,7 @@ test-ts:
 
 prepare-test-ts:
 	$(MAKE) -C test/lib/ts
+	$(MAKE) -C test/lib/ts-browser-safe
 
 test-ts-run:
 	$(MAKE) -C test/runner test-ts-run
@@ -121,6 +122,7 @@ clean-test:
 	$(MAKE) -C test/lib/py clean
 	$(MAKE) -C test/lib/go clean
 	$(MAKE) -C test/lib/ts clean
+	$(MAKE) -C test/lib/ts-browser-safe clean
 
 dart:
 	$(MAKE) -C bind/dart
