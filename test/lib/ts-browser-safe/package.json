@@ -1,0 +1,15 @@
+{
+  "name": "telepact-browser-safe-test",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc --project tsconfig.json"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.2"
+  },
+  "dependencies": {
+    "telepact": "file:telepact.tgz"
+  }
+}

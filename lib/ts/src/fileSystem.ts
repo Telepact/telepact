@@ -14,29 +14,48 @@
 //|  limitations under the License.
 //|
 
-// Define the shape of the fs and path modules
+// Define the minimal shape of the fs and path modules without depending on
+// Node.js-only ambient types such as `Buffer` or `BufferEncoding`.
+//
+// This keeps the package declarations browser-safe while remaining
+// structurally compatible with the standard Node `fs` and `path` modules.
+export type FileSystemPath = string | URL;
+export type FileSystemEncoding =
+    | 'ascii'
+    | 'utf8'
+    | 'utf-8'
+    | 'utf16le'
+    | 'utf-16le'
+    | 'ucs2'
+    | 'ucs-2'
+    | 'base64'
+    | 'base64url'
+    | 'latin1'
+    | 'binary'
+    | 'hex';
+
 export interface FsModule {
     readdirSync: (
-        path: string | Buffer | URL,
+        path: FileSystemPath,
         options?:
             | {
-                  encoding: BufferEncoding | null;
+                  encoding: FileSystemEncoding | null;
                   withFileTypes?: false | undefined;
                   recursive?: boolean | undefined;
               }
-            | BufferEncoding
+            | FileSystemEncoding
             | null,
     ) => string[];
     readFileSync: (
-        path: string | Buffer | URL | number,
+        path: FileSystemPath | number,
         options:
             | {
-                  encoding: BufferEncoding;
+                  encoding: FileSystemEncoding;
                   flag?: string | undefined;
               }
-            | BufferEncoding,
+            | FileSystemEncoding,
     ) => string;
-    statSync: (path: string | Buffer | URL) => { isDirectory: () => boolean };
+    statSync: (path: FileSystemPath) => { isDirectory: () => boolean };
 }
 
 export interface PathModule {
