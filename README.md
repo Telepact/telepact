@@ -50,6 +50,8 @@ Check out the [full-stack example](./doc/example.md).
 
 To learn how to write Telepact APIs, see the [API Schema Guide](./doc/schema-guide.md).
 A [JSON Schema](./common/json-schema.json) is available for validation.
+For transport wiring patterns and concrete HTTP/WebSocket examples, see the
+[Transport Guide](./doc/transports.md).
 For debugging local/runtime failures, see the [Runtime Error Guide](./doc/runtime-errors.md).
 
 To learn how to serve a Telepact API, see the specific library docs:

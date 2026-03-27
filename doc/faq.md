@@ -72,6 +72,20 @@ This is intentional. Telepact's goal is bring-your-own-transport, not
 transport abstraction. So implementers keep both the freedom and the
 responsibility that come with their chosen transport.
 
+For concrete HTTP and WebSocket examples, see the
+[Transport Guide](./transports.md).
+
+## Why are there no transport adapters included with Telepact?
+
+Telepact intentionally does not ship a first-party transport abstraction layer
+for the common case. In practice, bytes in and bytes out is not much
+boilerplate, and it preserves clarity at a critical component boundary.
+
+Because of that, Telepact prefers to keep the transport layer explicit rather
+than wrap it in a heavier abstraction that obscures how the system is actually
+wired. For examples of what that explicit code looks like in practice, see the
+[Transport Guide](./transports.md).
+
 ## Why can I not define nullable arrays or objects?
 
 Nullability is indicated on base types by appending type strings with `?`, but
