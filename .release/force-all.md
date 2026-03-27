@@ -21,3 +21,5 @@ for that PR's version bump.
 
 The file is intentionally persistent; only changes to this path trigger the
 force-all behavior.
+
+Bump all 2026-03-27
