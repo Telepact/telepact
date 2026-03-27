@@ -44,8 +44,8 @@ async def adapter(message: Message, serializer: Serializer) -> Message:
     return serializer.deserialize(response_bytes)
 ```
 
-That small cutpoint is intentional. It keeps the transport visible instead of
-hiding important operational behavior behind a large abstraction layer.
+That small cutpoint is intentional. Bytes in and bytes out is not much
+boilerplate, and it preserves clarity at a critical component boundary.
 
 ## Example API
 
@@ -67,8 +67,7 @@ HTTP is the most common Telepact deployment shape. A typical setup is:
 - request body contains Telepact request bytes
 - response body contains Telepact response bytes
 - `Content-Type` reflects whether the response is JSON or binary
-- ordinary HTTP middleware handles concerns such as CORS, auth, metrics, and
-  logging around the Telepact core
+- ordinary HTTP middleware can still sit around the Telepact core when needed
 
 ### HTTP server example (Python + Starlette)
 
@@ -152,10 +151,8 @@ if (response.getBodyTarget() === 'Ok_') {
 
 - `fetch` accepts binary request bodies, so the same client can work with JSON
   or binary Telepact payloads.
-- HTTP is often the easiest place to add CORS, auth middleware, request ids,
-  tracing, and reverse proxies.
-- If you already have framework middleware for logging or metrics, this adapter
-  layer is usually the right place to keep using it.
+- Reverse proxies, CORS configuration, and other HTTP concerns still remain
+  possible around a Telepact endpoint when your application needs them.
 
 ## WebSockets
 
