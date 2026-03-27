@@ -1,12 +1,27 @@
 {
   "changed_paths": [
-    "README.md",
-    "doc/example.md",
-    "doc/faq.md",
-    "doc/transports.md"
+    ".release/force-all.md"
   ],
-  "direct_targets": [],
-  "pr_number": 308,
-  "targets": [],
-  "version": "1.0.0-alpha.223"
+  "direct_targets": [
+    "cli",
+    "console",
+    "dart",
+    "go",
+    "java",
+    "prettier",
+    "py",
+    "ts"
+  ],
+  "pr_number": 309,
+  "targets": [
+    "cli",
+    "console",
+    "dart",
+    "go",
+    "java",
+    "prettier",
+    "py",
+    "ts"
+  ],
+  "version": "1.0.0-alpha.224"
 }

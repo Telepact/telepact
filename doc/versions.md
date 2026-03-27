@@ -7,10 +7,10 @@ Repository source versions may be ahead of these values between releases.
 
 | Kind | Package | Registry | Version |
 |---|---|---|---|
-| Library (Go) | `github.com/telepact/telepact/lib/go` | Go module (proxy.golang.org) | `v1.0.0-alpha.216` |
-| Library (Java) | `io.github.telepact:telepact` | Maven Central | `1.0.0-alpha.221` |
-| Library (Python) | `telepact` | PyPI | `1.0.0a216` |
-| Library (TypeScript) | `telepact` | npm | `1.0.0-alpha.222` |
-| SDK (CLI) | `telepact-cli` | PyPI | `1.0.0a221` |
-| SDK (Console) | `telepact-console` | npm | `1.0.0-alpha.222` |
-| SDK (Prettier) | `prettier-plugin-telepact` | npm | `1.0.0-alpha.221` |
+| Library (Go) | `github.com/telepact/telepact/lib/go` | Go module (proxy.golang.org) | `v1.0.0-alpha.224` |
+| Library (Java) | `io.github.telepact:telepact` | Maven Central | `1.0.0-alpha.224` |
+| Library (Python) | `telepact` | PyPI | `1.0.0a224` |
+| Library (TypeScript) | `telepact` | npm | `1.0.0-alpha.224` |
+| SDK (CLI) | `telepact-cli` | PyPI | `1.0.0a224` |
+| SDK (Console) | `telepact-console` | npm | `1.0.0-alpha.224` |
+| SDK (Prettier) | `prettier-plugin-telepact` | npm | `1.0.0-alpha.224` |
