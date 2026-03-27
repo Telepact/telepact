@@ -78,13 +78,10 @@ For concrete HTTP and WebSocket examples, see the
 ## Why are there no transport adapters out of the box?
 
 Telepact intentionally does not ship a first-party transport abstraction layer
-for the common case. In practice, bytes in and bytes out is not much
-boilerplate, and it preserves clarity at a critical component boundary.
-
-Because of that, Telepact prefers to keep the transport layer explicit rather
-than wrap it in a heavier abstraction that obscures how the system is actually
-wired. For examples of what that explicit code looks like in practice, see the
-[Transport Guide](./transports.md).
+for the common case. Because of that, Telepact prefers to keep the transport
+layer explicit rather than wrap it in a heavier abstraction that obscures how
+the system is actually wired. For examples of what that explicit code looks
+like in practice, see the [Transport Guide](./transports.md).
 
 ## Why can I not define nullable arrays or objects?
 

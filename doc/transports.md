@@ -44,8 +44,6 @@ async def adapter(message: Message, serializer: Serializer) -> Message:
     return serializer.deserialize(response_bytes)
 ```
 
-That small cutpoint is intentional. Bytes in and bytes out is not much
-boilerplate, and it preserves clarity at a critical component boundary.
 
 ## Example API
 
