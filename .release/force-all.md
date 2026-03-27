@@ -19,5 +19,7 @@
 Editing this file in a PR forces the release planner to mark all release targets
 for that PR's version bump.
 
+Use this path when we need a deliberate "bump all" release cycle.
+
 The file is intentionally persistent; only changes to this path trigger the
 force-all behavior.
