@@ -1,22 +1,12 @@
 {
   "changed_paths": [
-    "Makefile",
-    "lib/ts/src/fileSystem.ts",
-    "test/lib/ts-browser-safe/.gitignore",
-    "test/lib/ts-browser-safe/Makefile",
-    "test/lib/ts-browser-safe/package-lock.json",
-    "test/lib/ts-browser-safe/package.json",
-    "test/lib/ts-browser-safe/src/main.ts",
-    "test/lib/ts-browser-safe/tsconfig.json"
+    "README.md",
+    "doc/example.md",
+    "doc/faq.md",
+    "doc/transports.md"
   ],
-  "direct_targets": [
-    "ts"
-  ],
-  "pr_number": 307,
-  "targets": [
-    "console",
-    "dart",
-    "ts"
-  ],
-  "version": "1.0.0-alpha.222"
+  "direct_targets": [],
+  "pr_number": 308,
+  "targets": [],
+  "version": "1.0.0-alpha.223"
 }
