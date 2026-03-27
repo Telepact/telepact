@@ -78,9 +78,17 @@ For concrete HTTP and WebSocket examples, see the
 ## Why are there no transport adapters out of the box?
 
 Telepact intentionally does not ship a first-party transport abstraction layer
-for the common case. Because of that, Telepact prefers to keep the transport
-layer explicit rather than wrap it in a heavier abstraction that obscures how
-the system is actually wired. For examples of what that explicit code looks
+for the common case. In practice, transport code is usually manageable in size,
+and trying to abstract it too aggressively tends to hide important details.
+
+The transport boundary is where developers benefit from seeing how raw bytes
+flow in and out of their components. It is also a natural cutpoint for concerns
+such as metadata processing, logging, metrics, tracing, retries, timeouts,
+connection lifecycle management, and framework-specific middleware.
+
+Because of that, Telepact prefers to keep the transport layer explicit and close
+to application code rather than wrap it in a heavier abstraction that obscures
+how the system is actually wired. For examples of what that explicit code looks
 like in practice, see the [Transport Guide](./transports.md).
 
 ## Why can I not define nullable arrays or objects?
