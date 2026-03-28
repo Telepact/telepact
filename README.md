@@ -57,7 +57,7 @@ For debugging local/runtime failures, see the [Runtime Error Guide](./doc/runtim
 To learn how to serve a Telepact API, see the specific library docs:
 - [Typescript](./lib/ts/README.md)
 - [Python](./lib/py/README.md)
-- [Java](./lib/java/README.md) (requires Java 21)
+- [Java](./lib/java/README.md)
 - [Go](./lib/go/README.md)
 
 For development assistance, see the SDK tool docs:
