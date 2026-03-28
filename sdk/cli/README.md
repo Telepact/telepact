@@ -42,7 +42,7 @@ Options:
   --lang TEXT             Language target (one of "java", "py", "ts", or "go")
                           [required]
   --out TEXT              Output directory  [required]
-  --package TEXT          Java package (use if --lang is "java")
+  --package TEXT          Package name (required when --lang is "java" or "go")
   --help                  Show this message and exit.
 ```
 

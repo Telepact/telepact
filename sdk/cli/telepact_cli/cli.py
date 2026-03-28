@@ -71,7 +71,7 @@ def main() -> None:
 @click.option('--schema-dir', help='telepact schema directory', required=False)
 @click.option('--lang', help='Language target (one of "java", "py", "ts", or "go")', required=True)
 @click.option('--out', help='Output directory', required=True)
-@click.option('--package', help='Java package (use if --lang is "java")', callback=_validate_package)
+@click.option('--package', help='Package name (required when --lang is "java" or "go")', callback=_validate_package)
 def codegen(schema_http_url: str, schema_dir: str, lang: str, out: str, package: str) -> None:
     """
     Generate code bindings for a Telepact API schema.
