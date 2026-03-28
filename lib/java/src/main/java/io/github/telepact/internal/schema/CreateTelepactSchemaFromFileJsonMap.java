@@ -45,7 +45,7 @@ public class CreateTelepactSchemaFromFileJsonMap {
         // Determine if we need to add the auth schema
         final var authJson = getAuthTelepactJson();
         for (var json : jsonDocuments.values()) {
-            var regex = Pattern.compile("\"struct\\.Auth_\"\\s*:");
+            var regex = Pattern.compile("\"union\\.Auth_\"\\s*:");
             var matcher = regex.matcher(json);
             if (matcher.find()) {
                 if (!hasBundledDefinitions(jsonDocuments, "auth_", authJson)) {

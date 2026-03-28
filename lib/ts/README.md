@@ -53,7 +53,7 @@ const handler = async (requestMessage: Message): Promise<Message> => {
 };
 
 const options = new ServerOptions();
-// Set this to false when your schema does not define struct.Auth_.
+// Set this to false when your schema does not define union.Auth_.
 options.authRequired = false;
 const server = new Server(schema, handler, options);
 

@@ -34,7 +34,7 @@ func CreateTelepactSchemaFromFileJSONMap(jsonDocuments map[string]string) (*Pars
 		finalDocuments["internal_"] = internalJSON
 	}
 
-	authPattern := regexp.MustCompile(`"struct\.Auth_"\s*:`)
+	authPattern := regexp.MustCompile(`"union\.Auth_"\s*:`)
 	authJSON := GetAuthTelepactJSON()
 	for _, document := range jsonDocuments {
 		if authPattern.MatchString(document) {

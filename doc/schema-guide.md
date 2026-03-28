@@ -323,11 +323,11 @@ You can find all standard definitions
 
 Auth definitions include the `@auth_` header and the `ErrorUnauthenticated_` and
 `ErrorUnauthorized_` errors. These are included conditionally if the API writer
-defines a `struct.Auth_` definition in their schema, for the auth header
-definition data type references it, as in `"@auth_": "struct.Auth_"`.
+defines a `union.Auth_` definition in their schema, for the auth header
+definition data type references it, as in `"@auth_": "union.Auth_"`.
 
-API writiers are strongly encouraged to place all auth-related data into the
-standard `struct.Auth_` struct, as the `@auth_` header is treated with greater
+API writers are strongly encouraged to place auth-related credential variants in
+the standard `union.Auth_`, as the `@auth_` header is treated with greater
 sensitivity throughout the Telepact ecosystem.
 
 You can find details about auth definitions

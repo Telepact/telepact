@@ -321,16 +321,17 @@ Telepact automatically adds standard helpers and common errors such as `fn.ping_
 
 ### Auth Definitions
 
-If the API needs Telepact-standard auth, define a non empty `struct.Auth_`.
+If the API needs Telepact-standard auth, define a `union.Auth_`.
 
 Example:
 
 ```yaml
-struct.Auth_:
-  token: string
+union.Auth_:
+  - Token:
+      token: string
 ```
 
-This enables Telepact auth definitions such as the `@auth_` header and auth-related errors. Put auth-related credential data inside `struct.Auth_`.
+This enables Telepact auth definitions such as the `@auth_` header and auth-related errors. Put auth-related credential variants inside `union.Auth_`.
 
 ### Mock Definitions
 

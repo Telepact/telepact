@@ -80,7 +80,7 @@ func main() {
     }
 
 	serverOptions := telepact.NewServerOptions()
-	// Set this to false when your schema does not define struct.Auth_.
+	// Set this to false when your schema does not define union.Auth_.
 	serverOptions.AuthRequired = false
 	server, err := telepact.NewServer(schema, handler, serverOptions)
 	if err != nil {
