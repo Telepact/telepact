@@ -1,5 +1,13 @@
 ## Telepact Library for Java
 
+### Java version
+
+Telepact's Java library currently targets **Java 21**.
+
+Use a Java 21 JDK for local development, CI, and production builds. Older Java
+baselines are not supported by the published library or by the repository's
+current Maven compiler configuration.
+
 ### Installation
 ```xml
 <dependency>
