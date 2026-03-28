@@ -11,6 +11,6 @@ Repository source versions may be ahead of these values between releases.
 | Library (Java) | `io.github.telepact:telepact` | Maven Central | `1.0.0-alpha.224` |
 | Library (Python) | `telepact` | PyPI | `1.0.0a224` |
 | Library (TypeScript) | `telepact` | npm | `1.0.0-alpha.224` |
-| SDK (CLI) | `telepact-cli` | PyPI | `1.0.0a224` |
+| SDK (CLI) | `telepact-cli` | PyPI | `1.0.0a225` |
 | SDK (Console) | `telepact-console` | npm | `1.0.0-alpha.224` |
 | SDK (Prettier) | `prettier-plugin-telepact` | npm | `1.0.0-alpha.224` |
