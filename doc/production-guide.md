@@ -24,14 +24,13 @@ A common production shape is:
   service
 - one reverse proxy, gateway, or service mesh layer handling network policy,
   TLS termination, and traffic management outside the Telepact core
-- middleware inside the server handler, where application auth,
-  observability, and other request-level policy can run around function
-  dispatch
+- handler code that performs auth, observability, and function delegation inside
+  the Telepact server flow
 
 A minimal HTTP deployment usually looks like this:
 
 ```text
-client -> edge proxy / gateway -> transport adapter -> Telepact server -> handler middleware -> function handler
+client -> edge proxy / gateway -> transport adapter -> Telepact server -> handler -> function
 ```
 
 Recommended responsibilities by layer:
@@ -39,14 +38,15 @@ Recommended responsibilities by layer:
 - **edge proxy / gateway**
   - TLS termination
   - request size limits
-  - coarse network policy
+  - CORS and other HTTP-specific policy when needed
   - rate limits
   - access logging
 - **transport adapter**
   - map inbound bytes to the Telepact server
+  - call `server.process(...)`
   - map Telepact response bytes back to the transport response
   - stay thin and focused on bytes in / bytes out
-- **handler middleware and function handlers**
+- **handler code**
   - function dispatch
   - domain validation
   - application-specific authorization checks
@@ -54,8 +54,8 @@ Recommended responsibilities by layer:
   - business logic
 
 Keep the Telepact boundary small and explicit. The transport adapter should stay
-thin. Middleware code belongs inside the server handler that delegates messages
-to functions.
+thin and should not grow its own middleware stack. Put request-level policy in
+the handler code that delegates messages to functions.
 
 ## 2. Compatibility policy in practice
 
@@ -104,24 +104,67 @@ If you need a breaking change, use a staged migration:
 ## 3. Auth and observability patterns
 
 Telepact validates message structure, but production identity, policy, and
-observability should live in middleware inside the server handler that delegates
-messages to functions. The transport adapter should remain a small bytes-in /
-bytes-out boundary.
+observability belong in the handler code. There is no special Telepact
+middleware abstraction here. The normal pattern is:
+
+```text
+bytes -> Telepact server -> handler -> function
+```
+
+That handler is where you put the logic that teams would usually call
+middleware: authenticate the caller, attach request metadata, emit logs and
+metrics, then delegate to the target function.
 
 ### Auth
 
 Recommended pattern:
 
-- authenticate in middleware around your Telepact handler
-- normalize caller identity into request context or the specific Telepact
-  headers your application expects
+- validate bearer tokens, sessions, or cookies before the target function runs
+- translate the authenticated caller into the specific Telepact headers or
+  request context your schema expects
 - keep authorization decisions close to the business logic that owns the data
 
-For HTTP services, this often means:
+If credentials arrive through the transport layer, copy them into Telepact
+headers before calling `server.process(...)`. For example, an HTTP adapter can
+read a session cookie and pass a normalized auth header through
+`overrideHeaders`:
 
-- bearer token or session validation in framework middleware
-- passing a normalized caller identity into the Telepact handler middleware
-- rejecting unauthenticated requests before the target function runs
+```ts
+const response = await server.process(requestBytes, {
+  '@auth_': { sessionToken: readSessionCookie(request) },
+  '@id_': request.id,
+});
+```
+
+Inside the handler, use those normalized headers before delegating to the
+function implementation. An illustrative TypeScript sketch looks like this:
+
+```ts
+const server = new Server(schema, async (message) => {
+  const auth = message.headers['@auth_'];
+  const target = message.getBodyTarget();
+
+  if (!auth) {
+    return new Message({}, {
+      ErrorUnauthorized_: { message: 'missing credentials' },
+    });
+  }
+
+  const startedAt = Date.now();
+  try {
+    return await dispatchFunction(target, message, auth);
+  } finally {
+    logger.info('telepact_request', {
+      requestId: message.headers['@id_'],
+      function: target,
+      durationMs: Date.now() - startedAt,
+    });
+  }
+}, new ServerOptions());
+```
+
+The important point is the placement: transport code stays bytes in / bytes out,
+while auth and other request policy live in the handler code itself.
 
 ### Observability
 
@@ -134,14 +177,10 @@ At minimum, emit:
 - latency
 - payload size when relevant
 
-Recommended instrumentation points:
-
-- around the handler middleware that delegates messages to functions
-- around the business handler body for the specific function being invoked
-- at the edge proxy or gateway for transport-level request metrics
-
 A practical logging shape is one structured event per request with stable keys
-for function, duration, status, and correlation id.
+for function, duration, status, and correlation id. Emit those fields from the
+handler code before or after function delegation, depending on what you need to
+measure.
 
 Do not log the entire `Message` object by default. Headers can carry
 credentials, so prefer selective structured fields instead of dumping the full
