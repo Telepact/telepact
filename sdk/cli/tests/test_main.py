@@ -269,6 +269,23 @@ def test_command_ts(runner: CliRunner) -> None:
     assert "const theseFields = theseTags[\"Card\"] ?? [];" in generated
 
 
+def test_codegen_help_mentions_package_requirement_for_go_and_java(runner: CliRunner) -> None:
+    result = runner.invoke(main, ['codegen', '--help'])
+
+    assert result.exit_code == 0
+    assert 'Package name (required when --lang is "java" or "go")' in result.output
+
+
+
+def test_command_go_requires_package(runner: CliRunner) -> None:
+    result = runner.invoke(
+        main, ['codegen', '--schema-dir', 'tests/data', '--lang', 'go', '--out', 'tests/output/go'])
+
+    assert result.exit_code != 0
+    assert '--package is required when --lang is go' in result.output
+
+
+
 def test_command_go(runner: CliRunner) -> None:
     output_dir = Path('tests/output/go')
     result = runner.invoke(

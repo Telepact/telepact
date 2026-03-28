@@ -1,27 +1,15 @@
 {
   "changed_paths": [
-    ".release/force-all.md"
+    "sdk/cli/README.md",
+    "sdk/cli/telepact_cli/cli.py",
+    "sdk/cli/tests/test_main.py"
   ],
   "direct_targets": [
-    "cli",
-    "console",
-    "dart",
-    "go",
-    "java",
-    "prettier",
-    "py",
-    "ts"
+    "cli"
   ],
-  "pr_number": 309,
+  "pr_number": 310,
   "targets": [
-    "cli",
-    "console",
-    "dart",
-    "go",
-    "java",
-    "prettier",
-    "py",
-    "ts"
+    "cli"
   ],
-  "version": "1.0.0-alpha.224"
+  "version": "1.0.0-alpha.225"
 }
