@@ -14,13 +14,13 @@
 //|  limitations under the License.
 //|
 
-import { ValidationFailure } from '../validation/ValidationFailure.js';
-import { TTypeDeclaration } from './TTypeDeclaration.js';
-import { TType } from './TType.js';
-import { validateInteger } from '../validation/ValidateInteger.js';
-import { generateRandomInteger } from '../generation/GenerateRandomInteger.js';
-import { GenerateContext } from '../generation/GenerateContext.js';
-import { ValidateContext } from '../validation/ValidateContext.js';
+import { ValidationFailure } from '../validation/ValidationFailure';
+import { TTypeDeclaration } from './TTypeDeclaration';
+import { TType } from './TType';
+import { validateInteger } from '../validation/ValidateInteger';
+import { generateRandomInteger } from '../generation/GenerateRandomInteger';
+import { GenerateContext } from '../generation/GenerateContext';
+import { ValidateContext } from '../validation/ValidateContext';
 
 export const integerName: string = 'Integer';
 

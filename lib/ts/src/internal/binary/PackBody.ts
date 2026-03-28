@@ -14,7 +14,7 @@
 //|  limitations under the License.
 //|
 
-import { pack } from './Pack.js';
+import { pack } from './Pack';
 
 export function packBody(body: Map<any, any>): Map<any, any> {
     const result: Map<any, any> = new Map();

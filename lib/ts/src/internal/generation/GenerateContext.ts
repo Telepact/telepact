@@ -14,8 +14,8 @@
 //|  limitations under the License.
 //|
 
-import { RandomGenerator } from '../../RandomGenerator.js';
-import { TTypeDeclaration } from '../types/TTypeDeclaration.js';
+import { RandomGenerator } from '../../RandomGenerator';
+import { TTypeDeclaration } from '../types/TTypeDeclaration';
 
 export class GenerateContext {
     includeOptionalFields: boolean;

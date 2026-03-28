@@ -14,9 +14,9 @@
 //|  limitations under the License.
 //|
 
-import { ValidationFailure } from '../../internal/validation/ValidationFailure.js';
-import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure.js';
-import { booleanName } from '../types/TBoolean.js';
+import { ValidationFailure } from '../../internal/validation/ValidationFailure';
+import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure';
+import { booleanName } from '../types/TBoolean';
 
 export function validateBoolean(value: any): ValidationFailure[] {
     if (typeof value === 'boolean') {

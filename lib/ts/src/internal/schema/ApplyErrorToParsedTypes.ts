@@ -14,12 +14,12 @@
 //|  limitations under the License.
 //|
 
-import { TError } from '../types/TError.js';
-import { TType } from '../types/TType.js';
-import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure.js';
-import { TelepactSchemaParseError } from '../../TelepactSchemaParseError.js';
-import { resolveDocumentCoordinates } from '../../internal/schema/DocumentLocators.js';
-import { TUnion } from '../types/TUnion.js';
+import { TError } from '../types/TError';
+import { TType } from '../types/TType';
+import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
+import { TelepactSchemaParseError } from '../../TelepactSchemaParseError';
+import { resolveDocumentCoordinates } from '../../internal/schema/DocumentLocators';
+import { TUnion } from '../types/TUnion';
 
 export function applyErrorToParsedTypes(
     error: TError,

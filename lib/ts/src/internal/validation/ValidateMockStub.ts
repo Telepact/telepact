@@ -14,12 +14,12 @@
 //|  limitations under the License.
 //|
 
-import { ValidationFailure } from '../../internal/validation/ValidationFailure.js';
-import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure.js';
-import { TStruct } from '../types/TStruct.js';
-import { TType } from '../types/TType.js';
-import { TUnion } from '../types/TUnion.js';
-import { ValidateContext } from './ValidateContext.js';
+import { ValidationFailure } from '../../internal/validation/ValidationFailure';
+import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure';
+import { TStruct } from '../types/TStruct';
+import { TType } from '../types/TType';
+import { TUnion } from '../types/TUnion';
+import { ValidateContext } from './ValidateContext';
 
 export function validateMockStub(
     givenObj: any,

@@ -14,11 +14,11 @@
 //|  limitations under the License.
 //|
 
-import { FsModule, PathModule } from '../../fileSystem.js';
-import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure.js';
-import { TelepactSchemaParseError } from '../../TelepactSchemaParseError.js';
-import { DocumentLocator, setDocumentLocators } from './DocumentLocators.js';
-import { parseTelepactYaml } from './ParseTelepactYaml.js';
+import { FsModule, PathModule } from '../../fileSystem';
+import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
+import { TelepactSchemaParseError } from '../../TelepactSchemaParseError';
+import { DocumentLocator, setDocumentLocators } from './DocumentLocators';
+import { parseTelepactYaml } from './ParseTelepactYaml';
 
 export function getSchemaFileMap(directory: string, fs: FsModule, path: PathModule): Record<string, string> {
     const finalJsonDocuments: Record<string, string> = {};

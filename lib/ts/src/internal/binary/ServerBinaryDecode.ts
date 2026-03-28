@@ -14,11 +14,11 @@
 //|  limitations under the License.
 //|
 
-import { BinaryEncoding } from "../../internal/binary/BinaryEncoding.js";
-import { BinaryEncoderUnavailableError } from "../../internal/binary/BinaryEncoderUnavailableError.js";
-import { decodeBody } from "../../internal/binary/DecodeBody.js";
-import { unpackBody } from "../../internal/binary/UnpackBody.js";
-import { convertMapsToObjects } from "./ConvertMapsToObjects.js";
+import { BinaryEncoding } from "../../internal/binary/BinaryEncoding";
+import { BinaryEncoderUnavailableError } from "../../internal/binary/BinaryEncoderUnavailableError";
+import { decodeBody } from "../../internal/binary/DecodeBody";
+import { unpackBody } from "../../internal/binary/UnpackBody";
+import { convertMapsToObjects } from "./ConvertMapsToObjects";
 
 export function serverBinaryDecode(message: any[], binaryEncoder: BinaryEncoding): any[] {
     const headers = message[0] as Map<string, any>;

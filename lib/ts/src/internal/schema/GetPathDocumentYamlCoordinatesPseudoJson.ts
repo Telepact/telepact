@@ -14,8 +14,8 @@
 //|  limitations under the License.
 //|
 
-import { createDocumentLocatorFromYamlText } from './BuildDocumentLocatorFromYamlAst.js';
-import { Coordinates, DocumentLocator, Path } from './DocumentLocators.js';
+import { createDocumentLocatorFromYamlText } from './BuildDocumentLocatorFromYamlAst';
+import { Coordinates, DocumentLocator, Path } from './DocumentLocators';
 
 export function createPathDocumentYamlCoordinatesPseudoJsonLocator(text: string): DocumentLocator {
     return createDocumentLocatorFromYamlText(text);

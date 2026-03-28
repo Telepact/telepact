@@ -14,8 +14,8 @@
 //|  limitations under the License.
 //|
 
-import { GenerateContext } from '../../internal/generation/GenerateContext.js';
-import { TTypeDeclaration } from '../types/TTypeDeclaration.js';
+import { GenerateContext } from '../../internal/generation/GenerateContext';
+import { TTypeDeclaration } from '../types/TTypeDeclaration';
 
 export function generateRandomArray(
     blueprintValue: any,

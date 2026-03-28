@@ -14,9 +14,9 @@
 //|  limitations under the License.
 //|
 
-import { BinaryPackNode } from './BinaryPackNode.js';
-import { CannotPack } from './CannotPack.js';
-import { pack } from './Pack.js';
+import { BinaryPackNode } from './BinaryPackNode';
+import { CannotPack } from './CannotPack';
+import { pack } from './Pack';
 import { addExtension } from 'msgpackr';
 
 const UNDEFINED_BYTE = 18;

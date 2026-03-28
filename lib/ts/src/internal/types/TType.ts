@@ -14,10 +14,10 @@
 //|  limitations under the License.
 //|
 
-import { ValidationFailure } from '../validation/ValidationFailure.js';
-import { GenerateContext } from '../generation/GenerateContext.js';
-import { ValidateContext } from '../validation/ValidateContext.js';
-import { TTypeDeclaration } from './TTypeDeclaration.js';
+import { ValidationFailure } from '../validation/ValidationFailure';
+import { GenerateContext } from '../generation/GenerateContext';
+import { ValidateContext } from '../validation/ValidateContext';
+import { TTypeDeclaration } from './TTypeDeclaration';
 
 export abstract class TType {
     abstract getTypeParameterCount(): number;

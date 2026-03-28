@@ -14,21 +14,21 @@
 //|  limitations under the License.
 //|
 
-import { Message } from '../Message.js';
-import { TTypeDeclaration } from './types/TTypeDeclaration.js';
-import { TUnion } from './types/TUnion.js';
-import { ValidationFailure } from '../internal/validation/ValidationFailure.js';
-import { TType } from './types/TType.js';
-import { TelepactSchema } from '../TelepactSchema.js';
-import { selectStructFields } from '../internal/SelectStructFields.js';
-import { getInvalidErrorMessage } from '../internal/validation/GetInvalidErrorMessage.js';
-import { validateHeaders } from '../internal/validation/ValidateHeaders.js';
-import { validateResult } from '../internal/validation/ValidateResult.js';
-import { mapValidationFailuresToInvalidFieldCases } from './validation/MapValidationFailuresToInvalidFieldCases.js';
-import { ValidateContext } from './validation/ValidateContext.js';
-import { serverBase64Decode } from './binary/ServerBase64Decode.js';
-import { getApiDefinitionsWithExamples } from './GetApiDefinitionsWithExamples.js';
-import { TelepactError } from '../TelepactError.js';
+import { Message } from '../Message';
+import { TTypeDeclaration } from './types/TTypeDeclaration';
+import { TUnion } from './types/TUnion';
+import { ValidationFailure } from '../internal/validation/ValidationFailure';
+import { TType } from './types/TType';
+import { TelepactSchema } from '../TelepactSchema';
+import { selectStructFields } from '../internal/SelectStructFields';
+import { getInvalidErrorMessage } from '../internal/validation/GetInvalidErrorMessage';
+import { validateHeaders } from '../internal/validation/ValidateHeaders';
+import { validateResult } from '../internal/validation/ValidateResult';
+import { mapValidationFailuresToInvalidFieldCases } from './validation/MapValidationFailuresToInvalidFieldCases';
+import { ValidateContext } from './validation/ValidateContext';
+import { serverBase64Decode } from './binary/ServerBase64Decode';
+import { getApiDefinitionsWithExamples } from './GetApiDefinitionsWithExamples';
+import { TelepactError } from '../TelepactError';
 
 export async function handleMessage(
     requestMessage: Message,

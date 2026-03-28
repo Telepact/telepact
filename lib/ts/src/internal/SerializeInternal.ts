@@ -14,11 +14,11 @@
 //|  limitations under the License.
 //|
 
-import { SerializationError } from '../SerializationError.js';
-import { Serialization } from '../Serialization.js';
-import { Message } from '../Message.js';
-import { BinaryEncoder } from '../internal/binary/BinaryEncoder.js';
-import { Base64Encoder } from './binary/Base64Encoder.js';
+import { SerializationError } from '../SerializationError';
+import { Serialization } from '../Serialization';
+import { Message } from '../Message';
+import { BinaryEncoder } from '../internal/binary/BinaryEncoder';
+import { Base64Encoder } from './binary/Base64Encoder';
 
 export function serializeInternal(
     message: Message,

@@ -14,14 +14,14 @@
 //|  limitations under the License.
 //|
 
-import { Serializer } from '../Serializer.js';
-import { TelepactSchema } from '../TelepactSchema.js';
-import { Message } from '../Message.js';
-import { BinaryEncoderUnavailableError } from '../internal/binary/BinaryEncoderUnavailableError.js';
-import { BinaryEncodingMissing } from '../internal/binary/BinaryEncodingMissing.js';
-import { InvalidMessage } from '../internal/validation/InvalidMessage.js';
-import { InvalidMessageBody } from '../internal/validation/InvalidMessageBody.js';
-import { TelepactError } from '../TelepactError.js';
+import { Serializer } from '../Serializer';
+import { TelepactSchema } from '../TelepactSchema';
+import { Message } from '../Message';
+import { BinaryEncoderUnavailableError } from '../internal/binary/BinaryEncoderUnavailableError';
+import { BinaryEncodingMissing } from '../internal/binary/BinaryEncodingMissing';
+import { InvalidMessage } from '../internal/validation/InvalidMessage';
+import { InvalidMessageBody } from '../internal/validation/InvalidMessageBody';
+import { TelepactError } from '../TelepactError';
 
 export function parseRequestMessage(
     requestMessageBytes: Uint8Array,

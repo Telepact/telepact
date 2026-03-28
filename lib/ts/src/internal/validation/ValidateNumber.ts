@@ -14,9 +14,9 @@
 //|  limitations under the License.
 //|
 
-import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure.js';
-import { ValidationFailure } from '../../internal/validation/ValidationFailure.js';
-import { numberName } from '../types/TNumber.js';
+import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure';
+import { ValidationFailure } from '../../internal/validation/ValidationFailure';
+import { numberName } from '../types/TNumber';
 
 export function validateNumber(value: any): Array<ValidationFailure> {
     if (typeof value === 'number') {

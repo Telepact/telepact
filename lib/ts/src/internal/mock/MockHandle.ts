@@ -14,18 +14,18 @@
 //|  limitations under the License.
 //|
 
-import { Message } from '../../Message.js';
-import { MockInvocation } from '../../internal/mock/MockInvocation.js';
-import { MockStub } from '../../internal/mock/MockStub.js';
-import { RandomGenerator } from '../../RandomGenerator.js';
-import { TelepactSchema } from '../../TelepactSchema.js';
-import { isSubMap } from '../../internal/mock/IsSubMap.js';
-import { verify } from '../../internal/mock/Verify.js';
-import { verifyNoMoreInteractions } from '../../internal/mock/VerifyNoMoreInteractions.js';
-import { TelepactError } from '../../TelepactError.js';
-import { objectsAreEqual } from '../../internal/ObjectsAreEqual.js';
-import { GenerateContext } from '../generation/GenerateContext.js';
-import { TUnion } from '../types/TUnion.js';
+import { Message } from '../../Message';
+import { MockInvocation } from '../../internal/mock/MockInvocation';
+import { MockStub } from '../../internal/mock/MockStub';
+import { RandomGenerator } from '../../RandomGenerator';
+import { TelepactSchema } from '../../TelepactSchema';
+import { isSubMap } from '../../internal/mock/IsSubMap';
+import { verify } from '../../internal/mock/Verify';
+import { verifyNoMoreInteractions } from '../../internal/mock/VerifyNoMoreInteractions';
+import { TelepactError } from '../../TelepactError';
+import { objectsAreEqual } from '../../internal/ObjectsAreEqual';
+import { GenerateContext } from '../generation/GenerateContext';
+import { TUnion } from '../types/TUnion';
 
 export async function mockHandle(
     requestMessage: Message,

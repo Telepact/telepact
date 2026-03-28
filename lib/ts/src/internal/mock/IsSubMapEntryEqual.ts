@@ -14,9 +14,9 @@
 //|  limitations under the License.
 //|
 
-import { isSubMap } from '../../internal/mock/IsSubMap.js';
-import { partiallyMatches } from '../../internal/mock/PartiallyMatches.js';
-import { objectsAreEqual } from '../ObjectsAreEqual.js';
+import { isSubMap } from '../../internal/mock/IsSubMap';
+import { partiallyMatches } from '../../internal/mock/PartiallyMatches';
+import { objectsAreEqual } from '../ObjectsAreEqual';
 
 export function isSubMapEntryEqual(partValue: any, wholeValue: any): boolean {
     if (Array.isArray(partValue) && Array.isArray(wholeValue)) {

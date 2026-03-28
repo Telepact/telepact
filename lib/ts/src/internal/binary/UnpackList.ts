@@ -14,9 +14,9 @@
 //|  limitations under the License.
 //|
 
-import { MsgpackPacked } from './PackList.js';
-import { unpack } from './Unpack.js';
-import { unpackMap } from './UnpackMap.js';
+import { MsgpackPacked } from './PackList';
+import { unpack } from './Unpack';
+import { unpackMap } from './UnpackMap';
 
 export function unpackList(list: any[]): any[] {
     if (list.length === 0) {

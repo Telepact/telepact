@@ -14,26 +14,26 @@
 //|  limitations under the License.
 //|
 
-export * from './RandomGenerator.js';
-export * from './Client.js';
-export * from './Server.js';
-export * from './TestClient.js';
-export * from './MockServer.js';
-export * from './Message.js';
-export * from './TypedMessage.js';
-export * from './Response.js';
-export * from './Serializer.js';
-export * from './internal/binary/ClientBinaryStrategy.js';
-export * from './SerializationError.js';
-export * from './Serialization.js';
-export * from './TelepactSchema.js';
-export * from './MockTelepactSchema.js';
-export * from './TelepactSchemaParseError.js';
-export * from './TelepactSchemaFiles.js';
-export * from './fileSystem.js';
+export * from './RandomGenerator';
+export * from './Client';
+export * from './Server';
+export * from './TestClient';
+export * from './MockServer';
+export * from './Message';
+export * from './TypedMessage';
+export * from './Response';
+export * from './Serializer';
+export * from './internal/binary/ClientBinaryStrategy';
+export * from './SerializationError';
+export * from './Serialization';
+export * from './TelepactSchema';
+export * from './MockTelepactSchema';
+export * from './TelepactSchemaParseError';
+export * from './TelepactSchemaFiles';
+export * from './fileSystem';
 export { default as jsonSchema } from '../inc/json-schema.json';
 
-import { GenerateContext } from './internal/generation/GenerateContext.js';
+import { GenerateContext } from './internal/generation/GenerateContext';
 
 export const _internal = {
     GenerateContext

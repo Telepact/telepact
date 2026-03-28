@@ -14,11 +14,11 @@
 //|  limitations under the License.
 //|
 
-import { TUnion } from '../types/TUnion.js';
-import { ValidationFailure } from '../../internal/validation/ValidationFailure.js';
-import { mapValidationFailuresToInvalidFieldCases } from '../../internal/validation/MapValidationFailuresToInvalidFieldCases.js';
-import { validateResult } from '../../internal/validation/ValidateResult.js';
-import { Message } from '../../Message.js';
+import { TUnion } from '../types/TUnion';
+import { ValidationFailure } from '../../internal/validation/ValidationFailure';
+import { mapValidationFailuresToInvalidFieldCases } from '../../internal/validation/MapValidationFailuresToInvalidFieldCases';
+import { validateResult } from '../../internal/validation/ValidateResult';
+import { Message } from '../../Message';
 
 export function getInvalidErrorMessage(
     error: string,

@@ -14,13 +14,13 @@
 //|  limitations under the License.
 //|
 
-import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure.js';
-import { TUnion } from '../types/TUnion.js';
-import { TelepactSchemaParseError } from '../../TelepactSchemaParseError.js';
-import { getTypeUnexpectedParseFailure } from '../../internal/schema/GetTypeUnexpectedParseFailure.js';
-import { parseStructFields } from '../../internal/schema/ParseStructFields.js';
-import { TStruct } from '../types/TStruct.js';
-import { ParseContext } from '../../internal/schema/ParseContext.js';
+import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
+import { TUnion } from '../types/TUnion';
+import { TelepactSchemaParseError } from '../../TelepactSchemaParseError';
+import { getTypeUnexpectedParseFailure } from '../../internal/schema/GetTypeUnexpectedParseFailure';
+import { parseStructFields } from '../../internal/schema/ParseStructFields';
+import { TStruct } from '../types/TStruct';
+import { ParseContext } from '../../internal/schema/ParseContext';
 
 export function parseUnionType(
     path: any[],

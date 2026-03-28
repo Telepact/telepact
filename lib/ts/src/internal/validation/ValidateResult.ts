@@ -14,10 +14,10 @@
 //|  limitations under the License.
 //|
 
-import { TUnion } from '../types/TUnion.js';
-import { TelepactError } from '../../TelepactError.js';
-import { mapValidationFailuresToInvalidFieldCases } from '../../internal/validation/MapValidationFailuresToInvalidFieldCases.js';
-import { ValidateContext } from './ValidateContext.js';
+import { TUnion } from '../types/TUnion';
+import { TelepactError } from '../../TelepactError';
+import { mapValidationFailuresToInvalidFieldCases } from '../../internal/validation/MapValidationFailuresToInvalidFieldCases';
+import { ValidateContext } from './ValidateContext';
 
 export function validateResult(resultUnionType: TUnion, errorResult: any): void {
     const newErrorResultValidationFailures = resultUnionType.validate(errorResult, [], new ValidateContext(null, null, false));

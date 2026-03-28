@@ -14,7 +14,7 @@
 //|  limitations under the License.
 //|
 
-import { TTypeDeclaration } from './TTypeDeclaration.js';
+import { TTypeDeclaration } from './TTypeDeclaration';
 
 export class TFieldDeclaration {
     fieldName: string;

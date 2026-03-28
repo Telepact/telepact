@@ -14,8 +14,8 @@
 //|  limitations under the License.
 //|
 
-import { BinaryEncoding } from '../../internal/binary/BinaryEncoding.js';
-import { decodeKeys } from '../../internal/binary/DecodeKeys.js';
+import { BinaryEncoding } from '../../internal/binary/BinaryEncoding';
+import { decodeKeys } from '../../internal/binary/DecodeKeys';
 
 export function decodeBody(encodedMessageBody: Map<any, any>, binaryEncoder: BinaryEncoding): Record<string, any> {
     return decodeKeys(encodedMessageBody, binaryEncoder);

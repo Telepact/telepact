@@ -14,8 +14,8 @@
 //|  limitations under the License.
 //|
 
-import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure.js';
-import { resolveDocumentCoordinates } from './DocumentLocators.js';
+import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
+import { resolveDocumentCoordinates } from './DocumentLocators';
 
 export function mapSchemaParseFailuresToPseudoJson(
     schemaParseFailures: SchemaParseFailure[],

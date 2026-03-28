@@ -14,7 +14,7 @@
 //|  limitations under the License.
 //|
 
-import { encodeBase64 } from "./Base64Util.js";
+import { encodeBase64 } from "./Base64Util";
 
 export function serverBase64Encode(message: object[]): void {
     const headers = message[0] as Record<string, any>;

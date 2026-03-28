@@ -14,10 +14,10 @@
 //|  limitations under the License.
 //|
 
-import { BinaryPackNode } from './BinaryPackNode.js';
-import { pack } from './Pack.js';
-import { packMap } from './PackMap.js';
-import { CannotPack } from './CannotPack.js';
+import { BinaryPackNode } from './BinaryPackNode';
+import { pack } from './Pack';
+import { packMap } from './PackMap';
+import { CannotPack } from './CannotPack';
 import { addExtension } from 'msgpackr';
 
 const PACKED_BYTE = 17;

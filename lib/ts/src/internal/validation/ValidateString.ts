@@ -14,9 +14,9 @@
 //|  limitations under the License.
 //|
 
-import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure.js';
-import { ValidationFailure } from '../../internal/validation/ValidationFailure.js';
-import { stringName } from '../types/TString.js';
+import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure';
+import { ValidationFailure } from '../../internal/validation/ValidationFailure';
+import { stringName } from '../types/TString';
 
 export function validateString(value: any): ValidationFailure[] {
     if (typeof value === 'string') {

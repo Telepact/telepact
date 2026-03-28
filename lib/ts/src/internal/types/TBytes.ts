@@ -14,13 +14,13 @@
 //|  limitations under the License.
 //|
 
-import { ValidationFailure } from '../validation/ValidationFailure.js';
-import { TTypeDeclaration } from './TTypeDeclaration.js';
-import { TType } from './TType.js';
-import { validateBytes } from '../validation/ValidateBytes.js';
-import { generateRandomBytes } from '../generation/GenerateRandomBytes.js';
-import { GenerateContext } from '../generation/GenerateContext.js';
-import { ValidateContext } from '../validation/ValidateContext.js';
+import { ValidationFailure } from '../validation/ValidationFailure';
+import { TTypeDeclaration } from './TTypeDeclaration';
+import { TType } from './TType';
+import { validateBytes } from '../validation/ValidateBytes';
+import { generateRandomBytes } from '../generation/GenerateRandomBytes';
+import { GenerateContext } from '../generation/GenerateContext';
+import { ValidateContext } from '../validation/ValidateContext';
 
 export const bytesName: string = 'Bytes';
 

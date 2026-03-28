@@ -14,10 +14,10 @@
 //|  limitations under the License.
 //|
 
-import { GenerateContext } from './GenerateContext.js';
-import { TType } from '../types/TType.js';
-import { generateRandomStruct } from './GenerateRandomStruct.js';
-import { TUnion } from '../types/TUnion.js';
+import { GenerateContext } from './GenerateContext';
+import { TType } from '../types/TType';
+import { generateRandomStruct } from './GenerateRandomStruct';
+import { TUnion } from '../types/TUnion';
 
 export function generateRandomMockStub(types: { [key: string]: TType }, ctx: GenerateContext): object {
     const functions: string[] = Object.keys(types)

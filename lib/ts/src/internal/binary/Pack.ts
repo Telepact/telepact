@@ -14,7 +14,7 @@
 //|  limitations under the License.
 //|
 
-import { packList } from '../../internal/binary/PackList.js';
+import { packList } from '../../internal/binary/PackList';
 
 export function pack(value: any): any {
     if (Array.isArray(value)) {

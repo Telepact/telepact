@@ -14,11 +14,11 @@
 //|  limitations under the License.
 //|
 
-import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure.js';
-import { TError } from '../types/TError.js';
-import { TelepactSchemaParseError } from '../../TelepactSchemaParseError.js';
-import { parseUnionType } from '../../internal/schema/ParseUnionType.js';
-import { ParseContext } from '../../internal/schema/ParseContext.js';
+import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
+import { TError } from '../types/TError';
+import { TelepactSchemaParseError } from '../../TelepactSchemaParseError';
+import { parseUnionType } from '../../internal/schema/ParseUnionType';
+import { ParseContext } from '../../internal/schema/ParseContext';
 
 export function parseErrorType(
     path: any[],

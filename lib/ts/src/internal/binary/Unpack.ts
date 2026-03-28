@@ -14,7 +14,7 @@
 //|  limitations under the License.
 //|
 
-import { unpackList } from './UnpackList.js';
+import { unpackList } from './UnpackList';
 
 export function unpack(value: any): any {
     if (Array.isArray(value)) {

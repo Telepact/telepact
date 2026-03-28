@@ -14,13 +14,13 @@
 //|  limitations under the License.
 //|
 
-import { TTypeDeclaration } from './TTypeDeclaration.js';
-import { ValidationFailure } from '../validation/ValidationFailure.js';
-import { TType } from './TType.js';
-import { validateString } from '../validation/ValidateString.js';
-import { generateRandomString } from '../generation/GenerateRandomString.js';
-import { GenerateContext } from '../generation/GenerateContext.js';
-import { ValidateContext } from '../validation/ValidateContext.js';
+import { TTypeDeclaration } from './TTypeDeclaration';
+import { ValidationFailure } from '../validation/ValidationFailure';
+import { TType } from './TType';
+import { validateString } from '../validation/ValidateString';
+import { generateRandomString } from '../generation/GenerateRandomString';
+import { GenerateContext } from '../generation/GenerateContext';
+import { ValidateContext } from '../validation/ValidateContext';
 
 export const stringName: string = 'String';
 

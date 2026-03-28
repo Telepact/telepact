@@ -14,13 +14,13 @@
 //|  limitations under the License.
 //|
 
-import { TTypeDeclaration } from './TTypeDeclaration.js';
-import { ValidationFailure } from '../validation/ValidationFailure.js';
-import { TType } from './TType.js';
-import { validateMockCall } from '../validation/ValidateMockCall.js';
-import { GenerateContext } from '../generation/GenerateContext.js';
-import { generateRandomMockCall } from '../generation/GenerateRandomMockCall.js';
-import { ValidateContext } from '../validation/ValidateContext.js';
+import { TTypeDeclaration } from './TTypeDeclaration';
+import { ValidationFailure } from '../validation/ValidationFailure';
+import { TType } from './TType';
+import { validateMockCall } from '../validation/ValidateMockCall';
+import { GenerateContext } from '../generation/GenerateContext';
+import { generateRandomMockCall } from '../generation/GenerateRandomMockCall';
+import { ValidateContext } from '../validation/ValidateContext';
 
 export const mockCallName: string = '_ext.Call_';
 

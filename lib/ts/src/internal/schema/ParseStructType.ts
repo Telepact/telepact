@@ -14,12 +14,12 @@
 //|  limitations under the License.
 //|
 
-import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure.js';
-import { TStruct } from '../types/TStruct.js';
-import { getTypeUnexpectedParseFailure } from '../../internal/schema/GetTypeUnexpectedParseFailure.js';
-import { parseStructFields } from '../../internal/schema/ParseStructFields.js';
-import { TelepactSchemaParseError } from '../../TelepactSchemaParseError.js';
-import { ParseContext } from '../../internal/schema/ParseContext.js';
+import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
+import { TStruct } from '../types/TStruct';
+import { getTypeUnexpectedParseFailure } from '../../internal/schema/GetTypeUnexpectedParseFailure';
+import { parseStructFields } from '../../internal/schema/ParseStructFields';
+import { TelepactSchemaParseError } from '../../TelepactSchemaParseError';
+import { ParseContext } from '../../internal/schema/ParseContext';
 
 export function parseStructType(
     path: any[],

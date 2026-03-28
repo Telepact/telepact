@@ -16,8 +16,8 @@
 
 import { LineCounter, parseDocument } from 'yaml';
 
-import { DocumentLocator } from './DocumentLocators.js';
-import { createDocumentLocatorFromYamlDocument } from './BuildDocumentLocatorFromYamlAst.js';
+import { DocumentLocator } from './DocumentLocators';
+import { createDocumentLocatorFromYamlDocument } from './BuildDocumentLocatorFromYamlAst';
 
 function normalizeJsonCompatibleValue(value: any): any {
     if (value === null || typeof value === 'string' || typeof value === 'boolean') {

@@ -14,8 +14,8 @@
 //|  limitations under the License.
 //|
 
-import { BinaryEncoding } from '../../internal/binary/BinaryEncoding.js';
-import { BinaryEncodingMissing } from '../../internal/binary/BinaryEncodingMissing.js';
+import { BinaryEncoding } from '../../internal/binary/BinaryEncoding';
+import { BinaryEncodingMissing } from '../../internal/binary/BinaryEncodingMissing';
 
 export function decodeKeys(given: any, binaryEncoder: BinaryEncoding): any {
     if (given instanceof Map) {

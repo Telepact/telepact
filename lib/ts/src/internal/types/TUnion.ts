@@ -14,14 +14,14 @@
 //|  limitations under the License.
 //|
 
-import { ValidationFailure } from '../validation/ValidationFailure.js';
-import { TStruct } from './TStruct.js';
-import { TTypeDeclaration } from './TTypeDeclaration.js';
-import { validateUnion } from '../validation/ValidateUnion.js';
-import { generateRandomUnion } from '../generation/GenerateRandomUnion.js';
-import { TType } from './TType.js';
-import { GenerateContext } from '../generation/GenerateContext.js';
-import { ValidateContext } from '../validation/ValidateContext.js';
+import { ValidationFailure } from '../validation/ValidationFailure';
+import { TStruct } from './TStruct';
+import { TTypeDeclaration } from './TTypeDeclaration';
+import { validateUnion } from '../validation/ValidateUnion';
+import { generateRandomUnion } from '../generation/GenerateRandomUnion';
+import { TType } from './TType';
+import { GenerateContext } from '../generation/GenerateContext';
+import { ValidateContext } from '../validation/ValidateContext';
 
 export const unionName: string = 'Object';
 

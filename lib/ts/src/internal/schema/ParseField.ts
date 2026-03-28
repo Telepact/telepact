@@ -14,12 +14,12 @@
 //|  limitations under the License.
 //|
 
-import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure.js';
-import { TFieldDeclaration } from '../types/TFieldDeclaration.js';
-import { TelepactSchemaParseError } from '../../TelepactSchemaParseError.js';
-import { getTypeUnexpectedParseFailure } from '../../internal/schema/GetTypeUnexpectedParseFailure.js';
-import { ParseContext } from '../../internal/schema/ParseContext.js';
-import { parseTypeDeclaration } from './ParseTypeDeclaration.js';
+import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
+import { TFieldDeclaration } from '../types/TFieldDeclaration';
+import { TelepactSchemaParseError } from '../../TelepactSchemaParseError';
+import { getTypeUnexpectedParseFailure } from '../../internal/schema/GetTypeUnexpectedParseFailure';
+import { ParseContext } from '../../internal/schema/ParseContext';
+import { parseTypeDeclaration } from './ParseTypeDeclaration';
 
 export function parseField(
     path: any[],

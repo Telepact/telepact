@@ -14,10 +14,10 @@
 //|  limitations under the License.
 //|
 
-import { BinaryEncoding } from '../../internal/binary/BinaryEncoding.js';
-import { encodeBody } from '../../internal/binary/EncodeBody.js';
-import { packBody } from '../../internal/binary/PackBody.js';
-import { BinaryEncoderUnavailableError } from '../../internal/binary/BinaryEncoderUnavailableError.js';
+import { BinaryEncoding } from '../../internal/binary/BinaryEncoding';
+import { encodeBody } from '../../internal/binary/EncodeBody';
+import { packBody } from '../../internal/binary/PackBody';
+import { BinaryEncoderUnavailableError } from '../../internal/binary/BinaryEncoderUnavailableError';
 
 export function serverBinaryEncode(message: any[], binaryEncoder: BinaryEncoding): any[] {
     const headers: { [key: string]: any } = message[0];

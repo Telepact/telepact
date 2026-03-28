@@ -14,12 +14,12 @@
 //|  limitations under the License.
 //|
 
-import { TType } from './TType.js';
-import { ValidationFailure } from '../validation/ValidationFailure.js';
-import { validateValueOfType } from '../validation/ValidateValueOfType.js';
-import { generateRandomValueOfType } from '../generation/GenerateRandomValueOfType.js';
-import { GenerateContext } from '../generation/GenerateContext.js';
-import { ValidateContext } from '../validation/ValidateContext.js';
+import { TType } from './TType';
+import { ValidationFailure } from '../validation/ValidationFailure';
+import { validateValueOfType } from '../validation/ValidateValueOfType';
+import { generateRandomValueOfType } from '../generation/GenerateRandomValueOfType';
+import { GenerateContext } from '../generation/GenerateContext';
+import { ValidateContext } from '../validation/ValidateContext';
 
 export class TTypeDeclaration {
     type: TType;

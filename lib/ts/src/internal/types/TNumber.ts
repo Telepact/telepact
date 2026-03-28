@@ -14,13 +14,13 @@
 //|  limitations under the License.
 //|
 
-import { ValidationFailure } from '../validation/ValidationFailure.js';
-import { TType } from './TType.js';
-import { validateNumber } from '../validation/ValidateNumber.js';
-import { generateRandomNumber } from '../generation/GenerateRandomNumber.js';
-import { GenerateContext } from '../generation/GenerateContext.js';
-import { TTypeDeclaration } from './TTypeDeclaration.js';
-import { ValidateContext } from '../validation/ValidateContext.js';
+import { ValidationFailure } from '../validation/ValidationFailure';
+import { TType } from './TType';
+import { validateNumber } from '../validation/ValidateNumber';
+import { generateRandomNumber } from '../generation/GenerateRandomNumber';
+import { GenerateContext } from '../generation/GenerateContext';
+import { TTypeDeclaration } from './TTypeDeclaration';
+import { ValidateContext } from '../validation/ValidateContext';
 
 export const numberName: string = 'Number';
 

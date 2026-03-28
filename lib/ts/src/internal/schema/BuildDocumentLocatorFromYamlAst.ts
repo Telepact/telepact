@@ -16,7 +16,7 @@
 
 import { LineCounter, parseDocument } from 'yaml';
 
-import { Coordinates, DocumentLocator, Path } from './DocumentLocators.js';
+import { Coordinates, DocumentLocator, Path } from './DocumentLocators';
 
 type YamlDocument = { contents?: YamlNode | null; errors?: { message: string }[] };
 type YamlNode = {

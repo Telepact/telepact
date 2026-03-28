@@ -14,11 +14,11 @@
 //|  limitations under the License.
 //|
 
-import { Message } from '../Message.js';
-import { Serializer } from '../Serializer.js';
-import { TelepactError } from '../TelepactError.js';
-import { objectsAreEqual } from './ObjectsAreEqual.js';
-import { SerializationError } from '../SerializationError.js';
+import { Message } from '../Message';
+import { Serializer } from '../Serializer';
+import { TelepactError } from '../TelepactError';
+import { objectsAreEqual } from './ObjectsAreEqual';
+import { SerializationError } from '../SerializationError';
 
 function timeoutPromise(timeoutMs: number): Promise<never> {
     return new Promise((_resolve, reject) => {

@@ -14,11 +14,11 @@
 //|  limitations under the License.
 //|
 
-import { decodeBody } from "../../internal/binary/DecodeBody.js";
-import { unpackBody } from "../../internal/binary/UnpackBody.js";
-import { convertMapsToObjects } from "./ConvertMapsToObjects.js";
-import { BinaryEncodingCache } from "./BinaryEncodingCache.js";
-import { ClientBinaryStrategy } from "./ClientBinaryStrategy.js";
+import { decodeBody } from "../../internal/binary/DecodeBody";
+import { unpackBody } from "../../internal/binary/UnpackBody";
+import { convertMapsToObjects } from "./ConvertMapsToObjects";
+import { BinaryEncodingCache } from "./BinaryEncodingCache";
+import { ClientBinaryStrategy } from "./ClientBinaryStrategy";
 
 export function clientBinaryDecode(
     message: any[],

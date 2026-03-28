@@ -14,10 +14,10 @@
 //|  limitations under the License.
 //|
 
-import { GenerateContext } from './GenerateContext.js';
-import { generateRandomUnion } from './GenerateRandomUnion.js';
-import { TType } from '../types/TType.js';
-import { TUnion } from '../types/TUnion.js';
+import { GenerateContext } from './GenerateContext';
+import { generateRandomUnion } from './GenerateRandomUnion';
+import { TType } from '../types/TType';
+import { TUnion } from '../types/TUnion';
 
 export function generateRandomMockCall(types: { [key: string]: TType }, ctx: GenerateContext) {
     const functions: Array<TUnion> = Object.entries(types)

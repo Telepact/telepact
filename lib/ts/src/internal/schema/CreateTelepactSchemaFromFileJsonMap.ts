@@ -14,12 +14,12 @@
 //|  limitations under the License.
 //|
 
-import { getInternalTelepactJson } from './GetInternalTelepactJson.js';
-import { getAuthTelepactJson } from './GetAuthTelepactJson.js';
-import { TelepactSchema } from '../../TelepactSchema.js';
-import { parseTelepactSchema } from './ParseTelepactSchema.js';
-import { findSchemaKey } from './FindSchemaKey.js';
-import { copyDocumentLocators } from './DocumentLocators.js';
+import { getInternalTelepactJson } from './GetInternalTelepactJson';
+import { getAuthTelepactJson } from './GetAuthTelepactJson';
+import { TelepactSchema } from '../../TelepactSchema';
+import { parseTelepactSchema } from './ParseTelepactSchema';
+import { findSchemaKey } from './FindSchemaKey';
+import { copyDocumentLocators } from './DocumentLocators';
 
 export function createTelepactSchemaFromFileJsonMap(jsonDocuments: Record<string, string>): TelepactSchema {
     const finalJsonDocuments = { ...jsonDocuments };
