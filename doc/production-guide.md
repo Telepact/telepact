@@ -8,8 +8,8 @@ layers:
 
 - the Telepact runtime, which owns schema validation, request and response
   semantics, and serialization
-- your transport and service shell, which own deployment topology, auth,
-  observability, rollout controls, and incident response
+- your surrounding service, which owns deployment topology, middleware,
+  auth, observability, rollout controls, and incident response
 
 For byte-level transport patterns, see the [Transport Guide](./transports.md).
 
@@ -18,17 +18,20 @@ For byte-level transport patterns, see the [Transport Guide](./transports.md).
 A common production shape is:
 
 - one Telepact server instance inside each service process
-- one transport adapter per externally reachable surface, such as HTTP,
-  WebSockets, NATS, or an internal queue consumer
+- potentially many transport adapters, one per externally reachable surface,
+  such as HTTP, WebSockets, NATS, or an internal queue consumer
 - one schema directory checked into the service repository and released with the
   service
 - one reverse proxy, gateway, or service mesh layer handling network policy,
   TLS termination, and traffic management outside the Telepact core
+- middleware inside the server handler, where application auth,
+  observability, and other request-level policy can run around function
+  dispatch
 
 A minimal HTTP deployment usually looks like this:
 
 ```text
-client -> edge proxy / gateway -> service transport adapter -> Telepact server -> application handler
+client -> edge proxy / gateway -> transport adapter -> Telepact server -> handler middleware -> function handler
 ```
 
 Recommended responsibilities by layer:
@@ -36,53 +39,25 @@ Recommended responsibilities by layer:
 - **edge proxy / gateway**
   - TLS termination
   - request size limits
-  - coarse authn/authz policy
+  - coarse network policy
   - rate limits
   - access logging
-- **service transport adapter**
+- **transport adapter**
   - map inbound bytes to the Telepact server
   - map Telepact response bytes back to the transport response
-  - attach request ids, deadlines, and caller metadata
-- **Telepact handler layer**
+  - stay thin and focused on bytes in / bytes out
+- **handler middleware and function handlers**
   - function dispatch
   - domain validation
   - application-specific authorization checks
+  - request tracing and structured logs
   - business logic
 
-Keep the Telepact boundary small and explicit. Do not bury transport policy deep
-inside function handlers when it can live in the transport shell.
+Keep the Telepact boundary small and explicit. The transport adapter should stay
+thin. Middleware code belongs inside the server handler that delegates messages
+to functions.
 
-## 2. Version pinning expectations
-
-Current public Telepact packages are prereleases. Until you adopt a stable 1.0
-line, prefer exact version pinning rather than broad floating ranges.
-
-Examples:
-
-- Python:
-  `telepact==1.0.0a224`
-- CLI:
-  `telepact-cli==1.0.0a224`
-- TypeScript:
-  `telepact@1.0.0-alpha.224`
-- Java:
-  `io.github.telepact:telepact:1.0.0-alpha.224`
-- Go:
-  `github.com/telepact/telepact/lib/go@v1.0.0-alpha.224`
-
-Use [doc/versions.md](./versions.md) as the source of truth for published
-registry versions. Repository source may move ahead of published packages
-between releases.
-
-Recommended release hygiene:
-
-1. Pin exact Telepact versions in each service.
-2. Upgrade intentionally in a branch, not incidentally during unrelated work.
-3. Regenerate any generated bindings as part of the upgrade.
-4. Re-run schema compatibility checks before rollout.
-5. Roll forward service-by-service instead of changing every consumer at once.
-
-## 3. Compatibility policy in practice
+## 2. Compatibility policy in practice
 
 Telepact ships a schema compatibility tool because schema evolution should be a
 release gate, not a guess.
@@ -103,6 +78,22 @@ telepact compare \
   --new-schema-dir path/to/current-schema
 ```
 
+If your schema baseline usually lives on `main`, you can materialize that older
+version with `git` before running the compare. For a schema directory, one
+practical pattern is:
+
+```bash
+rm -rf /tmp/schema-baseline
+mkdir -p /tmp/schema-baseline
+
+git archive --format=tar origin/main path/to/schema \
+  | tar -x -C /tmp/schema-baseline
+
+telepact compare \
+  --old-schema-dir /tmp/schema-baseline/path/to/schema \
+  --new-schema-dir path/to/schema
+```
+
 If you need a breaking change, use a staged migration:
 
 - add a new field, function, or union tag in a backwards-compatible way
@@ -110,25 +101,27 @@ If you need a breaking change, use a staged migration:
 - deploy consumers that understand the new shape
 - remove the legacy shape only after every caller has migrated
 
-## 4. Auth and observability patterns
+## 3. Auth and observability patterns
 
 Telepact validates message structure, but production identity, policy, and
-observability still belong in the surrounding service shell.
+observability should live in middleware inside the server handler that delegates
+messages to functions. The transport adapter should remain a small bytes-in /
+bytes-out boundary.
 
 ### Auth
 
 Recommended pattern:
 
-- authenticate at the transport boundary
-- translate authenticated caller identity into request context or Telepact
-  headers expected by your handler layer
+- authenticate in middleware around your Telepact handler
+- normalize caller identity into request context or the specific Telepact
+  headers your application expects
 - keep authorization decisions close to the business logic that owns the data
 
 For HTTP services, this often means:
 
-- bearer token or session validation in middleware
-- forwarding a normalized caller identity into the Telepact handler
-- rejecting unauthenticated requests before they reach business handlers
+- bearer token or session validation in framework middleware
+- passing a normalized caller identity into the Telepact handler middleware
+- rejecting unauthenticated requests before the target function runs
 
 ### Observability
 
@@ -143,15 +136,18 @@ At minimum, emit:
 
 Recommended instrumentation points:
 
-- before transport parsing
-- immediately before `server.process(...)`
-- immediately after the Telepact response is produced
-- around the business handler body
+- around the handler middleware that delegates messages to functions
+- around the business handler body for the specific function being invoked
+- at the edge proxy or gateway for transport-level request metrics
 
 A practical logging shape is one structured event per request with stable keys
 for function, duration, status, and correlation id.
 
-## 5. Rollout and migration guidance
+Do not log the entire `Message` object by default. Headers can carry
+credentials, so prefer selective structured fields instead of dumping the full
+request or response.
+
+## 4. Rollout and migration guidance
 
 For routine upgrades:
 
@@ -177,13 +173,13 @@ For incident response, keep these artifacts easy to retrieve:
 - transport logs with request ids
 - recent compatibility reports
 
-## 6. Suggested pre-production checklist
+## 5. Suggested pre-production checklist
 
 - exact Telepact versions are pinned
 - schema files are checked into the service repository
 - `telepact compare` runs in CI
-- auth is enforced at the transport boundary and in business logic where needed
-- structured logs and latency metrics exist per Telepact function
+- auth is enforced in handler middleware and in business logic where needed
+- structured logs and latency metrics exist per Telepact function without logging full `Message` objects
 - request size and timeout limits are set at the transport layer
 - rollout plan supports canary or staged deployment
 - generated bindings are regenerated and committed during upgrades
