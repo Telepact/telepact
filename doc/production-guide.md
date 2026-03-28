@@ -18,8 +18,9 @@ For byte-level transport patterns, see the [Transport Guide](./transports.md).
 A common production shape is:
 
 - one Telepact server instance inside each service process
-- potentially many transport adapters, one per externally reachable surface,
-  such as HTTP, WebSockets, NATS, or an internal queue consumer
+- potentially many transport adapters funneling into the Telepact server, one per
+  externally reachable surface, such as HTTP, WebSockets, NATS, or an internal
+  queue consumer
 - one schema directory checked into the service repository and released with the
   service
 - one reverse proxy, gateway, or service mesh layer handling network policy,
@@ -125,9 +126,8 @@ Recommended pattern:
 - keep authorization decisions close to the business logic that owns the data
 
 If credentials arrive through the transport layer, copy them into Telepact
-headers before calling `server.process(...)`. For example, an HTTP adapter can
-read a session cookie and pass a normalized auth header through
-`overrideHeaders`:
+headers while calling `server.process(...)`. For example, an HTTP adapter can
+read a session cookie and pass it through `overrideHeaders`:
 
 ```ts
 const response = await server.process(requestBytes, {
@@ -136,8 +136,8 @@ const response = await server.process(requestBytes, {
 });
 ```
 
-Inside the handler, use those normalized headers before delegating to the
-function implementation. An illustrative TypeScript sketch looks like this:
+Inside the handler, parse and validate those credentials before delegating to
+the target function. An illustrative TypeScript sketch looks like this:
 
 ```ts
 const server = new Server(schema, async (message) => {
@@ -146,16 +146,28 @@ const server = new Server(schema, async (message) => {
 
   if (!auth) {
     return new Message({}, {
-      ErrorUnauthorized_: { message: 'missing credentials' },
+      ErrorUnauthenticated_: { message: 'missing credentials' },
     });
   }
 
+  const userId = lookupUserIdFromSession(auth.sessionToken);
+  if (!userId) {
+    return new Message({}, {
+      ErrorUnauthenticated_: { message: 'invalid credentials' },
+    });
+  }
+
+  const normalizedMessage = new Message(
+    { ...message.headers, '@userId_': userId },
+    message.body,
+  );
+
   const startedAt = Date.now();
   try {
-    return await dispatchFunction(target, message, auth);
+    return await dispatchFunction(target, normalizedMessage, auth);
   } finally {
     logger.info('telepact_request', {
-      requestId: message.headers['@id_'],
+      requestId: normalizedMessage.headers['@id_'],
       function: target,
       durationMs: Date.now() - startedAt,
     });
