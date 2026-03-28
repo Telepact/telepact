@@ -14,8 +14,8 @@
 //|  limitations under the License.
 //|
 
-import { BinaryEncodingCache } from "../../internal/binary/BinaryEncodingCache";
-import { BinaryEncoding } from "./BinaryEncoding";
+import { BinaryEncodingCache } from "../../internal/binary/BinaryEncodingCache.js";
+import { BinaryEncoding } from "./BinaryEncoding.js";
 
 export class DefaultBinaryEncodingCache extends BinaryEncodingCache {
     private recentBinaryEncoders: Map<number, BinaryEncoding>;

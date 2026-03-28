@@ -14,11 +14,11 @@
 //|  limitations under the License.
 //|
 
-import { ValidationFailure } from '../../internal/validation/ValidationFailure';
-import { TType } from '../types/TType';
-import { TTypeDeclaration } from '../types/TTypeDeclaration';
-import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure';
-import { ValidateContext } from './ValidateContext';
+import { ValidationFailure } from '../../internal/validation/ValidationFailure.js';
+import { TType } from '../types/TType.js';
+import { TTypeDeclaration } from '../types/TTypeDeclaration.js';
+import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure.js';
+import { ValidateContext } from './ValidateContext.js';
 
 export function validateValueOfType(
     value: any,

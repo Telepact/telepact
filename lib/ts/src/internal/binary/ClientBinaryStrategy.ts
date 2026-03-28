@@ -14,7 +14,7 @@
 //|  limitations under the License.
 //|
 
-import { BinaryEncodingCache } from "./BinaryEncodingCache";
+import { BinaryEncodingCache } from "./BinaryEncodingCache.js";
 
 export class Checksum {
     constructor(

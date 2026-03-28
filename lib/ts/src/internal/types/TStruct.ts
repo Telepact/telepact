@@ -14,14 +14,14 @@
 //|  limitations under the License.
 //|
 
-import { ValidationFailure } from '../validation/ValidationFailure';
-import { TFieldDeclaration } from './TFieldDeclaration';
-import { TTypeDeclaration } from './TTypeDeclaration';
-import { TType } from './TType';
-import { validateStruct } from '../validation/ValidateStruct';
-import { generateRandomStruct } from '../generation/GenerateRandomStruct';
-import { GenerateContext } from '../generation/GenerateContext';
-import { ValidateContext } from '../validation/ValidateContext';
+import { ValidationFailure } from '../validation/ValidationFailure.js';
+import { TFieldDeclaration } from './TFieldDeclaration.js';
+import { TTypeDeclaration } from './TTypeDeclaration.js';
+import { TType } from './TType.js';
+import { validateStruct } from '../validation/ValidateStruct.js';
+import { generateRandomStruct } from '../generation/GenerateRandomStruct.js';
+import { GenerateContext } from '../generation/GenerateContext.js';
+import { ValidateContext } from '../validation/ValidateContext.js';
 
 export const structName: string = 'Object';
 

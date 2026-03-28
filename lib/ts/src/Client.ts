@@ -14,15 +14,15 @@
 //|  limitations under the License.
 //|
 
-import { DefaultSerialization } from './DefaultSerialization';
-import { Serializer } from './Serializer';
-import { ClientBinaryEncoder } from './internal/binary/ClientBinaryEncoder';
-import { Message } from './Message';
-import { clientHandleMessage } from './internal/ClientHandleMessage';
-import { Serialization } from './Serialization';
-import { DefaultBinaryEncodingCache } from './internal/binary/DefaultBinaryEncodingCache';
-import { ClientBase64Encoder } from './internal/binary/ClientBase64Encoder';
-import { LocalStorageBackedBinaryEncodingCache } from './internal/binary/LocalStorageBackedBinaryEncodingCache';
+import { DefaultSerialization } from './DefaultSerialization.js';
+import { Serializer } from './Serializer.js';
+import { ClientBinaryEncoder } from './internal/binary/ClientBinaryEncoder.js';
+import { Message } from './Message.js';
+import { clientHandleMessage } from './internal/ClientHandleMessage.js';
+import { Serialization } from './Serialization.js';
+import { DefaultBinaryEncodingCache } from './internal/binary/DefaultBinaryEncodingCache.js';
+import { ClientBase64Encoder } from './internal/binary/ClientBase64Encoder.js';
+import { LocalStorageBackedBinaryEncodingCache } from './internal/binary/LocalStorageBackedBinaryEncodingCache.js';
 
 export class Client {
     private adapter: (message: Message, serializer: Serializer) => Promise<Message>;

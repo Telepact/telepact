@@ -14,12 +14,12 @@
 //|  limitations under the License.
 //|
 
-import { Message } from './Message';
-import { Serialization } from './Serialization';
-import { BinaryEncoder } from './internal/binary/BinaryEncoder';
-import { serializeInternal } from './internal/SerializeInternal';
-import { deserializeInternal } from './internal/DeserializeInternal';
-import { Base64Encoder } from './internal/binary/Base64Encoder';
+import { Message } from './Message.js';
+import { Serialization } from './Serialization.js';
+import { BinaryEncoder } from './internal/binary/BinaryEncoder.js';
+import { serializeInternal } from './internal/SerializeInternal.js';
+import { deserializeInternal } from './internal/DeserializeInternal.js';
+import { Base64Encoder } from './internal/binary/Base64Encoder.js';
 
 export class Serializer {
     /**

@@ -14,11 +14,11 @@
 //|  limitations under the License.
 //|
 
-import { BinaryEncoderUnavailableError } from "../../internal/binary/BinaryEncoderUnavailableError";
-import { encodeBody } from "../../internal/binary/EncodeBody";
-import { packBody } from "../../internal/binary/PackBody";
-import { BinaryEncodingCache } from "./BinaryEncodingCache";
-import { ClientBinaryStrategy } from "./ClientBinaryStrategy";
+import { BinaryEncoderUnavailableError } from "../../internal/binary/BinaryEncoderUnavailableError.js";
+import { encodeBody } from "../../internal/binary/EncodeBody.js";
+import { packBody } from "../../internal/binary/PackBody.js";
+import { BinaryEncodingCache } from "./BinaryEncodingCache.js";
+import { ClientBinaryStrategy } from "./ClientBinaryStrategy.js";
 
 export function clientBinaryEncode(
     message: any[],

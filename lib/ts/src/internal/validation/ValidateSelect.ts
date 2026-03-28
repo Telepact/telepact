@@ -14,9 +14,9 @@
 //|  limitations under the License.
 //|
 
-import { ValidationFailure } from '../../internal/validation/ValidationFailure';
-import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure';
-import { ValidateContext } from './ValidateContext';
+import { ValidationFailure } from '../../internal/validation/ValidationFailure.js';
+import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure.js';
+import { ValidateContext } from './ValidateContext.js';
 
 export function validateSelect(
     givenObj: any,

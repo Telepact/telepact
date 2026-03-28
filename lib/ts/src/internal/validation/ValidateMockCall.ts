@@ -14,11 +14,11 @@
 //|  limitations under the License.
 //|
 
-import { ValidationFailure } from '../../internal/validation/ValidationFailure';
-import { TType } from '../types/TType';
-import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure';
-import { ValidateContext } from './ValidateContext';
-import { TUnion } from '../types/TUnion';
+import { ValidationFailure } from '../../internal/validation/ValidationFailure.js';
+import { TType } from '../types/TType.js';
+import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure.js';
+import { ValidateContext } from './ValidateContext.js';
+import { TUnion } from '../types/TUnion.js';
 
 export function validateMockCall(
     givenObj: any,

@@ -14,7 +14,7 @@
 //|  limitations under the License.
 //|
 
-import { unpack } from './Unpack';
+import { unpack } from './Unpack.js';
 
 export function unpackBody(body: Map<any, any>): Map<any, any> {
     const result: Map<any, any> = new Map();

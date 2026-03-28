@@ -14,8 +14,8 @@
 //|  limitations under the License.
 //|
 
-import { TFieldDeclaration } from '../types/TFieldDeclaration';
-import { GenerateContext } from '../../internal/generation/GenerateContext';
+import { TFieldDeclaration } from '../types/TFieldDeclaration.js';
+import { GenerateContext } from '../../internal/generation/GenerateContext.js';
 
 export function generateRandomStruct(
     blueprintValue: any,

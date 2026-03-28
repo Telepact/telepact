@@ -14,9 +14,9 @@
 //|  limitations under the License.
 //|
 
-import { ValidationFailure } from '../../internal/validation/ValidationFailure';
-import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure';
-import { integerName } from '../types/TInteger';
+import { ValidationFailure } from '../../internal/validation/ValidationFailure.js';
+import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure.js';
+import { integerName } from '../types/TInteger.js';
 
 export function validateInteger(value: any): ValidationFailure[] {
     if (typeof value === 'number' && Number.isInteger(value)) {

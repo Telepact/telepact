@@ -14,7 +14,7 @@
 //|  limitations under the License.
 //|
 
-import { BinaryEncoding } from '../../internal/binary/BinaryEncoding';
+import { BinaryEncoding } from '../../internal/binary/BinaryEncoding.js';
 
 export function encodeKeys(given: any, binaryEncoder: BinaryEncoding): any {
     if (given === null || given === undefined) {

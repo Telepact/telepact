@@ -14,11 +14,11 @@
 //|  limitations under the License.
 //|
 
-import { createTelepactSchemaFromFileJsonMap } from './internal/schema/CreateTelepactSchemaFromFileJsonMap';
-import { getSchemaFileMap } from './internal/schema/GetSchemaFileMap';
-import { TFieldDeclaration } from './internal/types/TFieldDeclaration';
-import { TType } from './internal/types/TType';
-import { FsModule, PathModule } from './fileSystem';
+import { createTelepactSchemaFromFileJsonMap } from './internal/schema/CreateTelepactSchemaFromFileJsonMap.js';
+import { getSchemaFileMap } from './internal/schema/GetSchemaFileMap.js';
+import { TFieldDeclaration } from './internal/types/TFieldDeclaration.js';
+import { TType } from './internal/types/TType.js';
+import { FsModule, PathModule } from './fileSystem.js';
 
 export class TelepactSchema {
     /**

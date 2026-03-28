@@ -14,16 +14,16 @@
 //|  limitations under the License.
 //|
 
-import { TUnion } from '../types/TUnion';
-import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
-import { getTypeUnexpectedParseFailure } from '../../internal/schema/GetTypeUnexpectedParseFailure';
-import { parseStructType } from '../../internal/schema/ParseStructType';
-import { parseUnionType } from '../../internal/schema/ParseUnionType';
-import { TelepactSchemaParseError } from '../../TelepactSchemaParseError';
-import { ParseContext } from '../../internal/schema/ParseContext';
-import { getOrParseType } from './GetOrParseType';
-import { derivePossibleSelect } from './DerivePossibleSelect';
-import { TSelect } from '../types/TSelect';
+import { TUnion } from '../types/TUnion.js';
+import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure.js';
+import { getTypeUnexpectedParseFailure } from '../../internal/schema/GetTypeUnexpectedParseFailure.js';
+import { parseStructType } from '../../internal/schema/ParseStructType.js';
+import { parseUnionType } from '../../internal/schema/ParseUnionType.js';
+import { TelepactSchemaParseError } from '../../TelepactSchemaParseError.js';
+import { ParseContext } from '../../internal/schema/ParseContext.js';
+import { getOrParseType } from './GetOrParseType.js';
+import { derivePossibleSelect } from './DerivePossibleSelect.js';
+import { TSelect } from '../types/TSelect.js';
 
 export function parseFunctionResultType(
     path: any[],

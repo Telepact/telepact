@@ -1,0 +1,16 @@
+{
+  "name": "telepact-nodenext-test",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc --project tsconfig.json"
+  },
+  "devDependencies": {
+    "@types/node": "^25.0.3",
+    "typescript": "^5.9.2"
+  },
+  "dependencies": {
+    "telepact": "file:telepact.tgz"
+  }
+}

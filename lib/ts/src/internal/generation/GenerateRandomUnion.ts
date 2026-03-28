@@ -14,9 +14,9 @@
 //|  limitations under the License.
 //|
 
-import { TStruct } from '../types/TStruct';
-import { GenerateContext } from '../../internal/generation/GenerateContext';
-import { generateRandomStruct } from '../../internal/generation/GenerateRandomStruct';
+import { TStruct } from '../types/TStruct.js';
+import { GenerateContext } from '../../internal/generation/GenerateContext.js';
+import { generateRandomStruct } from '../../internal/generation/GenerateRandomStruct.js';
 
 export function generateRandomUnion(
     blueprintValue: any,

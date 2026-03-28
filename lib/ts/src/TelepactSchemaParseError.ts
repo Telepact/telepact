@@ -14,8 +14,8 @@
 //|  limitations under the License.
 //|
 
-import { SchemaParseFailure } from './internal/schema/SchemaParseFailure';
-import { mapSchemaParseFailuresToPseudoJson } from './internal/schema/MapSchemaParseFailuresToPseudoJson';
+import { SchemaParseFailure } from './internal/schema/SchemaParseFailure.js';
+import { mapSchemaParseFailuresToPseudoJson } from './internal/schema/MapSchemaParseFailuresToPseudoJson.js';
 
 export class TelepactSchemaParseError extends Error {
     /**

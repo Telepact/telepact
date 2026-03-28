@@ -14,10 +14,10 @@
 //|  limitations under the License.
 //|
 
-import { BinaryEncoder } from './BinaryEncoder';
-import { BinaryEncoding } from './BinaryEncoding';
-import { serverBinaryEncode } from './ServerBinaryEncode';
-import { serverBinaryDecode } from './ServerBinaryDecode';
+import { BinaryEncoder } from './BinaryEncoder.js';
+import { BinaryEncoding } from './BinaryEncoding.js';
+import { serverBinaryEncode } from './ServerBinaryEncode.js';
+import { serverBinaryDecode } from './ServerBinaryDecode.js';
 
 export class ServerBinaryEncoder implements BinaryEncoder {
     private binaryEncoder: BinaryEncoding;

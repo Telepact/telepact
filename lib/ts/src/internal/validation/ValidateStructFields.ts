@@ -14,9 +14,9 @@
 //|  limitations under the License.
 //|
 
-import { ValidationFailure } from '../../internal/validation/ValidationFailure';
-import { TFieldDeclaration } from '../types/TFieldDeclaration';
-import { ValidateContext } from './ValidateContext';
+import { ValidationFailure } from '../../internal/validation/ValidationFailure.js';
+import { TFieldDeclaration } from '../types/TFieldDeclaration.js';
+import { ValidateContext } from './ValidateContext.js';
 
 export function validateStructFields(
     fields: Record<string, TFieldDeclaration>,

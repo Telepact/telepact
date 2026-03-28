@@ -14,7 +14,7 @@
 //|  limitations under the License.
 //|
 
-import { ValidationFailure } from '../../internal/validation/ValidationFailure';
+import { ValidationFailure } from '../../internal/validation/ValidationFailure.js';
 
 export function mapValidationFailuresToInvalidFieldCases(
     argumentValidationFailures: ValidationFailure[],
