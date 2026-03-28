@@ -158,7 +158,7 @@ const server = new Server(schema, async (message) => {
   }
 
   const normalizedMessage = new Message(
-    { ...message.headers, '@userId_': userId },
+    { ...message.headers, '@userId': userId },
     message.body,
   );
 
