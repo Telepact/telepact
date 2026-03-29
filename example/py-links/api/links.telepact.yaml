@@ -1,0 +1,16 @@
+- ///: A structure that can point to a follow-up function call.
+  struct.Todo:
+    title: "string"
+- ///: The follow-up link a client can carry forward verbatim.
+  fn.followUp:
+    id: "string"
+  ->:
+    - Ok_:
+        summary: "string"
+- ///: Return a todo and a link to the next step.
+  fn.issueLink:
+    title: "string"
+  ->:
+    - Ok_:
+        todo: "struct.Todo"
+        next!: "fn.followUp"

@@ -1,0 +1,12 @@
+- ///: Domain errors for arithmetic operations.
+  errors.Math_:
+    - ///: The denominator was zero.
+      ErrorCannotDivideByZero:
+        denominator: "integer"
+- ///: Divide two integers and return a quotient or domain error.
+  fn.divide:
+    numerator: "integer"
+    denominator: "integer"
+  ->:
+    - Ok_:
+        quotient: "number"

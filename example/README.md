@@ -17,3 +17,5 @@ Common commands:
 | `java-binary` | Binary negotiation | A Java client/server pair that upgrades from JSON to Telepact binary payloads. |
 | `py-headers` | Request ids and warning headers | A Python server that echoes `@id_` and emits `@warn_` headers. |
 | `go-api-introspection` | `fn.api_` schema introspection | A Go server/client pair that confirms the built-in schema endpoint exposes the app schema. |
+| `py-errors` | `errors.*` result unions | A Python server that returns a reusable domain error when dividing by zero. |
+| `py-links` | Function-type links | A Python server that returns a prepopulated `fn.followUp` payload. |
