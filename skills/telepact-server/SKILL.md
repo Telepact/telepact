@@ -138,7 +138,7 @@ const handler = async (requestMessage: Message): Promise<Message> => {
 };
 
 const options = new ServerOptions();
-options.authRequired = false;
+options.authRequired = false
 const telepactServer = new Server(schema, handler, options);
 
 // Assuming `transport` is defined elsewhere
@@ -190,7 +190,7 @@ Function<Message, Message> handler = (requestMessage) -> {
 };
 
 var options = new Server.Options();
-options.authRequired = false;
+options.authRequired = false
 var telepactServer = new Server(schema, handler, options);
 
 // Assuming `transport` is defined elsewhere

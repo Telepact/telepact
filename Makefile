@@ -113,7 +113,7 @@ test-trace-go:
 deploy-go:
 	$(MAKE) -C lib/go deploy
 
-.PHONY: test prepare-test-java test-java-run prepare-test-py test-py-run prepare-test-ts test-ts-run prepare-test-go test-go-run
+.PHONY: test prepare-test-java test-java-run prepare-test-py test-py-run prepare-test-ts test-ts-run prepare-test-go test-go-run check-docs
 test:
 	$(MAKE) -C test/runner test
 
@@ -200,6 +200,9 @@ install-project-cli:
 
 uninstall-project-cli:
 	uv tool uninstall telepact-project-cli
+
+check-docs:
+	python3 scripts/check_docs_snippets.py
 
 version:
 	cd lib/java && telepact-project set-version ${VERSION}

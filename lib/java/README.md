@@ -60,7 +60,7 @@ Function<Message, Message> handler = (requestMessage) -> {
 };
 var options = new Server.Options();
 // Set this to false when your schema does not define struct.Auth_.
-options.authRequired = false;
+options.authRequired = false
 var server = new Server(schema, handler, options);
 
 

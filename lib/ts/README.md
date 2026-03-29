@@ -54,7 +54,7 @@ const handler = async (requestMessage: Message): Promise<Message> => {
 
 const options = new ServerOptions();
 // Set this to false when your schema does not define struct.Auth_.
-options.authRequired = false;
+options.authRequired = false
 const server = new Server(schema, handler, options);
 
 // Wire up request/response bytes from your transport of choice

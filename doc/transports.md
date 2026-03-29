@@ -90,7 +90,7 @@ async def handler(request_message: Message) -> Message:
     raise Exception(f'Unknown function: {function_name}')
 
 options = Server.Options()
-options.auth_required = False
+options.auth_required=False
 server = Server(schema, handler, options)
 
 async def http_handler(request):
@@ -182,7 +182,7 @@ async def handler(request_message: Message) -> Message:
     raise Exception(f'Unknown function: {function_name}')
 
 options = Server.Options()
-options.auth_required = False
+options.auth_required=False
 server = Server(schema, handler, options)
 
 async def websocket_handler(websocket):
