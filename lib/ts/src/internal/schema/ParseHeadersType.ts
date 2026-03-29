@@ -14,13 +14,13 @@
 //|  limitations under the License.
 //|
 
-import { TelepactSchemaParseError } from '../../TelepactSchemaParseError';
-import { getTypeUnexpectedParseFailure } from '../../internal/schema/GetTypeUnexpectedParseFailure';
-import { TFieldDeclaration } from '../types/TFieldDeclaration';
-import { ParseContext } from '../../internal/schema/ParseContext';
-import { parseStructFields } from './ParseStructFields';
-import { SchemaParseFailure } from './SchemaParseFailure';
-import { THeaders } from '../types/THeaders';
+import { TelepactSchemaParseError } from '../../TelepactSchemaParseError.js';
+import { getTypeUnexpectedParseFailure } from '../../internal/schema/GetTypeUnexpectedParseFailure.js';
+import { TFieldDeclaration } from '../types/TFieldDeclaration.js';
+import { ParseContext } from '../../internal/schema/ParseContext.js';
+import { parseStructFields } from './ParseStructFields.js';
+import { SchemaParseFailure } from './SchemaParseFailure.js';
+import { THeaders } from '../types/THeaders.js';
 
 export function parseHeadersType(
     path: any[],

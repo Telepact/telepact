@@ -14,7 +14,7 @@
 //|  limitations under the License.
 //|
 
-import { isSubMapEntryEqual } from '../../internal/mock/IsSubMapEntryEqual';
+import { isSubMapEntryEqual } from '../../internal/mock/IsSubMapEntryEqual.js';
 
 export function isSubMap(part: Record<string, any>, whole: Record<string, any>): boolean {
     for (const partKey in part) {

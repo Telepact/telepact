@@ -14,7 +14,7 @@
 //|  limitations under the License.
 //|
 
-import { GenerateContext } from '../../internal/generation/GenerateContext';
+import { GenerateContext } from '../../internal/generation/GenerateContext.js';
 
 export function generateRandomAny(ctx: GenerateContext): any {
     const selectType = ctx.randomGenerator.nextIntWithCeiling(3);

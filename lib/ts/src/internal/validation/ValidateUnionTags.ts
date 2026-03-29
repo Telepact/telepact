@@ -14,11 +14,11 @@
 //|  limitations under the License.
 //|
 
-import { ValidationFailure } from '../../internal/validation/ValidationFailure';
-import { TStruct } from '../types/TStruct';
-import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure';
-import { validateUnionStruct } from '../../internal/validation/ValidateUnionStruct';
-import { ValidateContext } from './ValidateContext';
+import { ValidationFailure } from '../../internal/validation/ValidationFailure.js';
+import { TStruct } from '../types/TStruct.js';
+import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure.js';
+import { validateUnionStruct } from '../../internal/validation/ValidateUnionStruct.js';
+import { ValidateContext } from './ValidateContext.js';
 
 export function validateUnionTags(
     referenceTags: Record<string, TStruct>,

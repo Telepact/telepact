@@ -14,7 +14,7 @@
 //|  limitations under the License.
 //|
 
-import { TFieldDeclaration } from './TFieldDeclaration';
+import { TFieldDeclaration } from './TFieldDeclaration.js';
 
 export class THeaders {
     name: string;

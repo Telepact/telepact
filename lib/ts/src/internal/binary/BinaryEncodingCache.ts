@@ -14,7 +14,7 @@
 //|  limitations under the License.
 //|
 
-import { BinaryEncoding } from "./BinaryEncoding";
+import { BinaryEncoding } from "./BinaryEncoding.js";
 
 export abstract class BinaryEncodingCache {
     abstract add(checksum: number, binaryEncodingMap: Map<string, number>): void

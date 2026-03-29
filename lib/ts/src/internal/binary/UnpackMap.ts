@@ -14,8 +14,8 @@
 //|  limitations under the License.
 //|
 
-import { MsgpackUndefined } from './PackMap';
-import { unpack } from './Unpack';
+import { MsgpackUndefined } from './PackMap.js';
+import { unpack } from './Unpack.js';
 
 export function unpackMap(row: any[], header: any[]): Map<any, any> {
     const finalMap = new Map<any, any>();

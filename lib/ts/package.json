@@ -31,7 +31,7 @@
     }
   },
   "scripts": {
-    "build": "tsc && rollup -c && node ./scripts/rewrite-dts-imports.mjs"
+    "build": "tsc && rollup -c"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^29.0.0",

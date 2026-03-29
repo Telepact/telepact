@@ -14,9 +14,9 @@
 //|  limitations under the License.
 //|
 
-import { TType } from '../types/TType';
-import { TTypeDeclaration } from '../types/TTypeDeclaration';
-import { GenerateContext } from '../../internal/generation/GenerateContext';
+import { TType } from '../types/TType.js';
+import { TTypeDeclaration } from '../types/TTypeDeclaration.js';
+import { GenerateContext } from '../../internal/generation/GenerateContext.js';
 
 export function generateRandomValueOfType(
     blueprintValue: any,

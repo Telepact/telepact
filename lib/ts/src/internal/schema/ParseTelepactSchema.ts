@@ -14,24 +14,24 @@
 //|  limitations under the License.
 //|
 
-import { TelepactSchema } from '../../TelepactSchema';
-import { SchemaParseFailure } from './SchemaParseFailure';
-import { TType } from '../types/TType';
-import { TFieldDeclaration } from '../types/TFieldDeclaration';
-import { TelepactSchemaParseError } from '../../TelepactSchemaParseError';
-import { applyErrorToParsedTypes } from './ApplyErrorToParsedTypes';
-import { catchErrorCollisions } from './CatchErrorCollisions';
-import { findMatchingSchemaKey } from './FindMatchingSchemaKey';
-import { findSchemaKey } from './FindSchemaKey';
-import { getOrParseType } from './GetOrParseType';
-import { getTypeUnexpectedParseFailure } from './GetTypeUnexpectedParseFailure';
-import { parseErrorType } from './ParseErrorType';
-import { parseHeadersType } from './ParseHeadersType';
-import { TError } from '../types/TError';
-import { ParseContext } from './ParseContext';
-import { resolveDocumentCoordinates } from './DocumentLocators';
-import { THeaders } from '../types/THeaders';
-import { catchHeaderCollisions } from './CatchHeaderCollisions';
+import { TelepactSchema } from '../../TelepactSchema.js';
+import { SchemaParseFailure } from './SchemaParseFailure.js';
+import { TType } from '../types/TType.js';
+import { TFieldDeclaration } from '../types/TFieldDeclaration.js';
+import { TelepactSchemaParseError } from '../../TelepactSchemaParseError.js';
+import { applyErrorToParsedTypes } from './ApplyErrorToParsedTypes.js';
+import { catchErrorCollisions } from './CatchErrorCollisions.js';
+import { findMatchingSchemaKey } from './FindMatchingSchemaKey.js';
+import { findSchemaKey } from './FindSchemaKey.js';
+import { getOrParseType } from './GetOrParseType.js';
+import { getTypeUnexpectedParseFailure } from './GetTypeUnexpectedParseFailure.js';
+import { parseErrorType } from './ParseErrorType.js';
+import { parseHeadersType } from './ParseHeadersType.js';
+import { TError } from '../types/TError.js';
+import { ParseContext } from './ParseContext.js';
+import { resolveDocumentCoordinates } from './DocumentLocators.js';
+import { THeaders } from '../types/THeaders.js';
+import { catchHeaderCollisions } from './CatchHeaderCollisions.js';
 
 export function parseTelepactSchema(telepactSchemaDocumentNamesToJson: Record<string, string>): TelepactSchema {
     const originalSchema: { [key: string]: Record<string, object> } = {};

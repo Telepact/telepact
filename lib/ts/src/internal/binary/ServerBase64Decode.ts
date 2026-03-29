@@ -14,7 +14,7 @@
 //|  limitations under the License.
 //|
 
-import { decodeBase64 } from "./Base64Util";
+import { decodeBase64 } from "./Base64Util.js";
 
 export function serverBase64Decode(body: Record<string, any>, bytesPaths: Record<string, any>): void {
     travelBase64Decode(body, bytesPaths);

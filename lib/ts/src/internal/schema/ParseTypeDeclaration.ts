@@ -14,13 +14,13 @@
 //|  limitations under the License.
 //|
 
-import { TTypeDeclaration } from '../types/TTypeDeclaration';
-import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
-import { TArray } from '../../internal/types/TArray';
-import { TObject } from '../../internal/types/TObject';
-import { TelepactSchemaParseError } from '../../TelepactSchemaParseError';
-import { getOrParseType } from '../../internal/schema/GetOrParseType';
-import { getTypeUnexpectedParseFailure } from '../../internal/schema/GetTypeUnexpectedParseFailure';
+import { TTypeDeclaration } from '../types/TTypeDeclaration.js';
+import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure.js';
+import { TArray } from '../../internal/types/TArray.js';
+import { TObject } from '../../internal/types/TObject.js';
+import { TelepactSchemaParseError } from '../../TelepactSchemaParseError.js';
+import { getOrParseType } from '../../internal/schema/GetOrParseType.js';
+import { getTypeUnexpectedParseFailure } from '../../internal/schema/GetTypeUnexpectedParseFailure.js';
 
 export function parseTypeDeclaration(
   path: Array<any>,
