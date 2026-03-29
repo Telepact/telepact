@@ -47,6 +47,9 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from .telepact.internal.types.TTypeDeclaration import TTypeDeclaration
 
+from .resources import load_calculator_telepact_json
+
+
 def bump_version(version: str) -> str:
     major, minor, patch = map(int, version.split('.'))
     patch += 1
@@ -520,8 +523,7 @@ def demo_server(port: int) -> None:
         raise Exception(f"Invalid function: {function_name}")
 
 
-    with pkg_resources.open_text('telepact_cli', 'calculator.telepact.yaml') as file:
-        telepact_json = json.dumps(yaml.safe_load(file.read()), separators=(',', ':'))
+    telepact_json = load_calculator_telepact_json()
 
     telepact_schema = TelepactSchema.from_json(telepact_json)
 

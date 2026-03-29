@@ -15,8 +15,10 @@
 #|
 
 import importlib.resources as pkg_resources
-from ... import json
+import json
+import yaml
 
 
-def get_auth_telepact_json() -> str:
-    return pkg_resources.files(json).joinpath('auth.telepact.json').read_text()
+def load_calculator_telepact_json() -> str:
+    calculator_schema = pkg_resources.files('telepact_cli').joinpath('calculator.telepact.yaml').read_text()
+    return json.dumps(yaml.safe_load(calculator_schema), separators=(',', ':'))
