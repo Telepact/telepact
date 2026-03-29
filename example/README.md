@@ -15,3 +15,5 @@ Common commands:
 | `go-websocket` | WebSocket transport | One Telepact request per WebSocket message using a Go server. |
 | `py-select` | `@select_` response shaping | A Python server that returns full data while Telepact trims the response graph. |
 | `java-binary` | Binary negotiation | A Java client/server pair that upgrades from JSON to Telepact binary payloads. |
+| `py-headers` | Request ids and warning headers | A Python server that echoes `@id_` and emits `@warn_` headers. |
+| `go-api-introspection` | `fn.api_` schema introspection | A Go server/client pair that confirms the built-in schema endpoint exposes the app schema. |

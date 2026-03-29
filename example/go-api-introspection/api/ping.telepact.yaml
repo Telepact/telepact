@@ -1,0 +1,5 @@
+- fn.ping:
+    {}
+  ->:
+    - Ok_:
+        pong: "string"
