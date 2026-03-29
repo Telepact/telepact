@@ -1,10 +1,21 @@
 {
   "changed_paths": [
-    "README.md",
-    "doc/production-guide.md"
+    "lib/py/telepact/internal/schema/GetAuthTelepactJson.py",
+    "lib/py/telepact/internal/schema/GetInternalTelepactJson.py",
+    "lib/py/telepact/internal/schema/GetMockTelepactJson.py",
+    "lib/py/tests/test_importlib_resources.py",
+    "sdk/cli/telepact_cli/cli.py",
+    "sdk/cli/telepact_cli/resources.py",
+    "sdk/cli/tests/test_resources.py"
   ],
-  "direct_targets": [],
-  "pr_number": 311,
-  "targets": [],
-  "version": "1.0.0-alpha.226"
+  "direct_targets": [
+    "cli",
+    "py"
+  ],
+  "pr_number": 316,
+  "targets": [
+    "cli",
+    "py"
+  ],
+  "version": "1.0.0-alpha.229"
 }
