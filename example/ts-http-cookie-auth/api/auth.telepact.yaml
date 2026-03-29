@@ -1,0 +1,6 @@
+- struct.Auth_:
+    sessionToken: "string"
+- fn.me: {}
+  ->:
+    - Ok_:
+        userId: "string"

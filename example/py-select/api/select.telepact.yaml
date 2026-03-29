@@ -1,0 +1,13 @@
+- struct.ResultCard:
+    title: "string"
+    done!: "boolean"
+- union.ResultItem:
+    - Card:
+        title: "string"
+    - Note:
+        body: "string"
+- fn.selectNested: {}
+  ->:
+    - Ok_:
+        card: "struct.ResultCard"
+        item: "union.ResultItem"

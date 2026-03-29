@@ -1,0 +1,5 @@
+- fn.numbers:
+    limit: "integer"
+  ->:
+    - Ok_:
+        values: ["integer"]

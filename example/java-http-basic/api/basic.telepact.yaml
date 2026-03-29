@@ -1,0 +1,5 @@
+- fn.hello:
+    name: "string"
+  ->:
+    - Ok_:
+        message: "string"
