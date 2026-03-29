@@ -1,13 +1,9 @@
 {
   "changed_paths": [
-    "lib/java/README.md"
+    "doc/example.md"
   ],
-  "direct_targets": [
-    "java"
-  ],
-  "pr_number": 312,
-  "targets": [
-    "java"
-  ],
-  "version": "1.0.0-alpha.227"
+  "direct_targets": [],
+  "pr_number": 314,
+  "targets": [],
+  "version": "1.0.0-alpha.228"
 }
