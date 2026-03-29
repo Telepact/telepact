@@ -14,7 +14,7 @@
 //|  limitations under the License.
 //|
 
-import { GenerateContext } from '../../internal/generation/GenerateContext';
+import { GenerateContext } from '../../internal/generation/GenerateContext.js';
 
 export function generateRandomInteger(blueprintValue: any, useBlueprintValue: boolean, ctx: GenerateContext): any {
     if (useBlueprintValue) {

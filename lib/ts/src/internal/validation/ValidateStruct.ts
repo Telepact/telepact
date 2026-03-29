@@ -14,12 +14,12 @@
 //|  limitations under the License.
 //|
 
-import { TFieldDeclaration } from '../types/TFieldDeclaration';
-import { ValidationFailure } from '../../internal/validation/ValidationFailure';
-import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure';
-import { validateStructFields } from '../../internal/validation/ValidateStructFields';
-import { structName } from '../types/TStruct';
-import { ValidateContext } from './ValidateContext';
+import { TFieldDeclaration } from '../types/TFieldDeclaration.js';
+import { ValidationFailure } from '../../internal/validation/ValidationFailure.js';
+import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure.js';
+import { validateStructFields } from '../../internal/validation/ValidateStructFields.js';
+import { structName } from '../types/TStruct.js';
+import { ValidateContext } from './ValidateContext.js';
 
 export function validateStruct(
     value: any,

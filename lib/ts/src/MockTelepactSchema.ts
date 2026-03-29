@@ -14,11 +14,11 @@
 //|  limitations under the License.
 //|
 
-import { TFieldDeclaration } from './internal/types/TFieldDeclaration';
-import { TType } from './internal/types/TType';
-import { createMockTelepactSchemaFromFileJsonMap } from './internal/schema/CreateMockTelepactSchemaFromFileJsonMap';
-import { getSchemaFileMap } from './internal/schema/GetSchemaFileMap';
-import { FsModule, PathModule } from './fileSystem';
+import { TFieldDeclaration } from './internal/types/TFieldDeclaration.js';
+import { TType } from './internal/types/TType.js';
+import { createMockTelepactSchemaFromFileJsonMap } from './internal/schema/CreateMockTelepactSchemaFromFileJsonMap.js';
+import { getSchemaFileMap } from './internal/schema/GetSchemaFileMap.js';
+import { FsModule, PathModule } from './fileSystem.js';
 
 export class MockTelepactSchema {
     /**

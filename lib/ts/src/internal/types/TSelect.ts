@@ -14,13 +14,13 @@
 //|  limitations under the License.
 //|
 
-import { TTypeDeclaration } from './TTypeDeclaration';
-import { ValidationFailure } from '../validation/ValidationFailure';
-import { TType } from './TType';
-import { validateSelect } from '../validation/ValidateSelect';
-import { GenerateContext } from '../generation/GenerateContext';
-import { generateRandomSelect } from '../generation/GenerateRandomSelect';
-import { ValidateContext } from '../validation/ValidateContext';
+import { TTypeDeclaration } from './TTypeDeclaration.js';
+import { ValidationFailure } from '../validation/ValidationFailure.js';
+import { TType } from './TType.js';
+import { validateSelect } from '../validation/ValidateSelect.js';
+import { GenerateContext } from '../generation/GenerateContext.js';
+import { generateRandomSelect } from '../generation/GenerateRandomSelect.js';
+import { ValidateContext } from '../validation/ValidateContext.js';
 
 export const select: string = 'Object';
 

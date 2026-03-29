@@ -14,10 +14,10 @@
 //|  limitations under the License.
 //|
 
-import { TStruct } from '../types/TStruct';
-import { ValidationFailure } from '../../internal/validation/ValidationFailure';
-import { validateStructFields } from '../../internal/validation/ValidateStructFields';
-import { ValidateContext } from './ValidateContext';
+import { TStruct } from '../types/TStruct.js';
+import { ValidationFailure } from '../../internal/validation/ValidationFailure.js';
+import { validateStructFields } from '../../internal/validation/ValidateStructFields.js';
+import { ValidateContext } from './ValidateContext.js';
 
 export function validateUnionStruct(
     unionStruct: TStruct,

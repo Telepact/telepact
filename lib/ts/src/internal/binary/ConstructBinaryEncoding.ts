@@ -14,14 +14,14 @@
 //|  limitations under the License.
 //|
 
-import { TelepactSchema } from '../../TelepactSchema';
-import { BinaryEncoding } from '../../internal/binary/BinaryEncoding';
-import { createChecksum } from '../../internal/binary/CreateChecksum';
-import { TUnion } from '../types/TUnion';
-import { TStruct } from '../types/TStruct';
-import { TArray } from '../types/TArray';
-import { TObject } from '../types/TObject';
-import { TTypeDeclaration } from '../types/TTypeDeclaration';
+import { TelepactSchema } from '../../TelepactSchema.js';
+import { BinaryEncoding } from '../../internal/binary/BinaryEncoding.js';
+import { createChecksum } from '../../internal/binary/CreateChecksum.js';
+import { TUnion } from '../types/TUnion.js';
+import { TStruct } from '../types/TStruct.js';
+import { TArray } from '../types/TArray.js';
+import { TObject } from '../types/TObject.js';
+import { TTypeDeclaration } from '../types/TTypeDeclaration.js';
 
 function traceType(typeDeclaration: TTypeDeclaration): string[] {
     const thisAllKeys: string[] = [];

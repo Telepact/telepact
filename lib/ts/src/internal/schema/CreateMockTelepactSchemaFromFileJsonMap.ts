@@ -14,10 +14,10 @@
 //|  limitations under the License.
 //|
 
-import { MockTelepactSchema } from '../../MockTelepactSchema';
-import { createTelepactSchemaFromFileJsonMap } from './CreateTelepactSchemaFromFileJsonMap';
-import { getMockTelepactJson } from './GetMockTelepactJson';
-import { copyDocumentLocators } from './DocumentLocators';
+import { MockTelepactSchema } from '../../MockTelepactSchema.js';
+import { createTelepactSchemaFromFileJsonMap } from './CreateTelepactSchemaFromFileJsonMap.js';
+import { getMockTelepactJson } from './GetMockTelepactJson.js';
+import { copyDocumentLocators } from './DocumentLocators.js';
 
 export function createMockTelepactSchemaFromFileJsonMap(jsonDocuments: Record<string, string>): MockTelepactSchema {
     const finalJsonDocuments = { ...jsonDocuments };

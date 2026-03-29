@@ -14,13 +14,13 @@
 //|  limitations under the License.
 //|
 
-import { Client } from "./Client";
-import { Message } from "./Message";
-import { isSubMap } from "./internal/mock/IsSubMap";
-import { RandomGenerator } from './RandomGenerator';
-import { TelepactSchema } from './TelepactSchema';
-import { TUnion } from './internal/types/TUnion';
-import { GenerateContext } from './internal/generation/GenerateContext';
+import { Client } from "./Client.js";
+import { Message } from "./Message.js";
+import { isSubMap } from "./internal/mock/IsSubMap.js";
+import { RandomGenerator } from './RandomGenerator.js';
+import { TelepactSchema } from './TelepactSchema.js';
+import { TUnion } from './internal/types/TUnion.js';
+import { GenerateContext } from './internal/generation/GenerateContext.js';
 
 export class TestClientOptions {
     generatedCollectionLengthMin: number;

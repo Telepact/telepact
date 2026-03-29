@@ -14,7 +14,7 @@
 //|  limitations under the License.
 //|
 
-import { TUnion } from './TUnion';
+import { TUnion } from './TUnion.js';
 
 export class TError {
     name: string;

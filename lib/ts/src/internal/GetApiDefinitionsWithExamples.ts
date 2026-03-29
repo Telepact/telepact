@@ -14,12 +14,12 @@
 //|  limitations under the License.
 //|
 
-import { RandomGenerator } from '../RandomGenerator';
-import { TelepactSchema } from '../TelepactSchema';
-import { encodeBase64 } from './binary/Base64Util';
-import { GenerateContext } from './generation/GenerateContext';
-import { TFieldDeclaration } from './types/TFieldDeclaration';
-import { TType } from './types/TType';
+import { RandomGenerator } from '../RandomGenerator.js';
+import { TelepactSchema } from '../TelepactSchema.js';
+import { encodeBase64 } from './binary/Base64Util.js';
+import { GenerateContext } from './generation/GenerateContext.js';
+import { TFieldDeclaration } from './types/TFieldDeclaration.js';
+import { TType } from './types/TType.js';
 
 const EXAMPLE_COLLECTION_LENGTH = 2;
 

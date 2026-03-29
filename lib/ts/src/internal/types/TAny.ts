@@ -14,12 +14,12 @@
 //|  limitations under the License.
 //|
 
-import { TTypeDeclaration } from './TTypeDeclaration';
-import { ValidationFailure } from '../validation/ValidationFailure';
-import { TType } from './TType';
-import { generateRandomAny } from '../generation/GenerateRandomAny';
-import { GenerateContext } from '../generation/GenerateContext';
-import { ValidateContext } from '../validation/ValidateContext';
+import { TTypeDeclaration } from './TTypeDeclaration.js';
+import { ValidationFailure } from '../validation/ValidationFailure.js';
+import { TType } from './TType.js';
+import { generateRandomAny } from '../generation/GenerateRandomAny.js';
+import { GenerateContext } from '../generation/GenerateContext.js';
+import { ValidateContext } from '../validation/ValidateContext.js';
 
 const anyName = 'Any';
 

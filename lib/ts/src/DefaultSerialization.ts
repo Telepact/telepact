@@ -15,7 +15,7 @@
 //|
 
 import { Packr, Unpackr } from 'msgpackr';
-import { Serialization } from './Serialization';
+import { Serialization } from './Serialization.js';
 
 export class DefaultSerialization implements Serialization {
     private packr = new Packr({ mapsAsObjects: false, useRecords: false });

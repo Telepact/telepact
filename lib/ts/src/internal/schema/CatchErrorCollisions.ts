@@ -14,9 +14,9 @@
 //|  limitations under the License.
 //|
 
-import { TelepactSchemaParseError } from '../../TelepactSchemaParseError';
-import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
-import { resolveDocumentCoordinates } from '../../internal/schema/DocumentLocators';
+import { TelepactSchemaParseError } from '../../TelepactSchemaParseError.js';
+import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure.js';
+import { resolveDocumentCoordinates } from '../../internal/schema/DocumentLocators.js';
 
 export function catchErrorCollisions(
     telepactSchemaNameToPseudoJson: Record<string, any[]>,

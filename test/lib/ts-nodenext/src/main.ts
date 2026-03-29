@@ -14,15 +14,10 @@
 //|  limitations under the License.
 //|
 
-import { unpack } from './Unpack.js';
+import { Client, ClientOptions, Message, Serializer } from 'telepact';
 
-export function unpackBody(body: Map<any, any>): Map<any, any> {
-    const result: Map<any, any> = new Map();
+const adapter = async (message: Message, serializer: Serializer): Promise<Message> => {
+  return serializer.deserialize(serializer.serialize(message));
+};
 
-    for (const [key, value] of body.entries()) {
-        const unpackedValue = unpack(value);
-        result.set(key, unpackedValue);
-    }
-
-    return result;
-}
+void new Client(adapter, new ClientOptions());

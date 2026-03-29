@@ -14,11 +14,11 @@
 //|  limitations under the License.
 //|
 
-import { TArray } from './types/TArray';
-import { TObject } from './types/TObject';
-import { TStruct } from './types/TStruct';
-import { TUnion } from './types/TUnion';
-import { TTypeDeclaration } from './types/TTypeDeclaration';
+import { TArray } from './types/TArray.js';
+import { TObject } from './types/TObject.js';
+import { TStruct } from './types/TStruct.js';
+import { TUnion } from './types/TUnion.js';
+import { TTypeDeclaration } from './types/TTypeDeclaration.js';
 
 export function selectStructFields(
     typeDeclaration: TTypeDeclaration,

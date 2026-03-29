@@ -14,13 +14,13 @@
 //|  limitations under the License.
 //|
 
-import { TType } from '../types/TType';
-import { TUnion } from '../types/TUnion';
-import { TStruct } from '../types/TStruct';
-import { TFieldDeclaration } from '../types/TFieldDeclaration';
-import { TArray } from '../types/TArray';
-import { TTypeDeclaration } from '../types/TTypeDeclaration';
-import { TObject } from '../types/TObject';
+import { TType } from '../types/TType.js';
+import { TUnion } from '../types/TUnion.js';
+import { TStruct } from '../types/TStruct.js';
+import { TFieldDeclaration } from '../types/TFieldDeclaration.js';
+import { TArray } from '../types/TArray.js';
+import { TTypeDeclaration } from '../types/TTypeDeclaration.js';
+import { TObject } from '../types/TObject.js';
 
 export function derivePossibleSelect(fnName: string, result: TUnion): Record<string, any> {
     const nestedTypes: Record<string, TType> = {};

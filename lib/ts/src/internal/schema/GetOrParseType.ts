@@ -14,25 +14,25 @@
 //|  limitations under the License.
 //|
 
-import { TelepactSchemaParseError } from '../../TelepactSchemaParseError';
-import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
-import { TType } from '../types/TType';
-import { TObject } from '../types/TObject';
-import { TArray } from '../types/TArray';
-import { TBoolean } from '../types/TBoolean';
-import { TInteger } from '../types/TInteger';
-import { TNumber } from '../types/TNumber';
-import { TString } from '../types/TString';
-import { TAny } from '../types/TAny';
-import { TBytes } from '../types/TBytes';
-import { parseFunctionErrorsRegex, parseFunctionResultType } from '../../internal/schema/ParseFunctionType';
-import { parseStructType } from '../../internal/schema/ParseStructType';
-import { parseUnionType } from '../../internal/schema/ParseUnionType';
-import { TSelect } from '../types/TSelect';
-import { TMockCall } from '../types/TMockCall';
-import { TMockStub } from '../types/TMockStub';
-import { ParseContext } from '../../internal/schema/ParseContext';
-import { TUnion } from '../types/TUnion';
+import { TelepactSchemaParseError } from '../../TelepactSchemaParseError.js';
+import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure.js';
+import { TType } from '../types/TType.js';
+import { TObject } from '../types/TObject.js';
+import { TArray } from '../types/TArray.js';
+import { TBoolean } from '../types/TBoolean.js';
+import { TInteger } from '../types/TInteger.js';
+import { TNumber } from '../types/TNumber.js';
+import { TString } from '../types/TString.js';
+import { TAny } from '../types/TAny.js';
+import { TBytes } from '../types/TBytes.js';
+import { parseFunctionErrorsRegex, parseFunctionResultType } from '../../internal/schema/ParseFunctionType.js';
+import { parseStructType } from '../../internal/schema/ParseStructType.js';
+import { parseUnionType } from '../../internal/schema/ParseUnionType.js';
+import { TSelect } from '../types/TSelect.js';
+import { TMockCall } from '../types/TMockCall.js';
+import { TMockStub } from '../types/TMockStub.js';
+import { ParseContext } from '../../internal/schema/ParseContext.js';
+import { TUnion } from '../types/TUnion.js';
 
 export function getOrParseType(path: any[], typeName: string, ctx: ParseContext): TType {
     if (ctx.failedTypes.has(typeName)) {

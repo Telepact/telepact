@@ -14,9 +14,9 @@
 //|  limitations under the License.
 //|
 
-import { TFieldDeclaration } from '../types/TFieldDeclaration';
-import { ValidationFailure } from '../../internal/validation/ValidationFailure';
-import { ValidateContext } from './ValidateContext';
+import { TFieldDeclaration } from '../types/TFieldDeclaration.js';
+import { ValidationFailure } from '../../internal/validation/ValidationFailure.js';
+import { ValidateContext } from './ValidateContext.js';
 
 export function validateHeaders(
     headers: Record<string, any>,
