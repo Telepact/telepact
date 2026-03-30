@@ -19,6 +19,6 @@ SHELL := /bin/bash
 .PHONY: check run
 
 check:
-	@set -euo pipefail; rm -f telepact.tgz; cp ../../lib/ts/dist-tgz/*.tgz telepact.tgz; npm install; npm test
+	@set -euo pipefail; $(MAKE) -C ../../lib/ts; rm -f telepact.tgz; cp ../../lib/ts/dist-tgz/*.tgz telepact.tgz; npm install; npm test
 
 run: check
