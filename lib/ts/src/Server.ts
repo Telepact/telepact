@@ -47,9 +47,9 @@ export class Server {
 
         this.serializer = new Serializer(options.serialization, binaryEncoder, base64Encoder);
 
-        if (!('struct.Auth_' in this.telepactSchema.parsed) && options.authRequired) {
+        if (!('union.Auth_' in this.telepactSchema.parsed) && options.authRequired) {
             throw new Error(
-                'Unauthenticated server. Either define a non-empty `struct.Auth_` in your schema or set `options.authRequired` to `false`.',
+                'Unauthenticated server. Either define a `union.Auth_` in your schema or set `options.authRequired` to `false`.',
             );
         }
     }

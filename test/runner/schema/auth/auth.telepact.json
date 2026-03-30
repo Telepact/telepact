@@ -3,9 +3,13 @@
         "info.AuthExample": {}
     },
     {
-        "struct.Auth_": {
-            "token": "string"
-        }
+        "union.Auth_": [
+            {
+                "Token": {
+                    "token": "string"
+                }
+            }
+        ]
     },
     {
         "fn.test": {},

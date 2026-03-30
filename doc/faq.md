@@ -53,9 +53,9 @@ everything is optional, and new runtime fields are not disallowed.
 
 ## Why does my unauthenticated server fail to start?
 
-Telepact server libraries default to requiring the standard `struct.Auth_`
-definition. If a non-empty `struct.Auth_` is not defined, the server will
-error on startup, prompting the implementer to either define `struct.Auth_`
+Telepact server libraries default to requiring the standard `union.Auth_`
+definition. If `union.Auth_` is not defined, the server will
+error on startup, prompting the implementer to either define `union.Auth_`
 or use the server options to indicate auth is not required.
 
 This startup check forces the implementer to make conscientious decisions

@@ -112,7 +112,7 @@ Common client-facing headers include:
 - `@time_`: request timeout in milliseconds
 - `@id_`: correlation ID reflected by the server
 - `@select_`: response field selection
-- `@auth_`: auth data when the schema defines `struct.Auth_`
+- `@auth_`: auth data when the schema defines `union.Auth_`
 - `@warn_`: warnings returned by the server
 - `@bin_`, `@enc_`, `@pac_`: binary negotiation headers (though should not use directly)
 
@@ -120,13 +120,14 @@ For JSON mode, API schema fields that have the `bytes` type travel as base64 str
 
 ## Auth
 
-If the server schema defines `struct.Auth_`, send credentials in the `@auth_` header. The fields inside `@auth_` must match `struct.Auth_` exactly.
+If the server schema defines `union.Auth_`, send credentials in the `@auth_` header. The value inside `@auth_` must match one variant of `union.Auth_` exactly.
 
 For example, if the schema includes:
 
 ```yaml
-struct.Auth_:
-  token: string
+union.Auth_:
+  - Token:
+      token: string
 ```
 
 then a client request should look like:
@@ -135,7 +136,9 @@ then a client request should look like:
 [
     {
         "@auth_": {
-            "token": "secret-token"
+            "Token": {
+                "token": "***"
+            }
         }
     },
     {

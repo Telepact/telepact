@@ -91,8 +91,8 @@ func NewServer(telepactSchema *TelepactSchema, handler ServerHandler, options *S
 	base64Encoder := binary.NewServerBase64Encoder()
 	serializer := NewSerializer(serializationImpl, binaryEncoder, base64Encoder)
 
-	if _, exists := telepactSchema.Parsed["struct.Auth_"]; !exists && options.AuthRequired {
-		return nil, NewTelepactError("Unauthenticated server. Either define a `struct.Auth_` in your schema or set `options.auth_required` to `false`.")
+	if _, exists := telepactSchema.Parsed["union.Auth_"]; !exists && options.AuthRequired {
+		return nil, NewTelepactError("Unauthenticated server. Either define a `union.Auth_` in your schema or set `options.auth_required` to `false`.")
 	}
 
 	return &Server{

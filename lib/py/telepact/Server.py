@@ -60,9 +60,9 @@ class Server:
         base64_encoder = ServerBase64Encoder()
         self.serializer = Serializer(options.serialization, binary_encoder, base64_encoder)
 
-        if "struct.Auth_" not in self.telepact_schema.parsed and options.auth_required:
+        if "union.Auth_" not in self.telepact_schema.parsed and options.auth_required:
             raise RuntimeError(
-                "Unauthenticated server. Either define a `struct.Auth_` in your schema or set `options.auth_required` to `false`."
+                "Unauthenticated server. Either define a `union.Auth_` in your schema or set `options.auth_required` to `false`."
             )
 
     async def process(self, request_message_bytes: bytes, override_headers: dict[str, object] = {}) -> 'Response':

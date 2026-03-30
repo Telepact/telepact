@@ -36,7 +36,7 @@ def create_telepact_schema_from_file_json_map(json_documents: dict[str, str]) ->
     # Determine if we need to add the auth schema
     auth_json = get_auth_telepact_json()
     for json in json_documents.values():
-        regex = re.compile(r'"struct\.Auth_"\s*:')
+        regex = re.compile(r'"union\.Auth_"\s*:')
         matcher = regex.search(json)
         if matcher:
             if not _has_bundled_definitions(json_documents, "auth_", auth_json):
