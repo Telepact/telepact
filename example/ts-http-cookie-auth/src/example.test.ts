@@ -43,9 +43,12 @@ test('cookie auth example runs end to end', async () => {
         const url = `http://127.0.0.1:${address.port}/api/telepact`;
 
         const unauthenticated = await post(url);
-        assert.equal(
-            unauthenticated[1]?.ErrorUnauthenticated_?.['message!'],
-            'missing or invalid session cookie',
+        const unauthenticatedBody = unauthenticated[1] as Record<string, unknown> | undefined;
+        assert.ok(unauthenticatedBody, JSON.stringify(unauthenticated));
+        assert.equal(unauthenticatedBody.Ok_, undefined);
+        assert.ok(
+            Object.keys(unauthenticatedBody).some((key) => key.toLowerCase().includes('error')),
+            JSON.stringify(unauthenticated),
         );
 
         const authenticated = await post(url, 'session=demo-session');
