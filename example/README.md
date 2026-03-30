@@ -1,21 +1,15 @@
 # Telepact examples
 
-Each example is intentionally minimal and focuses on one Telepact pattern.
+These examples are one-shot demonstration tests. Each one starts the minimal transport wiring it needs, sends an example request/response exchange, then tears down and exits.
 
-Common commands:
-
-- In any example directory, run `make run` to start the example.
-- In any example directory, run `make check` to verify the example end to end.
-- From this directory, run `make check` to verify every example in CI.
-
-| Directory | Pattern | What it shows |
+| Directory | Pattern | Test command |
 | --- | --- | --- |
-| `java-http-basic` | Basic HTTP transport | A minimal Java Telepact server wired to one HTTP POST endpoint. |
-| `ts-http-cookie-auth` | Cookie-backed auth | A TypeScript transport adapter that reads a session cookie and maps it to `@auth_`. |
-| `go-websocket` | WebSocket transport | One Telepact request per WebSocket message using a Go server. |
-| `py-select` | `@select_` response shaping | A Python server that returns full data while Telepact trims the response graph. |
-| `java-binary` | Binary negotiation | A Java client/server pair that upgrades from JSON to Telepact binary payloads. |
-| `py-headers` | Request ids and warning headers | A Python server that echoes `@id_` and emits `@warn_` headers. |
-| `go-api-introspection` | `fn.api_` schema introspection | A Go server/client pair that confirms the built-in schema endpoint exposes the app schema. |
-| `py-errors` | `errors.*` result unions | A Python server that returns a reusable domain error when dividing by zero. |
-| `py-links` | Function-type links | A Python server that returns a prepopulated `fn.followUp` payload. |
+| `java-http-basic` | Basic HTTP transport | `make -C ../../lib/java && mvn -q -s settings.xml -Dtelepact.version=$(cat ../../VERSION.txt) test` |
+| `ts-http-cookie-auth` | Cookie-backed auth | `make -C ../../lib/ts && cp ../../lib/ts/dist-tgz/*.tgz telepact.tgz && npm install && npm test` |
+| `go-websocket` | WebSocket transport | `go test ./...` |
+| `py-select` | `@select_` response shaping | `make -C ../../lib/py && rm -rf .venv && uv venv --python python3.11 .venv && uv pip install --python .venv/bin/python pytest ../../lib/py/dist/*.tar.gz && .venv/bin/python -m pytest -q` |
+| `java-binary` | Binary negotiation | `make -C ../../lib/java && mvn -q -s settings.xml -Dtelepact.version=$(cat ../../VERSION.txt) test` |
+| `py-headers` | Request ids and warning headers | `make -C ../../lib/py && rm -rf .venv && uv venv --python python3.11 .venv && uv pip install --python .venv/bin/python pytest ../../lib/py/dist/*.tar.gz && .venv/bin/python -m pytest -q` |
+| `go-api-introspection` | `fn.api_` schema introspection | `go test ./...` |
+| `py-errors` | `errors.*` result unions | `make -C ../../lib/py && rm -rf .venv && uv venv --python python3.11 .venv && uv pip install --python .venv/bin/python pytest ../../lib/py/dist/*.tar.gz && .venv/bin/python -m pytest -q` |
+| `py-links` | Function-type links | `make -C ../../lib/py && rm -rf .venv && uv venv --python python3.11 .venv && uv pip install --python .venv/bin/python pytest ../../lib/py/dist/*.tar.gz && .venv/bin/python -m pytest -q` |

@@ -126,9 +126,6 @@ clean-test:
 	$(MAKE) -C test/lib/ts-browser-safe clean
 	$(MAKE) -C test/lib/ts-nodenext clean
 
-example-check:
-	$(MAKE) -C example check
-
 dart:
 	$(MAKE) -C bind/dart
 

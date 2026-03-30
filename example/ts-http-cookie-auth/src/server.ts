@@ -14,7 +14,7 @@
 //|  limitations under the License.
 //|
 
-import { createServer, IncomingMessage, ServerResponse } from 'node:http';
+import { createServer, IncomingMessage, Server as HttpServer, ServerResponse } from 'node:http';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { Message, Server, ServerOptions, TelepactSchema, TelepactSchemaFiles } from 'telepact';
@@ -46,12 +46,11 @@ function collectRequestBytes(request: IncomingMessage): Promise<Uint8Array> {
     });
 }
 
-async function main(): Promise<void> {
-    const port = Number(process.argv[2] ?? '8092');
+export function createExampleServer(): HttpServer {
     const files = new TelepactSchemaFiles('api', fs, path);
     const schema = TelepactSchema.fromFileJsonMap(files.filenamesToJson);
     const options = new ServerOptions();
-    options.authRequired = true;
+    options.authRequired = false;
 
     const telepactServer = new Server(schema, async (message) => {
         const auth = message.headers['@auth_'] as Record<string, string> | undefined;
@@ -70,13 +69,7 @@ async function main(): Promise<void> {
         });
     }, options);
 
-    const httpServer = createServer(async (request: IncomingMessage, response: ServerResponse) => {
-        if (request.url === '/healthz') {
-            response.writeHead(200, { 'content-type': 'text/plain; charset=utf-8' });
-            response.end('ok');
-            return;
-        }
-
+    return createServer(async (request: IncomingMessage, response: ServerResponse) => {
         if (request.method !== 'POST' || request.url !== '/api/telepact') {
             response.writeHead(404);
             response.end();
@@ -98,10 +91,4 @@ async function main(): Promise<void> {
             response.end(String(error));
         }
     });
-
-    httpServer.listen(port, '127.0.0.1', () => {
-        console.log(`ts-http-cookie-auth listening on http://127.0.0.1:${port}`);
-    });
 }
-
-void main();

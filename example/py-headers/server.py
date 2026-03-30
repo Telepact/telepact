@@ -15,7 +15,6 @@
 #|
 
 import asyncio
-import sys
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 from telepact import Message, Server, TelepactSchema, TelepactSchemaFiles
@@ -48,40 +47,25 @@ async def handler(request_message: Message) -> Message:
 telepact_server = Server(schema, handler, options)
 
 
-class RequestHandler(BaseHTTPRequestHandler):
-    def do_GET(self) -> None:
-        if self.path != '/healthz':
-            self.send_response(404)
+def create_http_server(host: str = '127.0.0.1', port: int = 0) -> ThreadingHTTPServer:
+    class RequestHandler(BaseHTTPRequestHandler):
+        def do_POST(self) -> None:
+            if self.path != '/api/telepact':
+                self.send_response(404)
+                self.end_headers()
+                return
+
+            content_length = int(self.headers.get('Content-Length', '0'))
+            request_bytes = self.rfile.read(content_length)
+            response = asyncio.run(telepact_server.process(request_bytes))
+            content_type = 'application/octet-stream' if '@bin_' in response.headers else 'application/json'
+
+            self.send_response(200)
+            self.send_header('Content-Type', content_type)
             self.end_headers()
+            self.wfile.write(response.bytes)
+
+        def log_message(self, format: str, *args: object) -> None:
             return
 
-        self.send_response(200)
-        self.send_header('Content-Type', 'text/plain; charset=utf-8')
-        self.end_headers()
-        self.wfile.write(b'ok')
-
-    def do_POST(self) -> None:
-        if self.path != '/api/telepact':
-            self.send_response(404)
-            self.end_headers()
-            return
-
-        content_length = int(self.headers.get('Content-Length', '0'))
-        request_bytes = self.rfile.read(content_length)
-        response = asyncio.run(telepact_server.process(request_bytes))
-        content_type = 'application/octet-stream' if '@bin_' in response.headers else 'application/json'
-
-        self.send_response(200)
-        self.send_header('Content-Type', content_type)
-        self.end_headers()
-        self.wfile.write(response.bytes)
-
-    def log_message(self, format: str, *args: object) -> None:
-        return
-
-
-if __name__ == '__main__':
-    port = int(sys.argv[1]) if len(sys.argv) > 1 else 8096
-    server = ThreadingHTTPServer(('127.0.0.1', port), RequestHandler)
-    print(f'py-headers listening on http://127.0.0.1:{port}')
-    server.serve_forever()
+    return ThreadingHTTPServer((host, port), RequestHandler)

@@ -1,8 +1,9 @@
 # go-websocket
 
-Minimal Go Telepact server over WebSockets.
+Minimal Go Telepact example that runs as a one-shot Go test over WebSocket request/reply.
 
-Commands:
+Test command:
 
-- `make run` — start the server on `ws://127.0.0.1:8093/ws/telepact`
-- `make check` — start the server and verify a request/reply exchange over WebSocket
+```bash
+go test ./...
+```

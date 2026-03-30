@@ -1,8 +1,13 @@
 # py-errors
 
-Minimal Python Telepact server showing reusable `errors.*` result unions.
+Minimal Python Telepact example that runs as a one-shot `pytest` test and exercises reusable `errors.*` result unions.
 
-Commands:
+Test command:
 
-- `make run` — start the server on `http://127.0.0.1:8098`
-- `make check` — verify both success and error responses
+```bash
+make -C ../../lib/py
+rm -rf .venv
+uv venv --python python3.11 .venv
+uv pip install --python .venv/bin/python pytest ../../lib/py/dist/*.tar.gz
+.venv/bin/python -m pytest -q
+```

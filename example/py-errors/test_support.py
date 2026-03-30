@@ -14,40 +14,32 @@
 #|  limitations under the License.
 #|
 
+from __future__ import annotations
+
 import json
-import sys
+import threading
 import urllib.request
+from http.server import ThreadingHTTPServer
 
 
-def main() -> None:
-    if len(sys.argv) != 2:
-        raise SystemExit('usage: python check.py <url>')
+def run_server(server: ThreadingHTTPServer) -> threading.Thread:
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    return thread
 
-    body = [
-        {},
-        {
-            'fn.issueLink': {
-                'title': 'Ship docs',
-            },
-        },
-    ]
 
+def stop_server(server: ThreadingHTTPServer, thread: threading.Thread) -> None:
+    server.shutdown()
+    server.server_close()
+    thread.join(timeout=5)
+
+
+def post_json(url: str, body: list[object], *, headers: dict[str, str] | None = None) -> list[object]:
     request = urllib.request.Request(
-        sys.argv[1],
+        url,
         data=json.dumps(body).encode('utf-8'),
-        headers={'Content-Type': 'application/json'},
+        headers={'Content-Type': 'application/json', **(headers or {})},
         method='POST',
     )
-
     with urllib.request.urlopen(request) as response:
-        payload = json.loads(response.read().decode('utf-8'))
-
-    next_link = payload[1].get('Ok_', {}).get('next!', {})
-    if next_link.get('fn.followUp', {}).get('id') != 'follow-up-1':
-        raise SystemExit(f'unexpected response: {payload!r}')
-
-    print('py-links check passed')
-
-
-if __name__ == '__main__':
-    main()
+        return json.loads(response.read().decode('utf-8'))

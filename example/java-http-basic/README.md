@@ -1,8 +1,10 @@
 # java-http-basic
 
-Minimal Java Telepact server over HTTP.
+Minimal Java Telepact example that runs as a one-shot JUnit test.
 
-Commands:
+Test command:
 
-- `make run` — start the server on `http://127.0.0.1:8091`
-- `make check` — start the server, send a Telepact request, and verify the response
+```bash
+make -C ../../lib/java
+mvn -q -s settings.xml -Dtelepact.version=$(cat ../../VERSION.txt) test
+```

@@ -1,8 +1,13 @@
 # py-headers
 
-Minimal Python Telepact server showing request id propagation and warning headers.
+Minimal Python Telepact example that runs as a one-shot `pytest` test and verifies `@id_` echoing plus `@warn_` response headers.
 
-Commands:
+Test command:
 
-- `make run` — start the server on `http://127.0.0.1:8096`
-- `make check` — verify `@id_` echoing and `@warn_` response headers
+```bash
+make -C ../../lib/py
+rm -rf .venv
+uv venv --python python3.11 .venv
+uv pip install --python .venv/bin/python pytest ../../lib/py/dist/*.tar.gz
+.venv/bin/python -m pytest -q
+```

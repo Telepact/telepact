@@ -1,8 +1,10 @@
 # java-binary
 
-Minimal Java Telepact example showing binary negotiation over HTTP.
+Minimal Java Telepact example that runs as a one-shot JUnit test and verifies binary negotiation.
 
-Commands:
+Test command:
 
-- `make run` — start the server on `http://127.0.0.1:8095`
-- `make check` — verify that a Java Telepact client upgrades from JSON to binary payloads
+```bash
+make -C ../../lib/java
+mvn -q -s settings.xml -Dtelepact.version=$(cat ../../VERSION.txt) test
+```

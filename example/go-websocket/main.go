@@ -18,11 +18,7 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
-	"os"
-	"strconv"
-	"strings"
 
 	"github.com/gorilla/websocket"
 	telepact "github.com/telepact/telepact/lib/go"
@@ -30,25 +26,6 @@ import (
 
 var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool { return true },
-}
-
-func main() {
-	if len(os.Args) < 3 {
-		log.Fatal("usage: go run . server <port> | go run . check <ws-url>")
-	}
-
-	switch os.Args[1] {
-	case "server":
-		port, err := strconv.Atoi(os.Args[2])
-		if err != nil {
-			log.Fatal(err)
-		}
-		runServer(port)
-	case "check":
-		runCheck(os.Args[2])
-	default:
-		log.Fatalf("unknown mode: %s", os.Args[1])
-	}
 }
 
 func buildServer() (*telepact.Server, error) {
@@ -89,17 +66,13 @@ func buildServer() (*telepact.Server, error) {
 	}, options)
 }
 
-func runServer(port int) {
+func newWebsocketHandler() (http.Handler, error) {
 	server, err := buildServer()
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("/healthz", func(writer http.ResponseWriter, request *http.Request) {
-		writer.WriteHeader(http.StatusOK)
-		_, _ = writer.Write([]byte("ok"))
-	})
 	mux.HandleFunc("/ws/telepact", func(writer http.ResponseWriter, request *http.Request) {
 		conn, err := upgrader.Upgrade(writer, request, nil)
 		if err != nil {
@@ -115,7 +88,6 @@ func runServer(port int) {
 
 			response, err := server.Process(requestBytes)
 			if err != nil {
-				log.Println(err)
 				return
 			}
 
@@ -130,32 +102,5 @@ func runServer(port int) {
 		}
 	})
 
-	address := fmt.Sprintf("127.0.0.1:%d", port)
-	log.Printf("go-websocket listening on ws://%s/ws/telepact", address)
-	log.Fatal(http.ListenAndServe(address, mux))
-}
-
-func runCheck(wsURL string) {
-	conn, _, err := websocket.DefaultDialer.Dial(wsURL, nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer conn.Close()
-
-	request := `[{}, {"fn.greet": {"subject": "Telepact"}}]`
-	if err := conn.WriteMessage(websocket.TextMessage, []byte(request)); err != nil {
-		log.Fatal(err)
-	}
-
-	_, responseBytes, err := conn.ReadMessage()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	response := string(responseBytes)
-	if !strings.Contains(response, "Hello Telepact from WebSocket!") {
-		log.Fatalf("unexpected response: %s", response)
-	}
-
-	fmt.Println("go-websocket check passed")
+	return mux, nil
 }

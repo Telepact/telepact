@@ -1,8 +1,13 @@
 # py-links
 
-Minimal Python Telepact server showing function-type links in response payloads.
+Minimal Python Telepact example that runs as a one-shot `pytest` test and returns a prepopulated function-type link.
 
-Commands:
+Test command:
 
-- `make run` — start the server on `http://127.0.0.1:8099`
-- `make check` — verify the response includes a prepopulated `fn.*` link payload
+```bash
+make -C ../../lib/py
+rm -rf .venv
+uv venv --python python3.11 .venv
+uv pip install --python .venv/bin/python pytest ../../lib/py/dist/*.tar.gz
+.venv/bin/python -m pytest -q
+```
