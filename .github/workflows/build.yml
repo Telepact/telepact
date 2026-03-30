@@ -357,69 +357,8 @@ jobs:
       - name: Install Project CLI
         run: make install-project-cli
 
-      - name: Build Java library for examples
-        run: make -C lib/java
-
-      - name: Run Java HTTP example test
-        working-directory: example/java-http-basic
-        run: mvn -q -s settings.xml -Dtelepact.version=$(cat ../../VERSION.txt) test
-
-      - name: Run Java binary example test
-        working-directory: example/java-binary
-        run: mvn -q -s settings.xml -Dtelepact.version=$(cat ../../VERSION.txt) test
-
-      - name: Build TypeScript library for examples
-        run: make -C lib/ts
-
-      - name: Run TypeScript cookie auth example test
-        working-directory: example/ts-http-cookie-auth
-        run: |
-          cp ../../lib/ts/dist-tgz/*.tgz telepact.tgz
-          npm install
-          npm test
-
-      - name: Run Go WebSocket example test
-        working-directory: example/go-websocket
-        run: go test ./...
-
-      - name: Run Go API introspection example test
-        working-directory: example/go-api-introspection
-        run: go test ./...
-
-      - name: Build Python library for examples
-        run: make -C lib/py
-
-      - name: Run Python select example test
-        working-directory: example/py-select
-        run: |
-          rm -rf .venv
-          uv venv --python python3.11 .venv
-          uv pip install --python .venv/bin/python pytest ../../lib/py/dist/*.tar.gz
-          .venv/bin/python -m pytest -q
-
-      - name: Run Python headers example test
-        working-directory: example/py-headers
-        run: |
-          rm -rf .venv
-          uv venv --python python3.11 .venv
-          uv pip install --python .venv/bin/python pytest ../../lib/py/dist/*.tar.gz
-          .venv/bin/python -m pytest -q
-
-      - name: Run Python errors example test
-        working-directory: example/py-errors
-        run: |
-          rm -rf .venv
-          uv venv --python python3.11 .venv
-          uv pip install --python .venv/bin/python pytest ../../lib/py/dist/*.tar.gz
-          .venv/bin/python -m pytest -q
-
-      - name: Run Python links example test
-        working-directory: example/py-links
-        run: |
-          rm -rf .venv
-          uv venv --python python3.11 .venv
-          uv pip install --python .venv/bin/python pytest ../../lib/py/dist/*.tar.gz
-          .venv/bin/python -m pytest -q
+      - name: Run example checks
+        run: make example-check
 
   check-license-header:
     name: Check License Header
