@@ -1,25 +1,42 @@
 {
   "changed_paths": [
-    "bind/dart/package-lock.json",
-    "bind/dart/package.json",
-    "bind/dart/pubspec.lock",
-    "lib/ts/package-lock.json",
-    "lib/ts/package.json",
-    "sdk/console/package-lock.json",
-    "sdk/prettier/package-lock.json"
+    "common/auth.telepact.yaml",
+    "doc/faq.md",
+    "doc/schema-guide.md",
+    "lib/go/README.md",
+    "lib/go/Server.go",
+    "lib/go/internal/schema/CreateTelepactSchemaFromFileJsonMap.go",
+    "lib/go/internal/schema/do_not_edit/auth.telepact.json",
+    "lib/java/README.md",
+    "lib/java/src/main/java/io/github/telepact/Server.java",
+    "lib/java/src/main/java/io/github/telepact/internal/schema/CreateTelepactSchemaFromFileJsonMap.java",
+    "lib/py/README.md",
+    "lib/py/telepact/Server.py",
+    "lib/py/telepact/internal/schema/CreateTelepactSchemaFromFileJsonMap.py",
+    "lib/ts/README.md",
+    "lib/ts/src/Server.ts",
+    "lib/ts/src/internal/schema/CreateTelepactSchemaFromFileJsonMap.ts",
+    "skills/telepact-client/SKILL.md",
+    "skills/telepact-schema-writing/SKILL.md",
+    "skills/telepact-server/SKILL.md",
+    "test/runner/parameters/api_examples_cases.py",
+    "test/runner/schema/auth/auth.telepact.json"
   ],
   "direct_targets": [
-    "console",
-    "dart",
-    "prettier",
+    "go",
+    "java",
+    "py",
     "ts"
   ],
-  "pr_number": 319,
+  "pr_number": 313,
   "targets": [
+    "cli",
     "console",
     "dart",
-    "prettier",
+    "go",
+    "java",
+    "py",
     "ts"
   ],
-  "version": "1.0.0-alpha.231"
+  "version": "1.0.0-alpha.232"
 }

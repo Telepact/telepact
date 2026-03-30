@@ -32,7 +32,7 @@ export function createTelepactSchemaFromFileJsonMap(jsonDocuments: Record<string
     // Determine if we need to add the auth schema
     const authTelepactJson = getAuthTelepactJson();
     for (const json of Object.values(jsonDocuments)) {
-        const regex = /"struct\.Auth_"\s*:/;
+        const regex = /"union\.Auth_"\s*:/;
         if (regex.test(json)) {
             if (!hasBundledDefinitions(jsonDocuments, 'auth_', authTelepactJson)) {
                 finalJsonDocuments['auth_'] = authTelepactJson;

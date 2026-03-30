@@ -100,9 +100,9 @@ public class Server {
 
         this.serializer = new Serializer(options.serialization, binaryEncoder, base64Encoder);
 
-        if (!this.telepactSchema.parsed.containsKey("struct.Auth_") && options.authRequired) {
+        if (!this.telepactSchema.parsed.containsKey("union.Auth_") && options.authRequired) {
             throw new RuntimeException(
-                    "Unauthenticated server. Either define a `struct.Auth_` in your schema or set `options.authRequired` to `false`.");
+                    "Unauthenticated server. Either define a `union.Auth_` in your schema or set `options.authRequired` to `false`.");
         }
     }
 

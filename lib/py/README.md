@@ -54,7 +54,7 @@ async def handler(request_message: 'Message') -> 'Message':
 
 
 options = Server.Options()
-# Set this to False when your schema does not define struct.Auth_.
+# Set this to False when your schema does not define union.Auth_.
 options.auth_required = False
 server = Server(schema, handler, options)
 

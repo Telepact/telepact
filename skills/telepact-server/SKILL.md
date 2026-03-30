@@ -88,7 +88,7 @@ Do not manually re-implement those behaviors in your transport or business logic
 
 ## Auth
 
-If the API uses credentials, always model them as `struct.Auth_` and flow them through the `@auth_` header.
+If the API uses credentials, always model them as `union.Auth_` and flow them through the `@auth_` header.
 
 Do not invent alternate credential channels such as:
 
@@ -96,16 +96,16 @@ Do not invent alternate credential channels such as:
 - request body fields on ordinary functions
 - transport-specific side channels that bypass the Telepact message
 
-The Telepact ecosystem expects credentials to move through `struct.Auth_` and `@auth_`. That path is treated with greater sensitivity. Outside it, Telepact has no equivalent guardrails, and credentials are easier to leak accidentally through logs, copied payloads, examples, or tooling.
+The Telepact ecosystem expects credentials to move through `union.Auth_` and `@auth_`. That path is treated with greater sensitivity. Outside it, Telepact has no equivalent guardrails, and credentials are easier to leak accidentally through logs, copied payloads, examples, or tooling.
 
 Server rule:
 
-- define `struct.Auth_` in the schema when the API is authenticated
-- declare `@auth_` as `struct.Auth_` in the schema's headers definition
+- define `union.Auth_` in the schema when the API is authenticated
+- declare `@auth_` as `union.Auth_` in the schema's headers definition
 - read credentials from the request headers, not from ordinary function arguments
 - keep auth handling inside the Telepact message flow rather than transport-specific side channels
 
-If the API does not need authentication, omit `struct.Auth_` and `@auth_` entirely. Do not create custom credential placeholders.
+If the API does not need authentication, omit `union.Auth_` and `@auth_` entirely. Do not create custom credential placeholders.
 
 ## Language Quick Reference
 
@@ -505,9 +505,9 @@ If you need middleware-like behavior, place it near the start and end of the han
 
 ## Auth Guidance
 
-Check whether the schema defines `struct.Auth_`.
+Check whether the schema defines `union.Auth_`.
 
-- If the API is authenticated in the Telepact-standard way, keep `struct.Auth_` in the schema and configure the server normally.
+- If the API is authenticated in the Telepact-standard way, keep `union.Auth_` in the schema and configure the server normally.
 - If the server is intentionally unauthenticated, disable the library option that otherwise requires auth.
 
 Do not invent parallel auth envelope formats when the Telepact auth pattern already fits the task.
@@ -555,6 +555,6 @@ Before finishing, verify:
 - the handler only implements domain logic
 - `fn.api_` is not redundantly re-implemented
 - binary negotiation and field selection are left to the runtime
-- any auth option changes match the presence or absence of `struct.Auth_`
+- any auth option changes match the presence or absence of `union.Auth_`
 
 When the user asks for a Telepact server, assume they want working code, not just an explanation.

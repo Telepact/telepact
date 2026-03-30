@@ -67,8 +67,8 @@ auth_cases = {
                 {'info.AuthExample': {}, 'example': {}},
                 {'///': ' A standard error. ', 'errors.Auth_': [{'///': ' The credentials in the `_auth` header were missing or invalid. ', 'ErrorUnauthenticated_': {'message!': 'string'}}, {'///': ' The credentials in the `_auth` header were insufficient to run the function. ', 'ErrorUnauthorized_': {'message!': 'string'}}], 'example': {'ErrorUnauthorized_': {'message!': 'sigma'}}},
                 {'fn.test': {}, '->': [{'Ok_': {}}], 'inputExample': {'fn.test': {}}, 'outputExample': {'Ok_': {}}},
-                {'///': [' The `@auth_` header is the conventional location for sending credentials to     ', ' the server for the purpose of authentication and authorization.                 '], 'headers.Auth_': {'@auth_': 'struct.Auth_'}, '->': {}, 'inputExample': {'@auth_': {'token': 'sigma'}}, 'outputExample': {}},
-                {'struct.Auth_': {'token': 'string'}, 'example': {'token': 'sigma'}}
+                {'///': [' The `@auth_` header is the conventional location for sending credentials to     ', ' the server for the purpose of authentication and authorization.                 '], 'headers.Auth_': {'@auth_': 'union.Auth_'}, '->': {}, 'inputExample': {'@auth_': {'Token': {'token': 'sigma'}}}, 'outputExample': {}},
+                {'union.Auth_': [{'Token': {'token': 'string'}}], 'example': {'Token': {'token': 'sigma'}}}
             ]}}]
         ],
     ],
