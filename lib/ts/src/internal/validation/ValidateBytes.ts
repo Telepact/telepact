@@ -14,11 +14,11 @@
 //|  limitations under the License.
 //|
 
-import { bytesName } from '../../internal/types/TBytes';
-import { ValidationFailure } from './ValidationFailure';
-import { ValidateContext } from './ValidateContext';
-import { getTypeUnexpectedValidationFailure } from './GetTypeUnexpectedValidationFailure';
-import { decodeBase64, encodeBase64 } from '../binary/Base64Util';
+import { bytesName } from '../../internal/types/TBytes.js';
+import { ValidationFailure } from './ValidationFailure.js';
+import { ValidateContext } from './ValidateContext.js';
+import { getTypeUnexpectedValidationFailure } from './GetTypeUnexpectedValidationFailure.js';
+import { decodeBase64, encodeBase64 } from '../binary/Base64Util.js';
 
 export function validateBytes(value: unknown, ctx: ValidateContext): ValidationFailure[] {
     if (value instanceof Uint8Array) {

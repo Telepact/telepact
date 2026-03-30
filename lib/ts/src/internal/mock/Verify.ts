@@ -14,10 +14,10 @@
 //|  limitations under the License.
 //|
 
-import { objectsAreEqual } from '../ObjectsAreEqual';
-import { isSubMap } from './IsSubMap';
-import { isSubMapEntryEqual } from './IsSubMapEntryEqual';
-import { MockInvocation } from './MockInvocation';
+import { objectsAreEqual } from '../ObjectsAreEqual.js';
+import { isSubMap } from './IsSubMap.js';
+import { isSubMapEntryEqual } from './IsSubMapEntryEqual.js';
+import { MockInvocation } from './MockInvocation.js';
 
 export function verify(
     functionName: string,

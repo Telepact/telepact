@@ -14,8 +14,8 @@
 //|  limitations under the License.
 //|
 
-import { FsModule, PathModule } from './fileSystem';
-import { getSchemaFileMap } from './internal/schema/GetSchemaFileMap';
+import { FsModule, PathModule } from './fileSystem.js';
+import { getSchemaFileMap } from './internal/schema/GetSchemaFileMap.js';
 
 export class TelepactSchemaFiles {
     filenamesToJson: Record<string, string>;

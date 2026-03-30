@@ -14,14 +14,14 @@
 //|  limitations under the License.
 //|
 
-import { Serializer } from '../Serializer';
-import { TelepactSchema } from '../TelepactSchema';
-import { Message } from '../Message';
-import { handleMessage } from '../internal/HandleMessage';
-import { parseRequestMessage } from '../internal/ParseRequestMessage';
-import { Response } from '../Response';
-import { SerializationError } from '../SerializationError';
-import { TelepactError } from '../TelepactError';
+import { Serializer } from '../Serializer.js';
+import { TelepactSchema } from '../TelepactSchema.js';
+import { Message } from '../Message.js';
+import { handleMessage } from '../internal/HandleMessage.js';
+import { parseRequestMessage } from '../internal/ParseRequestMessage.js';
+import { Response } from '../Response.js';
+import { SerializationError } from '../SerializationError.js';
+import { TelepactError } from '../TelepactError.js';
 
 export type ErrorHandler = (error: any) => void;
 export type RequestHandler = (message: Message) => void;

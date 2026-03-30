@@ -14,8 +14,8 @@
 //|  limitations under the License.
 //|
 
-import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
-import { getType } from '../../internal/types/GetType';
+import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure.js';
+import { getType } from '../../internal/types/GetType.js';
 
 export function getTypeUnexpectedParseFailure(
     documentName: string,

@@ -14,7 +14,7 @@
 //|  limitations under the License.
 //|
 
-import { GenerateContext } from './GenerateContext';
+import { GenerateContext } from './GenerateContext.js';
 
 export function generateRandomSelect(possibleSelects: Record<string, any>, ctx: GenerateContext): object {
     const possibleSelect = possibleSelects[ctx.fnScope];

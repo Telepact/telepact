@@ -1,5 +1,9 @@
 ## Telepact Library for Java
 
+### Java version
+
+Requires **Java 21**.
+
 ### Installation
 ```xml
 <dependency>

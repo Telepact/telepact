@@ -14,7 +14,7 @@
 //|  limitations under the License.
 //|
 
-import { decodeBase64 } from "./Base64Util";
+import { decodeBase64 } from "./Base64Util.js";
 
 export function clientBase64Decode(message: object[]): void {
     const headers = message[0] as Record<string, unknown>;

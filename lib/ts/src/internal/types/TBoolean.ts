@@ -14,13 +14,13 @@
 //|  limitations under the License.
 //|
 
-import { ValidationFailure } from '../validation/ValidationFailure';
-import { TTypeDeclaration } from './TTypeDeclaration';
-import { TType } from './TType';
-import { validateBoolean } from '../validation/ValidateBoolean';
-import { generateRandomBoolean } from '../generation/GenerateRandomBoolean';
-import { GenerateContext } from '../generation/GenerateContext';
-import { ValidateContext } from '../validation/ValidateContext';
+import { ValidationFailure } from '../validation/ValidationFailure.js';
+import { TTypeDeclaration } from './TTypeDeclaration.js';
+import { TType } from './TType.js';
+import { validateBoolean } from '../validation/ValidateBoolean.js';
+import { generateRandomBoolean } from '../generation/GenerateRandomBoolean.js';
+import { GenerateContext } from '../generation/GenerateContext.js';
+import { ValidateContext } from '../validation/ValidateContext.js';
 
 export const booleanName: string = 'Boolean';
 

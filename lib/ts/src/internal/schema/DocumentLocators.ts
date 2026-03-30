@@ -14,7 +14,7 @@
 //|  limitations under the License.
 //|
 
-import { getPathDocumentCoordinatesPseudoJson } from './GetPathDocumentCoordinatesPseudoJson';
+import { getPathDocumentCoordinatesPseudoJson } from './GetPathDocumentCoordinatesPseudoJson.js';
 
 export type Path = (string | number)[];
 export type Coordinates = { row: number; col: number };

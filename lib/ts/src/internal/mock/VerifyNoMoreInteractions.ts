@@ -14,7 +14,7 @@
 //|  limitations under the License.
 //|
 
-import { MockInvocation } from '../../internal/mock/MockInvocation';
+import { MockInvocation } from '../../internal/mock/MockInvocation.js';
 
 export function verifyNoMoreInteractions(invocations: MockInvocation[]): {
     [key: string]: any;

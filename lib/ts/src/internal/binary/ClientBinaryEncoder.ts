@@ -14,12 +14,12 @@
 //|  limitations under the License.
 //|
 
-import { ClientBinaryStrategy } from './ClientBinaryStrategy';
-import { clientBinaryEncode } from '../../internal/binary/ClientBinaryEncode';
-import { clientBinaryDecode } from '../../internal/binary/ClientBinaryDecode';
-import { BinaryEncoder } from './BinaryEncoder';
-import { BinaryEncoding } from './BinaryEncoding';
-import { BinaryEncodingCache } from './BinaryEncodingCache';
+import { ClientBinaryStrategy } from './ClientBinaryStrategy.js';
+import { clientBinaryEncode } from '../../internal/binary/ClientBinaryEncode.js';
+import { clientBinaryDecode } from '../../internal/binary/ClientBinaryDecode.js';
+import { BinaryEncoder } from './BinaryEncoder.js';
+import { BinaryEncoding } from './BinaryEncoding.js';
+import { BinaryEncodingCache } from './BinaryEncodingCache.js';
 
 export class ClientBinaryEncoder implements BinaryEncoder {
     private readonly binaryEncodingCache: BinaryEncodingCache;

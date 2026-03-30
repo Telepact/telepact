@@ -14,8 +14,8 @@
 //|  limitations under the License.
 //|
 
-import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
-import { TType } from '../types/TType';
+import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure.js';
+import { TType } from '../types/TType.js';
 
 export class ParseContext {
     public readonly documentName: string;

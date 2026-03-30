@@ -19,5 +19,4 @@ from ... import json
 
 
 def get_auth_telepact_json() -> str:
-    with pkg_resources.open_text(json, 'auth.telepact.json') as stream:
-        return stream.read()
+    return pkg_resources.files(json).joinpath('auth.telepact.json').read_text()

@@ -14,12 +14,12 @@
 //|  limitations under the License.
 //|
 
-import { Serialization } from '../Serialization';
-import { BinaryEncoder } from '../internal/binary/BinaryEncoder';
-import { Message } from '../Message';
-import { InvalidMessage } from '../internal/validation/InvalidMessage';
-import { InvalidMessageBody } from '../internal/validation/InvalidMessageBody';
-import { Base64Encoder } from './binary/Base64Encoder';
+import { Serialization } from '../Serialization.js';
+import { BinaryEncoder } from '../internal/binary/BinaryEncoder.js';
+import { Message } from '../Message.js';
+import { InvalidMessage } from '../internal/validation/InvalidMessage.js';
+import { InvalidMessageBody } from '../internal/validation/InvalidMessageBody.js';
+import { Base64Encoder } from './binary/Base64Encoder.js';
 
 export function deserializeInternal(
     messageBytes: Uint8Array,

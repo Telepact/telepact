@@ -14,16 +14,16 @@
 //|  limitations under the License.
 //|
 
-import { DefaultSerialization } from './DefaultSerialization';
-import { Serializer } from './Serializer';
-import { ServerBinaryEncoder } from './internal/binary/ServerBinaryEncoder';
-import { Message } from './Message';
-import { TelepactSchema } from './TelepactSchema';
-import { constructBinaryEncoding } from './internal/binary/ConstructBinaryEncoding';
-import { processBytes } from './internal/ProcessBytes';
-import { Serialization } from './Serialization';
-import { ServerBase64Encoder } from './internal/binary/ServerBase64Encoder';
-import { Response } from './Response';
+import { DefaultSerialization } from './DefaultSerialization.js';
+import { Serializer } from './Serializer.js';
+import { ServerBinaryEncoder } from './internal/binary/ServerBinaryEncoder.js';
+import { Message } from './Message.js';
+import { TelepactSchema } from './TelepactSchema.js';
+import { constructBinaryEncoding } from './internal/binary/ConstructBinaryEncoding.js';
+import { processBytes } from './internal/ProcessBytes.js';
+import { Serialization } from './Serialization.js';
+import { ServerBase64Encoder } from './internal/binary/ServerBase64Encoder.js';
+import { Response } from './Response.js';
 
 export class Server {
     handler: (message: Message) => Promise<Message>;

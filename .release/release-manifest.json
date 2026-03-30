@@ -1,10 +1,25 @@
 {
   "changed_paths": [
-    "README.md",
-    "doc/production-guide.md"
+    "bind/dart/package-lock.json",
+    "bind/dart/package.json",
+    "bind/dart/pubspec.lock",
+    "lib/ts/package-lock.json",
+    "lib/ts/package.json",
+    "sdk/console/package-lock.json",
+    "sdk/prettier/package-lock.json"
   ],
-  "direct_targets": [],
-  "pr_number": 311,
-  "targets": [],
-  "version": "1.0.0-alpha.226"
+  "direct_targets": [
+    "console",
+    "dart",
+    "prettier",
+    "ts"
+  ],
+  "pr_number": 319,
+  "targets": [
+    "console",
+    "dart",
+    "prettier",
+    "ts"
+  ],
+  "version": "1.0.0-alpha.231"
 }

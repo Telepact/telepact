@@ -19,5 +19,4 @@ from ... import json
 
 
 def get_mock_telepact_json() -> str:
-    with pkg_resources.open_text(json, 'mock-internal.telepact.json') as stream:
-        return stream.read()
+    return pkg_resources.files(json).joinpath('mock-internal.telepact.json').read_text()

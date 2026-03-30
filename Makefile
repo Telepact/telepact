@@ -80,6 +80,7 @@ test-ts:
 prepare-test-ts:
 	$(MAKE) -C test/lib/ts
 	$(MAKE) -C test/lib/ts-browser-safe
+	$(MAKE) -C test/lib/ts-nodenext
 
 test-ts-run:
 	$(MAKE) -C test/runner test-ts-run
@@ -123,6 +124,7 @@ clean-test:
 	$(MAKE) -C test/lib/go clean
 	$(MAKE) -C test/lib/ts clean
 	$(MAKE) -C test/lib/ts-browser-safe clean
+	$(MAKE) -C test/lib/ts-nodenext clean
 
 dart:
 	$(MAKE) -C bind/dart
