@@ -29,9 +29,6 @@ def test_select_example_runs_end_to_end() -> None:
         payload = post_json(url, [
             {
                 '@select_': {
-                    '->': {
-                        'Ok_': ['users'],
-                    },
                     'struct.User': ['id'],
                 },
             },
