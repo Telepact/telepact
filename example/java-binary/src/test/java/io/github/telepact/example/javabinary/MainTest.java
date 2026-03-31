@@ -33,26 +33,24 @@ import java.util.concurrent.LinkedBlockingQueue;
 import org.junit.jupiter.api.Test;
 
 final class MainTest {
-    record EncodedRequest(byte[] bytes, String encoding) {}
-
     @Test
     void negotiatesBinaryAfterTheInitialRequest() throws Exception {
         var server = Main.buildTelepactServer();
         var requestEncodings = Collections.synchronizedList(new ArrayList<String>());
         var responseEncodings = Collections.synchronizedList(new ArrayList<String>());
-        BlockingQueue<EncodedRequest> requests = new LinkedBlockingQueue<>();
+        BlockingQueue<byte[]> requests = new LinkedBlockingQueue<>();
         BlockingQueue<byte[]> responses = new LinkedBlockingQueue<>();
 
         var serverLoop = CompletableFuture.runAsync(() -> {
             try {
                 while (true) {
                     var request = requests.take();
-                    if (request.bytes.length == 0) {
+                    if (request.length == 0) {
                         return;
                     }
 
-                    requestEncodings.add(request.encoding);
-                    var response = server.process(request.bytes);
+                    requestEncodings.add(Main.looksLikeJson(request) ? "json" : "binary");
+                    var response = server.process(request);
                     responseEncodings.add(response.headers.containsKey("@bin_") ? "binary" : "json");
                     responses.put(response.bytes);
                 }
@@ -66,8 +64,7 @@ final class MainTest {
                 CompletableFuture.supplyAsync(() -> {
                     try {
                         var requestBytes = serializer.serialize(message);
-                        var requestEncoding = Main.looksLikeJson(requestBytes) ? "json" : "binary";
-                        requests.put(new EncodedRequest(requestBytes, requestEncoding));
+                        requests.put(requestBytes);
                         return serializer.deserialize(responses.take());
                     } catch (InterruptedException exception) {
                         Thread.currentThread().interrupt();
@@ -95,7 +92,7 @@ final class MainTest {
         assertEquals("binary", requestEncodings.get(1));
         assertTrue(responseEncodings.contains("binary"), responseEncodings.toString());
 
-        requests.put(new EncodedRequest(new byte[0], "shutdown"));
+        requests.put(new byte[0]);
         serverLoop.get();
     }
 }
