@@ -18,6 +18,10 @@ from server import create_http_server
 from test_support import post_json, run_server, stop_server
 
 
+INDEX_MESSAGE_HEADER = 0
+INDEX_MESSAGE_BODY = 1
+
+
 def test_links_example_runs_end_to_end() -> None:
     server = create_http_server()
     thread = run_server(server)
@@ -32,7 +36,7 @@ def test_links_example_runs_end_to_end() -> None:
             },
         ])
 
-        next_call = payload[1]['Ok_']['next!']
+        next_call = payload[INDEX_MESSAGE_BODY]['Ok_']['next!']
         follow_up_name, follow_up_args = next(iter(next_call.items()))
         follow_up_payload = post_json(url, [
             {},
@@ -42,6 +46,6 @@ def test_links_example_runs_end_to_end() -> None:
         ])
 
         assert follow_up_name == 'fn.getFollowUp'
-        assert follow_up_payload[1]['Ok_']['summary'] == 'Followed up on follow-up-1'
+        assert follow_up_payload[INDEX_MESSAGE_BODY]['Ok_']['summary'] == 'Followed up on follow-up-1'
     finally:
         stop_server(server, thread)

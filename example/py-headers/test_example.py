@@ -18,6 +18,10 @@ from server import create_http_server
 from test_support import post_json, run_server, stop_server
 
 
+INDEX_MESSAGE_HEADER = 0
+INDEX_MESSAGE_BODY = 1
+
+
 def test_headers_example_runs_end_to_end() -> None:
     server = create_http_server()
     thread = run_server(server)
@@ -31,8 +35,8 @@ def test_headers_example_runs_end_to_end() -> None:
             ],
         )
 
-        assert payload[0]['@id_'] == 'request-123'
-        assert payload[0]['@warn_'] == ['header example']
-        assert payload[1]['Ok_']['message'] == 'Hello Telepact!'
+        assert payload[INDEX_MESSAGE_HEADER]['@id_'] == 'request-123'
+        assert payload[INDEX_MESSAGE_HEADER]['@warn_'] == ['header example']
+        assert payload[INDEX_MESSAGE_BODY]['Ok_']['message'] == 'Hello Telepact!'
     finally:
         stop_server(server, thread)
