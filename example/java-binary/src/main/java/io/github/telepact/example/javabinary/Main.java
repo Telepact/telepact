@@ -46,12 +46,4 @@ public final class Main {
         }, options);
     }
 
-    static boolean looksLikeJson(byte[] bytes) {
-        for (byte value : bytes) {
-            if (!Character.isWhitespace(value)) {
-                return value == '[' || value == '{';
-            }
-        }
-        return false;
-    }
 }

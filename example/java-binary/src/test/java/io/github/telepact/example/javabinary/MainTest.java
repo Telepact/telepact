@@ -45,6 +45,15 @@ final class MainTest {
         }
     }
 
+    private static boolean looksLikeJson(byte[] bytes) {
+        for (byte value : bytes) {
+            if (!Character.isWhitespace(value)) {
+                return value == '[' || value == '{';
+            }
+        }
+        return false;
+    }
+
     @Test
     void negotiatesBinaryAfterTheInitialRequest() throws Exception {
         var server = Main.buildTelepactServer();
@@ -63,9 +72,9 @@ final class MainTest {
 
                     var requestIndex = requestCount.getAndIncrement();
                     if (requestIndex == 0) {
-                        assertTrue(Main.looksLikeJson(request), "first request should be json");
+                        assertTrue(looksLikeJson(request), "first request should be json");
                     } else if (requestIndex == 1) {
-                        assertTrue(!Main.looksLikeJson(request), "second request should be binary");
+                        assertTrue(!looksLikeJson(request), "second request should be binary");
                     }
                     var response = server.process(request);
                     if (response.headers.containsKey("@bin_")) {
