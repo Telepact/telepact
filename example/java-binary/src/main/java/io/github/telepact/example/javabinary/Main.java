@@ -16,16 +16,10 @@
 
 package io.github.telepact.example.javabinary;
 
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpServer;
 import io.github.telepact.Message;
 import io.github.telepact.Server;
 import io.github.telepact.TelepactSchema;
 import io.github.telepact.TelepactSchemaFiles;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.InetSocketAddress;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -52,14 +46,6 @@ public final class Main {
         }, options);
     }
 
-    static HttpServer startHttpServer(int port) throws IOException {
-        var server = buildTelepactServer();
-        var httpServer = HttpServer.create(new InetSocketAddress("127.0.0.1", port), 0);
-        httpServer.createContext("/api/telepact", exchange -> handleTelepact(exchange, server));
-        httpServer.start();
-        return httpServer;
-    }
-
     static boolean looksLikeJson(byte[] bytes) {
         for (byte value : bytes) {
             if (!Character.isWhitespace(value)) {
@@ -67,32 +53,5 @@ public final class Main {
             }
         }
         return false;
-    }
-
-    private static void handleTelepact(HttpExchange exchange, Server server) throws IOException {
-        if (!"POST".equals(exchange.getRequestMethod())) {
-            exchange.sendResponseHeaders(405, -1);
-            exchange.close();
-            return;
-        }
-        var requestBytes = exchange.getRequestBody().readAllBytes();
-        var response = server.process(requestBytes);
-        var contentType = response.headers.containsKey("@bin_")
-                ? "application/octet-stream"
-                : "application/json";
-        exchange.getResponseHeaders().set("Content-Type", contentType);
-        exchange.sendResponseHeaders(200, response.bytes.length);
-        try (OutputStream outputStream = exchange.getResponseBody()) {
-            outputStream.write(response.bytes);
-        }
-    }
-
-    private static void respondText(HttpExchange exchange, int status, String body) throws IOException {
-        var bytes = body.getBytes(StandardCharsets.UTF_8);
-        exchange.getResponseHeaders().set("Content-Type", "text/plain; charset=utf-8");
-        exchange.sendResponseHeaders(status, bytes.length);
-        try (OutputStream outputStream = exchange.getResponseBody()) {
-            outputStream.write(bytes);
-        }
     }
 }
