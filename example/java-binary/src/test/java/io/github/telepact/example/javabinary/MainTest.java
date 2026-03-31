@@ -26,26 +26,52 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
 import org.junit.jupiter.api.Test;
 
 final class MainTest {
+    record EncodedRequest(byte[] bytes, String encoding) {}
+
     @Test
     void negotiatesBinaryAfterTheInitialRequest() throws Exception {
         var server = Main.buildTelepactServer();
         var requestEncodings = Collections.synchronizedList(new ArrayList<String>());
         var responseEncodings = Collections.synchronizedList(new ArrayList<String>());
+        BlockingQueue<EncodedRequest> requests = new LinkedBlockingQueue<>();
+        BlockingQueue<byte[]> responses = new LinkedBlockingQueue<>();
+
+        var serverLoop = CompletableFuture.runAsync(() -> {
+            try {
+                while (true) {
+                    var request = requests.take();
+                    if (request.bytes.length == 0) {
+                        return;
+                    }
+
+                    requestEncodings.add(request.encoding);
+                    var response = server.process(request.bytes);
+                    responseEncodings.add(response.headers.containsKey("@bin_") ? "binary" : "json");
+                    responses.put(response.bytes);
+                }
+            } catch (InterruptedException exception) {
+                Thread.currentThread().interrupt();
+                throw new RuntimeException(exception);
+            }
+        });
 
         var adapter = (java.util.function.BiFunction<Message, Serializer, Future<Message>>) (message, serializer) ->
                 CompletableFuture.supplyAsync(() -> {
                     try {
                         var requestBytes = serializer.serialize(message);
-                        requestEncodings.add(Main.looksLikeJson(requestBytes) ? "json" : "binary");
-
-                        var response = server.process(requestBytes);
-                        responseEncodings.add(response.headers.containsKey("@bin_") ? "binary" : "json");
-                        return serializer.deserialize(response.bytes);
+                        var requestEncoding = Main.looksLikeJson(requestBytes) ? "json" : "binary";
+                        requests.put(new EncodedRequest(requestBytes, requestEncoding));
+                        return serializer.deserialize(responses.take());
+                    } catch (InterruptedException exception) {
+                        Thread.currentThread().interrupt();
+                        throw new RuntimeException(exception);
                     } catch (Exception exception) {
                         throw new RuntimeException(exception);
                     }
@@ -68,5 +94,8 @@ final class MainTest {
         assertTrue(requestEncodings.size() >= 2, requestEncodings.toString());
         assertEquals("binary", requestEncodings.get(1));
         assertTrue(responseEncodings.contains("binary"), responseEncodings.toString());
+
+        requests.put(new EncodedRequest(new byte[0], "shutdown"));
+        serverLoop.get();
     }
 }
