@@ -16,9 +16,7 @@
 
 SHELL := /bin/bash
 
-.PHONY: check run
+.PHONY: run
 
-check:
+run:
 	@set -euo pipefail; go test ./...
-
-run: check

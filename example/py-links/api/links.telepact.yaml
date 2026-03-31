@@ -17,16 +17,16 @@
 - ///: A structure that can point to a follow-up function call.
   struct.Todo:
     title: "string"
-- ///: The follow-up link a client can carry forward verbatim.
-  fn.followUp:
+- ///: Fetch the next step after creating a todo.
+  fn.getFollowUp:
     id: "string"
   ->:
     - Ok_:
         summary: "string"
-- ///: Return a todo and a link to the next step.
-  fn.issueLink:
+- ///: Create a todo and return a link to the next step.
+  fn.createIssueLink:
     title: "string"
   ->:
     - Ok_:
         todo: "struct.Todo"
-        next!: "fn.followUp"
+        next!: "fn.getFollowUp"

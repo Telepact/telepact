@@ -21,7 +21,7 @@ This guide shows concrete examples for two common transports:
 - HTTP
 - WebSockets
 
-Runnable counterparts live under [`example/`](../example/README.md), including
+Runnable counterparts live under [`example/`](../example/), including
 [`example/java-http-basic`](../example/java-http-basic/README.md),
 [`example/ts-http-cookie-auth`](../example/ts-http-cookie-auth/README.md), and
 [`example/go-websocket`](../example/go-websocket/README.md).

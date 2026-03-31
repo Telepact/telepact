@@ -26,12 +26,22 @@ def test_links_example_runs_end_to_end() -> None:
         payload = post_json(url, [
             {},
             {
-                'fn.issueLink': {
+                'fn.createIssueLink': {
                     'title': 'Ship docs',
                 },
             },
         ])
 
-        assert payload[1]['Ok_']['next!']['fn.followUp']['id'] == 'follow-up-1'
+        next_call = payload[1]['Ok_']['next!']
+        follow_up_name, follow_up_args = next(iter(next_call.items()))
+        follow_up_payload = post_json(url, [
+            {},
+            {
+                follow_up_name: follow_up_args,
+            },
+        ])
+
+        assert follow_up_name == 'fn.getFollowUp'
+        assert follow_up_payload[1]['Ok_']['summary'] == 'Followed up on follow-up-1'
     finally:
         stop_server(server, thread)

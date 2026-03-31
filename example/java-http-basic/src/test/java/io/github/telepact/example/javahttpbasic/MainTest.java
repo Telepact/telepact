@@ -20,11 +20,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.sun.net.httpserver.HttpServer;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 final class MainTest {
@@ -33,9 +36,13 @@ final class MainTest {
         HttpServer server = Main.startHttpServer(0);
         try {
             var port = server.getAddress().getPort();
+            var objectMapper = new ObjectMapper();
+            var requestBody = objectMapper.writeValueAsString(List.of(
+                    Map.of(),
+                    Map.of("fn.hello", Map.of("name", "Telepact"))));
             var request = HttpRequest.newBuilder(URI.create("http://127.0.0.1:" + port + "/api/telepact"))
                     .header("Content-Type", "application/json")
-                    .POST(HttpRequest.BodyPublishers.ofString("[{}, {\"fn.hello\": {\"name\": \"Telepact\"}}]"))
+                    .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                     .build();
 
             var response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));

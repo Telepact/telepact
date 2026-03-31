@@ -1,9 +1,9 @@
 # go-websocket
 
-Minimal Go Telepact example that runs as a one-shot Go test over WebSocket request/reply.
+Minimal Go Telepact example over WebSocket request/reply.
 
-Test command:
+Run it:
 
 ```bash
-go test ./...
+make run
 ```

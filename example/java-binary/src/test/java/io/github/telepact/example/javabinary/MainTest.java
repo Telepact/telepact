@@ -72,7 +72,7 @@ final class MainTest {
             var client = new Client(adapter, clientOptions);
 
             for (int i = 0; i < 2; i += 1) {
-                var response = client.request(new Message(Map.of(), Map.of("fn.numbers", Map.of("limit", 3))));
+                var response = client.request(new Message(Map.of(), Map.of("fn.getNumbers", Map.of("limit", 3))));
                 @SuppressWarnings("unchecked")
                 var payload = (Map<String, Object>) response.body.get("Ok_");
                 @SuppressWarnings("unchecked")

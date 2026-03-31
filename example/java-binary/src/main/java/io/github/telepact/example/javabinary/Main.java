@@ -39,7 +39,7 @@ public final class Main {
         options.authRequired = false;
         return new Server(schema, requestMessage -> {
             var functionName = requestMessage.getBodyTarget();
-            if (!"fn.numbers".equals(functionName)) {
+            if (!"fn.getNumbers".equals(functionName)) {
                 throw new IllegalArgumentException("Unknown function: " + functionName);
             }
             var arguments = requestMessage.getBodyPayload();

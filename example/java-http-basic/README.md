@@ -1,10 +1,9 @@
 # java-http-basic
 
-Minimal Java Telepact example that runs as a one-shot JUnit test.
+Minimal Java Telepact example for basic HTTP request/reply.
 
-Test command:
+Run it:
 
 ```bash
-make -C ../../lib/java
-mvn -q -s settings.xml -Dtelepact.version=$(cat ../../VERSION.txt) test
+make run
 ```

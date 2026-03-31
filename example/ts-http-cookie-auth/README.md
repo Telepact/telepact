@@ -1,12 +1,9 @@
 # ts-http-cookie-auth
 
-Minimal TypeScript Telepact example that runs as a one-shot `node:test` suite and maps a session cookie to `@auth_` at the HTTP boundary.
+Minimal TypeScript Telepact example that shows how to pull a session cookie into `@auth_` at the HTTP boundary.
 
-Test command:
+Run it:
 
 ```bash
-make -C ../../lib/ts
-cp ../../lib/ts/dist-tgz/*.tgz telepact.tgz
-npm install
-npm test
+make run
 ```

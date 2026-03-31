@@ -26,22 +26,30 @@ options.auth_required = False
 
 
 async def handler(request_message: Message) -> Message:
-    if request_message.get_body_target() != 'fn.issueLink':
-        raise RuntimeError(f'Unknown function: {request_message.get_body_target()}')
-
-    title = request_message.get_body_payload()['title']
-    return Message({}, {
-        'Ok_': {
-            'todo': {
-                'title': title,
-            },
-            'next!': {
-                'fn.followUp': {
-                    'id': 'follow-up-1',
+    if request_message.get_body_target() == 'fn.createIssueLink':
+        title = request_message.get_body_payload()['title']
+        return Message({}, {
+            'Ok_': {
+                'todo': {
+                    'title': title,
+                },
+                'next!': {
+                    'fn.getFollowUp': {
+                        'id': 'follow-up-1',
+                    },
                 },
             },
-        },
-    })
+        })
+
+    if request_message.get_body_target() == 'fn.getFollowUp':
+        follow_up_id = request_message.get_body_payload()['id']
+        return Message({}, {
+            'Ok_': {
+                'summary': f'Followed up on {follow_up_id}',
+            },
+        })
+
+    raise RuntimeError(f'Unknown function: {request_message.get_body_target()}')
 
 
 telepact_server = Server(schema, handler, options)

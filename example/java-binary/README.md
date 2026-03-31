@@ -1,10 +1,9 @@
 # java-binary
 
-Minimal Java Telepact example that runs as a one-shot JUnit test and verifies binary negotiation.
+Minimal Java Telepact example that verifies binary negotiation.
 
-Test command:
+Run it:
 
 ```bash
-make -C ../../lib/java
-mvn -q -s settings.xml -Dtelepact.version=$(cat ../../VERSION.txt) test
+make run
 ```

@@ -14,7 +14,7 @@
 #|  limitations under the License.
 #|
 
-EXAMPLES := java-http-basic ts-http-cookie-auth go-websocket py-select java-binary py-headers go-api-introspection py-errors py-links
+EXAMPLES := java-http-basic ts-http-cookie-auth go-websocket py-select java-binary py-headers py-errors py-links
 
 .PHONY: list check run
 
@@ -24,7 +24,7 @@ list:
 check:
 	@for example in $(EXAMPLES); do \
 		echo "==> $$example"; \
-		$(MAKE) -C $$example check || exit $$?; \
+		$(MAKE) -C $$example run || exit $$?; \
 	done
 
 run:

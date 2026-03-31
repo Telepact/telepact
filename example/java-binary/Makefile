@@ -18,9 +18,7 @@ SHELL := /bin/bash
 VERSION := $(shell cat ../../VERSION.txt)
 MAVEN := mvn -q -s settings.xml -Dtelepact.version=$(VERSION)
 
-.PHONY: check run
+.PHONY: run
 
-check:
+run:
 	@set -euo pipefail; $(MAVEN) test
-
-run: check

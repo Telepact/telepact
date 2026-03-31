@@ -18,15 +18,19 @@ from server import create_http_server
 from test_support import post_json, run_server, stop_server
 
 
+INDEX_MESSAGE_HEADER = 0
+INDEX_MESSAGE_BODY = 1
+
+
 def test_errors_example_runs_end_to_end() -> None:
     server = create_http_server()
     thread = run_server(server)
     try:
         url = f'http://127.0.0.1:{server.server_address[1]}/api/telepact'
         success = post_json(url, [{}, {'fn.divide': {'numerator': 8, 'denominator': 2}}])
-        assert success[1]['Ok_']['quotient'] == 4
+        assert success[INDEX_MESSAGE_BODY]['Ok_']['quotient'] == 4
 
         failure = post_json(url, [{}, {'fn.divide': {'numerator': 8, 'denominator': 0}}])
-        assert failure[1]['ErrorCannotDivideByZero']['denominator'] == 0
+        assert failure[INDEX_MESSAGE_BODY]['ErrorCannotDivideByZero']['denominator'] == 0
     finally:
         stop_server(server, thread)
