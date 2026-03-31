@@ -54,6 +54,7 @@ For transport wiring patterns and concrete HTTP/WebSocket examples, see the
 [Transport Guide](./doc/transports.md).
 For deployment, rollout, compatibility, auth, and observability guidance, see
 the [Production Guide](./doc/production-guide.md).
+For runnable end-to-end examples, see the `example/` directory.
 For debugging local/runtime failures, see the [Runtime Error Guide](./doc/runtime-errors.md).
 
 To learn how to serve a Telepact API, see the specific library docs:

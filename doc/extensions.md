@@ -201,6 +201,9 @@ changes the response shape to:
 The data values did not change. Only the reachable fields selected by the
 header remained in the encoded response.
 
+For a runnable minimal version of this pattern, see
+[`example/py-select`](../example/py-select/README.md).
+
 ## `_ext.Call_`
 
 `_ext.Call_` represents one call made to a mocked non-internal function.

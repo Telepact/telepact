@@ -129,6 +129,9 @@ If credentials arrive through the transport layer, copy them into Telepact
 headers while calling `server.process(...)`. For example, an HTTP adapter can
 read a session cookie and pass it through `overrideHeaders`:
 
+A runnable minimal version of this pattern lives in
+[`example/ts-http-cookie-auth`](../example/ts-http-cookie-auth/README.md).
+
 ```ts
 const response = await server.process(requestBytes, {
   '@auth_': { sessionToken: readSessionCookie(request) },
