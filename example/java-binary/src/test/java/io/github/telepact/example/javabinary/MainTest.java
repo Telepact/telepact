@@ -29,16 +29,18 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 
 final class MainTest {
     @Test
     void negotiatesBinaryAfterTheInitialRequest() throws Exception {
         var server = Main.buildTelepactServer();
-        var requestEncodings = new ArrayList<String>();
-        var responseEncodings = new ArrayList<String>();
         BlockingQueue<byte[]> requests = new LinkedBlockingQueue<>();
         BlockingQueue<byte[]> responses = new LinkedBlockingQueue<>();
+        AtomicInteger requestCount = new AtomicInteger();
+        AtomicBoolean sawBinaryResponse = new AtomicBoolean(false);
 
         var serverLoop = CompletableFuture.runAsync(() -> {
             try {
@@ -48,9 +50,16 @@ final class MainTest {
                         return;
                     }
 
-                    requestEncodings.add(Main.looksLikeJson(request) ? "json" : "binary");
+                    var requestIndex = requestCount.getAndIncrement();
+                    if (requestIndex == 0) {
+                        assertTrue(Main.looksLikeJson(request), "first request should be json");
+                    } else if (requestIndex == 1) {
+                        assertTrue(!Main.looksLikeJson(request), "second request should be binary");
+                    }
                     var response = server.process(request);
-                    responseEncodings.add(response.headers.containsKey("@bin_") ? "binary" : "json");
+                    if (response.headers.containsKey("@bin_")) {
+                        sawBinaryResponse.set(true);
+                    }
                     responses.put(response.bytes);
                 }
             } catch (InterruptedException exception) {
@@ -87,9 +96,8 @@ final class MainTest {
             assertEquals(List.of(1, 2, 3), values);
         }
 
-        assertTrue(requestEncodings.size() >= 2, requestEncodings.toString());
-        assertEquals("binary", requestEncodings.get(1));
-        assertTrue(responseEncodings.contains("binary"), responseEncodings.toString());
+        assertTrue(requestCount.get() >= 2, Integer.toString(requestCount.get()));
+        assertTrue(sawBinaryResponse.get(), "expected at least one binary response");
 
         requests.put(new byte[0]);
         serverLoop.get();
