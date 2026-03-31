@@ -34,6 +34,17 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 
 final class MainTest {
+    private static byte[] putRequestAndTakeResponse(BlockingQueue<byte[]> requests, BlockingQueue<byte[]> responses,
+            byte[] requestBytes) {
+        try {
+            requests.put(requestBytes);
+            return responses.take();
+        } catch (InterruptedException exception) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(exception);
+        }
+    }
+
     @Test
     void negotiatesBinaryAfterTheInitialRequest() throws Exception {
         var server = Main.buildTelepactServer();
@@ -72,11 +83,8 @@ final class MainTest {
                 CompletableFuture.supplyAsync(() -> {
                     try {
                         var requestBytes = serializer.serialize(message);
-                        requests.put(requestBytes);
-                        return serializer.deserialize(responses.take());
-                    } catch (InterruptedException exception) {
-                        Thread.currentThread().interrupt();
-                        throw new RuntimeException(exception);
+                        var responseBytes = putRequestAndTakeResponse(requests, responses, requestBytes);
+                        return serializer.deserialize(responseBytes);
                     } catch (Exception exception) {
                         throw new RuntimeException(exception);
                     }
