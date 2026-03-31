@@ -26,20 +26,23 @@ options.auth_required = False
 
 
 async def handler(request_message: Message) -> Message:
-    if request_message.get_body_target() != 'fn.selectNested':
+    if request_message.get_body_target() != 'fn.listUsers':
         raise RuntimeError(f'Unknown function: {request_message.get_body_target()}')
 
     return Message({}, {
         'Ok_': {
-            'card': {
-                'title': 'Ship docs',
-                'done!': False,
-            },
-            'item': {
-                'Card': {
-                    'title': 'Ship docs',
+            'users': [
+                {
+                    'id': 'user-1',
+                    'email': 'ada@example.com',
+                    'name': 'Ada',
                 },
-            },
+                {
+                    'id': 'user-2',
+                    'email': 'grace@example.com',
+                    'name': 'Grace',
+                },
+            ],
         },
     })
 

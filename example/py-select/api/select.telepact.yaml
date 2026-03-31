@@ -14,16 +14,11 @@
 #|  limitations under the License.
 #|
 
-- struct.ResultCard:
-    title: "string"
-    done!: "boolean"
-- union.ResultItem:
-    - Card:
-        title: "string"
-    - Note:
-        body: "string"
-- fn.selectNested: {}
+- struct.User:
+    id: "string"
+    email: "string"
+    name: "string"
+- fn.listUsers: {}
   ->:
     - Ok_:
-        card: "struct.ResultCard"
-        item: "union.ResultItem"
+        users: ["struct.User"]

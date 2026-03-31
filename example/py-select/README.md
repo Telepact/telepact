@@ -1,6 +1,6 @@
 # py-select
 
-Minimal Python Telepact example that lets Telepact apply `@select_` response shaping.
+Minimal Python Telepact example that selects just the `id` field from a list of users.
 
 Run it:
 

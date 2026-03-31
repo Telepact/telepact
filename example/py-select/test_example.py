@@ -18,6 +18,9 @@ from server import create_http_server
 from test_support import post_json, run_server, stop_server
 
 
+INDEX_MESSAGE_BODY = 1
+
+
 def test_select_example_runs_end_to_end() -> None:
     server = create_http_server()
     thread = run_server(server)
@@ -27,16 +30,13 @@ def test_select_example_runs_end_to_end() -> None:
             {
                 '@select_': {
                     '->': {
-                        'Ok_': ['card', 'item'],
+                        'Ok_': ['users'],
                     },
-                    'struct.ResultCard': ['title'],
-                    'union.ResultItem': {
-                        'Card': [],
-                    },
+                    'struct.User': ['id'],
                 },
             },
             {
-                'fn.selectNested': {},
+                'fn.listUsers': {},
             },
         ])
 
@@ -44,10 +44,16 @@ def test_select_example_runs_end_to_end() -> None:
             {},
             {
                 'Ok_': {
-                    'card': {'title': 'Ship docs'},
-                    'item': {'Card': {}},
+                    'users': [
+                        {'id': 'user-1'},
+                        {'id': 'user-2'},
+                    ],
                 },
             },
+        ]
+        assert payload[INDEX_MESSAGE_BODY]['Ok_']['users'] == [
+            {'id': 'user-1'},
+            {'id': 'user-2'},
         ]
     finally:
         stop_server(server, thread)
