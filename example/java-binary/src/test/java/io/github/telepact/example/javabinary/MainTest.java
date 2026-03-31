@@ -23,7 +23,6 @@ import io.github.telepact.Client;
 import io.github.telepact.Message;
 import io.github.telepact.Serializer;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
@@ -36,8 +35,8 @@ final class MainTest {
     @Test
     void negotiatesBinaryAfterTheInitialRequest() throws Exception {
         var server = Main.buildTelepactServer();
-        var requestEncodings = Collections.synchronizedList(new ArrayList<String>());
-        var responseEncodings = Collections.synchronizedList(new ArrayList<String>());
+        var requestEncodings = new ArrayList<String>();
+        var responseEncodings = new ArrayList<String>();
         BlockingQueue<byte[]> requests = new LinkedBlockingQueue<>();
         BlockingQueue<byte[]> responses = new LinkedBlockingQueue<>();
 
