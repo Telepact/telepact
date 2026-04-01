@@ -52,10 +52,14 @@ from .resources import load_calculator_telepact_json
 
 
 def _get_cli_version() -> str:
+    version_file = Path(__file__).resolve().parents[3] / 'VERSION.txt'
+    if version_file.exists():
+        return version_file.read_text().strip()
+
     try:
         return package_version('telepact-cli')
     except PackageNotFoundError:
-        return (Path(__file__).resolve().parents[3] / 'VERSION.txt').read_text().strip()
+        raise RuntimeError('Unable to determine the telepact CLI version.')
 
 
 def bump_version(version: str) -> str:
