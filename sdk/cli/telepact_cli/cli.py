@@ -24,6 +24,7 @@ import yaml
 from typing import cast, Pattern
 import jinja2
 import click
+from importlib.metadata import PackageNotFoundError, version as package_version
 from pathlib import Path
 import re
 from starlette.applications import Starlette
@@ -50,6 +51,13 @@ if TYPE_CHECKING:
 from .resources import load_calculator_telepact_json
 
 
+def _get_cli_version() -> str:
+    try:
+        return package_version('telepact-cli')
+    except PackageNotFoundError:
+        return (Path(__file__).resolve().parents[3] / 'VERSION.txt').read_text().strip()
+
+
 def bump_version(version: str) -> str:
     major, minor, patch = map(int, version.split('.'))
     patch += 1
@@ -65,6 +73,7 @@ def _validate_package(ctx: click.Context, param: click.Parameter, value: str) ->
 
 
 @click.group()
+@click.version_option(version=_get_cli_version(), prog_name='telepact')
 def main() -> None:
     pass
 

@@ -161,6 +161,15 @@ def test_fetch_sets_content_type_header() -> None:
         thread.join(timeout=5)
 
 
+def test_version_flag(runner: CliRunner) -> None:
+    expected_version = Path('../../VERSION.txt').read_text().strip()
+
+    result = runner.invoke(main, ['--version'])
+
+    assert result.exit_code == 0
+    assert result.output.strip() == f'telepact, version {expected_version}'
+
+
 @pytest.mark.parametrize("assertion, old, new, expected, expected_code", compare_cases)
 def test_compare(runner: CliRunner, assertion: str, old: dict, new: dict, expected: list[str], expected_code: int) -> None:
     import os
