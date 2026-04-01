@@ -14,19 +14,9 @@
 #|  limitations under the License.
 #|
 
-EXAMPLES := java-http-basic ts-http-cookie-auth ts-websocket-parallel go-websocket py-select py-mock-server java-binary py-links
-
-.PHONY: list check run
-
-list:
-	@printf '%s\n' $(EXAMPLES)
-
-check:
-	@for example in $(EXAMPLES); do \
-		echo "==> $$example"; \
-		$(MAKE) -C $$example run || exit $$?; \
-	done
-
-run:
-	@test -n "$(EXAMPLE)" || (echo "Usage: make run EXAMPLE=<name>" && exit 1)
-	@$(MAKE) -C $(EXAMPLE) run
+- fn.greet:
+    subject: "string"
+    delayMs!: "integer"
+  ->:
+    - Ok_:
+        message: "string"

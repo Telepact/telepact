@@ -14,19 +14,9 @@
 #|  limitations under the License.
 #|
 
-EXAMPLES := java-http-basic ts-http-cookie-auth ts-websocket-parallel go-websocket py-select py-mock-server java-binary py-links
+SHELL := /bin/bash
 
-.PHONY: list check run
-
-list:
-	@printf '%s\n' $(EXAMPLES)
-
-check:
-	@for example in $(EXAMPLES); do \
-		echo "==> $$example"; \
-		$(MAKE) -C $$example run || exit $$?; \
-	done
+.PHONY: run
 
 run:
-	@test -n "$(EXAMPLE)" || (echo "Usage: make run EXAMPLE=<name>" && exit 1)
-	@$(MAKE) -C $(EXAMPLE) run
+	@set -euo pipefail; $(MAKE) -C ../../lib/ts; rm -f telepact.tgz; cp ../../lib/ts/dist-tgz/*.tgz telepact.tgz; npm install; npm test

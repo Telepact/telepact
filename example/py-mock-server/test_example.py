@@ -14,19 +14,17 @@
 #|  limitations under the License.
 #|
 
-EXAMPLES := java-http-basic ts-http-cookie-auth ts-websocket-parallel go-websocket py-select py-mock-server java-binary py-links
+import asyncio
 
-.PHONY: list check run
+from example import interact_with_mock_server
 
-list:
-	@printf '%s\n' $(EXAMPLES)
 
-check:
-	@for example in $(EXAMPLES); do \
-		echo "==> $$example"; \
-		$(MAKE) -C $$example run || exit $$?; \
-	done
+def test_mock_server_example_runs_end_to_end() -> None:
+    response, verification = asyncio.run(interact_with_mock_server())
 
-run:
-	@test -n "$(EXAMPLE)" || (echo "Usage: make run EXAMPLE=<name>" && exit 1)
-	@$(MAKE) -C $(EXAMPLE) run
+    assert response.body == {
+        'Ok_': {
+            'message': 'Hello from the mock server!',
+        },
+    }
+    assert verification.body == {'Ok_': {}}
