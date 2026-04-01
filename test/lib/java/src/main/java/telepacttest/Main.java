@@ -430,6 +430,25 @@ public class Main {
         class ThisError extends RuntimeException {
         }
 
+        Function<Object, Map<String, Object>> onAuth = (auth) -> {
+            if (auth instanceof Map<?, ?> authMap) {
+                var tokenPayload = authMap.get("Token");
+                if (tokenPayload instanceof Map<?, ?> tokenMap) {
+                    var token = tokenMap.get("token");
+                    if (Objects.equals("ok", token)) {
+                        return Map.of("@responseHeader", Map.of("@authResolved_", true));
+                    }
+                    if (Objects.equals("unauthenticated", token)) {
+                        return Map.of("@result", Map.of("ErrorUnauthenticated_", Map.of("message!", "a")));
+                    }
+                    if (Objects.equals("unauthorized", token)) {
+                        return Map.of("@result", Map.of("ErrorUnauthorized_", Map.of("message!", "a")));
+                    }
+                }
+            }
+            return Map.of();
+        };
+
         Function<Message, Message> handler = (requestMessage) -> {
             try {
                 var requestHeaders = requestMessage.headers;
@@ -495,6 +514,7 @@ public class Main {
                 throw new RuntimeException();
             }
         };
+        options.onAuth = onAuth;
         options.onResponse = m -> {
             if ((Boolean) m.headers.getOrDefault("@onResponseError_", false)) {
                 throw new RuntimeException();
@@ -505,6 +525,7 @@ public class Main {
         var server = new Server(telepact, handler, options);
 
         var alternateOptions = new Server.Options();
+        alternateOptions.onAuth = onAuth;
         alternateOptions.onError = (e) -> e.printStackTrace();
         alternateOptions.authRequired = authRequired;
 

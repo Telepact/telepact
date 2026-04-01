@@ -26,6 +26,7 @@ type ServerHandler func(Message) (Message, error)
 
 // ServerOptions configures server behaviour.
 type ServerOptions struct {
+	OnAuth        func(any) map[string]any
 	OnError       func(error)
 	OnRequest     func(Message)
 	OnResponse    func(Message)
@@ -36,6 +37,7 @@ type ServerOptions struct {
 // NewServerOptions constructs ServerOptions populated with defaults.
 func NewServerOptions() *ServerOptions {
 	return &ServerOptions{
+		OnAuth:        func(any) map[string]any { return map[string]any{} },
 		OnError:       func(error) {},
 		OnRequest:     func(Message) {},
 		OnResponse:    func(Message) {},
@@ -47,6 +49,7 @@ func NewServerOptions() *ServerOptions {
 // Server represents a Telepact server instance.
 type Server struct {
 	handler        ServerHandler
+	onAuth         func(any) map[string]any
 	onError        func(error)
 	onRequest      func(Message)
 	onResponse     func(Message)
@@ -69,6 +72,9 @@ func NewServer(telepactSchema *TelepactSchema, handler ServerHandler, options *S
 
 	if options.OnError == nil {
 		options.OnError = func(error) {}
+	}
+	if options.OnAuth == nil {
+		options.OnAuth = func(any) map[string]any { return map[string]any{} }
 	}
 	if options.OnRequest == nil {
 		options.OnRequest = func(Message) {}
@@ -97,6 +103,7 @@ func NewServer(telepactSchema *TelepactSchema, handler ServerHandler, options *S
 
 	return &Server{
 		handler:        handler,
+		onAuth:         options.OnAuth,
 		onError:        options.OnError,
 		onRequest:      options.OnRequest,
 		onResponse:     options.OnResponse,
@@ -150,6 +157,7 @@ func (s *Server) ProcessWithHeaders(requestMessageBytes []byte, overrideHeaders 
 		deserialize,
 		serialize,
 		s.telepactSchema,
+		s.onAuth,
 		s.onError,
 		internalOnRequest,
 		internalOnResponse,

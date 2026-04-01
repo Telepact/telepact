@@ -29,6 +29,7 @@ func HandleMessage(
 	overrideHeaders map[string]any,
 	schema SchemaAccessor,
 	handler func(ServerMessage) (ServerMessage, error),
+	onAuth func(any) map[string]any,
 	onError func(error),
 ) (ServerMessage, error) {
 	if schema == nil {
@@ -123,6 +124,17 @@ func HandleMessage(
 	if len(requestHeaderFailures) > 0 {
 		invalidMessage, err := buildInvalidErrorMessage("ErrorInvalidRequestHeaders_", requestHeaderFailures, resultUnionType, responseHeaders)
 		return invalidMessage, err
+	}
+
+	if authValue, ok := requestHeaders["@auth_"]; ok {
+		authHeaders, err := invokeOnAuth(onAuth, authValue, functionName)
+		if err != nil {
+			invokeOnError(onError, err)
+			return ServerMessage{Headers: cloneStringAnyMap(responseHeaders), Body: map[string]any{"ErrorUnknown_": map[string]any{}}}, nil
+		}
+		for key, value := range authHeaders {
+			requestHeaders[key] = value
+		}
 	}
 
 	if clientKnownRaw, ok := requestHeaders["@bin_"]; ok {
@@ -281,6 +293,33 @@ func invokeOnError(callback func(error), err error) {
 	}
 	defer func() { _ = recover() }()
 	callback(err)
+}
+
+func invokeOnAuth(callback func(any) map[string]any, authValue any, functionName string) (_ map[string]any, err error) {
+	if callback == nil {
+		return nil, nil
+	}
+	defer func() {
+		if recovered := recover(); recovered != nil {
+			err = NewTelepactErrorWithCause(
+				fmt.Sprintf("telepact auth handler failed while handling %s", functionName),
+				"auth",
+				panicAsError(recovered),
+			)
+		}
+	}()
+	return callback(authValue), nil
+}
+
+func panicAsError(value any) error {
+	switch typed := value.(type) {
+	case nil:
+		return fmt.Errorf("panic")
+	case error:
+		return typed
+	default:
+		return fmt.Errorf("%v", typed)
+	}
 }
 
 func buildInvalidErrorMessage(

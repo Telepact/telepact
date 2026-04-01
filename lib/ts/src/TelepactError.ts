@@ -14,7 +14,7 @@
 //|  limitations under the License.
 //|
 
-export type TelepactErrorKind = 'parse' | 'validation' | 'serialization' | 'transport' | 'handler';
+export type TelepactErrorKind = 'parse' | 'validation' | 'serialization' | 'transport' | 'handler' | 'auth';
 
 function toError(error: unknown): Error | undefined {
     if (error instanceof Error) {

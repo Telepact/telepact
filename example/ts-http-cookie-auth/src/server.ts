@@ -51,10 +51,21 @@ export function createExampleServer(): HttpServer {
     const schema = TelepactSchema.fromFileJsonMap(files.filenamesToJson);
     const options = new ServerOptions();
     options.authRequired = false;
+    options.onAuth = async (authHeader) => {
+        const auth = authHeader as Record<string, string> | undefined;
+        if (!auth || auth.sessionToken !== VALID_SESSION) {
+            return {
+                '@result': {
+                    ErrorUnauthenticated_: { 'message!': 'missing or invalid session cookie' },
+                },
+            };
+        }
+
+        return { '@userId': 'user-123' };
+    };
 
     const telepactServer = new Server(schema, async (message) => {
-        const auth = message.headers['@auth_'] as Record<string, string> | undefined;
-        if (!auth || auth.sessionToken !== VALID_SESSION) {
+        if (!message.headers['@userId']) {
             return new Message({}, {
                 ErrorUnauthenticated_: { 'message!': 'missing or invalid session cookie' },
             });
@@ -65,7 +76,7 @@ export function createExampleServer(): HttpServer {
         }
 
         return new Message({}, {
-            Ok_: { userId: 'user-123' },
+            Ok_: { userId: message.headers['@userId'] },
         });
     }, options);
 

@@ -34,6 +34,7 @@ async def handle_message(
     override_headers: dict[str, object],
     telepact_schema: 'TelepactSchema',
     handler: Callable[['Message'], Awaitable['Message']],
+    on_auth: Callable[[object], Awaitable[dict[str, object] | None]],
     on_error: Callable[[Exception], None],
 ) -> 'Message':
     from ..internal.SelectStructFields import select_struct_fields
@@ -93,6 +94,24 @@ async def handle_message(
             result_union_type,
             response_headers,
         )
+
+    if "@auth_" in request_headers:
+        try:
+            auth_headers = await on_auth(request_headers["@auth_"])
+            if auth_headers is not None:
+                request_headers.update(auth_headers)
+        except Exception as e:
+            try:
+                on_error(
+                    TelepactError(
+                        f"telepact auth handler failed while handling {function_name}",
+                        kind="auth",
+                        cause=e,
+                    )
+                )
+            except Exception:
+                pass
+            return Message(response_headers, {"ErrorUnknown_": {}})
 
     if "@bin_" in request_headers:
         client_known_binary_checksums = cast(

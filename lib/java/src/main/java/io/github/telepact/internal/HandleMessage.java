@@ -42,7 +42,7 @@ import io.github.telepact.internal.validation.ValidationFailure;
 
 public class HandleMessage {
     static Message handleMessage(Message requestMessage, Map<String, Object> overrideHeaders, TelepactSchema telepactSchema, Function<Message, Message> handler,
-            Consumer<Throwable> onError) {
+            Function<Object, Map<String, Object>> onAuth, Consumer<Throwable> onError) {
         final var responseHeaders = (Map<String, Object>) new HashMap<String, Object>();
         final Map<String, Object> requestHeaders = requestMessage.headers;
         final Map<String, Object> requestBody = requestMessage.body;
@@ -89,6 +89,25 @@ public class HandleMessage {
             return getInvalidErrorMessage("ErrorInvalidRequestHeaders_", requestHeaderValidationFailures,
                     resultUnionType,
                     responseHeaders);
+        }
+
+        if (requestHeaders.containsKey("@auth_")) {
+            try {
+                final var authHeaders = onAuth.apply(requestHeaders.get("@auth_"));
+                if (authHeaders != null) {
+                    requestHeaders.putAll(authHeaders);
+                }
+            } catch (Throwable e) {
+                try {
+                    onError.accept(new TelepactError(
+                            "telepact auth handler failed while handling %s".formatted(functionName),
+                            "auth",
+                            e));
+                } catch (Throwable ignored) {
+
+                }
+                return new Message(responseHeaders, Map.of("ErrorUnknown_", Map.of()));
+            }
         }
 
         if (requestHeaders.containsKey("@bin_")) {

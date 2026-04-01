@@ -27,9 +27,10 @@ if TYPE_CHECKING:
 
 
 async def process_bytes(request_message_bytes: bytes, override_headers: dict[str, object],
-                        serializer: 'Serializer', telepact_schema: 'TelepactSchema',
-                        on_error: Callable[[Exception], None], on_request: Callable[['Message'], None],
-                        on_response: Callable[['Message'], None], handler: Callable[['Message'], Awaitable['Message']]) -> 'Response':
+                         serializer: 'Serializer', telepact_schema: 'TelepactSchema',
+                         on_auth: Callable[[object], Awaitable[dict[str, object] | None]],
+                         on_error: Callable[[Exception], None], on_request: Callable[['Message'], None],
+                         on_response: Callable[['Message'], None], handler: Callable[['Message'], Awaitable['Message']]) -> 'Response':
     from ..internal.HandleMessage import handle_message
     from ..internal.ParseRequestMessage import parse_request_message
     from ..Response import Response
@@ -44,7 +45,7 @@ async def process_bytes(request_message_bytes: bytes, override_headers: dict[str
             pass
 
         response_message = await handle_message(
-            request_message, override_headers, telepact_schema, handler, on_error)
+            request_message, override_headers, telepact_schema, handler, on_auth, on_error)
 
         try:
             on_response(response_message)

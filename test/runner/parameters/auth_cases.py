@@ -52,9 +52,9 @@ _AUTH_PUBLIC_SCHEMA = _load_sorted_schema(
 
 cases = {
     'auth': [
-        [[{'@ok_': {}}, {'fn.test': {}}], [{}, {'Ok_': {}}]],
-        [[{'@result': {'ErrorUnauthenticated_': {'message!': 'a'}}}, {'fn.test': {}}], [{}, {'ErrorUnauthenticated_': {'message!': 'a'}}]],
-        [[{'@result': {'ErrorUnauthorized_': {'message!': 'a'}}}, {'fn.test': {}}], [{}, {'ErrorUnauthorized_': {'message!': 'a'}}]],
+        [[{'@auth_': {'Token': {'token': 'ok'}}}, {'fn.test': {}}], [{'@authResolved_': True}, {'Ok_': {}}]],
+        [[{'@auth_': {'Token': {'token': 'unauthenticated'}}}, {'fn.test': {}}], [{}, {'ErrorUnauthenticated_': {'message!': 'a'}}]],
+        [[{'@auth_': {'Token': {'token': 'unauthorized'}}}, {'fn.test': {}}], [{}, {'ErrorUnauthorized_': {'message!': 'a'}}]],
         [[{}, {'fn.api_': {}}], [{}, {'Ok_': {'api': _AUTH_PUBLIC_SCHEMA}}]],
         [[{}, {'fn.api_': {'includeInternal!': True}}], [{}, {'Ok_': {'api': _AUTH_FULL_SCHEMA}}]],
    ]

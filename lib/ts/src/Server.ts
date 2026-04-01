@@ -27,6 +27,7 @@ import { Response } from './Response.js';
 
 export class Server {
     handler: (message: Message) => Promise<Message>;
+    onAuth: (auth: any) => Promise<Record<string, any> | null | undefined>;
     onError: (error: any) => void;
     onRequest: (message: Message) => void;
     onResponse: (message: Message) => void;
@@ -35,6 +36,7 @@ export class Server {
 
     constructor(telepactSchema: TelepactSchema, handler: (message: Message) => Promise<Message>, options: ServerOptions) {
         this.handler = handler;
+        this.onAuth = options.onAuth;
         this.onError = options.onError;
         this.onRequest = options.onRequest;
         this.onResponse = options.onResponse;
@@ -60,6 +62,7 @@ export class Server {
             overrideHeaders,
             this.serializer,
             this.telepactSchema,
+            this.onAuth,
             this.onError,
             this.onRequest,
             this.onResponse,
@@ -69,6 +72,7 @@ export class Server {
 }
 
 export class ServerOptions {
+    onAuth: (auth: any) => Promise<Record<string, any> | null | undefined>;
     onError: (error: any) => void;
     onRequest: (message: Message) => void;
     onResponse: (message: Message) => void;
@@ -76,6 +80,7 @@ export class ServerOptions {
     serialization: Serialization;
 
     constructor() {
+        this.onAuth = async (_auth: any) => ({});
         this.onError = (e: any) => {};
         this.onRequest = (m: Message) => {};
         this.onResponse = (m: Message) => {};

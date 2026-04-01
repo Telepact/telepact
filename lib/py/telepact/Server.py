@@ -36,6 +36,7 @@ class Server:
         """
 
         def __init__(self) -> None:
+            self.on_auth = _noop_on_auth
             self.on_error = lambda e: None
             self.on_request = lambda m: None
             self.on_response = lambda m: None
@@ -49,6 +50,7 @@ class Server:
         from .internal.binary.ConstructBinaryEncoding import construct_binary_encoding
 
         self.handler = handler
+        self.on_auth = options.on_auth
         self.on_error = options.on_error
         self.on_request = options.on_request
         self.on_response = options.on_response
@@ -71,5 +73,9 @@ class Server:
         """
         from .internal.ProcessBytes import process_bytes
 
-        return await process_bytes(request_message_bytes, override_headers, self.serializer, self.telepact_schema, self.on_error,
+        return await process_bytes(request_message_bytes, override_headers, self.serializer, self.telepact_schema, self.on_auth, self.on_error,
                                    self.on_request, self.on_response, self.handler)
+
+
+async def _noop_on_auth(_auth: object) -> dict[str, object]:
+    return {}

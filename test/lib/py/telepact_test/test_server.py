@@ -316,6 +316,21 @@ async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, 
     class ThisError(RuntimeError):
         pass
 
+    async def on_auth(auth: object) -> dict[str, object]:
+        token = None
+        if isinstance(auth, dict):
+            token_payload = auth.get("Token")
+            if isinstance(token_payload, dict):
+                token = token_payload.get("token")
+
+        if token == "ok":
+            return {"@responseHeader": {"@authResolved_": True}}
+        if token == "unauthenticated":
+            return {"@result": {"ErrorUnauthenticated_": {"message!": "a"}}}
+        if token == "unauthorized":
+            return {"@result": {"ErrorUnauthorized_": {"message!": "a"}}}
+        return {}
+
     async def handler(request_message: 'Message') -> 'Message':
         nonlocal serve_alternate_server
         nonlocal executor
@@ -365,6 +380,7 @@ async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, 
 
     options = Server.Options()
 
+    options.on_auth = on_auth
     options.on_error = on_err
     options.on_request = on_request_err
     options.on_response = on_response_err
@@ -372,6 +388,7 @@ async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, 
 
     server = Server(telepact, handler, options)
     alternate_options = Server.Options()
+    alternate_options.on_auth = on_auth
     alternate_options.on_error = on_err
     alternate_options.auth_required = auth_required
     alternate_server = Server(

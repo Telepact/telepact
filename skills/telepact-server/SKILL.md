@@ -138,6 +138,7 @@ const handler = async (requestMessage: Message): Promise<Message> => {
 };
 
 const options = new ServerOptions();
+options.onAuth = async (auth) => ({ '@userId': lookupUserId(auth) });
 options.authRequired = false;
 const telepactServer = new Server(schema, handler, options);
 
@@ -164,6 +165,7 @@ async def handler(request_message: 'Message') -> 'Message':
     return Message({}, {'Ok_': {}})
 
 options = Server.Options()
+options.on_auth = resolve_auth
 options.auth_required = False
 telepactServer = Server(schema, handler, options)
 
@@ -190,6 +192,7 @@ Function<Message, Message> handler = (requestMessage) -> {
 };
 
 var options = new Server.Options();
+options.onAuth = auth -> Map.of("@userId", lookupUserId(auth));
 options.authRequired = false;
 var telepactServer = new Server(schema, handler, options);
 
@@ -236,6 +239,7 @@ handler := func(request telepact.Message) (telepact.Message, error) {
 }
 
 telepactOptions := telepact.NewServerOptions()
+telepactOptions.OnAuth = func(auth any) map[string]any { return map[string]any{"@userId": lookupUserID(auth)} }
 telepactOptions.AuthRequired = false
 telepactServer, err := telepact.NewServer(schema, handler, telepactOptions)
 if err != nil {

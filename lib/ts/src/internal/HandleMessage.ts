@@ -35,6 +35,7 @@ export async function handleMessage(
     overrideHeaders: Record<string, any>,
     telepactSchema: TelepactSchema,
     handler: (message: Message) => Promise<Message>,
+    onAuth: (auth: any) => Promise<Record<string, any> | null | undefined>,
     onError: (error: Error) => void,
 ): Promise<Message> {
     const responseHeaders: Record<string, any> = {};
@@ -90,6 +91,22 @@ export async function handleMessage(
             resultUnionType,
             responseHeaders,
         );
+    }
+
+    if ('@auth_' in requestHeaders) {
+        try {
+            const authHeaders = await onAuth(requestHeaders['@auth_']);
+            if (authHeaders != null) {
+                Object.assign(requestHeaders, authHeaders);
+            }
+        } catch (e) {
+            try {
+                onError(new TelepactError(`telepact auth handler failed while handling ${functionName}`, 'auth', e));
+            } catch (error) {
+                // Ignore error
+            }
+            return new Message(responseHeaders, { ErrorUnknown_: {} });
+        }
     }
 
     if ('@bin_' in requestHeaders) {

@@ -50,6 +50,11 @@ public class Server {
         };
 
         /**
+         * Handler for auth data provided through the @auth_ header.
+         */
+        public Function<Object, Map<String, Object>> onAuth = (auth) -> Map.of();
+
+        /**
          * Execution hook that runs when a request Message is received.
          */
         public Consumer<Message> onRequest = (m) -> {
@@ -75,6 +80,7 @@ public class Server {
 
     final TelepactSchema telepactSchema;
     private final Function<Message, Message> handler;
+    private final Function<Object, Map<String, Object>> onAuth;
     private final Consumer<Throwable> onError;
     private final Consumer<Message> onRequest;
     private final Consumer<Message> onResponse;
@@ -89,6 +95,7 @@ public class Server {
      */
     public Server(TelepactSchema telepactSchema, Function<Message, Message> handler, Options options) {
         this.handler = handler;
+        this.onAuth = options.onAuth;
         this.onError = options.onError;
         this.onRequest = options.onRequest;
         this.onResponse = options.onResponse;
@@ -113,7 +120,7 @@ public class Server {
      * @return The bytes of the response message.
      */
     public Response process(byte[] requestMessageBytes) {
-        return processBytes(requestMessageBytes, Map.of(), this.serializer, this.telepactSchema, this.onError,
+        return processBytes(requestMessageBytes, Map.of(), this.serializer, this.telepactSchema, this.onAuth, this.onError,
                 this.onRequest, this.onResponse, this.handler);
     }
 
@@ -126,7 +133,7 @@ public class Server {
      * @return The bytes of the response message.
      */
     public Response process(byte[] requestMessageBytes, Map<String, Object> overrideHeaders) {
-        return processBytes(requestMessageBytes, overrideHeaders, this.serializer, this.telepactSchema, this.onError,
+        return processBytes(requestMessageBytes, overrideHeaders, this.serializer, this.telepactSchema, this.onAuth, this.onError,
                 this.onRequest, this.onResponse, this.handler);
     }
 }

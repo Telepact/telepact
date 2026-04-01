@@ -139,35 +139,41 @@ const response = await server.process(requestBytes, {
 });
 ```
 
-Inside the handler, parse and validate those credentials before delegating to
-the target function. An illustrative TypeScript sketch looks like this:
+Resolve those credentials in `ServerOptions.onAuth`, then let the handler read
+the normalized auth headers. An illustrative TypeScript sketch looks like this:
 
 ```ts
+const options = new ServerOptions();
+options.onAuth = async (auth) => {
+  const userId = lookupUserIdFromSession(auth?.sessionToken);
+  if (!userId) {
+    return {
+      '@result': {
+        ErrorUnauthenticated_: { message: 'invalid credentials' },
+      },
+    };
+  }
+
+  return { '@userId': userId };
+};
+
 const server = new Server(schema, async (message) => {
-  const auth = message.headers['@auth_'];
   const target = message.getBodyTarget();
 
-  if (!auth) {
+  if (!message.headers['@userId']) {
     return new Message({}, {
       ErrorUnauthenticated_: { message: 'missing credentials' },
     });
   }
 
-  const userId = lookupUserIdFromSession(auth.sessionToken);
-  if (!userId) {
-    return new Message({}, {
-      ErrorUnauthenticated_: { message: 'invalid credentials' },
-    });
-  }
-
   const normalizedMessage = new Message(
-    { ...message.headers, '@userId': userId },
+    message.headers,
     message.body,
   );
 
   const startedAt = Date.now();
   try {
-    return await dispatchFunction(target, normalizedMessage, auth);
+    return await dispatchFunction(target, normalizedMessage);
   } finally {
     logger.info('telepact_request', {
       requestId: normalizedMessage.headers['@id_'],
@@ -175,11 +181,12 @@ const server = new Server(schema, async (message) => {
       durationMs: Date.now() - startedAt,
     });
   }
-}, new ServerOptions());
+}, options);
 ```
 
 The important point is the placement: transport code stays bytes in / bytes out,
-while auth and other request policy live in the handler code itself.
+`onAuth` handles credential normalization, and the handler receives the derived
+identity headers it needs.
 
 ### Observability
 

@@ -24,6 +24,7 @@ import { SerializationError } from '../SerializationError.js';
 import { TelepactError } from '../TelepactError.js';
 
 export type ErrorHandler = (error: any) => void;
+export type AuthHandler = (auth: any) => Promise<Record<string, any> | null | undefined>;
 export type RequestHandler = (message: Message) => void;
 export type ResponseHandler = (message: Message) => void;
 export type MessageHandler = (message: Message) => Promise<Message>;
@@ -33,6 +34,7 @@ export async function processBytes(
     overrideHeaders: Record<string, any>,
     serializer: Serializer,
     telepactSchema: TelepactSchema,
+    onAuth: AuthHandler,
     onError: ErrorHandler,
     onRequest: RequestHandler,
     onResponse: ResponseHandler,
@@ -47,7 +49,7 @@ export async function processBytes(
             // Handle error
         }
 
-        const responseMessage = await handleMessage(requestMessage, overrideHeaders, telepactSchema, handler, onError);
+        const responseMessage = await handleMessage(requestMessage, overrideHeaders, telepactSchema, handler, onAuth, onError);
 
         try {
             onResponse(responseMessage);
