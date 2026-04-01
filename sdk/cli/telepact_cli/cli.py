@@ -59,7 +59,9 @@ def _get_cli_version() -> str:
     try:
         return package_version('telepact-cli')
     except PackageNotFoundError:
-        raise RuntimeError('Unable to determine the telepact CLI version.')
+        raise RuntimeError(
+            'Unable to determine CLI version: VERSION.txt not found and telepact-cli package not installed.'
+        )
 
 
 def bump_version(version: str) -> str:
