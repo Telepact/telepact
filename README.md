@@ -55,12 +55,12 @@ For transport wiring patterns and concrete HTTP/WebSocket examples, see the
 For deployment, rollout, compatibility, auth, and observability guidance, see
 the [Production Guide](./doc/production-guide.md).
 For runnable end-to-end examples, see:
-- [go-websocket](./example/go-websocket/README.md) - Minimal Go example over WebSocket request/reply
-- [java-binary](./example/java-binary/README.md) - Minimal Java example that verifies binary negotiation
-- [java-http-basic](./example/java-http-basic/README.md) - Minimal Java example for basic HTTP request/reply
-- [py-links](./example/py-links/README.md) - Minimal Python example that returns a prepopulated function-type link
-- [py-select](./example/py-select/README.md) - Minimal Python example that selects just the `id` field from a list of users
-- [ts-http-cookie-auth](./example/ts-http-cookie-auth/README.md) - Minimal TypeScript example that pulls a session cookie into `@auth_` at the HTTP boundary
+- [go-websocket](./example/go-websocket/README.md) - Minimal Go example that demonstrates WebSocket request/reply
+- [java-binary](./example/java-binary/README.md) - Minimal Java example that demonstrates binary negotiation
+- [java-http-basic](./example/java-http-basic/README.md) - Minimal Java example that demonstrates basic HTTP request/reply
+- [py-links](./example/py-links/README.md) - Minimal Python example that demonstrates a prepopulated function-type link
+- [py-select](./example/py-select/README.md) - Minimal Python example that demonstrates selecting just the `id` field from a list of users
+- [ts-http-cookie-auth](./example/ts-http-cookie-auth/README.md) - Minimal TypeScript example that demonstrates pulling a session cookie into `@auth_` at the HTTP boundary
 For debugging local/runtime failures, see the [Runtime Error Guide](./doc/runtime-errors.md).
 
 To learn how to serve a Telepact API, see the specific library docs:
