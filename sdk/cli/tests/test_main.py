@@ -16,6 +16,7 @@
 
 from typing import Generator
 from pathlib import Path
+from importlib.metadata import version as package_version
 import traceback
 import asyncio
 import pytest
@@ -33,7 +34,6 @@ import os
 import shutil
 import threading
 from http.server import BaseHTTPRequestHandler, HTTPServer
-
 
 
 @pytest.fixture
@@ -159,6 +159,15 @@ def test_fetch_sets_content_type_header() -> None:
         server.shutdown()
         server.server_close()
         thread.join(timeout=5)
+
+
+def test_version_flag(runner: CliRunner) -> None:
+    expected_version = package_version('telepact-cli')
+
+    result = runner.invoke(main, ['--version'])
+
+    assert result.exit_code == 0
+    assert result.output.strip() == f'telepact, version {expected_version}'
 
 
 @pytest.mark.parametrize("assertion, old, new, expected, expected_code", compare_cases)
