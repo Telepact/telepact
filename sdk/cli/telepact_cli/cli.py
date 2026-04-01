@@ -51,12 +51,17 @@ if TYPE_CHECKING:
 from .resources import load_calculator_telepact_json
 
 
-REPO_ROOT = Path(__file__).resolve().parents[3]
+def _find_version_file() -> Path | None:
+    for parent in Path(__file__).resolve().parents:
+        version_file = parent / 'VERSION.txt'
+        if version_file.exists():
+            return version_file
+    return None
 
 
 def _get_cli_version() -> str:
-    version_file = REPO_ROOT / 'VERSION.txt'
-    if version_file.exists():
+    version_file = _find_version_file()
+    if version_file is not None:
         return version_file.read_text().strip()
 
     try:
