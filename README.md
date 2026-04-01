@@ -54,13 +54,7 @@ For transport wiring patterns and concrete HTTP/WebSocket examples, see the
 [Transport Guide](./doc/transports.md).
 For deployment, rollout, compatibility, auth, and observability guidance, see
 the [Production Guide](./doc/production-guide.md).
-For runnable end-to-end examples, see:
-- [go-websocket](./example/go-websocket/README.md) - Minimal Go example that shows how to use WebSocket request/reply
-- [java-binary](./example/java-binary/README.md) - Minimal Java example that shows how to verify binary negotiation
-- [java-http-basic](./example/java-http-basic/README.md) - Minimal Java example that shows how to handle basic HTTP request/reply
-- [py-links](./example/py-links/README.md) - Minimal Python example that shows how to return a prepopulated function-type link
-- [py-select](./example/py-select/README.md) - Minimal Python example that shows how to select just the `id` field from a list of users
-- [ts-http-cookie-auth](./example/ts-http-cookie-auth/README.md) - Minimal TypeScript example that shows how to pull a session cookie into `@auth_` at the HTTP boundary
+For runnable end-to-end examples, see the [Examples landing page](./example/README.md).
 For debugging local/runtime failures, see the [Runtime Error Guide](./doc/runtime-errors.md).
 
 To learn how to serve a Telepact API, see the specific library docs:
