@@ -21,4 +21,4 @@ MAVEN := mvn -q -s settings.xml -Dtelepact.version=$(VERSION)
 .PHONY: run
 
 run:
-	@set -euo pipefail; $(MAVEN) test
+	@set -euo pipefail; $(MAKE) -C ../../lib/java; $(MAVEN) test
