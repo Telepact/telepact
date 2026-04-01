@@ -52,11 +52,7 @@ from .resources import load_calculator_telepact_json
 
 
 def _get_cli_version() -> str:
-    try:
-        return package_version('telepact-cli')
-    except PackageNotFoundError:
-        return (Path(__file__).resolve().parents[3] / 'VERSION.txt').read_text().strip()
-
+    return package_version('telepact-cli')
 
 def bump_version(version: str) -> str:
     major, minor, patch = map(int, version.split('.'))
