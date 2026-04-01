@@ -589,6 +589,7 @@ public class Main {
                 System.out.flush();
 
                 byte[] responseBytes;
+                var shouldEnd = false;
                 try {
                     var request = (List<Object>) objectMapper.readValue(requestBytes, List.class);
                     var body = (Map<String, Object>) request.get(1);
@@ -601,9 +602,7 @@ public class Main {
 
                         }
                         case "End" -> {
-                            lock.lock();
-                            done.signalAll();
-                            lock.unlock();
+                            shouldEnd = true;
                         }
                         case "Stop" -> {
                             var id = (String) payload.get("id");
@@ -677,6 +676,14 @@ public class Main {
                 System.out.flush();
 
                 connection.publish(msg.getReplyTo(), responseBytes);
+                if (shouldEnd) {
+                    lock.lock();
+                    try {
+                        done.signalAll();
+                    } finally {
+                        lock.unlock();
+                    }
+                }
             });
 
             dispatcher.subscribe("java");

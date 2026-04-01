@@ -301,11 +301,7 @@ func invokeOnAuth(callback func(any) map[string]any, authValue any, functionName
 	}
 	defer func() {
 		if recovered := recover(); recovered != nil {
-			err = NewTelepactErrorWithCause(
-				fmt.Sprintf("telepact auth handler failed while handling %s", functionName),
-				"auth",
-				panicAsError(recovered),
-			)
+			err = fmt.Errorf("telepact auth handler failed while handling %s: %w", functionName, panicAsError(recovered))
 		}
 	}()
 	return callback(authValue), nil

@@ -413,7 +413,7 @@ async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, 
                 response = await alternate_server.process(request_bytes)
                 return response.bytes
             else:
-                override_headers = {'@override': 'old'}
+                override_headers = {'@override': 'new'}
                 response = await server.process(request_bytes, override_headers)
                 return response.bytes
 
