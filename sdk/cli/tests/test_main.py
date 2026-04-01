@@ -35,6 +35,9 @@ import threading
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 
+REPO_ROOT = Path(__file__).resolve().parents[3]
+
+
 
 @pytest.fixture
 def runner() -> CliRunner:
@@ -162,7 +165,7 @@ def test_fetch_sets_content_type_header() -> None:
 
 
 def test_version_flag(runner: CliRunner) -> None:
-    expected_version = (Path(__file__).resolve().parents[3] / 'VERSION.txt').read_text().strip()
+    expected_version = (REPO_ROOT / 'VERSION.txt').read_text().strip()
 
     result = runner.invoke(main, ['--version'])
 
