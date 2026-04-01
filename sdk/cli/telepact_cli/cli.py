@@ -51,26 +51,11 @@ if TYPE_CHECKING:
 from .resources import load_calculator_telepact_json
 
 
-def _find_version_file() -> Path | None:
-    for parent in Path(__file__).resolve().parents:
-        version_file = parent / 'VERSION.txt'
-        if version_file.exists():
-            return version_file
-    return None
-
-
 def _get_cli_version() -> str:
-    version_file = _find_version_file()
-    if version_file is not None:
-        return version_file.read_text().strip()
-
     try:
         return package_version('telepact-cli')
     except PackageNotFoundError:
-        raise RuntimeError(
-            'Unable to determine CLI version: VERSION.txt not found and telepact-cli package not installed. '
-            'Run from the repository with VERSION.txt present, or install the telepact-cli package.'
-        )
+        return (Path(__file__).resolve().parents[3] / 'VERSION.txt').read_text().strip()
 
 
 def bump_version(version: str) -> str:

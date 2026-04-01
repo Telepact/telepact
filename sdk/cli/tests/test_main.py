@@ -16,6 +16,7 @@
 
 from typing import Generator
 from pathlib import Path
+from importlib.metadata import version as package_version
 import traceback
 import asyncio
 import pytest
@@ -33,10 +34,6 @@ import os
 import shutil
 import threading
 from http.server import BaseHTTPRequestHandler, HTTPServer
-
-
-REPO_ROOT = Path(__file__).resolve().parents[3]
-
 
 
 @pytest.fixture
@@ -165,7 +162,7 @@ def test_fetch_sets_content_type_header() -> None:
 
 
 def test_version_flag(runner: CliRunner) -> None:
-    expected_version = (REPO_ROOT / 'VERSION.txt').read_text().strip()
+    expected_version = package_version('telepact-cli')
 
     result = runner.invoke(main, ['--version'])
 
