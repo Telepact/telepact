@@ -23,6 +23,7 @@ import static io.github.telepact.internal.schema.ParseUnionType.parseUnionType;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -93,19 +94,31 @@ public class GetOrParseType {
             final List<Object> thisPath = List.of(thisIndex);
             final TType type;
             if (customTypeName.startsWith("struct")) {
-                type = parseStructType(thisPath, definition, customTypeName, List.of(),
+                final var placeholder = new io.github.telepact.internal.types.TStruct(customTypeName, new LinkedHashMap<>());
+                ctx.parsedTypes.put(customTypeName, placeholder);
+                final var parsedType = parseStructType(thisPath, definition, customTypeName, List.of(),
                         ctx.copyWithNewDocumentName(thisDocumentName));
+                placeholder.fields.putAll(((io.github.telepact.internal.types.TStruct) parsedType).fields);
+                type = placeholder;
             } else if (customTypeName.startsWith("union")) {
-                type = parseUnionType(thisPath, definition, customTypeName, List.of(),
+                final var placeholder = new TUnion(customTypeName, new LinkedHashMap<>(), new LinkedHashMap<>());
+                ctx.parsedTypes.put(customTypeName, placeholder);
+                final var parsedType = parseUnionType(thisPath, definition, customTypeName, List.of(),
                         List.of(),
                         ctx.copyWithNewDocumentName(thisDocumentName));
+                final var parsedUnion = (TUnion) parsedType;
+                placeholder.tags.putAll(parsedUnion.tags);
+                placeholder.tagIndices.putAll(parsedUnion.tagIndices);
+                type = placeholder;
             } else if (customTypeName.startsWith("fn")) {
+                final var placeholder = new TUnion(customTypeName, new LinkedHashMap<>(), new LinkedHashMap<>());
+                ctx.parsedTypes.put(customTypeName, placeholder);
 
                 final var argType = parseStructType(path, definition,
                     customTypeName, List.of("->", "_errors"), ctx);
-                type = new TUnion(customTypeName, Map.of(customTypeName, argType), Map.of(customTypeName, 0));
-
-                ctx.parsedTypes.put(customTypeName, type);
+                placeholder.tags.put(customTypeName, argType);
+                placeholder.tagIndices.put(customTypeName, 0);
+                type = placeholder;
 
                 final var resultType = parseFunctionResultType(
                     thisPath,

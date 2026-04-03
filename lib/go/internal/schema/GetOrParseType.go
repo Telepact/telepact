@@ -117,24 +117,39 @@ func GetOrParseType(path []any, typeName string, ctx *ParseContext) (types.TType
 
 	switch {
 	case strings.HasPrefix(customTypeName, "struct"):
+		placeholder := types.NewTStruct(customTypeName, map[string]*types.TFieldDeclaration{})
+		storeParsedType(ctx, customTypeName, placeholder)
 		parsedType, err = ParseStructType(thisPath, definition, customTypeName, nil, childCtx)
+		if err == nil && parsedType != nil {
+			if parsedStruct, ok := parsedType.(*types.TStruct); ok {
+				placeholder.Fields = parsedStruct.Fields
+			}
+			return placeholder, nil
+		}
 	case strings.HasPrefix(customTypeName, "union"):
+		placeholder := types.NewTUnion(customTypeName, map[string]*types.TStruct{}, map[string]int{})
+		storeParsedType(ctx, customTypeName, placeholder)
 		parsedType, err = ParseUnionType(thisPath, definition, customTypeName, nil, nil, childCtx)
+		if err == nil && parsedType != nil {
+			if parsedUnion, ok := parsedType.(*types.TUnion); ok {
+				placeholder.Tags = parsedUnion.Tags
+				placeholder.TagIndices = parsedUnion.TagIndices
+			}
+			return placeholder, nil
+		}
 	case strings.HasPrefix(customTypeName, "fn"):
+		placeholder := types.NewTUnion(customTypeName, map[string]*types.TStruct{}, map[string]int{})
+		storeParsedType(ctx, customTypeName, placeholder)
 		argStruct, argErr := ParseStructType(path, definition, customTypeName, []string{"->", "_errors"}, ctx)
 		if argErr != nil {
 			err = argErr
 			break
 		}
 
-		// Functions are represented as a single-variant union containing their call struct.
-		unionTags := map[string]*types.TStruct{}
-		unionIndices := map[string]int{}
 		if argStruct != nil {
-			unionTags[customTypeName] = argStruct
-			unionIndices[customTypeName] = 0
+			placeholder.Tags[customTypeName] = argStruct
+			placeholder.TagIndices[customTypeName] = 0
 		}
-		storeParsedType(ctx, customTypeName, types.NewTUnion(customTypeName, unionTags, unionIndices))
 
 		resultType, resultErr := ParseFunctionResultType(thisPath, definition, customTypeName, childCtx)
 		if resultErr != nil {
@@ -151,7 +166,7 @@ func GetOrParseType(path []any, typeName string, ctx *ParseContext) (types.TType
 		if ctx.FnErrorRegexes != nil {
 			ctx.FnErrorRegexes[customTypeName] = errorsRegex
 		}
-		return ctx.ParsedTypes[customTypeName], nil
+		return placeholder, nil
 	default:
 		parsedType, err = resolveTypeExtension(customTypeName, path, ctx)
 	}

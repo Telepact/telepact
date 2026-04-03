@@ -241,6 +241,24 @@ public class ParseTelepactSchema {
             }
         }
 
+        if (!parseFailures.isEmpty()) {
+            throw new TelepactSchemaParseError(parseFailures, telepactSchemaNameToJson);
+        }
+
+        try {
+            ValidateTypeTermination.validateTypeTermination(
+                    parsedTypes,
+                    schemaKeysToDocumentName,
+                    schemaKeysToIndex,
+                    telepactSchemaNameToJson);
+        } catch (TelepactSchemaParseError e) {
+            parseFailures.addAll(e.schemaParseFailures);
+        }
+
+        if (!parseFailures.isEmpty()) {
+            throw new TelepactSchemaParseError(parseFailures, telepactSchemaNameToJson);
+        }
+
         var headers = new ArrayList<THeaders>();
 
         var requestHeaders = new HashMap<String, TFieldDeclaration>();

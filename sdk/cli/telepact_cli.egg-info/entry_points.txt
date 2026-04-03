@@ -1,2 +1,0 @@
-[console_scripts]
-telepact = telepact_cli.cli:main

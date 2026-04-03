@@ -40,6 +40,7 @@ def parse_telepact_schema(
     from .ParseErrorType import parse_error_type
     from .ParseHeadersType import parse_headers_type
     from .ParseContext import ParseContext
+    from .ValidateTypeTermination import validate_type_termination
     from .DocumentLocators import resolve_document_coordinates
     from ..types.TError import TError
     from collections import OrderedDict
@@ -223,6 +224,20 @@ def parse_telepact_schema(
                 error, parsed_types, schema_keys_to_document_names, schema_keys_to_index, telepact_schema_document_names_to_json, fn_error_regexes)
         except TelepactSchemaParseError as e:
             parse_failures.extend(e.schema_parse_failures)
+
+    if parse_failures:
+        raise TelepactSchemaParseError(
+            parse_failures, telepact_schema_document_names_to_json)
+
+    try:
+        validate_type_termination(
+            parsed_types,
+            schema_keys_to_document_names,
+            schema_keys_to_index,
+            telepact_schema_document_names_to_json,
+        )
+    except TelepactSchemaParseError as e:
+        parse_failures.extend(e.schema_parse_failures)
 
     headers: list[THeaders] = []
 
