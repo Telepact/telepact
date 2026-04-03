@@ -241,10 +241,6 @@ public class ParseTelepactSchema {
             }
         }
 
-        if (!parseFailures.isEmpty()) {
-            throw new TelepactSchemaParseError(parseFailures, telepactSchemaNameToJson);
-        }
-
         try {
             ValidateTypeTermination.validateTypeTermination(
                     parsedTypes,

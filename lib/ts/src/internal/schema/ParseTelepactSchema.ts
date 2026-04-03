@@ -273,10 +273,6 @@ export function parseTelepactSchema(telepactSchemaDocumentNamesToJson: Record<st
         }
     }
 
-    if (parseFailures.length > 0) {
-        throw new TelepactSchemaParseError(parseFailures, telepactSchemaDocumentNamesToJson);
-    }
-
     try {
         validateTypeTermination(
             parsedTypes,
