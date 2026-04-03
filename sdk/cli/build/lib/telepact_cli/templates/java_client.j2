@@ -1,0 +1,23 @@
+package {{ package }};
+
+import io.github.telepact.Message;
+import io.github.telepact.Client;
+import io.github.telepact.TypedMessage;
+import java.util.Map;
+
+public class TypedClient {
+
+    private final Client client;
+
+    public TypedClient(Client client) {
+        this.client = client;
+    }
+
+    {%- for fn in functions %}
+    {%- set function_name = fn | replace('fn.', '') %}
+    public TypedMessage<{{ function_name }}.Output> {{ function_name }}(Map<String, Object> headers, {{ function_name }}.Input input) {
+        var message = this.client.request(new Message(headers, input.pseudoJson));
+        return new TypedMessage<>(message.headers, new {{ function_name }}.Output(message.body));
+    }
+    {%- endfor %}
+}

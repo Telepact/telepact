@@ -1,0 +1,28 @@
+package {{ package }};
+
+import io.github.telepact.Message;
+import io.github.telepact.TypedMessage;
+import java.util.Map;
+
+public abstract class TypedServerHandler {
+
+    {%- for fn in functions %}
+    {%- set function_name = fn | replace('fn.', '') %}
+    public abstract TypedMessage<{{ function_name }}.Output> {{ function_name }}(Map<String, Object> headers, {{ function_name }}.Input input);
+    {%- endfor %}
+
+    public Message handler(Message message) {
+        var functionName = message.body.keySet().stream().findAny().get();
+        switch (functionName) {
+            {%- for fn in functions %}
+            {%- set function_name = fn | replace('fn.', '') %}
+            case "{{ fn }}" -> {
+                var typedMessage = this.{{ function_name }}(message.headers, new {{ function_name }}.Input(message.body));
+                return new Message(typedMessage.headers, typedMessage.body.pseudoJson);
+            }
+            {%- endfor %}
+            default -> throw new IllegalArgumentException("Unknown function: " + functionName);
+        }
+    }
+
+}
