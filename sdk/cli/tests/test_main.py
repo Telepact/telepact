@@ -23,6 +23,7 @@ import pytest
 from click.testing import CliRunner
 # Adjust the import path according to your project structure
 from telepact_cli.cli import main, get_api_from_http
+from telepact_cli.resources import load_calculator_telepact_json
 import traceback
 import subprocess
 import requests
@@ -74,7 +75,7 @@ def test_demo_server_and_fetch_and_mock() -> None:
             schema_content = schema_file.read()
             schema_json = json.loads(schema_content)
 
-        reference_json = [{'///': ' A calculator app that provides basic math computation capabilities. ', 'info.Calculator': {}}, {'///': ' A function that adds two numbers. ', 'fn.add': {'x': 'number', 'y': 'number'}, '->': [{'Ok_': {'result': 'number'}}]}, {'///': ' Compute the `result` of the given `x` and `y` values. ', 'fn.compute': {'x': 'union.Value', 'y': 'union.Value', 'op': 'union.Operation'}, '->': [{'Ok_': {'result': 'number'}}, {'ErrorCannotDivideByZero': {}}]}, {'///': ' Export all saved variables, up to an optional `limit`. ', 'fn.exportVariables': {'limit!': 'integer'}, '->': [{'Ok_': {'variables': ['struct.Variable']}}]}, {'///': ' A function template. ', 'fn.getPaperTape': {}, '->': [{'Ok_': {'tape': ['struct.Computation']}}]}, {'///': ' Save a set of variables as a dynamic map of variable names to their value. ', 'fn.saveVariables': {'variables': {'string': 'number'}}, '->': [{'Ok_': {}}]}, {'fn.showExample': {}, '->': [{'Ok_': {'link': 'fn.compute'}}]}, {'///': ' A computation. ', 'struct.Computation': {'firstOperand': 'union.Value', 'secondOperand': 'union.Value', 'operation': 'union.Operation', 'timestamp': 'integer', 'successful': 'boolean'}}, {'///': ' A mathematical variable represented by a `name` that holds a certain `value`. ', 'struct.Variable': {'name': 'string', 'value': 'number'}}, {'///': ' A basic mathematical operation. ', 'union.Operation': [{'Add': {}}, {'Sub': {}}, {'Mul': {}}, {'Div': {}}]}, {'///': ' A value for computation that can take either a constant or variable form. ', 'union.Value': [{'Constant': {'value': 'number'}}, {'Variable': {'name': 'string'}}]}]
+        reference_json = json.loads(load_calculator_telepact_json())
 
         # Compare the fetched schema with the reference schema
         print(f"Fetched schema: {schema_json}")

@@ -1,23 +1,7 @@
-#|
-#|  Copyright The Telepact Authors
-#|
-#|  Licensed under the Apache License, Version 2.0 (the "License");
-#|  you may not use this file except in compliance with the License.
-#|  You may obtain a copy of the License at
-#|
-#|  https://www.apache.org/licenses/LICENSE-2.0
-#|
-#|  Unless required by applicable law or agreed to in writing, software
-#|  distributed under the License is distributed on an "AS IS" BASIS,
-#|  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#|  See the License for the specific language governing permissions and
-#|  limitations under the License.
-#|
-
-- ///: " A calculator app that provides basic math computation capabilities. "
+- ///: A calculator app that provides basic math computation capabilities.
   info.Calculator: {}
 
-- ///: " A function that adds two numbers. "
+- ///: A function that adds two numbers.
   fn.add:
     x: "number"
     y: "number"
@@ -25,63 +9,128 @@
     - Ok_:
         result: "number"
 
-- ///: " A value for computation that can take either a constant or variable form. "
-  union.Value:
-    - Constant:
-        value: "number"
-    - Variable:
-        name: "string"
-
-- ///: " A basic mathematical operation. "
-  union.Operation:
-    - Add: {}
-    - Sub: {}
-    - Mul: {}
-    - Div: {}
-
-- ///: " A mathematical variable represented by a `name` that holds a certain `value`. "
-  struct.Variable:
+- ///: |
+    Save a variable with a given `name` and `value`. If a variable with the same name already exists, it will be overwritten.
+  fn.saveVariable:
     name: "string"
     value: "number"
+  ->:
+    - Ok_: {}
 
-- ///: " Save a set of variables as a dynamic map of variable names to their value. "
+- ///: |
+    Save a map of `variables` where keys are variable names and values are their corresponding numeric values. Existing variables with the same names will be overwritten.
   fn.saveVariables:
     variables: {"string": "number"}
   ->:
     - Ok_: {}
 
-- ///: " Compute the `result` of the given `x` and `y` values. "
-  fn.compute:
-    x: "union.Value"
-    y: "union.Value"
-    op: "union.Operation"
+- ///: |
+    Retrieve a variable by its `name`.
+  fn.getVariable:
+    name: "string"
   ->:
     - Ok_:
-        result: "number"
-    - ErrorCannotDivideByZero: {}
+        variable!: "struct.Variable"
 
-- ///: " Export all saved variables, up to an optional `limit`. "
-  fn.exportVariables:
-    limit!: "integer"
+- ///: |
+    Retrieve all variables.
+  fn.getVariables: {}
   ->:
     - Ok_:
         variables: ["struct.Variable"]
 
-- ///: " A function template. "
-  fn.getPaperTape: {}
+- ///: |
+    Delete a variable by its `name`.
+  fn.deleteVariable:
+    name: "string"
+  ->:
+    - Ok_: {}
+
+- ///: |
+    Delete multiple variables by their `names`.
+  fn.deleteVariables:
+    names: ["string"]
+  ->:
+    - Ok_: {}
+
+- ///: |
+    Evaluate an `expression` and return the result.
+  fn.evaluate:
+    expression: "union.Expression"
   ->:
     - Ok_:
-        tape: ["struct.Computation"]
+        result: "number"
+        saveResult: "fn.saveVariable"
+    - ErrorUnknownVariables:
+        unknownVariables: ["string"]
+    - ErrorCannotDivideByZero: {}
 
-- ///: " A computation. "
-  struct.Computation:
-    firstOperand: "union.Value"
-    secondOperand: "union.Value"
-    operation: "union.Operation"
+- ///: |
+    An individual variable with a `name` and `value`.
+  struct.Variable:
+    name: "string"
+    value: "number"
+
+- ///: |
+    A mathematical expression, either a `Constant`, a `Variable`, or a binary operation (`Add`, `Sub`, `Mul`, `Div`).
+  union.Expression:
+    - ///: A constant numeric `value`.
+      Constant:
+        value: "number"
+    - ///: A variable reference by `name`.
+      Variable:
+        name: "string"
+    - ///: An addition expression, `left` plus `right`.
+      Add:
+        left: "union.Expression"
+        right: "union.Expression"
+    - ///: A subtraction expression, `left` minus `right`.
+      Sub:
+        left: "union.Expression"
+        right: "union.Expression"
+    - ///: A multiplication expression, `left` times `right`.
+      Mul:
+        left: "union.Expression"
+        right: "union.Expression"
+    - ///: A division expression, `left` divided by `right`.
+      Div:
+        left: "union.Expression"
+        right: "union.Expression"
+
+- ///: |
+    Get previous computations, ordered from most recent to least recent, up to the specified `limit`.
+  fn.getPaperTape:
+    limit!: "integer"
+  ->:
+    - Ok_:
+        tape: ["struct.Evaluation"]
+
+- ///: |
+    A record of an evaluated expression, including the original `expression`, the computed `result`, the `timestamp` of evaluation, and whether the evaluation was `successful`.
+  struct.Evaluation:
+    expression: "union.Expression"
+    result: "number"
     timestamp: "integer"
     successful: "boolean"
 
-- fn.showExample: {}
+- ///: |
+    Claim a session for the given `username`, if available.
+  fn.login:
+    username: "string"
   ->:
     - Ok_:
-        link: "fn.compute"
+        token: "string"
+    - ErrorUsernameAlreadyInUse: {}
+
+- ///: |
+    End the session for the given `username`, and delete all information related to it. Requires session authentication for the given `username`.
+  fn.logout:
+    username: "string"
+  ->:
+    - Ok_: {}
+
+- union.Auth_:
+    - Ephemeral:
+        username: "string"
+    - Session:
+        token: "string"

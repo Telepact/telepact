@@ -38,6 +38,7 @@ from starlette.middleware.cors import CORSMiddleware
 
 import importlib.resources as pkg_resources
 import time
+import secrets
 import uvicorn
 from .telepact import Client, Server, Message, Serializer, TelepactSchema, MockTelepactSchema, MockServer, SerializationError
 import asyncio
@@ -458,72 +459,174 @@ def demo_server(port: int) -> None:
     Start a demo Telepact server.
     """
 
-    global_variables: dict[str, float] = {}
-    global_computations: list[dict[str, object]] = []
+    user_variables: dict[str, dict[str, float]] = {}
+    user_evaluations: dict[str, list[dict[str, object]]] = {}
+    session_tokens: dict[str, str] = {}
+    usernames_by_token: dict[str, str] = {}
+
+    def get_username(message: Message, require_session: bool = False) -> str | None:
+        auth = cast(dict[str, object] | None, message.headers.get('@auth_'))
+        if auth is None:
+            return None
+        if 'Ephemeral' in auth:
+            if require_session:
+                return None
+            return cast(str, cast(dict[str, object], auth['Ephemeral'])['username'])
+        if 'Session' in auth:
+            token = cast(str, cast(dict[str, object], auth['Session'])['token'])
+            return usernames_by_token.get(token)
+        return None
+
+    def get_user_variables(username: str) -> dict[str, float]:
+        return user_variables.setdefault(username, {})
+
+    def get_user_evaluations(username: str) -> list[dict[str, object]]:
+        return user_evaluations.setdefault(username, [])
+
+    def unauthenticated_response() -> Message:
+        return Message({}, {'ErrorUnauthenticated_': {'message!': 'Valid authentication is required.'}})
+
+    def unauthorized_response(message: str) -> Message:
+        return Message({}, {'ErrorUnauthorized_': {'message!': message}})
+
+    def record_evaluation(username: str, expression: dict[str, object], result: float, successful: bool) -> None:
+        get_user_evaluations(username).append({
+            'expression': expression,
+            'result': result,
+            'timestamp': int(time.time()),
+            'successful': successful,
+        })
+
+    def evaluate_expression(expression: dict[str, object], variables: dict[str, float]) -> tuple[float, list[str], bool]:
+        kind, payload = next(iter(expression.items()))
+        payload_dict = cast(dict[str, object], payload)
+
+        if kind == 'Constant':
+            return cast(float, payload_dict['value']), [], False
+
+        if kind == 'Variable':
+            name = cast(str, payload_dict['name'])
+            if name not in variables:
+                return 0.0, [name], False
+            return variables[name], [], False
+
+        left_result, left_unknowns, left_divide_by_zero = evaluate_expression(
+            cast(dict[str, object], payload_dict['left']), variables)
+        right_result, right_unknowns, right_divide_by_zero = evaluate_expression(
+            cast(dict[str, object], payload_dict['right']), variables)
+
+        unknown_variables = list(dict.fromkeys(left_unknowns + right_unknowns))
+        if unknown_variables:
+            return 0.0, unknown_variables, False
+        if left_divide_by_zero or right_divide_by_zero:
+            return 0.0, [], True
+
+        if kind == 'Add':
+            return left_result + right_result, [], False
+        if kind == 'Sub':
+            return left_result - right_result, [], False
+        if kind == 'Mul':
+            return left_result * right_result, [], False
+        if kind == 'Div':
+            if right_result == 0:
+                return 0.0, [], True
+            return left_result / right_result, [], False
+
+        raise Exception(f'Invalid expression kind: {kind}')
 
     async def handler(message: Message) -> Message:
-        nonlocal global_variables, global_computations
         function_name = next(iter(message.body.keys()))
         arguments: dict[str, object] = cast(
             dict[str, object], message.body[function_name])
 
-        if function_name == 'fn.compute':
-            x = cast(dict[str, object], arguments['x'])
-            y = cast(dict[str, object], arguments['y'])
-            op = cast(dict[str, object], arguments['op'])
+        if function_name == 'fn.add':
+            x = cast(float, arguments['x'])
+            y = cast(float, arguments['y'])
+            return Message({}, {'Ok_': {'result': x + y}})
 
-            # Extract values
-            x_value = cast(float, cast(dict[str, object], x['Constant'])[
-                'value']) if 'Constant' in x else global_variables.get(cast(str, cast(dict[str, object], x['Variable'])['name']), 0)
-            y_value = cast(float, cast(dict[str, object], y['Constant'])[
-                'value']) if 'Constant' in y else global_variables.get(cast(str, cast(dict[str, object], y['Variable'])['name']), 0)
+        if function_name == 'fn.login':
+            username = cast(str, arguments['username'])
+            if username in session_tokens:
+                return Message({}, {'ErrorUsernameAlreadyInUse': {}})
+            token = secrets.token_urlsafe(16)
+            session_tokens[username] = token
+            usernames_by_token[token] = username
+            return Message({}, {'Ok_': {'token': token}})
 
-            if x_value is None or y_value is None:
-                raise Exception("Invalid input")
-
-            # Perform operation
-            if 'Add' in op:
-                result = x_value + y_value
-            elif 'Sub' in op:
-                result = x_value - y_value
-            elif 'Mul' in op:
-                result = x_value * y_value
-            elif 'Div' in op:
-                if y_value == 0:
-                    return Message({}, {"ErrorCannotDivideByZero": {}})
-                result = x_value / y_value
-            else:
-                raise Exception("Invalid operation")
-
-            # Log computation
-            global_computations.append({
-                "firstOperand": x,
-                "secondOperand": y,
-                "operation": op,
-                "timestamp": int(time.time()),
-                "successful": True
-            })
-
-            return Message({}, {'Ok_': {"result": result}})
-
-        elif function_name == 'fn.saveVariables':
-            these_variables = cast(dict[str, float], arguments['variables'])
-            global_variables.update(these_variables)
+        if function_name == 'fn.logout':
+            username = get_username(message, require_session=True)
+            requested_username = cast(str, arguments['username'])
+            if username is None:
+                return unauthenticated_response()
+            if username != requested_username:
+                return unauthorized_response('Session authentication must match the requested username.')
+            token = session_tokens.pop(username, None)
+            if token is not None:
+                usernames_by_token.pop(token, None)
+            user_variables.pop(username, None)
+            user_evaluations.pop(username, None)
             return Message({}, {'Ok_': {}})
 
-        elif function_name == 'fn.exportVariables':
-            limit = cast(int, arguments.get('limit', 10))
-            variables = [{"name": k, "value": v}
-                         for k, v in global_variables.items()]
-            if limit:
-                variables = variables[:limit]
-            return Message({}, {'Ok_': {"variables": variables}})
+        username = get_username(message)
+        if function_name != 'fn.add' and username is None:
+            return unauthenticated_response()
 
-        elif function_name == 'fn.getPaperTape':
-            return Message({}, {'Ok_': {"tape": global_computations}})
+        if username is None:
+            raise Exception('Expected authenticated username')
 
-        elif function_name == 'fn.showExample':
-            return Message({}, {'Ok_': {'link': {'fn.compute': {'x': {'Constant': {'value': 5}}, 'y': {'Constant': {'value': 7}}, 'op': {'Add': {}}}}}})
+        if function_name == 'fn.saveVariable':
+            get_user_variables(username)[cast(str, arguments['name'])] = cast(float, arguments['value'])
+            return Message({}, {'Ok_': {}})
+
+        if function_name == 'fn.saveVariables':
+            get_user_variables(username).update(cast(dict[str, float], arguments['variables']))
+            return Message({}, {'Ok_': {}})
+
+        if function_name == 'fn.getVariable':
+            value = get_user_variables(username).get(cast(str, arguments['name']))
+            if value is None:
+                return Message({}, {'Ok_': {}})
+            return Message({}, {'Ok_': {'variable!': {'name': cast(str, arguments['name']), 'value': value}}})
+
+        if function_name == 'fn.getVariables':
+            variables = [
+                {'name': name, 'value': value}
+                for name, value in sorted(get_user_variables(username).items())
+            ]
+            return Message({}, {'Ok_': {'variables': variables}})
+
+        if function_name == 'fn.deleteVariable':
+            get_user_variables(username).pop(cast(str, arguments['name']), None)
+            return Message({}, {'Ok_': {}})
+
+        if function_name == 'fn.deleteVariables':
+            these_variables = get_user_variables(username)
+            for name in cast(list[str], arguments['names']):
+                these_variables.pop(name, None)
+            return Message({}, {'Ok_': {}})
+
+        if function_name == 'fn.evaluate':
+            expression = cast(dict[str, object], arguments['expression'])
+            result, unknown_variables, divide_by_zero = evaluate_expression(
+                expression, get_user_variables(username))
+            if unknown_variables:
+                record_evaluation(username, expression, 0.0, False)
+                return Message({}, {'ErrorUnknownVariables': {'unknownVariables': unknown_variables}})
+            if divide_by_zero:
+                record_evaluation(username, expression, 0.0, False)
+                return Message({}, {'ErrorCannotDivideByZero': {}})
+            record_evaluation(username, expression, result, True)
+            return Message({}, {'Ok_': {
+                'result': result,
+                'saveResult': {'fn.saveVariable': {'name': 'result', 'value': result}},
+            }})
+
+        if function_name == 'fn.getPaperTape':
+            limit = cast(int | None, arguments.get('limit!'))
+            evaluations = list(reversed(get_user_evaluations(username)))
+            if limit is not None:
+                evaluations = evaluations[:limit]
+            return Message({}, {'Ok_': {'tape': evaluations}})
 
         raise Exception(f"Invalid function: {function_name}")
 
@@ -533,7 +636,7 @@ def demo_server(port: int) -> None:
     telepact_schema = TelepactSchema.from_json(telepact_json)
 
     server_options = Server.Options()
-    server_options.auth_required = False
+    server_options.auth_required = True
     server_options.on_error = lambda e: print(e)
     telepact_server = Server(telepact_schema, handler, server_options)
 

@@ -119,31 +119,212 @@ export async function loadConsoleData(url: URL): Promise<LoadedConsoleData> {
 		const telepactSchema = TelepactSchema.fromJson(JSON.stringify(demoSchemaPseudoJson));
 
 		const serverOptions = new ServerOptions();
-		serverOptions.authRequired = false;
 		serverOptions.onError = (e) => console.log(e);
 
-		const handler = async (m: Message) => {
-			if (m.getBodyTarget() !== 'fn.compute') {
-				throw new Error('Not implemented');
+		const userVariables = new Map<string, Map<string, number>>();
+		const userEvaluations = new Map<string, any[]>();
+		const sessionTokens = new Map<string, string>();
+		const usernamesByToken = new Map<string, string>();
+
+		const getUserVariables = (username: string): Map<string, number> => {
+			let variables = userVariables.get(username);
+			if (!variables) {
+				variables = new Map<string, number>();
+				userVariables.set(username, variables);
+			}
+			return variables;
+		};
+
+		const getUserEvaluations = (username: string): any[] => {
+			let evaluations = userEvaluations.get(username);
+			if (!evaluations) {
+				evaluations = [];
+				userEvaluations.set(username, evaluations);
+			}
+			return evaluations;
+		};
+
+		const getUsername = (m: Message, requireSession = false): string | undefined => {
+			const auth = m.headers['@auth_'];
+			if (!auth || typeof auth !== 'object') return undefined;
+			if ('Ephemeral' in auth) {
+				if (requireSession) return undefined;
+				return auth.Ephemeral.username as string;
+			}
+			if ('Session' in auth) {
+				return usernamesByToken.get(auth.Session.token as string);
+			}
+			return undefined;
+		};
+
+		const recordEvaluation = (username: string, expression: Record<string, any>, result: number, successful: boolean) => {
+			getUserEvaluations(username).push({
+				expression,
+				result,
+				timestamp: Math.floor(Date.now() / 1000),
+				successful,
+			});
+		};
+
+		const evaluateExpression = (
+			expression: Record<string, any>,
+			variables: Map<string, number>
+		): { result: number; unknownVariables: string[]; divideByZero: boolean } => {
+			const [kind, payload] = Object.entries(expression)[0] as [string, Record<string, any>];
+
+			if (kind === 'Constant') {
+				return { result: payload.value as number, unknownVariables: [], divideByZero: false };
 			}
 
-			const args = m.getBodyPayload();
-			const x = args['x']['Constant']['value'];
-			const y = args['y']['Constant']['value'];
-			const op = args['op'];
-			const opKey = Object.keys(op)[0];
+			if (kind === 'Variable') {
+				const variableName = payload.name as string;
+				const value = variables.get(variableName);
+				if (value === undefined) {
+					return { result: 0, unknownVariables: [variableName], divideByZero: false };
+				}
+				return { result: value, unknownVariables: [], divideByZero: false };
+			}
 
-			switch (opKey) {
+			const left = evaluateExpression(payload.left as Record<string, any>, variables);
+			const right = evaluateExpression(payload.right as Record<string, any>, variables);
+			const unknownVariables = [...new Set([...left.unknownVariables, ...right.unknownVariables])];
+			if (unknownVariables.length > 0) {
+				return { result: 0, unknownVariables, divideByZero: false };
+			}
+			if (left.divideByZero || right.divideByZero) {
+				return { result: 0, unknownVariables: [], divideByZero: true };
+			}
+
+			switch (kind) {
 				case 'Add':
-					return new Message({}, { Ok_: { result: x + y } });
+					return { result: left.result + right.result, unknownVariables: [], divideByZero: false };
 				case 'Sub':
-					return new Message({}, { Ok_: { result: x - y } });
+					return { result: left.result - right.result, unknownVariables: [], divideByZero: false };
 				case 'Mul':
-					return new Message({}, { Ok_: { result: x * y } });
+					return { result: left.result * right.result, unknownVariables: [], divideByZero: false };
 				case 'Div':
-					return new Message({}, { Ok_: { result: x / y } });
+					if (right.result === 0) {
+						return { result: 0, unknownVariables: [], divideByZero: true };
+					}
+					return { result: left.result / right.result, unknownVariables: [], divideByZero: false };
 				default:
-					throw new Error('Invalid operation');
+					throw new Error('Invalid expression');
+			}
+		};
+
+		const handler = async (m: Message) => {
+			const functionName = m.getBodyTarget();
+			const args = m.getBodyPayload();
+
+			if (functionName === 'fn.add') {
+				return new Message({}, { Ok_: { result: (args.x as number) + (args.y as number) } });
+			}
+
+			if (functionName === 'fn.login') {
+				const username = args.username as string;
+				if (sessionTokens.has(username)) {
+					return new Message({}, { ErrorUsernameAlreadyInUse: {} });
+				}
+				const token =
+					typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+						? crypto.randomUUID()
+						: `${username}-${Date.now()}`;
+				sessionTokens.set(username, token);
+				usernamesByToken.set(token, username);
+				return new Message({}, { Ok_: { token } });
+			}
+
+			if (functionName === 'fn.logout') {
+				const username = getUsername(m, true);
+				if (!username) {
+					return new Message({}, { ErrorUnauthenticated_: { 'message!': 'Valid authentication is required.' } });
+				}
+				if (username !== (args.username as string)) {
+					return new Message(
+						{},
+						{ ErrorUnauthorized_: { 'message!': 'Session authentication must match the requested username.' } }
+					);
+				}
+				const token = sessionTokens.get(username);
+				if (token) {
+					sessionTokens.delete(username);
+					usernamesByToken.delete(token);
+				}
+				userVariables.delete(username);
+				userEvaluations.delete(username);
+				return new Message({}, { Ok_: {} });
+			}
+
+			const username = getUsername(m);
+			if (!username) {
+				return new Message({}, { ErrorUnauthenticated_: { 'message!': 'Valid authentication is required.' } });
+			}
+
+			switch (functionName) {
+				case 'fn.saveVariable':
+					getUserVariables(username).set(args.name as string, args.value as number);
+					return new Message({}, { Ok_: {} });
+				case 'fn.saveVariables':
+					for (const [name, value] of Object.entries(args.variables as Record<string, number>)) {
+						getUserVariables(username).set(name, value);
+					}
+					return new Message({}, { Ok_: {} });
+				case 'fn.getVariable': {
+					const variableName = args.name as string;
+					const value = getUserVariables(username).get(variableName);
+					return new Message(
+						{},
+						value === undefined
+							? { Ok_: {} }
+							: { Ok_: { 'variable!': { name: variableName, value } } }
+					);
+				}
+				case 'fn.getVariables':
+					return new Message({}, {
+						Ok_: {
+							variables: [...getUserVariables(username).entries()]
+								.sort(([left], [right]) => left.localeCompare(right))
+								.map(([name, value]) => ({ name, value })),
+						},
+					});
+				case 'fn.deleteVariable':
+					getUserVariables(username).delete(args.name as string);
+					return new Message({}, { Ok_: {} });
+				case 'fn.deleteVariables':
+					for (const name of args.names as string[]) {
+						getUserVariables(username).delete(name);
+					}
+					return new Message({}, { Ok_: {} });
+				case 'fn.evaluate': {
+					const expression = args.expression as Record<string, any>;
+					const evaluation = evaluateExpression(expression, getUserVariables(username));
+					if (evaluation.unknownVariables.length > 0) {
+						recordEvaluation(username, expression, 0, false);
+						return new Message({}, {
+							ErrorUnknownVariables: { unknownVariables: evaluation.unknownVariables },
+						});
+					}
+					if (evaluation.divideByZero) {
+						recordEvaluation(username, expression, 0, false);
+						return new Message({}, { ErrorCannotDivideByZero: {} });
+					}
+					recordEvaluation(username, expression, evaluation.result, true);
+					return new Message({}, {
+						Ok_: {
+							result: evaluation.result,
+							saveResult: {
+								'fn.saveVariable': { name: 'result', value: evaluation.result },
+							},
+						},
+					});
+				}
+				case 'fn.getPaperTape': {
+					const limit = args['limit!'] as number | undefined;
+					const tape = [...getUserEvaluations(username)].reverse();
+					return new Message({}, { Ok_: { tape: limit === undefined ? tape : tape.slice(0, limit) } });
+				}
+				default:
+					throw new Error('Not implemented');
 			}
 		};
 

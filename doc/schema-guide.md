@@ -363,64 +363,117 @@ There is also a guide to Telepact extension types, including mock extensions,
   ->:
     - Ok_:
         result: "number"
-- ///: A value for computation that can take either a constant or variable form.
-  union.Value:
-    - Constant:
-        value: "number"
-    - Variable:
-        name: "string"
-- ///: A basic mathematical operation.
-  union.Operation:
-    - Add: {}
-    - Sub: {}
-    - Mul: {}
-    - Div: {}
+- ///: |
+    Save a variable with a given `name` and `value`. If a variable with the same name already exists, it will be overwritten.
+  fn.saveVariable:
+    name: "string"
+    value: "number"
+  ->:
+    - Ok_: {}
 - ///: A mathematical variable represented by a `name` that holds a certain `value`.
   struct.Variable:
     name: "string"
     value: "number"
-- ///: Save a set of variables as a dynamic map of variable names to their value.
+- ///: |
+    Save a map of `variables` where keys are variable names and values are their corresponding numeric values. Existing variables with the same names will be overwritten.
   fn.saveVariables:
     variables: {"string": "number"}
   ->:
     - Ok_: {}
-- ///: Compute the `result` of the given `x` and `y` values.
-  fn.compute:
-    x: "union.Value"
-    y: "union.Value"
-    op: "union.Operation"
+- ///: |
+    Retrieve a variable by its `name`.
+  fn.getVariable:
+    name: "string"
   ->:
     - Ok_:
-        result: "number"
-    - ErrorCannotDivideByZero: {}
-- ///: Export all saved variables, up to an optional `limit`.
-  fn.exportVariables:
-    limit!: "integer"
+        variable!: "struct.Variable"
+- ///: |
+    Retrieve all variables.
+  fn.getVariables: {}
   ->:
     - Ok_:
         variables: ["struct.Variable"]
-- ///: A function template.
-  fn.getPaperTape: {}
+- ///: |
+    Delete a variable by its `name`.
+  fn.deleteVariable:
+    name: "string"
+  ->:
+    - Ok_: {}
+- ///: |
+    Delete multiple variables by their `names`.
+  fn.deleteVariables:
+    names: ["string"]
+  ->:
+    - Ok_: {}
+- ///: |
+    Evaluate an `expression` and return the result.
+  fn.evaluate:
+    expression: "union.Expression"
   ->:
     - Ok_:
-        tape: ["struct.Computation"]
-- ///: A computation.
-  struct.Computation:
-    user: "string?"
-    firstOperand: "union.Value"
-    secondOperand: "union.Value"
-    operation: "union.Operation"
-    result: "number?"
+        result: "number"
+        saveResult: "fn.saveVariable"
+    - ErrorUnknownVariables:
+        unknownVariables: ["string"]
+    - ErrorCannotDivideByZero: {}
+- ///: |
+    A mathematical expression, either a `Constant`, a `Variable`, or a binary operation (`Add`, `Sub`, `Mul`, `Div`).
+  union.Expression:
+    - ///: A constant numeric `value`.
+      Constant:
+        value: "number"
+    - ///: A variable reference by `name`.
+      Variable:
+        name: "string"
+    - ///: An addition expression, `left` plus `right`.
+      Add:
+        left: "union.Expression"
+        right: "union.Expression"
+    - ///: A subtraction expression, `left` minus `right`.
+      Sub:
+        left: "union.Expression"
+        right: "union.Expression"
+    - ///: A multiplication expression, `left` times `right`.
+      Mul:
+        left: "union.Expression"
+        right: "union.Expression"
+    - ///: A division expression, `left` divided by `right`.
+      Div:
+        left: "union.Expression"
+        right: "union.Expression"
+- ///: |
+    Get previous computations, ordered from most recent to least recent, up to the specified `limit`.
+  fn.getPaperTape:
+    limit!: "integer"
+  ->:
+    - Ok_:
+        tape: ["struct.Evaluation"]
+- ///: |
+    A record of an evaluated expression, including the original `expression`, the computed `result`, the `timestamp` of evaluation, and whether the evaluation was `successful`.
+  struct.Evaluation:
+    expression: "union.Expression"
+    result: "number"
+    timestamp: "integer"
     successful: "boolean"
-- fn.showExample: {}
+- ///: |
+    Claim a session for the given `username`, if available.
+  fn.login:
+    username: "string"
   ->:
     - Ok_:
-        link: "fn.compute"
-- errors.RateLimit:
-    - ErrorTooManyRequests: {}
-- headers.Identity:
-    "@user": "string"
-  ->: {}
+        token: "string"
+    - ErrorUsernameAlreadyInUse: {}
+- ///: |
+    End the session for the given `username`, and delete all information related to it. Requires session authentication for the given `username`.
+  fn.logout:
+    username: "string"
+  ->:
+    - Ok_: {}
+- union.Auth_:
+    - Ephemeral:
+        username: "string"
+    - Session:
+        token: "string"
 ```
 
 ### Valid Client/Server Interactions
@@ -435,30 +488,27 @@ There is also a guide to Telepact extension types, including mock extensions,
 -> [{}, {"fn.add": {"x": 1, "y": 2}}]
 <- [{}, {"Ok_": {"result": 3}}]
 
--> [{}, {"fn.saveVariables": {"a": 1, "b": 2}}]
+-> [{}, {"fn.login": {"username": "bob"}}]
+<- [{}, {"Ok_": {"token": "token-bob"}}]
+
+-> [{"@auth_": {"Ephemeral": {"username": "bob"}}}, {"fn.saveVariables": {"variables": {"a": 1, "b": 2}}}]
 <- [{}, {"Ok_": {}}]
 
--> [{}, {"fn.showExample": {}}]
-<- [{}, {"Ok_": {"link": {"fn.compute": {"x": {"Constant": {"value": 5}}, "y": {"Variable": {"name": "b"}}, "op": {"Mul": {}}}}}}]
+-> [{"@auth_": {"Session": {"token": "token-bob"}}}, {"fn.evaluate": {"expression": {"Mul": {"left": {"Constant": {"value": 5}}, "right": {"Variable": {"name": "b"}}}}}}]
+<- [{}, {"Ok_": {"result": 10, "saveResult": {"fn.saveVariable": {"name": "result", "value": 10}}}}]
 
--> [{"@user": "bob"}, {"fn.compute": {"x": {"Constant": {"value": 5}}, "y": {"Variable": {"name": "b"}}, "op": {"Mul": {}}}}]
-<- [{}, {"Ok_": {"result": 10}}]
-
--> [{"@user": "bob"}, {"fn.compute": {"x": {"Variable": {"name": "a"}}, "y": {"Constant": {"value": 0}}, "op": {"Div": {}}}}]
+-> [{"@auth_": {"Session": {"token": "token-bob"}}}, {"fn.evaluate": {"expression": {"Div": {"left": {"Variable": {"name": "a"}}, "right": {"Constant": {"value": 0}}}}}}]
 <- [{}, {"ErrorCannotDivideByZero": {}}]
 
--> [{}, {"fn.getPaperTape": {}}]
-<- [{}, {"Ok_": {"tape": [{"user": null, "firstOperand": {"Constant": {"value": 1}}, "secondOperand": {"Constant": {"value": 2}}, "operation": {"Add": {}}, "result": 3, "successful": true}, {"user": "bob", "firstOperand": {"Constant": {"value": 5}}, "secondOperand": {"Variable": {"name": "b"}}, "operation": {"Mul": {}}, "result": 10, "successful": true}, {"user": "bob", "firstOperand": {"Variable": {"name": "a"}}, "secondOperand": {"Constant": {"value": 0}}, "operation": {"Div": {}}, "result": null, "successful": false}]}}]
+-> [{"@auth_": {"Ephemeral": {"username": "bob"}}}, {"fn.evaluate": {"expression": {"Add": {"left": {"Variable": {"name": "a"}}, "right": {"Variable": {"name": "missing"}}}}}}]
+<- [{}, {"ErrorUnknownVariables": {"unknownVariables": ["missing"]}}]
 
--> [{}, {"fn.exportVariables": {}}]
+-> [{"@auth_": {"Ephemeral": {"username": "bob"}}}, {"fn.getPaperTape": {"limit!": 2}}]
+<- [{}, {"Ok_": {"tape": [{"expression": {"Add": {"left": {"Variable": {"name": "a"}}, "right": {"Variable": {"name": "missing"}}}}, "result": 0, "timestamp": 1710000001, "successful": false}, {"expression": {"Mul": {"left": {"Constant": {"value": 5}}, "right": {"Variable": {"name": "b"}}}}, "result": 10, "timestamp": 1710000000, "successful": true}]}}]
+
+-> [{"@auth_": {"Ephemeral": {"username": "bob"}}}, {"fn.getVariables": {}}]
 <- [{}, {"Ok_": {"variables": [{"name": "a", "value": 1}, {"name": "b", "value": 2}]}}]
 
--> [{}, {"fn.exportVariables": {"limit!": 1}}]
-<- [{}, {"Ok_": {"variables": [{"name": "a", "value": 1}]}}]
-
--> [{}, {"fn.add": {"x": 1, "y": 2}}]
-<- [{}, {"ErrorTooManyRequests": {}}]
-
--> [{}, {"fn.showExample": {}}]
-<- [{}, {"ErrorTooManyRequests": {}}]
+-> [{"@auth_": {"Session": {"token": "token-bob"}}}, {"fn.logout": {"username": "bob"}}]
+<- [{}, {"Ok_": {}}]
 ```
