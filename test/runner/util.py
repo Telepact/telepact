@@ -38,7 +38,6 @@ class Constants:
     load_api_path = '../../runner/schema/load'
     auth_api_path = '../../runner/schema/auth'
     mockgen_api_path = '../../runner/schema/mockgen'
-    calculator_api_path = '../../runner/schema/calculator'
     nats_url = 'nats://127.0.0.1:4222'
     frontdoor_topic = 'frontdoor'
     intermediate_topic = 'intermediate'

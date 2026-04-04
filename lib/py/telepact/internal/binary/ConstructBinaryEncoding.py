@@ -25,34 +25,43 @@ if TYPE_CHECKING:
     from ..types.TTypeDeclaration import TTypeDeclaration
 
 
-def trace_type(type_declaration: 'TTypeDeclaration') -> list[str]:
+def trace_type(type_declaration: 'TTypeDeclaration', visited_type_names: set[str] | None = None) -> list[str]:
     from ..types.TArray import TArray
     from ..types.TObject import TObject
     from ..types.TStruct import TStruct
     from ..types.TUnion import TUnion
 
+    if visited_type_names is None:
+        visited_type_names = set()
+
     this_all_keys: list[str] = []
 
     if isinstance(type_declaration.type, TArray):
-        these_keys2 = trace_type(type_declaration.type_parameters[0])
+        these_keys2 = trace_type(type_declaration.type_parameters[0], visited_type_names)
         this_all_keys.extend(these_keys2)
     elif isinstance(type_declaration.type, TObject):
-        these_keys2 = trace_type(type_declaration.type_parameters[0])
+        these_keys2 = trace_type(type_declaration.type_parameters[0], visited_type_names)
         this_all_keys.extend(these_keys2)
     elif isinstance(type_declaration.type, TStruct):
+        if type_declaration.type.name in visited_type_names:
+            return this_all_keys
+        visited_type_names.add(type_declaration.type.name)
         struct_fields = type_declaration.type.fields
         for struct_field_key, struct_field in struct_fields.items():
             this_all_keys.append(struct_field_key)
-            more_keys = trace_type(struct_field.type_declaration)
+            more_keys = trace_type(struct_field.type_declaration, visited_type_names)
             this_all_keys.extend(more_keys)
     elif isinstance(type_declaration.type, TUnion):
+        if type_declaration.type.name in visited_type_names:
+            return this_all_keys
+        visited_type_names.add(type_declaration.type.name)
         union_tags = type_declaration.type.tags
         for tag_key, tag_value in union_tags.items():
             this_all_keys.append(tag_key)
             struct_fields = tag_value.fields
             for struct_field_key, struct_field in struct_fields.items():
                 this_all_keys.append(struct_field_key)
-                more_keys = trace_type(struct_field.type_declaration)
+                more_keys = trace_type(struct_field.type_declaration, visited_type_names)
                 this_all_keys.extend(more_keys)
 
     return this_all_keys

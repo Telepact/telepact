@@ -20,7 +20,6 @@ import estreePlugin from 'prettier/plugins/estree';
 import babelPlugin from 'prettier/plugins/babel';
 
 import telepactPlugin from './prettier-plugin-telepact/index.esm.js';
-import demoSchemaPseudoJson from '../demo.telepact.json';
 
 import {
 	Client,
@@ -30,13 +29,11 @@ import {
 	MockServerOptions,
 	MockTelepactSchema,
 	Serializer,
-	Server,
-	ServerOptions,
 	TelepactSchema
 } from './telepact/index.esm.js';
 
 export type ProtocolOption = 'http' | 'ws';
-export type SchemaSourceKind = 'draft' | 'http' | 'ws' | 'demo' | 'unknown';
+export type SchemaSourceKind = 'draft' | 'http' | 'ws' | 'unknown';
 
 export type LoadedConsoleData = {
 	client?: Client;
@@ -74,7 +71,9 @@ export async function loadConsoleData(url: URL): Promise<LoadedConsoleData> {
 
 	const schemaProtocolParam = url.searchParams.get('p');
 	const normalizedProtocol =
-		schemaProtocolParam === 'http' || schemaProtocolParam === 'ws' ? schemaProtocolParam : undefined;
+		schemaProtocolParam === 'http' || schemaProtocolParam === 'ws'
+			? schemaProtocolParam
+			: undefined;
 
 	const lowerSchemaSource = schemaSource.toLowerCase();
 	const inferredProtocol =
@@ -93,9 +92,10 @@ export async function loadConsoleData(url: URL): Promise<LoadedConsoleData> {
 	let readonlyEditor = true;
 
 	if (schemaSource === '') {
-		const defaultSchema = typeof window.overrideDefaultSchema === 'function'
-			? window.overrideDefaultSchema()
-			: '[{"///": "No schema loaded.\\n\\nTry [editing the schema](/?v=ds), or loading a schema from a live running Telepact server by entering a URL in the `Live URL` text box.", "info.Example":{}}]';
+		const defaultSchema =
+			typeof window.overrideDefaultSchema === 'function'
+				? window.overrideDefaultSchema()
+				: '[{"///": "No schema loaded.\\n\\nTry [editing the schema](/?v=ds), or loading a schema from a live running Telepact server by entering a URL in the `Live URL` text box.", "info.Example":{}}]';
 
 		const schemaDraft = url.searchParams.get('sd') ?? defaultSchema;
 
@@ -115,47 +115,6 @@ export async function loadConsoleData(url: URL): Promise<LoadedConsoleData> {
 
 		schemaSourceKind = 'draft';
 		readonlyEditor = false;
-	} else if (schemaSource === 'demo') {
-		const telepactSchema = TelepactSchema.fromJson(JSON.stringify(demoSchemaPseudoJson));
-
-		const serverOptions = new ServerOptions();
-		serverOptions.authRequired = false;
-		serverOptions.onError = (e) => console.log(e);
-
-		const handler = async (m: Message) => {
-			if (m.getBodyTarget() !== 'fn.compute') {
-				throw new Error('Not implemented');
-			}
-
-			const args = m.getBodyPayload();
-			const x = args['x']['Constant']['value'];
-			const y = args['y']['Constant']['value'];
-			const op = args['op'];
-			const opKey = Object.keys(op)[0];
-
-			switch (opKey) {
-				case 'Add':
-					return new Message({}, { Ok_: { result: x + y } });
-				case 'Sub':
-					return new Message({}, { Ok_: { result: x - y } });
-				case 'Mul':
-					return new Message({}, { Ok_: { result: x * y } });
-				case 'Div':
-					return new Message({}, { Ok_: { result: x / y } });
-				default:
-					throw new Error('Invalid operation');
-			}
-		};
-
-		const server = new Server(telepactSchema, handler, serverOptions);
-
-		client = new Client(async (m: Message, s: Serializer) => {
-			const req = s.serialize(m);
-			const res = await server.process(req);
-			return s.deserialize(res.bytes);
-		}, new ClientOptions());
-
-		schemaSourceKind = 'demo';
 	} else if (schemaProtocol === 'http') {
 		client = new Client(async (m: Message, s: Serializer) => {
 			const maybeOverrideAuthHeader = async (
@@ -183,7 +142,9 @@ export async function loadConsoleData(url: URL): Promise<LoadedConsoleData> {
 				return maybeOverrideAuthHeader(undefined, finish);
 			}
 
-			return window.overrideAuthHeader(schemaSource, (a) => maybeOverrideAuthHeader(a, finish));
+			return window.overrideAuthHeader(schemaSource, (a) =>
+				maybeOverrideAuthHeader(a, finish)
+			);
 		}, new ClientOptions());
 
 		schemaSourceKind = 'http';
@@ -228,7 +189,9 @@ export async function loadConsoleData(url: URL): Promise<LoadedConsoleData> {
 				if (ws !== socket) return;
 				const pending = pendingRequests.shift();
 				if (!pending) {
-					console.warn('Received unexpected WebSocket message with no pending Telepact request.');
+					console.warn(
+						'Received unexpected WebSocket message with no pending Telepact request.'
+					);
 					return;
 				}
 				try {
@@ -298,7 +261,9 @@ export async function loadConsoleData(url: URL): Promise<LoadedConsoleData> {
 						socket = null;
 					}
 					const reason = event.reason ? `: ${event.reason}` : '';
-					const error = new Error(`WebSocket closed before ready (code ${event.code}${reason})`);
+					const error = new Error(
+						`WebSocket closed before ready (code ${event.code}${reason})`
+					);
 					reject(error);
 					failPending(error);
 				};
@@ -329,7 +294,11 @@ export async function loadConsoleData(url: URL): Promise<LoadedConsoleData> {
 					ws.send(payload);
 				} catch (err) {
 					pendingRequests.pop();
-					reject(err instanceof Error ? err : new Error('Failed to send message over WebSocket'));
+					reject(
+						err instanceof Error
+							? err
+							: new Error('Failed to send message over WebSocket')
+					);
 				}
 			});
 		};
@@ -353,7 +322,9 @@ export async function loadConsoleData(url: URL): Promise<LoadedConsoleData> {
 				return maybeOverrideAuthHeader(undefined, finish);
 			}
 
-			return window.overrideAuthHeader(schemaSource, (a) => maybeOverrideAuthHeader(a, finish));
+			return window.overrideAuthHeader(schemaSource, (a) =>
+				maybeOverrideAuthHeader(a, finish)
+			);
 		}, new ClientOptions());
 
 		schemaSourceKind = 'ws';
@@ -382,7 +353,10 @@ export async function loadConsoleData(url: URL): Promise<LoadedConsoleData> {
 
 	const filteredSchemaPseudoJson = schemaPseudoJson.filter((item) => {
 		if (showInternalApi) return true;
-		if (typeof item === 'object' && Object.keys(item).find((i) => i.endsWith('_')) !== undefined) {
+		if (
+			typeof item === 'object' &&
+			Object.keys(item).find((i) => i.endsWith('_')) !== undefined
+		) {
 			return false;
 		}
 		return true;
@@ -401,7 +375,8 @@ export async function loadConsoleData(url: URL): Promise<LoadedConsoleData> {
 	return {
 		client,
 		schemaSource: schemaSourceKind,
-		schemaProtocol: schemaSourceKind === 'http' || schemaSourceKind === 'ws' ? schemaSourceKind : undefined,
+		schemaProtocol:
+			schemaSourceKind === 'http' || schemaSourceKind === 'ws' ? schemaSourceKind : undefined,
 		showInternalApi,
 		readonlyEditor,
 		filteredSchemaPseudoJson,
