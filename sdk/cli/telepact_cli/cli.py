@@ -56,6 +56,13 @@ from .resources import load_calculator_telepact_json
 def _get_cli_version() -> str:
     return package_version('telepact-cli')
 
+
+def _demo_unavailable_response() -> Message | None:
+    if random.random() < 0.01:
+        return Message({}, {'ErrorUnavailable': {}})
+    return None
+
+
 def bump_version(version: str) -> str:
     major, minor, patch = map(int, version.split('.'))
     patch += 1
@@ -540,8 +547,9 @@ def demo_server(port: int) -> None:
         arguments: dict[str, object] = cast(
             dict[str, object], message.body[function_name])
 
-        if random.random() < 0.01:
-            return Message({}, {'ErrorUnavailable': {}})
+        unavailable_response = _demo_unavailable_response()
+        if unavailable_response is not None:
+            return unavailable_response
 
         if function_name == 'fn.add':
             x = cast(float, arguments['x'])
