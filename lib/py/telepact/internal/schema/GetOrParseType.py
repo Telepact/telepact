@@ -37,6 +37,7 @@ def get_or_parse_type(path: list[object], type_name: str, ctx: 'ParseContext') -
     from ..types.TMockCall import TMockCall
     from ..types.TMockStub import TMockStub
     from ..types.TSelect import TSelect
+    from ..types.TStruct import TStruct
     from ..types.TUnion import TUnion
     from ..types.TAny import TAny
     from ...internal.schema.ParseFunctionType import parse_function_result_type
@@ -92,22 +93,26 @@ def get_or_parse_type(path: list[object], type_name: str, ctx: 'ParseContext') -
     try:
         this_path: list[object] = [this_index]
         if custom_type_name.startswith("struct"):
-            type = parse_struct_type(this_path, definition, custom_type_name, [],
-                                     ctx.copy(document_name=this_document_name))
+            type = TStruct(custom_type_name, {})
             ctx.parsed_types[custom_type_name] = type
+            parsed_type = parse_struct_type(this_path, definition, custom_type_name, [],
+                                            ctx.copy(document_name=this_document_name))
+            type.fields = parsed_type.fields
         elif custom_type_name.startswith("union"):
-            type = parse_union_type(this_path, definition, custom_type_name, [], [],
-                                    ctx.copy(document_name=this_document_name))
-            
+            type = TUnion(custom_type_name, {}, {})
             ctx.parsed_types[custom_type_name] = type
+            parsed_type = parse_union_type(this_path, definition, custom_type_name, [], [],
+                                           ctx.copy(document_name=this_document_name))
+            type.tags = parsed_type.tags
+            type.tag_indices = parsed_type.tag_indices
         elif custom_type_name.startswith("fn"):
+            type = TUnion(custom_type_name, {}, {})
+            ctx.parsed_types[custom_type_name] = type
             arg_type = parse_struct_type(path, definition,
                                         custom_type_name, ["->", "_errors"],
                                         ctx.copy(document_name=this_document_name))
-            type = TUnion(custom_type_name, {custom_type_name: arg_type}, {
-                            custom_type_name: 0})
-
-            ctx.parsed_types[custom_type_name] = type
+            type.tags[custom_type_name] = arg_type
+            type.tag_indices[custom_type_name] = 0
 
             result_type = parse_function_result_type(
                 this_path,

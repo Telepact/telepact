@@ -32,6 +32,7 @@ import { TSelect } from '../types/TSelect.js';
 import { TMockCall } from '../types/TMockCall.js';
 import { TMockStub } from '../types/TMockStub.js';
 import { ParseContext } from '../../internal/schema/ParseContext.js';
+import { TStruct } from '../types/TStruct.js';
 import { TUnion } from '../types/TUnion.js';
 
 export function getOrParseType(path: any[], typeName: string, ctx: ParseContext): TType {
@@ -84,17 +85,22 @@ export function getOrParseType(path: any[], typeName: string, ctx: ParseContext)
     let type: TType;
     try {
         if (customTypeName.startsWith('struct')) {
-            type = parseStructType(
+            const placeholder = new TStruct(customTypeName, {});
+            type = placeholder;
+            ctx.parsedTypes[customTypeName] = type;
+            const parsedType = parseStructType(
                 [thisIndex],
                 definition,
                 customTypeName,
                 [],
                 ctx.copy({ documentName: thisDocumentName }),
             );
-
-            ctx.parsedTypes[customTypeName] = type;
+            placeholder.fields = parsedType.fields;
         } else if (customTypeName.startsWith('union')) {
-            type = parseUnionType(
+            const placeholder = new TUnion(customTypeName, {}, {});
+            type = placeholder;
+            ctx.parsedTypes[customTypeName] = type;
+            const parsedType = parseUnionType(
                 [thisIndex],
                 definition,
                 customTypeName,
@@ -102,25 +108,37 @@ export function getOrParseType(path: any[], typeName: string, ctx: ParseContext)
                 [],
                 ctx.copy({ documentName: thisDocumentName }),
             );
-
-            ctx.parsedTypes[customTypeName] = type;
+            placeholder.tags = parsedType.tags;
+            placeholder.tagIndices = parsedType.tagIndices;
         } else if (customTypeName.startsWith('fn')) {
-            const argType = parseStructType([thisIndex], definition, customTypeName, ['->', '_errors'], ctx.copy({ documentName: thisDocumentName }));
-            type = new TUnion(customTypeName, { [customTypeName]: argType }, { [customTypeName]: 0 });
-
+            const placeholder = new TUnion(customTypeName, {}, {});
+            type = placeholder;
             ctx.parsedTypes[customTypeName] = type;
-
-            const resultType = parseFunctionResultType([thisIndex],
+            const argType = parseStructType(
+                [thisIndex],
                 definition,
                 customTypeName,
-                ctx.copy({ documentName: thisDocumentName }));
-            
+                ['->', '_errors'],
+                ctx.copy({ documentName: thisDocumentName }),
+            );
+            placeholder.tags[customTypeName] = argType;
+            placeholder.tagIndices[customTypeName] = 0;
+
+            const resultType = parseFunctionResultType(
+                [thisIndex],
+                definition,
+                customTypeName,
+                ctx.copy({ documentName: thisDocumentName }),
+            );
+
             ctx.parsedTypes[customTypeName + '.->'] = resultType;
 
-            const errorsRegex = parseFunctionErrorsRegex([thisIndex],
+            const errorsRegex = parseFunctionErrorsRegex(
+                [thisIndex],
                 definition,
                 customTypeName,
-                ctx.copy({ documentName: thisDocumentName }));
+                ctx.copy({ documentName: thisDocumentName }),
+            );
 
             ctx.fnErrorRegexes[customTypeName] = errorsRegex;
         } else {

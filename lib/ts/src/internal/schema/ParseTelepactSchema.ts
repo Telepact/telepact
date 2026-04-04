@@ -32,6 +32,7 @@ import { ParseContext } from './ParseContext.js';
 import { resolveDocumentCoordinates } from './DocumentLocators.js';
 import { THeaders } from '../types/THeaders.js';
 import { catchHeaderCollisions } from './CatchHeaderCollisions.js';
+import { validateTypeTermination } from './ValidateTypeTermination.js';
 
 export function parseTelepactSchema(telepactSchemaDocumentNamesToJson: Record<string, string>): TelepactSchema {
     const originalSchema: { [key: string]: Record<string, object> } = {};
@@ -269,6 +270,21 @@ export function parseTelepactSchema(telepactSchemaDocumentNamesToJson: Record<st
             } else {
                 throw e;
             }
+        }
+    }
+
+    try {
+        validateTypeTermination(
+            parsedTypes,
+            schemaKeysToDocumentName,
+            schemaKeysToIndex,
+            telepactSchemaDocumentNamesToJson,
+        );
+    } catch (e) {
+        if (e instanceof TelepactSchemaParseError) {
+            parseFailures.push(...e.schemaParseFailures);
+        } else {
+            throw e;
         }
     }
 

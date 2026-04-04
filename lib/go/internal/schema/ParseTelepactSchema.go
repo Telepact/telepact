@@ -237,6 +237,23 @@ func ParseTelepactSchema(telepactSchemaDocumentNamesToJSON map[string]string) (*
 		return nil, &ParseError{Failures: parseFailures, DocumentJSON: telepactSchemaDocumentNamesToJSON}
 	}
 
+	if err := ValidateTypeTermination(
+		parsedTypes,
+		schemaKeysToDocumentNames,
+		schemaKeysToIndex,
+		telepactSchemaDocumentNamesToJSON,
+	); err != nil {
+		if parseErr, ok := err.(*ParseError); ok {
+			parseFailures = append(parseFailures, parseErr.Failures...)
+		} else {
+			return nil, err
+		}
+	}
+
+	if len(parseFailures) > 0 {
+		return nil, &ParseError{Failures: parseFailures, DocumentJSON: telepactSchemaDocumentNamesToJSON}
+	}
+
 	headersList := make([]*types.THeaders, 0, len(headerKeys))
 
 	for headerKey := range headerKeys {

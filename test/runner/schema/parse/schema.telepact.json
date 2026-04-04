@@ -95,6 +95,8 @@
             "DirectoryDisallowed": {}
         }, {
             "ObjectKeyDisallowed": {}
+        }, {
+            "RecursiveTypeUnterminated": {}
         }]
     },
     {
