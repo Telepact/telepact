@@ -74,7 +74,9 @@ export async function loadConsoleData(url: URL): Promise<LoadedConsoleData> {
 
 	const schemaProtocolParam = url.searchParams.get('p');
 	const normalizedProtocol =
-		schemaProtocolParam === 'http' || schemaProtocolParam === 'ws' ? schemaProtocolParam : undefined;
+		schemaProtocolParam === 'http' || schemaProtocolParam === 'ws'
+			? schemaProtocolParam
+			: undefined;
 
 	const lowerSchemaSource = schemaSource.toLowerCase();
 	const inferredProtocol =
@@ -93,9 +95,10 @@ export async function loadConsoleData(url: URL): Promise<LoadedConsoleData> {
 	let readonlyEditor = true;
 
 	if (schemaSource === '') {
-		const defaultSchema = typeof window.overrideDefaultSchema === 'function'
-			? window.overrideDefaultSchema()
-			: '[{"///": "No schema loaded.\\n\\nTry [editing the schema](/?v=ds), or loading a schema from a live running Telepact server by entering a URL in the `Live URL` text box.", "info.Example":{}}]';
+		const defaultSchema =
+			typeof window.overrideDefaultSchema === 'function'
+				? window.overrideDefaultSchema()
+				: '[{"///": "No schema loaded.\\n\\nTry [editing the schema](/?v=ds), or loading a schema from a live running Telepact server by entering a URL in the `Live URL` text box.", "info.Example":{}}]';
 
 		const schemaDraft = url.searchParams.get('sd') ?? defaultSchema;
 
@@ -157,12 +160,17 @@ export async function loadConsoleData(url: URL): Promise<LoadedConsoleData> {
 			return undefined;
 		};
 
-		const recordEvaluation = (username: string, expression: Record<string, any>, result: number, successful: boolean) => {
+		const recordEvaluation = (
+			username: string,
+			expression: Record<string, any>,
+			result: number,
+			successful: boolean
+		) => {
 			getUserEvaluations(username).push({
 				expression,
 				result,
 				timestamp: Math.floor(Date.now() / 1000),
-				successful,
+				successful
 			});
 		};
 
@@ -173,7 +181,11 @@ export async function loadConsoleData(url: URL): Promise<LoadedConsoleData> {
 			const [kind, payload] = Object.entries(expression)[0] as [string, Record<string, any>];
 
 			if (kind === 'Constant') {
-				return { result: payload.value as number, unknownVariables: [], divideByZero: false };
+				return {
+					result: payload.value as number,
+					unknownVariables: [],
+					divideByZero: false
+				};
 			}
 
 			if (kind === 'Variable') {
@@ -187,7 +199,9 @@ export async function loadConsoleData(url: URL): Promise<LoadedConsoleData> {
 
 			const left = evaluateExpression(payload.left as Record<string, any>, variables);
 			const right = evaluateExpression(payload.right as Record<string, any>, variables);
-			const unknownVariables = [...new Set([...left.unknownVariables, ...right.unknownVariables])];
+			const unknownVariables = [
+				...new Set([...left.unknownVariables, ...right.unknownVariables])
+			];
 			if (unknownVariables.length > 0) {
 				return { result: 0, unknownVariables, divideByZero: false };
 			}
@@ -197,16 +211,32 @@ export async function loadConsoleData(url: URL): Promise<LoadedConsoleData> {
 
 			switch (kind) {
 				case 'Add':
-					return { result: left.result + right.result, unknownVariables: [], divideByZero: false };
+					return {
+						result: left.result + right.result,
+						unknownVariables: [],
+						divideByZero: false
+					};
 				case 'Sub':
-					return { result: left.result - right.result, unknownVariables: [], divideByZero: false };
+					return {
+						result: left.result - right.result,
+						unknownVariables: [],
+						divideByZero: false
+					};
 				case 'Mul':
-					return { result: left.result * right.result, unknownVariables: [], divideByZero: false };
+					return {
+						result: left.result * right.result,
+						unknownVariables: [],
+						divideByZero: false
+					};
 				case 'Div':
 					if (right.result === 0) {
 						return { result: 0, unknownVariables: [], divideByZero: true };
 					}
-					return { result: left.result / right.result, unknownVariables: [], divideByZero: false };
+					return {
+						result: left.result / right.result,
+						unknownVariables: [],
+						divideByZero: false
+					};
 				default:
 					throw new Error('Invalid expression');
 			}
@@ -217,7 +247,10 @@ export async function loadConsoleData(url: URL): Promise<LoadedConsoleData> {
 			const args = m.getBodyPayload();
 
 			if (functionName === 'fn.add') {
-				return new Message({}, { Ok_: { result: (args.x as number) + (args.y as number) } });
+				return new Message(
+					{},
+					{ Ok_: { result: (args.x as number) + (args.y as number) } }
+				);
 			}
 
 			if (functionName === 'fn.login') {
@@ -237,12 +270,24 @@ export async function loadConsoleData(url: URL): Promise<LoadedConsoleData> {
 			if (functionName === 'fn.logout') {
 				const username = getUsername(m, true);
 				if (!username) {
-					return new Message({}, { ErrorUnauthenticated_: { 'message!': 'Valid authentication is required.' } });
+					return new Message(
+						{},
+						{
+							ErrorUnauthenticated_: {
+								'message!': 'Valid authentication is required.'
+							}
+						}
+					);
 				}
 				if (username !== (args.username as string)) {
 					return new Message(
 						{},
-						{ ErrorUnauthorized_: { 'message!': 'Session authentication must match the requested username.' } }
+						{
+							ErrorUnauthorized_: {
+								'message!':
+									'Session authentication must match the requested username.'
+							}
+						}
 					);
 				}
 				const token = sessionTokens.get(username);
@@ -257,7 +302,10 @@ export async function loadConsoleData(url: URL): Promise<LoadedConsoleData> {
 
 			const username = getUsername(m);
 			if (!username) {
-				return new Message({}, { ErrorUnauthenticated_: { 'message!': 'Valid authentication is required.' } });
+				return new Message(
+					{},
+					{ ErrorUnauthenticated_: { 'message!': 'Valid authentication is required.' } }
+				);
 			}
 
 			switch (functionName) {
@@ -265,7 +313,9 @@ export async function loadConsoleData(url: URL): Promise<LoadedConsoleData> {
 					getUserVariables(username).set(args.name as string, args.value as number);
 					return new Message({}, { Ok_: {} });
 				case 'fn.saveVariables':
-					for (const [name, value] of Object.entries(args.variables as Record<string, number>)) {
+					for (const [name, value] of Object.entries(
+						args.variables as Record<string, number>
+					)) {
 						getUserVariables(username).set(name, value);
 					}
 					return new Message({}, { Ok_: {} });
@@ -280,13 +330,16 @@ export async function loadConsoleData(url: URL): Promise<LoadedConsoleData> {
 					);
 				}
 				case 'fn.getVariables':
-					return new Message({}, {
-						Ok_: {
-							variables: [...getUserVariables(username).entries()]
-								.sort(([left], [right]) => left.localeCompare(right))
-								.map(([name, value]) => ({ name, value })),
-						},
-					});
+					return new Message(
+						{},
+						{
+							Ok_: {
+								variables: [...getUserVariables(username).entries()]
+									.sort(([left], [right]) => left.localeCompare(right))
+									.map(([name, value]) => ({ name, value }))
+							}
+						}
+					);
 				case 'fn.deleteVariable':
 					getUserVariables(username).delete(args.name as string);
 					return new Message({}, { Ok_: {} });
@@ -300,28 +353,39 @@ export async function loadConsoleData(url: URL): Promise<LoadedConsoleData> {
 					const evaluation = evaluateExpression(expression, getUserVariables(username));
 					if (evaluation.unknownVariables.length > 0) {
 						recordEvaluation(username, expression, 0, false);
-						return new Message({}, {
-							ErrorUnknownVariables: { unknownVariables: evaluation.unknownVariables },
-						});
+						return new Message(
+							{},
+							{
+								ErrorUnknownVariables: {
+									unknownVariables: evaluation.unknownVariables
+								}
+							}
+						);
 					}
 					if (evaluation.divideByZero) {
 						recordEvaluation(username, expression, 0, false);
 						return new Message({}, { ErrorCannotDivideByZero: {} });
 					}
 					recordEvaluation(username, expression, evaluation.result, true);
-					return new Message({}, {
-						Ok_: {
-							result: evaluation.result,
-							saveResult: {
-								'fn.saveVariable': { name: 'result', value: evaluation.result },
-							},
-						},
-					});
+					return new Message(
+						{},
+						{
+							Ok_: {
+								result: evaluation.result,
+								saveResult: {
+									'fn.saveVariable': { name: 'result', value: evaluation.result }
+								}
+							}
+						}
+					);
 				}
 				case 'fn.getPaperTape': {
 					const limit = args['limit!'] as number | undefined;
 					const tape = [...getUserEvaluations(username)].reverse();
-					return new Message({}, { Ok_: { tape: limit === undefined ? tape : tape.slice(0, limit) } });
+					return new Message(
+						{},
+						{ Ok_: { tape: limit === undefined ? tape : tape.slice(0, limit) } }
+					);
 				}
 				default:
 					throw new Error('Not implemented');
@@ -364,7 +428,9 @@ export async function loadConsoleData(url: URL): Promise<LoadedConsoleData> {
 				return maybeOverrideAuthHeader(undefined, finish);
 			}
 
-			return window.overrideAuthHeader(schemaSource, (a) => maybeOverrideAuthHeader(a, finish));
+			return window.overrideAuthHeader(schemaSource, (a) =>
+				maybeOverrideAuthHeader(a, finish)
+			);
 		}, new ClientOptions());
 
 		schemaSourceKind = 'http';
@@ -409,7 +475,9 @@ export async function loadConsoleData(url: URL): Promise<LoadedConsoleData> {
 				if (ws !== socket) return;
 				const pending = pendingRequests.shift();
 				if (!pending) {
-					console.warn('Received unexpected WebSocket message with no pending Telepact request.');
+					console.warn(
+						'Received unexpected WebSocket message with no pending Telepact request.'
+					);
 					return;
 				}
 				try {
@@ -479,7 +547,9 @@ export async function loadConsoleData(url: URL): Promise<LoadedConsoleData> {
 						socket = null;
 					}
 					const reason = event.reason ? `: ${event.reason}` : '';
-					const error = new Error(`WebSocket closed before ready (code ${event.code}${reason})`);
+					const error = new Error(
+						`WebSocket closed before ready (code ${event.code}${reason})`
+					);
 					reject(error);
 					failPending(error);
 				};
@@ -510,7 +580,11 @@ export async function loadConsoleData(url: URL): Promise<LoadedConsoleData> {
 					ws.send(payload);
 				} catch (err) {
 					pendingRequests.pop();
-					reject(err instanceof Error ? err : new Error('Failed to send message over WebSocket'));
+					reject(
+						err instanceof Error
+							? err
+							: new Error('Failed to send message over WebSocket')
+					);
 				}
 			});
 		};
@@ -534,7 +608,9 @@ export async function loadConsoleData(url: URL): Promise<LoadedConsoleData> {
 				return maybeOverrideAuthHeader(undefined, finish);
 			}
 
-			return window.overrideAuthHeader(schemaSource, (a) => maybeOverrideAuthHeader(a, finish));
+			return window.overrideAuthHeader(schemaSource, (a) =>
+				maybeOverrideAuthHeader(a, finish)
+			);
 		}, new ClientOptions());
 
 		schemaSourceKind = 'ws';
@@ -563,7 +639,10 @@ export async function loadConsoleData(url: URL): Promise<LoadedConsoleData> {
 
 	const filteredSchemaPseudoJson = schemaPseudoJson.filter((item) => {
 		if (showInternalApi) return true;
-		if (typeof item === 'object' && Object.keys(item).find((i) => i.endsWith('_')) !== undefined) {
+		if (
+			typeof item === 'object' &&
+			Object.keys(item).find((i) => i.endsWith('_')) !== undefined
+		) {
 			return false;
 		}
 		return true;
@@ -582,7 +661,8 @@ export async function loadConsoleData(url: URL): Promise<LoadedConsoleData> {
 	return {
 		client,
 		schemaSource: schemaSourceKind,
-		schemaProtocol: schemaSourceKind === 'http' || schemaSourceKind === 'ws' ? schemaSourceKind : undefined,
+		schemaProtocol:
+			schemaSourceKind === 'http' || schemaSourceKind === 'ws' ? schemaSourceKind : undefined,
 		showInternalApi,
 		readonlyEditor,
 		filteredSchemaPseudoJson,
