@@ -145,6 +145,11 @@
   ->:
     - Ok_: {}
 
+- ///: |
+    Errors related to general avaiability.
+  errors.Availability:
+    - ErrorUnavailable: {}
+
 - union.Auth_:
     - Ephemeral:
         username: "string"

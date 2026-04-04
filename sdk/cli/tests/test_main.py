@@ -22,7 +22,7 @@ import asyncio
 import pytest
 from click.testing import CliRunner
 # Adjust the import path according to your project structure
-from telepact_cli.cli import main, get_api_from_http
+from telepact_cli.cli import main, get_api_from_http, _demo_unavailable_response
 from telepact_cli.resources import load_calculator_telepact_json
 from telepact_cli.telepact import TelepactSchema
 import traceback
@@ -170,6 +170,14 @@ def test_version_flag(runner: CliRunner) -> None:
 
     assert result.exit_code == 0
     assert result.output.strip() == f'telepact, version {expected_version}'
+
+
+def test_demo_unavailable_response(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr('telepact_cli.cli.random.random', lambda: 0.0)
+    assert _demo_unavailable_response().body == {'ErrorUnavailable': {}}
+
+    monkeypatch.setattr('telepact_cli.cli.random.random', lambda: 0.5)
+    assert _demo_unavailable_response() is None
 
 
 @pytest.mark.parametrize("assertion, old, new, expected, expected_code", compare_cases)

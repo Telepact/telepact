@@ -39,6 +39,7 @@ from starlette.middleware.cors import CORSMiddleware
 import importlib.resources as pkg_resources
 import time
 import secrets
+import random
 import uvicorn
 from .telepact import Client, Server, Message, Serializer, TelepactSchema, MockTelepactSchema, MockServer, SerializationError
 import asyncio
@@ -54,6 +55,13 @@ from .resources import load_calculator_telepact_json
 
 def _get_cli_version() -> str:
     return package_version('telepact-cli')
+
+
+def _demo_unavailable_response() -> Message | None:
+    if random.random() < 0.01:
+        return Message({}, {'ErrorUnavailable': {}})
+    return None
+
 
 def bump_version(version: str) -> str:
     major, minor, patch = map(int, version.split('.'))
@@ -538,6 +546,10 @@ def demo_server(port: int) -> None:
         function_name = next(iter(message.body.keys()))
         arguments: dict[str, object] = cast(
             dict[str, object], message.body[function_name])
+
+        unavailable_response = _demo_unavailable_response()
+        if unavailable_response is not None:
+            return unavailable_response
 
         if function_name == 'fn.add':
             x = cast(float, arguments['x'])
