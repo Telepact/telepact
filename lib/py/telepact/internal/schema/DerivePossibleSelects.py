@@ -77,12 +77,16 @@ def find_nested_types(type_declaration: 'TTypeDeclaration', nested_types: dict[s
     typ = type_declaration.type
 
     if isinstance(typ, TUnion):
+        if typ.name in nested_types:
+            return
         nested_types[typ.name] = typ
         for tag in typ.tags.values():
             for field_decl in tag.fields.values():
                 find_nested_types(field_decl.type_declaration, nested_types)
 
     elif isinstance(typ, TStruct):
+        if typ.name in nested_types:
+            return
         nested_types[typ.name] = typ
         for field_decl in typ.fields.values():
             find_nested_types(field_decl.type_declaration, nested_types)

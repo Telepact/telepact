@@ -24,6 +24,7 @@ from click.testing import CliRunner
 # Adjust the import path according to your project structure
 from telepact_cli.cli import main, get_api_from_http
 from telepact_cli.resources import load_calculator_telepact_json
+from telepact_cli.telepact import TelepactSchema
 import traceback
 import subprocess
 import requests
@@ -75,7 +76,7 @@ def test_demo_server_and_fetch_and_mock() -> None:
             schema_content = schema_file.read()
             schema_json = json.loads(schema_content)
 
-        reference_json = json.loads(load_calculator_telepact_json())
+        reference_json = TelepactSchema.from_json(load_calculator_telepact_json()).original
 
         # Compare the fetched schema with the reference schema
         print(f"Fetched schema: {schema_json}")
