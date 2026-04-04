@@ -568,11 +568,8 @@ def demo_server(port: int) -> None:
             return Message({}, {'Ok_': {}})
 
         username = get_username(message)
-        if function_name != 'fn.add' and username is None:
-            return unauthenticated_response()
-
         if username is None:
-            raise Exception('Expected authenticated username')
+            return unauthenticated_response()
 
         if function_name == 'fn.saveVariable':
             get_user_variables(username)[cast(str, arguments['name'])] = cast(float, arguments['value'])
