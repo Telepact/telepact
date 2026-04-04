@@ -39,6 +39,7 @@ from starlette.middleware.cors import CORSMiddleware
 import importlib.resources as pkg_resources
 import time
 import secrets
+import random
 import uvicorn
 from .telepact import Client, Server, Message, Serializer, TelepactSchema, MockTelepactSchema, MockServer, SerializationError
 import asyncio
@@ -538,6 +539,9 @@ def demo_server(port: int) -> None:
         function_name = next(iter(message.body.keys()))
         arguments: dict[str, object] = cast(
             dict[str, object], message.body[function_name])
+
+        if random.random() < 0.01:
+            return Message({}, {'ErrorUnavailable': {}})
 
         if function_name == 'fn.add':
             x = cast(float, arguments['x'])
