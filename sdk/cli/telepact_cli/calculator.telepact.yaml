@@ -125,7 +125,7 @@
     A record of an evaluated expression, including the original `expression`, the computed `result`, the `timestamp` of evaluation, and whether the evaluation was `successful`.
   struct.Evaluation:
     expression: "union.Expression"
-    result: "number"
+    result: "number?"
     timestamp: "integer"
     successful: "boolean"
 
