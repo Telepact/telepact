@@ -1,6 +1,6 @@
 name: telepact
 description: A Dart library for wrapping the telepact npm package.
-version: 1.0.0-alpha.236
+version: 1.0.0-alpha.237
 repository: https://github.com/Telepact/telepact
 environment:
   sdk: ^3.6.0

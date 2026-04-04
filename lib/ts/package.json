@@ -1,6 +1,6 @@
 {
   "name": "telepact",
-  "version": "1.0.0-alpha.236",
+  "version": "1.0.0-alpha.237",
   "description": "The Typescript Telepact library",
   "type": "module",
   "license": "Apache-2.0",
