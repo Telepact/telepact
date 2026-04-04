@@ -1,35 +1,26 @@
 {
   "changed_paths": [
-    "lib/go/internal/schema/GetOrParseType.go",
-    "lib/go/internal/schema/ParseTelepactSchema.go",
-    "lib/go/internal/schema/ValidateTypeTermination.go",
-    "lib/java/src/main/java/io/github/telepact/internal/schema/GetOrParseType.java",
-    "lib/java/src/main/java/io/github/telepact/internal/schema/ParseTelepactSchema.java",
-    "lib/java/src/main/java/io/github/telepact/internal/schema/ValidateTypeTermination.java",
-    "lib/py/telepact/internal/schema/GetOrParseType.py",
-    "lib/py/telepact/internal/schema/ParseTelepactSchema.py",
-    "lib/py/telepact/internal/schema/ValidateTypeTermination.py",
-    "lib/ts/src/internal/schema/GetOrParseType.ts",
-    "lib/ts/src/internal/schema/ParseTelepactSchema.ts",
-    "lib/ts/src/internal/schema/ValidateTypeTermination.ts",
-    "test/runner/parameters/parse_cases.py",
-    "test/runner/schema/parse/schema.telepact.json"
+    "doc/schema-guide.md",
+    "lib/py/telepact/internal/binary/ConstructBinaryEncoding.py",
+    "lib/py/telepact/internal/schema/DerivePossibleSelects.py",
+    "sdk/cli/telepact_cli/calculator.telepact.yaml",
+    "sdk/cli/telepact_cli/cli.py",
+    "sdk/cli/tests/test_main.py",
+    "sdk/console/src/demo.telepact.json",
+    "sdk/console/src/lib/loadConsoleData.ts",
+    "test/runner/schema/calculator/calculator.telepact.yaml",
+    "test/runner/util.py"
   ],
   "direct_targets": [
-    "go",
-    "java",
-    "py",
-    "ts"
+    "cli",
+    "console",
+    "py"
   ],
-  "pr_number": 326,
+  "pr_number": 327,
   "targets": [
     "cli",
     "console",
-    "dart",
-    "go",
-    "java",
-    "py",
-    "ts"
+    "py"
   ],
-  "version": "1.0.0-alpha.237"
+  "version": "1.0.0-alpha.238"
 }
