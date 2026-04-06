@@ -93,8 +93,10 @@ public class HandleMessage {
 
         if (requestHeaders.containsKey("@auth_")) {
             try {
-                requestHeaders.put("@authResult_", Objects.requireNonNullElseGet(onAuth.apply(requestHeaders), Map::of));
-                requestHeaders.remove("@auth_");
+                final var authHeaders = onAuth.apply(requestHeaders);
+                if (authHeaders != null) {
+                    requestHeaders.putAll(authHeaders);
+                }
             } catch (Throwable e) {
                 try {
                     onError.accept(new TelepactError(

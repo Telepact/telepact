@@ -68,7 +68,11 @@ def on_auth(request_headers: dict[str, object]) -> dict[str, object]:
         return {}
 
     token = token_value.get("token")
-    return {} if token is None else {"token": token}
+    if token == "ok":
+        return {"@ok_": {}}
+    if token == "unauthorized":
+        return {"@result": {"ErrorUnauthorized_": {"message!": "a"}}}
+    return {"@result": {"ErrorUnauthenticated_": {"message!": "a"}}}
     
 
 def find_bytes(obj):
@@ -335,19 +339,6 @@ async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, 
 
         request_headers = request_message.headers
         request_body = request_message.body
-
-        if "@authResult_" in request_headers:
-            if "@auth_" in request_headers:
-                raise RuntimeError("auth header should not reach handler")
-
-            auth_result = request_headers["@authResult_"]
-            token = auth_result.get("token") if isinstance(auth_result, dict) else None
-            if token == "ok":
-                return Message({}, {"Ok_": {}})
-            if token == "unauthorized":
-                return Message({}, {"ErrorUnauthorized_": {"message!": "a"}})
-            return Message({}, {"ErrorUnauthenticated_": {"message!": "a"}})
-
         request_pseudo_json = [request_headers, request_body]
 
         def default_serializer(obj):

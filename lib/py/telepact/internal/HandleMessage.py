@@ -97,8 +97,8 @@ async def handle_message(
 
     if "@auth_" in request_headers:
         try:
-            request_headers["@authResult_"] = on_auth(request_headers) or {}
-            del request_headers["@auth_"]
+            auth_headers = on_auth(request_headers) or {}
+            request_headers.update(auth_headers)
         except Exception as e:
             try:
                 on_error(

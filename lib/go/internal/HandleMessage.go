@@ -127,13 +127,14 @@ func HandleMessage(
 	}
 
 	if _, ok := requestHeaders["@auth_"]; ok {
-		authResult, err := invokeOnAuth(onAuth, requestHeaders)
+		authHeaders, err := invokeOnAuth(onAuth, requestHeaders)
 		if err != nil {
 			invokeOnError(onError, fmt.Errorf("telepact auth handler failed while handling %s: %w", functionName, err))
 			return ServerMessage{Headers: cloneStringAnyMap(responseHeaders), Body: map[string]any{"ErrorUnknown_": map[string]any{}}}, nil
 		}
-		requestHeaders["@authResult_"] = authResult
-		delete(requestHeaders, "@auth_")
+		for key, value := range authHeaders {
+			requestHeaders[key] = value
+		}
 	}
 
 	if clientKnownRaw, ok := requestHeaders["@bin_"]; ok {

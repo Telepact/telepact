@@ -442,32 +442,22 @@ public class Main {
             }
 
             Object token = tokenMap.get("token");
-            return token == null ? Map.of() : Map.of("token", token);
+            if (Objects.equals("ok", token)) {
+                return Map.of("@ok_", Map.of());
+            }
+            if (Objects.equals("unauthorized", token)) {
+                return Map.of("@result", Map.of("ErrorUnauthorized_", Map.of("message!", "a")));
+            }
+            if (token != null) {
+                return Map.of("@result", Map.of("ErrorUnauthenticated_", Map.of("message!", "a")));
+            }
+            return Map.of();
         };
 
         Function<Message, Message> handler = (requestMessage) -> {
             try {
                 var requestHeaders = requestMessage.headers;
                 var requestBody = requestMessage.body;
-
-                if (requestHeaders.containsKey("@authResult_")) {
-                    if (requestHeaders.containsKey("@auth_")) {
-                        throw new RuntimeException("auth header should not reach handler");
-                    }
-
-                    Object authResultObject = requestHeaders.get("@authResult_");
-                    Object token = authResultObject instanceof Map<?, ?> authResult
-                            ? authResult.get("token")
-                            : null;
-                    if (Objects.equals("ok", token)) {
-                        return new Message(Map.of(), Map.of("Ok_", Map.of()));
-                    }
-                    if (Objects.equals("unauthorized", token)) {
-                        return new Message(Map.of(), Map.of("ErrorUnauthorized_", Map.of("message!", "a")));
-                    }
-                    return new Message(Map.of(), Map.of("ErrorUnauthenticated_", Map.of("message!", "a")));
-                }
-
                 var requestPseudoJson = List.of(requestHeaders, requestBody);
 
                 var requestBytes = objectMapper.writeValueAsBytes(requestPseudoJson);
