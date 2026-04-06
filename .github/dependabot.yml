@@ -110,11 +110,6 @@ updates:
     multi-ecosystem-group: "all-weekly-updates"
     patterns: ["*"]
 
-  - package-ecosystem: "gomod"
-    directory: "/example/go-websocket"
-    multi-ecosystem-group: "all-weekly-updates"
-    patterns: ["*"]
-
   - package-ecosystem: "pub"
     directory: "/bind/dart"
     multi-ecosystem-group: "all-weekly-updates"
