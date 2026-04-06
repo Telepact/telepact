@@ -95,8 +95,8 @@ export async function handleMessage(
 
     if ('@auth_' in requestHeaders) {
         try {
-            const authHeaders = onAuth(requestHeaders) ?? {};
-            Object.assign(requestHeaders, authHeaders);
+            requestHeaders['@authResult_'] = onAuth(requestHeaders) ?? {};
+            delete requestHeaders['@auth_'];
         } catch (error) {
             try {
                 onError(new TelepactError(`telepact auth handler failed while handling ${functionName}`, 'handler', error));

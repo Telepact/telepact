@@ -813,20 +813,35 @@ func startTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscription, 
 			return map[string]any{}
 		}
 		token, _ := tokenMap["token"].(string)
-		switch token {
-		case "ok":
-			return map[string]any{"@ok_": map[string]any{}}
-		case "unauthorized":
-			return map[string]any{"@result": map[string]any{"ErrorUnauthorized_": map[string]any{"message!": "a"}}}
-		case "":
+		if token == "" {
 			return map[string]any{}
-		default:
-			return map[string]any{"@result": map[string]any{"ErrorUnauthenticated_": map[string]any{"message!": "a"}}}
 		}
+		return map[string]any{"token": token}
 	}
 
 	handler := func(message telepact.Message) (telepact.Message, error) {
 		reqHeaders := message.Headers
+
+		if authResultRaw, ok := reqHeaders["@authResult_"]; ok {
+			if _, hasAuth := reqHeaders["@auth_"]; hasAuth {
+				return telepact.Message{}, fmt.Errorf("telepact: auth header should not reach handler")
+			}
+
+			authResult, ok := authResultRaw.(map[string]any)
+			if !ok {
+				return telepact.NewMessage(map[string]any{}, map[string]any{"ErrorUnauthenticated_": map[string]any{"message!": "a"}}), nil
+			}
+
+			token, _ := authResult["token"].(string)
+			switch token {
+			case "ok":
+				return telepact.NewMessage(map[string]any{}, map[string]any{"Ok_": map[string]any{}}), nil
+			case "unauthorized":
+				return telepact.NewMessage(map[string]any{}, map[string]any{"ErrorUnauthorized_": map[string]any{"message!": "a"}}), nil
+			default:
+				return telepact.NewMessage(map[string]any{}, map[string]any{"ErrorUnauthenticated_": map[string]any{"message!": "a"}}), nil
+			}
+		}
 
 		if boolValue(reqHeaders["@toggleAlternateServer_"]) {
 			serveAlternate.Store(!serveAlternate.Load())

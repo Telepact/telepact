@@ -139,20 +139,20 @@ const response = await server.process(requestBytes, {
 });
 ```
 
-Inside the server, use `options.onAuth` to normalize credentials into the
-headers your handler should consume. An illustrative TypeScript sketch looks
-like this:
+Inside the server, use `options.onAuth` to normalize credentials into
+`@authResult_`. Telepact then removes `@auth_` before your handler runs. An
+illustrative TypeScript sketch looks like this:
 
 ```ts
 const options = new ServerOptions();
 options.onAuth = (headers) => {
   const auth = headers['@auth_'];
   const userId = lookupUserIdFromSession(auth?.sessionToken);
-  return userId ? { '@userId': userId } : {};
+  return userId ? { userId } : {};
 };
 
 const server = new Server(schema, async (message) => {
-  const userId = message.headers['@userId'];
+  const userId = message.headers['@authResult_']?.userId;
   const target = message.getBodyTarget();
 
   if (!userId) {

@@ -417,21 +417,28 @@ function startTestServer(
 
     const onAuth = (requestHeaders: Record<string, any>): Record<string, any> => {
         const token = requestHeaders["@auth_"]?.Token?.token;
-        if (token === "ok") {
-            return { "@ok_": {} };
-        }
-        if (token === "unauthorized") {
-            return { "@result": { ErrorUnauthorized_: { "message!": "a" } } };
-        }
-        if (token !== undefined) {
-            return { "@result": { ErrorUnauthenticated_: { "message!": "a" } } };
-        }
-        return {};
+        return token === undefined ? {} : { token };
     };
 
     const handler = async (requestMessage: Message): Promise<Message> => {
         const requestHeaders = requestMessage.headers;
         const requestBody = requestMessage.body;
+
+        if ("@authResult_" in requestHeaders) {
+            if ("@auth_" in requestHeaders) {
+                throw new Error("auth header should not reach handler");
+            }
+
+            const token = requestHeaders["@authResult_"]?.token;
+            if (token === "ok") {
+                return new Message({}, { Ok_: {} });
+            }
+            if (token === "unauthorized") {
+                return new Message({}, { ErrorUnauthorized_: { "message!": "a" } });
+            }
+            return new Message({}, { ErrorUnauthenticated_: { "message!": "a" } });
+        }
+
         const requestPseudoJson = [requestHeaders, requestBody];
         const requestJson = JSON.stringify(requestPseudoJson, uint8ArrayToBase64Replacer);
         const requestBytes = new TextEncoder().encode(requestJson);

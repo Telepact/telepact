@@ -56,11 +56,12 @@ export function createExampleServer(): HttpServer {
         if (!auth || auth.sessionToken !== VALID_SESSION) {
             return {};
         }
-        return { '@userId': 'user-123' };
+        return { userId: 'user-123' };
     };
 
     const telepactServer = new Server(schema, async (message) => {
-        const userId = message.headers['@userId'];
+        const authResult = message.headers['@authResult_'] as { userId?: string } | undefined;
+        const userId = authResult?.userId;
         if (userId !== 'user-123') {
             return new Message({}, {
                 ErrorUnauthenticated_: { 'message!': 'missing or invalid session cookie' },
