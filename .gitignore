@@ -6,6 +6,7 @@ __pycache__/
 .mypy_cache/
 .pytest_cache/
 .venv/
+lib/py/telepact.egg-info/
 dist/
 node_modules/
 target/

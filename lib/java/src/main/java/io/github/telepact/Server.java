@@ -62,6 +62,12 @@ public class Server {
         };
 
         /**
+         * Execution hook that runs when auth headers are present and can add derived
+         * request headers.
+         */
+        public Function<Map<String, Object>, Map<String, Object>> onAuth = (headers) -> Map.of();
+
+        /**
          * Flag to indicate if authentication via the _auth header is required.
          */
         public boolean authRequired = true;
@@ -78,6 +84,7 @@ public class Server {
     private final Consumer<Throwable> onError;
     private final Consumer<Message> onRequest;
     private final Consumer<Message> onResponse;
+    private final Function<Map<String, Object>, Map<String, Object>> onAuth;
     private final Serializer serializer;
 
     /**
@@ -92,6 +99,7 @@ public class Server {
         this.onError = options.onError;
         this.onRequest = options.onRequest;
         this.onResponse = options.onResponse;
+        this.onAuth = options.onAuth;
         this.telepactSchema = telepactSchema;
 
         final var binaryEncoding = constructBinaryEncoding(this.telepactSchema);
@@ -114,7 +122,7 @@ public class Server {
      */
     public Response process(byte[] requestMessageBytes) {
         return processBytes(requestMessageBytes, Map.of(), this.serializer, this.telepactSchema, this.onError,
-                this.onRequest, this.onResponse, this.handler);
+                this.onRequest, this.onResponse, this.onAuth, this.handler);
     }
 
     /**
@@ -127,6 +135,6 @@ public class Server {
      */
     public Response process(byte[] requestMessageBytes, Map<String, Object> overrideHeaders) {
         return processBytes(requestMessageBytes, overrideHeaders, this.serializer, this.telepactSchema, this.onError,
-                this.onRequest, this.onResponse, this.handler);
+                this.onRequest, this.onResponse, this.onAuth, this.handler);
     }
 }

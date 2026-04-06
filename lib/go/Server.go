@@ -29,6 +29,7 @@ type ServerOptions struct {
 	OnError       func(error)
 	OnRequest     func(Message)
 	OnResponse    func(Message)
+	OnAuth        func(map[string]any) map[string]any
 	AuthRequired  bool
 	Serialization Serialization
 }
@@ -39,6 +40,7 @@ func NewServerOptions() *ServerOptions {
 		OnError:       func(error) {},
 		OnRequest:     func(Message) {},
 		OnResponse:    func(Message) {},
+		OnAuth:        func(map[string]any) map[string]any { return map[string]any{} },
 		AuthRequired:  true,
 		Serialization: NewDefaultSerialization(),
 	}
@@ -50,6 +52,7 @@ type Server struct {
 	onError        func(error)
 	onRequest      func(Message)
 	onResponse     func(Message)
+	onAuth         func(map[string]any) map[string]any
 	telepactSchema *TelepactSchema
 	serializer     *Serializer
 }
@@ -76,6 +79,9 @@ func NewServer(telepactSchema *TelepactSchema, handler ServerHandler, options *S
 	if options.OnResponse == nil {
 		options.OnResponse = func(Message) {}
 	}
+	if options.OnAuth == nil {
+		options.OnAuth = func(map[string]any) map[string]any { return map[string]any{} }
+	}
 
 	serializationImpl := options.Serialization
 	if serializationImpl == nil {
@@ -100,6 +106,7 @@ func NewServer(telepactSchema *TelepactSchema, handler ServerHandler, options *S
 		onError:        options.OnError,
 		onRequest:      options.OnRequest,
 		onResponse:     options.OnResponse,
+		onAuth:         options.OnAuth,
 		telepactSchema: telepactSchema,
 		serializer:     serializer,
 	}, nil
@@ -153,6 +160,7 @@ func (s *Server) ProcessWithHeaders(requestMessageBytes []byte, overrideHeaders 
 		s.onError,
 		internalOnRequest,
 		internalOnResponse,
+		s.onAuth,
 		internalHandler,
 	)
 	if err != nil {

@@ -56,6 +56,23 @@ def on_request_err(m):
 def on_response_err(m):
     if m.headers.get("@onResponseError_", False):
         raise RuntimeError()
+
+
+def on_auth(request_headers: dict[str, object]) -> dict[str, object]:
+    auth = request_headers.get("@auth_")
+    if not isinstance(auth, dict):
+        return {}
+
+    token_value = auth.get("Token")
+    if not isinstance(token_value, dict):
+        return {}
+
+    token = token_value.get("token")
+    if token == "ok":
+        return {"@ok_": {}}
+    if token == "unauthorized":
+        return {"@result": {"ErrorUnauthorized_": {"message!": "a"}}}
+    return {"@result": {"ErrorUnauthenticated_": {"message!": "a"}}}
     
 
 def find_bytes(obj):
@@ -368,11 +385,13 @@ async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, 
     options.on_error = on_err
     options.on_request = on_request_err
     options.on_response = on_response_err
+    options.on_auth = on_auth
     options.auth_required = auth_required
 
     server = Server(telepact, handler, options)
     alternate_options = Server.Options()
     alternate_options.on_error = on_err
+    alternate_options.on_auth = on_auth
     alternate_options.auth_required = auth_required
     alternate_server = Server(
         alternate_telepact, handler, alternate_options)

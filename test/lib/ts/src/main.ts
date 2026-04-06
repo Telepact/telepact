@@ -415,6 +415,20 @@ function startTestServer(
 
     class ThisError extends Error {}
 
+    const onAuth = (requestHeaders: Record<string, any>): Record<string, any> => {
+        const token = requestHeaders["@auth_"]?.Token?.token;
+        if (token === "ok") {
+            return { "@ok_": {} };
+        }
+        if (token === "unauthorized") {
+            return { "@result": { ErrorUnauthorized_: { "message!": "a" } } };
+        }
+        if (token !== undefined) {
+            return { "@result": { ErrorUnauthenticated_: { "message!": "a" } } };
+        }
+        return {};
+    };
+
     const handler = async (requestMessage: Message): Promise<Message> => {
         const requestHeaders = requestMessage.headers;
         const requestBody = requestMessage.body;
@@ -469,12 +483,14 @@ function startTestServer(
             throw new Error();
         }
     };
+    options.onAuth = onAuth;
     options.authRequired = authRequired;
 
     const server: Server = new Server(telepact, handler, options);
 
     const alternateOptions = new ServerOptions();
     alternateOptions.onError = (e) => console.error(e);
+    alternateOptions.onAuth = onAuth;
     alternateOptions.authRequired = authRequired;
     const alternateServer: Server = new Server(alternateTelepact, handler, alternateOptions);
 

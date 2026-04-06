@@ -34,6 +34,7 @@ import io.github.telepact.Serializer;
 public class ProcessBytes {
     public static Response processBytes(byte[] requestMessageBytes, Map<String, Object> overrideHeaders, Serializer serializer, TelepactSchema telepactSchema,
             Consumer<Throwable> onError, Consumer<Message> onRequest, Consumer<Message> onResponse,
+            Function<Map<String, Object>, Map<String, Object>> onAuth,
             Function<Message, Message> handler) {
         try {
             final var requestMessage = parseRequestMessage(requestMessageBytes, serializer,
@@ -44,7 +45,7 @@ public class ProcessBytes {
             } catch (Throwable ignored) {
             }
 
-            final var responseMessage = handleMessage(requestMessage, overrideHeaders, telepactSchema, handler, onError);
+            final var responseMessage = handleMessage(requestMessage, overrideHeaders, telepactSchema, handler, onError, onAuth);
 
             try {
                 onResponse.accept(responseMessage);

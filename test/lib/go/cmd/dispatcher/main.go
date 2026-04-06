@@ -795,6 +795,36 @@ func startTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscription, 
 
 	type handlerError struct{}
 
+	onAuth := func(requestHeaders map[string]any) map[string]any {
+		authRaw, ok := requestHeaders["@auth_"]
+		if !ok {
+			return map[string]any{}
+		}
+		authMap, ok := authRaw.(map[string]any)
+		if !ok {
+			return map[string]any{}
+		}
+		tokenRaw, ok := authMap["Token"]
+		if !ok {
+			return map[string]any{}
+		}
+		tokenMap, ok := tokenRaw.(map[string]any)
+		if !ok {
+			return map[string]any{}
+		}
+		token, _ := tokenMap["token"].(string)
+		switch token {
+		case "ok":
+			return map[string]any{"@ok_": map[string]any{}}
+		case "unauthorized":
+			return map[string]any{"@result": map[string]any{"ErrorUnauthorized_": map[string]any{"message!": "a"}}}
+		case "":
+			return map[string]any{}
+		default:
+			return map[string]any{"@result": map[string]any{"ErrorUnauthenticated_": map[string]any{"message!": "a"}}}
+		}
+	}
+
 	handler := func(message telepact.Message) (telepact.Message, error) {
 		reqHeaders := message.Headers
 
@@ -844,6 +874,7 @@ func startTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscription, 
 			panic(handlerError{})
 		}
 	}
+	options.OnAuth = onAuth
 
 	server, err := telepact.NewServer(tele, handler, options)
 	if err != nil {
@@ -857,6 +888,7 @@ func startTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscription, 
 			d.logger.Printf("alternate server error: %v", err)
 		}
 	}
+	alternateOptions.OnAuth = onAuth
 	alternateServer, err := telepact.NewServer(alternateTele, handler, alternateOptions)
 	if err != nil {
 		return nil, err
