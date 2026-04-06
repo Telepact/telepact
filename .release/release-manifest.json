@@ -1,15 +1,41 @@
 {
   "changed_paths": [
-    "sdk/cli/telepact_cli/calculator.telepact.yaml",
-    "sdk/cli/telepact_cli/cli.py",
-    "sdk/cli/tests/test_main.py"
+    ".gitignore",
+    "doc/production-guide.md",
+    "example/ts-http-cookie-auth/src/server.ts",
+    "lib/go/Server.go",
+    "lib/go/internal/HandleMessage.go",
+    "lib/go/internal/ProcessBytes.go",
+    "lib/java/src/main/java/io/github/telepact/Server.java",
+    "lib/java/src/main/java/io/github/telepact/internal/HandleMessage.java",
+    "lib/java/src/main/java/io/github/telepact/internal/ProcessBytes.java",
+    "lib/py/telepact/Server.py",
+    "lib/py/telepact/internal/HandleMessage.py",
+    "lib/py/telepact/internal/ProcessBytes.py",
+    "lib/ts/src/Server.ts",
+    "lib/ts/src/internal/HandleMessage.ts",
+    "lib/ts/src/internal/ProcessBytes.ts",
+    "test/lib/go/cmd/dispatcher/main.go",
+    "test/lib/java/src/main/java/telepacttest/Main.java",
+    "test/lib/py/telepact_test/test_server.py",
+    "test/lib/ts/src/main.ts",
+    "test/runner/parameters/auth_cases.py"
   ],
   "direct_targets": [
-    "cli"
+    "go",
+    "java",
+    "py",
+    "ts"
   ],
-  "pr_number": 329,
+  "pr_number": 331,
   "targets": [
-    "cli"
+    "cli",
+    "console",
+    "dart",
+    "go",
+    "java",
+    "py",
+    "ts"
   ],
-  "version": "1.0.0-alpha.240"
+  "version": "1.0.0-alpha.241"
 }
