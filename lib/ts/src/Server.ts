@@ -30,6 +30,7 @@ export class Server {
     onError: (error: any) => void;
     onRequest: (message: Message) => void;
     onResponse: (message: Message) => void;
+    onAuth: (headers: Record<string, any>) => Record<string, any>;
     telepactSchema: TelepactSchema;
     serializer: Serializer;
 
@@ -38,6 +39,7 @@ export class Server {
         this.onError = options.onError;
         this.onRequest = options.onRequest;
         this.onResponse = options.onResponse;
+        this.onAuth = options.onAuth;
 
         this.telepactSchema = telepactSchema;
 
@@ -63,6 +65,7 @@ export class Server {
             this.onError,
             this.onRequest,
             this.onResponse,
+            this.onAuth,
             this.handler,
         );
     }
@@ -72,6 +75,7 @@ export class ServerOptions {
     onError: (error: any) => void;
     onRequest: (message: Message) => void;
     onResponse: (message: Message) => void;
+    onAuth: (headers: Record<string, any>) => Record<string, any>;
     authRequired: boolean;
     serialization: Serialization;
 
@@ -79,6 +83,7 @@ export class ServerOptions {
         this.onError = (e: any) => {};
         this.onRequest = (m: Message) => {};
         this.onResponse = (m: Message) => {};
+        this.onAuth = (headers: Record<string, any>) => ({});
         this.authRequired = true;
         this.serialization = new DefaultSerialization();
     }

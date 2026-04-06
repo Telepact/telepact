@@ -139,47 +139,44 @@ const response = await server.process(requestBytes, {
 });
 ```
 
-Inside the handler, parse and validate those credentials before delegating to
-the target function. An illustrative TypeScript sketch looks like this:
+Inside the server, use `options.onAuth` to normalize credentials into the
+headers your handler should consume. An illustrative TypeScript sketch looks
+like this:
 
 ```ts
+const options = new ServerOptions();
+options.onAuth = (headers) => {
+  const auth = headers['@auth_'];
+  const userId = lookupUserIdFromSession(auth?.sessionToken);
+  return userId ? { '@userId': userId } : {};
+};
+
 const server = new Server(schema, async (message) => {
-  const auth = message.headers['@auth_'];
+  const userId = message.headers['@userId'];
   const target = message.getBodyTarget();
 
-  if (!auth) {
+  if (!userId) {
     return new Message({}, {
       ErrorUnauthenticated_: { message: 'missing credentials' },
     });
   }
 
-  const userId = lookupUserIdFromSession(auth.sessionToken);
-  if (!userId) {
-    return new Message({}, {
-      ErrorUnauthenticated_: { message: 'invalid credentials' },
-    });
-  }
-
-  const normalizedMessage = new Message(
-    { ...message.headers, '@userId': userId },
-    message.body,
-  );
-
   const startedAt = Date.now();
   try {
-    return await dispatchFunction(target, normalizedMessage, auth);
+    return await dispatchFunction(target, message);
   } finally {
     logger.info('telepact_request', {
-      requestId: normalizedMessage.headers['@id_'],
+      requestId: message.headers['@id_'],
       function: target,
       durationMs: Date.now() - startedAt,
     });
   }
-}, new ServerOptions());
+}, options);
 ```
 
 The important point is the placement: transport code stays bytes in / bytes out,
-while auth and other request policy live in the handler code itself.
+while auth normalization and other request policy live in Telepact server hooks
+and the handler code.
 
 ### Observability
 

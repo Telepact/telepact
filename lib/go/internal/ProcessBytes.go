@@ -27,6 +27,7 @@ func ProcessBytes(
 	onError func(error),
 	onRequest func(ServerMessage),
 	onResponse func(ServerMessage),
+	onAuth func(map[string]any) map[string]any,
 	handler func(ServerMessage) (ServerMessage, error),
 ) (ServerMessage, []byte, error) {
 	requestMessage, err := ParseRequestMessage(requestMessageBytes, deserialize, schema, onError)
@@ -36,7 +37,7 @@ func ProcessBytes(
 
 	safeInvokeMessage(onRequest, requestMessage)
 
-	responseMessage, err := HandleMessage(requestMessage, overrideHeaders, schema, handler, onError)
+	responseMessage, err := HandleMessage(requestMessage, overrideHeaders, schema, handler, onError, onAuth)
 	if err != nil {
 		invokeOnError(onError, err)
 		return buildUnknownResponse(serialize)

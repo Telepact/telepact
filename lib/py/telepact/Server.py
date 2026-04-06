@@ -39,6 +39,7 @@ class Server:
             self.on_error = lambda e: None
             self.on_request = lambda m: None
             self.on_response = lambda m: None
+            self.on_auth = lambda headers: {}
             self.auth_required = True
             self.serialization = DefaultSerialization()
 
@@ -52,6 +53,7 @@ class Server:
         self.on_error = options.on_error
         self.on_request = options.on_request
         self.on_response = options.on_response
+        self.on_auth = options.on_auth
 
         self.telepact_schema = telepact_schema
 
@@ -72,4 +74,4 @@ class Server:
         from .internal.ProcessBytes import process_bytes
 
         return await process_bytes(request_message_bytes, override_headers, self.serializer, self.telepact_schema, self.on_error,
-                                   self.on_request, self.on_response, self.handler)
+                                   self.on_request, self.on_response, self.on_auth, self.handler)

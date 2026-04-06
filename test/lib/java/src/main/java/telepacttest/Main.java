@@ -430,6 +430,30 @@ public class Main {
         class ThisError extends RuntimeException {
         }
 
+        Function<Map<String, Object>, Map<String, Object>> onAuth = (requestHeaders) -> {
+            Object authObject = requestHeaders.get("@auth_");
+            if (!(authObject instanceof Map<?, ?> authMap)) {
+                return Map.of();
+            }
+
+            Object tokenObject = authMap.get("Token");
+            if (!(tokenObject instanceof Map<?, ?> tokenMap)) {
+                return Map.of();
+            }
+
+            Object token = tokenMap.get("token");
+            if (Objects.equals("ok", token)) {
+                return Map.of("@ok_", Map.of());
+            }
+            if (Objects.equals("unauthorized", token)) {
+                return Map.of("@result", Map.of("ErrorUnauthorized_", Map.of("message!", "a")));
+            }
+            if (token != null) {
+                return Map.of("@result", Map.of("ErrorUnauthenticated_", Map.of("message!", "a")));
+            }
+            return Map.of();
+        };
+
         Function<Message, Message> handler = (requestMessage) -> {
             try {
                 var requestHeaders = requestMessage.headers;
@@ -500,12 +524,14 @@ public class Main {
                 throw new RuntimeException();
             }
         };
+        options.onAuth = onAuth;
         options.authRequired = authRequired;
 
         var server = new Server(telepact, handler, options);
 
         var alternateOptions = new Server.Options();
         alternateOptions.onError = (e) -> e.printStackTrace();
+        alternateOptions.onAuth = onAuth;
         alternateOptions.authRequired = authRequired;
 
         var alternateServer = new Server(alternateTelepact, handler, alternateOptions);
