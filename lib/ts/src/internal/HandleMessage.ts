@@ -187,11 +187,11 @@ export async function handleMessage(
         resultMessage = new Message({}, { Ok_: { api: apiDefinitions } });
     } else {
         const next: ServerNext = async (
-        headers: Record<string, any>,
-        nextFunctionName: string,
-        arguments_: Record<string, any>,
+            headers: Record<string, any>,
+            nextFunctionName: string,
+            arguments_: Record<string, any>,
         ): Promise<Message> => {
-        throw new Error(`Unknown function: ${nextFunctionName}`);
+            throw new Error(`Unknown function: ${nextFunctionName}`);
         };
 
         try {

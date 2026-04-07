@@ -161,16 +161,16 @@ func HandleMessage(
 	}
 
 	unsafeResponseEnabled := boolValue(requestHeaders["@unsafe_"])
-	requestArguments, ok := requestPayload.(map[string]any)
-	if !ok || requestArguments == nil {
-		return ServerMessage{}, fmt.Errorf("telepact: request payload for %s is not an object", functionName)
-	}
 
 	var resultMessage ServerMessage
 	switch functionName {
 	case "fn.ping_":
 		resultMessage = ServerMessage{Headers: make(map[string]any), Body: map[string]any{"Ok_": map[string]any{}}}
 	case "fn.api_":
+		requestArguments, ok := requestPayload.(map[string]any)
+		if !ok || requestArguments == nil {
+			return ServerMessage{}, fmt.Errorf("telepact: request payload for %s is not an object", functionName)
+		}
 		includeInternal := boolValue(requestArguments["includeInternal!"])
 		includeExamples := boolValue(requestArguments["includeExamples!"])
 		apiDefinitions := schema.OriginalDefinitions()
@@ -182,6 +182,10 @@ func HandleMessage(
 		}
 		resultMessage = ServerMessage{Headers: make(map[string]any), Body: map[string]any{"Ok_": map[string]any{"api": apiDefinitions}}}
 	default:
+		requestArguments, ok := requestPayload.(map[string]any)
+		if !ok || requestArguments == nil {
+			return ServerMessage{}, fmt.Errorf("telepact: request payload for %s is not an object", functionName)
+		}
 		next := func(headers map[string]any, nextFunctionName string, arguments map[string]any) (ServerMessage, error) {
 			return ServerMessage{}, fmt.Errorf("telepact: unknown function %s", nextFunctionName)
 		}

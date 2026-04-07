@@ -368,8 +368,7 @@ class TypedServerHandler:
 
     def _register(self, router: telepact.FunctionRouter) -> None:
         {%- for fn in functions %}
-        {%- set function_name = fn | replace('fn.', '') %}
-        router.register("{{ fn }}", lambda headers, arguments: self._handle_{{ function_name }}(headers, arguments))
+        router.register("{{ fn }}", self._handle_{{ fn | replace('fn.', '') }})
         {% endfor %}
 
     {%- for fn in functions %}
