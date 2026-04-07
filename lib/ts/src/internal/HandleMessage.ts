@@ -174,36 +174,36 @@ export async function handleMessage(
     const unsafeResponseEnabled = requestHeaders['@unsafe_'] || false;
 
     let resultMessage: Message;
-    const next: ServerNext = async (
+    if (functionName === 'fn.ping_') {
+        resultMessage = new Message({}, { Ok_: {} });
+    } else if (functionName === 'fn.api_') {
+        const includeInternal = requestPayload['includeInternal!'] === true;
+        const includeExamples = requestPayload['includeExamples!'] === true;
+        const apiDefinitions = includeExamples
+            ? getApiDefinitionsWithExamples(telepactSchema, includeInternal)
+            : includeInternal
+                ? telepactSchema.full
+                : telepactSchema.original;
+        resultMessage = new Message({}, { Ok_: { api: apiDefinitions } });
+    } else {
+        const next: ServerNext = async (
         headers: Record<string, any>,
         nextFunctionName: string,
         arguments_: Record<string, any>,
-    ): Promise<Message> => {
-        if (nextFunctionName === 'fn.ping_') {
-            return new Message({}, { Ok_: {} });
-        }
-        if (nextFunctionName === 'fn.api_') {
-            const includeInternal = arguments_['includeInternal!'] === true;
-            const includeExamples = arguments_['includeExamples!'] === true;
-            const apiDefinitions = includeExamples
-                ? getApiDefinitionsWithExamples(telepactSchema, includeInternal)
-                : includeInternal
-                    ? telepactSchema.full
-                    : telepactSchema.original;
-            return new Message({}, { Ok_: { api: apiDefinitions } });
-        }
+        ): Promise<Message> => {
         throw new Error(`Unknown function: ${nextFunctionName}`);
-    };
+        };
 
-    try {
-        resultMessage = await middleware(requestHeaders, functionName, requestPayload, next);
-    } catch (e) {
         try {
-            onError(new TelepactError(`telepact handler failed while handling ${functionName}`, 'handler', e));
-        } catch (error) {
-            // Ignore error
+            resultMessage = await middleware(requestHeaders, functionName, requestPayload, next);
+        } catch (e) {
+            try {
+                onError(new TelepactError(`telepact handler failed while handling ${functionName}`, 'handler', e));
+            } catch (error) {
+                // Ignore error
+            }
+            return new Message(responseHeaders, { ErrorUnknown_: {} });
         }
-        return new Message(responseHeaders, { ErrorUnknown_: {} });
     }
 
     const resultUnion: Record<string, any> = resultMessage.body;

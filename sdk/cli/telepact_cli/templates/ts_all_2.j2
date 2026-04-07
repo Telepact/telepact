@@ -1,4 +1,4 @@
-import { Message, Client, TypedMessage } from 'telepact';
+import { Message, Client, TypedMessage, FunctionRouter, ServerNext } from 'telepact';
 
 export class TaggedValue_<T, U> {
     tag: T;
@@ -336,19 +336,19 @@ export class TypedClient {
 }
 
 export class TypedServerHandler {
-    private readonly router: telepact.FunctionRouter;
+    private readonly router: FunctionRouter;
 
-    constructor(router: telepact.FunctionRouter = new telepact.FunctionRouter()) {
+    constructor(router: FunctionRouter = new FunctionRouter()) {
         this.router = router;
         this.register(router);
     }
 
-    private register(router: telepact.FunctionRouter): void {
+    private register(router: FunctionRouter): void {
         {% for fn in functions %}
         {%- set function_name = fn | replace('fn.', '') %}
-        router.register("{{ fn }}", async (headers: Record<string, any>, arguments_: Record<string, any>): Promise<telepact.Message> => {
+        router.register("{{ fn }}", async (headers: Record<string, any>, arguments_: Record<string, any>): Promise<Message> => {
             const { headers: responseHeaders, body } = await this.{{ function_name }}(headers, new {{ function_name }}.Input({ "{{ fn }}": arguments_ }));
-            return new telepact.Message(responseHeaders, body.pseudoJson);
+            return new Message(responseHeaders, body.pseudoJson);
         });
         {% endfor %}
     }
@@ -360,7 +360,7 @@ export class TypedServerHandler {
     }
     {%- endfor %}
 
-    async middleware(headers: Record<string, any>, functionName: string, arguments_: Record<string, any>, next: telepact.ServerNext): Promise<telepact.Message> {
+    async middleware(headers: Record<string, any>, functionName: string, arguments_: Record<string, any>, next: ServerNext): Promise<Message> {
         return await this.router.middleware(headers, functionName, arguments_, next);
     }
 }

@@ -151,9 +151,9 @@ options.onAuth = (headers) => {
   return userId ? { '@userId': userId } : {};
 };
 
-const server = new Server(schema, async (message) => {
-  const userId = message.headers['@userId'];
-  const target = message.getBodyTarget();
+options.middleware = async (headers, target, arguments, next) => {
+  const userId = headers['@userId'];
+  const message = new Message(headers, { [target]: arguments });
 
   if (!userId) {
     return new Message({}, {
@@ -167,11 +167,12 @@ const server = new Server(schema, async (message) => {
   } finally {
     logger.info('telepact_request', {
       requestId: message.headers['@id_'],
-      function: target,
-      durationMs: Date.now() - startedAt,
-    });
-  }
-}, options);
+        function: target,
+        durationMs: Date.now() - startedAt,
+      });
+    }
+};
+const server = new Server(schema, options);
 ```
 
 The important point is the placement: transport code stays bytes in / bytes out,

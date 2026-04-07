@@ -52,11 +52,12 @@ async def handler(req_msg):
         raise Exception('Unknown function')
 
 options = Server.Options()
+options.middleware = handler
 options.auth_required = False
 
 schema_files = TelepactSchemaFiles('./api')
 api = TelepactSchema.from_file_json_map(schema_files.filenames_to_json)
-server = Server(api, handler, options)
+server = Server(api, options)
 
 async def http_handler(request):
     request_bytes = await request.body()

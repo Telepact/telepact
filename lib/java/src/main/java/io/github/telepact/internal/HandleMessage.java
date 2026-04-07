@@ -152,34 +152,34 @@ public class HandleMessage {
         final var unsafeResponseEnabled = Objects.equals(true, requestHeaders.get("@unsafe_"));
 
         final Message resultMessage;
-        try {
-            resultMessage = middleware.apply(requestHeaders, functionName, requestPayload, new ServerNext() {
-                @Override
-                public Message apply(Map<String, Object> headers, String nextFunctionName, Map<String, Object> arguments) {
-                    if (nextFunctionName.equals("fn.ping_")) {
-                        return new Message(Map.of(), Map.of("Ok_", Map.of()));
-                    }
-                    if (nextFunctionName.equals("fn.api_")) {
-                        final var includeInternal = Objects.equals(true, arguments.get("includeInternal!"));
-                        final var includeExamples = Objects.equals(true, arguments.get("includeExamples!"));
-                        return new Message(Map.of(),
-                                Map.of("Ok_", Map.of("api", includeExamples
-                                        ? GetApiDefinitionsWithExamples.getApiDefinitionsWithExamples(telepactSchema, includeInternal)
-                                        : includeInternal ? telepactSchema.full : telepactSchema.original)));
-                    }
-                    throw new IllegalArgumentException("Unknown function: " + nextFunctionName);
-                }
-            });
-        } catch (Throwable e) {
+        if (functionName.equals("fn.ping_")) {
+            resultMessage = new Message(Map.of(), Map.of("Ok_", Map.of()));
+        } else if (functionName.equals("fn.api_")) {
+            final var includeInternal = Objects.equals(true, requestPayload.get("includeInternal!"));
+            final var includeExamples = Objects.equals(true, requestPayload.get("includeExamples!"));
+            resultMessage = new Message(Map.of(),
+                    Map.of("Ok_", Map.of("api", includeExamples
+                            ? GetApiDefinitionsWithExamples.getApiDefinitionsWithExamples(telepactSchema, includeInternal)
+                            : includeInternal ? telepactSchema.full : telepactSchema.original)));
+        } else {
             try {
-                onError.accept(new TelepactError(
-                        "telepact handler failed while handling %s".formatted(functionName),
-                        "handler",
-                        e));
-            } catch (Throwable ignored) {
+                resultMessage = middleware.apply(requestHeaders, functionName, requestPayload, new ServerNext() {
+                    @Override
+                    public Message apply(Map<String, Object> headers, String nextFunctionName, Map<String, Object> arguments) {
+                        throw new IllegalArgumentException("Unknown function: " + nextFunctionName);
+                    }
+                });
+            } catch (Throwable e) {
+                try {
+                    onError.accept(new TelepactError(
+                            "telepact handler failed while handling %s".formatted(functionName),
+                            "handler",
+                            e));
+                } catch (Throwable ignored) {
 
+                }
+                return new Message(responseHeaders, Map.of("ErrorUnknown_", Map.of()));
             }
-            return new Message(responseHeaders, Map.of("ErrorUnknown_", Map.of()));
         }
 
         final Map<String, Object> resultUnion = resultMessage.body;

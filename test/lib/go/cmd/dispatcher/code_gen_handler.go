@@ -29,13 +29,13 @@ func (c *codeGenHandler) Middleware(headers map[string]any, functionName string,
 		return telepact.Message{}, err
 	}
 
-	headers := response.Headers
-	if headers == nil {
-		headers = map[string]any{}
+	responseHeaders := response.Headers
+	if responseHeaders == nil {
+		responseHeaders = map[string]any{}
 	}
-	headers["@codegens_"] = true
+	responseHeaders["@codegens_"] = true
 
-	return telepact.NewMessage(headers, response.Body), nil
+	return telepact.NewMessage(responseHeaders, response.Body), nil
 }
 
 type typedCodeGenServer struct{}

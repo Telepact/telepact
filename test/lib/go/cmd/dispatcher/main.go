@@ -781,7 +781,7 @@ func startTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscription, 
 			return telepact.Message{}, errors.New("invalid backdoor response payload")
 		}
 
-		headers, err := asMap(response[0])
+		responseHeaders, err := asMap(response[0])
 		if err != nil {
 			return telepact.Message{}, err
 		}
@@ -790,7 +790,7 @@ func startTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscription, 
 			return telepact.Message{}, err
 		}
 
-		return telepact.NewMessage(headers, body), nil
+		return telepact.NewMessage(responseHeaders, body), nil
 	}
 
 	type handlerError struct{}

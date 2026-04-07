@@ -29,9 +29,12 @@ const schema = TelepactSchema.fromFileJsonMap(files.filenamesToJson);
 // The schema directory may contain multiple *.telepact.yaml and
 // *.telepact.json files. Subdirectories are rejected.
 
-const handler = async (requestMessage: Message): Promise<Message> => {
-    const functionName = Object.keys(requestMessage.body)[0];
-    const arguments = requestMessage.body[functionName];
+const middleware = async (
+    headers: Record<string, any>,
+    functionName: string,
+    arguments: Record<string, any>,
+    next,
+): Promise<Message> => {
 
     try {
         // Early in the handler, perform any pre-flight "middleware" operations, such as
@@ -53,9 +56,10 @@ const handler = async (requestMessage: Message): Promise<Message> => {
 };
 
 const options = new ServerOptions();
+options.middleware = middleware;
 // Set this to false when your schema does not define union.Auth_.
 options.authRequired = false;
-const server = new Server(schema, handler, options);
+const server = new Server(schema, options);
 
 // Wire up request/response bytes from your transport of choice
 transport.receive(async (requestBytes: Uint8Array): Promise<Uint8Array> => {

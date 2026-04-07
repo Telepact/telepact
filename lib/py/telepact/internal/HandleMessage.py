@@ -162,39 +162,40 @@ async def handle_message(
     unsafe_response_enabled = cast(bool, request_headers.get("@unsafe_", False))
 
     result_message: Message
-    async def next(
-        headers: dict[str, object],
-        next_function_name: str,
-        arguments: dict[str, object],
-    ) -> 'Message':
-        if next_function_name == "fn.ping_":
-            return Message({}, {"Ok_": {}})
-        if next_function_name == "fn.api_":
-            include_internal = arguments.get("includeInternal!") is True
-            include_examples = arguments.get("includeExamples!") is True
-            api_definitions = get_api_definitions_with_examples(
-                telepact_schema,
-                include_internal,
-            ) if include_examples else (
-                telepact_schema.full if include_internal else telepact_schema.original
-            )
-            return Message({}, {"Ok_": {"api": api_definitions}})
-        raise RuntimeError(f"Unknown function: {next_function_name}")
+    if function_name == "fn.ping_":
+        result_message = Message({}, {"Ok_": {}})
+    elif function_name == "fn.api_":
+        include_internal = request_payload.get("includeInternal!") is True
+        include_examples = request_payload.get("includeExamples!") is True
+        api_definitions = get_api_definitions_with_examples(
+            telepact_schema,
+            include_internal,
+        ) if include_examples else (
+            telepact_schema.full if include_internal else telepact_schema.original
+        )
+        result_message = Message({}, {"Ok_": {"api": api_definitions}})
+    else:
+        async def next_handler(
+            headers: dict[str, object],
+            next_function_name: str,
+            arguments: dict[str, object],
+        ) -> 'Message':
+            raise RuntimeError(f"Unknown function: {next_function_name}")
 
-    try:
-        result_message = await middleware(request_headers, function_name, request_payload, next)
-    except Exception as e:
         try:
-            on_error(
-                TelepactError(
-                    f"telepact handler failed while handling {function_name}",
-                    kind="handler",
-                    cause=e,
+            result_message = await middleware(request_headers, function_name, request_payload, next_handler)
+        except Exception as e:
+            try:
+                on_error(
+                    TelepactError(
+                        f"telepact handler failed while handling {function_name}",
+                        kind="handler",
+                        cause=e,
+                    )
                 )
-            )
-        except Exception:
-            pass
-        return Message(response_headers, {"ErrorUnknown_": {}})
+            except Exception:
+                pass
+            return Message(response_headers, {"ErrorUnknown_": {}})
 
     result_union: dict[str, object] = result_message.body
 

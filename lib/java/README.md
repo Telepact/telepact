@@ -36,9 +36,7 @@ var files = new TelepactSchemaFiles("./directory/containing/api/files");
 var schema = TelepactSchema.fromFileJsonMap(files.filenamesToJson);
 // The schema directory may contain multiple *.telepact.yaml and
 // *.telepact.json files. Subdirectories are rejected.
-Function<Message, Message> handler = (requestMessage) -> {
-    var functionName = requestMessage.body.keySet().stream().findAny().orElseThrow();
-    var arguments = (Map<String, Object>) requestMessage.body.get(functionName);
+var middleware = (io.github.telepact.ServerMiddleware) (headers, functionName, arguments, next) -> {
 
     try {
         // Early in the handler, perform any pre-flight "middleware" operations, such as
@@ -59,9 +57,10 @@ Function<Message, Message> handler = (requestMessage) -> {
     }
 };
 var options = new Server.Options();
+options.middleware = middleware;
 // Set this to false when your schema does not define union.Auth_.
 options.authRequired = false;
-var server = new Server(schema, handler, options);
+var server = new Server(schema, options);
 
 
 // Wire up request/response bytes from your transport of choice

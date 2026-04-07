@@ -32,9 +32,7 @@ schema = TelepactSchema.from_file_json_map(files.filenames_to_json)
 # The schema directory may contain multiple *.telepact.yaml and
 # *.telepact.json files. Subdirectories are rejected.
 
-async def handler(request_message: 'Message') -> 'Message':
-    function_name = next(iter(request_message.body.keys()))
-    arguments = request_message.body[function_name]
+async def middleware(headers: dict[str, object], function_name: str, arguments: dict[str, object], next) -> 'Message':
 
     try:
         # Early in the handler, perform any pre-flight "middleware" operations, such as
@@ -54,9 +52,10 @@ async def handler(request_message: 'Message') -> 'Message':
 
 
 options = Server.Options()
+options.middleware = middleware
 # Set this to False when your schema does not define union.Auth_.
 options.auth_required = False
-server = Server(schema, handler, options)
+server = Server(schema, options)
 
 
 # Wire up request/response bytes from your transport of choice

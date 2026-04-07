@@ -28,6 +28,7 @@ import {
     TelepactSchema,
     MockTelepactSchema,
     TelepactSchemaFiles,
+    ServerNext,
     TestClient,
     TestClientOptions,
 } from "telepact";
@@ -314,7 +315,7 @@ function startSchemaTestServer(
         headers: Record<string, any>,
         functionName: string,
         arguments_: Record<string, any>,
-        next,
+        next: ServerNext,
     ): Promise<Message> => {
         if (functionName !== "fn.validateSchema") {
             return new Message({}, { ErrorUnknown_: {} });
@@ -441,7 +442,7 @@ function startTestServer(
         requestHeaders: Record<string, any>,
         functionName: string,
         arguments_: Record<string, any>,
-        next,
+        next: ServerNext,
     ): Promise<Message> => {
         const requestBody = { [functionName]: arguments_ };
         const requestPseudoJson = [requestHeaders, requestBody];

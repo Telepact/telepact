@@ -167,29 +167,29 @@ func HandleMessage(
 	}
 
 	var resultMessage ServerMessage
-	next := func(headers map[string]any, nextFunctionName string, arguments map[string]any) (ServerMessage, error) {
-		switch nextFunctionName {
-		case "fn.ping_":
-			return ServerMessage{Headers: make(map[string]any), Body: map[string]any{"Ok_": map[string]any{}}}, nil
-		case "fn.api_":
-			includeInternal := boolValue(arguments["includeInternal!"])
-			includeExamples := boolValue(arguments["includeExamples!"])
-			apiDefinitions := schema.OriginalDefinitions()
-			if includeInternal {
-				apiDefinitions = schema.FullDefinitions()
-			}
-			if includeExamples {
-				apiDefinitions = GetAPIDefinitionsWithExamples(schema, includeInternal)
-			}
-			return ServerMessage{Headers: make(map[string]any), Body: map[string]any{"Ok_": map[string]any{"api": apiDefinitions}}}, nil
-		default:
+	switch functionName {
+	case "fn.ping_":
+		resultMessage = ServerMessage{Headers: make(map[string]any), Body: map[string]any{"Ok_": map[string]any{}}}
+	case "fn.api_":
+		includeInternal := boolValue(requestArguments["includeInternal!"])
+		includeExamples := boolValue(requestArguments["includeExamples!"])
+		apiDefinitions := schema.OriginalDefinitions()
+		if includeInternal {
+			apiDefinitions = schema.FullDefinitions()
+		}
+		if includeExamples {
+			apiDefinitions = GetAPIDefinitionsWithExamples(schema, includeInternal)
+		}
+		resultMessage = ServerMessage{Headers: make(map[string]any), Body: map[string]any{"Ok_": map[string]any{"api": apiDefinitions}}}
+	default:
+		next := func(headers map[string]any, nextFunctionName string, arguments map[string]any) (ServerMessage, error) {
 			return ServerMessage{}, fmt.Errorf("telepact: unknown function %s", nextFunctionName)
 		}
-	}
-	resultMessage, err = middleware(requestHeaders, functionName, requestArguments, next)
-	if err != nil {
-		invokeOnError(onError, fmt.Errorf("telepact handler failed while handling %s: %w", functionName, err))
-		return ServerMessage{Headers: cloneStringAnyMap(responseHeaders), Body: map[string]any{"ErrorUnknown_": map[string]any{}}}, nil
+		resultMessage, err = middleware(requestHeaders, functionName, requestArguments, next)
+		if err != nil {
+			invokeOnError(onError, fmt.Errorf("telepact handler failed while handling %s: %w", functionName, err))
+			return ServerMessage{Headers: cloneStringAnyMap(responseHeaders), Body: map[string]any{"ErrorUnknown_": map[string]any{}}}, nil
+		}
 	}
 
 	if resultMessage.Headers == nil {
