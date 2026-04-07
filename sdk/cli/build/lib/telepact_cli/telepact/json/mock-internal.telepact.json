@@ -1,0 +1,155 @@
+[
+  {
+    "///": "`_ext.Stub_` is the mock stub object consumed by `fn.createStub_`. It\ncontains exactly one non-internal `fn.*` matcher plus a matching `->`\nresult payload that the mock should return.\n\nSee https://raw.githubusercontent.com/Telepact/telepact/main/doc/extensions.md\nfor full `_ext.Stub_` rules and end-to-end examples.\n",
+    "_ext.Stub_": {
+    }
+  },
+  {
+    "///": "`_ext.Call_` is the mock call object used by `fn.verify_` and verification\nfailures. It contains exactly one non-internal `fn.*` key whose value is\nthat function's argument object.\n\nSee https://raw.githubusercontent.com/Telepact/telepact/main/doc/extensions.md\nfor full `_ext.Call_` rules and end-to-end examples.\n",
+    "_ext.Call_": {
+    }
+  },
+  {
+    "///": "The number of times a function is allowed to be called.",
+    "union.CallCountCriteria_": [
+      {
+        "Exact": {
+          "times": "integer"
+        }
+      },
+      {
+        "AtMost": {
+          "times": "integer"
+        }
+      },
+      {
+        "AtLeast": {
+          "times": "integer"
+        }
+      }
+    ]
+  },
+  {
+    "///": "Possible causes for a mock verification to fail.",
+    "union.VerificationFailure_": [
+      {
+        "TooFewMatchingCalls": {
+          "wanted": "union.CallCountCriteria_",
+          "found": "integer",
+          "allCalls": [
+            "_ext.Call_"
+          ]
+        }
+      },
+      {
+        "TooManyMatchingCalls": {
+          "wanted": "union.CallCountCriteria_",
+          "found": "integer",
+          "allCalls": [
+            "_ext.Call_"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "///": "Create a mock stub from an `_ext.Stub_`.\n\nBy default the stub matcher is partial, so extra fields on the actual\nrequest argument are allowed. Set `strictMatch!` to `true` to require exact\nargument equality instead.\n\nSet `count!` to limit how many matching calls consume this stub before it\nstops matching.\n",
+    "fn.createStub_": {
+      "stub": "_ext.Stub_",
+      "strictMatch!": "boolean",
+      "count!": "integer"
+    },
+    "->": [
+      {
+        "Ok_": {
+        }
+      }
+    ],
+    "_errors": "^errors\\.Validation_$"
+  },
+  {
+    "///": "Verify that the mock received a call matching the given `_ext.Call_`.\n\nBy default verification is partial and succeeds if at least one recorded\ncall contains the given argument as a JSON sub-structure. Set\n`strictMatch!` to `true` to require exact argument equality.\n\nSet `count!` to require `Exact`, `AtLeast`, or `AtMost` matching call\ncounts. Matching calls are marked as verified, which affects\n`fn.verifyNoMoreInteractions_`.\n",
+    "fn.verify_": {
+      "call": "_ext.Call_",
+      "strictMatch!": "boolean",
+      "count!": "union.CallCountCriteria_"
+    },
+    "->": [
+      {
+        "Ok_": {
+        }
+      },
+      {
+        "ErrorVerificationFailure": {
+          "reason": "union.VerificationFailure_"
+        }
+      }
+    ],
+    "_errors": "^errors\\.Validation_$"
+  },
+  {
+    "///": "Verify that no interactions have occurred with this mock or that all\ninteractions have been verified.\n",
+    "fn.verifyNoMoreInteractions_": {
+    },
+    "->": [
+      {
+        "Ok_": {
+        }
+      },
+      {
+        "ErrorVerificationFailure": {
+          "additionalUnverifiedCalls": [
+            "_ext.Call_"
+          ]
+        }
+      }
+    ],
+    "_errors": "^errors\\.Validation_$"
+  },
+  {
+    "///": "Clear all stub conditions.",
+    "fn.clearStubs_": {
+    },
+    "->": [
+      {
+        "Ok_": {
+        }
+      }
+    ],
+    "_errors": "^errors\\.Validation_$"
+  },
+  {
+    "///": "Clear all call data.",
+    "fn.clearCalls_": {
+    },
+    "->": [
+      {
+        "Ok_": {
+        }
+      }
+    ],
+    "_errors": "^errors\\.Validation_$"
+  },
+  {
+    "///": "Set the seed of the random generator.",
+    "fn.setRandomSeed_": {
+      "seed": "integer"
+    },
+    "->": [
+      {
+        "Ok_": {
+        }
+      }
+    ],
+    "_errors": "^errors\\.Validation_$"
+  },
+  {
+    "errors.Mock_": [
+      {
+        "///": "The mock could not return a result due to no matching stub being\navailable.\n",
+        "ErrorNoMatchingStub_": {
+        }
+      }
+    ]
+  }
+]
