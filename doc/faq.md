@@ -115,7 +115,8 @@ empty optional value.
 
 Telepact has several errors to communicate request invalidity with respect to
 the API schema, but there is no out-of-the-box "Bad Request" error that a server
-can raise from some custom validation logic in the server handler.
+can raise from some custom validation logic in server middleware or a function
+route.
 
 Overly generalized abstractions, such as a catch-all "Bad Request", are
 unpreferred in Telepact in favor of precise data types. Where necessary, all

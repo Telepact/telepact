@@ -5,7 +5,7 @@ Telepact keeps wire compatibility and local diagnostics separate.
 - On the wire, server-side unexpected failures still become `ErrorUnknown_`.
 - Locally, Telepact libraries now try to classify failures so application logs
   and caught exceptions say whether the problem came from parsing, validation,
-  serialization, transport, or handler logic.
+  serialization, transport, or user server logic (middleware / function routes).
 
 ## Failure Categories
 
@@ -15,7 +15,7 @@ Telepact keeps wire compatibility and local diagnostics separate.
 | `validation` | A message was decoded, but Telepact rejected headers or body data against the schema. | `telepact response validation failed ...` or `telepact response header validation failed ...` |
 | `serialization` | Telepact could not serialize or deserialize a message at the library boundary. | `telepact serialization failed ...` or `telepact client serialization or deserialization failed` |
 | `transport` | The client adapter timed out or failed while talking to the remote service. | `telepact client transport failed` or `telepact client transport timed out ...` |
-| `handler` | User server code threw while handling a valid request message. | `telepact handler failed while handling fn.someCall` |
+| `handler` | User server middleware or function-route code threw while handling a valid request message. | `telepact handler failed while handling fn.someCall` |
 
 ## Server-Side Behavior
 
@@ -59,7 +59,7 @@ For client code:
 
 1. If the wire response is `ErrorInvalid*`, fix the schema mismatch first.
 2. If the wire response is `ErrorUnknown_`, check the local Telepact error:
-   it should usually tell you whether the root cause was handler code or
+   it should usually tell you whether the root cause was middleware / function-route code or
    serialization.
 3. If the client raised before any response arrived, check whether the local
    error is `transport` or `serialization`.

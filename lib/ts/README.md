@@ -29,33 +29,26 @@ const schema = TelepactSchema.fromFileJsonMap(files.filenamesToJson);
 // The schema directory may contain multiple *.telepact.yaml and
 // *.telepact.json files. Subdirectories are rejected.
 
-const handler = async (requestMessage: Message): Promise<Message> => {
-    const functionName = Object.keys(requestMessage.body)[0];
-    const arguments = requestMessage.body[functionName];
-
-    try {
-        // Early in the handler, perform any pre-flight "middleware" operations, such as
-        // authentication, tracing, or logging.
-        log.info("Function started", {function: functionName});
-
-        // Dispatch request to appropriate function handling code.
-        // (This example uses manual dispatching, but you can also use a more advanced pattern.)
-        if (functionName == 'fn.greet') {
-            var subject = arguments['subject'];
-            return new Message({}, {Ok_: {message: `Hello ${subject}!`}});
-        }
-
-        throw new Error('Function not found');
-    } finally {
-        // At the end the handler, perform any post-flight "middleware" operations
-        log.info("Function finished", {function: functionName});
-    }
+const functionRoutes = {
+    'fn.greet': async (_headers: Record<string, any>, argument: Record<string, any>): Promise<Message> => {
+        const subject = argument['subject'];
+        return new Message({}, {Ok_: {message: `Hello ${subject}!`}});
+    },
 };
 
 const options = new ServerOptions();
 // Set this to false when your schema does not define union.Auth_.
 options.authRequired = false;
-const server = new Server(schema, handler, options);
+options.middleware = async (requestMessage: Message, functionRouter): Promise<Message> => {
+    const functionName = requestMessage.getBodyTarget();
+    try {
+        log.info("Function started", {function: functionName});
+        return await functionRouter.route(requestMessage);
+    } finally {
+        log.info("Function finished", {function: functionName});
+    }
+};
+const server = new Server(schema, functionRoutes, options);
 
 // Wire up request/response bytes from your transport of choice
 transport.receive(async (requestBytes: Uint8Array): Promise<Uint8Array> => {

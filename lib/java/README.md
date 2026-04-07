@@ -36,32 +36,26 @@ var files = new TelepactSchemaFiles("./directory/containing/api/files");
 var schema = TelepactSchema.fromFileJsonMap(files.filenamesToJson);
 // The schema directory may contain multiple *.telepact.yaml and
 // *.telepact.json files. Subdirectories are rejected.
-Function<Message, Message> handler = (requestMessage) -> {
-    var functionName = requestMessage.body.keySet().stream().findAny().orElseThrow();
-    var arguments = (Map<String, Object>) requestMessage.body.get(functionName);
-
-    try {
-        // Early in the handler, perform any pre-flight "middleware" operations, such as
-        // authentication, tracing, or logging.
-        log.info("Function started", Map.of("function", functionName));
-
-        // Dispatch request to appropriate function handling code.
-        // (This example uses manual dispatching, but you can also use a more advanced pattern.)
-        if (functionName.equals("fn.greet")) {
-            var subject = (String) arguments.get("subject");
-            return new Message(Map.of(), Map.of("Ok_", Map.of("message": "Hello %s!".formatted(subject))));
-        }
-
-        throw new RuntimeException("Function not found");
-    } finally {
-        // At the end the handler, perform any post-flight "middleware" operations
-        log.info("Function finished", Map.of("function", functionName));
+Map<String, Server.FunctionRoute> functionRoutes = Map.of(
+    "fn.greet",
+    (_headers, arguments) -> {
+        var subject = (String) arguments.get("subject");
+        return new Message(Map.of(), Map.of("Ok_", Map.of("message", "Hello %s!".formatted(subject))));
     }
-};
+);
 var options = new Server.Options();
 // Set this to false when your schema does not define union.Auth_.
 options.authRequired = false;
-var server = new Server(schema, handler, options);
+options.middleware = (requestMessage, functionRouter) -> {
+    var functionName = requestMessage.getBodyTarget();
+    try {
+        log.info("Function started", Map.of("function", functionName));
+        return functionRouter.route(requestMessage);
+    } finally {
+        log.info("Function finished", Map.of("function", functionName));
+    }
+};
+var server = new Server(schema, functionRoutes, options);
 
 
 // Wire up request/response bytes from your transport of choice

@@ -84,19 +84,13 @@ import uvicorn
 files = TelepactSchemaFiles('./api')
 schema = TelepactSchema.from_file_json_map(files.filenames_to_json)
 
-async def handler(request_message: Message) -> Message:
-    function_name = request_message.get_body_target()
-    arguments = request_message.get_body_payload()
-
-    if function_name == 'fn.greet':
-        subject = arguments['subject']
-        return Message({}, {'Ok_': {'message': f'Hello {subject}!'}})
-
-    raise Exception(f'Unknown function: {function_name}')
+async def greet(_headers: dict[str, object], arguments: dict[str, object]) -> Message:
+    subject = arguments['subject']
+    return Message({}, {'Ok_': {'message': f'Hello {subject}!'}})
 
 options = Server.Options()
 options.auth_required = False
-server = Server(schema, handler, options)
+server = Server(schema, {'fn.greet': greet}, options)
 
 async def http_handler(request):
     request_bytes = await request.body()
@@ -176,19 +170,13 @@ import uvicorn
 files = TelepactSchemaFiles('./api')
 schema = TelepactSchema.from_file_json_map(files.filenames_to_json)
 
-async def handler(request_message: Message) -> Message:
-    function_name = request_message.get_body_target()
-    arguments = request_message.get_body_payload()
-
-    if function_name == 'fn.greet':
-        subject = arguments['subject']
-        return Message({}, {'Ok_': {'message': f'Hello {subject}!'}})
-
-    raise Exception(f'Unknown function: {function_name}')
+async def greet(_headers: dict[str, object], arguments: dict[str, object]) -> Message:
+    subject = arguments['subject']
+    return Message({}, {'Ok_': {'message': f'Hello {subject}!'}})
 
 options = Server.Options()
 options.auth_required = False
-server = Server(schema, handler, options)
+server = Server(schema, {'fn.greet': greet}, options)
 
 async def websocket_handler(websocket):
     await websocket.accept()
