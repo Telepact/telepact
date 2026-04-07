@@ -327,10 +327,7 @@ public class Main {
 
         var timers = metrics.timer(frontdoorTopic);
 
-        Function<Message, Message> handler = (requestMessage) -> {
-            var requestBody = requestMessage.body;
-
-            var arg = (Map<String, Object>) requestBody.get("fn.validateSchema");
+        Map<String, Server.FunctionRoute> functionRoutes = Map.of("fn.validateSchema", (headers, arg) -> {
             var input = (Map<String, Object>) arg.get("input");
 
             var inputTag = input.keySet().iterator().next();
@@ -365,7 +362,7 @@ public class Main {
             }
 
             return new Message(Map.of(), Map.of("Ok_", Map.of()));
-        };
+        });
 
         var options = new Server.Options();
         options.onError = (e) -> {
@@ -373,7 +370,7 @@ public class Main {
             System.err.flush();
         };
         options.authRequired = false;
-        var server = new Server(telepact, handler, options);
+        var server = new Server(telepact, functionRoutes, options);
 
         var dispatcher = connection.createDispatcher((msg) -> {
             var requestBytes = msg.getData();
@@ -454,7 +451,7 @@ public class Main {
             return Map.of();
         };
 
-        Function<Message, Message> handler = (requestMessage) -> {
+        Server.Middleware middleware = (requestMessage, functionRouter) -> {
             try {
                 var requestHeaders = requestMessage.headers;
                 var requestBody = requestMessage.body;
@@ -525,16 +522,18 @@ public class Main {
             }
         };
         options.onAuth = onAuth;
+        options.middleware = middleware;
         options.authRequired = authRequired;
 
-        var server = new Server(telepact, handler, options);
+        var server = new Server(telepact, Map.of(), options);
 
         var alternateOptions = new Server.Options();
         alternateOptions.onError = (e) -> e.printStackTrace();
         alternateOptions.onAuth = onAuth;
+        alternateOptions.middleware = middleware;
         alternateOptions.authRequired = authRequired;
 
-        var alternateServer = new Server(alternateTelepact, handler, alternateOptions);
+        var alternateServer = new Server(alternateTelepact, Map.of(), alternateOptions);
 
         var dispatcher = connection.createDispatcher((msg) -> {
 

@@ -542,102 +542,144 @@ def demo_server(port: int) -> None:
 
         raise Exception(f'Invalid expression kind: {kind}')
 
-    async def handler(message: Message) -> Message:
-        function_name = next(iter(message.body.keys()))
-        arguments: dict[str, object] = cast(
-            dict[str, object], message.body[function_name])
-
+    async def add_route(headers: dict[str, object], arguments: dict[str, object]) -> Message:
         unavailable_response = _demo_unavailable_response()
         if unavailable_response is not None:
             return unavailable_response
+        x = cast(float, arguments['x'])
+        y = cast(float, arguments['y'])
+        return Message({}, {'Ok_': {'result': x + y}})
 
-        if function_name == 'fn.add':
-            x = cast(float, arguments['x'])
-            y = cast(float, arguments['y'])
-            return Message({}, {'Ok_': {'result': x + y}})
+    async def login_route(headers: dict[str, object], arguments: dict[str, object]) -> Message:
+        unavailable_response = _demo_unavailable_response()
+        if unavailable_response is not None:
+            return unavailable_response
+        username = cast(str, arguments['username'])
+        if username in session_tokens:
+            return Message({}, {'ErrorUsernameAlreadyInUse': {}})
+        token = secrets.token_urlsafe(16)
+        session_tokens[username] = token
+        usernames_by_token[token] = username
+        return Message({}, {'Ok_': {'token': token}})
 
-        if function_name == 'fn.login':
-            username = cast(str, arguments['username'])
-            if username in session_tokens:
-                return Message({}, {'ErrorUsernameAlreadyInUse': {}})
-            token = secrets.token_urlsafe(16)
-            session_tokens[username] = token
-            usernames_by_token[token] = username
-            return Message({}, {'Ok_': {'token': token}})
-
-        if function_name == 'fn.logout':
-            username = get_username(message, require_session=True)
-            requested_username = cast(str, arguments['username'])
-            if username is None:
-                return unauthenticated_response()
-            if username != requested_username:
-                return unauthorized_response('Session authentication must match the requested username.')
-            token = session_tokens.pop(username, None)
-            if token is not None:
-                usernames_by_token.pop(token, None)
-            user_variables.pop(username, None)
-            user_evaluations.pop(username, None)
-            return Message({}, {'Ok_': {}})
-
-        username = get_username(message)
+    async def logout_route(headers: dict[str, object], arguments: dict[str, object]) -> Message:
+        unavailable_response = _demo_unavailable_response()
+        if unavailable_response is not None:
+            return unavailable_response
+        message = Message(headers, {'fn.logout': arguments})
+        username = get_username(message, require_session=True)
+        requested_username = cast(str, arguments['username'])
         if username is None:
             return unauthenticated_response()
+        if username != requested_username:
+            return unauthorized_response('Session authentication must match the requested username.')
+        token = session_tokens.pop(username, None)
+        if token is not None:
+            usernames_by_token.pop(token, None)
+        user_variables.pop(username, None)
+        user_evaluations.pop(username, None)
+        return Message({}, {'Ok_': {}})
 
-        if function_name == 'fn.saveVariable':
-            get_user_variables(username)[cast(str, arguments['name'])] = cast(float, arguments['value'])
+    async def require_username(function_name: str, headers: dict[str, object], arguments: dict[str, object]) -> tuple[Message | None, str | None]:
+        unavailable_response = _demo_unavailable_response()
+        if unavailable_response is not None:
+            return unavailable_response, None
+        username = get_username(Message(headers, {function_name: arguments}))
+        if username is None:
+            return unauthenticated_response(), None
+        return None, username
+
+    async def save_variable_route(headers: dict[str, object], arguments: dict[str, object]) -> Message:
+        unavailable_response, username = await require_username('fn.saveVariable', headers, arguments)
+        if unavailable_response is not None:
+            return unavailable_response
+        get_user_variables(cast(str, username))[cast(str, arguments['name'])] = cast(float, arguments['value'])
+        return Message({}, {'Ok_': {}})
+
+    async def save_variables_route(headers: dict[str, object], arguments: dict[str, object]) -> Message:
+        unavailable_response, username = await require_username('fn.saveVariables', headers, arguments)
+        if unavailable_response is not None:
+            return unavailable_response
+        get_user_variables(cast(str, username)).update(cast(dict[str, float], arguments['variables']))
+        return Message({}, {'Ok_': {}})
+
+    async def get_variable_route(headers: dict[str, object], arguments: dict[str, object]) -> Message:
+        unavailable_response, username = await require_username('fn.getVariable', headers, arguments)
+        if unavailable_response is not None:
+            return unavailable_response
+        value = get_user_variables(cast(str, username)).get(cast(str, arguments['name']))
+        if value is None:
             return Message({}, {'Ok_': {}})
+        return Message({}, {'Ok_': {'variable!': {'name': cast(str, arguments['name']), 'value': value}}})
 
-        if function_name == 'fn.saveVariables':
-            get_user_variables(username).update(cast(dict[str, float], arguments['variables']))
-            return Message({}, {'Ok_': {}})
+    async def get_variables_route(headers: dict[str, object], arguments: dict[str, object]) -> Message:
+        unavailable_response, username = await require_username('fn.getVariables', headers, arguments)
+        if unavailable_response is not None:
+            return unavailable_response
+        variables = [
+            {'name': name, 'value': value}
+            for name, value in sorted(get_user_variables(cast(str, username)).items())
+        ]
+        return Message({}, {'Ok_': {'variables': variables}})
 
-        if function_name == 'fn.getVariable':
-            value = get_user_variables(username).get(cast(str, arguments['name']))
-            if value is None:
-                return Message({}, {'Ok_': {}})
-            return Message({}, {'Ok_': {'variable!': {'name': cast(str, arguments['name']), 'value': value}}})
+    async def delete_variable_route(headers: dict[str, object], arguments: dict[str, object]) -> Message:
+        unavailable_response, username = await require_username('fn.deleteVariable', headers, arguments)
+        if unavailable_response is not None:
+            return unavailable_response
+        get_user_variables(cast(str, username)).pop(cast(str, arguments['name']), None)
+        return Message({}, {'Ok_': {}})
 
-        if function_name == 'fn.getVariables':
-            variables = [
-                {'name': name, 'value': value}
-                for name, value in sorted(get_user_variables(username).items())
-            ]
-            return Message({}, {'Ok_': {'variables': variables}})
+    async def delete_variables_route(headers: dict[str, object], arguments: dict[str, object]) -> Message:
+        unavailable_response, username = await require_username('fn.deleteVariables', headers, arguments)
+        if unavailable_response is not None:
+            return unavailable_response
+        these_variables = get_user_variables(cast(str, username))
+        for name in cast(list[str], arguments['names']):
+            these_variables.pop(name, None)
+        return Message({}, {'Ok_': {}})
 
-        if function_name == 'fn.deleteVariable':
-            get_user_variables(username).pop(cast(str, arguments['name']), None)
-            return Message({}, {'Ok_': {}})
+    async def evaluate_route(headers: dict[str, object], arguments: dict[str, object]) -> Message:
+        unavailable_response, username = await require_username('fn.evaluate', headers, arguments)
+        if unavailable_response is not None:
+            return unavailable_response
+        expression = cast(dict[str, object], arguments['expression'])
+        result, unknown_variables, divide_by_zero = evaluate_expression(
+            expression, get_user_variables(cast(str, username)))
+        if unknown_variables:
+            record_evaluation(cast(str, username), expression, 0.0, False)
+            return Message({}, {'ErrorUnknownVariables': {'unknownVariables': unknown_variables}})
+        if divide_by_zero:
+            record_evaluation(cast(str, username), expression, 0.0, False)
+            return Message({}, {'ErrorCannotDivideByZero': {}})
+        record_evaluation(cast(str, username), expression, result, True)
+        return Message({}, {'Ok_': {
+            'result': result,
+            'saveResult': {'fn.saveVariable': {'name': 'result', 'value': result}},
+        }})
 
-        if function_name == 'fn.deleteVariables':
-            these_variables = get_user_variables(username)
-            for name in cast(list[str], arguments['names']):
-                these_variables.pop(name, None)
-            return Message({}, {'Ok_': {}})
+    async def get_paper_tape_route(headers: dict[str, object], arguments: dict[str, object]) -> Message:
+        unavailable_response, username = await require_username('fn.getPaperTape', headers, arguments)
+        if unavailable_response is not None:
+            return unavailable_response
+        limit = cast(int | None, arguments.get('limit!'))
+        evaluations = list(reversed(get_user_evaluations(cast(str, username))))
+        if limit is not None:
+            evaluations = evaluations[:limit]
+        return Message({}, {'Ok_': {'tape': evaluations}})
 
-        if function_name == 'fn.evaluate':
-            expression = cast(dict[str, object], arguments['expression'])
-            result, unknown_variables, divide_by_zero = evaluate_expression(
-                expression, get_user_variables(username))
-            if unknown_variables:
-                record_evaluation(username, expression, 0.0, False)
-                return Message({}, {'ErrorUnknownVariables': {'unknownVariables': unknown_variables}})
-            if divide_by_zero:
-                record_evaluation(username, expression, 0.0, False)
-                return Message({}, {'ErrorCannotDivideByZero': {}})
-            record_evaluation(username, expression, result, True)
-            return Message({}, {'Ok_': {
-                'result': result,
-                'saveResult': {'fn.saveVariable': {'name': 'result', 'value': result}},
-            }})
-
-        if function_name == 'fn.getPaperTape':
-            limit = cast(int | None, arguments.get('limit!'))
-            evaluations = list(reversed(get_user_evaluations(username)))
-            if limit is not None:
-                evaluations = evaluations[:limit]
-            return Message({}, {'Ok_': {'tape': evaluations}})
-
-        raise Exception(f"Invalid function: {function_name}")
+    function_routes = {
+        'fn.add': add_route,
+        'fn.login': login_route,
+        'fn.logout': logout_route,
+        'fn.saveVariable': save_variable_route,
+        'fn.saveVariables': save_variables_route,
+        'fn.getVariable': get_variable_route,
+        'fn.getVariables': get_variables_route,
+        'fn.deleteVariable': delete_variable_route,
+        'fn.deleteVariables': delete_variables_route,
+        'fn.evaluate': evaluate_route,
+        'fn.getPaperTape': get_paper_tape_route,
+    }
 
 
     telepact_json = load_calculator_telepact_json()
@@ -647,7 +689,7 @@ def demo_server(port: int) -> None:
     server_options = Server.Options()
     server_options.auth_required = True
     server_options.on_error = lambda e: print(e)
-    telepact_server = Server(telepact_schema, handler, server_options)
+    telepact_server = Server(telepact_schema, function_routes, server_options)
 
     print('Telepact Server running at /api')
 

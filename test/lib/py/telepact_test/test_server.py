@@ -245,10 +245,7 @@ async def start_schema_test_server(connection: NatsClient, metrics: CollectorReg
     timers = Summary(frontdoor_topic.replace(
         '.', '_').replace('-', '_'), '', registry=metrics)
 
-    async def handler(request_message: 'Message') -> 'Message':
-        request_body = request_message.body
-
-        arg = request_body.get("fn.validateSchema", {})
+    async def validate_schema_route(headers: dict[str, object], arg: dict[str, object]) -> 'Message':
         input = arg.get("input")
 
         input_tag = next(iter(input.keys()))
@@ -283,7 +280,7 @@ async def start_schema_test_server(connection: NatsClient, metrics: CollectorReg
     options = Server.Options()
     options.on_error = on_err
     options.auth_required = False
-    server = Server(telepact, handler, options)
+    server = Server(telepact, {"fn.validateSchema": validate_schema_route}, options)
 
     async def handle_message(msg: Msg) -> None:
         nonlocal server
@@ -386,15 +383,17 @@ async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, 
     options.on_request = on_request_err
     options.on_response = on_response_err
     options.on_auth = on_auth
+    options.middleware = lambda request_message, function_router: handler(request_message)
     options.auth_required = auth_required
 
-    server = Server(telepact, handler, options)
+    server = Server(telepact, {}, options)
     alternate_options = Server.Options()
     alternate_options.on_error = on_err
     alternate_options.on_auth = on_auth
+    alternate_options.middleware = lambda request_message, function_router: handler(request_message)
     alternate_options.auth_required = auth_required
     alternate_server = Server(
-        alternate_telepact, handler, alternate_options)
+        alternate_telepact, {}, alternate_options)
 
     async def handle_test_message(msg: Msg) -> None:
         nonlocal serve_alternate_server

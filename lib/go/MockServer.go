@@ -79,6 +79,9 @@ func NewMockServer(mockSchema *MockTelepactSchema, options *MockServerOptions) (
 	serverOptions := NewServerOptions()
 	serverOptions.OnError = options.OnError
 	serverOptions.AuthRequired = false
+	serverOptions.Middleware = func(requestMessage Message, functionRouter *FunctionRouter) (Message, error) {
+		return ms.handle(requestMessage)
+	}
 
 	telepactSchema := NewTelepactSchema(
 		mockSchema.Original,
@@ -88,7 +91,7 @@ func NewMockServer(mockSchema *MockTelepactSchema, options *MockServerOptions) (
 		mockSchema.ParsedResponseHeaders,
 	)
 
-	server, err := NewServer(telepactSchema, ms.handle, serverOptions)
+	server, err := NewServer(telepactSchema, map[string]FunctionRoute{}, serverOptions)
 	if err != nil {
 		return nil, err
 	}

@@ -25,34 +25,35 @@ options = Server.Options()
 options.auth_required = False
 
 
-async def handler(request_message: Message) -> Message:
-    if request_message.get_body_target() == 'fn.createIssueLink':
-        title = request_message.get_body_payload()['title']
-        return Message({}, {
-            'Ok_': {
-                'todo': {
-                    'title': title,
-                },
-                'next!': {
-                    'fn.getFollowUp': {
-                        'id': 'follow-up-1',
-                    },
+async def create_issue_link(headers: dict[str, object], argument: dict[str, object]) -> Message:
+    title = argument['title']
+    return Message({}, {
+        'Ok_': {
+            'todo': {
+                'title': title,
+            },
+            'next!': {
+                'fn.getFollowUp': {
+                    'id': 'follow-up-1',
                 },
             },
-        })
-
-    if request_message.get_body_target() == 'fn.getFollowUp':
-        follow_up_id = request_message.get_body_payload()['id']
-        return Message({}, {
-            'Ok_': {
-                'summary': f'Followed up on {follow_up_id}',
-            },
-        })
-
-    raise RuntimeError(f'Unknown function: {request_message.get_body_target()}')
+        },
+    })
 
 
-telepact_server = Server(schema, handler, options)
+async def get_follow_up(headers: dict[str, object], argument: dict[str, object]) -> Message:
+    follow_up_id = argument['id']
+    return Message({}, {
+        'Ok_': {
+            'summary': f'Followed up on {follow_up_id}',
+        },
+    })
+
+
+telepact_server = Server(schema, {
+    'fn.createIssueLink': create_issue_link,
+    'fn.getFollowUp': get_follow_up,
+}, options)
 
 
 def create_http_server(host: str = '127.0.0.1', port: int = 0) -> ThreadingHTTPServer:

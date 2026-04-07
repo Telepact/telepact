@@ -22,7 +22,48 @@ import (
 )
 
 // ServerHandler processes incoming Telepact messages and returns a response message.
-type ServerHandler func(Message) (Message, error)
+type FunctionRoute func(headers map[string]any, argument map[string]any) (Message, error)
+
+// Middleware wraps server-side request handling and can delegate to the supplied function router.
+type Middleware func(Message, *FunctionRouter) (Message, error)
+
+// FunctionRouter routes a request message to the configured function route for its body target.
+type FunctionRouter struct {
+	functionRoutes map[string]FunctionRoute
+}
+
+// NewFunctionRouter constructs a FunctionRouter from the supplied function routes.
+func NewFunctionRouter(functionRoutes map[string]FunctionRoute) *FunctionRouter {
+	clonedRoutes := make(map[string]FunctionRoute, len(functionRoutes))
+	for functionName, functionRoute := range functionRoutes {
+		clonedRoutes[functionName] = functionRoute
+	}
+	return &FunctionRouter{functionRoutes: clonedRoutes}
+}
+
+// Route dispatches a request message to the configured function route for its target.
+func (r *FunctionRouter) Route(requestMessage Message) (Message, error) {
+	if r == nil {
+		return Message{}, NewTelepactError("telepact: function router is nil")
+	}
+
+	functionName, err := requestMessage.BodyTarget()
+	if err != nil {
+		return Message{}, err
+	}
+
+	functionRoute, ok := r.functionRoutes[functionName]
+	if !ok || functionRoute == nil {
+		return Message{}, NewTelepactError("telepact: unknown function route for " + functionName)
+	}
+
+	argument, err := requestMessage.BodyPayload()
+	if err != nil {
+		return Message{}, err
+	}
+
+	return functionRoute(requestMessage.Headers, argument)
+}
 
 // ServerOptions configures server behaviour.
 type ServerOptions struct {
@@ -30,6 +71,7 @@ type ServerOptions struct {
 	OnRequest     func(Message)
 	OnResponse    func(Message)
 	OnAuth        func(map[string]any) map[string]any
+	Middleware    Middleware
 	AuthRequired  bool
 	Serialization Serialization
 }
@@ -41,6 +83,7 @@ func NewServerOptions() *ServerOptions {
 		OnRequest:     func(Message) {},
 		OnResponse:    func(Message) {},
 		OnAuth:        func(map[string]any) map[string]any { return map[string]any{} },
+		Middleware:    func(requestMessage Message, functionRouter *FunctionRouter) (Message, error) { return functionRouter.Route(requestMessage) },
 		AuthRequired:  true,
 		Serialization: NewDefaultSerialization(),
 	}
@@ -48,7 +91,8 @@ func NewServerOptions() *ServerOptions {
 
 // Server represents a Telepact server instance.
 type Server struct {
-	handler        ServerHandler
+	functionRouter *FunctionRouter
+	middleware     Middleware
 	onError        func(error)
 	onRequest      func(Message)
 	onResponse     func(Message)
@@ -57,13 +101,13 @@ type Server struct {
 	serializer     *Serializer
 }
 
-// NewServer constructs a Server using the supplied schema, handler, and options.
-func NewServer(telepactSchema *TelepactSchema, handler ServerHandler, options *ServerOptions) (*Server, error) {
+// NewServer constructs a Server using the supplied schema, function routes, and options.
+func NewServer(telepactSchema *TelepactSchema, functionRoutes map[string]FunctionRoute, options *ServerOptions) (*Server, error) {
 	if telepactSchema == nil {
 		return nil, NewTelepactError("telepact: schema must not be nil")
 	}
-	if handler == nil {
-		return nil, NewTelepactError("telepact: handler must not be nil")
+	if functionRoutes == nil {
+		return nil, NewTelepactError("telepact: function routes must not be nil")
 	}
 
 	if options == nil {
@@ -81,6 +125,11 @@ func NewServer(telepactSchema *TelepactSchema, handler ServerHandler, options *S
 	}
 	if options.OnAuth == nil {
 		options.OnAuth = func(map[string]any) map[string]any { return map[string]any{} }
+	}
+	if options.Middleware == nil {
+		options.Middleware = func(requestMessage Message, functionRouter *FunctionRouter) (Message, error) {
+			return functionRouter.Route(requestMessage)
+		}
 	}
 
 	serializationImpl := options.Serialization
@@ -102,7 +151,8 @@ func NewServer(telepactSchema *TelepactSchema, handler ServerHandler, options *S
 	}
 
 	return &Server{
-		handler:        handler,
+		functionRouter: NewFunctionRouter(functionRoutes),
+		middleware:     options.Middleware,
 		onError:        options.OnError,
 		onRequest:      options.OnRequest,
 		onResponse:     options.OnResponse,
@@ -143,8 +193,12 @@ func (s *Server) ProcessWithHeaders(requestMessageBytes []byte, overrideHeaders 
 		s.onResponse(NewMessage(message.Headers, message.Body))
 	}
 
-	internalHandler := func(message telepactinternal.ServerMessage) (telepactinternal.ServerMessage, error) {
-		response, err := s.handler(NewMessage(message.Headers, message.Body))
+	internalFunctionRouter := &serverFunctionRouterAdapter{
+		functionRouter: s.functionRouter,
+	}
+
+	internalMiddleware := func(message telepactinternal.ServerMessage, _ telepactinternal.FunctionRouter) (telepactinternal.ServerMessage, error) {
+		response, err := s.middleware(NewMessage(message.Headers, message.Body), s.functionRouter)
 		if err != nil {
 			return telepactinternal.ServerMessage{}, err
 		}
@@ -161,7 +215,8 @@ func (s *Server) ProcessWithHeaders(requestMessageBytes []byte, overrideHeaders 
 		internalOnRequest,
 		internalOnResponse,
 		s.onAuth,
-		internalHandler,
+		internalMiddleware,
+		internalFunctionRouter,
 	)
 	if err != nil {
 		return Response{}, err
@@ -189,4 +244,21 @@ func (s *Server) Serializer() *Serializer {
 		return nil
 	}
 	return s.serializer
+}
+
+type serverFunctionRouterAdapter struct {
+	functionRouter *FunctionRouter
+}
+
+func (a *serverFunctionRouterAdapter) Route(message telepactinternal.ServerMessage) (telepactinternal.ServerMessage, error) {
+	if a == nil || a.functionRouter == nil {
+		return telepactinternal.ServerMessage{}, NewTelepactError("telepact: function router is nil")
+	}
+
+	response, err := a.functionRouter.Route(NewMessage(message.Headers, message.Body))
+	if err != nil {
+		return telepactinternal.ServerMessage{}, err
+	}
+
+	return telepactinternal.ServerMessage{Headers: response.Headers, Body: response.Body}, nil
 }

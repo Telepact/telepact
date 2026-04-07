@@ -42,27 +42,15 @@ func buildServer() (*telepact.Server, error) {
 	options := telepact.NewServerOptions()
 	options.AuthRequired = false
 
-	return telepact.NewServer(schema, func(request telepact.Message) (telepact.Message, error) {
-		functionName, err := request.BodyTarget()
-		if err != nil {
-			return telepact.Message{}, err
-		}
-
-		arguments, err := request.BodyPayload()
-		if err != nil {
-			return telepact.Message{}, err
-		}
-
-		if functionName != "fn.greet" {
-			return telepact.Message{}, fmt.Errorf("unknown function: %s", functionName)
-		}
-
-		subject, _ := arguments["subject"].(string)
-		return telepact.NewMessage(map[string]any{}, map[string]any{
-			"Ok_": map[string]any{
-				"message": fmt.Sprintf("Hello %s from WebSocket!", subject),
-			},
-		}), nil
+	return telepact.NewServer(schema, map[string]telepact.FunctionRoute{
+		"fn.greet": func(headers map[string]any, arguments map[string]any) (telepact.Message, error) {
+			subject, _ := arguments["subject"].(string)
+			return telepact.NewMessage(map[string]any{}, map[string]any{
+				"Ok_": map[string]any{
+					"message": fmt.Sprintf("Hello %s from WebSocket!", subject),
+				},
+			}), nil
+		},
 	}, options)
 }
 

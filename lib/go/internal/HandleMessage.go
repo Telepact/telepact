@@ -28,15 +28,19 @@ func HandleMessage(
 	requestMessage ServerMessage,
 	overrideHeaders map[string]any,
 	schema SchemaAccessor,
-	handler func(ServerMessage) (ServerMessage, error),
+	middleware Middleware,
+	functionRouter FunctionRouter,
 	onError func(error),
 	onAuth func(map[string]any) map[string]any,
 ) (ServerMessage, error) {
 	if schema == nil {
 		return ServerMessage{}, fmt.Errorf("telepact: schema must not be nil")
 	}
-	if handler == nil {
-		return ServerMessage{}, fmt.Errorf("telepact: handler must not be nil")
+	if middleware == nil {
+		return ServerMessage{}, fmt.Errorf("telepact: middleware must not be nil")
+	}
+	if functionRouter == nil {
+		return ServerMessage{}, fmt.Errorf("telepact: function router must not be nil")
 	}
 
 	requestHeaders := requestMessage.Headers
@@ -187,7 +191,7 @@ func HandleMessage(
 		}
 		resultMessage = ServerMessage{Headers: make(map[string]any), Body: map[string]any{"Ok_": map[string]any{"api": apiDefinitions}}}
 	default:
-		resp, err := handler(callMessage)
+		resp, err := middleware(callMessage, functionRouter)
 		if err != nil {
 			invokeOnError(onError, fmt.Errorf("telepact handler failed while handling %s: %w", functionName, err))
 			return ServerMessage{Headers: cloneStringAnyMap(responseHeaders), Body: map[string]any{"ErrorUnknown_": map[string]any{}}}, nil

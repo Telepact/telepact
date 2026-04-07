@@ -642,13 +642,8 @@ func startSchemaTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscrip
 		return nil, err
 	}
 
-	handler := func(message telepact.Message) (telepact.Message, error) {
-		body := message.Body
-		payload, ok := body["fn.validateSchema"].(map[string]any)
-		if !ok {
-			return telepact.NewMessage(map[string]any{}, map[string]any{"ErrorUnknown_": map[string]any{}}), nil
-		}
-
+	functionRoutes := map[string]telepact.FunctionRoute{
+		"fn.validateSchema": func(headers map[string]any, payload map[string]any) (telepact.Message, error) {
 		input, ok := payload["input"].(map[string]any)
 		if !ok {
 			return telepact.NewMessage(map[string]any{}, map[string]any{"ErrorUnknown_": map[string]any{}}), nil
@@ -687,6 +682,7 @@ func startSchemaTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscrip
 		}
 
 		return telepact.NewMessage(map[string]any{}, map[string]any{"Ok_": map[string]any{}}), nil
+		},
 	}
 
 	options := telepact.NewServerOptions()
@@ -697,7 +693,7 @@ func startSchemaTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscrip
 	}
 	options.AuthRequired = false
 
-	server, err := telepact.NewServer(schema, handler, options)
+	server, err := telepact.NewServer(schema, functionRoutes, options)
 	if err != nil {
 		return nil, err
 	}
@@ -825,7 +821,7 @@ func startTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscription, 
 		}
 	}
 
-	handler := func(message telepact.Message) (telepact.Message, error) {
+	middleware := func(message telepact.Message, functionRouter *telepact.FunctionRouter) (telepact.Message, error) {
 		reqHeaders := message.Headers
 
 		if boolValue(reqHeaders["@toggleAlternateServer_"]) {
@@ -875,8 +871,9 @@ func startTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscription, 
 		}
 	}
 	options.OnAuth = onAuth
+	options.Middleware = middleware
 
-	server, err := telepact.NewServer(tele, handler, options)
+	server, err := telepact.NewServer(tele, map[string]telepact.FunctionRoute{}, options)
 	if err != nil {
 		return nil, err
 	}
@@ -889,7 +886,8 @@ func startTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscription, 
 		}
 	}
 	alternateOptions.OnAuth = onAuth
-	alternateServer, err := telepact.NewServer(alternateTele, handler, alternateOptions)
+	alternateOptions.Middleware = middleware
+	alternateServer, err := telepact.NewServer(alternateTele, map[string]telepact.FunctionRoute{}, alternateOptions)
 	if err != nil {
 		return nil, err
 	}
