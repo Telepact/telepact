@@ -17,7 +17,7 @@
 import { createServer, IncomingMessage, Server as HttpServer, ServerResponse } from 'node:http';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { Message, Server, ServerOptions, TelepactSchema, TelepactSchemaFiles } from 'telepact';
+import { FunctionRouter, Message, Server, ServerOptions, TelepactSchema, TelepactSchemaFiles } from 'telepact';
 
 const VALID_SESSION = 'demo-session';
 
@@ -50,6 +50,7 @@ export function createExampleServer(): HttpServer {
     const files = new TelepactSchemaFiles('api', fs, path);
     const schema = TelepactSchema.fromFileJsonMap(files.filenamesToJson);
     const options = new ServerOptions();
+    const functionRouter = new FunctionRouter();
     options.authRequired = false;
     options.onAuth = (headers) => {
         const auth = headers['@auth_'] as Record<string, string> | undefined;
@@ -59,24 +60,28 @@ export function createExampleServer(): HttpServer {
         return { '@userId': 'user-123' };
     };
 
-    options.middleware = async (headers, functionName, arguments_, next) => {
+    functionRouter.registerAuthenticated('fn.me', async (headers) => {
         const userId = headers['@userId'];
         if (userId !== 'user-123') {
             return new Message({}, {
                 ErrorUnauthenticated_: { 'message!': 'missing or invalid session cookie' },
             });
         }
-
-        if (functionName !== 'fn.me') {
-            throw new Error(`Unknown function: ${functionName}`);
-        }
-
         return new Message({}, {
             Ok_: { userId },
         });
+    });
+
+    options.middleware = async (requestMessage, router) => {
+        if (requestMessage.headers['@userId'] !== 'user-123') {
+            return new Message({}, {
+                ErrorUnauthenticated_: { 'message!': 'missing or invalid session cookie' },
+            });
+        }
+        return await router.route(requestMessage);
     };
 
-    const telepactServer = new Server(schema, options);
+    const telepactServer = new Server(schema, functionRouter, options);
 
     return createServer(async (request: IncomingMessage, response: ServerResponse) => {
         if (request.method !== 'POST' || request.url !== '/api/telepact') {

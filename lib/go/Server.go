@@ -35,8 +35,8 @@ type ServerOptions struct {
 // NewServerOptions constructs ServerOptions populated with defaults.
 func NewServerOptions() *ServerOptions {
 	return &ServerOptions{
-		Middleware: func(headers map[string]any, functionName string, arguments map[string]any, next ServerNext) (Message, error) {
-			return next(headers, functionName, arguments)
+		Middleware: func(requestMessage Message, functionRouter *FunctionRouter) (Message, error) {
+			return functionRouter.Route(requestMessage)
 		},
 		OnError:       func(error) {},
 		OnRequest:     func(Message) {},
@@ -49,6 +49,7 @@ func NewServerOptions() *ServerOptions {
 
 // Server represents a Telepact server instance.
 type Server struct {
+	functionRouter *FunctionRouter
 	middleware     ServerMiddleware
 	onError        func(error)
 	onRequest      func(Message)
@@ -59,9 +60,12 @@ type Server struct {
 }
 
 // NewServer constructs a Server using the supplied schema and options.
-func NewServer(telepactSchema *TelepactSchema, options *ServerOptions) (*Server, error) {
+func NewServer(telepactSchema *TelepactSchema, functionRouter *FunctionRouter, options *ServerOptions) (*Server, error) {
 	if telepactSchema == nil {
 		return nil, NewTelepactError("telepact: schema must not be nil")
+	}
+	if functionRouter == nil {
+		functionRouter = NewFunctionRouter()
 	}
 
 	if options == nil {
@@ -69,8 +73,8 @@ func NewServer(telepactSchema *TelepactSchema, options *ServerOptions) (*Server,
 	}
 
 	if options.Middleware == nil {
-		options.Middleware = func(headers map[string]any, functionName string, arguments map[string]any, next ServerNext) (Message, error) {
-			return next(headers, functionName, arguments)
+		options.Middleware = func(requestMessage Message, functionRouter *FunctionRouter) (Message, error) {
+			return functionRouter.Route(requestMessage)
 		}
 	}
 	if options.OnError == nil {
@@ -105,6 +109,7 @@ func NewServer(telepactSchema *TelepactSchema, options *ServerOptions) (*Server,
 	}
 
 	return &Server{
+		functionRouter: functionRouter,
 		middleware:     options.Middleware,
 		onError:        options.OnError,
 		onRequest:      options.OnRequest,
@@ -147,18 +152,9 @@ func (s *Server) ProcessWithHeaders(requestMessageBytes []byte, overrideHeaders 
 	}
 
 	internalMiddleware := func(
-		headers map[string]any,
-		functionName string,
-		arguments map[string]any,
-		next func(map[string]any, string, map[string]any) (telepactinternal.ServerMessage, error),
+		requestMessage telepactinternal.ServerMessage,
 	) (telepactinternal.ServerMessage, error) {
-		response, err := s.middleware(headers, functionName, arguments, func(nextHeaders map[string]any, nextFunctionName string, nextArguments map[string]any) (Message, error) {
-			internalResponse, internalErr := next(nextHeaders, nextFunctionName, nextArguments)
-			if internalErr != nil {
-				return Message{}, internalErr
-			}
-			return NewMessage(internalResponse.Headers, internalResponse.Body), nil
-		})
+		response, err := s.middleware(NewMessage(requestMessage.Headers, requestMessage.Body), s.functionRouter)
 		if err != nil {
 			return telepactinternal.ServerMessage{}, err
 		}

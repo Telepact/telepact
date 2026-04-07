@@ -21,26 +21,37 @@ if TYPE_CHECKING:
 
 
 ServerFunction = Callable[[dict[str, object], dict[str, object]], Awaitable['Message']]
-ServerNext = Callable[[dict[str, object], str, dict[str, object]], Awaitable['Message']]
-ServerMiddleware = Callable[[dict[str, object], str, dict[str, object], ServerNext], Awaitable['Message']]
+ServerMiddleware = Callable[['Message', 'FunctionRouter'], Awaitable['Message']]
 
 
 class FunctionRouter:
     def __init__(self) -> None:
-        self._functions: dict[str, ServerFunction] = {}
+        self._functions: dict[str, tuple[bool, ServerFunction]] = {}
 
     def register(self, function_name: str, handler: ServerFunction) -> 'FunctionRouter':
-        self._functions[function_name] = handler
+        return self.register_unauthenticated(function_name, handler)
+
+    def register_unauthenticated(self, function_name: str, handler: ServerFunction) -> 'FunctionRouter':
+        self._functions[function_name] = (False, handler)
         return self
 
-    async def middleware(
-        self,
-        headers: dict[str, object],
-        function_name: str,
-        arguments: dict[str, object],
-        next: ServerNext,
-    ) -> 'Message':
-        handler = self._functions.get(function_name)
-        if handler is not None:
-            return await handler(headers, arguments)
-        return await next(headers, function_name, arguments)
+    def register_authenticated(self, function_name: str, handler: ServerFunction) -> 'FunctionRouter':
+        self._functions[function_name] = (True, handler)
+        return self
+
+    async def route(self, request_message: 'Message') -> 'Message':
+        from .Message import Message
+
+        function_name = request_message.get_body_target()
+        arguments = request_message.get_body_payload()
+        registration = self._functions.get(function_name)
+        if registration is None:
+            raise RuntimeError(f"Unknown function: {function_name}")
+        authenticated, handler = registration
+        if authenticated:
+            auth_result = request_message.headers.get('@result')
+            if auth_result is not None:
+                return Message({}, cast(dict[str, object], auth_result))
+            if '@auth_' not in request_message.headers:
+                return Message({}, {'ErrorUnauthenticated_': {'message!': 'Valid authentication is required.'}})
+        return await handler(request_message.headers, arguments)

@@ -16,26 +16,14 @@ func newCodeGenHandler(enabled bool) *codeGenHandler {
 		return nil
 	}
 	impl := &typedCodeGenServer{}
-	return &codeGenHandler{handler: gen.NewTypedServerHandler(impl, nil)}
+	return &codeGenHandler{handler: gen.NewTypedServerHandler(impl)}
 }
 
-func (c *codeGenHandler) Middleware(headers map[string]any, functionName string, arguments map[string]any, next telepact.ServerNext) (telepact.Message, error) {
+func (c *codeGenHandler) Register(functionRouter *telepact.FunctionRouter) *telepact.FunctionRouter {
 	if c == nil || c.handler == nil {
-		return next(headers, functionName, arguments)
+		return functionRouter
 	}
-
-	response, err := c.handler.Middleware(headers, functionName, arguments, next)
-	if err != nil {
-		return telepact.Message{}, err
-	}
-
-	responseHeaders := response.Headers
-	if responseHeaders == nil {
-		responseHeaders = map[string]any{}
-	}
-	responseHeaders["@codegens_"] = true
-
-	return telepact.NewMessage(responseHeaders, response.Body), nil
+	return c.handler.Register(functionRouter)
 }
 
 type typedCodeGenServer struct{}

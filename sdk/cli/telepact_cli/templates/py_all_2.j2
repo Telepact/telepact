@@ -362,14 +362,11 @@ class TypedClient:
     {% endfor %}
 
 class TypedServerHandler:
-    def __init__(self, router: telepact.FunctionRouter | None = None) -> None:
-        self.router = router or telepact.FunctionRouter()
-        self._register(self.router)
-
-    def _register(self, router: telepact.FunctionRouter) -> None:
+    def register(self, router: telepact.FunctionRouter) -> telepact.FunctionRouter:
         {%- for fn in functions %}
-        router.register("{{ fn }}", self._handle_{{ fn | replace('fn.', '') }})
+        router.{{ 'register_authenticated' if auth_enabled else 'register_unauthenticated' }}("{{ fn }}", self._handle_{{ fn | replace('fn.', '') }})
         {% endfor %}
+        return router
 
     {%- for fn in functions %}
     {%- set function_name = fn | replace('fn.', '') %}
@@ -383,12 +380,3 @@ class TypedServerHandler:
         response_headers, {{ function_name }}_output = await self.{{ function_name }}(headers, {{ function_name }}.Input({"{{ fn }}": arguments}))
         return telepact.Message(response_headers, {{ function_name }}_output.pseudo_json)
     {% endfor %}
-
-    async def middleware(
-        self,
-        headers: dict[str, object],
-        function_name: str,
-        arguments: dict[str, object],
-        next: telepact.ServerNext,
-    ) -> telepact.Message:
-        return await self.router.middleware(headers, function_name, arguments, next)

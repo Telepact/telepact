@@ -31,8 +31,8 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import io.github.telepact.FunctionRouter;
 import io.github.telepact.ServerMiddleware;
-import io.github.telepact.ServerNext;
 import io.github.telepact.Message;
 import io.github.telepact.TelepactError;
 import io.github.telepact.TelepactSchema;
@@ -43,7 +43,7 @@ import io.github.telepact.internal.validation.ValidateContext;
 import io.github.telepact.internal.validation.ValidationFailure;
 
 public class HandleMessage {
-    static Message handleMessage(Message requestMessage, Map<String, Object> overrideHeaders, TelepactSchema telepactSchema, ServerMiddleware middleware,
+    static Message handleMessage(Message requestMessage, Map<String, Object> overrideHeaders, TelepactSchema telepactSchema, FunctionRouter functionRouter, ServerMiddleware middleware,
             Consumer<Throwable> onError, Function<Map<String, Object>, Map<String, Object>> onAuth) {
         final var responseHeaders = (Map<String, Object>) new HashMap<String, Object>();
         final Map<String, Object> requestHeaders = requestMessage.headers;
@@ -163,12 +163,7 @@ public class HandleMessage {
                             : includeInternal ? telepactSchema.full : telepactSchema.original)));
         } else {
             try {
-                resultMessage = middleware.apply(requestHeaders, functionName, requestPayload, new ServerNext() {
-                    @Override
-                    public Message apply(Map<String, Object> headers, String nextFunctionName, Map<String, Object> arguments) {
-                        throw new IllegalArgumentException("Unknown function: " + nextFunctionName);
-                    }
-                });
+                resultMessage = middleware.apply(new Message(requestHeaders, Map.of(functionName, requestPayload)), functionRouter);
             } catch (Throwable e) {
                 try {
                     onError.accept(new TelepactError(

@@ -17,40 +17,50 @@
 import { Message } from './Message.js';
 
 export type ServerFunction = (headers: Record<string, any>, arguments_: Record<string, any>) => Promise<Message>;
-export type ServerNext = (
-    headers: Record<string, any>,
-    functionName: string,
-    arguments_: Record<string, any>,
-) => Promise<Message>;
-export type ServerMiddleware = (
-    headers: Record<string, any>,
-    functionName: string,
-    arguments_: Record<string, any>,
-    next: ServerNext,
-) => Promise<Message>;
+export type ServerMiddleware = (requestMessage: Message, functionRouter: FunctionRouter) => Promise<Message>;
+
+type RegisteredFunction = {
+    authenticated: boolean;
+    handler: ServerFunction;
+};
 
 export class FunctionRouter {
-    private readonly functions: Map<string, ServerFunction>;
+    private readonly functions: Map<string, RegisteredFunction>;
 
     constructor() {
-        this.functions = new Map<string, ServerFunction>();
+        this.functions = new Map<string, RegisteredFunction>();
     }
 
     register(functionName: string, handler: ServerFunction): FunctionRouter {
-        this.functions.set(functionName, handler);
+        return this.registerUnauthenticated(functionName, handler);
+    }
+
+    registerUnauthenticated(functionName: string, handler: ServerFunction): FunctionRouter {
+        this.functions.set(functionName, { authenticated: false, handler });
         return this;
     }
 
-    async middleware(
-        headers: Record<string, any>,
-        functionName: string,
-        arguments_: Record<string, any>,
-        next: ServerNext,
-    ): Promise<Message> {
-        const handler = this.functions.get(functionName);
-        if (handler !== undefined) {
-            return await handler(headers, arguments_);
+    registerAuthenticated(functionName: string, handler: ServerFunction): FunctionRouter {
+        this.functions.set(functionName, { authenticated: true, handler });
+        return this;
+    }
+
+    async route(requestMessage: Message): Promise<Message> {
+        const functionName = requestMessage.getBodyTarget();
+        const arguments_ = requestMessage.getBodyPayload();
+        const registration = this.functions.get(functionName);
+        if (registration === undefined) {
+            throw new Error(`Unknown function: ${functionName}`);
         }
-        return await next(headers, functionName, arguments_);
+        if (registration.authenticated) {
+            const authResult = requestMessage.headers['@result'];
+            if (authResult !== undefined) {
+                return new Message({}, authResult as Record<string, any>);
+            }
+            if (!('@auth_' in requestMessage.headers)) {
+                return new Message({}, { ErrorUnauthenticated_: { 'message!': 'Valid authentication is required.' } });
+            }
+        }
+        return await registration.handler(requestMessage.headers, arguments_);
     }
 }

@@ -327,11 +327,8 @@ public class Main {
 
         var timers = metrics.timer(frontdoorTopic);
 
-        var handler = (io.github.telepact.ServerMiddleware) (headers, functionName, arguments, next) -> {
-            if (!"fn.validateSchema".equals(functionName)) {
-                return new Message(Map.of(), Map.of("ErrorUnknown_", Map.of()));
-            }
-
+        var functionRouter = new io.github.telepact.FunctionRouter();
+        functionRouter.registerUnauthenticated("fn.validateSchema", (headers, arguments) -> {
             var arg = arguments;
             var input = (Map<String, Object>) arg.get("input");
 
@@ -367,16 +364,15 @@ public class Main {
             }
 
             return new Message(Map.of(), Map.of("Ok_", Map.of()));
-        };
+        });
 
         var options = new Server.Options();
-        options.middleware = handler;
         options.onError = (e) -> {
             e.printStackTrace();
             System.err.flush();
         };
         options.authRequired = false;
-        var server = new Server(telepact, options);
+        var server = new Server(telepact, functionRouter, options);
 
         var dispatcher = connection.createDispatcher((msg) -> {
             var requestBytes = msg.getData();
@@ -429,6 +425,10 @@ public class Main {
         var serveAlternateServer = new AtomicBoolean();
 
         CodeGenHandler codeGenHandler = new CodeGenHandler();
+        var functionRouter = new io.github.telepact.FunctionRouter();
+        if (useCodeGen) {
+            codeGenHandler.register(functionRouter);
+        }
 
         class ThisError extends RuntimeException {
         }
@@ -457,9 +457,10 @@ public class Main {
             return Map.of();
         };
 
-        var handler = (io.github.telepact.ServerMiddleware) (requestHeaders, functionName, arguments, next) -> {
+        var handler = (io.github.telepact.ServerMiddleware) (requestMessage, functionRouterParam) -> {
             try {
-                var requestBody = Map.of(functionName, arguments);
+                var requestHeaders = requestMessage.headers;
+                var requestBody = requestMessage.body;
                 var requestPseudoJson = List.of(requestHeaders, requestBody);
 
                 var requestBytes = objectMapper.writeValueAsBytes(requestPseudoJson);
@@ -467,9 +468,11 @@ public class Main {
                 Message message;
                 if (useCodeGen) {
                     System.out.println("     :H %s".formatted(objectMapper.writeValueAsString(requestPseudoJson)));
-                    message = codeGenHandler.middleware(requestHeaders, functionName, arguments, next);
+                    message = functionRouterParam.route(requestMessage);
                     message.headers.put("@codegens_", true);
                 } else {
+                    var functionName = requestMessage.getBodyTarget();
+                    var arguments = requestMessage.getBodyPayload();
                     System.out.println("    <-s %s".formatted(new String(requestBytes)));
                     System.out.flush();
 
@@ -530,7 +533,7 @@ public class Main {
         options.onAuth = onAuth;
         options.authRequired = authRequired;
 
-        var server = new Server(telepact, options);
+        var server = new Server(telepact, functionRouter, options);
 
         var alternateOptions = new Server.Options();
         alternateOptions.middleware = handler;
@@ -538,7 +541,7 @@ public class Main {
         alternateOptions.onAuth = onAuth;
         alternateOptions.authRequired = authRequired;
 
-        var alternateServer = new Server(alternateTelepact, alternateOptions);
+        var alternateServer = new Server(alternateTelepact, functionRouter, alternateOptions);
 
         var dispatcher = connection.createDispatcher((msg) -> {
 

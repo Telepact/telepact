@@ -35,7 +35,7 @@ import json
 from nats.aio.client import Client as NATSClient, Subscription
 import asyncio
 import nats
-from telepact import SerializationError, Message, Serializer, Client, Server, TelepactSchema, MockTelepactSchema, MockServer, TelepactSchemaFiles, TelepactSchemaParseError, TestClient
+from telepact import FunctionRouter, SerializationError, Message, Serializer, Client, Server, TelepactSchema, MockTelepactSchema, MockServer, TelepactSchemaFiles, TelepactSchemaParseError, TestClient
 import traceback
 import sys
 from concurrent.futures import ThreadPoolExecutor
@@ -245,10 +245,7 @@ async def start_schema_test_server(connection: NatsClient, metrics: CollectorReg
     timers = Summary(frontdoor_topic.replace(
         '.', '_').replace('-', '_'), '', registry=metrics)
 
-    async def handler(headers: dict[str, object], function_name: str, arguments: dict[str, object], next) -> 'Message':
-        if function_name != "fn.validateSchema":
-            return Message({}, {"ErrorUnknown_": {}})
-
+    async def handler(headers: dict[str, object], arguments: dict[str, object]) -> 'Message':
         arg = arguments
         input = arg.get("input")
 
@@ -281,11 +278,12 @@ async def start_schema_test_server(connection: NatsClient, metrics: CollectorReg
 
         return Message({}, {"Ok_": {}})
 
+    function_router = FunctionRouter()
+    function_router.register_unauthenticated('fn.validateSchema', handler)
     options = Server.Options()
-    options.middleware = handler
     options.on_error = on_err
     options.auth_required = False
-    server = Server(telepact, options)
+    server = Server(telepact, function_router, options)
 
     async def handle_message(msg: Msg) -> None:
         nonlocal server
@@ -329,18 +327,21 @@ async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, 
     serve_alternate_server = False
 
     code_gen_handler = CodeGenHandler()
+    function_router = FunctionRouter()
+    if use_codegen:
+        code_gen_handler.register(function_router)
 
     executor = ThreadPoolExecutor()
 
     class ThisError(RuntimeError):
         pass
 
-    async def handler(headers: dict[str, object], function_name: str, arguments: dict[str, object], next) -> 'Message':
+    async def handler(request_message: 'Message', function_router: FunctionRouter) -> 'Message':
         nonlocal serve_alternate_server
         nonlocal executor
 
-        request_headers = headers
-        request_body = {function_name: arguments}
+        request_headers = request_message.headers
+        request_body = request_message.body
         request_pseudo_json = [request_headers, request_body]
 
         def default_serializer(obj):
@@ -352,7 +353,7 @@ async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, 
 
         if use_codegen:
             print(f"     :H {request_bytes}")
-            message = await code_gen_handler.middleware(headers, function_name, arguments, next)
+            message = await function_router.route(request_message)
             message.headers['@codegens_'] = True
         else:
             print(f"    <-s {request_bytes}")
@@ -391,14 +392,14 @@ async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, 
     options.on_auth = on_auth
     options.auth_required = auth_required
 
-    server = Server(telepact, options)
+    server = Server(telepact, function_router, options)
     alternate_options = Server.Options()
     alternate_options.middleware = handler
     alternate_options.on_error = on_err
     alternate_options.on_auth = on_auth
     alternate_options.auth_required = auth_required
     alternate_server = Server(
-        alternate_telepact, alternate_options)
+        alternate_telepact, function_router, alternate_options)
 
     async def handle_test_message(msg: Msg) -> None:
         nonlocal serve_alternate_server

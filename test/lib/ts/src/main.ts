@@ -20,6 +20,7 @@ import {
     ClientOptions,
     Server,
     ServerOptions,
+    FunctionRouter,
     Message,
     SerializationError,
     Serializer,
@@ -28,7 +29,6 @@ import {
     TelepactSchema,
     MockTelepactSchema,
     TelepactSchemaFiles,
-    ServerNext,
     TestClient,
     TestClientOptions,
 } from "telepact";
@@ -311,16 +311,8 @@ function startSchemaTestServer(
 
     const timer = registry.createTimer(frontdoorTopic);
 
-    const handler = async (
-        headers: Record<string, any>,
-        functionName: string,
-        arguments_: Record<string, any>,
-        next: ServerNext,
-    ): Promise<Message> => {
-        if (functionName !== "fn.validateSchema") {
-            return new Message({}, { ErrorUnknown_: {} });
-        }
-
+    const functionRouter = new FunctionRouter();
+    functionRouter.registerUnauthenticated("fn.validateSchema", async (_headers: Record<string, any>, arguments_: Record<string, any>): Promise<Message> => {
         const arg: { [key: string]: any } = arguments_;
 
         const input: { [key: string]: any } = arg["input"];
@@ -361,14 +353,13 @@ function startSchemaTestServer(
         }
 
         return new Message({}, { Ok_: {} });
-    };
+    });
 
     const options: ServerOptions = new ServerOptions();
-    options.middleware = handler;
     options.onError = (e: Error) => console.error(e);
     options.authRequired = false;
 
-    const server: Server = new Server(telepact, options);
+    const server: Server = new Server(telepact, functionRouter, options);
 
     const sub: Subscription = connection.subscribe(frontdoorTopic);
     (async () => {
@@ -421,6 +412,10 @@ function startTestServer(
     const serveAlternateServer = { value: false };
 
     const codeGenHandler = new CodeGenHandler();
+    const functionRouter = new FunctionRouter();
+    if (useCodegen) {
+        codeGenHandler.register(functionRouter);
+    }
 
     class ThisError extends Error {}
 
@@ -438,13 +433,9 @@ function startTestServer(
         return {};
     };
 
-    const handler = async (
-        requestHeaders: Record<string, any>,
-        functionName: string,
-        arguments_: Record<string, any>,
-        next: ServerNext,
-    ): Promise<Message> => {
-        const requestBody = { [functionName]: arguments_ };
+    const handler = async (requestMessage: Message, functionRouter: FunctionRouter): Promise<Message> => {
+        const requestHeaders = requestMessage.headers;
+        const requestBody = requestMessage.body;
         const requestPseudoJson = [requestHeaders, requestBody];
         const requestJson = JSON.stringify(requestPseudoJson, uint8ArrayToBase64Replacer);
         const requestBytes = new TextEncoder().encode(requestJson);
@@ -452,7 +443,7 @@ function startTestServer(
         let message: Message;
         if (useCodegen) {
             console.log(`     :H ${new TextDecoder().decode(requestBytes)}`);
-            message = await codeGenHandler.middleware(requestHeaders, functionName, arguments_, next);
+            message = await functionRouter.route(requestMessage);
             message.headers["@codegens_"] = true;
         } else {
             console.log(`    <-s ${new TextDecoder().decode(requestBytes)}`);
@@ -500,14 +491,14 @@ function startTestServer(
     options.onAuth = onAuth;
     options.authRequired = authRequired;
 
-    const server: Server = new Server(telepact, options);
+    const server: Server = new Server(telepact, functionRouter, options);
 
     const alternateOptions = new ServerOptions();
     alternateOptions.middleware = handler;
     alternateOptions.onError = (e) => console.error(e);
     alternateOptions.onAuth = onAuth;
     alternateOptions.authRequired = authRequired;
-    const alternateServer: Server = new Server(alternateTelepact, alternateOptions);
+    const alternateServer: Server = new Server(alternateTelepact, functionRouter, alternateOptions);
 
     const subscription: Subscription = connection.subscribe(frontdoorTopic);
     (async () => {

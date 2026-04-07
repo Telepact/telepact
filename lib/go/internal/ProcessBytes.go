@@ -28,7 +28,7 @@ func ProcessBytes(
 	onRequest func(ServerMessage),
 	onResponse func(ServerMessage),
 	onAuth func(map[string]any) map[string]any,
-	middleware func(map[string]any, string, map[string]any, func(map[string]any, string, map[string]any) (ServerMessage, error)) (ServerMessage, error),
+	middleware func(ServerMessage) (ServerMessage, error),
 ) (ServerMessage, []byte, error) {
 	requestMessage, err := ParseRequestMessage(requestMessageBytes, deserialize, schema, onError)
 	if err != nil {

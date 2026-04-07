@@ -22,7 +22,7 @@ import { RandomGenerator } from './RandomGenerator.js';
 import { mockHandle } from './internal/mock/MockHandle.js';
 import { MockTelepactSchema } from './MockTelepactSchema.js';
 import { Response } from './Response.js';
-import { ServerNext } from './FunctionRouter.js';
+import { FunctionRouter } from './FunctionRouter.js';
 import { Message } from './Message.js';
 
 export class MockServer {
@@ -51,8 +51,9 @@ export class MockServer {
             mockTelepactSchema.parsedResponseHeaders,
         );
 
+        const functionRouter = new FunctionRouter();
         serverOptions.middleware = this.handle;
-        this.server = new Server(telepactSchema, serverOptions);
+        this.server = new Server(telepactSchema, functionRouter, serverOptions);
     }
 
     private random: RandomGenerator;
@@ -74,13 +75,11 @@ export class MockServer {
     }
 
     private handle = async (
-        headers: Record<string, any>,
-        functionName: string,
-        arguments_: Record<string, any>,
-        next: ServerNext,
+        requestMessage: Message,
+        _functionRouter: FunctionRouter,
     ): Promise<any> => {
         return await mockHandle(
-            new Message(headers, { [functionName]: arguments_ }),
+            requestMessage,
             this.stubs,
             this.invocations,
             this.random,

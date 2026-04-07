@@ -20,5 +20,5 @@ import java.util.Map;
 
 @FunctionalInterface
 public interface ServerMiddleware {
-    Message apply(Map<String, Object> headers, String functionName, Map<String, Object> arguments, ServerNext next);
+    Message apply(Message requestMessage, FunctionRouter functionRouter);
 }

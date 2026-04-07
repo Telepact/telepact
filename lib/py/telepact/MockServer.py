@@ -45,6 +45,7 @@ class MockServer:
         from .Server import Server
         from .RandomGenerator import RandomGenerator
         from .TelepactSchema import TelepactSchema
+        from .FunctionRouter import FunctionRouter
 
         self.random: RandomGenerator = RandomGenerator(
             options.generated_collection_length_min, options.generated_collection_length_max)
@@ -59,12 +60,13 @@ class MockServer:
         server_options.on_error = options.on_error
         server_options.auth_required = False
         server_options.middleware = self._handle
+        function_router = FunctionRouter()
 
         telepact_schema = TelepactSchema(mock_telepact_schema.original, mock_telepact_schema.full, mock_telepact_schema.parsed,
                                         mock_telepact_schema.parsed_request_headers, mock_telepact_schema.parsed_response_headers)
 
         self.server = Server(
-            telepact_schema, server_options)
+            telepact_schema, function_router, server_options)
 
     async def process(self, message: bytes) -> bytes:
         """
@@ -75,9 +77,8 @@ class MockServer:
         """
         return await self.server.process(message)
 
-    async def _handle(self, headers: dict[str, object], function_name: str, arguments: dict[str, object], next) -> 'Message':
+    async def _handle(self, request_message: 'Message', function_router: 'FunctionRouter') -> 'Message':
         from .internal.mock.MockHandle import mock_handle
-        from .Message import Message
-        return await mock_handle(Message(headers, {function_name: arguments}), self.stubs, self.invocations, self.random,
-                                  self.server.telepact_schema, self.enableGeneratedDefaultStub,
-                                  self.enable_optional_field_generation, self.randomize_optional_field_generation)
+        return await mock_handle(request_message, self.stubs, self.invocations, self.random,
+                                   self.server.telepact_schema, self.enableGeneratedDefaultStub,
+                                   self.enable_optional_field_generation, self.randomize_optional_field_generation)

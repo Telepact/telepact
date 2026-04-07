@@ -80,6 +80,7 @@ func NewMockServer(mockSchema *MockTelepactSchema, options *MockServerOptions) (
 	serverOptions.Middleware = ms.handle
 	serverOptions.OnError = options.OnError
 	serverOptions.AuthRequired = false
+	functionRouter := NewFunctionRouter()
 
 	telepactSchema := NewTelepactSchema(
 		mockSchema.Original,
@@ -89,7 +90,7 @@ func NewMockServer(mockSchema *MockTelepactSchema, options *MockServerOptions) (
 		mockSchema.ParsedResponseHeaders,
 	)
 
-	server, err := NewServer(telepactSchema, serverOptions)
+	server, err := NewServer(telepactSchema, functionRouter, serverOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -107,15 +108,24 @@ func (ms *MockServer) Process(message []byte) (Response, error) {
 	return ms.server.Process(message)
 }
 
-func (ms *MockServer) handle(headers map[string]any, functionName string, argument map[string]any, next ServerNext) (Message, error) {
+func (ms *MockServer) handle(requestMessage Message, functionRouter *FunctionRouter) (Message, error) {
 	if ms == nil {
 		return Message{}, NewTelepactError("telepact: mock server is nil")
 	}
+	functionName, err := requestMessage.BodyTarget()
+	if err != nil {
+		return Message{}, err
+	}
+	arguments, err := requestMessage.BodyPayload()
+	if err != nil {
+		return Message{}, err
+	}
+	_ = functionRouter
 
 	responseHeaders, responseBody, handleErr := mock.MockHandle(
-		headers,
+		requestMessage.Headers,
 		functionName,
-		argument,
+		arguments,
 		&ms.stubs,
 		&ms.invocations,
 		ms.random,

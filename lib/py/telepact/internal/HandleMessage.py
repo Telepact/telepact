@@ -20,7 +20,7 @@ from ..internal.binary.ServerBase64Decode import server_base64_decode
 
 from ..Message import Message
 from ..TelepactError import TelepactError
-from ..FunctionRouter import ServerMiddleware, ServerNext
+from ..FunctionRouter import FunctionRouter, ServerMiddleware
 from .GetApiDefinitionsWithExamples import get_api_definitions_with_examples
 from .types.TTypeDeclaration import TTypeDeclaration
 
@@ -34,6 +34,7 @@ async def handle_message(
     request_message: 'Message',
     override_headers: dict[str, object],
     telepact_schema: 'TelepactSchema',
+    function_router: FunctionRouter,
     middleware: ServerMiddleware,
     on_error: Callable[[Exception], None],
     on_auth: Callable[[dict[str, object]], dict[str, object]],
@@ -175,15 +176,8 @@ async def handle_message(
         )
         result_message = Message({}, {"Ok_": {"api": api_definitions}})
     else:
-        async def next_handler(
-            headers: dict[str, object],
-            next_function_name: str,
-            arguments: dict[str, object],
-        ) -> 'Message':
-            raise RuntimeError(f"Unknown function: {next_function_name}")
-
         try:
-            result_message = await middleware(request_headers, function_name, request_payload, next_handler)
+            result_message = await middleware(Message(request_headers, {function_name: request_payload}), function_router)
         except Exception as e:
             try:
                 on_error(

@@ -41,7 +41,7 @@ import time
 import secrets
 import random
 import uvicorn
-from .telepact import Client, Server, Message, Serializer, TelepactSchema, MockTelepactSchema, MockServer, SerializationError
+from .telepact import Client, FunctionRouter, Server, Message, Serializer, TelepactSchema, MockTelepactSchema, MockServer, SerializationError
 import asyncio
 import requests
 
@@ -253,6 +253,8 @@ def _generate_internal(schema_data: list[dict[str, object]], possible_fn_selects
                 results = cast(list[dict[str, object]], schema_entry['->'])
                 results.extend(errors)
 
+    auth_enabled = any(_find_schema_key(schema_entry) == 'union.Auth_' for schema_entry in schema_data)
+
     if target == "java":
 
         functions: list[str] = []
@@ -288,13 +290,13 @@ def _generate_internal(schema_data: list[dict[str, object]], possible_fn_selects
                 functions.append(schema_key)
 
             _write_java_file('java_type_2.j2', {
-                'package': package_name, 'data': schema_entry, 'possible_fn_selects': possible_fn_selects}, f"{schema_key.split('.')[1]}.java")
+                'package': package_name, 'data': schema_entry, 'possible_fn_selects': possible_fn_selects, 'auth_enabled': auth_enabled}, f"{schema_key.split('.')[1]}.java")
 
         _write_java_file('java_server.j2', {
-                         'package': package_name, 'functions': functions, 'possible_fn_selects': possible_fn_selects}, f"TypedServerHandler.java")
+                         'package': package_name, 'functions': functions, 'possible_fn_selects': possible_fn_selects, 'auth_enabled': auth_enabled}, f"TypedServerHandler.java")
 
         _write_java_file('java_client.j2', {
-                         'package': package_name, 'functions': functions, 'possible_fn_selects': possible_fn_selects}, f"TypedClient.java")
+                         'package': package_name, 'functions': functions, 'possible_fn_selects': possible_fn_selects, 'auth_enabled': auth_enabled}, f"TypedClient.java")
 
         _write_java_file('java_utility.j2', {
                          'package': package_name}, f"Utility_.java")
@@ -322,7 +324,8 @@ def _generate_internal(schema_data: list[dict[str, object]], possible_fn_selects
         output = type_template.render({
             'input': schema_entries,
             'functions': functions,
-            'possible_fn_selects': possible_fn_selects
+            'possible_fn_selects': possible_fn_selects,
+            'auth_enabled': auth_enabled,
         })
 
         # Write the output to a file
@@ -368,7 +371,8 @@ def _generate_internal(schema_data: list[dict[str, object]], possible_fn_selects
         output = ts_type_template.render({
             'input': ts_schema_entries,
             'functions': functions,
-            'possible_fn_selects': possible_fn_selects
+            'possible_fn_selects': possible_fn_selects,
+            'auth_enabled': auth_enabled,
         })
 
         # Write the output to a file
@@ -448,6 +452,7 @@ def _generate_internal(schema_data: list[dict[str, object]], possible_fn_selects
             'entries': go_entries,
             'functions': go_functions,
             'possible_fn_selects': possible_fn_selects,
+            'auth_enabled': auth_enabled,
         })
 
         if output_dir:
@@ -645,13 +650,14 @@ def demo_server(port: int) -> None:
     telepact_schema = TelepactSchema.from_json(telepact_json)
 
     server_options = Server.Options()
+    function_router = FunctionRouter()
     server_options.auth_required = True
     server_options.on_error = lambda e: print(e)
-    async def middleware(headers: dict[str, object], function_name: str, arguments: dict[str, object], next) -> Message:
-        return await handler(Message(headers, {function_name: arguments}))
+    async def middleware(request_message: Message, function_router: FunctionRouter) -> Message:
+        return await handler(request_message)
 
     server_options.middleware = middleware
-    telepact_server = Server(telepact_schema, server_options)
+    telepact_server = Server(telepact_schema, function_router, server_options)
 
     print('Telepact Server running at /api')
 

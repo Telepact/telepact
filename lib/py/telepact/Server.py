@@ -20,7 +20,7 @@ from .DefaultSerialization import DefaultSerialization
 from .Serializer import Serializer
 from .internal.binary.ServerBinaryEncoder import ServerBinaryEncoder
 from .internal.binary.ServerBase64Encoder import ServerBase64Encoder
-from .FunctionRouter import ServerMiddleware
+from .FunctionRouter import FunctionRouter, ServerMiddleware
 
 if TYPE_CHECKING:
     from .Message import Message
@@ -37,13 +37,8 @@ class Server:
         """
 
         def __init__(self) -> None:
-            async def default_middleware(
-                headers: dict[str, object],
-                function_name: str,
-                arguments: dict[str, object],
-                next,
-            ) -> 'Message':
-                return await next(headers, function_name, arguments)
+            async def default_middleware(request_message: 'Message', function_router: FunctionRouter) -> 'Message':
+                return await function_router.route(request_message)
 
             self.middleware: ServerMiddleware = default_middleware
             self.on_error = lambda e: None
@@ -53,12 +48,13 @@ class Server:
             self.auth_required = True
             self.serialization = DefaultSerialization()
 
-    def __init__(self, telepact_schema: 'TelepactSchema', options: Options):
+    def __init__(self, telepact_schema: 'TelepactSchema', function_router: FunctionRouter, options: Options):
         """
         Create a server with the given telepact schema and options.
         """
         from .internal.binary.ConstructBinaryEncoding import construct_binary_encoding
 
+        self.function_router = function_router
         self.middleware = options.middleware
         self.on_error = options.on_error
         self.on_request = options.on_request
@@ -84,4 +80,4 @@ class Server:
         from .internal.ProcessBytes import process_bytes
 
         return await process_bytes(request_message_bytes, override_headers, self.serializer, self.telepact_schema, self.on_error,
-                                   self.on_request, self.on_response, self.on_auth, self.middleware)
+                                   self.on_request, self.on_response, self.on_auth, self.function_router, self.middleware)

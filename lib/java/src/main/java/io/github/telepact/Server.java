@@ -51,7 +51,7 @@ public class Server {
         /**
          * Middleware for function routing.
          */
-        public ServerMiddleware middleware = (headers, functionName, arguments, next) -> next.apply(headers, functionName, arguments);
+        public ServerMiddleware middleware = (requestMessage, functionRouter) -> functionRouter.route(requestMessage);
 
         /**
          * Execution hook that runs when a request Message is received.
@@ -84,6 +84,7 @@ public class Server {
     }
 
     final TelepactSchema telepactSchema;
+    private final FunctionRouter functionRouter;
     private final ServerMiddleware middleware;
     private final Consumer<Throwable> onError;
     private final Consumer<Message> onRequest;
@@ -97,7 +98,8 @@ public class Server {
      * @param telepactSchema The schema to be used by the server.
      * @param options The options for configuring the server.
      */
-    public Server(TelepactSchema telepactSchema, Options options) {
+    public Server(TelepactSchema telepactSchema, FunctionRouter functionRouter, Options options) {
+        this.functionRouter = functionRouter == null ? new FunctionRouter() : functionRouter;
         this.middleware = options.middleware;
         this.onError = options.onError;
         this.onRequest = options.onRequest;
@@ -125,7 +127,7 @@ public class Server {
      */
     public Response process(byte[] requestMessageBytes) {
         return processBytes(requestMessageBytes, Map.of(), this.serializer, this.telepactSchema, this.onError,
-                this.onRequest, this.onResponse, this.onAuth, this.middleware);
+                this.onRequest, this.onResponse, this.onAuth, this.functionRouter, this.middleware);
     }
 
     /**
@@ -138,6 +140,6 @@ public class Server {
      */
     public Response process(byte[] requestMessageBytes, Map<String, Object> overrideHeaders) {
         return processBytes(requestMessageBytes, overrideHeaders, this.serializer, this.telepactSchema, this.onError,
-                this.onRequest, this.onResponse, this.onAuth, this.middleware);
+                this.onRequest, this.onResponse, this.onAuth, this.functionRouter, this.middleware);
     }
 }

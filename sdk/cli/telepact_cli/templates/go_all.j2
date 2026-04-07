@@ -450,24 +450,21 @@ type TypedServer interface {
 
 type TypedServerHandler struct {
     Impl TypedServer
-    Router *telepact.FunctionRouter
 }
 
-func NewTypedServerHandler(impl TypedServer, router *telepact.FunctionRouter) *TypedServerHandler {
+func NewTypedServerHandler(impl TypedServer) *TypedServerHandler {
+    return &TypedServerHandler{Impl: impl}
+}
+
+func (h *TypedServerHandler) Register(router *telepact.FunctionRouter) *telepact.FunctionRouter {
+    if h == nil || h.Impl == nil {
+        return router
+    }
     if router == nil {
         router = telepact.NewFunctionRouter()
     }
-    handler := &TypedServerHandler{Impl: impl, Router: router}
-    handler.register(router)
-    return handler
-}
-
-func (h *TypedServerHandler) register(router *telepact.FunctionRouter) {
-    if h == nil || h.Impl == nil {
-        return
-    }
     {%- for fn in functions %}
-    router.Register("{{ fn.raw_name }}", func(headers map[string]any, arguments map[string]any) (telepact.Message, error) {
+    router.{{ 'RegisterAuthenticated' if auth_enabled else 'RegisterUnauthenticated' }}("{{ fn.raw_name }}", func(headers map[string]any, arguments map[string]any) (telepact.Message, error) {
         result, ierr := h.Impl.{{ fn.name }}(headers, New{{ fn.name }}InputFromPseudoJSON(map[string]any{"{{ fn.raw_name }}": arguments}))
         if ierr != nil {
             return telepact.Message{}, ierr
@@ -475,13 +472,7 @@ func (h *TypedServerHandler) register(router *telepact.FunctionRouter) {
         return telepact.NewMessage(result.Headers, result.Body.PseudoJSON()), nil
     })
     {%- endfor %}
-}
-
-func (h *TypedServerHandler) Middleware(headers map[string]any, functionName string, arguments map[string]any, next telepact.ServerNext) (telepact.Message, error) {
-    if h == nil || h.Impl == nil || h.Router == nil {
-        return telepact.Message{}, errors.New("telepact: typed server not configured")
-    }
-    return h.Router.Middleware(headers, functionName, arguments, next)
+    return router
 }
 {%- endmacro %}
 

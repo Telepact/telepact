@@ -17,7 +17,7 @@
 import asyncio
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
-from telepact import Message, Server, TelepactSchema, TelepactSchemaFiles
+from telepact import FunctionRouter, Message, Server, TelepactSchema, TelepactSchemaFiles
 
 files = TelepactSchemaFiles('api')
 schema = TelepactSchema.from_file_json_map(files.filenames_to_json)
@@ -46,8 +46,9 @@ async def handler(headers: dict[str, object], function_name: str, arguments: dic
         },
     })
 
-options.middleware = handler
-telepact_server = Server(schema, options)
+function_router = FunctionRouter()
+function_router.register_unauthenticated('fn.listUsers', lambda headers, arguments: handler(headers, 'fn.listUsers', arguments, None))
+telepact_server = Server(schema, function_router, options)
 
 
 def create_http_server(host: str = '127.0.0.1', port: int = 0) -> ThreadingHTTPServer:

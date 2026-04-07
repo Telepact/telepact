@@ -29,12 +29,13 @@ import { ValidateContext } from './validation/ValidateContext.js';
 import { serverBase64Decode } from './binary/ServerBase64Decode.js';
 import { getApiDefinitionsWithExamples } from './GetApiDefinitionsWithExamples.js';
 import { TelepactError } from '../TelepactError.js';
-import { ServerMiddleware, ServerNext } from '../FunctionRouter.js';
+import { FunctionRouter, ServerMiddleware } from '../FunctionRouter.js';
 
 export async function handleMessage(
     requestMessage: Message,
     overrideHeaders: Record<string, any>,
     telepactSchema: TelepactSchema,
+    functionRouter: FunctionRouter,
     middleware: ServerMiddleware,
     onError: (error: Error) => void,
     onAuth: (headers: Record<string, any>) => Record<string, any>,
@@ -186,16 +187,8 @@ export async function handleMessage(
                 : telepactSchema.original;
         resultMessage = new Message({}, { Ok_: { api: apiDefinitions } });
     } else {
-        const next: ServerNext = async (
-            headers: Record<string, any>,
-            nextFunctionName: string,
-            arguments_: Record<string, any>,
-        ): Promise<Message> => {
-            throw new Error(`Unknown function: ${nextFunctionName}`);
-        };
-
         try {
-            resultMessage = await middleware(requestHeaders, functionName, requestPayload, next);
+            resultMessage = await middleware(new Message(requestHeaders, { [functionName]: requestPayload }), functionRouter);
         } catch (e) {
             try {
                 onError(new TelepactError(`telepact handler failed while handling ${functionName}`, 'handler', e));

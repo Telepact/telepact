@@ -2,39 +2,23 @@ package {{ package }};
 
 import io.github.telepact.Message;
 import io.github.telepact.FunctionRouter;
-import io.github.telepact.ServerNext;
 import io.github.telepact.TypedMessage;
 import java.util.Map;
 
 public abstract class TypedServerHandler {
-    protected final FunctionRouter router;
-
-    protected TypedServerHandler() {
-        this(new FunctionRouter());
-    }
-
-    protected TypedServerHandler(FunctionRouter router) {
-        this.router = router;
-        this.register(router);
-    }
-
-    private void register(FunctionRouter router) {
+    public FunctionRouter register(FunctionRouter router) {
         {%- for fn in functions %}
         {%- set function_name = fn | replace('fn.', '') %}
-        router.register("{{ fn }}", (headers, arguments) -> {
+        router.{{ 'registerAuthenticated' if auth_enabled else 'registerUnauthenticated' }}("{{ fn }}", (headers, arguments) -> {
             var typedMessage = this.{{ function_name }}(headers, new {{ function_name }}.Input(Map.of("{{ fn }}", arguments)));
             return new Message(typedMessage.headers, typedMessage.body.pseudoJson);
         });
         {%- endfor %}
+        return router;
     }
 
     {%- for fn in functions %}
     {%- set function_name = fn | replace('fn.', '') %}
     public abstract TypedMessage<{{ function_name }}.Output> {{ function_name }}(Map<String, Object> headers, {{ function_name }}.Input input);
     {%- endfor %}
-
-    public Message middleware(Map<String, Object> headers, String functionName, Map<String, Object> arguments, ServerNext next) {
-        return this.router.middleware(headers, functionName, arguments, next);
-    }
-
 }

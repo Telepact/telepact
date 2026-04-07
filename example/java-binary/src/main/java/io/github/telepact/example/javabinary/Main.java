@@ -16,6 +16,7 @@
 
 package io.github.telepact.example.javabinary;
 
+import io.github.telepact.FunctionRouter;
 import io.github.telepact.Message;
 import io.github.telepact.Server;
 import io.github.telepact.TelepactSchema;
@@ -30,19 +31,17 @@ public final class Main {
         var files = new TelepactSchemaFiles("api");
         var schema = TelepactSchema.fromFileJsonMap(files.filenamesToJson);
         var options = new Server.Options();
+        var functionRouter = new FunctionRouter();
         options.authRequired = false;
-        options.middleware = (headers, functionName, arguments, next) -> {
-            if (!"fn.getNumbers".equals(functionName)) {
-                throw new IllegalArgumentException("Unknown function: " + functionName);
-            }
+        functionRouter.registerUnauthenticated("fn.getNumbers", (headers, arguments) -> {
             var limit = ((Number) arguments.get("limit")).intValue();
             var values = new ArrayList<Integer>();
             for (int i = 1; i <= limit; i += 1) {
                 values.add(i);
             }
             return new Message(Map.of(), Map.of("Ok_", Map.of("values", values)));
-        };
-        return new Server(schema, options);
+        });
+        return new Server(schema, functionRouter, options);
     }
 
 }

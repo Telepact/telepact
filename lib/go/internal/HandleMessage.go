@@ -28,7 +28,7 @@ func HandleMessage(
 	requestMessage ServerMessage,
 	overrideHeaders map[string]any,
 	schema SchemaAccessor,
-	middleware func(map[string]any, string, map[string]any, func(map[string]any, string, map[string]any) (ServerMessage, error)) (ServerMessage, error),
+	middleware func(ServerMessage) (ServerMessage, error),
 	onError func(error),
 	onAuth func(map[string]any) map[string]any,
 ) (ServerMessage, error) {
@@ -186,10 +186,7 @@ func HandleMessage(
 		if !ok || requestArguments == nil {
 			return ServerMessage{}, fmt.Errorf("telepact: request payload for %s is not an object", functionName)
 		}
-		next := func(headers map[string]any, nextFunctionName string, arguments map[string]any) (ServerMessage, error) {
-			return ServerMessage{}, fmt.Errorf("telepact: unknown function %s", nextFunctionName)
-		}
-		resultMessage, err = middleware(requestHeaders, functionName, requestArguments, next)
+		resultMessage, err = middleware(ServerMessage{Headers: requestHeaders, Body: map[string]any{functionName: requestArguments}})
 		if err != nil {
 			invokeOnError(onError, fmt.Errorf("telepact handler failed while handling %s: %w", functionName, err))
 			return ServerMessage{Headers: cloneStringAnyMap(responseHeaders), Body: map[string]any{"ErrorUnknown_": map[string]any{}}}, nil

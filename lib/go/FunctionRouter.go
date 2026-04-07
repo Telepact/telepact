@@ -16,43 +16,97 @@
 
 package telepact
 
+import "fmt"
+
 // ServerFunction handles a Telepact function call using pseudo-json headers and arguments.
 type ServerFunction func(headers map[string]any, arguments map[string]any) (Message, error)
 
-// ServerNext invokes the next server routing step.
-type ServerNext func(headers map[string]any, functionName string, arguments map[string]any) (Message, error)
+// ServerMiddleware handles a Telepact request message using a function router.
+type ServerMiddleware func(requestMessage Message, functionRouter *FunctionRouter) (Message, error)
 
-// ServerMiddleware handles a Telepact function call and can delegate using next.
-type ServerMiddleware func(headers map[string]any, functionName string, arguments map[string]any, next ServerNext) (Message, error)
+type registeredFunction struct {
+	authenticated bool
+	handler       ServerFunction
+}
 
 // FunctionRouter routes function names to registered handlers.
 type FunctionRouter struct {
-	functions map[string]ServerFunction
+	functions map[string]registeredFunction
 }
 
 // NewFunctionRouter constructs an empty FunctionRouter.
 func NewFunctionRouter() *FunctionRouter {
-	return &FunctionRouter{functions: map[string]ServerFunction{}}
+	return &FunctionRouter{functions: map[string]registeredFunction{}}
 }
 
 // Register stores a handler for a function name.
 func (r *FunctionRouter) Register(functionName string, handler ServerFunction) *FunctionRouter {
+	return r.RegisterUnauthenticated(functionName, handler)
+}
+
+// RegisterUnauthenticated stores a handler for an unauthenticated function name.
+func (r *FunctionRouter) RegisterUnauthenticated(functionName string, handler ServerFunction) *FunctionRouter {
 	if r == nil {
 		return nil
 	}
 	if r.functions == nil {
-		r.functions = map[string]ServerFunction{}
+		r.functions = map[string]registeredFunction{}
 	}
-	r.functions[functionName] = handler
+	r.functions[functionName] = registeredFunction{authenticated: false, handler: handler}
 	return r
 }
 
-// Middleware delegates to a registered handler or the provided next function.
-func (r *FunctionRouter) Middleware(headers map[string]any, functionName string, arguments map[string]any, next ServerNext) (Message, error) {
-	if r != nil && r.functions != nil {
-		if handler, ok := r.functions[functionName]; ok && handler != nil {
-			return handler(headers, arguments)
+// RegisterAuthenticated stores a handler for an authenticated function name.
+func (r *FunctionRouter) RegisterAuthenticated(functionName string, handler ServerFunction) *FunctionRouter {
+	if r == nil {
+		return nil
+	}
+	if r.functions == nil {
+		r.functions = map[string]registeredFunction{}
+	}
+	r.functions[functionName] = registeredFunction{authenticated: true, handler: handler}
+	return r
+}
+
+// Route delegates to a registered handler.
+func (r *FunctionRouter) Route(requestMessage Message) (Message, error) {
+	if r == nil || r.functions == nil {
+		return Message{}, NewTelepactError("telepact: function router is not configured")
+	}
+
+	functionName, err := requestMessage.BodyTarget()
+	if err != nil {
+		return Message{}, err
+	}
+	arguments, err := requestMessage.BodyPayload()
+	if err != nil {
+		return Message{}, err
+	}
+
+	registration, ok := r.functions[functionName]
+	if !ok || registration.handler == nil {
+		return Message{}, NewTelepactError("telepact: unknown function " + functionName)
+	}
+	if registration.authenticated {
+		if authResult, ok := requestMessage.Headers["@result"]; ok {
+			switch typed := authResult.(type) {
+			case map[string]any:
+				return NewMessage(map[string]any{}, typed), nil
+			case map[any]any:
+				converted := make(map[string]any, len(typed))
+				for key, value := range typed {
+					converted[fmt.Sprint(key)] = value
+				}
+				return NewMessage(map[string]any{}, converted), nil
+			}
+		}
+		if _, ok := requestMessage.Headers["@auth_"]; !ok {
+			return NewMessage(map[string]any{}, map[string]any{
+				"ErrorUnauthenticated_": map[string]any{
+					"message!": "Valid authentication is required.",
+				},
+			}), nil
 		}
 	}
-	return next(headers, functionName, arguments)
+	return registration.handler(requestMessage.Headers, arguments)
 }

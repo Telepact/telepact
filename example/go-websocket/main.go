@@ -41,19 +41,16 @@ func buildServer() (*telepact.Server, error) {
 
 	options := telepact.NewServerOptions()
 	options.AuthRequired = false
-	options.Middleware = func(headers map[string]any, functionName string, arguments map[string]any, next telepact.ServerNext) (telepact.Message, error) {
-		if functionName != "fn.greet" {
-			return telepact.Message{}, fmt.Errorf("unknown function: %s", functionName)
-		}
-
+	functionRouter := telepact.NewFunctionRouter()
+	functionRouter.RegisterUnauthenticated("fn.greet", func(headers map[string]any, arguments map[string]any) (telepact.Message, error) {
 		subject, _ := arguments["subject"].(string)
 		return telepact.NewMessage(map[string]any{}, map[string]any{
 			"Ok_": map[string]any{
-			"message": fmt.Sprintf("Hello %s from WebSocket!", subject),
+				"message": fmt.Sprintf("Hello %s from WebSocket!", subject),
 			},
 		}), nil
-	}
-	return telepact.NewServer(schema, options)
+	})
+	return telepact.NewServer(schema, functionRouter, options)
 }
 
 func newWebsocketHandler() (http.Handler, error) {

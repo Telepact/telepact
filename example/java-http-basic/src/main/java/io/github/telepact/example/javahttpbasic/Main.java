@@ -18,6 +18,7 @@ package io.github.telepact.example.javahttpbasic;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
+import io.github.telepact.FunctionRouter;
 import io.github.telepact.Message;
 import io.github.telepact.Server;
 import io.github.telepact.TelepactSchema;
@@ -35,15 +36,13 @@ public final class Main {
         var files = new TelepactSchemaFiles("api");
         var schema = TelepactSchema.fromFileJsonMap(files.filenamesToJson);
         var options = new Server.Options();
+        var functionRouter = new FunctionRouter();
         options.authRequired = false;
-        options.middleware = (headers, functionName, arguments, next) -> {
-            if ("fn.hello".equals(functionName)) {
-                var name = (String) arguments.get("name");
-                return new Message(Map.of(), Map.of("Ok_", Map.of("message", "Hello " + name + "!")));
-            }
-            throw new IllegalArgumentException("Unknown function: " + functionName);
-        };
-        return new Server(schema, options);
+        functionRouter.registerUnauthenticated("fn.hello", (headers, arguments) -> {
+            var name = (String) arguments.get("name");
+            return new Message(Map.of(), Map.of("Ok_", Map.of("message", "Hello " + name + "!")));
+        });
+        return new Server(schema, functionRouter, options);
     }
 
     static HttpServer startHttpServer(int port) throws IOException {

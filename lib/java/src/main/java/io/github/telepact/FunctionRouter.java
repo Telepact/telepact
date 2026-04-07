@@ -20,18 +20,48 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class FunctionRouter {
-    private final Map<String, ServerFunction> functions = new HashMap<>();
+    private static final class RegisteredFunction {
+        private final boolean authenticated;
+        private final ServerFunction handler;
+
+        private RegisteredFunction(boolean authenticated, ServerFunction handler) {
+            this.authenticated = authenticated;
+            this.handler = handler;
+        }
+    }
+
+    private final Map<String, RegisteredFunction> functions = new HashMap<>();
 
     public FunctionRouter register(String functionName, ServerFunction handler) {
-        this.functions.put(functionName, handler);
+        return this.registerUnauthenticated(functionName, handler);
+    }
+
+    public FunctionRouter registerUnauthenticated(String functionName, ServerFunction handler) {
+        this.functions.put(functionName, new RegisteredFunction(false, handler));
         return this;
     }
 
-    public Message middleware(Map<String, Object> headers, String functionName, Map<String, Object> arguments, ServerNext next) {
-        final var handler = this.functions.get(functionName);
-        if (handler != null) {
-            return handler.apply(headers, arguments);
+    public FunctionRouter registerAuthenticated(String functionName, ServerFunction handler) {
+        this.functions.put(functionName, new RegisteredFunction(true, handler));
+        return this;
+    }
+
+    public Message route(Message requestMessage) {
+        final var functionName = requestMessage.getBodyTarget();
+        final var arguments = requestMessage.getBodyPayload();
+        final var registration = this.functions.get(functionName);
+        if (registration == null || registration.handler == null) {
+            throw new IllegalArgumentException("Unknown function: " + functionName);
         }
-        return next.apply(headers, functionName, arguments);
+        if (registration.authenticated) {
+            final var authResult = requestMessage.headers.get("@result");
+            if (authResult instanceof Map<?, ?> authMap) {
+                return new Message(Map.of(), (Map<String, Object>) authMap);
+            }
+            if (!requestMessage.headers.containsKey("@auth_")) {
+                return new Message(Map.of(), Map.of("ErrorUnauthenticated_", Map.of("message!", "Valid authentication is required.")));
+            }
+        }
+        return registration.handler.apply(requestMessage.headers, arguments);
     }
 }

@@ -642,11 +642,7 @@ func startSchemaTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscrip
 		return nil, err
 	}
 
-	handler := func(headers map[string]any, functionName string, arguments map[string]any, next telepact.ServerNext) (telepact.Message, error) {
-		if functionName != "fn.validateSchema" {
-			return telepact.NewMessage(map[string]any{}, map[string]any{"ErrorUnknown_": map[string]any{}}), nil
-		}
-
+	handler := func(headers map[string]any, arguments map[string]any) (telepact.Message, error) {
 		input, ok := arguments["input"].(map[string]any)
 		if !ok {
 			return telepact.NewMessage(map[string]any{}, map[string]any{"ErrorUnknown_": map[string]any{}}), nil
@@ -687,8 +683,9 @@ func startSchemaTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscrip
 		return telepact.NewMessage(map[string]any{}, map[string]any{"Ok_": map[string]any{}}), nil
 	}
 
+	functionRouter := telepact.NewFunctionRouter()
+	functionRouter.RegisterUnauthenticated("fn.validateSchema", handler)
 	options := telepact.NewServerOptions()
-	options.Middleware = handler
 	options.OnError = func(err error) {
 		if err != nil {
 			d.logger.Printf("schema server error: %v", err)
@@ -696,7 +693,7 @@ func startSchemaTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscrip
 	}
 	options.AuthRequired = false
 
-	server, err := telepact.NewServer(schema, options)
+	server, err := telepact.NewServer(schema, functionRouter, options)
 	if err != nil {
 		return nil, err
 	}
@@ -825,28 +822,44 @@ func startTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscription, 
 		}
 	}
 
-	handler := func(headers map[string]any, functionName string, arguments map[string]any, next telepact.ServerNext) (telepact.Message, error) {
-		if boolValue(headers["@toggleAlternateServer_"]) {
+	functionRouter := telepact.NewFunctionRouter()
+	if codegenHandler != nil {
+		codegenHandler.Register(functionRouter)
+	}
+	handler := func(requestMessage telepact.Message, functionRouter *telepact.FunctionRouter) (telepact.Message, error) {
+		requestHeaders := requestMessage.Headers
+		functionName, err := requestMessage.BodyTarget()
+		if err != nil {
+			return telepact.Message{}, err
+		}
+		arguments, err := requestMessage.BodyPayload()
+		if err != nil {
+			return telepact.Message{}, err
+		}
+		if boolValue(requestHeaders["@toggleAlternateServer_"]) {
 			serveAlternate.Store(!serveAlternate.Load())
 		}
 
-		if boolValue(headers["@throwError_"]) {
+		if boolValue(requestHeaders["@throwError_"]) {
 			return telepact.Message{}, fmt.Errorf("telepact: requested server error")
 		}
 
 		var msg telepact.Message
-		var err error
 		if codegenHandler != nil {
-			msg, err = codegenHandler.Middleware(headers, functionName, arguments, next)
+			msg, err = functionRouter.Route(requestMessage)
 			if err != nil {
 				return telepact.Message{}, err
 			}
+			if msg.Headers == nil {
+				msg.Headers = map[string]any{}
+			}
+			msg.Headers["@codegens_"] = true
 		} else {
 			if cfg.BackdoorTopic == "" {
 				return telepact.Message{}, fmt.Errorf("telepact: backdoor topic not configured")
 			}
 
-			msg, err = forwardRequest(headers, functionName, arguments)
+			msg, err = forwardRequest(requestHeaders, functionName, arguments)
 			if err != nil {
 				return telepact.Message{}, err
 			}
@@ -875,7 +888,7 @@ func startTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscription, 
 	}
 	options.OnAuth = onAuth
 
-	server, err := telepact.NewServer(tele, options)
+	server, err := telepact.NewServer(tele, functionRouter, options)
 	if err != nil {
 		return nil, err
 	}
@@ -889,7 +902,7 @@ func startTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscription, 
 		}
 	}
 	alternateOptions.OnAuth = onAuth
-	alternateServer, err := telepact.NewServer(alternateTele, alternateOptions)
+	alternateServer, err := telepact.NewServer(alternateTele, functionRouter, alternateOptions)
 	if err != nil {
 		return nil, err
 	}
