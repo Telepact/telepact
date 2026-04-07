@@ -359,11 +359,11 @@ export class TypedServerHandler {
     }
 
     async handler(message: Message): Promise<Message> {
-        const functionName = Object.keys(message.body)[0];
+        const functionName = message.getBodyTarget();
         const functionRoute = this.functionRoutes()[functionName];
         if (functionRoute === undefined) {
             throw new Error("Unknown function: " + functionName);
         }
-        return await functionRoute(message.headers, message.body[functionName]);
+        return await functionRoute(message.headers, message.getBodyPayload());
     }
 }

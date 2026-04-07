@@ -1,5 +1,5 @@
 import keyword
-from typing import Callable, TypeVar, Union, Literal, Generic, NoReturn, Never
+from typing import Awaitable, Callable, TypeVar, Union, Literal, Generic, NoReturn, Never
 from dataclasses import dataclass
 from typing import cast, ForwardRef
 import telepact.Message
@@ -373,7 +373,7 @@ class TypedServerHandler:
         return {
             {% for fn in functions %}
             {%- set function_name = fn | replace('fn.', '') %}
-            "{{ fn }}": lambda headers, argument: self._{{ function_name }}_route(headers, argument),
+            "{{ fn }}": self._{{ function_name }}_route,
             {%- endfor %}
         }
 
