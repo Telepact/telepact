@@ -1,0 +1,64 @@
+name: Copilot Setup Steps
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/copilot-setup-steps.yml
+  pull_request:
+    paths:
+      - .github/workflows/copilot-setup-steps.yml
+
+jobs:
+  copilot-setup-steps:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: |
+            bind/dart/package-lock.json
+            example/ts-http-cookie-auth/package-lock.json
+            lib/ts/package-lock.json
+            sdk/console/package-lock.json
+            sdk/prettier/package-lock.json
+            test/console-self-hosted/package-lock.json
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: "21"
+          distribution: corretto
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Set up Dart
+        uses: dart-lang/setup-dart@v1
+        with:
+          sdk: "3.6"
+
+      - name: Install repo prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y nats-server
+          make install-project-cli
+
+      - name: Preinstall Playwright browsers
+        working-directory: ./sdk/console
+        run: |
+          npm ci --ignore-scripts
+          npx playwright install --with-deps --force
