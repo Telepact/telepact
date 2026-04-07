@@ -13,4 +13,4 @@ Repository source versions may be ahead of these values between releases.
 | Library (TypeScript) | `telepact` | npm | `1.0.0-alpha.241` |
 | SDK (CLI) | `telepact-cli` | PyPI | `1.0.0a241` |
 | SDK (Console) | `telepact-console` | npm | `1.0.0-alpha.241` |
-| SDK (Prettier) | `prettier-plugin-telepact` | npm | `1.0.0-alpha.231` |
+| SDK (Prettier) | `prettier-plugin-telepact` | npm | `—` |
