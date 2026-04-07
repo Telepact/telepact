@@ -23,6 +23,34 @@ noop:
 doc-versions:
 	telepact-project doc-versions
 
+.PHONY: local-ci
+local-ci:
+	$(MAKE) clean-java
+	$(MAKE) clean-py
+	$(MAKE) clean-ts
+	$(MAKE) clean-go
+	$(MAKE) clean-dart
+	$(MAKE) clean-cli
+	$(MAKE) clean-console
+	$(MAKE) clean-prettier
+	$(MAKE) clean-console-self-hosted
+	$(MAKE) clean-test
+	$(MAKE) install-project-cli
+	$(MAKE) java
+	$(MAKE) py
+	$(MAKE) ts
+	$(MAKE) go
+	$(MAKE) dart
+	$(MAKE) cli
+	$(MAKE) install-cli
+	$(MAKE) console
+	$(MAKE) prettier
+	$(MAKE) example-check
+	$(MAKE) test
+	$(MAKE) console-self-hosted
+	$(MAKE) license-header
+	$(MAKE) version
+
 java:
 	$(MAKE) -C lib/java
 

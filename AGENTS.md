@@ -41,6 +41,11 @@ The entire project uses a hierarchical `Makefile` system. The root `Makefile` de
 -   Be careful running `uv run python -m pytest ...` directly in `test/runner` after a library change.
     That is only reliable if the corresponding `test/lib/<lang>` consumer has already been rebuilt.
 
+### Final Verification
+
+-   Before calling a task done, run `make local-ci` from the repository root.
+    This target cleans the shared workspace, rebuilds the primary CI targets in order, and catches issues that only show up when the repo is exercised end-to-end in one environment.
+
 ### Key Files & Directories
 
 -   `Makefile`: The entry point for all build, test, and deploy operations.
