@@ -44,7 +44,9 @@ func main() {
     // The schema directory may contain multiple *.telepact.yaml and
     // *.telepact.json files. Subdirectories are rejected.
 
-    middleware := func(headers map[string]any, functionName string, arguments map[string]any, next telepact.ServerNext) (telepact.Message, error) {
+    middleware := func(requestMessage telepact.Message, functionRouter *telepact.FunctionRouter) (telepact.Message, error) {
+        functionName, _ := requestMessage.BodyTarget()
+        arguments, _ := requestMessage.BodyPayload()
         // Early in the handler, perform any pre-flight "middleware" operations, such as
         // authentication, tracing, or logging.
         log.Printf("Function started: %s", functionName)
@@ -66,14 +68,15 @@ func main() {
             ), nil
         }
 
-        return telepact.Message{}, telepact.NewTelepactError("function not found")
+        return functionRouter.Route(requestMessage)
     }
 
 	serverOptions := telepact.NewServerOptions()
 	serverOptions.Middleware = middleware
 	// Set this to false when your schema does not define union.Auth_.
 	serverOptions.AuthRequired = false
-	server, err := telepact.NewServer(schema, serverOptions)
+	functionRouter := telepact.NewFunctionRouter()
+	server, err := telepact.NewServer(schema, functionRouter, serverOptions)
 	if err != nil {
 		log.Fatal(err)
     }

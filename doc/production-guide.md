@@ -151,9 +151,8 @@ options.onAuth = (headers) => {
   return userId ? { '@userId': userId } : {};
 };
 
-options.middleware = async (headers, target, arguments, next) => {
-  const userId = headers['@userId'];
-  const message = new Message(headers, { [target]: arguments });
+options.middleware = async (requestMessage, functionRouter) => {
+  const userId = requestMessage.headers['@userId'];
 
   if (!userId) {
     return new Message({}, {
@@ -163,7 +162,7 @@ options.middleware = async (headers, target, arguments, next) => {
 
   const startedAt = Date.now();
   try {
-    return await dispatchFunction(target, message);
+    return await functionRouter.route(requestMessage);
   } finally {
     logger.info('telepact_request', {
       requestId: message.headers['@id_'],

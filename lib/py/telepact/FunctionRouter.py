@@ -14,7 +14,7 @@
 #|  limitations under the License.
 #|
 
-from typing import Awaitable, Callable, TYPE_CHECKING
+from typing import Awaitable, Callable, TYPE_CHECKING, cast
 
 if TYPE_CHECKING:
     from .Message import Message

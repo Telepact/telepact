@@ -30,11 +30,11 @@ const schema = TelepactSchema.fromFileJsonMap(files.filenamesToJson);
 // *.telepact.json files. Subdirectories are rejected.
 
 const middleware = async (
-    headers: Record<string, any>,
-    functionName: string,
-    arguments: Record<string, any>,
-    next,
+    requestMessage: Message,
+    functionRouter: FunctionRouter,
 ): Promise<Message> => {
+    const functionName = requestMessage.getBodyTarget();
+    const arguments = requestMessage.getBodyPayload();
 
     try {
         // Early in the handler, perform any pre-flight "middleware" operations, such as
@@ -48,7 +48,7 @@ const middleware = async (
             return new Message({}, {Ok_: {message: `Hello ${subject}!`}});
         }
 
-        throw new Error('Function not found');
+        return await functionRouter.route(requestMessage);
     } finally {
         // At the end the handler, perform any post-flight "middleware" operations
         log.info("Function finished", {function: functionName});
@@ -59,7 +59,8 @@ const options = new ServerOptions();
 options.middleware = middleware;
 // Set this to false when your schema does not define union.Auth_.
 options.authRequired = false;
-const server = new Server(schema, options);
+const functionRouter = new FunctionRouter();
+const server = new Server(schema, functionRouter, options);
 
 // Wire up request/response bytes from your transport of choice
 transport.receive(async (requestBytes: Uint8Array): Promise<Uint8Array> => {
