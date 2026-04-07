@@ -16,6 +16,7 @@
 
 from .RandomGenerator import RandomGenerator
 from .Client import Client
+from .FunctionRouter import FunctionRouter
 from .Server import Server
 from .TestClient import TestClient
 from .MockServer import MockServer
@@ -33,6 +34,7 @@ from .TelepactSchemaFiles import TelepactSchemaFiles
 __all__ = [
     "RandomGenerator",
     "Client",
+    "FunctionRouter",
     "Server",
     "TestClient",
     "MockServer",

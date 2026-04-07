@@ -25,9 +25,9 @@ options = Server.Options()
 options.auth_required = False
 
 
-async def handler(request_message: Message) -> Message:
-    if request_message.get_body_target() != 'fn.listUsers':
-        raise RuntimeError(f'Unknown function: {request_message.get_body_target()}')
+async def handler(headers: dict[str, object], function_name: str, arguments: dict[str, object], next) -> Message:
+    if function_name != 'fn.listUsers':
+        raise RuntimeError(f'Unknown function: {function_name}')
 
     return Message({}, {
         'Ok_': {
@@ -46,8 +46,8 @@ async def handler(request_message: Message) -> Message:
         },
     })
 
-
-telepact_server = Server(schema, handler, options)
+options.middleware = handler
+telepact_server = Server(schema, options)
 
 
 def create_http_server(host: str = '127.0.0.1', port: int = 0) -> ThreadingHTTPServer:

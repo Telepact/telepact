@@ -28,15 +28,15 @@ func HandleMessage(
 	requestMessage ServerMessage,
 	overrideHeaders map[string]any,
 	schema SchemaAccessor,
-	handler func(ServerMessage) (ServerMessage, error),
+	middleware func(map[string]any, string, map[string]any, func(map[string]any, string, map[string]any) (ServerMessage, error)) (ServerMessage, error),
 	onError func(error),
 	onAuth func(map[string]any) map[string]any,
 ) (ServerMessage, error) {
 	if schema == nil {
 		return ServerMessage{}, fmt.Errorf("telepact: schema must not be nil")
 	}
-	if handler == nil {
-		return ServerMessage{}, fmt.Errorf("telepact: handler must not be nil")
+	if middleware == nil {
+		return ServerMessage{}, fmt.Errorf("telepact: middleware must not be nil")
 	}
 
 	requestHeaders := requestMessage.Headers
@@ -161,38 +161,35 @@ func HandleMessage(
 	}
 
 	unsafeResponseEnabled := boolValue(requestHeaders["@unsafe_"])
-
-	callMessage := ServerMessage{
-		Headers: requestHeaders,
-		Body:    map[string]any{requestTarget: requestPayload},
+	requestArguments, ok := requestPayload.(map[string]any)
+	if !ok || requestArguments == nil {
+		return ServerMessage{}, fmt.Errorf("telepact: request payload for %s is not an object", functionName)
 	}
 
 	var resultMessage ServerMessage
-	switch functionName {
-	case "fn.ping_":
-		resultMessage = ServerMessage{Headers: make(map[string]any), Body: map[string]any{"Ok_": map[string]any{}}}
-	case "fn.api_":
-		includeInternal := false
-		includeExamples := false
-		if requestMap, ok := requestPayload.(map[string]any); ok {
-			includeInternal = boolValue(requestMap["includeInternal!"])
-			includeExamples = boolValue(requestMap["includeExamples!"])
+	next := func(headers map[string]any, nextFunctionName string, arguments map[string]any) (ServerMessage, error) {
+		switch nextFunctionName {
+		case "fn.ping_":
+			return ServerMessage{Headers: make(map[string]any), Body: map[string]any{"Ok_": map[string]any{}}}, nil
+		case "fn.api_":
+			includeInternal := boolValue(arguments["includeInternal!"])
+			includeExamples := boolValue(arguments["includeExamples!"])
+			apiDefinitions := schema.OriginalDefinitions()
+			if includeInternal {
+				apiDefinitions = schema.FullDefinitions()
+			}
+			if includeExamples {
+				apiDefinitions = GetAPIDefinitionsWithExamples(schema, includeInternal)
+			}
+			return ServerMessage{Headers: make(map[string]any), Body: map[string]any{"Ok_": map[string]any{"api": apiDefinitions}}}, nil
+		default:
+			return ServerMessage{}, fmt.Errorf("telepact: unknown function %s", nextFunctionName)
 		}
-		apiDefinitions := schema.OriginalDefinitions()
-		if includeInternal {
-			apiDefinitions = schema.FullDefinitions()
-		}
-		if includeExamples {
-			apiDefinitions = GetAPIDefinitionsWithExamples(schema, includeInternal)
-		}
-		resultMessage = ServerMessage{Headers: make(map[string]any), Body: map[string]any{"Ok_": map[string]any{"api": apiDefinitions}}}
-	default:
-		resp, err := handler(callMessage)
-		if err != nil {
-			invokeOnError(onError, fmt.Errorf("telepact handler failed while handling %s: %w", functionName, err))
-			return ServerMessage{Headers: cloneStringAnyMap(responseHeaders), Body: map[string]any{"ErrorUnknown_": map[string]any{}}}, nil
-		}
-		resultMessage = resp
+	}
+	resultMessage, err = middleware(requestHeaders, functionName, requestArguments, next)
+	if err != nil {
+		invokeOnError(onError, fmt.Errorf("telepact handler failed while handling %s: %w", functionName, err))
+		return ServerMessage{Headers: cloneStringAnyMap(responseHeaders), Body: map[string]any{"ErrorUnknown_": map[string]any{}}}, nil
 	}
 
 	if resultMessage.Headers == nil {

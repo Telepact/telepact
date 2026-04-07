@@ -36,15 +36,14 @@ public final class Main {
         var schema = TelepactSchema.fromFileJsonMap(files.filenamesToJson);
         var options = new Server.Options();
         options.authRequired = false;
-        return new Server(schema, requestMessage -> {
-            var functionName = requestMessage.getBodyTarget();
-            var arguments = requestMessage.getBodyPayload();
+        options.middleware = (headers, functionName, arguments, next) -> {
             if ("fn.hello".equals(functionName)) {
                 var name = (String) arguments.get("name");
                 return new Message(Map.of(), Map.of("Ok_", Map.of("message", "Hello " + name + "!")));
             }
             throw new IllegalArgumentException("Unknown function: " + functionName);
-        }, options);
+        };
+        return new Server(schema, options);
     }
 
     static HttpServer startHttpServer(int port) throws IOException {

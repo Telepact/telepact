@@ -22,12 +22,12 @@ import { parseRequestMessage } from '../internal/ParseRequestMessage.js';
 import { Response } from '../Response.js';
 import { SerializationError } from '../SerializationError.js';
 import { TelepactError } from '../TelepactError.js';
+import { ServerMiddleware, ServerNext } from '../FunctionRouter.js';
 
 export type ErrorHandler = (error: any) => void;
 export type RequestHandler = (message: Message) => void;
 export type ResponseHandler = (message: Message) => void;
 export type AuthHandler = (headers: Record<string, any>) => Record<string, any>;
-export type MessageHandler = (message: Message) => Promise<Message>;
 
 export async function processBytes(
     requestMessageBytes: Uint8Array,
@@ -38,7 +38,7 @@ export async function processBytes(
     onRequest: RequestHandler,
     onResponse: ResponseHandler,
     onAuth: AuthHandler,
-    handler: MessageHandler,
+    middleware: ServerMiddleware,
 ): Promise<Response> {
     try {
         const requestMessage = parseRequestMessage(requestMessageBytes, serializer, telepactSchema, onError);
@@ -49,7 +49,7 @@ export async function processBytes(
             // Handle error
         }
 
-        const responseMessage = await handleMessage(requestMessage, overrideHeaders, telepactSchema, handler, onError, onAuth);
+        const responseMessage = await handleMessage(requestMessage, overrideHeaders, telepactSchema, middleware, onError, onAuth);
 
         try {
             onResponse(responseMessage);

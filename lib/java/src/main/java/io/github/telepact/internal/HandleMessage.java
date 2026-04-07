@@ -31,6 +31,8 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import io.github.telepact.ServerMiddleware;
+import io.github.telepact.ServerNext;
 import io.github.telepact.Message;
 import io.github.telepact.TelepactError;
 import io.github.telepact.TelepactSchema;
@@ -41,7 +43,7 @@ import io.github.telepact.internal.validation.ValidateContext;
 import io.github.telepact.internal.validation.ValidationFailure;
 
 public class HandleMessage {
-    static Message handleMessage(Message requestMessage, Map<String, Object> overrideHeaders, TelepactSchema telepactSchema, Function<Message, Message> handler,
+    static Message handleMessage(Message requestMessage, Map<String, Object> overrideHeaders, TelepactSchema telepactSchema, ServerMiddleware middleware,
             Consumer<Throwable> onError, Function<Map<String, Object>, Map<String, Object>> onAuth) {
         final var responseHeaders = (Map<String, Object>) new HashMap<String, Object>();
         final Map<String, Object> requestHeaders = requestMessage.headers;
@@ -149,34 +151,35 @@ public class HandleMessage {
 
         final var unsafeResponseEnabled = Objects.equals(true, requestHeaders.get("@unsafe_"));
 
-        final var callMessage = new Message(requestHeaders, Map.of(requestTarget, requestPayload));
-
         final Message resultMessage;
-        if (functionName.equals("fn.ping_")) {
-            resultMessage = new Message(Map.of(), Map.of("Ok_", Map.of()));
-        } else if (functionName.equals("fn.api_")) {
-            final var includeInternal = requestPayload instanceof Map<?, ?>
-                    && Objects.equals(true, ((Map<?, ?>) requestPayload).get("includeInternal!"));
-            final var includeExamples = requestPayload instanceof Map<?, ?>
-                    && Objects.equals(true, ((Map<?, ?>) requestPayload).get("includeExamples!"));
-            resultMessage = new Message(Map.of(),
-                    Map.of("Ok_", Map.of("api", includeExamples
-                            ? GetApiDefinitionsWithExamples.getApiDefinitionsWithExamples(telepactSchema, includeInternal)
-                            : includeInternal ? telepactSchema.full : telepactSchema.original)));
-        } else {
-            try {
-                resultMessage = handler.apply(callMessage);
-            } catch (Throwable e) {
-                try {
-                    onError.accept(new TelepactError(
-                            "telepact handler failed while handling %s".formatted(functionName),
-                            "handler",
-                            e));
-                } catch (Throwable ignored) {
-
+        try {
+            resultMessage = middleware.apply(requestHeaders, functionName, requestPayload, new ServerNext() {
+                @Override
+                public Message apply(Map<String, Object> headers, String nextFunctionName, Map<String, Object> arguments) {
+                    if (nextFunctionName.equals("fn.ping_")) {
+                        return new Message(Map.of(), Map.of("Ok_", Map.of()));
+                    }
+                    if (nextFunctionName.equals("fn.api_")) {
+                        final var includeInternal = Objects.equals(true, arguments.get("includeInternal!"));
+                        final var includeExamples = Objects.equals(true, arguments.get("includeExamples!"));
+                        return new Message(Map.of(),
+                                Map.of("Ok_", Map.of("api", includeExamples
+                                        ? GetApiDefinitionsWithExamples.getApiDefinitionsWithExamples(telepactSchema, includeInternal)
+                                        : includeInternal ? telepactSchema.full : telepactSchema.original)));
+                    }
+                    throw new IllegalArgumentException("Unknown function: " + nextFunctionName);
                 }
-                return new Message(responseHeaders, Map.of("ErrorUnknown_", Map.of()));
+            });
+        } catch (Throwable e) {
+            try {
+                onError.accept(new TelepactError(
+                        "telepact handler failed while handling %s".formatted(functionName),
+                        "handler",
+                        e));
+            } catch (Throwable ignored) {
+
             }
+            return new Message(responseHeaders, Map.of("ErrorUnknown_", Map.of()));
         }
 
         final Map<String, Object> resultUnion = resultMessage.body;

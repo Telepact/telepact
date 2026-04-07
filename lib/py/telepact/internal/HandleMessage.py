@@ -14,12 +14,13 @@
 #|  limitations under the License.
 #|
 
-from typing import Callable, TYPE_CHECKING, cast, Awaitable
+from typing import Callable, TYPE_CHECKING, cast
 
 from ..internal.binary.ServerBase64Decode import server_base64_decode
 
 from ..Message import Message
 from ..TelepactError import TelepactError
+from ..FunctionRouter import ServerMiddleware, ServerNext
 from .GetApiDefinitionsWithExamples import get_api_definitions_with_examples
 from .types.TTypeDeclaration import TTypeDeclaration
 
@@ -33,7 +34,7 @@ async def handle_message(
     request_message: 'Message',
     override_headers: dict[str, object],
     telepact_schema: 'TelepactSchema',
-    handler: Callable[['Message'], Awaitable['Message']],
+    middleware: ServerMiddleware,
     on_error: Callable[[Exception], None],
     on_auth: Callable[[dict[str, object]], dict[str, object]],
 ) -> 'Message':
@@ -160,37 +161,40 @@ async def handle_message(
 
     unsafe_response_enabled = cast(bool, request_headers.get("@unsafe_", False))
 
-    call_message: Message = Message(
-        request_headers, {request_target: request_payload})
-
     result_message: Message
-    if function_name == "fn.ping_":
-        result_message = Message({}, {"Ok_": {}})
-    elif function_name == "fn.api_":
-        include_internal = isinstance(request_payload, dict) and request_payload.get("includeInternal!") is True
-        include_examples = isinstance(request_payload, dict) and request_payload.get("includeExamples!") is True
-        api_definitions = get_api_definitions_with_examples(
-            telepact_schema,
-            include_internal,
-        ) if include_examples else (
-            telepact_schema.full if include_internal else telepact_schema.original
-        )
-        result_message = Message({}, {"Ok_": {"api": api_definitions}})
-    else:
+    async def next(
+        headers: dict[str, object],
+        next_function_name: str,
+        arguments: dict[str, object],
+    ) -> 'Message':
+        if next_function_name == "fn.ping_":
+            return Message({}, {"Ok_": {}})
+        if next_function_name == "fn.api_":
+            include_internal = arguments.get("includeInternal!") is True
+            include_examples = arguments.get("includeExamples!") is True
+            api_definitions = get_api_definitions_with_examples(
+                telepact_schema,
+                include_internal,
+            ) if include_examples else (
+                telepact_schema.full if include_internal else telepact_schema.original
+            )
+            return Message({}, {"Ok_": {"api": api_definitions}})
+        raise RuntimeError(f"Unknown function: {next_function_name}")
+
+    try:
+        result_message = await middleware(request_headers, function_name, request_payload, next)
+    except Exception as e:
         try:
-            result_message = await handler(call_message)
-        except Exception as e:
-            try:
-                on_error(
-                    TelepactError(
-                        f"telepact handler failed while handling {function_name}",
-                        kind="handler",
-                        cause=e,
-                    )
+            on_error(
+                TelepactError(
+                    f"telepact handler failed while handling {function_name}",
+                    kind="handler",
+                    cause=e,
                 )
-            except Exception:
-                pass
-            return Message(response_headers, {"ErrorUnknown_": {}})
+            )
+        except Exception:
+            pass
+        return Message(response_headers, {"ErrorUnknown_": {}})
 
     result_union: dict[str, object] = result_message.body
 

@@ -24,9 +24,10 @@ import { processBytes } from './internal/ProcessBytes.js';
 import { Serialization } from './Serialization.js';
 import { ServerBase64Encoder } from './internal/binary/ServerBase64Encoder.js';
 import { Response } from './Response.js';
+import { ServerMiddleware } from './FunctionRouter.js';
 
 export class Server {
-    handler: (message: Message) => Promise<Message>;
+    middleware: ServerMiddleware;
     onError: (error: any) => void;
     onRequest: (message: Message) => void;
     onResponse: (message: Message) => void;
@@ -34,8 +35,8 @@ export class Server {
     telepactSchema: TelepactSchema;
     serializer: Serializer;
 
-    constructor(telepactSchema: TelepactSchema, handler: (message: Message) => Promise<Message>, options: ServerOptions) {
-        this.handler = handler;
+    constructor(telepactSchema: TelepactSchema, options: ServerOptions) {
+        this.middleware = options.middleware;
         this.onError = options.onError;
         this.onRequest = options.onRequest;
         this.onResponse = options.onResponse;
@@ -66,12 +67,13 @@ export class Server {
             this.onRequest,
             this.onResponse,
             this.onAuth,
-            this.handler,
+            this.middleware,
         );
     }
 }
 
 export class ServerOptions {
+    middleware: ServerMiddleware;
     onError: (error: any) => void;
     onRequest: (message: Message) => void;
     onResponse: (message: Message) => void;
@@ -80,6 +82,12 @@ export class ServerOptions {
     serialization: Serialization;
 
     constructor() {
+        this.middleware = async (
+            headers: Record<string, any>,
+            functionName: string,
+            arguments_: Record<string, any>,
+            next,
+        ): Promise<Message> => await next(headers, functionName, arguments_);
         this.onError = (e: any) => {};
         this.onRequest = (m: Message) => {};
         this.onResponse = (m: Message) => {};

@@ -21,7 +21,6 @@ import static io.github.telepact.internal.binary.ConstructBinaryEncoding.constru
 
 import java.util.Map;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import io.github.telepact.internal.binary.ServerBase64Encoder;
 import io.github.telepact.internal.binary.ServerBinaryEncoder;
@@ -48,6 +47,11 @@ public class Server {
          */
         public Consumer<Throwable> onError = (e) -> {
         };
+
+        /**
+         * Middleware for function routing.
+         */
+        public ServerMiddleware middleware = (headers, functionName, arguments, next) -> next.apply(headers, functionName, arguments);
 
         /**
          * Execution hook that runs when a request Message is received.
@@ -80,7 +84,7 @@ public class Server {
     }
 
     final TelepactSchema telepactSchema;
-    private final Function<Message, Message> handler;
+    private final ServerMiddleware middleware;
     private final Consumer<Throwable> onError;
     private final Consumer<Message> onRequest;
     private final Consumer<Message> onResponse;
@@ -88,14 +92,13 @@ public class Server {
     private final Serializer serializer;
 
     /**
-     * Create a server with the given telepact schema and handler.
+     * Create a server with the given telepact schema and options.
      * 
      * @param telepactSchema The schema to be used by the server.
-     * @param handler The function to handle incoming messages.
      * @param options The options for configuring the server.
      */
-    public Server(TelepactSchema telepactSchema, Function<Message, Message> handler, Options options) {
-        this.handler = handler;
+    public Server(TelepactSchema telepactSchema, Options options) {
+        this.middleware = options.middleware;
         this.onError = options.onError;
         this.onRequest = options.onRequest;
         this.onResponse = options.onResponse;
@@ -122,7 +125,7 @@ public class Server {
      */
     public Response process(byte[] requestMessageBytes) {
         return processBytes(requestMessageBytes, Map.of(), this.serializer, this.telepactSchema, this.onError,
-                this.onRequest, this.onResponse, this.onAuth, this.handler);
+                this.onRequest, this.onResponse, this.onAuth, this.middleware);
     }
 
     /**
@@ -135,6 +138,6 @@ public class Server {
      */
     public Response process(byte[] requestMessageBytes, Map<String, Object> overrideHeaders) {
         return processBytes(requestMessageBytes, overrideHeaders, this.serializer, this.telepactSchema, this.onError,
-                this.onRequest, this.onResponse, this.onAuth, this.handler);
+                this.onRequest, this.onResponse, this.onAuth, this.middleware);
     }
 }

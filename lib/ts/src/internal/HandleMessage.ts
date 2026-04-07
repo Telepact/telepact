@@ -29,12 +29,13 @@ import { ValidateContext } from './validation/ValidateContext.js';
 import { serverBase64Decode } from './binary/ServerBase64Decode.js';
 import { getApiDefinitionsWithExamples } from './GetApiDefinitionsWithExamples.js';
 import { TelepactError } from '../TelepactError.js';
+import { ServerMiddleware, ServerNext } from '../FunctionRouter.js';
 
 export async function handleMessage(
     requestMessage: Message,
     overrideHeaders: Record<string, any>,
     telepactSchema: TelepactSchema,
-    handler: (message: Message) => Promise<Message>,
+    middleware: ServerMiddleware,
     onError: (error: Error) => void,
     onAuth: (headers: Record<string, any>) => Record<string, any>,
 ): Promise<Message> {
@@ -172,31 +173,37 @@ export async function handleMessage(
 
     const unsafeResponseEnabled = requestHeaders['@unsafe_'] || false;
 
-    const callMessage: Message = new Message(requestHeaders, { [functionName]: requestPayload });
-
     let resultMessage: Message;
-    if (functionName === 'fn.ping_') {
-        resultMessage = new Message({}, { Ok_: {} });
-    } else if (functionName === 'fn.api_') {
-        const includeInternal = requestPayload['includeInternal!'] === true;
-        const includeExamples = requestPayload['includeExamples!'] === true;
-        const apiDefinitions = includeExamples
-            ? getApiDefinitionsWithExamples(telepactSchema, includeInternal)
-            : includeInternal
-                ? telepactSchema.full
-                : telepactSchema.original;
-        resultMessage = new Message({}, { Ok_: { api: apiDefinitions } });
-    } else {
-        try {
-            resultMessage = await handler(callMessage);
-        } catch (e) {
-            try {
-                onError(new TelepactError(`telepact handler failed while handling ${functionName}`, 'handler', e));
-            } catch (error) {
-                // Ignore error
-            }
-            return new Message(responseHeaders, { ErrorUnknown_: {} });
+    const next: ServerNext = async (
+        headers: Record<string, any>,
+        nextFunctionName: string,
+        arguments_: Record<string, any>,
+    ): Promise<Message> => {
+        if (nextFunctionName === 'fn.ping_') {
+            return new Message({}, { Ok_: {} });
         }
+        if (nextFunctionName === 'fn.api_') {
+            const includeInternal = arguments_['includeInternal!'] === true;
+            const includeExamples = arguments_['includeExamples!'] === true;
+            const apiDefinitions = includeExamples
+                ? getApiDefinitionsWithExamples(telepactSchema, includeInternal)
+                : includeInternal
+                    ? telepactSchema.full
+                    : telepactSchema.original;
+            return new Message({}, { Ok_: { api: apiDefinitions } });
+        }
+        throw new Error(`Unknown function: ${nextFunctionName}`);
+    };
+
+    try {
+        resultMessage = await middleware(requestHeaders, functionName, requestPayload, next);
+    } catch (e) {
+        try {
+            onError(new TelepactError(`telepact handler failed while handling ${functionName}`, 'handler', e));
+        } catch (error) {
+            // Ignore error
+        }
+        return new Message(responseHeaders, { ErrorUnknown_: {} });
     }
 
     const resultUnion: Record<string, any> = resultMessage.body;

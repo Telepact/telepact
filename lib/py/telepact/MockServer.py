@@ -58,12 +58,13 @@ class MockServer:
         server_options = Server.Options()
         server_options.on_error = options.on_error
         server_options.auth_required = False
+        server_options.middleware = self._handle
 
         telepact_schema = TelepactSchema(mock_telepact_schema.original, mock_telepact_schema.full, mock_telepact_schema.parsed,
-                                       mock_telepact_schema.parsed_request_headers, mock_telepact_schema.parsed_response_headers)
+                                        mock_telepact_schema.parsed_request_headers, mock_telepact_schema.parsed_response_headers)
 
         self.server = Server(
-            telepact_schema, self._handle, server_options)
+            telepact_schema, server_options)
 
     async def process(self, message: bytes) -> bytes:
         """
@@ -74,8 +75,9 @@ class MockServer:
         """
         return await self.server.process(message)
 
-    async def _handle(self, request_message: 'Message') -> 'Message':
+    async def _handle(self, headers: dict[str, object], function_name: str, arguments: dict[str, object], next) -> 'Message':
         from .internal.mock.MockHandle import mock_handle
-        return await mock_handle(request_message, self.stubs, self.invocations, self.random,
-                                 self.server.telepact_schema, self.enableGeneratedDefaultStub,
-                                 self.enable_optional_field_generation, self.randomize_optional_field_generation)
+        from .Message import Message
+        return await mock_handle(Message(headers, {function_name: arguments}), self.stubs, self.invocations, self.random,
+                                  self.server.telepact_schema, self.enableGeneratedDefaultStub,
+                                  self.enable_optional_field_generation, self.randomize_optional_field_generation)

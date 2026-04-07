@@ -327,10 +327,12 @@ public class Main {
 
         var timers = metrics.timer(frontdoorTopic);
 
-        Function<Message, Message> handler = (requestMessage) -> {
-            var requestBody = requestMessage.body;
+        var handler = (io.github.telepact.ServerMiddleware) (headers, functionName, arguments, next) -> {
+            if (!"fn.validateSchema".equals(functionName)) {
+                return new Message(Map.of(), Map.of("ErrorUnknown_", Map.of()));
+            }
 
-            var arg = (Map<String, Object>) requestBody.get("fn.validateSchema");
+            var arg = arguments;
             var input = (Map<String, Object>) arg.get("input");
 
             var inputTag = input.keySet().iterator().next();
@@ -368,12 +370,13 @@ public class Main {
         };
 
         var options = new Server.Options();
+        options.middleware = handler;
         options.onError = (e) -> {
             e.printStackTrace();
             System.err.flush();
         };
         options.authRequired = false;
-        var server = new Server(telepact, handler, options);
+        var server = new Server(telepact, options);
 
         var dispatcher = connection.createDispatcher((msg) -> {
             var requestBytes = msg.getData();
@@ -454,10 +457,9 @@ public class Main {
             return Map.of();
         };
 
-        Function<Message, Message> handler = (requestMessage) -> {
+        var handler = (io.github.telepact.ServerMiddleware) (requestHeaders, functionName, arguments, next) -> {
             try {
-                var requestHeaders = requestMessage.headers;
-                var requestBody = requestMessage.body;
+                var requestBody = Map.of(functionName, arguments);
                 var requestPseudoJson = List.of(requestHeaders, requestBody);
 
                 var requestBytes = objectMapper.writeValueAsBytes(requestPseudoJson);
@@ -465,7 +467,7 @@ public class Main {
                 Message message;
                 if (useCodeGen) {
                     System.out.println("     :H %s".formatted(objectMapper.writeValueAsString(requestPseudoJson)));
-                    message = codeGenHandler.handler(requestMessage);
+                    message = codeGenHandler.middleware(requestHeaders, functionName, arguments, next);
                     message.headers.put("@codegens_", true);
                 } else {
                     System.out.println("    <-s %s".formatted(new String(requestBytes)));
@@ -507,6 +509,7 @@ public class Main {
         };
 
         var options = new Server.Options();
+        options.middleware = handler;
         options.onError = (e) -> {
             e.printStackTrace();
             System.err.flush();
@@ -527,14 +530,15 @@ public class Main {
         options.onAuth = onAuth;
         options.authRequired = authRequired;
 
-        var server = new Server(telepact, handler, options);
+        var server = new Server(telepact, options);
 
         var alternateOptions = new Server.Options();
+        alternateOptions.middleware = handler;
         alternateOptions.onError = (e) -> e.printStackTrace();
         alternateOptions.onAuth = onAuth;
         alternateOptions.authRequired = authRequired;
 
-        var alternateServer = new Server(alternateTelepact, handler, alternateOptions);
+        var alternateServer = new Server(alternateTelepact, alternateOptions);
 
         var dispatcher = connection.createDispatcher((msg) -> {
 

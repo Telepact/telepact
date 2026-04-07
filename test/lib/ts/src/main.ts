@@ -310,10 +310,17 @@ function startSchemaTestServer(
 
     const timer = registry.createTimer(frontdoorTopic);
 
-    const handler = async (requestMessage: Message): Promise<Message> => {
-        const requestBody = requestMessage.body;
+    const handler = async (
+        headers: Record<string, any>,
+        functionName: string,
+        arguments_: Record<string, any>,
+        next,
+    ): Promise<Message> => {
+        if (functionName !== "fn.validateSchema") {
+            return new Message({}, { ErrorUnknown_: {} });
+        }
 
-        const arg: { [key: string]: any } = requestBody["fn.validateSchema"];
+        const arg: { [key: string]: any } = arguments_;
 
         const input: { [key: string]: any } = arg["input"];
         const inputTag = Object.keys(input)[0];
@@ -356,10 +363,11 @@ function startSchemaTestServer(
     };
 
     const options: ServerOptions = new ServerOptions();
+    options.middleware = handler;
     options.onError = (e: Error) => console.error(e);
     options.authRequired = false;
 
-    const server: Server = new Server(telepact, handler, options);
+    const server: Server = new Server(telepact, options);
 
     const sub: Subscription = connection.subscribe(frontdoorTopic);
     (async () => {
@@ -429,9 +437,13 @@ function startTestServer(
         return {};
     };
 
-    const handler = async (requestMessage: Message): Promise<Message> => {
-        const requestHeaders = requestMessage.headers;
-        const requestBody = requestMessage.body;
+    const handler = async (
+        requestHeaders: Record<string, any>,
+        functionName: string,
+        arguments_: Record<string, any>,
+        next,
+    ): Promise<Message> => {
+        const requestBody = { [functionName]: arguments_ };
         const requestPseudoJson = [requestHeaders, requestBody];
         const requestJson = JSON.stringify(requestPseudoJson, uint8ArrayToBase64Replacer);
         const requestBytes = new TextEncoder().encode(requestJson);
@@ -439,7 +451,7 @@ function startTestServer(
         let message: Message;
         if (useCodegen) {
             console.log(`     :H ${new TextDecoder().decode(requestBytes)}`);
-            message = await codeGenHandler.handler(requestMessage);
+            message = await codeGenHandler.middleware(requestHeaders, functionName, arguments_, next);
             message.headers["@codegens_"] = true;
         } else {
             console.log(`    <-s ${new TextDecoder().decode(requestBytes)}`);
@@ -467,6 +479,7 @@ function startTestServer(
     };
 
     const options: ServerOptions = new ServerOptions();
+    options.middleware = handler;
     options.onError = (e: Error) => {
         console.error(e);
         if (e instanceof ThisError) {
@@ -486,13 +499,14 @@ function startTestServer(
     options.onAuth = onAuth;
     options.authRequired = authRequired;
 
-    const server: Server = new Server(telepact, handler, options);
+    const server: Server = new Server(telepact, options);
 
     const alternateOptions = new ServerOptions();
+    alternateOptions.middleware = handler;
     alternateOptions.onError = (e) => console.error(e);
     alternateOptions.onAuth = onAuth;
     alternateOptions.authRequired = authRequired;
-    const alternateServer: Server = new Server(alternateTelepact, handler, alternateOptions);
+    const alternateServer: Server = new Server(alternateTelepact, alternateOptions);
 
     const subscription: Subscription = connection.subscribe(frontdoorTopic);
     (async () => {

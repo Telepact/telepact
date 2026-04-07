@@ -21,11 +21,9 @@ import (
 	"github.com/telepact/telepact/lib/go/internal/binary"
 )
 
-// ServerHandler processes incoming Telepact messages and returns a response message.
-type ServerHandler func(Message) (Message, error)
-
 // ServerOptions configures server behaviour.
 type ServerOptions struct {
+	Middleware    ServerMiddleware
 	OnError       func(error)
 	OnRequest     func(Message)
 	OnResponse    func(Message)
@@ -37,6 +35,9 @@ type ServerOptions struct {
 // NewServerOptions constructs ServerOptions populated with defaults.
 func NewServerOptions() *ServerOptions {
 	return &ServerOptions{
+		Middleware: func(headers map[string]any, functionName string, arguments map[string]any, next ServerNext) (Message, error) {
+			return next(headers, functionName, arguments)
+		},
 		OnError:       func(error) {},
 		OnRequest:     func(Message) {},
 		OnResponse:    func(Message) {},
@@ -48,7 +49,7 @@ func NewServerOptions() *ServerOptions {
 
 // Server represents a Telepact server instance.
 type Server struct {
-	handler        ServerHandler
+	middleware     ServerMiddleware
 	onError        func(error)
 	onRequest      func(Message)
 	onResponse     func(Message)
@@ -57,19 +58,21 @@ type Server struct {
 	serializer     *Serializer
 }
 
-// NewServer constructs a Server using the supplied schema, handler, and options.
-func NewServer(telepactSchema *TelepactSchema, handler ServerHandler, options *ServerOptions) (*Server, error) {
+// NewServer constructs a Server using the supplied schema and options.
+func NewServer(telepactSchema *TelepactSchema, options *ServerOptions) (*Server, error) {
 	if telepactSchema == nil {
 		return nil, NewTelepactError("telepact: schema must not be nil")
-	}
-	if handler == nil {
-		return nil, NewTelepactError("telepact: handler must not be nil")
 	}
 
 	if options == nil {
 		options = NewServerOptions()
 	}
 
+	if options.Middleware == nil {
+		options.Middleware = func(headers map[string]any, functionName string, arguments map[string]any, next ServerNext) (Message, error) {
+			return next(headers, functionName, arguments)
+		}
+	}
 	if options.OnError == nil {
 		options.OnError = func(error) {}
 	}
@@ -102,7 +105,7 @@ func NewServer(telepactSchema *TelepactSchema, handler ServerHandler, options *S
 	}
 
 	return &Server{
-		handler:        handler,
+		middleware:     options.Middleware,
 		onError:        options.OnError,
 		onRequest:      options.OnRequest,
 		onResponse:     options.OnResponse,
@@ -143,8 +146,19 @@ func (s *Server) ProcessWithHeaders(requestMessageBytes []byte, overrideHeaders 
 		s.onResponse(NewMessage(message.Headers, message.Body))
 	}
 
-	internalHandler := func(message telepactinternal.ServerMessage) (telepactinternal.ServerMessage, error) {
-		response, err := s.handler(NewMessage(message.Headers, message.Body))
+	internalMiddleware := func(
+		headers map[string]any,
+		functionName string,
+		arguments map[string]any,
+		next func(map[string]any, string, map[string]any) (telepactinternal.ServerMessage, error),
+	) (telepactinternal.ServerMessage, error) {
+		response, err := s.middleware(headers, functionName, arguments, func(nextHeaders map[string]any, nextFunctionName string, nextArguments map[string]any) (Message, error) {
+			internalResponse, internalErr := next(nextHeaders, nextFunctionName, nextArguments)
+			if internalErr != nil {
+				return Message{}, internalErr
+			}
+			return NewMessage(internalResponse.Headers, internalResponse.Body), nil
+		})
 		if err != nil {
 			return telepactinternal.ServerMessage{}, err
 		}
@@ -161,7 +175,7 @@ func (s *Server) ProcessWithHeaders(requestMessageBytes []byte, overrideHeaders 
 		internalOnRequest,
 		internalOnResponse,
 		s.onAuth,
-		internalHandler,
+		internalMiddleware,
 	)
 	if err != nil {
 		return Response{}, err

@@ -14,12 +14,13 @@
 #|  limitations under the License.
 #|
 
-from typing import Callable, TYPE_CHECKING, Awaitable, NamedTuple
+from typing import Callable, TYPE_CHECKING
 
 from .DefaultSerialization import DefaultSerialization
 from .Serializer import Serializer
 from .internal.binary.ServerBinaryEncoder import ServerBinaryEncoder
 from .internal.binary.ServerBase64Encoder import ServerBase64Encoder
+from .FunctionRouter import ServerMiddleware
 
 if TYPE_CHECKING:
     from .Message import Message
@@ -36,6 +37,15 @@ class Server:
         """
 
         def __init__(self) -> None:
+            async def default_middleware(
+                headers: dict[str, object],
+                function_name: str,
+                arguments: dict[str, object],
+                next,
+            ) -> 'Message':
+                return await next(headers, function_name, arguments)
+
+            self.middleware: ServerMiddleware = default_middleware
             self.on_error = lambda e: None
             self.on_request = lambda m: None
             self.on_response = lambda m: None
@@ -43,13 +53,13 @@ class Server:
             self.auth_required = True
             self.serialization = DefaultSerialization()
 
-    def __init__(self, telepact_schema: 'TelepactSchema', handler: Callable[['Message'], Awaitable['Message']], options: Options):
+    def __init__(self, telepact_schema: 'TelepactSchema', options: Options):
         """
-        Create a server with the given telepact schema and handler.
+        Create a server with the given telepact schema and options.
         """
         from .internal.binary.ConstructBinaryEncoding import construct_binary_encoding
 
-        self.handler = handler
+        self.middleware = options.middleware
         self.on_error = options.on_error
         self.on_request = options.on_request
         self.on_response = options.on_response
@@ -74,4 +84,4 @@ class Server:
         from .internal.ProcessBytes import process_bytes
 
         return await process_bytes(request_message_bytes, override_headers, self.serializer, self.telepact_schema, self.on_error,
-                                   self.on_request, self.on_response, self.on_auth, self.handler)
+                                   self.on_request, self.on_response, self.on_auth, self.middleware)

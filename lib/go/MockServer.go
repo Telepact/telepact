@@ -77,6 +77,7 @@ func NewMockServer(mockSchema *MockTelepactSchema, options *MockServerOptions) (
 	}
 
 	serverOptions := NewServerOptions()
+	serverOptions.Middleware = ms.handle
 	serverOptions.OnError = options.OnError
 	serverOptions.AuthRequired = false
 
@@ -88,7 +89,7 @@ func NewMockServer(mockSchema *MockTelepactSchema, options *MockServerOptions) (
 		mockSchema.ParsedResponseHeaders,
 	)
 
-	server, err := NewServer(telepactSchema, ms.handle, serverOptions)
+	server, err := NewServer(telepactSchema, serverOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -106,23 +107,13 @@ func (ms *MockServer) Process(message []byte) (Response, error) {
 	return ms.server.Process(message)
 }
 
-func (ms *MockServer) handle(request Message) (Message, error) {
+func (ms *MockServer) handle(headers map[string]any, functionName string, argument map[string]any, next ServerNext) (Message, error) {
 	if ms == nil {
 		return Message{}, NewTelepactError("telepact: mock server is nil")
 	}
 
-	functionName, err := request.BodyTarget()
-	if err != nil {
-		return Message{}, err
-	}
-
-	argument, err := request.BodyPayload()
-	if err != nil {
-		return Message{}, err
-	}
-
 	responseHeaders, responseBody, handleErr := mock.MockHandle(
-		request.Headers,
+		headers,
 		functionName,
 		argument,
 		&ms.stubs,

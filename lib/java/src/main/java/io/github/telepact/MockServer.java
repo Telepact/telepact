@@ -98,13 +98,14 @@ public class MockServer {
         this.randomizeOptionalFieldGeneration = options.randomizeOptionalFieldGeneration;
 
         final var serverOptions = new Server.Options();
+        serverOptions.middleware = this::handle;
         serverOptions.onError = options.onError;
         serverOptions.authRequired = false;
 
         final var telepactSchema = new TelepactSchema(mockTelepactSchema.original, mockTelepactSchema.full, mockTelepactSchema.parsed,
                 mockTelepactSchema.parsedRequestHeaders, mockTelepactSchema.parsedResponseHeaders);
 
-        this.server = new Server(telepactSchema, this::handle, serverOptions);
+        this.server = new Server(telepactSchema, serverOptions);
     }
 
     /**
@@ -117,8 +118,8 @@ public class MockServer {
         return this.server.process(message);
     }
 
-    private Message handle(Message requestMessage) {
-        return mockHandle(requestMessage, this.stubs, this.invocations, this.random,
+    private Message handle(java.util.Map<String, Object> headers, String functionName, java.util.Map<String, Object> arguments, ServerNext next) {
+        return mockHandle(new Message(headers, java.util.Map.of(functionName, arguments)), this.stubs, this.invocations, this.random,
                 this.server.telepactSchema, this.enableGeneratedDefaultStub, this.enableOptionalFieldGeneration,
                 this.randomizeOptionalFieldGeneration);
     }

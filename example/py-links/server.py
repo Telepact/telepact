@@ -25,9 +25,9 @@ options = Server.Options()
 options.auth_required = False
 
 
-async def handler(request_message: Message) -> Message:
-    if request_message.get_body_target() == 'fn.createIssueLink':
-        title = request_message.get_body_payload()['title']
+async def handler(headers: dict[str, object], function_name: str, arguments: dict[str, object], next) -> Message:
+    if function_name == 'fn.createIssueLink':
+        title = arguments['title']
         return Message({}, {
             'Ok_': {
                 'todo': {
@@ -41,18 +41,19 @@ async def handler(request_message: Message) -> Message:
             },
         })
 
-    if request_message.get_body_target() == 'fn.getFollowUp':
-        follow_up_id = request_message.get_body_payload()['id']
+    if function_name == 'fn.getFollowUp':
+        follow_up_id = arguments['id']
         return Message({}, {
             'Ok_': {
                 'summary': f'Followed up on {follow_up_id}',
             },
         })
 
-    raise RuntimeError(f'Unknown function: {request_message.get_body_target()}')
+    raise RuntimeError(f'Unknown function: {function_name}')
 
 
-telepact_server = Server(schema, handler, options)
+options.middleware = handler
+telepact_server = Server(schema, options)
 
 
 def create_http_server(host: str = '127.0.0.1', port: int = 0) -> ThreadingHTTPServer:

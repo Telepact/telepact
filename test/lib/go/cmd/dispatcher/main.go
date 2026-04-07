@@ -642,14 +642,12 @@ func startSchemaTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscrip
 		return nil, err
 	}
 
-	handler := func(message telepact.Message) (telepact.Message, error) {
-		body := message.Body
-		payload, ok := body["fn.validateSchema"].(map[string]any)
-		if !ok {
+	handler := func(headers map[string]any, functionName string, arguments map[string]any, next telepact.ServerNext) (telepact.Message, error) {
+		if functionName != "fn.validateSchema" {
 			return telepact.NewMessage(map[string]any{}, map[string]any{"ErrorUnknown_": map[string]any{}}), nil
 		}
 
-		input, ok := payload["input"].(map[string]any)
+		input, ok := arguments["input"].(map[string]any)
 		if !ok {
 			return telepact.NewMessage(map[string]any{}, map[string]any{"ErrorUnknown_": map[string]any{}}), nil
 		}
@@ -690,6 +688,7 @@ func startSchemaTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscrip
 	}
 
 	options := telepact.NewServerOptions()
+	options.Middleware = handler
 	options.OnError = func(err error) {
 		if err != nil {
 			d.logger.Printf("schema server error: %v", err)
@@ -697,7 +696,7 @@ func startSchemaTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscrip
 	}
 	options.AuthRequired = false
 
-	server, err := telepact.NewServer(schema, handler, options)
+	server, err := telepact.NewServer(schema, options)
 	if err != nil {
 		return nil, err
 	}
@@ -750,7 +749,8 @@ func startTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscription, 
 
 	const requestTimeout = 5 * time.Second
 
-	forwardRequest := func(message telepact.Message) (telepact.Message, error) {
+	forwardRequest := func(headers map[string]any, functionName string, arguments map[string]any) (telepact.Message, error) {
+		message := telepact.NewMessage(headers, map[string]any{functionName: arguments})
 		payload := []any{message.Headers, message.Body}
 		payloadBytes, err := json.Marshal(payload)
 		if err != nil {
@@ -825,21 +825,19 @@ func startTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscription, 
 		}
 	}
 
-	handler := func(message telepact.Message) (telepact.Message, error) {
-		reqHeaders := message.Headers
-
-		if boolValue(reqHeaders["@toggleAlternateServer_"]) {
+	handler := func(headers map[string]any, functionName string, arguments map[string]any, next telepact.ServerNext) (telepact.Message, error) {
+		if boolValue(headers["@toggleAlternateServer_"]) {
 			serveAlternate.Store(!serveAlternate.Load())
 		}
 
-		if boolValue(reqHeaders["@throwError_"]) {
+		if boolValue(headers["@throwError_"]) {
 			return telepact.Message{}, fmt.Errorf("telepact: requested server error")
 		}
 
 		var msg telepact.Message
 		var err error
 		if codegenHandler != nil {
-			msg, err = codegenHandler.Handle(message)
+			msg, err = codegenHandler.Middleware(headers, functionName, arguments, next)
 			if err != nil {
 				return telepact.Message{}, err
 			}
@@ -848,7 +846,7 @@ func startTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscription, 
 				return telepact.Message{}, fmt.Errorf("telepact: backdoor topic not configured")
 			}
 
-			msg, err = forwardRequest(message)
+			msg, err = forwardRequest(headers, functionName, arguments)
 			if err != nil {
 				return telepact.Message{}, err
 			}
@@ -858,6 +856,7 @@ func startTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscription, 
 	}
 
 	options := telepact.NewServerOptions()
+	options.Middleware = handler
 	options.AuthRequired = cfg.AuthRequired
 	options.OnError = func(err error) {
 		if err != nil {
@@ -876,12 +875,13 @@ func startTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscription, 
 	}
 	options.OnAuth = onAuth
 
-	server, err := telepact.NewServer(tele, handler, options)
+	server, err := telepact.NewServer(tele, options)
 	if err != nil {
 		return nil, err
 	}
 
 	alternateOptions := telepact.NewServerOptions()
+	alternateOptions.Middleware = handler
 	alternateOptions.AuthRequired = cfg.AuthRequired
 	alternateOptions.OnError = func(err error) {
 		if err != nil {
@@ -889,7 +889,7 @@ func startTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscription, 
 		}
 	}
 	alternateOptions.OnAuth = onAuth
-	alternateServer, err := telepact.NewServer(alternateTele, handler, alternateOptions)
+	alternateServer, err := telepact.NewServer(alternateTele, alternateOptions)
 	if err != nil {
 		return nil, err
 	}

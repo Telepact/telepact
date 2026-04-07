@@ -16,15 +16,15 @@ func newCodeGenHandler(enabled bool) *codeGenHandler {
 		return nil
 	}
 	impl := &typedCodeGenServer{}
-	return &codeGenHandler{handler: gen.NewTypedServerHandler(impl)}
+	return &codeGenHandler{handler: gen.NewTypedServerHandler(impl, nil)}
 }
 
-func (c *codeGenHandler) Handle(message telepact.Message) (telepact.Message, error) {
+func (c *codeGenHandler) Middleware(headers map[string]any, functionName string, arguments map[string]any, next telepact.ServerNext) (telepact.Message, error) {
 	if c == nil || c.handler == nil {
-		return message, nil
+		return next(headers, functionName, arguments)
 	}
 
-	response, err := c.handler.Handler(message)
+	response, err := c.handler.Middleware(headers, functionName, arguments, next)
 	if err != nil {
 		return telepact.Message{}, err
 	}

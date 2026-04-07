@@ -31,19 +31,18 @@ public final class Main {
         var schema = TelepactSchema.fromFileJsonMap(files.filenamesToJson);
         var options = new Server.Options();
         options.authRequired = false;
-        return new Server(schema, requestMessage -> {
-            var functionName = requestMessage.getBodyTarget();
+        options.middleware = (headers, functionName, arguments, next) -> {
             if (!"fn.getNumbers".equals(functionName)) {
                 throw new IllegalArgumentException("Unknown function: " + functionName);
             }
-            var arguments = requestMessage.getBodyPayload();
             var limit = ((Number) arguments.get("limit")).intValue();
             var values = new ArrayList<Integer>();
             for (int i = 1; i <= limit; i += 1) {
                 values.add(i);
             }
             return new Message(Map.of(), Map.of("Ok_", Map.of("values", values)));
-        }, options);
+        };
+        return new Server(schema, options);
     }
 
 }

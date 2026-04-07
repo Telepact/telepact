@@ -245,10 +245,11 @@ async def start_schema_test_server(connection: NatsClient, metrics: CollectorReg
     timers = Summary(frontdoor_topic.replace(
         '.', '_').replace('-', '_'), '', registry=metrics)
 
-    async def handler(request_message: 'Message') -> 'Message':
-        request_body = request_message.body
+    async def handler(headers: dict[str, object], function_name: str, arguments: dict[str, object], next) -> 'Message':
+        if function_name != "fn.validateSchema":
+            return Message({}, {"ErrorUnknown_": {}})
 
-        arg = request_body.get("fn.validateSchema", {})
+        arg = arguments
         input = arg.get("input")
 
         input_tag = next(iter(input.keys()))
@@ -281,9 +282,10 @@ async def start_schema_test_server(connection: NatsClient, metrics: CollectorReg
         return Message({}, {"Ok_": {}})
 
     options = Server.Options()
+    options.middleware = handler
     options.on_error = on_err
     options.auth_required = False
-    server = Server(telepact, handler, options)
+    server = Server(telepact, options)
 
     async def handle_message(msg: Msg) -> None:
         nonlocal server
@@ -333,12 +335,12 @@ async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, 
     class ThisError(RuntimeError):
         pass
 
-    async def handler(request_message: 'Message') -> 'Message':
+    async def handler(headers: dict[str, object], function_name: str, arguments: dict[str, object], next) -> 'Message':
         nonlocal serve_alternate_server
         nonlocal executor
 
-        request_headers = request_message.headers
-        request_body = request_message.body
+        request_headers = headers
+        request_body = {function_name: arguments}
         request_pseudo_json = [request_headers, request_body]
 
         def default_serializer(obj):
@@ -350,7 +352,7 @@ async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, 
 
         if use_codegen:
             print(f"     :H {request_bytes}")
-            message = await code_gen_handler.handler(request_message)
+            message = await code_gen_handler.middleware(headers, function_name, arguments, next)
             message.headers['@codegens_'] = True
         else:
             print(f"    <-s {request_bytes}")
@@ -382,19 +384,21 @@ async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, 
 
     options = Server.Options()
 
+    options.middleware = handler
     options.on_error = on_err
     options.on_request = on_request_err
     options.on_response = on_response_err
     options.on_auth = on_auth
     options.auth_required = auth_required
 
-    server = Server(telepact, handler, options)
+    server = Server(telepact, options)
     alternate_options = Server.Options()
+    alternate_options.middleware = handler
     alternate_options.on_error = on_err
     alternate_options.on_auth = on_auth
     alternate_options.auth_required = auth_required
     alternate_server = Server(
-        alternate_telepact, handler, alternate_options)
+        alternate_telepact, alternate_options)
 
     async def handle_test_message(msg: Msg) -> None:
         nonlocal serve_alternate_server

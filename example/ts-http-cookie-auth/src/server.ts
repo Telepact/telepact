@@ -59,22 +59,24 @@ export function createExampleServer(): HttpServer {
         return { '@userId': 'user-123' };
     };
 
-    const telepactServer = new Server(schema, async (message) => {
-        const userId = message.headers['@userId'];
+    options.middleware = async (headers, functionName, arguments_, next) => {
+        const userId = headers['@userId'];
         if (userId !== 'user-123') {
             return new Message({}, {
                 ErrorUnauthenticated_: { 'message!': 'missing or invalid session cookie' },
             });
         }
 
-        if (message.getBodyTarget() !== 'fn.me') {
-            throw new Error(`Unknown function: ${message.getBodyTarget()}`);
+        if (functionName !== 'fn.me') {
+            throw new Error(`Unknown function: ${functionName}`);
         }
 
         return new Message({}, {
             Ok_: { userId },
         });
-    }, options);
+    };
+
+    const telepactServer = new Server(schema, options);
 
     return createServer(async (request: IncomingMessage, response: ServerResponse) => {
         if (request.method !== 'POST' || request.url !== '/api/telepact') {

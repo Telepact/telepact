@@ -647,7 +647,11 @@ def demo_server(port: int) -> None:
     server_options = Server.Options()
     server_options.auth_required = True
     server_options.on_error = lambda e: print(e)
-    telepact_server = Server(telepact_schema, handler, server_options)
+    async def middleware(headers: dict[str, object], function_name: str, arguments: dict[str, object], next) -> Message:
+        return await handler(Message(headers, {function_name: arguments}))
+
+    server_options.middleware = middleware
+    telepact_server = Server(telepact_schema, server_options)
 
     print('Telepact Server running at /api')
 
