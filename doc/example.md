@@ -37,9 +37,9 @@ from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
 import uvicorn
 
-async def divide(_headers, args):
-    x = args['x']
-    y = args['y']
+async def divide(_headers, arguments):
+    x = arguments['x']
+    y = arguments['y']
     if y == 0:
         return Message({}, {'ErrorCannotDivideByZero': {}})
 

@@ -37,10 +37,19 @@ async def greet(_headers: dict[str, object], arguments: dict[str, object]) -> 'M
     return Message({}, {'Ok_': {'message': f'Hello {subject}!'}})
 
 
+async def middleware(request_message: 'Message', function_router) -> 'Message':
+    function_name = request_message.get_body_target()
+    try:
+        log.info("Function started", {'function': function_name})
+        return await function_router.route(request_message)
+    finally:
+        log.info("Function finished", {'function': function_name})
+
+
 options = Server.Options()
 # Set this to False when your schema does not define union.Auth_.
 options.auth_required = False
-options.middleware = lambda request_message, function_router: function_router.route(request_message)
+options.middleware = middleware
 server = Server(schema, {'fn.greet': greet}, options)
 
 
