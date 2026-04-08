@@ -384,7 +384,7 @@ cases = {
         [[{'@ok_': {}, '@responseHeader': {'@out': {}}}, {'fn.test': {}}], [{'@assert_': {'skipBinaryCheck': True, 'skipFieldIdCheck': True}}, {'ErrorInvalidResponseHeaders_': {'cases': [{'path': ['@out'], 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]],
         [[{'@ok_': {}, '@responseHeader': {'randomOut': {}}}, {'fn.test': {}}], [{'@assert_': {'skipBinaryCheck': True, 'skipFieldIdCheck': True}}, {'ErrorInvalidResponseHeaders_': {'cases': [{'path': ['randomOut'], 'reason': {'RequiredObjectKeyPrefixMissing': {'prefix': '@'}}}]}}]],
     ],
-    'overrideHeaders': [
+    'updateHeaders': [
         [[{'@ok_': {}, '@override': 'old'}, {'fn.test': {}}], [{}, {'Ok_': {}}]],
     ]
 }

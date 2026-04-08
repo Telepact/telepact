@@ -906,8 +906,10 @@ func startTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscription, 
 		if serveAlternate.Load() {
 			resp, err = alternateServer.Process(msg.Data)
 		} else {
-			override := map[string]any{"@override": "new"}
-			resp, err = server.ProcessWithHeaders(msg.Data, override)
+			updateHeaders := func(headers map[string]any) {
+				headers["@override"] = "new"
+			}
+			resp, err = server.ProcessWithHeaders(msg.Data, updateHeaders)
 		}
 
 		if err != nil {

@@ -29,10 +29,11 @@ import { ValidateContext } from './validation/ValidateContext.js';
 import { serverBase64Decode } from './binary/ServerBase64Decode.js';
 import { getApiDefinitionsWithExamples } from './GetApiDefinitionsWithExamples.js';
 import { TelepactError } from '../TelepactError.js';
+import { UpdateHeaders } from '../Server.js';
 
 export async function handleMessage(
     requestMessage: Message,
-    overrideHeaders: Record<string, any>,
+    updateHeaders: UpdateHeaders | undefined,
     telepactSchema: TelepactSchema,
     middleware: (requestMessage: Message, functionRouter: { route: (message: Message) => Promise<Message> }) => Promise<Message>,
     functionRouter: { route: (message: Message) => Promise<Message> },
@@ -45,7 +46,7 @@ export async function handleMessage(
     const parsedTelepactSchema: Record<string, TType> = telepactSchema.parsed;
     const requestEntry: [string, any] = Object.entries(requestBody)[0];
 
-    Object.assign(requestHeaders, overrideHeaders);
+    updateHeaders?.(requestHeaders);
 
     const requestTargetInit = requestEntry[0];
     const requestPayload = requestEntry[1] as Record<string, any>;

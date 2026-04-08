@@ -88,8 +88,11 @@ export function createExampleServer(): HttpServer {
         try {
             const requestBytes = await collectRequestBytes(request);
             const sessionToken = readCookie(request, 'session');
-            const overrideHeaders = sessionToken ? { '@auth_': { sessionToken } } : {};
-            const telepactResponse = await telepactServer.process(requestBytes, overrideHeaders);
+            const telepactResponse = await telepactServer.process(requestBytes, (headers) => {
+                if (sessionToken) {
+                    headers['@auth_'] = { sessionToken };
+                }
+            });
             const contentType = '@bin_' in telepactResponse.headers
                 ? 'application/octet-stream'
                 : 'application/json';
