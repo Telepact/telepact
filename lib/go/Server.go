@@ -74,11 +74,13 @@ type ServerOptions struct {
 // NewServerOptions constructs ServerOptions populated with defaults.
 func NewServerOptions() *ServerOptions {
 	return &ServerOptions{
-		OnError:       func(error) {},
-		OnRequest:     func(Message) {},
-		OnResponse:    func(Message) {},
-		OnAuth:        func(map[string]any) map[string]any { return map[string]any{} },
-		Middleware:    func(requestMessage Message, functionRouter *FunctionRouter) (Message, error) { return functionRouter.Route(requestMessage) },
+		OnError:    func(error) {},
+		OnRequest:  func(Message) {},
+		OnResponse: func(Message) {},
+		OnAuth:     func(map[string]any) map[string]any { return map[string]any{} },
+		Middleware: func(requestMessage Message, functionRouter *FunctionRouter) (Message, error) {
+			return functionRouter.Route(requestMessage)
+		},
 		AuthRequired:  true,
 		Serialization: NewDefaultSerialization(),
 	}
