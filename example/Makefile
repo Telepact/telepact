@@ -19,14 +19,14 @@ EXAMPLES := py-binary py-http-cookie-auth py-links py-select py-websocket
 .PHONY: list check run
 
 list:
-@printf '%s\n' $(EXAMPLES)
+	@printf '%s\n' $(EXAMPLES)
 
 check:
-@for example in $(EXAMPLES); do \
-echo "==> $$example"; \
-$(MAKE) -C $$example run || exit $$?; \
-done
+	@for example in $(EXAMPLES); do \
+	echo "==> $$example"; \
+	$(MAKE) -C $$example run || exit $$?; \
+	done
 
 run:
-@test -n "$(EXAMPLE)" || (echo "Usage: make run EXAMPLE=<name>" && exit 1)
-@$(MAKE) -C $(EXAMPLE) run
+	@test -n "$(EXAMPLE)" || (echo "Usage: make run EXAMPLE=<name>" && exit 1)
+	@$(MAKE) -C $(EXAMPLE) run
