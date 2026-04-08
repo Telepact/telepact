@@ -14,11 +14,11 @@
 #|  limitations under the License.
 #|
 
-import importlib.resources as pkg_resources
+from importlib import resources as importlib_resources
 import json
 import yaml
 
 
 def load_calculator_telepact_json() -> str:
-    calculator_schema = pkg_resources.files('telepact_cli').joinpath('calculator.telepact.yaml').read_text()
+    calculator_schema = importlib_resources.files('telepact_cli').joinpath('calculator.telepact.yaml').read_text()
     return json.dumps(yaml.safe_load(calculator_schema), separators=(',', ':'))

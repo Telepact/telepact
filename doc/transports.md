@@ -22,9 +22,9 @@ This guide shows concrete examples for two common transports:
 - WebSockets
 
 Runnable counterparts live under [`example/`](../example/), including
-[`example/java-http-basic`](../example/java-http-basic/README.md),
-[`example/ts-http-cookie-auth`](../example/ts-http-cookie-auth/README.md), and
-[`example/go-websocket`](../example/go-websocket/README.md).
+[`example/py-links`](../example/py-links/README.md),
+[`example/py-http-cookie-auth`](../example/py-http-cookie-auth/README.md), and
+[`example/py-websocket`](../example/py-websocket/README.md).
 
 The same pattern applies to NATS, stdio, queues, custom RPC layers, and other
 IPC boundaries.

@@ -28,6 +28,7 @@ if TYPE_CHECKING:
 
 FunctionRoute = Callable[[str, 'Message'], Awaitable['Message']]
 Middleware = Callable[['Message', 'FunctionRouter'], Awaitable['Message']]
+UpdateHeaders = Callable[[dict[str, object]], None]
 
 
 class FunctionRouter:
@@ -88,11 +89,11 @@ class Server:
                 "Unauthenticated server. Either define a `union.Auth_` in your schema or set `options.auth_required` to `false`."
             )
 
-    async def process(self, request_message_bytes: bytes, override_headers: dict[str, object] = {}) -> 'Response':
+    async def process(self, request_message_bytes: bytes, update_headers: UpdateHeaders | None = None) -> 'Response':
         """
         Process a given telepact Request Message into a telepact Response Message.
         """
         from .internal.ProcessBytes import process_bytes
 
-        return await process_bytes(request_message_bytes, override_headers, self.serializer, self.telepact_schema, self.on_error,
-                                   self.on_request, self.on_response, self.on_auth, self.middleware, self.function_router)
+        return await process_bytes(request_message_bytes, update_headers, self.serializer, self.telepact_schema, self.on_error,
+                                    self.on_request, self.on_response, self.on_auth, self.middleware, self.function_router)
