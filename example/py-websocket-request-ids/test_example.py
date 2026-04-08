@@ -27,10 +27,10 @@ from server import create_websocket_server
 class PendingWebSocketTransport:
     def __init__(self, websocket: websockets.ClientConnection) -> None:
         self.websocket = websocket
-        self.pending: dict[object, asyncio.Future[Message]] = {}
+        self.pending: dict[str, asyncio.Future[Message]] = {}
         self.receive_task: asyncio.Task[None] | None = None
-        self.receive_order: list[object] = []
-        self.send_order: list[object] = []
+        self.receive_order: list[str] = []
+        self.send_order: list[str] = []
         self.send_lock = asyncio.Lock()
         self.serializer: Serializer | None = None
         self.next_request_number = 1
@@ -46,6 +46,8 @@ class PendingWebSocketTransport:
             request_id = f'call-{self.next_request_number}'
             request_headers['@id_'] = request_id
             self.next_request_number += 1
+        elif not isinstance(request_id, str):
+            raise RuntimeError(f'expected string @id_, got {request_id!r}')
 
         future = asyncio.get_running_loop().create_future()
         self.pending[request_id] = future
@@ -68,6 +70,8 @@ class PendingWebSocketTransport:
 
                 response_message = self.serializer.deserialize(response_bytes)
                 response_id = response_message.headers.get('@id_')
+                if not isinstance(response_id, str):
+                    raise RuntimeError(f'expected string response @id_, got {response_id!r}')
                 response_future = self.pending.get(response_id)
                 if response_future is None:
                     raise RuntimeError(f'unexpected response id: {response_id!r}')
