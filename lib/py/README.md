@@ -32,31 +32,26 @@ schema = TelepactSchema.from_file_json_map(files.filenames_to_json)
 # The schema directory may contain multiple *.telepact.yaml and
 # *.telepact.json files. Subdirectories are rejected.
 
-async def handler(request_message: 'Message') -> 'Message':
-    function_name = next(iter(request_message.body.keys()))
+async def greet(function_name: str, request_message: 'Message') -> 'Message':
     arguments = request_message.body[function_name]
+    subject = arguments['subject']
+    return Message({}, {'Ok_': {'message': f'Hello {subject}!'}})
 
+
+async def middleware(request_message: 'Message', function_router) -> 'Message':
+    function_name = request_message.get_body_target()
     try:
-        # Early in the handler, perform any pre-flight "middleware" operations, such as
-        # authentication, tracing, or logging.
         log.info("Function started", {'function': function_name})
-
-        # Dispatch request to appropriate function handling code.
-        # (This example uses manual dispatching, but you can also use a more advanced pattern.)
-        if function_name == 'fn.greet':
-            subject = arguments['subject']
-            return Message({}, {'Ok_': {'message': f'Hello {subject}!'}})
-
-        raise Exception('Function not found')
+        return await function_router.route(request_message)
     finally:
-        # At the end the handler, perform any post-flight "middleware" operations
         log.info("Function finished", {'function': function_name})
 
 
 options = Server.Options()
 # Set this to False when your schema does not define union.Auth_.
 options.auth_required = False
-server = Server(schema, handler, options)
+options.middleware = middleware
+server = Server(schema, {'fn.greet': greet}, options)
 
 
 # Wire up request/response bytes from your transport of choice

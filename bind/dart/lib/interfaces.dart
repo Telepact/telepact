@@ -177,14 +177,15 @@ class Server {
   /// Initializes the server with the schema, handler function, and options.
   static b.Server initServer(b.TelepactSchema schema,
       Future<Message> Function(Message im) handler, ServerOptions options) {
-    JSPromise outerHandler(b.Message om) {
+    JSPromise outerMiddleware(b.Message om, JSAny _) {
       final m = Message.fromJS(om);
       return handler(m).then((response) {
         return response._message;
       }).toJS;
     }
 
-    return b.Server(schema, outerHandler.toJS, options._options);
+    options._options.middleware = outerMiddleware.toJS;
+    return b.Server(schema, <String, Object>{}.jsify() as JSObject, options._options);
   }
 
   /// Processes a request message and returns the response as a [Response].

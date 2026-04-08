@@ -32,6 +32,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import io.github.telepact.Message;
+import io.github.telepact.Server.FunctionRouter;
+import io.github.telepact.Server.Middleware;
 import io.github.telepact.TelepactError;
 import io.github.telepact.TelepactSchema;
 import io.github.telepact.internal.types.TType;
@@ -41,7 +43,8 @@ import io.github.telepact.internal.validation.ValidateContext;
 import io.github.telepact.internal.validation.ValidationFailure;
 
 public class HandleMessage {
-    static Message handleMessage(Message requestMessage, Map<String, Object> overrideHeaders, TelepactSchema telepactSchema, Function<Message, Message> handler,
+    static Message handleMessage(Message requestMessage, Map<String, Object> overrideHeaders, TelepactSchema telepactSchema, Middleware middleware,
+            FunctionRouter functionRouter,
             Consumer<Throwable> onError, Function<Map<String, Object>, Map<String, Object>> onAuth) {
         final var responseHeaders = (Map<String, Object>) new HashMap<String, Object>();
         final Map<String, Object> requestHeaders = requestMessage.headers;
@@ -165,7 +168,7 @@ public class HandleMessage {
                             : includeInternal ? telepactSchema.full : telepactSchema.original)));
         } else {
             try {
-                resultMessage = handler.apply(callMessage);
+                resultMessage = middleware.apply(callMessage, functionRouter);
             } catch (Throwable e) {
                 try {
                     onError.accept(new TelepactError(

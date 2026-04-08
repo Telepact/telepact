@@ -24,6 +24,7 @@ from .GetApiDefinitionsWithExamples import get_api_definitions_with_examples
 from .types.TTypeDeclaration import TTypeDeclaration
 
 if TYPE_CHECKING:
+    from ..Server import FunctionRouter, Middleware
     from ..internal.validation.ValidationFailure import ValidationFailure
     from .types.TType import TType
     from ..TelepactSchema import TelepactSchema
@@ -33,7 +34,8 @@ async def handle_message(
     request_message: 'Message',
     override_headers: dict[str, object],
     telepact_schema: 'TelepactSchema',
-    handler: Callable[['Message'], Awaitable['Message']],
+    middleware: 'Middleware',
+    function_router: 'FunctionRouter',
     on_error: Callable[[Exception], None],
     on_auth: Callable[[dict[str, object]], dict[str, object]],
 ) -> 'Message':
@@ -178,7 +180,7 @@ async def handle_message(
         result_message = Message({}, {"Ok_": {"api": api_definitions}})
     else:
         try:
-            result_message = await handler(call_message)
+            result_message = await middleware(call_message, function_router)
         except Exception as e:
             try:
                 on_error(

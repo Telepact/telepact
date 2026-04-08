@@ -59,21 +59,23 @@ export function createExampleServer(): HttpServer {
         return { '@userId': 'user-123' };
     };
 
-    const telepactServer = new Server(schema, async (message) => {
-        const userId = message.headers['@userId'];
-        if (userId !== 'user-123') {
+    const telepactServer = new Server(schema, {
+        'fn.me': async (functionName, requestMessage) => {
+            const args = requestMessage.body[functionName];
+            if (typeof args !== 'object' || args === null) {
+                throw new Error(`Invalid arguments for ${functionName}`);
+            }
+            const userId = requestMessage.headers['@userId'];
+            if (userId !== 'user-123') {
+                return new Message({}, {
+                    ErrorUnauthenticated_: { 'message!': 'missing or invalid session cookie' },
+                });
+            }
+
             return new Message({}, {
-                ErrorUnauthenticated_: { 'message!': 'missing or invalid session cookie' },
+                Ok_: { userId },
             });
-        }
-
-        if (message.getBodyTarget() !== 'fn.me') {
-            throw new Error(`Unknown function: ${message.getBodyTarget()}`);
-        }
-
-        return new Message({}, {
-            Ok_: { userId },
-        });
+        },
     }, options);
 
     return createServer(async (request: IncomingMessage, response: ServerResponse) => {

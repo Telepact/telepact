@@ -18,6 +18,12 @@ package internal
 
 import "fmt"
 
+type FunctionRouter interface {
+	Route(ServerMessage) (ServerMessage, error)
+}
+
+type Middleware func(ServerMessage, FunctionRouter) (ServerMessage, error)
+
 func ProcessBytes(
 	requestMessageBytes []byte,
 	overrideHeaders map[string]any,
@@ -28,7 +34,8 @@ func ProcessBytes(
 	onRequest func(ServerMessage),
 	onResponse func(ServerMessage),
 	onAuth func(map[string]any) map[string]any,
-	handler func(ServerMessage) (ServerMessage, error),
+	middleware Middleware,
+	functionRouter FunctionRouter,
 ) (ServerMessage, []byte, error) {
 	requestMessage, err := ParseRequestMessage(requestMessageBytes, deserialize, schema, onError)
 	if err != nil {
@@ -37,7 +44,7 @@ func ProcessBytes(
 
 	safeInvokeMessage(onRequest, requestMessage)
 
-	responseMessage, err := HandleMessage(requestMessage, overrideHeaders, schema, handler, onError, onAuth)
+	responseMessage, err := HandleMessage(requestMessage, overrideHeaders, schema, middleware, functionRouter, onError, onAuth)
 	if err != nil {
 		invokeOnError(onError, err)
 		return buildUnknownResponse(serialize)

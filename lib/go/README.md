@@ -44,27 +44,12 @@ func main() {
     // The schema directory may contain multiple *.telepact.yaml and
     // *.telepact.json files. Subdirectories are rejected.
 
-    handler := func(request telepact.Message) (telepact.Message, error) {
-        functionName, err := request.BodyTarget()
-        if err != nil {
-            return telepact.Message{}, err
-        }
-
-        arguments, err := request.BodyPayload()
-        if err != nil {
-            return telepact.Message{}, err
-        }
-
-        // Early in the handler, perform any pre-flight "middleware" operations, such as
-        // authentication, tracing, or logging.
-        log.Printf("Function started: %s", functionName)
-    
-        // At the end the handler, perform any post-flight "middleware" operations
-        defer log.Printf("Function finished: %s", functionName)
-
-        // Dispatch request to appropriate function handling code.
-        // (This example uses manual dispatching, but you can also use a more advanced pattern.)
-        if functionName == "fn.greet" {
+    functionRoutes := map[string]telepact.FunctionRoute{
+        "fn.greet": func(functionName string, requestMessage telepact.Message) (telepact.Message, error) {
+            arguments, ok := requestMessage.Body[functionName].(map[string]any)
+            if !ok {
+                return telepact.Message{}, fmt.Errorf("unexpected %s payload", functionName)
+            }
             subject, _ := arguments["subject"].(string)
             return telepact.NewMessage(
                 map[string]any{},
@@ -74,15 +59,22 @@ func main() {
                     },
                 },
             ), nil
-        }
-
-        return telepact.Message{}, telepact.NewTelepactError("function not found")
+        },
     }
 
 	serverOptions := telepact.NewServerOptions()
 	// Set this to false when your schema does not define union.Auth_.
 	serverOptions.AuthRequired = false
-	server, err := telepact.NewServer(schema, handler, serverOptions)
+	serverOptions.Middleware = func(request telepact.Message, functionRouter *telepact.FunctionRouter) (telepact.Message, error) {
+        functionName, err := request.BodyTarget()
+        if err != nil {
+            return telepact.Message{}, err
+        }
+        log.Printf("Function started: %s", functionName)
+        defer log.Printf("Function finished: %s", functionName)
+        return functionRouter.Route(request)
+    }
+	server, err := telepact.NewServer(schema, functionRoutes, serverOptions)
 	if err != nil {
 		log.Fatal(err)
     }

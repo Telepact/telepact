@@ -14,7 +14,7 @@
 #|  limitations under the License.
 #|
 
-from typing import Callable, TYPE_CHECKING, Awaitable, NamedTuple
+from typing import Callable, TYPE_CHECKING, Awaitable
 
 from .DefaultSerialization import DefaultSerialization
 from .Serializer import Serializer
@@ -25,6 +25,25 @@ if TYPE_CHECKING:
     from .Message import Message
     from .TelepactSchema import TelepactSchema
     from .Response import Response
+
+FunctionRoute = Callable[[str, 'Message'], Awaitable['Message']]
+Middleware = Callable[['Message', 'FunctionRouter'], Awaitable['Message']]
+
+
+class FunctionRouter:
+    def __init__(self, function_routes: dict[str, FunctionRoute]) -> None:
+        self.function_routes = function_routes
+
+    async def route(self, request_message: 'Message') -> 'Message':
+        function_name = request_message.get_body_target()
+        function_route = self.function_routes.get(function_name)
+        if function_route is None:
+            raise RuntimeError(f"Unknown function: {function_name}")
+        return await function_route(function_name, request_message)
+
+
+async def _default_middleware(request_message: 'Message', function_router: FunctionRouter) -> 'Message':
+    return await function_router.route(request_message)
 
 class Server:
     """
@@ -40,16 +59,18 @@ class Server:
             self.on_request = lambda m: None
             self.on_response = lambda m: None
             self.on_auth = lambda headers: {}
+            self.middleware = _default_middleware
             self.auth_required = True
             self.serialization = DefaultSerialization()
 
-    def __init__(self, telepact_schema: 'TelepactSchema', handler: Callable[['Message'], Awaitable['Message']], options: Options):
+    def __init__(self, telepact_schema: 'TelepactSchema', function_routes: dict[str, FunctionRoute], options: Options):
         """
-        Create a server with the given telepact schema and handler.
+        Create a server with the given telepact schema and function routes.
         """
         from .internal.binary.ConstructBinaryEncoding import construct_binary_encoding
 
-        self.handler = handler
+        self.function_router = FunctionRouter(function_routes)
+        self.middleware = options.middleware
         self.on_error = options.on_error
         self.on_request = options.on_request
         self.on_response = options.on_response
@@ -74,4 +95,4 @@ class Server:
         from .internal.ProcessBytes import process_bytes
 
         return await process_bytes(request_message_bytes, override_headers, self.serializer, self.telepact_schema, self.on_error,
-                                   self.on_request, self.on_response, self.on_auth, self.handler)
+                                   self.on_request, self.on_response, self.on_auth, self.middleware, self.function_router)
