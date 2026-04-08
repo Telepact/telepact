@@ -1,31 +1,30 @@
 {
   "changed_paths": [
-    "bind/dart/package.json",
-    "bind/dart/pubspec.lock",
+    "AGENTS.md",
+    "example/ts-http-cookie-auth/Makefile",
     "example/ts-http-cookie-auth/package-lock.json",
-    "lib/ts/package-lock.json",
-    "lib/ts/package.json",
-    "sdk/cli/pyproject.toml",
+    "lib/py/telepact/internal/generation/GenerateRandomUnion.py",
+    "lib/py/telepact/internal/schema/GetAuthTelepactJson.py",
+    "lib/py/telepact/internal/schema/GetInternalTelepactJson.py",
+    "lib/py/telepact/internal/schema/GetMockTelepactJson.py",
+    "sdk/cli/telepact_cli/cli.py",
+    "sdk/cli/telepact_cli/resources.py",
+    "sdk/cli/tests/test_resources.py",
     "sdk/console/package-lock.json",
     "sdk/console/package.json",
-    "sdk/prettier/package.json",
-    "tool/telepact_project_cli/telepact_project_cli/cli.py",
-    "tool/telepact_project_cli/tests/test_release_plan.py"
+    "sdk/console/proxy-server.cjs",
+    "test/runner/README.md"
   ],
   "direct_targets": [
     "cli",
     "console",
-    "dart",
-    "prettier",
-    "ts"
+    "py"
   ],
-  "pr_number": 330,
+  "pr_number": 338,
   "targets": [
     "cli",
     "console",
-    "dart",
-    "prettier",
-    "ts"
+    "py"
   ],
-  "version": "1.0.0-alpha.246"
+  "version": "1.0.0-alpha.247"
 }
