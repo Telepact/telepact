@@ -44,7 +44,6 @@ jobs:
           cache: npm
           cache-dependency-path: |
             bind/dart/package-lock.json
-            example/ts-http-cookie-auth/package-lock.json
             lib/ts/package-lock.json
             sdk/console/package-lock.json
             sdk/prettier/package-lock.json

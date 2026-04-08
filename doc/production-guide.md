@@ -130,7 +130,7 @@ headers while calling `server.process(...)`. For example, an HTTP adapter can
 read a session cookie and apply it with `updateHeaders`:
 
 A runnable minimal version of this pattern lives in
-[`example/ts-http-cookie-auth`](../example/ts-http-cookie-auth/README.md).
+[`example/py-http-cookie-auth`](../example/py-http-cookie-auth/README.md).
 
 ```ts
 const response = await server.process(requestBytes, (headers) => {
