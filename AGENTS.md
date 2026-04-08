@@ -53,6 +53,6 @@ The entire project uses a hierarchical `Makefile` system. The root `Makefile` de
 -   `bind/dart`: Language-specific bindings for Dart.
 -   `test/runner`: The cross-language integration test suite. This is the best place to understand how different language implementations are expected to behave and interact.
 -   `common/*.telepact.yaml`: The common schema files that define the internal APIs used by Telepact itself.
--   `sdk/console`: A SvelteKit and TypeScript project for the developer console.
+-   `sdk/console`: A React and Vite TypeScript project for the developer console.
 -   `sdk/cli`: A Python/uv project for the command-line interface.
 -   `sdk/prettier`: A project for the Prettier plugin.

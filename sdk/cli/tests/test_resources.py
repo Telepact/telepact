@@ -40,7 +40,7 @@ class _FakeTraversable:
 
 def test_calculator_schema_load_avoids_deprecation_warning(monkeypatch) -> None:
     schema_text = Path('telepact_cli/calculator.telepact.yaml').read_text()
-    monkeypatch.setattr(resources.pkg_resources, 'files', lambda package: _FakeTraversable(schema_text))
+    monkeypatch.setattr(resources.importlib_resources, 'files', lambda package: _FakeTraversable(schema_text))
 
     with warnings.catch_warnings(record=True) as caught:
         warnings.simplefilter('always', DeprecationWarning)

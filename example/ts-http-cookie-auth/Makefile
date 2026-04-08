@@ -19,4 +19,4 @@ SHELL := /bin/bash
 .PHONY: run
 
 run:
-	@set -euo pipefail; $(MAKE) -C ../../lib/ts; rm -f telepact.tgz; cp ../../lib/ts/dist-tgz/*.tgz telepact.tgz; npm install; npm test
+	@set -euo pipefail; $(MAKE) -C ../../lib/ts; rm -f telepact.tgz; cp ../../lib/ts/dist-tgz/*.tgz telepact.tgz; npm install --no-package-lock; npm test
