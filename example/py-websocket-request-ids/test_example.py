@@ -41,8 +41,11 @@ class PendingWebSocketTransport:
             self.receive_task = asyncio.create_task(self.receive_loop())
 
         request_headers = dict(message.headers)
-        request_id = request_headers.setdefault('@id_', f'call-{self.next_request_number}')
-        self.next_request_number += 1
+        request_id = request_headers.get('@id_')
+        if request_id is None:
+            request_id = f'call-{self.next_request_number}'
+            request_headers['@id_'] = request_id
+            self.next_request_number += 1
 
         future = asyncio.get_running_loop().create_future()
         self.pending[request_id] = future
