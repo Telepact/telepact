@@ -417,7 +417,7 @@ async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, 
             else:
                 response = await server.process(
                     request_bytes,
-                    lambda headers: headers.update({'@override': 'old'}),
+                    lambda headers: headers.update({'@override': 'new'}),
                 )
                 return response.bytes
 

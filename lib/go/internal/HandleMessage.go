@@ -55,7 +55,7 @@ func HandleMessage(
 	responseHeaders := make(map[string]any)
 	if updateHeaders != nil {
 		if err := invokeUpdateHeaders(updateHeaders, requestHeaders); err != nil {
-			return ServerMessage{}, err
+			return ServerMessage{}, fmt.Errorf("telepact: updateHeaders failed while preparing request headers: %w", err)
 		}
 	}
 
