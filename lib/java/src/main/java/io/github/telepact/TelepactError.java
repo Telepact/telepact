@@ -61,10 +61,9 @@ public class TelepactError extends RuntimeException {
         return this.caseId;
     }
 
-    public TelepactError withCaseId(String caseId) {
-        if (this.caseId == null && caseId != null && !caseId.isEmpty()) {
+    public void setCaseId(String caseId) {
+        if (caseId != null && !caseId.isEmpty()) {
             this.caseId = caseId;
         }
-        return this;
     }
 }

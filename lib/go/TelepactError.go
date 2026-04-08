@@ -34,13 +34,12 @@ func NewTelepactErrorWithCause(message string, kind string, cause error) *Telepa
 	return &TelepactError{message: message, kind: kind, cause: cause}
 }
 
-// WithCaseID associates a server-side case identifier with this error.
-func (e *TelepactError) WithCaseID(caseID string) *TelepactError {
-	if e == nil || caseID == "" || e.caseID != "" {
-		return e
+// SetCaseID associates a server-side case identifier with this error.
+func (e *TelepactError) SetCaseID(caseID string) {
+	if e == nil || caseID == "" {
+		return
 	}
 	e.caseID = caseID
-	return e
 }
 
 // Error implements the error interface.

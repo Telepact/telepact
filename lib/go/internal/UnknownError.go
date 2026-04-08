@@ -75,12 +75,11 @@ func (e *telepactError) CaseID() string {
 	return e.caseID
 }
 
-func (e *telepactError) WithCaseID(caseID string) *telepactError {
-	if e == nil || caseID == "" || e.caseID != "" {
-		return e
+func (e *telepactError) SetCaseID(caseID string) {
+	if e == nil || caseID == "" {
+		return
 	}
 	e.caseID = caseID
-	return e
 }
 
 func ensureUnknownCaseID(err *telepactError) string {
@@ -88,7 +87,7 @@ func ensureUnknownCaseID(err *telepactError) string {
 		return err.CaseID()
 	}
 	caseID := newUnknownCaseID()
-	err.WithCaseID(caseID)
+	err.SetCaseID(caseID)
 	return caseID
 }
 

@@ -32,7 +32,7 @@ public final class UnknownError {
             return existing;
         }
         final var caseId = UUID.randomUUID().toString();
-        error.withCaseId(caseId);
+        error.setCaseId(caseId);
         return caseId;
     }
 
