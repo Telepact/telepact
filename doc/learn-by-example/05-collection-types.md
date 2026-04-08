@@ -61,7 +61,7 @@ curl -s localhost:8000/api -d '[{"@auth_": {"Ephemeral": {"username": "collectio
 ```
 
 One subtle rule matters here: collections are not nullable. We do not write
-`[]?` or `{ }?`. That is intentional, because collections already have a built-in
+`[]?` or `{}?`. That is intentional, because collections already have a built-in
 empty value: length zero.
 
 Next, let's move from free-form collections to fixed-shape objects in

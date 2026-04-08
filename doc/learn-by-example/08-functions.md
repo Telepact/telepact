@@ -1,4 +1,4 @@
-# 08. Function
+# 08. Functions
 
 A Telepact function is an argument struct plus a result union.
 

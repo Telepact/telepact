@@ -1,4 +1,4 @@
-# 07. Union
+# 07. Unions
 
 A union is a sum type. On the wire, Telepact represents it with a tagged-object
 pattern: one uppercase tag, plus the fields that belong to that tag.
