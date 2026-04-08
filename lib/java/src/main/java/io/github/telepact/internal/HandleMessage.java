@@ -42,8 +42,8 @@ import io.github.telepact.internal.types.TUnion;
 import io.github.telepact.internal.validation.ValidateContext;
 import io.github.telepact.internal.validation.ValidationFailure;
 
-public class HandleMessage {
-    static Message handleMessage(Message requestMessage, Map<String, Object> overrideHeaders, TelepactSchema telepactSchema, Middleware middleware,
+    public class HandleMessage {
+    static Message handleMessage(Message requestMessage, Consumer<Map<String, Object>> updateHeaders, TelepactSchema telepactSchema, Middleware middleware,
             FunctionRouter functionRouter,
             Consumer<Throwable> onError, Function<Map<String, Object>, Map<String, Object>> onAuth) {
         final var responseHeaders = (Map<String, Object>) new HashMap<String, Object>();
@@ -52,7 +52,9 @@ public class HandleMessage {
         final Map<String, TType> parsedTelepactSchema = telepactSchema.parsed;
         final Map.Entry<String, Object> requestEntry = requestBody.entrySet().stream().findAny().get();
 
-        requestHeaders.putAll(overrideHeaders);
+        if (updateHeaders != null) {
+            updateHeaders.accept(requestHeaders);
+        }
 
         final String requestTargetInit = requestEntry.getKey();
         final Map<String, Object> requestPayload = (Map<String, Object>) requestEntry.getValue();

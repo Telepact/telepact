@@ -508,8 +508,9 @@ function startTestServer(
                     let response = await alternateServer.process(requestBytes);
                     responseBytes = response.bytes;
                 } else {
-                    const overrideHeaders: Record<string, any> = { '@override': 'new' };
-                    let response = await server.process(requestBytes, overrideHeaders);
+                    let response = await server.process(requestBytes, (headers) => {
+                        headers['@override'] = 'new';
+                    });
                     responseBytes = response.bytes;
                 }
             } finally {

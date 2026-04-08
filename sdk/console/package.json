@@ -1,6 +1,6 @@
 {
   "name": "telepact-console",
-  "version": "1.0.0-alpha.243",
+  "version": "1.0.0-alpha.248",
   "description": "A web-based interface for inspecting and testing Telepact APIs.",
   "license": "Apache-2.0",
   "repository": {
@@ -41,7 +41,6 @@
     "@tailwindcss/vite": "^4.2.2",
     "@types/react": "^19.0.12",
     "@types/react-dom": "^19.0.5",
-    "@types/dompurify": "^3.2.0",
     "@types/node": "^25.0.3",
     "@vitejs/plugin-react": "^6.0.1",
     "autoprefixer": "^10.4.17",

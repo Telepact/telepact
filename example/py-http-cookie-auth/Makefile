@@ -15,10 +15,9 @@
 #|
 
 SHELL := /bin/bash
-VERSION := $(shell cat ../../VERSION.txt)
-MAVEN := mvn -q -s settings.xml -Dtelepact.version=$(VERSION)
+PYTHON := .venv/bin/python
 
 .PHONY: run
 
 run:
-	@set -euo pipefail; $(MAKE) -C ../../lib/java; $(MAVEN) test
+	@set -euo pipefail; $(MAKE) -C ../../lib/py; rm -rf .venv; uv venv --python python3.11 .venv; uv pip install --python $(PYTHON) pytest ../../lib/py/dist/*.tar.gz; $(PYTHON) -m pytest -q

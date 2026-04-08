@@ -549,8 +549,9 @@ public class Main {
                     final var response = alternateServer.process(requestBytes);
                     responseBytes = response.bytes;
                 } else {
-                    Map<String, Object> overrideHeaders = Map.of("@override", "new");
-                    final var response = server.process(requestBytes, overrideHeaders);
+                    final var response = server.process(requestBytes, (headers) -> {
+                        headers.put("@override", "new");
+                    });
                     responseBytes = response.bytes;
                 }
             }

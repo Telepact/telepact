@@ -14,9 +14,9 @@
 #|  limitations under the License.
 #|
 
-import importlib.resources as pkg_resources
+from importlib import resources as importlib_resources
 from ... import json
 
 
 def get_mock_telepact_json() -> str:
-    return pkg_resources.files(json).joinpath('mock-internal.telepact.json').read_text()
+    return importlib_resources.files(json).joinpath('mock-internal.telepact.json').read_text()
