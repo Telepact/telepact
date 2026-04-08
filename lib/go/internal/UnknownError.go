@@ -23,13 +23,67 @@ import (
 	"fmt"
 	"sync/atomic"
 	"time"
-
-	telepact "github.com/telepact/telepact/lib/go"
 )
 
 var unknownCaseIDFallbackCounter uint64
 
-func ensureUnknownCaseID(err *telepact.TelepactError) string {
+type telepactError struct {
+	message string
+	kind    string
+	caseID  string
+	cause   error
+}
+
+func newTelepactError(message string, kind string, cause error) *telepactError {
+	return &telepactError{message: message, kind: kind, cause: cause}
+}
+
+func (e *telepactError) Error() string {
+	if e == nil {
+		return "<nil>"
+	}
+	if e.message == "" {
+		if e.cause != nil {
+			return e.cause.Error()
+		}
+		return "telepact error"
+	}
+	if e.cause != nil {
+		return e.message + ": " + e.cause.Error()
+	}
+	return e.message
+}
+
+func (e *telepactError) Unwrap() error {
+	if e == nil {
+		return nil
+	}
+	return e.cause
+}
+
+func (e *telepactError) Kind() string {
+	if e == nil {
+		return ""
+	}
+	return e.kind
+}
+
+func (e *telepactError) CaseID() string {
+	if e == nil {
+		return ""
+	}
+	return e.caseID
+}
+
+func (e *telepactError) WithCaseID(caseID string) *telepactError {
+	if e == nil || caseID == "" || e.caseID != "" {
+		return e
+	}
+	e.caseID = caseID
+	return e
+}
+
+func ensureUnknownCaseID(err *telepactError) string {
 	if err.CaseID() != "" {
 		return err.CaseID()
 	}
@@ -49,12 +103,12 @@ func newUnknownCaseID() string {
 	return fmt.Sprintf("%s-%s-%s-%s-%s", encoded[0:8], encoded[8:12], encoded[12:16], encoded[16:20], encoded[20:32])
 }
 
-func wrapUnknownError(err error, message string, kind string) *telepact.TelepactError {
-	var telepactErr *telepact.TelepactError
+func wrapUnknownError(err error, message string, kind string) *telepactError {
+	var telepactErr *telepactError
 	if errors.As(err, &telepactErr) {
 		return telepactErr
 	}
-	return telepact.NewTelepactErrorWithCause(message, kind, err)
+	return newTelepactError(message, kind, err)
 }
 
 func newUnknownErrorResponse(headers map[string]any, caseID string) ServerMessage {

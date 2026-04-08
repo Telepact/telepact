@@ -19,7 +19,6 @@ package internal
 import (
 	"fmt"
 
-	telepact "github.com/telepact/telepact/lib/go"
 	"github.com/telepact/telepact/lib/go/internal/binary"
 	"github.com/telepact/telepact/lib/go/internal/types"
 )
@@ -132,7 +131,7 @@ func HandleMessage(
 	if _, ok := requestHeaders["@auth_"]; ok {
 		authHeaders, err := invokeOnAuth(onAuth, requestHeaders)
 		if err != nil {
-			wrapped := telepact.NewTelepactErrorWithCause(
+			wrapped := newTelepactError(
 				fmt.Sprintf("telepact auth handler failed while handling %s", functionName),
 				"handler",
 				err,
@@ -197,7 +196,7 @@ func HandleMessage(
 	default:
 		resp, err := middleware(callMessage, functionRouter)
 		if err != nil {
-			wrapped := telepact.NewTelepactErrorWithCause(
+			wrapped := newTelepactError(
 				fmt.Sprintf("telepact handler failed while handling %s", functionName),
 				"handler",
 				err,

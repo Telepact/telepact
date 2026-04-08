@@ -17,6 +17,8 @@
 package telepact
 
 import (
+	"errors"
+
 	telepactinternal "github.com/telepact/telepact/lib/go/internal"
 	"github.com/telepact/telepact/lib/go/internal/binary"
 )
@@ -186,6 +188,32 @@ func (s *Server) ProcessWithHeaders(requestMessageBytes []byte, updateHeaders fu
 		s.onResponse(NewMessage(message.Headers, message.Body))
 	}
 
+	internalOnError := func(err error) {
+		if err == nil {
+			return
+		}
+
+		var telepactErr *TelepactError
+		if errors.As(err, &telepactErr) {
+			s.onError(telepactErr)
+			return
+		}
+
+		var detailedErr interface {
+			error
+			Kind() string
+			CaseID() string
+		}
+		if errors.As(err, &detailedErr) {
+			wrapped := NewTelepactErrorWithCause(err.Error(), detailedErr.Kind(), errors.Unwrap(err))
+			wrapped.WithCaseID(detailedErr.CaseID())
+			s.onError(wrapped)
+			return
+		}
+
+		s.onError(err)
+	}
+
 	internalFunctionRouter := &serverFunctionRouterAdapter{
 		functionRouter: s.functionRouter,
 	}
@@ -204,7 +232,7 @@ func (s *Server) ProcessWithHeaders(requestMessageBytes []byte, updateHeaders fu
 		deserialize,
 		serialize,
 		s.telepactSchema,
-		s.onError,
+		internalOnError,
 		internalOnRequest,
 		internalOnResponse,
 		s.onAuth,
