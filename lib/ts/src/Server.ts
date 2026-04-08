@@ -28,6 +28,7 @@ import { Response } from './Response.js';
 export type FunctionRoute = (functionName: string, requestMessage: Message) => Promise<Message>;
 export type FunctionRoutes = Record<string, FunctionRoute>;
 export type Middleware = (requestMessage: Message, functionRouter: FunctionRouter) => Promise<Message>;
+export type UpdateHeaders = (headers: Record<string, any>) => void;
 
 export class FunctionRouter {
     functionRoutes: FunctionRoutes;
@@ -80,10 +81,10 @@ export class Server {
         }
     }
 
-    async process(requestMessageBytes: Uint8Array, overrideHeaders: Record<string, any> = {}): Promise<Response> {
+    async process(requestMessageBytes: Uint8Array, updateHeaders?: UpdateHeaders): Promise<Response> {
         return await processBytes(
             requestMessageBytes,
-            overrideHeaders,
+            updateHeaders,
             this.serializer,
             this.telepactSchema,
             this.onError,

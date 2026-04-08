@@ -24,7 +24,7 @@ from .GetApiDefinitionsWithExamples import get_api_definitions_with_examples
 from .types.TTypeDeclaration import TTypeDeclaration
 
 if TYPE_CHECKING:
-    from ..Server import FunctionRouter, Middleware
+    from ..Server import FunctionRouter, Middleware, UpdateHeaders
     from ..internal.validation.ValidationFailure import ValidationFailure
     from .types.TType import TType
     from ..TelepactSchema import TelepactSchema
@@ -32,7 +32,7 @@ if TYPE_CHECKING:
 
 async def handle_message(
     request_message: 'Message',
-    override_headers: dict[str, object],
+    update_headers: 'UpdateHeaders | None',
     telepact_schema: 'TelepactSchema',
     middleware: 'Middleware',
     function_router: 'FunctionRouter',
@@ -53,7 +53,8 @@ async def handle_message(
     parsed_telepact_schema: dict[str, TType] = telepact_schema.parsed
     request_entry: tuple[str, object] = next(iter(request_body.items()))
 
-    request_headers.update(override_headers)
+    if update_headers is not None:
+        update_headers(request_headers)
 
     request_target_init = request_entry[0]
     request_payload = cast(

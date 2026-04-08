@@ -74,11 +74,13 @@ type ServerOptions struct {
 // NewServerOptions constructs ServerOptions populated with defaults.
 func NewServerOptions() *ServerOptions {
 	return &ServerOptions{
-		OnError:       func(error) {},
-		OnRequest:     func(Message) {},
-		OnResponse:    func(Message) {},
-		OnAuth:        func(map[string]any) map[string]any { return map[string]any{} },
-		Middleware:    func(requestMessage Message, functionRouter *FunctionRouter) (Message, error) { return functionRouter.Route(requestMessage) },
+		OnError:    func(error) {},
+		OnRequest:  func(Message) {},
+		OnResponse: func(Message) {},
+		OnAuth:     func(map[string]any) map[string]any { return map[string]any{} },
+		Middleware: func(requestMessage Message, functionRouter *FunctionRouter) (Message, error) {
+			return functionRouter.Route(requestMessage)
+		},
 		AuthRequired:  true,
 		Serialization: NewDefaultSerialization(),
 	}
@@ -157,14 +159,10 @@ func NewServer(telepactSchema *TelepactSchema, functionRoutes map[string]Functio
 	}, nil
 }
 
-// ProcessWithHeaders processes a request message with optional override headers.
-func (s *Server) ProcessWithHeaders(requestMessageBytes []byte, overrideHeaders map[string]any) (Response, error) {
+// ProcessWithHeaders processes a request message with optional header updates.
+func (s *Server) ProcessWithHeaders(requestMessageBytes []byte, updateHeaders func(map[string]any)) (Response, error) {
 	if s == nil {
 		return Response{}, NewTelepactError("telepact: server is nil")
-	}
-
-	if overrideHeaders == nil {
-		overrideHeaders = map[string]any{}
 	}
 
 	deserialize := func(bytes []byte) (telepactinternal.ServerMessage, error) {
@@ -202,7 +200,7 @@ func (s *Server) ProcessWithHeaders(requestMessageBytes []byte, overrideHeaders 
 
 	responseMessage, responseBytes, err := telepactinternal.ProcessBytes(
 		requestMessageBytes,
-		overrideHeaders,
+		updateHeaders,
 		deserialize,
 		serialize,
 		s.telepactSchema,
@@ -220,7 +218,7 @@ func (s *Server) ProcessWithHeaders(requestMessageBytes []byte, overrideHeaders 
 	return NewResponse(responseBytes, responseMessage.Headers), nil
 }
 
-// Process processes a request message without any header overrides.
+// Process processes a request message without any header updates.
 func (s *Server) Process(requestMessageBytes []byte) (Response, error) {
 	return s.ProcessWithHeaders(requestMessageBytes, nil)
 }

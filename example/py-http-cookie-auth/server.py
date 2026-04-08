@@ -71,8 +71,12 @@ def create_http_server(host: str = '127.0.0.1', port: int = 0) -> ThreadingHTTPS
             content_length = int(self.headers.get('Content-Length', '0'))
             request_bytes = self.rfile.read(content_length)
             session_token = read_cookie(self.headers.get('Cookie'), 'session')
-            override_headers = {'@auth_': {'sessionToken': session_token}} if session_token else {}
-            response = asyncio.run(telepact_server.process(request_bytes, override_headers))
+
+            def update_headers(headers: dict[str, object]) -> None:
+                if session_token:
+                    headers['@auth_'] = {'sessionToken': session_token}
+
+            response = asyncio.run(telepact_server.process(request_bytes, update_headers))
             content_type = 'application/octet-stream' if '@bin_' in response.headers else 'application/json'
 
             self.send_response(200)

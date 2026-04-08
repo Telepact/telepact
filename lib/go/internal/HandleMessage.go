@@ -26,7 +26,7 @@ import (
 // HandleMessage mirrors the Python server handler orchestration using primitive maps.
 func HandleMessage(
 	requestMessage ServerMessage,
-	overrideHeaders map[string]any,
+	updateHeaders func(map[string]any),
 	schema SchemaAccessor,
 	middleware Middleware,
 	functionRouter FunctionRouter,
@@ -52,13 +52,11 @@ func HandleMessage(
 		requestBody = make(map[string]any)
 	}
 
-	if overrideHeaders == nil {
-		overrideHeaders = map[string]any{}
-	}
-
 	responseHeaders := make(map[string]any)
-	for key, value := range overrideHeaders {
-		requestHeaders[key] = value
+	if updateHeaders != nil {
+		if err := invokeUpdateHeaders(updateHeaders, requestHeaders); err != nil {
+			return ServerMessage{}, fmt.Errorf("telepact: updateHeaders failed while preparing request headers: %w", err)
+		}
 	}
 
 	requestTargetInit, requestPayload, err := firstServerMessageEntry(requestBody)
@@ -302,6 +300,20 @@ func invokeOnAuth(callback func(map[string]any) map[string]any, headers map[stri
 		return map[string]any{}, nil
 	}
 	return result, nil
+}
+
+func invokeUpdateHeaders(callback func(map[string]any), headers map[string]any) (err error) {
+	defer func() {
+		if recovered := recover(); recovered != nil {
+			if recoveredErr, ok := recovered.(error); ok {
+				err = recoveredErr
+			} else {
+				err = fmt.Errorf("%v", recovered)
+			}
+		}
+	}()
+	callback(headers)
+	return nil
 }
 
 func boolValue(value any) bool {
