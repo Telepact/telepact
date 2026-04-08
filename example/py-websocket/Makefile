@@ -20,4 +20,4 @@ PYTHON := .venv/bin/python
 .PHONY: run
 
 run:
-@set -euo pipefail; $(MAKE) -C ../../lib/py; rm -rf .venv; uv venv --python python3.11 .venv; uv pip install --python $(PYTHON) pytest websockets==15.0.1 ../../lib/py/dist/*.tar.gz; $(PYTHON) -m pytest -q
+	@set -euo pipefail; $(MAKE) -C ../../lib/py; rm -rf .venv; uv venv --python python3.11 .venv; uv pip install --python $(PYTHON) pytest websockets==15.0.1 ../../lib/py/dist/*.tar.gz; $(PYTHON) -m pytest -q
