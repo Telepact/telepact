@@ -2,18 +2,6 @@
 
 This document provides guidance for AI agents working within the Telepact codebase.
 
-## Big Picture
-
-Telepact is a multi-language API ecosystem built around a unified schema definition. The core idea is to define your API in `.telepact.yaml` files for normal authoring, and then use language-specific libraries to implement clients and servers. `.telepact.json` remains valid and is still the lowered, wire-aligned form.
-
-The project is a monorepo containing several independent but related components:
--   **Core Libraries (`/lib`)**: Implementations of the Telepact protocol in `go`, `java`, `py` (Python), and `ts` (TypeScript). These provide the `Server` and `Client` classes.
--   **SDKs (`/sdk`)**: Tools built on top of the core libraries, including a `cli`, a web-based `console`, and a `prettier` plugin for formatting schema files.
--   **Bindings (`/bind`)**: Language-specific bindings, like for `dart`.
--   **Schema Definitions**: APIs are usually authored in `.telepact.yaml` files (e.g., `common/auth.telepact.yaml`). `.telepact.json` is also accepted, but YAML is preferred at rest because multi-line docstrings are much cleaner there.
-
-The key architectural pattern is that the core libraries are transport-agnostic. They provide a `process` (server) or `adapter` (client) function that deals with raw byte arrays or messages, allowing you to wire them into any transport layer (HTTP, WebSockets, etc.).
-
 ## Developer Workflow
 
 The entire project uses a hierarchical `Makefile` system. The root `Makefile` delegates tasks to the `Makefile`s within each component's directory.
@@ -53,6 +41,11 @@ The entire project uses a hierarchical `Makefile` system. The root `Makefile` de
 -   Be careful running `uv run python -m pytest ...` directly in `test/runner` after a library change.
     That is only reliable if the corresponding `test/lib/<lang>` consumer has already been rebuilt.
 
+### Final Verification
+
+-   Before calling a task done, run `make local-ci` from the repository root.
+    This target cleans the shared workspace, rebuilds the primary CI targets in order, and catches issues that only show up when the repo is exercised end-to-end in one environment.
+
 ### Key Files & Directories
 
 -   `Makefile`: The entry point for all build, test, and deploy operations.
@@ -63,24 +56,3 @@ The entire project uses a hierarchical `Makefile` system. The root `Makefile` de
 -   `sdk/console`: A SvelteKit and TypeScript project for the developer console.
 -   `sdk/cli`: A Python/uv project for the command-line interface.
 -   `sdk/prettier`: A project for the Prettier plugin.
-
-## Schema Authoring (`.telepact.yaml`)
-
-Telepact schemas are usually authored in `.telepact.yaml` files. `.telepact.json` is also supported, but YAML is preferred for checked-in schemas because multi-line docstrings are much easier to read and edit. Semantically, the schema is still a JSON-shaped array of definitions, and the tooling lowers YAML to JSON internally. The full guide can be found in `doc/schema-guide.md`.
-
-## Skills
-
-Repo-local skills live under `skills/` and should be used when the task matches them closely.
-
-### Available skills
-
--   `telepact-schema-writing`: Convert a plain-English API description into a correct Telepact schema, usually authored as `.telepact.yaml`. (file: `/Users/brendanbartels/workspace/telepact/skills/telepact-schema-writing/SKILL.md`)
--   `telepact-server`: Implement a Telepact server for an already-drafted schema using the Telepact server library in Go, Java, Python, or TypeScript. (file: `/Users/brendanbartels/workspace/telepact/skills/telepact-server/SKILL.md`)
--   `telepact-client`: Implement a Telepact client for an already-drafted schema using either raw Telepact JSON over a transport or the Telepact client library in Go, Java, Python, or TypeScript. (file: `/Users/brendanbartels/workspace/telepact/skills/telepact-client/SKILL.md`)
--   `telepact-downstream-testing`: Test code that consumes an external Telepact API by fetching the downstream schema and running a Telepact CLI mock server, with optional stubbing and request verification. (file: `/Users/brendanbartels/workspace/telepact/skills/telepact-downstream-testing/SKILL.md`)
-
-### How to use skills
-
--   If the user names one of these skills, or the task clearly matches one, open its `SKILL.md` and follow it.
--   Keep context small: read only the skill plus the repo files needed for the active task.
--   If a skill does not fit cleanly, state that briefly and continue with the closest sensible approach.

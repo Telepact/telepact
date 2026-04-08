@@ -58,12 +58,13 @@ class MockServer:
         server_options = Server.Options()
         server_options.on_error = options.on_error
         server_options.auth_required = False
+        server_options.middleware = lambda request_message, function_router: self._handle(request_message)
 
         telepact_schema = TelepactSchema(mock_telepact_schema.original, mock_telepact_schema.full, mock_telepact_schema.parsed,
                                        mock_telepact_schema.parsed_request_headers, mock_telepact_schema.parsed_response_headers)
 
         self.server = Server(
-            telepact_schema, self._handle, server_options)
+            telepact_schema, {}, server_options)
 
     async def process(self, message: bytes) -> bytes:
         """

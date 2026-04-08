@@ -1,5 +1,5 @@
 import keyword
-from typing import Callable, TypeVar, Union, Literal, Generic, NoReturn, Never
+from typing import Awaitable, Callable, TypeVar, Union, Literal, Generic, NoReturn, Never
 from dataclasses import dataclass
 from typing import cast, ForwardRef
 import telepact.Message
@@ -368,13 +368,26 @@ class TypedServerHandler:
     async def {{function_name}}(self, headers: dict[str, object], input: {{ function_name }}.Input) -> telepact.TypedMessage[{{ function_name }}.Output]:
         raise NotImplementedError()
     {% endfor %}
+
+    def function_routes(self) -> dict[str, Callable[[str, telepact.Message], Awaitable[telepact.Message]]]:
+        return {
+            {% for fn in functions %}
+            {%- set function_name = fn | replace('fn.', '') %}
+            "{{ fn }}": self._{{ function_name }}_route,
+            {%- endfor %}
+        }
+
+    {%- for fn in functions %}
+    {%- set function_name = fn | replace('fn.', '') %}
+    async def _{{ function_name }}_route(self, function_name: str, request_message: telepact.Message) -> telepact.Message:
+        argument = request_message.body[function_name]
+        response_headers, {{ function_name }}_output = await self.{{ function_name }}(request_message.headers, {{ function_name }}.Input({"{{ fn }}": argument}))
+        return telepact.Message(response_headers, {{ function_name }}_output.pseudo_json)
+    {% endfor %}
+
     async def handler(self, message: telepact.Message) -> telepact.Message:
         function_name = next(iter(message.body.keys()))
-
-        {%- for fn in functions %}
-        {%- set function_name = fn | replace('fn.', '') %}
-        {% if loop.first %}if{% else %}elif{% endif %} function_name == "{{ fn }}":
-            headers, {{ function_name }}_output = await self.{{ function_name }}(message.headers, {{ function_name }}.Input(cast(dict[str, object], message.body)))
-            return telepact.Message(headers, {{ function_name }}_output.pseudo_json)
-        {% endfor %}
-        raise Exception("Unknown function: " + function_name)
+        function_route = self.function_routes().get(function_name)
+        if function_route is None:
+            raise Exception("Unknown function: " + function_name)
+        return await function_route(function_name, message)

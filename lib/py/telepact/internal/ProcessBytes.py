@@ -22,6 +22,7 @@ from ..TelepactError import TelepactError
 
 if TYPE_CHECKING:
     from ..Serializer import Serializer
+    from ..Server import Middleware, FunctionRouter
     from ..TelepactSchema import TelepactSchema
     from ..Response import Response
 
@@ -30,7 +31,7 @@ async def process_bytes(request_message_bytes: bytes, override_headers: dict[str
                         serializer: 'Serializer', telepact_schema: 'TelepactSchema',
                         on_error: Callable[[Exception], None], on_request: Callable[['Message'], None],
                         on_response: Callable[['Message'], None], on_auth: Callable[[dict[str, object]], dict[str, object]],
-                        handler: Callable[['Message'], Awaitable['Message']]) -> 'Response':
+                        middleware: 'Middleware', function_router: 'FunctionRouter') -> 'Response':
     from ..internal.HandleMessage import handle_message
     from ..internal.ParseRequestMessage import parse_request_message
     from ..Response import Response
@@ -45,7 +46,7 @@ async def process_bytes(request_message_bytes: bytes, override_headers: dict[str
             pass
 
         response_message = await handle_message(
-            request_message, override_headers, telepact_schema, handler, on_error, on_auth)
+            request_message, override_headers, telepact_schema, middleware, function_router, on_error, on_auth)
 
         try:
             on_response(response_message)

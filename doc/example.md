@@ -37,26 +37,22 @@ from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
 import uvicorn
 
-async def handler(req_msg):
-    fn = req_msg.get_body_target()
-    args = req_msg.body[fn]
-    if fn == 'fn.divide':
-        x = args['x']
-        y = args['y']
-        if y == 0:
-            return Message({}, {'ErrorCannotDivideByZero': {}})
+async def divide(function_name, request_message):
+    arguments = request_message.body[function_name]
+    x = arguments['x']
+    y = arguments['y']
+    if y == 0:
+        return Message({}, {'ErrorCannotDivideByZero': {}})
 
-        result = x / y
-        return Message({}, {'Ok_': {'result': result}})
-    else:
-        raise Exception('Unknown function')
+    result = x / y
+    return Message({}, {'Ok_': {'result': result}})
 
 options = Server.Options()
 options.auth_required = False
 
 schema_files = TelepactSchemaFiles('./api')
 api = TelepactSchema.from_file_json_map(schema_files.filenames_to_json)
-server = Server(api, handler, options)
+server = Server(api, {'fn.divide': divide}, options)
 
 async def http_handler(request):
     request_bytes = await request.body()

@@ -34,7 +34,8 @@ export async function handleMessage(
     requestMessage: Message,
     overrideHeaders: Record<string, any>,
     telepactSchema: TelepactSchema,
-    handler: (message: Message) => Promise<Message>,
+    middleware: (requestMessage: Message, functionRouter: { route: (message: Message) => Promise<Message> }) => Promise<Message>,
+    functionRouter: { route: (message: Message) => Promise<Message> },
     onError: (error: Error) => void,
     onAuth: (headers: Record<string, any>) => Record<string, any>,
 ): Promise<Message> {
@@ -188,7 +189,7 @@ export async function handleMessage(
         resultMessage = new Message({}, { Ok_: { api: apiDefinitions } });
     } else {
         try {
-            resultMessage = await handler(callMessage);
+            resultMessage = await middleware(callMessage, functionRouter);
         } catch (e) {
             try {
                 onError(new TelepactError(`telepact handler failed while handling ${functionName}`, 'handler', e));
