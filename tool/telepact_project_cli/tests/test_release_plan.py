@@ -49,6 +49,20 @@ def _pushd(path: Path):
 
 
 class ReleasePlanTests(unittest.TestCase):
+    def test_set_version_preserves_aligned_package_json(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            project_root = Path(tmp_dir)
+            package_json = project_root / "package.json"
+            original = '{\n  "name": "example",\n  "version": "1.2.3"\n}\n'
+            package_json.write_text(original, encoding="utf-8")
+
+            runner = CliRunner()
+            with _pushd(project_root):
+                result = runner.invoke(main, ["set-version", "1.2.3"])
+
+            self.assertEqual(result.exit_code, 0, msg=result.output)
+            self.assertEqual(package_json.read_text(encoding="utf-8"), original)
+
     def test_compute_release_manifest_uses_declarative_rules_and_dependency_expansion(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             repo_root = Path(tmp_dir)

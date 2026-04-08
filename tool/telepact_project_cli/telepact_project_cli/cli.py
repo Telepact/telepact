@@ -38,6 +38,11 @@ from .release_plan import (
 yaml = YAML()
 
 
+def _write_json(path: str, data: dict) -> None:
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(json.dumps(data, indent=2) + "\n")
+
+
 def _load_pyproject() -> dict:
     with open("pyproject.toml", "r") as f:
         return toml.load(f)
@@ -115,8 +120,7 @@ def set_version(version: str) -> None:
         with open("package.json", "r") as f:
             data = json.load(f)
         data["version"] = version
-        with open("package.json", "w") as f:
-            json.dump(data, f, indent=2)
+        _write_json("package.json", data)
         click.echo(f"Set package.json to version {version}")
         updated = True
 
@@ -205,8 +209,7 @@ def bump() -> None:
                 with open(project_file, 'r') as f:
                     data = json.load(f)
                 data["version"] = new_version
-                with open(project_file, 'w') as f:
-                    json.dump(data, f, indent=2)
+                _write_json(project_file, data)
                 click.echo(f"Updated {project_file} to version {new_version}")
                 edited_files.append(project_file)
             elif project_file.endswith("pyproject.toml"):
