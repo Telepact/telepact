@@ -44,7 +44,8 @@ telepact_server = Server(schema, {'fn.greet': greet}, options)
 
 async def telepact_websocket(websocket: websockets.ServerConnection) -> None:
     request = getattr(websocket, 'request', None)
-    if request is not None and getattr(request, 'path', '/ws/telepact') != '/ws/telepact':
+    path = None if request is None else getattr(request, 'path', None)
+    if path is not None and path != '/ws/telepact':
         await websocket.close(code=1008, reason='unexpected path')
         return
 
