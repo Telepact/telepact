@@ -22,6 +22,7 @@ import { parseRequestMessage } from '../internal/ParseRequestMessage.js';
 import { Response } from '../Response.js';
 import { SerializationError } from '../SerializationError.js';
 import { TelepactError } from '../TelepactError.js';
+import { UpdateHeaders } from '../Server.js';
 
 export type ErrorHandler = (error: any) => void;
 export type RequestHandler = (message: Message) => void;
@@ -32,7 +33,7 @@ export type Middleware = (requestMessage: Message, functionRouter: FunctionRoute
 
 export async function processBytes(
     requestMessageBytes: Uint8Array,
-    overrideHeaders: Record<string, any>,
+    updateHeaders: UpdateHeaders | undefined,
     serializer: Serializer,
     telepactSchema: TelepactSchema,
     onError: ErrorHandler,
@@ -53,7 +54,7 @@ export async function processBytes(
 
         const responseMessage = await handleMessage(
             requestMessage,
-            overrideHeaders,
+            updateHeaders,
             telepactSchema,
             middleware,
             functionRouter,

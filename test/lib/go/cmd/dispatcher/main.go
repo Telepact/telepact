@@ -644,48 +644,48 @@ func startSchemaTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscrip
 
 	functionRoutes := map[string]telepact.FunctionRoute{
 		"fn.validateSchema": func(functionName string, requestMessage telepact.Message) (telepact.Message, error) {
-		payload, ok := requestMessage.Body[functionName].(map[string]any)
-		if !ok {
-			return telepact.NewMessage(map[string]any{}, map[string]any{"ErrorUnknown_": map[string]any{}}), nil
-		}
-		input, ok := payload["input"].(map[string]any)
-		if !ok {
-			return telepact.NewMessage(map[string]any{}, map[string]any{"ErrorUnknown_": map[string]any{}}), nil
-		}
+			payload, ok := requestMessage.Body[functionName].(map[string]any)
+			if !ok {
+				return telepact.NewMessage(map[string]any{}, map[string]any{"ErrorUnknown_": map[string]any{}}), nil
+			}
+			input, ok := payload["input"].(map[string]any)
+			if !ok {
+				return telepact.NewMessage(map[string]any{}, map[string]any{"ErrorUnknown_": map[string]any{}}), nil
+			}
 
-		key := firstKey(input)
-		switch key {
-		case "PseudoJson":
-			pseudo, _ := input[key].(map[string]any)
-			failures, err := validatePseudoJSONSchema(pseudo)
-			if err != nil {
-				return telepact.Message{}, err
-			}
-			if len(failures) > 0 {
-				body := map[string]any{"ErrorValidationFailure": map[string]any{"cases": failures}}
-				return telepact.NewMessage(map[string]any{}, body), nil
-			}
-		case "Json":
-			if union, _ := input[key].(map[string]any); union != nil {
-				if schemaJSON, ok := union["schema"].(string); ok {
-					if _, err := telepact.TelepactSchemaFromJSON(schemaJSON); err != nil {
-						return schemaValidationFailureMessage(err), nil
+			key := firstKey(input)
+			switch key {
+			case "PseudoJson":
+				pseudo, _ := input[key].(map[string]any)
+				failures, err := validatePseudoJSONSchema(pseudo)
+				if err != nil {
+					return telepact.Message{}, err
+				}
+				if len(failures) > 0 {
+					body := map[string]any{"ErrorValidationFailure": map[string]any{"cases": failures}}
+					return telepact.NewMessage(map[string]any{}, body), nil
+				}
+			case "Json":
+				if union, _ := input[key].(map[string]any); union != nil {
+					if schemaJSON, ok := union["schema"].(string); ok {
+						if _, err := telepact.TelepactSchemaFromJSON(schemaJSON); err != nil {
+							return schemaValidationFailureMessage(err), nil
+						}
 					}
 				}
-			}
-		case "Directory":
-			if union, _ := input[key].(map[string]any); union != nil {
-				if dir, ok := union["schemaDirectory"].(string); ok {
-					if _, err := telepact.TelepactSchemaFromDirectory(dir); err != nil {
-						return schemaValidationFailureMessage(err), nil
+			case "Directory":
+				if union, _ := input[key].(map[string]any); union != nil {
+					if dir, ok := union["schemaDirectory"].(string); ok {
+						if _, err := telepact.TelepactSchemaFromDirectory(dir); err != nil {
+							return schemaValidationFailureMessage(err), nil
+						}
 					}
 				}
+			default:
+				return telepact.NewMessage(map[string]any{}, map[string]any{"ErrorUnknown_": map[string]any{}}), nil
 			}
-		default:
-			return telepact.NewMessage(map[string]any{}, map[string]any{"ErrorUnknown_": map[string]any{}}), nil
-		}
 
-		return telepact.NewMessage(map[string]any{}, map[string]any{"Ok_": map[string]any{}}), nil
+			return telepact.NewMessage(map[string]any{}, map[string]any{"Ok_": map[string]any{}}), nil
 		},
 	}
 
@@ -906,8 +906,10 @@ func startTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscription, 
 		if serveAlternate.Load() {
 			resp, err = alternateServer.Process(msg.Data)
 		} else {
-			override := map[string]any{"@override": "new"}
-			resp, err = server.ProcessWithHeaders(msg.Data, override)
+			updateHeaders := func(headers map[string]any) {
+				headers["@override"] = "new"
+			}
+			resp, err = server.ProcessWithHeaders(msg.Data, updateHeaders)
 		}
 
 		if err != nil {

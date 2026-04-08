@@ -156,7 +156,7 @@ public class Server {
      * @return The bytes of the response message.
      */
     public Response process(byte[] requestMessageBytes) {
-        return processBytes(requestMessageBytes, Map.of(), this.serializer, this.telepactSchema, this.onError,
+        return processBytes(requestMessageBytes, null, this.serializer, this.telepactSchema, this.onError,
                 this.onRequest, this.onResponse, this.onAuth, this.middleware, this.functionRouter);
     }
 
@@ -164,12 +164,12 @@ public class Server {
      * Process a given telepact Request Message into a telepact Response Message.
      * 
      * @param requestMessageBytes The bytes of the request message to be processed.
-     * @param overrideHeaders Headers that should override any headers in the request
-     *            message.
+     * @param updateHeaders Callback that can update the mutable request headers
+     *            before request handling continues.
      * @return The bytes of the response message.
      */
-    public Response process(byte[] requestMessageBytes, Map<String, Object> overrideHeaders) {
-        return processBytes(requestMessageBytes, overrideHeaders, this.serializer, this.telepactSchema, this.onError,
+    public Response process(byte[] requestMessageBytes, Consumer<Map<String, Object>> updateHeaders) {
+        return processBytes(requestMessageBytes, updateHeaders, this.serializer, this.telepactSchema, this.onError,
                 this.onRequest, this.onResponse, this.onAuth, this.middleware, this.functionRouter);
     }
 }

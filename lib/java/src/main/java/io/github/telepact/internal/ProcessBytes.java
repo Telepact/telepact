@@ -34,7 +34,7 @@ import io.github.telepact.Server.FunctionRouter;
 import io.github.telepact.Server.Middleware;
 
 public class ProcessBytes {
-    public static Response processBytes(byte[] requestMessageBytes, Map<String, Object> overrideHeaders, Serializer serializer, TelepactSchema telepactSchema,
+    public static Response processBytes(byte[] requestMessageBytes, Consumer<Map<String, Object>> updateHeaders, Serializer serializer, TelepactSchema telepactSchema,
             Consumer<Throwable> onError, Consumer<Message> onRequest, Consumer<Message> onResponse,
             Function<Map<String, Object>, Map<String, Object>> onAuth,
             Middleware middleware, FunctionRouter functionRouter) {
@@ -47,7 +47,7 @@ public class ProcessBytes {
             } catch (Throwable ignored) {
             }
 
-            final var responseMessage = handleMessage(requestMessage, overrideHeaders, telepactSchema, middleware, functionRouter, onError, onAuth);
+            final var responseMessage = handleMessage(requestMessage, updateHeaders, telepactSchema, middleware, functionRouter, onError, onAuth);
 
             try {
                 onResponse.accept(responseMessage);

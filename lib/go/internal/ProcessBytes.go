@@ -26,7 +26,7 @@ type Middleware func(ServerMessage, FunctionRouter) (ServerMessage, error)
 
 func ProcessBytes(
 	requestMessageBytes []byte,
-	overrideHeaders map[string]any,
+	updateHeaders func(map[string]any),
 	deserialize func([]byte) (ServerMessage, error),
 	serialize func(ServerMessage) ([]byte, error),
 	schema SchemaAccessor,
@@ -44,7 +44,7 @@ func ProcessBytes(
 
 	safeInvokeMessage(onRequest, requestMessage)
 
-	responseMessage, err := HandleMessage(requestMessage, overrideHeaders, schema, middleware, functionRouter, onError, onAuth)
+	responseMessage, err := HandleMessage(requestMessage, updateHeaders, schema, middleware, functionRouter, onError, onAuth)
 	if err != nil {
 		invokeOnError(onError, err)
 		return buildUnknownResponse(serialize)
