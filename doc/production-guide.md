@@ -152,8 +152,9 @@ options.onAuth = (headers) => {
 };
 
 const functionRoutes = {
-  'fn.greet': async (headers, argument) => {
-    const userId = headers['@userId'];
+  'fn.greet': async (functionName, requestMessage) => {
+    const argument = requestMessage.body[functionName];
+    const userId = requestMessage.headers['@userId'];
 
     if (!userId) {
       return new Message({}, {

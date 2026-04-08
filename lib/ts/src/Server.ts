@@ -25,7 +25,7 @@ import { Serialization } from './Serialization.js';
 import { ServerBase64Encoder } from './internal/binary/ServerBase64Encoder.js';
 import { Response } from './Response.js';
 
-export type FunctionRoute = (headers: Record<string, any>, argument: Record<string, any>) => Promise<Message>;
+export type FunctionRoute = (functionName: string, requestMessage: Message) => Promise<Message>;
 export type FunctionRoutes = Record<string, FunctionRoute>;
 export type Middleware = (requestMessage: Message, functionRouter: FunctionRouter) => Promise<Message>;
 
@@ -43,7 +43,7 @@ export class FunctionRouter {
             throw new Error(`Unknown function: ${functionName}`);
         }
 
-        return await functionRoute(requestMessage.headers, requestMessage.getBodyPayload());
+        return await functionRoute(functionName, requestMessage);
     }
 }
 

@@ -369,7 +369,7 @@ class TypedServerHandler:
         raise NotImplementedError()
     {% endfor %}
 
-    def function_routes(self) -> dict[str, Callable[[dict[str, object], dict[str, object]], Awaitable[telepact.Message]]]:
+    def function_routes(self) -> dict[str, Callable[[str, telepact.Message], Awaitable[telepact.Message]]]:
         return {
             {% for fn in functions %}
             {%- set function_name = fn | replace('fn.', '') %}
@@ -379,8 +379,8 @@ class TypedServerHandler:
 
     {%- for fn in functions %}
     {%- set function_name = fn | replace('fn.', '') %}
-    async def _{{ function_name }}_route(self, headers: dict[str, object], argument: dict[str, object]) -> telepact.Message:
-        response_headers, {{ function_name }}_output = await self.{{ function_name }}(headers, {{ function_name }}.Input({"{{ fn }}": argument}))
+    async def _{{ function_name }}_route(self, function_name: str, request_message: telepact.Message) -> telepact.Message:
+        response_headers, {{ function_name }}_output = await self.{{ function_name }}(request_message.headers, {{ function_name }}.Input({function_name: request_message.body[function_name]}))
         return telepact.Message(response_headers, {{ function_name }}_output.pseudo_json)
     {% endfor %}
 
@@ -389,4 +389,4 @@ class TypedServerHandler:
         function_route = self.function_routes().get(function_name)
         if function_route is None:
             raise Exception("Unknown function: " + function_name)
-        return await function_route(message.headers, cast(dict[str, object], message.body[function_name]))
+        return await function_route(function_name, message)

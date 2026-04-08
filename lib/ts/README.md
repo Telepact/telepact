@@ -30,7 +30,8 @@ const schema = TelepactSchema.fromFileJsonMap(files.filenamesToJson);
 // *.telepact.json files. Subdirectories are rejected.
 
 const functionRoutes = {
-    'fn.greet': async (_headers: Record<string, any>, argument: Record<string, any>): Promise<Message> => {
+    'fn.greet': async (functionName: string, requestMessage: Message): Promise<Message> => {
+        const argument = requestMessage.body[functionName] as Record<string, any>;
         const subject = argument['subject'];
         return new Message({}, {Ok_: {message: `Hello ${subject}!`}});
     },

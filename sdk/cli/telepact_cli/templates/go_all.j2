@@ -463,8 +463,8 @@ func (h *TypedServerHandler) FunctionRoutes() map[string]telepact.FunctionRoute 
 
     return map[string]telepact.FunctionRoute{
     {%- for fn in functions %}
-        "{{ fn.raw_name }}": func(headers map[string]any, argument map[string]any) (telepact.Message, error) {
-            result, err := h.Impl.{{ fn.name }}(headers, New{{ fn.name }}InputFromPseudoJSON(map[string]any{"{{ fn.raw_name }}": argument}))
+        "{{ fn.raw_name }}": func(functionName string, requestMessage telepact.Message) (telepact.Message, error) {
+            result, err := h.Impl.{{ fn.name }}(requestMessage.Headers, New{{ fn.name }}InputFromPseudoJSON(map[string]any{functionName: requestMessage.Body[functionName]}))
             if err != nil {
                 return telepact.Message{}, err
             }

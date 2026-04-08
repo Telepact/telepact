@@ -327,7 +327,8 @@ public class Main {
 
         var timers = metrics.timer(frontdoorTopic);
 
-        Map<String, Server.FunctionRoute> functionRoutes = Map.of("fn.validateSchema", (headers, arg) -> {
+        Map<String, Server.FunctionRoute> functionRoutes = Map.of("fn.validateSchema", (functionName, requestMessage) -> {
+            var arg = (Map<String, Object>) requestMessage.body.get(functionName);
             var input = (Map<String, Object>) arg.get("input");
 
             var inputTag = input.keySet().iterator().next();

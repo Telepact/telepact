@@ -16,8 +16,11 @@ public abstract class TypedServerHandler {
         return Map.ofEntries(
             {%- for fn in functions %}
             {%- set function_name = fn | replace('fn.', '') %}
-            Map.entry("{{ fn }}", (headers, argument) -> {
-                var typedMessage = this.{{ function_name }}(headers, new {{ function_name }}.Input(Map.of("{{ fn }}", argument)));
+            Map.entry("{{ fn }}", (functionName, requestMessage) -> {
+                var typedMessage = this.{{ function_name }}(
+                    requestMessage.headers,
+                    new {{ function_name }}.Input(Map.of(functionName, requestMessage.body.get(functionName)))
+                );
                 return new Message(typedMessage.headers, typedMessage.body.pseudoJson);
             }){{ "," if not loop.last else "" }}
             {%- endfor %}
@@ -30,7 +33,7 @@ public abstract class TypedServerHandler {
         if (functionRoute == null) {
             throw new IllegalArgumentException("Unknown function: " + functionName);
         }
-        return functionRoute.apply(message.headers, message.getBodyPayload());
+        return functionRoute.apply(functionName, message);
     }
 
 }

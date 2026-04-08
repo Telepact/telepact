@@ -26,7 +26,7 @@ if TYPE_CHECKING:
     from .TelepactSchema import TelepactSchema
     from .Response import Response
 
-FunctionRoute = Callable[[dict[str, object], dict[str, object]], Awaitable['Message']]
+FunctionRoute = Callable[[str, 'Message'], Awaitable['Message']]
 Middleware = Callable[['Message', 'FunctionRouter'], Awaitable['Message']]
 
 
@@ -39,7 +39,7 @@ class FunctionRouter:
         function_route = self.function_routes.get(function_name)
         if function_route is None:
             raise RuntimeError(f"Unknown function: {function_name}")
-        return await function_route(request_message.headers, request_message.get_body_payload())
+        return await function_route(function_name, request_message)
 
 
 async def _default_middleware(request_message: 'Message', function_router: FunctionRouter) -> 'Message':

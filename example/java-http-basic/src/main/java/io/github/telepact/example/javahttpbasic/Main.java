@@ -36,7 +36,8 @@ public final class Main {
         var schema = TelepactSchema.fromFileJsonMap(files.filenamesToJson);
         var options = new Server.Options();
         options.authRequired = false;
-        return new Server(schema, Map.of("fn.hello", (Server.FunctionRoute) (headers, arguments) -> {
+        return new Server(schema, Map.of("fn.hello", (Server.FunctionRoute) (functionName, requestMessage) -> {
+                var arguments = (Map<String, Object>) requestMessage.body.get(functionName);
                 var name = (String) arguments.get("name");
                 return new Message(Map.of(), Map.of("Ok_", Map.of("message", "Hello " + name + "!")));
             }), options);

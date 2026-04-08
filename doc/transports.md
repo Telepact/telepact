@@ -84,7 +84,8 @@ import uvicorn
 files = TelepactSchemaFiles('./api')
 schema = TelepactSchema.from_file_json_map(files.filenames_to_json)
 
-async def greet(_headers: dict[str, object], arguments: dict[str, object]) -> Message:
+async def greet(function_name: str, request_message: Message) -> Message:
+    arguments = request_message.body[function_name]
     subject = arguments['subject']
     return Message({}, {'Ok_': {'message': f'Hello {subject}!'}})
 
@@ -170,7 +171,8 @@ import uvicorn
 files = TelepactSchemaFiles('./api')
 schema = TelepactSchema.from_file_json_map(files.filenames_to_json)
 
-async def greet(_headers: dict[str, object], arguments: dict[str, object]) -> Message:
+async def greet(function_name: str, request_message: Message) -> Message:
+    arguments = request_message.body[function_name]
     subject = arguments['subject']
     return Message({}, {'Ok_': {'message': f'Hello {subject}!'}})
 

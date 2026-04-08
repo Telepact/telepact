@@ -643,7 +643,11 @@ func startSchemaTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscrip
 	}
 
 	functionRoutes := map[string]telepact.FunctionRoute{
-		"fn.validateSchema": func(headers map[string]any, payload map[string]any) (telepact.Message, error) {
+		"fn.validateSchema": func(functionName string, requestMessage telepact.Message) (telepact.Message, error) {
+		payload, ok := requestMessage.Body[functionName].(map[string]any)
+		if !ok {
+			return telepact.NewMessage(map[string]any{}, map[string]any{"ErrorUnknown_": map[string]any{}}), nil
+		}
 		input, ok := payload["input"].(map[string]any)
 		if !ok {
 			return telepact.NewMessage(map[string]any{}, map[string]any{"ErrorUnknown_": map[string]any{}}), nil

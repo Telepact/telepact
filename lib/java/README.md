@@ -38,7 +38,8 @@ var schema = TelepactSchema.fromFileJsonMap(files.filenamesToJson);
 // *.telepact.json files. Subdirectories are rejected.
 Map<String, Server.FunctionRoute> functionRoutes = Map.of(
     "fn.greet",
-    (_headers, arguments) -> {
+    (functionName, requestMessage) -> {
+        var arguments = (Map<String, Object>) requestMessage.body.get(functionName);
         var subject = (String) arguments.get("subject");
         return new Message(Map.of(), Map.of("Ok_", Map.of("message", "Hello %s!".formatted(subject))));
     }

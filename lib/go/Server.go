@@ -21,8 +21,8 @@ import (
 	"github.com/telepact/telepact/lib/go/internal/binary"
 )
 
-// ServerHandler processes incoming Telepact messages and returns a response message.
-type FunctionRoute func(headers map[string]any, argument map[string]any) (Message, error)
+// FunctionRoute processes a request message for a target function and returns a response message.
+type FunctionRoute func(functionName string, requestMessage Message) (Message, error)
 
 // Middleware wraps server-side request handling and can delegate to the supplied function router.
 type Middleware func(Message, *FunctionRouter) (Message, error)
@@ -57,12 +57,7 @@ func (r *FunctionRouter) Route(requestMessage Message) (Message, error) {
 		return Message{}, NewTelepactError("telepact: unknown function route for " + functionName)
 	}
 
-	argument, err := requestMessage.BodyPayload()
-	if err != nil {
-		return Message{}, err
-	}
-
-	return functionRoute(requestMessage.Headers, argument)
+	return functionRoute(functionName, requestMessage)
 }
 
 // ServerOptions configures server behaviour.

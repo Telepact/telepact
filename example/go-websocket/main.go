@@ -43,7 +43,8 @@ func buildServer() (*telepact.Server, error) {
 	options.AuthRequired = false
 
 	return telepact.NewServer(schema, map[string]telepact.FunctionRoute{
-		"fn.greet": func(headers map[string]any, arguments map[string]any) (telepact.Message, error) {
+		"fn.greet": func(functionName string, requestMessage telepact.Message) (telepact.Message, error) {
+			arguments, _ := requestMessage.Body[functionName].(map[string]any)
 			subject, _ := arguments["subject"].(string)
 			return telepact.NewMessage(map[string]any{}, map[string]any{
 				"Ok_": map[string]any{

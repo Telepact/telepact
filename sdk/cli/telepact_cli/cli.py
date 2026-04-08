@@ -542,7 +542,8 @@ def demo_server(port: int) -> None:
 
         raise Exception(f'Invalid expression kind: {kind}')
 
-    async def add_route(headers: dict[str, object], arguments: dict[str, object]) -> Message:
+    async def add_route(function_name: str, request_message: Message) -> Message:
+        arguments = cast(dict[str, object], request_message.body[function_name])
         unavailable_response = _demo_unavailable_response()
         if unavailable_response is not None:
             return unavailable_response
@@ -550,7 +551,8 @@ def demo_server(port: int) -> None:
         y = cast(float, arguments['y'])
         return Message({}, {'Ok_': {'result': x + y}})
 
-    async def login_route(headers: dict[str, object], arguments: dict[str, object]) -> Message:
+    async def login_route(function_name: str, request_message: Message) -> Message:
+        arguments = cast(dict[str, object], request_message.body[function_name])
         unavailable_response = _demo_unavailable_response()
         if unavailable_response is not None:
             return unavailable_response
@@ -562,12 +564,12 @@ def demo_server(port: int) -> None:
         usernames_by_token[token] = username
         return Message({}, {'Ok_': {'token': token}})
 
-    async def logout_route(headers: dict[str, object], arguments: dict[str, object]) -> Message:
+    async def logout_route(function_name: str, request_message: Message) -> Message:
+        arguments = cast(dict[str, object], request_message.body[function_name])
         unavailable_response = _demo_unavailable_response()
         if unavailable_response is not None:
             return unavailable_response
-        message = Message(headers, {'fn.logout': arguments})
-        username = get_username(message, require_session=True)
+        username = get_username(request_message, require_session=True)
         requested_username = cast(str, arguments['username'])
         if username is None:
             return unauthenticated_response()
@@ -580,31 +582,34 @@ def demo_server(port: int) -> None:
         user_evaluations.pop(username, None)
         return Message({}, {'Ok_': {}})
 
-    async def require_username(function_name: str, headers: dict[str, object], arguments: dict[str, object]) -> tuple[Message | None, str | None]:
+    async def require_username(request_message: Message) -> tuple[Message | None, str | None]:
         unavailable_response = _demo_unavailable_response()
         if unavailable_response is not None:
             return unavailable_response, None
-        username = get_username(Message(headers, {function_name: arguments}))
+        username = get_username(request_message)
         if username is None:
             return unauthenticated_response(), None
         return None, username
 
-    async def save_variable_route(headers: dict[str, object], arguments: dict[str, object]) -> Message:
-        unavailable_response, username = await require_username('fn.saveVariable', headers, arguments)
+    async def save_variable_route(function_name: str, request_message: Message) -> Message:
+        arguments = cast(dict[str, object], request_message.body[function_name])
+        unavailable_response, username = await require_username(request_message)
         if unavailable_response is not None:
             return unavailable_response
         get_user_variables(cast(str, username))[cast(str, arguments['name'])] = cast(float, arguments['value'])
         return Message({}, {'Ok_': {}})
 
-    async def save_variables_route(headers: dict[str, object], arguments: dict[str, object]) -> Message:
-        unavailable_response, username = await require_username('fn.saveVariables', headers, arguments)
+    async def save_variables_route(function_name: str, request_message: Message) -> Message:
+        arguments = cast(dict[str, object], request_message.body[function_name])
+        unavailable_response, username = await require_username(request_message)
         if unavailable_response is not None:
             return unavailable_response
         get_user_variables(cast(str, username)).update(cast(dict[str, float], arguments['variables']))
         return Message({}, {'Ok_': {}})
 
-    async def get_variable_route(headers: dict[str, object], arguments: dict[str, object]) -> Message:
-        unavailable_response, username = await require_username('fn.getVariable', headers, arguments)
+    async def get_variable_route(function_name: str, request_message: Message) -> Message:
+        arguments = cast(dict[str, object], request_message.body[function_name])
+        unavailable_response, username = await require_username(request_message)
         if unavailable_response is not None:
             return unavailable_response
         value = get_user_variables(cast(str, username)).get(cast(str, arguments['name']))
@@ -612,8 +617,9 @@ def demo_server(port: int) -> None:
             return Message({}, {'Ok_': {}})
         return Message({}, {'Ok_': {'variable!': {'name': cast(str, arguments['name']), 'value': value}}})
 
-    async def get_variables_route(headers: dict[str, object], arguments: dict[str, object]) -> Message:
-        unavailable_response, username = await require_username('fn.getVariables', headers, arguments)
+    async def get_variables_route(function_name: str, request_message: Message) -> Message:
+        arguments = cast(dict[str, object], request_message.body[function_name])
+        unavailable_response, username = await require_username(request_message)
         if unavailable_response is not None:
             return unavailable_response
         variables = [
@@ -622,15 +628,17 @@ def demo_server(port: int) -> None:
         ]
         return Message({}, {'Ok_': {'variables': variables}})
 
-    async def delete_variable_route(headers: dict[str, object], arguments: dict[str, object]) -> Message:
-        unavailable_response, username = await require_username('fn.deleteVariable', headers, arguments)
+    async def delete_variable_route(function_name: str, request_message: Message) -> Message:
+        arguments = cast(dict[str, object], request_message.body[function_name])
+        unavailable_response, username = await require_username(request_message)
         if unavailable_response is not None:
             return unavailable_response
         get_user_variables(cast(str, username)).pop(cast(str, arguments['name']), None)
         return Message({}, {'Ok_': {}})
 
-    async def delete_variables_route(headers: dict[str, object], arguments: dict[str, object]) -> Message:
-        unavailable_response, username = await require_username('fn.deleteVariables', headers, arguments)
+    async def delete_variables_route(function_name: str, request_message: Message) -> Message:
+        arguments = cast(dict[str, object], request_message.body[function_name])
+        unavailable_response, username = await require_username(request_message)
         if unavailable_response is not None:
             return unavailable_response
         these_variables = get_user_variables(cast(str, username))
@@ -638,8 +646,9 @@ def demo_server(port: int) -> None:
             these_variables.pop(name, None)
         return Message({}, {'Ok_': {}})
 
-    async def evaluate_route(headers: dict[str, object], arguments: dict[str, object]) -> Message:
-        unavailable_response, username = await require_username('fn.evaluate', headers, arguments)
+    async def evaluate_route(function_name: str, request_message: Message) -> Message:
+        arguments = cast(dict[str, object], request_message.body[function_name])
+        unavailable_response, username = await require_username(request_message)
         if unavailable_response is not None:
             return unavailable_response
         expression = cast(dict[str, object], arguments['expression'])
@@ -657,8 +666,9 @@ def demo_server(port: int) -> None:
             'saveResult': {'fn.saveVariable': {'name': 'result', 'value': result}},
         }})
 
-    async def get_paper_tape_route(headers: dict[str, object], arguments: dict[str, object]) -> Message:
-        unavailable_response, username = await require_username('fn.getPaperTape', headers, arguments)
+    async def get_paper_tape_route(function_name: str, request_message: Message) -> Message:
+        arguments = cast(dict[str, object], request_message.body[function_name])
+        unavailable_response, username = await require_username(request_message)
         if unavailable_response is not None:
             return unavailable_response
         limit = cast(int | None, arguments.get('limit!'))

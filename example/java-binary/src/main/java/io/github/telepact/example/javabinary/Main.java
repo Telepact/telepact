@@ -31,7 +31,8 @@ public final class Main {
         var schema = TelepactSchema.fromFileJsonMap(files.filenamesToJson);
         var options = new Server.Options();
         options.authRequired = false;
-        return new Server(schema, Map.of("fn.getNumbers", (Server.FunctionRoute) (headers, arguments) -> {
+        return new Server(schema, Map.of("fn.getNumbers", (Server.FunctionRoute) (functionName, requestMessage) -> {
+            var arguments = (Map<String, Object>) requestMessage.body.get(functionName);
             var limit = ((Number) arguments.get("limit")).intValue();
             var values = new ArrayList<Integer>();
             for (int i = 1; i <= limit; i += 1) {

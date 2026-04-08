@@ -34,7 +34,7 @@ public class Server {
 
     @FunctionalInterface
     public interface FunctionRoute {
-        Message apply(Map<String, Object> headers, Map<String, Object> argument);
+        Message apply(String functionName, Message requestMessage);
     }
 
     @FunctionalInterface
@@ -55,7 +55,7 @@ public class Server {
             if (functionRoute == null) {
                 throw new IllegalArgumentException("Unknown function: " + functionName);
             }
-            return functionRoute.apply(requestMessage.headers, requestMessage.getBodyPayload());
+            return functionRoute.apply(functionName, requestMessage);
         }
     }
 
@@ -122,7 +122,7 @@ public class Server {
     private final Serializer serializer;
 
     /**
-     * Create a server with the given telepact schema and handler.
+     * Create a server with the given telepact schema and function routes.
      * 
      * @param telepactSchema The schema to be used by the server.
      * @param functionRoutes The function routes to handle incoming messages.

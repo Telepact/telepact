@@ -37,7 +37,8 @@ from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
 import uvicorn
 
-async def divide(_headers, arguments):
+async def divide(function_name, request_message):
+    arguments = request_message.body[function_name]
     x = arguments['x']
     y = arguments['y']
     if y == 0:

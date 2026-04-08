@@ -311,7 +311,8 @@ function startSchemaTestServer(
     const timer = registry.createTimer(frontdoorTopic);
 
     const functionRoutes = {
-        "fn.validateSchema": async (_headers: Record<string, any>, arg: Record<string, any>): Promise<Message> => {
+        "fn.validateSchema": async (functionName: string, requestMessage: Message): Promise<Message> => {
+        const arg = requestMessage.body[functionName] as Record<string, any>;
         const input: { [key: string]: any } = arg["input"];
         const inputTag = Object.keys(input)[0];
 

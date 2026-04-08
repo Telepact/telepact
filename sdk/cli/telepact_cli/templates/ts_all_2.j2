@@ -343,14 +343,14 @@ export class TypedServerHandler {
     }
     {%- endfor %}
 
-    functionRoutes(): Record<string, (headers: Record<string, any>, argument: Record<string, any>) => Promise<Message>> {
+    functionRoutes(): Record<string, (functionName: string, requestMessage: Message) => Promise<Message>> {
         return {
             {% for fn in functions %}
             {%- set function_name = fn | replace('fn.', '') %}
-            "{{ fn }}": async (headers: Record<string, any>, argument: Record<string, any>): Promise<Message> => {
+            "{{ fn }}": async (functionName: string, requestMessage: Message): Promise<Message> => {
                 const { headers: responseHeaders, body } = await this.{{ function_name }}(
-                    headers,
-                    new {{ function_name }}.Input({ "{{ fn }}": argument }),
+                    requestMessage.headers,
+                    new {{ function_name }}.Input({ [functionName]: requestMessage.body[functionName] }),
                 );
                 return new Message(responseHeaders, body.pseudoJson);
             },
@@ -364,6 +364,6 @@ export class TypedServerHandler {
         if (functionRoute === undefined) {
             throw new Error("Unknown function: " + functionName);
         }
-        return await functionRoute(message.headers, message.getBodyPayload());
+        return await functionRoute(functionName, message);
     }
 }
