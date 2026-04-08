@@ -15,8 +15,9 @@
 #|
 
 SHELL := /bin/bash
+PYTHON := .venv/bin/python
 
 .PHONY: run
 
 run:
-	@set -euo pipefail; $(MAKE) -C ../../lib/ts; rm -f telepact.tgz; cp ../../lib/ts/dist-tgz/*.tgz telepact.tgz; npm install --no-package-lock; npm test
+	@set -euo pipefail; $(MAKE) -C ../../lib/py; rm -rf .venv; uv venv --python python3.11 .venv; uv pip install --python $(PYTHON) pytest ../../lib/py/dist/*.tar.gz; $(PYTHON) -m pytest -q
