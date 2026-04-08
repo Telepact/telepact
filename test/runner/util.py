@@ -313,6 +313,12 @@ async def verify_client_case(nats_client, request, expected_response, client_fro
     response_was_success = 'Ok_' in response[1]
 
     if expected_response:
+        if assert_rules.get('assertCaseId', False):
+            case_id = response[1].get('ErrorUnknown_', {}).get('caseId')
+            assert isinstance(case_id, str)
+            assert case_id != ''
+            response[1]['ErrorUnknown_']['caseId'] = '<caseId>'
+
         if assert_rules.get('setCompare', False):
             expected_response = convert_lists_to_sets(expected_response)
             response = convert_lists_to_sets(response)

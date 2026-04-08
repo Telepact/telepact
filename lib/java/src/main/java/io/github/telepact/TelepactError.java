@@ -21,6 +21,7 @@ package io.github.telepact;
  */
 public class TelepactError extends RuntimeException {
     private final String kind;
+    private String caseId;
 
     /**
      * Constructs a new TelepactError with the specified detail message.
@@ -54,5 +55,16 @@ public class TelepactError extends RuntimeException {
 
     public String getKind() {
         return this.kind;
+    }
+
+    public String getCaseId() {
+        return this.caseId;
+    }
+
+    public TelepactError withCaseId(String caseId) {
+        if (this.caseId == null && caseId != null && !caseId.isEmpty()) {
+            this.caseId = caseId;
+        }
+        return this;
     }
 }

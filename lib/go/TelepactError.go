@@ -20,6 +20,7 @@ package telepact
 type TelepactError struct {
 	message string
 	kind    string
+	caseID  string
 	cause   error
 }
 
@@ -31,6 +32,15 @@ func NewTelepactError(message string) *TelepactError {
 // NewTelepactErrorWithCause constructs a new TelepactError with a category and wrapped cause.
 func NewTelepactErrorWithCause(message string, kind string, cause error) *TelepactError {
 	return &TelepactError{message: message, kind: kind, cause: cause}
+}
+
+// WithCaseID associates a server-side case identifier with this error.
+func (e *TelepactError) WithCaseID(caseID string) *TelepactError {
+	if e == nil || caseID == "" || e.caseID != "" {
+		return e
+	}
+	e.caseID = caseID
+	return e
 }
 
 // Error implements the error interface.
@@ -64,4 +74,12 @@ func (e *TelepactError) Kind() string {
 		return ""
 	}
 	return e.kind
+}
+
+// CaseID returns the server-side case identifier for this error, if set.
+func (e *TelepactError) CaseID() string {
+	if e == nil {
+		return ""
+	}
+	return e.caseID
 }

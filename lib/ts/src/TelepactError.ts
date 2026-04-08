@@ -31,6 +31,7 @@ function toError(error: unknown): Error | undefined {
 
 export class TelepactError extends Error {
     kind?: TelepactErrorKind;
+    caseId?: string;
     override cause?: Error;
 
     constructor(message: string, kind?: TelepactErrorKind, cause?: unknown);

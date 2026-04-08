@@ -14,20 +14,20 @@
 #|  limitations under the License.
 #|
 
-class TelepactError(Exception):
-    """
-    Indicates critical failure in telepact processing logic.
-    """
+from uuid import uuid4
 
-    def __init__(
-        self,
-        message: str = "telepact error",
-        *,
-        kind: str | None = None,
-        cause: BaseException | None = None,
-        case_id: str | None = None,
-    ) -> None:
-        super().__init__(message)
-        self.kind = kind
-        self.cause = cause
-        self.case_id = case_id
+from ..Message import Message
+from ..TelepactError import TelepactError
+
+
+def ensure_unknown_case_id(error: TelepactError) -> str:
+    if error.case_id is None:
+        error.case_id = str(uuid4())
+    return error.case_id
+
+
+def build_unknown_error_message(
+    error: TelepactError,
+    headers: dict[str, object] | None = None,
+) -> Message:
+    return Message(headers or {}, {"ErrorUnknown_": {"caseId": ensure_unknown_case_id(error)}})

@@ -19,6 +19,7 @@ package internal
 import (
 	"fmt"
 
+	telepact "github.com/telepact/telepact/lib/go"
 	"github.com/telepact/telepact/lib/go/internal/binary"
 	"github.com/telepact/telepact/lib/go/internal/types"
 )
@@ -131,8 +132,13 @@ func HandleMessage(
 	if _, ok := requestHeaders["@auth_"]; ok {
 		authHeaders, err := invokeOnAuth(onAuth, requestHeaders)
 		if err != nil {
-			invokeOnError(onError, fmt.Errorf("telepact auth handler failed while handling %s: %w", functionName, err))
-			return ServerMessage{Headers: cloneStringAnyMap(responseHeaders), Body: map[string]any{"ErrorUnknown_": map[string]any{}}}, nil
+			wrapped := telepact.NewTelepactErrorWithCause(
+				fmt.Sprintf("telepact auth handler failed while handling %s", functionName),
+				"handler",
+				err,
+			)
+			invokeOnError(onError, wrapped)
+			return newUnknownErrorResponse(responseHeaders, ensureUnknownCaseID(wrapped)), nil
 		}
 		for key, value := range authHeaders {
 			requestHeaders[key] = value
@@ -191,8 +197,13 @@ func HandleMessage(
 	default:
 		resp, err := middleware(callMessage, functionRouter)
 		if err != nil {
-			invokeOnError(onError, fmt.Errorf("telepact handler failed while handling %s: %w", functionName, err))
-			return ServerMessage{Headers: cloneStringAnyMap(responseHeaders), Body: map[string]any{"ErrorUnknown_": map[string]any{}}}, nil
+			wrapped := telepact.NewTelepactErrorWithCause(
+				fmt.Sprintf("telepact handler failed while handling %s", functionName),
+				"handler",
+				err,
+			)
+			invokeOnError(onError, wrapped)
+			return newUnknownErrorResponse(responseHeaders, ensureUnknownCaseID(wrapped)), nil
 		}
 		resultMessage = resp
 	}
