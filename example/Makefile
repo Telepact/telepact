@@ -23,8 +23,8 @@ list:
 
 check:
 	@for example in $(EXAMPLES); do \
-	echo "==> $$example"; \
-	$(MAKE) -C $$example run || exit $$?; \
+		echo "==> $$example"; \
+		$(MAKE) -C $$example run || exit $$?; \
 	done
 
 run:

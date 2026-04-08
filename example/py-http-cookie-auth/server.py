@@ -90,7 +90,7 @@ def create_http_server(host: str = '127.0.0.1', port: int = 0) -> ThreadingHTTPS
             self.end_headers()
             self.wfile.write(response.bytes)
 
-        def log_message(self, format: str, *args: object) -> None:
+        def log_message(self, format_string: str, *args: object) -> None:
             return
 
     return ThreadingHTTPServer((host, port), RequestHandler)

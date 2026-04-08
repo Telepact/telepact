@@ -14,6 +14,8 @@
 #|  limitations under the License.
 #|
 
+from __future__ import annotations
+
 import websockets
 
 from telepact import Message, Server, TelepactSchema, TelepactSchemaFiles
@@ -37,7 +39,7 @@ async def greet(function_name: str, request_message: Message) -> Message:
 telepact_server = Server(schema, {'fn.greet': greet}, options)
 
 
-async def telepact_websocket(websocket) -> None:
+async def telepact_websocket(websocket: websockets.ServerConnection) -> None:
     request = getattr(websocket, 'request', None)
     if request is not None and getattr(request, 'path', '/ws/telepact') != '/ws/telepact':
         await websocket.close(code=1008, reason='unexpected path')
