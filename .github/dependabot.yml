@@ -100,6 +100,16 @@ updates:
     multi-ecosystem-group: "all-weekly-updates"
     patterns: ["*"]
 
+  - package-ecosystem: "gomod"
+    directory: "/lib/go"
+    multi-ecosystem-group: "all-weekly-updates"
+    patterns: ["*"]
+
+  - package-ecosystem: "gomod"
+    directory: "/test/lib/go"
+    multi-ecosystem-group: "all-weekly-updates"
+    patterns: ["*"]
+
   - package-ecosystem: "pub"
     directory: "/bind/dart"
     multi-ecosystem-group: "all-weekly-updates"
