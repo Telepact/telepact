@@ -35,8 +35,6 @@ from starlette.websockets import WebSocket, WebSocketDisconnect, WebSocketState
 from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
 
-
-import importlib.resources as pkg_resources
 import time
 import secrets
 import random

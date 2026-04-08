@@ -3,7 +3,7 @@ const { createProxyMiddleware } = require('http-proxy-middleware');
 const { spawn } = require('child_process');
 
 const app = express();
-const target = 'http://localhost:4173'; // Your SvelteKit dev server
+const target = 'http://localhost:4173'; // The Telepact Console preview server
 const simulationPath = '/s/my-dev-simulation'; // The path you want to test
 
 // Start the target server using npm run preview
@@ -25,7 +25,7 @@ app.use(simulationPath, createProxyMiddleware({
     pathRewrite: {
         [`^${simulationPath}`]: '', // Remove the prefix when forwarding
     },
-    ws: true, // Important for HMR (WebSocket proxying)
+    ws: true, // Keep WebSocket proxying enabled for preview traffic
 }));
 
 // Optional: Add a simple root handler for clarity
