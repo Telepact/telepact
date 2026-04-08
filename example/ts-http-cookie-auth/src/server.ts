@@ -60,8 +60,9 @@ export function createExampleServer(): HttpServer {
     };
 
     const telepactServer = new Server(schema, {
-        'fn.me': async (headers) => {
-            const userId = headers['@userId'];
+        'fn.me': async (functionName, requestMessage) => {
+            const _arguments = requestMessage.body[functionName];
+            const userId = requestMessage.headers['@userId'];
             if (userId !== 'user-123') {
                 return new Message({}, {
                     ErrorUnauthenticated_: { 'message!': 'missing or invalid session cookie' },

@@ -25,7 +25,8 @@ options = Server.Options()
 options.auth_required = False
 
 
-async def create_issue_link(headers: dict[str, object], argument: dict[str, object]) -> Message:
+async def create_issue_link(function_name: str, request_message: Message) -> Message:
+    argument = request_message.body[function_name]
     title = argument['title']
     return Message({}, {
         'Ok_': {
@@ -41,7 +42,8 @@ async def create_issue_link(headers: dict[str, object], argument: dict[str, obje
     })
 
 
-async def get_follow_up(headers: dict[str, object], argument: dict[str, object]) -> Message:
+async def get_follow_up(function_name: str, request_message: Message) -> Message:
+    argument = request_message.body[function_name]
     follow_up_id = argument['id']
     return Message({}, {
         'Ok_': {

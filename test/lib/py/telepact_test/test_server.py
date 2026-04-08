@@ -245,7 +245,8 @@ async def start_schema_test_server(connection: NatsClient, metrics: CollectorReg
     timers = Summary(frontdoor_topic.replace(
         '.', '_').replace('-', '_'), '', registry=metrics)
 
-    async def validate_schema_route(headers: dict[str, object], arg: dict[str, object]) -> 'Message':
+    async def validate_schema_route(function_name: str, request_message: 'Message') -> 'Message':
+        arg = request_message.body[function_name]
         input = arg.get("input")
 
         input_tag = next(iter(input.keys()))

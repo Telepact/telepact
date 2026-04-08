@@ -25,7 +25,8 @@ options = Server.Options()
 options.auth_required = False
 
 
-async def list_users(headers: dict[str, object], argument: dict[str, object]) -> Message:
+async def list_users(function_name: str, request_message: Message) -> Message:
+    argument = request_message.body[function_name]
     return Message({}, {
         'Ok_': {
             'users': [
