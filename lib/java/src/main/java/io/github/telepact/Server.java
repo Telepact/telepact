@@ -19,6 +19,7 @@ package io.github.telepact;
 import static io.github.telepact.internal.ProcessBytes.processBytes;
 import static io.github.telepact.internal.binary.ConstructBinaryEncoding.constructBinaryEncoding;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -30,6 +31,33 @@ import io.github.telepact.internal.binary.ServerBinaryEncoder;
  * A telepact Server.
  */
 public class Server {
+
+    @FunctionalInterface
+    public interface FunctionRoute {
+        Message apply(String functionName, Message requestMessage);
+    }
+
+    @FunctionalInterface
+    public interface Middleware {
+        Message apply(Message requestMessage, FunctionRouter functionRouter);
+    }
+
+    public static class FunctionRouter {
+        private final Map<String, FunctionRoute> functionRoutes;
+
+        public FunctionRouter(Map<String, FunctionRoute> functionRoutes) {
+            this.functionRoutes = new HashMap<>(functionRoutes);
+        }
+
+        public Message route(Message requestMessage) {
+            final var functionName = requestMessage.getBodyTarget();
+            final var functionRoute = this.functionRoutes.get(functionName);
+            if (functionRoute == null) {
+                throw new IllegalArgumentException("Unknown function: " + functionName);
+            }
+            return functionRoute.apply(functionName, requestMessage);
+        }
+    }
 
     /**
      * Options for configuring the Server.
@@ -62,6 +90,17 @@ public class Server {
         };
 
         /**
+         * Execution hook that runs when auth headers are present and can add derived
+         * request headers.
+         */
+        public Function<Map<String, Object>, Map<String, Object>> onAuth = (headers) -> Map.of();
+
+        /**
+         * Middleware that can wrap function routing.
+         */
+        public Middleware middleware = (requestMessage, functionRouter) -> functionRouter.route(requestMessage);
+
+        /**
          * Flag to indicate if authentication via the _auth header is required.
          */
         public boolean authRequired = true;
@@ -74,24 +113,28 @@ public class Server {
     }
 
     final TelepactSchema telepactSchema;
-    private final Function<Message, Message> handler;
+    private final FunctionRouter functionRouter;
+    private final Middleware middleware;
     private final Consumer<Throwable> onError;
     private final Consumer<Message> onRequest;
     private final Consumer<Message> onResponse;
+    private final Function<Map<String, Object>, Map<String, Object>> onAuth;
     private final Serializer serializer;
 
     /**
-     * Create a server with the given telepact schema and handler.
+     * Create a server with the given telepact schema and function routes.
      * 
      * @param telepactSchema The schema to be used by the server.
-     * @param handler The function to handle incoming messages.
+     * @param functionRoutes The function routes to handle incoming messages.
      * @param options The options for configuring the server.
      */
-    public Server(TelepactSchema telepactSchema, Function<Message, Message> handler, Options options) {
-        this.handler = handler;
+    public Server(TelepactSchema telepactSchema, Map<String, FunctionRoute> functionRoutes, Options options) {
+        this.functionRouter = new FunctionRouter(functionRoutes);
+        this.middleware = options.middleware;
         this.onError = options.onError;
         this.onRequest = options.onRequest;
         this.onResponse = options.onResponse;
+        this.onAuth = options.onAuth;
         this.telepactSchema = telepactSchema;
 
         final var binaryEncoding = constructBinaryEncoding(this.telepactSchema);
@@ -114,7 +157,7 @@ public class Server {
      */
     public Response process(byte[] requestMessageBytes) {
         return processBytes(requestMessageBytes, Map.of(), this.serializer, this.telepactSchema, this.onError,
-                this.onRequest, this.onResponse, this.handler);
+                this.onRequest, this.onResponse, this.onAuth, this.middleware, this.functionRouter);
     }
 
     /**
@@ -127,6 +170,6 @@ public class Server {
      */
     public Response process(byte[] requestMessageBytes, Map<String, Object> overrideHeaders) {
         return processBytes(requestMessageBytes, overrideHeaders, this.serializer, this.telepactSchema, this.onError,
-                this.onRequest, this.onResponse, this.handler);
+                this.onRequest, this.onResponse, this.onAuth, this.middleware, this.functionRouter);
     }
 }

@@ -30,11 +30,14 @@ import io.github.telepact.SerializationError;
 import io.github.telepact.TelepactError;
 import io.github.telepact.TelepactSchema;
 import io.github.telepact.Serializer;
+import io.github.telepact.Server.FunctionRouter;
+import io.github.telepact.Server.Middleware;
 
 public class ProcessBytes {
     public static Response processBytes(byte[] requestMessageBytes, Map<String, Object> overrideHeaders, Serializer serializer, TelepactSchema telepactSchema,
             Consumer<Throwable> onError, Consumer<Message> onRequest, Consumer<Message> onResponse,
-            Function<Message, Message> handler) {
+            Function<Map<String, Object>, Map<String, Object>> onAuth,
+            Middleware middleware, FunctionRouter functionRouter) {
         try {
             final var requestMessage = parseRequestMessage(requestMessageBytes, serializer,
                     telepactSchema, onError);
@@ -44,7 +47,7 @@ public class ProcessBytes {
             } catch (Throwable ignored) {
             }
 
-            final var responseMessage = handleMessage(requestMessage, overrideHeaders, telepactSchema, handler, onError);
+            final var responseMessage = handleMessage(requestMessage, overrideHeaders, telepactSchema, middleware, functionRouter, onError, onAuth);
 
             try {
                 onResponse.accept(responseMessage);

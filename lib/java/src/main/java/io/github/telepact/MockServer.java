@@ -20,6 +20,7 @@ import static io.github.telepact.internal.mock.MockHandle.mockHandle;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 import io.github.telepact.internal.mock.MockInvocation;
@@ -100,11 +101,12 @@ public class MockServer {
         final var serverOptions = new Server.Options();
         serverOptions.onError = options.onError;
         serverOptions.authRequired = false;
+        serverOptions.middleware = (requestMessage, functionRouter) -> this.handle(requestMessage);
 
         final var telepactSchema = new TelepactSchema(mockTelepactSchema.original, mockTelepactSchema.full, mockTelepactSchema.parsed,
                 mockTelepactSchema.parsedRequestHeaders, mockTelepactSchema.parsedResponseHeaders);
 
-        this.server = new Server(telepactSchema, this::handle, serverOptions);
+        this.server = new Server(telepactSchema, Map.of(), serverOptions);
     }
 
     /**

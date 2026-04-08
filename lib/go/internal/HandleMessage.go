@@ -28,14 +28,19 @@ func HandleMessage(
 	requestMessage ServerMessage,
 	overrideHeaders map[string]any,
 	schema SchemaAccessor,
-	handler func(ServerMessage) (ServerMessage, error),
+	middleware Middleware,
+	functionRouter FunctionRouter,
 	onError func(error),
+	onAuth func(map[string]any) map[string]any,
 ) (ServerMessage, error) {
 	if schema == nil {
 		return ServerMessage{}, fmt.Errorf("telepact: schema must not be nil")
 	}
-	if handler == nil {
-		return ServerMessage{}, fmt.Errorf("telepact: handler must not be nil")
+	if middleware == nil {
+		return ServerMessage{}, fmt.Errorf("telepact: middleware must not be nil")
+	}
+	if functionRouter == nil {
+		return ServerMessage{}, fmt.Errorf("telepact: function router must not be nil")
 	}
 
 	requestHeaders := requestMessage.Headers
@@ -125,6 +130,17 @@ func HandleMessage(
 		return invalidMessage, err
 	}
 
+	if _, ok := requestHeaders["@auth_"]; ok {
+		authHeaders, err := invokeOnAuth(onAuth, requestHeaders)
+		if err != nil {
+			invokeOnError(onError, fmt.Errorf("telepact auth handler failed while handling %s: %w", functionName, err))
+			return ServerMessage{Headers: cloneStringAnyMap(responseHeaders), Body: map[string]any{"ErrorUnknown_": map[string]any{}}}, nil
+		}
+		for key, value := range authHeaders {
+			requestHeaders[key] = value
+		}
+	}
+
 	if clientKnownRaw, ok := requestHeaders["@bin_"]; ok {
 		responseHeaders["@binary_"] = true
 		responseHeaders["@clientKnownBinaryChecksums_"] = convertToAnySlice(clientKnownRaw)
@@ -175,7 +191,7 @@ func HandleMessage(
 		}
 		resultMessage = ServerMessage{Headers: make(map[string]any), Body: map[string]any{"Ok_": map[string]any{"api": apiDefinitions}}}
 	default:
-		resp, err := handler(callMessage)
+		resp, err := middleware(callMessage, functionRouter)
 		if err != nil {
 			invokeOnError(onError, fmt.Errorf("telepact handler failed while handling %s: %w", functionName, err))
 			return ServerMessage{Headers: cloneStringAnyMap(responseHeaders), Body: map[string]any{"ErrorUnknown_": map[string]any{}}}, nil
@@ -266,6 +282,26 @@ func extractSelectStructFields(value any) map[string]any {
 	default:
 		return nil
 	}
+}
+
+func invokeOnAuth(callback func(map[string]any) map[string]any, headers map[string]any) (result map[string]any, err error) {
+	if callback == nil {
+		return map[string]any{}, nil
+	}
+	defer func() {
+		if recovered := recover(); recovered != nil {
+			if recoveredErr, ok := recovered.(error); ok {
+				err = recoveredErr
+			} else {
+				err = fmt.Errorf("%v", recovered)
+			}
+		}
+	}()
+	result = callback(headers)
+	if result == nil {
+		return map[string]any{}, nil
+	}
+	return result, nil
 }
 
 func boolValue(value any) bool {

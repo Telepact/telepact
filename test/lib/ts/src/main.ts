@@ -310,11 +310,9 @@ function startSchemaTestServer(
 
     const timer = registry.createTimer(frontdoorTopic);
 
-    const handler = async (requestMessage: Message): Promise<Message> => {
-        const requestBody = requestMessage.body;
-
-        const arg: { [key: string]: any } = requestBody["fn.validateSchema"];
-
+    const functionRoutes = {
+        "fn.validateSchema": async (functionName: string, requestMessage: Message): Promise<Message> => {
+        const arg = requestMessage.body[functionName] as Record<string, any>;
         const input: { [key: string]: any } = arg["input"];
         const inputTag = Object.keys(input)[0];
 
@@ -353,13 +351,14 @@ function startSchemaTestServer(
         }
 
         return new Message({}, { Ok_: {} });
+        },
     };
 
     const options: ServerOptions = new ServerOptions();
     options.onError = (e: Error) => console.error(e);
     options.authRequired = false;
 
-    const server: Server = new Server(telepact, handler, options);
+    const server: Server = new Server(telepact, functionRoutes, options);
 
     const sub: Subscription = connection.subscribe(frontdoorTopic);
     (async () => {
@@ -415,7 +414,21 @@ function startTestServer(
 
     class ThisError extends Error {}
 
-    const handler = async (requestMessage: Message): Promise<Message> => {
+    const onAuth = (requestHeaders: Record<string, any>): Record<string, any> => {
+        const token = requestHeaders["@auth_"]?.Token?.token;
+        if (token === "ok") {
+            return { "@ok_": {} };
+        }
+        if (token === "unauthorized") {
+            return { "@result": { ErrorUnauthorized_: { "message!": "a" } } };
+        }
+        if (token !== undefined) {
+            return { "@result": { ErrorUnauthenticated_: { "message!": "a" } } };
+        }
+        return {};
+    };
+
+    const middleware = async (requestMessage: Message): Promise<Message> => {
         const requestHeaders = requestMessage.headers;
         const requestBody = requestMessage.body;
         const requestPseudoJson = [requestHeaders, requestBody];
@@ -469,14 +482,18 @@ function startTestServer(
             throw new Error();
         }
     };
+    options.onAuth = onAuth;
+    options.middleware = middleware;
     options.authRequired = authRequired;
 
-    const server: Server = new Server(telepact, handler, options);
+    const server: Server = new Server(telepact, {}, options);
 
     const alternateOptions = new ServerOptions();
     alternateOptions.onError = (e) => console.error(e);
+    alternateOptions.onAuth = onAuth;
+    alternateOptions.middleware = middleware;
     alternateOptions.authRequired = authRequired;
-    const alternateServer: Server = new Server(alternateTelepact, handler, alternateOptions);
+    const alternateServer: Server = new Server(alternateTelepact, {}, alternateOptions);
 
     const subscription: Subscription = connection.subscribe(frontdoorTopic);
     (async () => {

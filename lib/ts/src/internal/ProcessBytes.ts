@@ -26,7 +26,9 @@ import { TelepactError } from '../TelepactError.js';
 export type ErrorHandler = (error: any) => void;
 export type RequestHandler = (message: Message) => void;
 export type ResponseHandler = (message: Message) => void;
-export type MessageHandler = (message: Message) => Promise<Message>;
+export type AuthHandler = (headers: Record<string, any>) => Record<string, any>;
+export type FunctionRouter = { route: (message: Message) => Promise<Message> };
+export type Middleware = (requestMessage: Message, functionRouter: FunctionRouter) => Promise<Message>;
 
 export async function processBytes(
     requestMessageBytes: Uint8Array,
@@ -36,7 +38,9 @@ export async function processBytes(
     onError: ErrorHandler,
     onRequest: RequestHandler,
     onResponse: ResponseHandler,
-    handler: MessageHandler,
+    onAuth: AuthHandler,
+    middleware: Middleware,
+    functionRouter: FunctionRouter,
 ): Promise<Response> {
     try {
         const requestMessage = parseRequestMessage(requestMessageBytes, serializer, telepactSchema, onError);
@@ -47,7 +51,15 @@ export async function processBytes(
             // Handle error
         }
 
-        const responseMessage = await handleMessage(requestMessage, overrideHeaders, telepactSchema, handler, onError);
+        const responseMessage = await handleMessage(
+            requestMessage,
+            overrideHeaders,
+            telepactSchema,
+            middleware,
+            functionRouter,
+            onError,
+            onAuth,
+        );
 
         try {
             onResponse(responseMessage);

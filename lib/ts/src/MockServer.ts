@@ -22,6 +22,7 @@ import { RandomGenerator } from './RandomGenerator.js';
 import { mockHandle } from './internal/mock/MockHandle.js';
 import { MockTelepactSchema } from './MockTelepactSchema.js';
 import { Response } from './Response.js';
+import { Message } from './Message.js';
 
 export class MockServer {
     /**
@@ -40,6 +41,7 @@ export class MockServer {
         const serverOptions = new ServerOptions();
         serverOptions.onError = options.onError;
         serverOptions.authRequired = false;
+        serverOptions.middleware = async (requestMessage: Message): Promise<Message> => await this.handle(requestMessage);
 
         const telepactSchema = new TelepactSchema(
             mockTelepactSchema.original,
@@ -49,7 +51,7 @@ export class MockServer {
             mockTelepactSchema.parsedResponseHeaders,
         );
 
-        this.server = new Server(telepactSchema, this.handle, serverOptions);
+        this.server = new Server(telepactSchema, {}, serverOptions);
     }
 
     private random: RandomGenerator;

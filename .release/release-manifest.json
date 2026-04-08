@@ -1,15 +1,9 @@
 {
   "changed_paths": [
-    "sdk/cli/telepact_cli/calculator.telepact.yaml",
-    "sdk/cli/telepact_cli/cli.py",
-    "sdk/cli/tests/test_main.py"
+    ".github/dependabot.yml"
   ],
-  "direct_targets": [
-    "cli"
-  ],
-  "pr_number": 329,
-  "targets": [
-    "cli"
-  ],
-  "version": "1.0.0-alpha.240"
+  "direct_targets": [],
+  "pr_number": 332,
+  "targets": [],
+  "version": "1.0.0-alpha.244"
 }

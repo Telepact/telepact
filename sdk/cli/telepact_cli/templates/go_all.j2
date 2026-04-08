@@ -456,28 +456,35 @@ func NewTypedServerHandler(impl TypedServer) *TypedServerHandler {
     return &TypedServerHandler{Impl: impl}
 }
 
+func (h *TypedServerHandler) FunctionRoutes() map[string]telepact.FunctionRoute {
+    if h == nil || h.Impl == nil {
+        return nil
+    }
+
+    return map[string]telepact.FunctionRoute{
+    {%- for fn in functions %}
+        "{{ fn.raw_name }}": func(functionName string, requestMessage telepact.Message) (telepact.Message, error) {
+            argument := requestMessage.Body[functionName]
+            result, err := h.Impl.{{ fn.name }}(requestMessage.Headers, New{{ fn.name }}InputFromPseudoJSON(map[string]any{"{{ fn.raw_name }}": argument}))
+            if err != nil {
+                return telepact.Message{}, err
+            }
+            return telepact.NewMessage(result.Headers, result.Body.PseudoJSON()), nil
+        },
+    {%- endfor %}
+    }
+}
+
 func (h *TypedServerHandler) Handler(message telepact.Message) (telepact.Message, error) {
     if h == nil || h.Impl == nil {
         return telepact.Message{}, errors.New("telepact: typed server not configured")
     }
 
-    target, err := message.BodyTarget()
-    if err != nil {
-        return telepact.Message{}, err
+    functionRouter := telepact.NewFunctionRouter(h.FunctionRoutes())
+    if functionRouter == nil {
+        return telepact.Message{}, fmt.Errorf("telepact: typed server not configured")
     }
-
-    switch target {
-    {%- for fn in functions %}
-    case "{{ fn.raw_name }}":
-        result, ierr := h.Impl.{{ fn.name }}(message.Headers, New{{ fn.name }}InputFromPseudoJSON(message.Body))
-        if ierr != nil {
-            return telepact.Message{}, ierr
-        }
-        return telepact.NewMessage(result.Headers, result.Body.PseudoJSON()), nil
-    {%- endfor %}
-    default:
-        return telepact.Message{}, fmt.Errorf("telepact: unknown function %s", target)
-    }
+    return functionRouter.Route(message)
 }
 {%- endmacro %}
 

@@ -24,6 +24,7 @@ from .GetApiDefinitionsWithExamples import get_api_definitions_with_examples
 from .types.TTypeDeclaration import TTypeDeclaration
 
 if TYPE_CHECKING:
+    from ..Server import FunctionRouter, Middleware
     from ..internal.validation.ValidationFailure import ValidationFailure
     from .types.TType import TType
     from ..TelepactSchema import TelepactSchema
@@ -33,8 +34,10 @@ async def handle_message(
     request_message: 'Message',
     override_headers: dict[str, object],
     telepact_schema: 'TelepactSchema',
-    handler: Callable[['Message'], Awaitable['Message']],
+    middleware: 'Middleware',
+    function_router: 'FunctionRouter',
     on_error: Callable[[Exception], None],
+    on_auth: Callable[[dict[str, object]], dict[str, object]],
 ) -> 'Message':
     from ..internal.SelectStructFields import select_struct_fields
     from ..internal.validation.GetInvalidErrorMessage import get_invalid_error_message
@@ -93,6 +96,23 @@ async def handle_message(
             result_union_type,
             response_headers,
         )
+
+    if "@auth_" in request_headers:
+        try:
+            auth_headers = on_auth(request_headers) or {}
+            request_headers.update(auth_headers)
+        except Exception as e:
+            try:
+                on_error(
+                    TelepactError(
+                        f"telepact auth handler failed while handling {function_name}",
+                        kind="handler",
+                        cause=e,
+                    )
+                )
+            except Exception:
+                pass
+            return Message(response_headers, {"ErrorUnknown_": {}})
 
     if "@bin_" in request_headers:
         client_known_binary_checksums = cast(
@@ -160,7 +180,7 @@ async def handle_message(
         result_message = Message({}, {"Ok_": {"api": api_definitions}})
     else:
         try:
-            result_message = await handler(call_message)
+            result_message = await middleware(call_message, function_router)
         except Exception as e:
             try:
                 on_error(

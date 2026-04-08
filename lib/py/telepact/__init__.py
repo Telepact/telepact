@@ -16,7 +16,7 @@
 
 from .RandomGenerator import RandomGenerator
 from .Client import Client
-from .Server import Server
+from .Server import FunctionRouter, Server
 from .TestClient import TestClient
 from .MockServer import MockServer
 from .Message import Message
@@ -34,6 +34,7 @@ __all__ = [
     "RandomGenerator",
     "Client",
     "Server",
+    "FunctionRouter",
     "TestClient",
     "MockServer",
     "Message",

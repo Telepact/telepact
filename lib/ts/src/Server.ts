@@ -25,19 +25,45 @@ import { Serialization } from './Serialization.js';
 import { ServerBase64Encoder } from './internal/binary/ServerBase64Encoder.js';
 import { Response } from './Response.js';
 
+export type FunctionRoute = (functionName: string, requestMessage: Message) => Promise<Message>;
+export type FunctionRoutes = Record<string, FunctionRoute>;
+export type Middleware = (requestMessage: Message, functionRouter: FunctionRouter) => Promise<Message>;
+
+export class FunctionRouter {
+    functionRoutes: FunctionRoutes;
+
+    constructor(functionRoutes: FunctionRoutes) {
+        this.functionRoutes = functionRoutes;
+    }
+
+    async route(requestMessage: Message): Promise<Message> {
+        const functionName = requestMessage.getBodyTarget();
+        const functionRoute = this.functionRoutes[functionName];
+        if (functionRoute === undefined) {
+            throw new Error(`Unknown function: ${functionName}`);
+        }
+
+        return await functionRoute(functionName, requestMessage);
+    }
+}
+
 export class Server {
-    handler: (message: Message) => Promise<Message>;
+    functionRouter: FunctionRouter;
+    middleware: Middleware;
     onError: (error: any) => void;
     onRequest: (message: Message) => void;
     onResponse: (message: Message) => void;
+    onAuth: (headers: Record<string, any>) => Record<string, any>;
     telepactSchema: TelepactSchema;
     serializer: Serializer;
 
-    constructor(telepactSchema: TelepactSchema, handler: (message: Message) => Promise<Message>, options: ServerOptions) {
-        this.handler = handler;
+    constructor(telepactSchema: TelepactSchema, functionRoutes: FunctionRoutes, options: ServerOptions) {
+        this.functionRouter = new FunctionRouter(functionRoutes);
+        this.middleware = options.middleware;
         this.onError = options.onError;
         this.onRequest = options.onRequest;
         this.onResponse = options.onResponse;
+        this.onAuth = options.onAuth;
 
         this.telepactSchema = telepactSchema;
 
@@ -63,7 +89,9 @@ export class Server {
             this.onError,
             this.onRequest,
             this.onResponse,
-            this.handler,
+            this.onAuth,
+            this.middleware,
+            this.functionRouter,
         );
     }
 }
@@ -72,6 +100,8 @@ export class ServerOptions {
     onError: (error: any) => void;
     onRequest: (message: Message) => void;
     onResponse: (message: Message) => void;
+    onAuth: (headers: Record<string, any>) => Record<string, any>;
+    middleware: Middleware;
     authRequired: boolean;
     serialization: Serialization;
 
@@ -79,6 +109,9 @@ export class ServerOptions {
         this.onError = (e: any) => {};
         this.onRequest = (m: Message) => {};
         this.onResponse = (m: Message) => {};
+        this.onAuth = (headers: Record<string, any>) => ({});
+        this.middleware = async (requestMessage: Message, functionRouter: FunctionRouter): Promise<Message> =>
+            await functionRouter.route(requestMessage);
         this.authRequired = true;
         this.serialization = new DefaultSerialization();
     }
