@@ -380,7 +380,8 @@ class TypedServerHandler:
     {%- for fn in functions %}
     {%- set function_name = fn | replace('fn.', '') %}
     async def _{{ function_name }}_route(self, function_name: str, request_message: telepact.Message) -> telepact.Message:
-        response_headers, {{ function_name }}_output = await self.{{ function_name }}(request_message.headers, {{ function_name }}.Input({function_name: request_message.body[function_name]}))
+        argument = request_message.body[function_name]
+        response_headers, {{ function_name }}_output = await self.{{ function_name }}(request_message.headers, {{ function_name }}.Input({"{{ fn }}": argument}))
         return telepact.Message(response_headers, {{ function_name }}_output.pseudo_json)
     {% endfor %}
 

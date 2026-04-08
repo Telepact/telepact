@@ -569,7 +569,8 @@ def demo_server(port: int) -> None:
         unavailable_response = _demo_unavailable_response()
         if unavailable_response is not None:
             return unavailable_response
-        username = get_username(request_message, require_session=True)
+        message = Message(request_message.headers, {function_name: arguments})
+        username = get_username(message, require_session=True)
         requested_username = cast(str, arguments['username'])
         if username is None:
             return unauthenticated_response()

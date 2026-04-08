@@ -46,7 +46,10 @@ func main() {
 
     functionRoutes := map[string]telepact.FunctionRoute{
         "fn.greet": func(functionName string, requestMessage telepact.Message) (telepact.Message, error) {
-            arguments, _ := requestMessage.Body[functionName].(map[string]any)
+            arguments, ok := requestMessage.Body[functionName].(map[string]any)
+            if !ok {
+                return telepact.Message{}, fmt.Errorf("unexpected %s payload", functionName)
+            }
             subject, _ := arguments["subject"].(string)
             return telepact.NewMessage(
                 map[string]any{},
