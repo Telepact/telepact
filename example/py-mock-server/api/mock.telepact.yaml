@@ -14,19 +14,11 @@
 #|  limitations under the License.
 #|
 
-EXAMPLES := py-binary py-http-cookie-auth py-links py-mock-server py-select py-websocket py-websocket-request-ids
-
-.PHONY: list check run
-
-list:
-	@printf '%s\n' $(EXAMPLES)
-
-check:
-	@for example in $(EXAMPLES); do \
-		echo "==> $$example"; \
-		$(MAKE) -C $$example run || exit $$?; \
-	done
-
-run:
-	@test -n "$(EXAMPLE)" || (echo "Usage: make run EXAMPLE=<name>" && exit 1)
-	@$(MAKE) -C $(EXAMPLE) run
+- struct.Greeting:
+    message: "string"
+    excited: "boolean"
+- fn.lookupGreeting:
+    locale: "string"
+  ->:
+    - Ok_:
+        greeting: "struct.Greeting"
