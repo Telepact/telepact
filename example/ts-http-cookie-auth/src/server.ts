@@ -62,7 +62,9 @@ export function createExampleServer(): HttpServer {
     const telepactServer = new Server(schema, {
         'fn.me': async (functionName, requestMessage) => {
             const args = requestMessage.body[functionName];
-            void args;
+            if (typeof args !== 'object' || args === null) {
+                throw new Error(`Invalid arguments for ${functionName}`);
+            }
             const userId = requestMessage.headers['@userId'];
             if (userId !== 'user-123') {
                 return new Message({}, {
