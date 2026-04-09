@@ -76,8 +76,8 @@ public class ProcessBytes {
             }
             return new Response(responseBytes, responseMessage.headers);
         } catch (Throwable e) {
-            final var wrapped = e instanceof TelepactError
-                    ? e
+            final TelepactError wrapped = e instanceof TelepactError telepactError
+                    ? telepactError
                     : e instanceof SerializationError
                             ? new TelepactError("telepact response serialization failed", "serialization", e)
                             : new TelepactError("telepact server processing failed", null, e);
@@ -87,7 +87,7 @@ public class ProcessBytes {
             }
 
             final var responseBytes = serializer
-                    .serialize(buildUnknownErrorMessage((TelepactError) wrapped, new HashMap<>()));
+                    .serialize(buildUnknownErrorMessage(wrapped, new HashMap<>()));
             return new Response(responseBytes, Map.of());
         }
     }

@@ -18,6 +18,7 @@ package telepact
 
 import (
 	cryptorand "crypto/rand"
+	"encoding/binary"
 	"encoding/hex"
 	"fmt"
 	"sync/atomic"
@@ -55,7 +56,8 @@ func NewTelepactErrorWithCaseID(message string, kind string, cause error, caseID
 func newTelepactCaseID() string {
 	var raw [16]byte
 	if _, err := cryptorand.Read(raw[:]); err != nil {
-		return fmt.Sprintf("%016x-%016x", time.Now().UnixNano(), atomic.AddUint64(&telepactCaseIDFallbackCounter, 1))
+		binary.BigEndian.PutUint64(raw[0:8], uint64(time.Now().UnixNano()))
+		binary.BigEndian.PutUint64(raw[8:16], atomic.AddUint64(&telepactCaseIDFallbackCounter, 1))
 	}
 	raw[6] = (raw[6] & 0x0f) | 0x40
 	raw[8] = (raw[8] & 0x3f) | 0x80
