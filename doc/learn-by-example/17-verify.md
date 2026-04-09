@@ -33,7 +33,7 @@ The entry looks like this:
 }
 ```
 
-For the `_ext.Call_` shape, see the [extensions guide](../extensions.md#_extcall_).
+For the `_ext.Call_` shape, see the [extensions guide](../extensions.md).
 
 ## Verify before the call
 

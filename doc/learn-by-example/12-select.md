@@ -25,7 +25,7 @@ The schema entry looks like this:
 }
 ```
 
-For the full rule set, see the [extensions guide](../extensions.md#_extselect_).
+For the full rule set, see the [extensions guide](../extensions.md).
 
 ## Compare a full response with a selected response
 

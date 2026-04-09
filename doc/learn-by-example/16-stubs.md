@@ -33,7 +33,7 @@ The key entry is:
 }
 ```
 
-For the `_ext.Stub_` shape, see the [extensions guide](../extensions.md#_extstub_).
+For the `_ext.Stub_` shape, see the [extensions guide](../extensions.md).
 
 ## Create a stub for `fn.add`
 
