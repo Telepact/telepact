@@ -521,10 +521,40 @@ def demo_server(port: int) -> None:
             'evaluations': get_user_evaluations(username),
         }, separators=(',', ':'), sort_keys=True).encode('utf-8')
 
+    def parse_namespace_blob(blob: bytes) -> tuple[dict[str, float], list[dict[str, object]]]:
+        try:
+            namespace = json.loads(blob.decode('utf-8'))
+        except (UnicodeDecodeError, json.JSONDecodeError) as e:
+            raise ValueError('Imported namespace blob must be valid UTF-8 JSON.') from e
+        if not isinstance(namespace, dict):
+            raise ValueError('Imported namespace blob must decode to an object.')
+        variables = namespace.get('variables')
+        evaluations = namespace.get('evaluations')
+        if not isinstance(variables, dict):
+            raise ValueError('Imported namespace blob must include a variables object.')
+        if not isinstance(evaluations, list):
+            raise ValueError('Imported namespace blob must include an evaluations array.')
+
+        parsed_variables: dict[str, float] = {}
+        for name, value in variables.items():
+            if not isinstance(name, str):
+                raise ValueError('Imported namespace variable names must be strings.')
+            if isinstance(value, bool) or not isinstance(value, (int, float)):
+                raise ValueError('Imported namespace variable values must be numbers.')
+            parsed_variables[name] = float(value)
+
+        parsed_evaluations: list[dict[str, object]] = []
+        for evaluation in evaluations:
+            if not isinstance(evaluation, dict):
+                raise ValueError('Imported namespace evaluations must be objects.')
+            parsed_evaluations.append(cast(dict[str, object], evaluation))
+
+        return parsed_variables, parsed_evaluations
+
     def replace_namespace(username: str, blob: bytes) -> None:
-        namespace = cast(dict[str, object], json.loads(blob.decode('utf-8')))
-        user_variables[username] = dict(cast(dict[str, float], namespace['variables']))
-        user_evaluations[username] = list(cast(list[dict[str, object]], namespace['evaluations']))
+        variables, evaluations = parse_namespace_blob(blob)
+        user_variables[username] = variables
+        user_evaluations[username] = evaluations
 
     def evaluate_expression(expression: dict[str, object], variables: dict[str, float]) -> tuple[float, list[str], bool]:
         kind, payload = next(iter(expression.items()))
@@ -700,9 +730,8 @@ def demo_server(port: int) -> None:
         unavailable_response, username = await require_namespace(request_message)
         if unavailable_response is not None:
             return unavailable_response
-        replace_namespace(
-            cast(str, username),
-            cast(bytes, cast(dict[str, object], request_message.body[function_name])['blob']))
+        blob = cast(bytes, cast(dict[str, object], request_message.body[function_name])['blob'])
+        replace_namespace(cast(str, username), blob)
         return Message({}, {'Ok_': {}})
 
     function_routes = {
