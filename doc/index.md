@@ -21,7 +21,7 @@ To learn how to serve a Telepact API, see the specific library docs:
 
 For development assistance, see the SDK tool docs:
 - [CLI](../sdk/cli/README.md)
-    - Conveniently retreive API schemas from running live Telepact servers, and
+    - Conveniently retrieve API schemas from running live Telepact servers, and
       use schemas to create mock servers and generate code bindings, all from
       the command line
 - [Browser Console](../sdk/console/README.md)
