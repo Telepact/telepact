@@ -527,18 +527,19 @@ def demo_server(port: int) -> None:
         except (UnicodeDecodeError, json.JSONDecodeError) as e:
             raise ValueError('Imported namespace blob must be valid UTF-8 JSON.') from e
         if not isinstance(namespace, dict):
-            raise ValueError('Imported namespace blob must decode to an object.')
+            raise ValueError('Imported namespace blob must decode to a JSON object.')
         variables = namespace.get('variables')
         evaluations = namespace.get('evaluations')
         if not isinstance(variables, dict):
-            raise ValueError('Imported namespace blob must include a variables object.')
+            raise ValueError('Imported namespace blob must include a variables JSON object.')
         if not isinstance(evaluations, list):
-            raise ValueError('Imported namespace blob must include an evaluations array.')
+            raise ValueError('Imported namespace blob must include an evaluations JSON array.')
 
         parsed_variables: dict[str, float] = {}
         for name, value in variables.items():
             if not isinstance(name, str):
                 raise ValueError('Imported namespace variable names must be strings.')
+            # Reject bool explicitly because bool is a subclass of int in Python.
             if isinstance(value, bool) or not isinstance(value, (int, float)):
                 raise ValueError('Imported namespace variable values must be numbers.')
             parsed_variables[name] = float(value)
@@ -546,7 +547,7 @@ def demo_server(port: int) -> None:
         parsed_evaluations: list[dict[str, object]] = []
         for evaluation in evaluations:
             if not isinstance(evaluation, dict):
-                raise ValueError('Imported namespace evaluations must be objects.')
+                raise ValueError('Imported namespace evaluations must be JSON objects.')
             parsed_evaluations.append(cast(dict[str, object], evaluation))
 
         return parsed_variables, parsed_evaluations
