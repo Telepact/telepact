@@ -18,7 +18,6 @@ import click
 import os
 import json
 import argparse
-import json
 import msgpack
 import shutil
 import yaml
