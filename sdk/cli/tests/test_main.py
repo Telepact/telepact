@@ -55,6 +55,18 @@ def tmp_dir_manager() -> Generator[None, None, None]:
     if os.path.exists(tmp_dir):
         shutil.rmtree(tmp_dir)
 
+
+def _post_demo_server(payload: list[dict[str, object]], *, port: int = 8000) -> list[dict[str, object]]:
+    for _ in range(20):
+        response = requests.post(f'http://localhost:{port}/api', data=json.dumps(payload))
+        assert response.status_code == 200
+        response_json = response.json()
+        if response_json != [{}, {'ErrorUnavailable': {}}]:
+            return response_json
+        time.sleep(0.1)
+    raise AssertionError('Demo server remained unavailable after repeated retries')
+
+
 def test_demo_server_and_fetch_and_mock() -> None:
     p = subprocess.Popen(['uv', 'run', 'telepact', 'demo-server'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, cwd='tests/tmp')
     p_mock: subprocess.Popen | None = None
@@ -124,6 +136,67 @@ def test_demo_server_and_fetch_and_mock() -> None:
                 stdout_mock, stderr_mock = p_mock.communicate(timeout=5)
             print(f"Mock server stdout: {stdout_mock}")
             print(f"Mock server stderr: {stderr_mock}")
+
+
+def test_demo_server_uses_shared_namespace_without_auth() -> None:
+    p = subprocess.Popen(['uv', 'run', 'telepact', 'demo-server'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, cwd='tests/tmp')
+
+    try:
+        time.sleep(1)
+
+        save_response = _post_demo_server([
+            {},
+            {'fn.saveVariables': {'variables': {'a': 2, 'b': 4}}},
+        ])
+        assert save_response == [{}, {'Ok_': {}}]
+
+        evaluate_response = _post_demo_server([
+            {},
+            {'fn.evaluate': {'expression': {'Add': {
+                'left': {'Variable': {'name': 'a'}},
+                'right': {'Variable': {'name': 'b'}},
+            }}}},
+        ])
+        assert evaluate_response == [{}, {'Ok_': {
+            'result': 6,
+            'saveResult': {'fn.saveVariable': {'name': 'result', 'value': 6}},
+        }}]
+
+        variables_response = _post_demo_server([
+            {},
+            {'fn.getVariables': {}},
+        ])
+        assert variables_response == [{}, {'Ok_': {'variables': [
+            {'name': 'a', 'value': 2},
+            {'name': 'b', 'value': 4},
+        ]}}]
+
+        tape_response = _post_demo_server([
+            {},
+            {'fn.getPaperTape': {}},
+        ])
+        assert tape_response == [{}, {'Ok_': {'tape': [{
+            'expression': {'Add': {
+                'left': {'Variable': {'name': 'a'}},
+                'right': {'Variable': {'name': 'b'}},
+            }},
+            'result': 6,
+            'timestamp': tape_response[1]['Ok_']['tape'][0]['timestamp'],
+            'successful': True,
+        }]}}]
+
+        logout_response = _post_demo_server([
+            {},
+            {'fn.logout': {'username': 'shared'}},
+        ])
+        assert logout_response == [{}, {'ErrorUnauthenticated_': {'message!': 'Valid authentication is required.'}}]
+    finally:
+        p.terminate()
+        try:
+            p.communicate(timeout=5)
+        except subprocess.TimeoutExpired:
+            p.kill()
+            p.communicate(timeout=5)
 
 
 def test_fetch_sets_content_type_header() -> None:
