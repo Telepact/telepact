@@ -23,6 +23,7 @@ import { Response } from '../Response.js';
 import { SerializationError } from '../SerializationError.js';
 import { TelepactError } from '../TelepactError.js';
 import { UpdateHeaders } from '../Server.js';
+import { buildUnknownErrorMessage } from './UnknownError.js';
 
 export type ErrorHandler = (error: any) => void;
 export type RequestHandler = (message: Message) => void;
@@ -80,7 +81,7 @@ export async function processBytes(
             } catch (error) {
                 // Handle error
             }
-            const unknownResponseBytes = serializer.serialize(new Message({}, { ErrorUnknown_: {} }));
+            const unknownResponseBytes = serializer.serialize(buildUnknownErrorMessage(wrapped));
             return { bytes: unknownResponseBytes, headers: {} };
         }
 
@@ -97,7 +98,7 @@ export async function processBytes(
             // Handle error
         }
 
-        const responseBytes = serializer.serialize(new Message({}, { ErrorUnknown_: {} }));
+        const responseBytes = serializer.serialize(buildUnknownErrorMessage(wrapped));
 
         return { bytes: responseBytes, headers: {} };
     }

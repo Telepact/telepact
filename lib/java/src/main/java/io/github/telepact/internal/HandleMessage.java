@@ -17,6 +17,7 @@
 package io.github.telepact.internal;
 
 import static io.github.telepact.internal.SelectStructFields.selectStructFields;
+import static io.github.telepact.internal.UnknownError.buildUnknownErrorMessage;
 import static io.github.telepact.internal.validation.GetInvalidErrorMessage.getInvalidErrorMessage;
 import static io.github.telepact.internal.validation.MapValidationFailuresToInvalidFieldCases.mapValidationFailuresToInvalidFieldCases;
 import static io.github.telepact.internal.validation.ValidateHeaders.validateHeaders;
@@ -103,14 +104,15 @@ import io.github.telepact.internal.validation.ValidationFailure;
                     requestHeaders.putAll(authHeaders);
                 }
             } catch (Throwable e) {
+                final var wrapped = new TelepactError(
+                        "telepact auth handler failed while handling %s".formatted(functionName),
+                        "handler",
+                        e);
                 try {
-                    onError.accept(new TelepactError(
-                            "telepact auth handler failed while handling %s".formatted(functionName),
-                            "handler",
-                            e));
+                    onError.accept(wrapped);
                 } catch (Throwable ignored) {
                 }
-                return new Message(responseHeaders, Map.of("ErrorUnknown_", Map.of()));
+                return buildUnknownErrorMessage(wrapped, responseHeaders);
             }
         }
 
@@ -172,15 +174,16 @@ import io.github.telepact.internal.validation.ValidationFailure;
             try {
                 resultMessage = middleware.apply(callMessage, functionRouter);
             } catch (Throwable e) {
+                final var wrapped = new TelepactError(
+                        "telepact handler failed while handling %s".formatted(functionName),
+                        "handler",
+                        e);
                 try {
-                    onError.accept(new TelepactError(
-                            "telepact handler failed while handling %s".formatted(functionName),
-                            "handler",
-                            e));
+                    onError.accept(wrapped);
                 } catch (Throwable ignored) {
 
                 }
-                return new Message(responseHeaders, Map.of("ErrorUnknown_", Map.of()));
+                return buildUnknownErrorMessage(wrapped, responseHeaders);
             }
         }
 

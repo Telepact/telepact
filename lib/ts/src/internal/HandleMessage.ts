@@ -30,6 +30,7 @@ import { serverBase64Decode } from './binary/ServerBase64Decode.js';
 import { getApiDefinitionsWithExamples } from './GetApiDefinitionsWithExamples.js';
 import { TelepactError } from '../TelepactError.js';
 import { UpdateHeaders } from '../Server.js';
+import { buildUnknownErrorMessage } from './UnknownError.js';
 
 export async function handleMessage(
     requestMessage: Message,
@@ -100,11 +101,12 @@ export async function handleMessage(
             const authHeaders = onAuth(requestHeaders) ?? {};
             Object.assign(requestHeaders, authHeaders);
         } catch (error) {
+            const wrapped = new TelepactError(`telepact auth handler failed while handling ${functionName}`, 'handler', error);
             try {
-                onError(new TelepactError(`telepact auth handler failed while handling ${functionName}`, 'handler', error));
+                onError(wrapped);
             } catch (ignored) {
             }
-            return new Message(responseHeaders, { ErrorUnknown_: {} });
+            return buildUnknownErrorMessage(wrapped, responseHeaders);
         }
     }
 
@@ -192,12 +194,13 @@ export async function handleMessage(
         try {
             resultMessage = await middleware(callMessage, functionRouter);
         } catch (e) {
+            const wrapped = new TelepactError(`telepact handler failed while handling ${functionName}`, 'handler', e);
             try {
-                onError(new TelepactError(`telepact handler failed while handling ${functionName}`, 'handler', e));
+                onError(wrapped);
             } catch (error) {
                 // Ignore error
             }
-            return new Message(responseHeaders, { ErrorUnknown_: {} });
+            return buildUnknownErrorMessage(wrapped, responseHeaders);
         }
     }
 
