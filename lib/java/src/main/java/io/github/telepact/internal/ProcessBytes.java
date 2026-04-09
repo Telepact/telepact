@@ -18,6 +18,7 @@ package io.github.telepact.internal;
 
 import static io.github.telepact.internal.HandleMessage.handleMessage;
 import static io.github.telepact.internal.ParseRequestMessage.parseRequestMessage;
+import static io.github.telepact.internal.UnknownError.buildUnknownErrorMessage;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -70,13 +71,13 @@ public class ProcessBytes {
                 }
 
                 final var unknownResponseBytes = serializer
-                        .serialize(new Message(new HashMap<>(), Map.of("ErrorUnknown_", Map.of())));
+                        .serialize(buildUnknownErrorMessage(wrapped, new HashMap<>()));
                 return new Response(unknownResponseBytes, Map.of());
             }
             return new Response(responseBytes, responseMessage.headers);
         } catch (Throwable e) {
-            final var wrapped = e instanceof TelepactError
-                    ? e
+            final TelepactError wrapped = e instanceof TelepactError telepactError
+                    ? telepactError
                     : e instanceof SerializationError
                             ? new TelepactError("telepact response serialization failed", "serialization", e)
                             : new TelepactError("telepact server processing failed", null, e);
@@ -86,7 +87,7 @@ public class ProcessBytes {
             }
 
             final var responseBytes = serializer
-                    .serialize(new Message(new HashMap<>(), Map.of("ErrorUnknown_", Map.of())));
+                    .serialize(buildUnknownErrorMessage(wrapped, new HashMap<>()));
             return new Response(responseBytes, Map.of());
         }
     }

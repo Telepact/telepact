@@ -17,7 +17,7 @@ import asyncio
 import logging
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
-from telepact import Message, Server, TelepactSchema, TelepactSchemaFiles
+from telepact import Message, Server, TelepactError, TelepactSchema, TelepactSchemaFiles
 
 
 logging.basicConfig(level=logging.INFO)
@@ -40,7 +40,13 @@ async def middleware(request_message: Message, function_router) -> Message:
 
 
 options.middleware = middleware
-options.on_error = lambda error: log.exception('telepact error', exc_info=error)
+
+
+def on_error(error: TelepactError) -> None:
+    log.exception('telepact error case_id=%s', error.case_id, exc_info=error)
+
+
+options.on_error = on_error
 
 
 async def hello(function_name: str, request_message: Message) -> Message:
@@ -72,11 +78,12 @@ curl -s localhost:8002/api/telepact -d '[{}, {"fn.hello": {"name": "boom"}}]'
 Response:
 
 ```json
-[{}, {"ErrorUnknown_": {}}]
+[{}, {"ErrorUnknown_": {"caseId": "5941539f-127c-4c4d-8194-1648f679be92"}}]
 ```
 
-And the server logs should contain the actual stack trace. That is the main
-operational pattern: keep the wire response generic, and keep the actionable
-details in server logs.
+And the server logs should contain the actual stack trace with the same
+`case_id=5941539f-127c-4c4d-8194-1648f679be92`. That is the main operational
+pattern: keep the wire response generic, and use the case ID to match a
+client-side `ErrorUnknown_` report to the corresponding server-side log entry.
 
 Next: [24. Server auth](./24-server-auth.md)

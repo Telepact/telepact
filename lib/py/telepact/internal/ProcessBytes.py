@@ -19,6 +19,7 @@ from typing import Callable, TYPE_CHECKING, Awaitable
 from ..Message import Message
 from ..SerializationError import SerializationError
 from ..TelepactError import TelepactError
+from ..internal.UnknownError import build_unknown_error_message
 
 if TYPE_CHECKING:
     from ..Serializer import Serializer
@@ -73,7 +74,7 @@ async def process_bytes(request_message_bytes: bytes, update_headers: 'UpdateHea
                 on_error(wrapped)
             except Exception:
                 pass
-            response_bytes = serializer.serialize(Message({}, {"ErrorUnknown_": {}}))
+            response_bytes = serializer.serialize(build_unknown_error_message(wrapped))
             return Response(response_bytes, {})
 
         return Response(response_bytes, response_message.headers)
@@ -87,6 +88,6 @@ async def process_bytes(request_message_bytes: bytes, update_headers: 'UpdateHea
         except Exception:
             pass
 
-        response_bytes = serializer.serialize(Message({}, {"ErrorUnknown_": {}}))
+        response_bytes = serializer.serialize(build_unknown_error_message(wrapped))
 
         return Response(response_bytes, {})

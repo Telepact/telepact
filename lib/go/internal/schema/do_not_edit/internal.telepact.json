@@ -252,6 +252,7 @@
       {
         "///": "The server implementation raised an unknown error.",
         "ErrorUnknown_": {
+          "caseId": "string"
         }
       },
       {
