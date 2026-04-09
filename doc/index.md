@@ -5,13 +5,7 @@ tools you need to design, serve, and operate a Telepact API.
 
 To learn how to write Telepact APIs, start with the
 [API Schema Guide](./schema-guide.md). A
-[JSON Schema](../common/json-schema.json) is available for validation. For
-transport wiring patterns and concrete HTTP/WebSocket examples, see the
-[Transport Guide](./transports.md). For deployment, rollout, compatibility,
-auth, and observability guidance, see the
-[Production Guide](./production-guide.md). For runnable end-to-end examples,
-see the [Examples landing page](../example/README.md). For debugging
-local/runtime failures, see the [Runtime Error Guide](./runtime-errors.md).
+[JSON Schema](../common/json-schema.json) is available for validation.
 
 To learn how to serve a Telepact API, see the specific library docs:
 - [Typescript](../lib/ts/README.md)
@@ -33,6 +27,17 @@ For development assistance, see the SDK tool docs:
 Find the latest versions of all libraries and sdks [here](./versions.md). That
 page tracks published registry versions, which may lag the source tree between
 releases.
+
+For transport wiring patterns and concrete HTTP/WebSocket examples, see the
+[Transport Guide](./transports.md). For deployment, rollout, compatibility,
+auth, and observability guidance, see the
+[Production Guide](./production-guide.md).
+
+For runnable end-to-end examples, see the
+[Examples landing page](../example/README.md).
+
+For debugging local/runtime
+failures, see the [Runtime Error Guide](./runtime-errors.md).
 
 For further reading, see [Motivation](./motivation.md).
 
