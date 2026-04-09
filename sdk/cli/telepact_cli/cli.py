@@ -465,6 +465,7 @@ def demo_server(port: int) -> None:
     Start a demo Telepact server.
     """
 
+    shared_namespace = '__unauthenticated__'
     user_variables: dict[str, dict[str, float]] = {}
     user_evaluations: dict[str, list[dict[str, object]]] = {}
     session_tokens: dict[str, str] = {}
@@ -494,6 +495,17 @@ def demo_server(port: int) -> None:
 
     def unauthorized_response(message: str) -> Message:
         return Message({}, {'ErrorUnauthorized_': {'message!': message}})
+
+    async def require_namespace(request_message: Message) -> tuple[Message | None, str | None]:
+        unavailable_response = _demo_unavailable_response()
+        if unavailable_response is not None:
+            return unavailable_response, None
+        if '@auth_' not in request_message.headers:
+            return None, shared_namespace
+        username = get_username(request_message)
+        if username is None:
+            return unauthenticated_response(), None
+        return None, username
 
     def record_evaluation(username: str, expression: dict[str, object], result: float, successful: bool) -> None:
         get_user_evaluations(username).append({
@@ -581,18 +593,9 @@ def demo_server(port: int) -> None:
         user_evaluations.pop(username, None)
         return Message({}, {'Ok_': {}})
 
-    async def require_username(request_message: Message) -> tuple[Message | None, str | None]:
-        unavailable_response = _demo_unavailable_response()
-        if unavailable_response is not None:
-            return unavailable_response, None
-        username = get_username(request_message)
-        if username is None:
-            return unauthenticated_response(), None
-        return None, username
-
     async def save_variable_route(function_name: str, request_message: Message) -> Message:
         arguments = cast(dict[str, object], request_message.body[function_name])
-        unavailable_response, username = await require_username(request_message)
+        unavailable_response, username = await require_namespace(request_message)
         if unavailable_response is not None:
             return unavailable_response
         get_user_variables(cast(str, username))[cast(str, arguments['name'])] = cast(float, arguments['value'])
@@ -600,7 +603,7 @@ def demo_server(port: int) -> None:
 
     async def save_variables_route(function_name: str, request_message: Message) -> Message:
         arguments = cast(dict[str, object], request_message.body[function_name])
-        unavailable_response, username = await require_username(request_message)
+        unavailable_response, username = await require_namespace(request_message)
         if unavailable_response is not None:
             return unavailable_response
         get_user_variables(cast(str, username)).update(cast(dict[str, float], arguments['variables']))
@@ -608,7 +611,7 @@ def demo_server(port: int) -> None:
 
     async def get_variable_route(function_name: str, request_message: Message) -> Message:
         arguments = cast(dict[str, object], request_message.body[function_name])
-        unavailable_response, username = await require_username(request_message)
+        unavailable_response, username = await require_namespace(request_message)
         if unavailable_response is not None:
             return unavailable_response
         value = get_user_variables(cast(str, username)).get(cast(str, arguments['name']))
@@ -618,7 +621,7 @@ def demo_server(port: int) -> None:
 
     async def get_variables_route(function_name: str, request_message: Message) -> Message:
         arguments = cast(dict[str, object], request_message.body[function_name])
-        unavailable_response, username = await require_username(request_message)
+        unavailable_response, username = await require_namespace(request_message)
         if unavailable_response is not None:
             return unavailable_response
         variables = [
@@ -629,7 +632,7 @@ def demo_server(port: int) -> None:
 
     async def delete_variable_route(function_name: str, request_message: Message) -> Message:
         arguments = cast(dict[str, object], request_message.body[function_name])
-        unavailable_response, username = await require_username(request_message)
+        unavailable_response, username = await require_namespace(request_message)
         if unavailable_response is not None:
             return unavailable_response
         get_user_variables(cast(str, username)).pop(cast(str, arguments['name']), None)
@@ -637,7 +640,7 @@ def demo_server(port: int) -> None:
 
     async def delete_variables_route(function_name: str, request_message: Message) -> Message:
         arguments = cast(dict[str, object], request_message.body[function_name])
-        unavailable_response, username = await require_username(request_message)
+        unavailable_response, username = await require_namespace(request_message)
         if unavailable_response is not None:
             return unavailable_response
         these_variables = get_user_variables(cast(str, username))
@@ -647,7 +650,7 @@ def demo_server(port: int) -> None:
 
     async def evaluate_route(function_name: str, request_message: Message) -> Message:
         arguments = cast(dict[str, object], request_message.body[function_name])
-        unavailable_response, username = await require_username(request_message)
+        unavailable_response, username = await require_namespace(request_message)
         if unavailable_response is not None:
             return unavailable_response
         expression = cast(dict[str, object], arguments['expression'])
@@ -667,7 +670,7 @@ def demo_server(port: int) -> None:
 
     async def get_paper_tape_route(function_name: str, request_message: Message) -> Message:
         arguments = cast(dict[str, object], request_message.body[function_name])
-        unavailable_response, username = await require_username(request_message)
+        unavailable_response, username = await require_namespace(request_message)
         if unavailable_response is not None:
             return unavailable_response
         limit = cast(int | None, arguments.get('limit!'))
