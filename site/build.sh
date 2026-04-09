@@ -47,21 +47,17 @@ fi
 rewrite_guide_links() {
     local file="$1"
 
-    # Rewrite ../lib/*/README.md → GitHub blob link
-    sed -i "s|\.\./lib/\([^)]*\)|${GITHUB_BLOB}/lib/\1|g" "$file"
+    # Rewrite relative links that escape doc/ (../lib, ../sdk, ../common,
+    # ../example) into absolute GitHub URLs.
+    for dir in lib sdk common; do
+        sed -i "s|\.\.\/${dir}/\([^)]*\)|${GITHUB_BLOB}/${dir}/\1|g" "$file"
+    done
 
-    # Rewrite ../sdk/*/README.md → GitHub blob link
-    sed -i "s|\.\./sdk/\([^)]*\)|${GITHUB_BLOB}/sdk/\1|g" "$file"
-
-    # Rewrite ../example/*/README.md and ../example/ → GitHub link
+    # ../example/<path> → GitHub blob (file links)
     sed -i "s|\.\./example/\([^)]*\)|${GITHUB_BLOB}/example/\1|g" "$file"
-    sed -i "s|\.\./example/\?)|${GITHUB_TREE}/example)|g" "$file"
 
-    # Rewrite ../common/* → GitHub blob link
-    sed -i "s|\.\./common/\([^)]*\)|${GITHUB_BLOB}/common/\1|g" "$file"
-
-    # Rewrite raw.githubusercontent.com links to stay as-is (already absolute)
-    # no-op, they're fine
+    # Bare ../example) with no trailing path — link to the directory tree
+    sed -i "s|\.\./example)|${GITHUB_TREE}/example)|g" "$file"
 }
 
 for f in "${DOCS_DIR}"/guide/*.md; do
