@@ -51,6 +51,18 @@ at runtime, something strictly disallowed with normal structs. When users see
 the `@` prefix, they know they are working with headers, a psuedo-struct where
 everything is optional, and new runtime fields are not disallowed.
 
+## What headers should I define in the schema?
+
+Define all headers that clients might be expected to use directly. If a client
+is supposed to send a header, inspect a header, or otherwise rely on it as part
+of the API contract, it should be present in the schema.
+
+Leave server-dedicated convenience headers undefined. If a header only exists to
+pass transport, auth, request-id, or middleware data around inside server code,
+do not promote it into the schema just for convenience. That keeps internal
+plumbing out of the public contract while still allowing the server to use those
+runtime headers.
+
 ## Why does my unauthenticated server fail to start?
 
 Telepact server libraries default to requiring the standard `union.Auth_`
