@@ -16,6 +16,16 @@
 
 package telepact
 
+import (
+	cryptorand "crypto/rand"
+	"encoding/hex"
+	"fmt"
+	"sync/atomic"
+	"time"
+)
+
+var telepactCaseIDFallbackCounter uint64
+
 // TelepactError indicates a critical failure in Telepact processing logic.
 type TelepactError struct {
 	message string
@@ -26,20 +36,31 @@ type TelepactError struct {
 
 // NewTelepactError constructs a new TelepactError with the given message.
 func NewTelepactError(message string) *TelepactError {
-	return &TelepactError{message: message}
+	return NewTelepactErrorWithCaseID(message, "", nil, "")
 }
 
 // NewTelepactErrorWithCause constructs a new TelepactError with a category and wrapped cause.
 func NewTelepactErrorWithCause(message string, kind string, cause error) *TelepactError {
-	return &TelepactError{message: message, kind: kind, cause: cause}
+	return NewTelepactErrorWithCaseID(message, kind, cause, "")
 }
 
-// SetCaseID associates a server-side case identifier with this error.
-func (e *TelepactError) SetCaseID(caseID string) {
-	if e == nil || caseID == "" {
-		return
+// NewTelepactErrorWithCaseID constructs a new TelepactError with an explicit or generated case ID.
+func NewTelepactErrorWithCaseID(message string, kind string, cause error, caseID string) *TelepactError {
+	if caseID == "" {
+		caseID = newTelepactCaseID()
 	}
-	e.caseID = caseID
+	return &TelepactError{message: message, kind: kind, caseID: caseID, cause: cause}
+}
+
+func newTelepactCaseID() string {
+	var raw [16]byte
+	if _, err := cryptorand.Read(raw[:]); err != nil {
+		return fmt.Sprintf("%016x-%016x", time.Now().UnixNano(), atomic.AddUint64(&telepactCaseIDFallbackCounter, 1))
+	}
+	raw[6] = (raw[6] & 0x0f) | 0x40
+	raw[8] = (raw[8] & 0x3f) | 0x80
+	encoded := hex.EncodeToString(raw[:])
+	return fmt.Sprintf("%s-%s-%s-%s-%s", encoded[0:8], encoded[8:12], encoded[12:16], encoded[16:20], encoded[20:32])
 }
 
 // Error implements the error interface.

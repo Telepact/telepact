@@ -17,39 +17,6 @@
 import { Message } from '../Message.js';
 import { TelepactError } from '../TelepactError.js';
 
-function fillRandomValues(bytes: Uint8Array): void {
-    const cryptoObject = globalThis.crypto;
-    if (typeof cryptoObject?.getRandomValues === 'function') {
-        cryptoObject.getRandomValues(bytes);
-        return;
-    }
-
-    for (let i = 0; i < bytes.length; i += 1) {
-        bytes[i] = Math.floor(Math.random() * 256);
-    }
-}
-
-function generateCaseId(): string {
-    const cryptoObject = globalThis.crypto;
-    if (typeof cryptoObject?.randomUUID === 'function') {
-        return cryptoObject.randomUUID();
-    }
-
-    const bytes = new Uint8Array(16);
-    fillRandomValues(bytes);
-    bytes[6] = (bytes[6] & 0x0f) | 0x40;
-    bytes[8] = (bytes[8] & 0x3f) | 0x80;
-    const hex = Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('');
-    return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
-}
-
-export function ensureUnknownCaseId(error: TelepactError): string {
-    if (!error.caseId) {
-        error.caseId = generateCaseId();
-    }
-    return error.caseId;
-}
-
 export function buildUnknownErrorMessage(error: TelepactError, headers: Record<string, any> = {}): Message {
-    return new Message(headers, { ErrorUnknown_: { caseId: ensureUnknownCaseId(error) } });
+    return new Message(headers, { ErrorUnknown_: { caseId: error.caseId } });
 }

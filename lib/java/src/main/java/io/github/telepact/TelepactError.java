@@ -16,12 +16,14 @@
 
 package io.github.telepact;
 
+import java.util.UUID;
+
 /**
  * Indicates critical failure in telepact processing logic.
  */
 public class TelepactError extends RuntimeException {
     private final String kind;
-    private String caseId;
+    private final String caseId;
 
     /**
      * Constructs a new TelepactError with the specified detail message.
@@ -29,8 +31,7 @@ public class TelepactError extends RuntimeException {
      * @param message the detail message
      */
     public TelepactError(String message) {
-        super(message);
-        this.kind = null;
+        this(message, null, null, null);
     }
 
     /**
@@ -39,18 +40,27 @@ public class TelepactError extends RuntimeException {
      * @param cause the cause of the error
      */
     public TelepactError(Throwable cause) {
-        super(cause);
-        this.kind = null;
+        this(cause == null ? null : cause.getMessage(), null, cause, null);
     }
 
     public TelepactError(String message, String kind, Throwable cause) {
-        super(message, cause);
-        this.kind = kind;
+        this(message, kind, cause, null);
     }
 
     public TelepactError(String message, String kind) {
+        this(message, kind, null, null);
+    }
+
+    public TelepactError(String message, String kind, Throwable cause, String caseId) {
+        super(message, cause);
+        this.kind = kind;
+        this.caseId = caseId == null || caseId.isEmpty() ? UUID.randomUUID().toString() : caseId;
+    }
+
+    public TelepactError(String message, String kind, String caseId) {
         super(message);
         this.kind = kind;
+        this.caseId = caseId == null || caseId.isEmpty() ? UUID.randomUUID().toString() : caseId;
     }
 
     public String getKind() {
@@ -59,11 +69,5 @@ public class TelepactError extends RuntimeException {
 
     public String getCaseId() {
         return this.caseId;
-    }
-
-    public void setCaseId(String caseId) {
-        if (caseId != null && !caseId.isEmpty()) {
-            this.caseId = caseId;
-        }
     }
 }

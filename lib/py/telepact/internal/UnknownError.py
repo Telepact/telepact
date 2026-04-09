@@ -14,20 +14,11 @@
 #|  limitations under the License.
 #|
 
-from uuid import uuid4
-
 from ..Message import Message
 from ..TelepactError import TelepactError
-
-
-def ensure_unknown_case_id(error: TelepactError) -> str:
-    if error.case_id is None:
-        error.case_id = str(uuid4())
-    return error.case_id
-
 
 def build_unknown_error_message(
     error: TelepactError,
     headers: dict[str, object] | None = None,
 ) -> Message:
-    return Message(headers or {}, {"ErrorUnknown_": {"caseId": ensure_unknown_case_id(error)}})
+    return Message(headers or {}, {"ErrorUnknown_": {"caseId": error.case_id}})

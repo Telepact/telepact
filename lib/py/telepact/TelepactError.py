@@ -14,6 +14,9 @@
 #|  limitations under the License.
 #|
 
+from uuid import uuid4
+
+
 class TelepactError(Exception):
     """
     Indicates critical failure in telepact processing logic.
@@ -30,4 +33,4 @@ class TelepactError(Exception):
         super().__init__(message)
         self.kind = kind
         self.cause = cause
-        self.case_id = case_id
+        self.case_id = case_id or str(uuid4())

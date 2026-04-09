@@ -205,8 +205,7 @@ func (s *Server) ProcessWithHeaders(requestMessageBytes []byte, updateHeaders fu
 			CaseID() string
 		}
 		if errors.As(err, &detailedErr) {
-			wrapped := NewTelepactErrorWithCause(err.Error(), detailedErr.Kind(), errors.Unwrap(err))
-			wrapped.SetCaseID(detailedErr.CaseID())
+			wrapped := NewTelepactErrorWithCaseID(err.Error(), detailedErr.Kind(), errors.Unwrap(err), detailedErr.CaseID())
 			s.onError(wrapped)
 			return
 		}

@@ -25,7 +25,7 @@ import (
 	"time"
 )
 
-var unknownCaseIDFallbackCounter uint64
+var internalCaseIDFallbackCounter uint64
 
 type telepactError struct {
 	message string
@@ -35,7 +35,12 @@ type telepactError struct {
 }
 
 func newTelepactError(message string, kind string, cause error) *telepactError {
-	return &telepactError{message: message, kind: kind, cause: cause}
+	return &telepactError{
+		message: message,
+		kind:    kind,
+		caseID:  newInternalCaseID(),
+		cause:   cause,
+	}
 }
 
 func (e *telepactError) Error() string {
@@ -75,39 +80,23 @@ func (e *telepactError) CaseID() string {
 	return e.caseID
 }
 
-func (e *telepactError) SetCaseID(caseID string) {
-	if e == nil || caseID == "" {
-		return
-	}
-	e.caseID = caseID
-}
-
-func ensureUnknownCaseID(err *telepactError) string {
-	if err.CaseID() != "" {
-		return err.CaseID()
-	}
-	caseID := newUnknownCaseID()
-	err.SetCaseID(caseID)
-	return caseID
-}
-
-func newUnknownCaseID() string {
-	var raw [16]byte
-	if _, err := cryptorand.Read(raw[:]); err != nil {
-		return fmt.Sprintf("%016x-%016x", time.Now().UnixNano(), atomic.AddUint64(&unknownCaseIDFallbackCounter, 1))
-	}
-	raw[6] = (raw[6] & 0x0f) | 0x40
-	raw[8] = (raw[8] & 0x3f) | 0x80
-	encoded := hex.EncodeToString(raw[:])
-	return fmt.Sprintf("%s-%s-%s-%s-%s", encoded[0:8], encoded[8:12], encoded[12:16], encoded[16:20], encoded[20:32])
-}
-
 func wrapUnknownError(err error, message string, kind string) *telepactError {
 	var telepactErr *telepactError
 	if errors.As(err, &telepactErr) {
 		return telepactErr
 	}
 	return newTelepactError(message, kind, err)
+}
+
+func newInternalCaseID() string {
+	var raw [16]byte
+	if _, err := cryptorand.Read(raw[:]); err != nil {
+		return fmt.Sprintf("%016x-%016x", time.Now().UnixNano(), atomic.AddUint64(&internalCaseIDFallbackCounter, 1))
+	}
+	raw[6] = (raw[6] & 0x0f) | 0x40
+	raw[8] = (raw[8] & 0x3f) | 0x80
+	encoded := hex.EncodeToString(raw[:])
+	return fmt.Sprintf("%s-%s-%s-%s-%s", encoded[0:8], encoded[8:12], encoded[12:16], encoded[16:20], encoded[20:32])
 }
 
 func newUnknownErrorResponse(headers map[string]any, caseID string) ServerMessage {

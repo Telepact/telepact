@@ -48,7 +48,7 @@ func ProcessBytes(
 	if err != nil {
 		wrapped := wrapUnknownError(err, "telepact server processing failed", "")
 		invokeOnError(onError, wrapped)
-		return buildUnknownResponse(serialize, ensureUnknownCaseID(wrapped))
+		return buildUnknownResponse(serialize, wrapped.CaseID())
 	}
 
 	safeInvokeMessage(onResponse, responseMessage)
@@ -61,7 +61,7 @@ func ProcessBytes(
 			"serialization",
 		)
 		invokeOnError(onError, wrapped)
-		return buildUnknownResponse(serialize, ensureUnknownCaseID(wrapped))
+		return buildUnknownResponse(serialize, wrapped.CaseID())
 	}
 
 	return responseMessage, responseBytes, nil

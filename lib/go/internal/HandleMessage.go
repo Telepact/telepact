@@ -137,7 +137,7 @@ func HandleMessage(
 				err,
 			)
 			invokeOnError(onError, wrapped)
-			return newUnknownErrorResponse(responseHeaders, ensureUnknownCaseID(wrapped)), nil
+			return newUnknownErrorResponse(responseHeaders, wrapped.CaseID()), nil
 		}
 		for key, value := range authHeaders {
 			requestHeaders[key] = value
@@ -202,7 +202,7 @@ func HandleMessage(
 				err,
 			)
 			invokeOnError(onError, wrapped)
-			return newUnknownErrorResponse(responseHeaders, ensureUnknownCaseID(wrapped)), nil
+			return newUnknownErrorResponse(responseHeaders, wrapped.CaseID()), nil
 		}
 		resultMessage = resp
 	}

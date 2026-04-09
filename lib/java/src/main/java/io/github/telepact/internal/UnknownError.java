@@ -17,7 +17,6 @@
 package io.github.telepact.internal;
 
 import java.util.Map;
-import java.util.UUID;
 
 import io.github.telepact.Message;
 import io.github.telepact.TelepactError;
@@ -26,17 +25,7 @@ public final class UnknownError {
     private UnknownError() {
     }
 
-    public static String ensureUnknownCaseId(TelepactError error) {
-        final var existing = error.getCaseId();
-        if (existing != null && !existing.isEmpty()) {
-            return existing;
-        }
-        final var caseId = UUID.randomUUID().toString();
-        error.setCaseId(caseId);
-        return caseId;
-    }
-
     public static Message buildUnknownErrorMessage(TelepactError error, Map<String, Object> headers) {
-        return new Message(headers, Map.of("ErrorUnknown_", Map.of("caseId", ensureUnknownCaseId(error))));
+        return new Message(headers, Map.of("ErrorUnknown_", Map.of("caseId", error.getCaseId())));
     }
 }
