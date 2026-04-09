@@ -1,15 +1,37 @@
 {
   "changed_paths": [
-    "sdk/cli/telepact_cli/calculator.telepact.yaml",
-    "sdk/cli/telepact_cli/cli.py",
-    "sdk/cli/tests/test_main.py"
+    "doc/learn-by-example/00-installation.md",
+    "doc/learn-by-example/01-ping.md",
+    "doc/learn-by-example/02-schema-and-add.md",
+    "doc/learn-by-example/03-data-type-validation.md",
+    "doc/learn-by-example/04-scalar-types.md",
+    "doc/learn-by-example/05-collection-types.md",
+    "doc/learn-by-example/06-structs.md",
+    "doc/learn-by-example/07-unions.md",
+    "doc/learn-by-example/08-functions.md",
+    "doc/learn-by-example/09-service-errors.md",
+    "doc/learn-by-example/10-headers.md",
+    "doc/learn-by-example/11-comments.md",
+    "doc/learn-by-example/12-select.md",
+    "doc/learn-by-example/13-binary.md",
+    "doc/learn-by-example/14-mock-server.md",
+    "doc/learn-by-example/15-stock-mock.md",
+    "doc/learn-by-example/16-stubs.md",
+    "doc/learn-by-example/17-verify.md",
+    "doc/learn-by-example/18-auth.md",
+    "doc/learn-by-example/19-minimum-python-client.md",
+    "doc/learn-by-example/20-automatic-binary-negotiation.md",
+    "doc/learn-by-example/21-code-generation.md",
+    "doc/learn-by-example/22-minimum-server.md",
+    "doc/learn-by-example/23-logging.md",
+    "doc/learn-by-example/24-server-auth.md",
+    "doc/learn-by-example/25-managed-auth.md",
+    "doc/learn-by-example/26-schema-evolution.md",
+    "doc/learn-by-example/27-server-best-practices.md",
+    "doc/learn-by-example/README.md"
   ],
-  "direct_targets": [
-    "cli"
-  ],
-  "pr_number": 346,
-  "targets": [
-    "cli"
-  ],
-  "version": "1.0.0-alpha.251"
+  "direct_targets": [],
+  "pr_number": 347,
+  "targets": [],
+  "version": "1.0.0-alpha.252"
 }
