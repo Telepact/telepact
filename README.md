@@ -48,40 +48,8 @@ Check out the [full-stack example](./doc/example.md).
 
 # Explore
 
-To learn how to write Telepact APIs, see the [API Schema Guide](./doc/schema-guide.md).
-A [JSON Schema](./common/json-schema.json) is available for validation.
-For transport wiring patterns and concrete HTTP/WebSocket examples, see the
-[Transport Guide](./doc/transports.md).
-For deployment, rollout, compatibility, auth, and observability guidance, see
-the [Production Guide](./doc/production-guide.md).
-For runnable end-to-end examples, see the [Examples landing page](./example/README.md).
-For debugging local/runtime failures, see the [Runtime Error Guide](./doc/runtime-errors.md).
-
-To learn how to serve a Telepact API, see the specific library docs:
-- [Typescript](./lib/ts/README.md)
-- [Python](./lib/py/README.md)
-- [Java](./lib/java/README.md)
-- [Go](./lib/go/README.md)
-
-For development assistance, see the SDK tool docs:
-- [CLI](./sdk/cli/README.md)
-    - Conveniently retreive API schemas from running live Telepact servers, and
-      use schemas to create mock servers and generate code bindings, all from
-      the command line
-- [Browser Console](./sdk/console/README.md)
-    - Develop against a live Telepact server by reading rendered docs, drafting
-      requests, and submitting live requests with json-friendly editors
-- [Prettier Plugin](./sdk/prettier/README.md)
-    - Consistently format your Telepact api schemas, especially the doc-strings
-
-Find the latest versions of all libraries and sdks [here](./doc/versions.md).
-That page tracks published registry versions, which may lag the source tree
-between releases.
-
-For further reading, see [Motivation](./doc/motivation.md).
-
-Telepact does have a few unorthodox design decisions. To be best informed,
-you should read the explanations in [the FAQ](./doc/faq.md).
+Start with the [docs landing page](./doc/index.md) for guides, examples,
+library references, SDK tools, version information, and further reading.
 
 # Licensing
 
