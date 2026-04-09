@@ -48,7 +48,7 @@ suffix.
 This design constraint helps distinguish header fields from struct fields.
 Headers significantly differ from structs in that any undeclared field is valid
 at runtime, something strictly disallowed with normal structs. When users see
-the `@` prefix, they know they are working with headers, a psuedo-struct where
+the `@` prefix, they know they are working with headers, a pseudo-struct where
 everything is optional, and new runtime fields are not disallowed.
 
 ## What headers should I define in the schema?
