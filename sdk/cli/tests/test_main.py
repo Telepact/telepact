@@ -67,6 +67,10 @@ def _post_demo_server(payload: list[dict[str, object]], *, port: int = 8000) -> 
     raise AssertionError('Demo server remained unavailable after repeated retries')
 
 
+def _demo_auth_headers(username: str) -> dict[str, object]:
+    return {'@auth_': {'Ephemeral': {'username': username}}}
+
+
 def test_demo_server_and_fetch_and_mock() -> None:
     p = subprocess.Popen(['uv', 'run', 'telepact', 'demo-server'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, cwd='tests/tmp')
     p_mock: subprocess.Popen | None = None
@@ -190,6 +194,164 @@ def test_demo_server_uses_shared_namespace_without_auth() -> None:
             {'fn.logout': {'username': 'shared'}},
         ])
         assert logout_response == [{}, {'ErrorUnauthenticated_': {'message!': 'Valid authentication is required.'}}]
+    finally:
+        p.terminate()
+        try:
+            p.communicate(timeout=5)
+        except subprocess.TimeoutExpired:
+            p.kill()
+            p.communicate(timeout=5)
+
+
+def test_demo_server_export_import_replaces_shared_namespace() -> None:
+    p = subprocess.Popen(['uv', 'run', 'telepact', 'demo-server'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, cwd='tests/tmp')
+
+    try:
+        time.sleep(1)
+
+        assert _post_demo_server([
+            {},
+            {'fn.saveVariables': {'variables': {'a': 2, 'b': 4}}},
+        ]) == [{}, {'Ok_': {}}]
+        assert _post_demo_server([
+            {},
+            {'fn.evaluate': {'expression': {'Add': {
+                'left': {'Variable': {'name': 'a'}},
+                'right': {'Variable': {'name': 'b'}},
+            }}}},
+        ]) == [{}, {'Ok_': {
+            'result': 6,
+            'saveResult': {'fn.saveVariable': {'name': 'result', 'value': 6}},
+        }}]
+
+        export_response = _post_demo_server([
+            {},
+            {'fn.export': {}},
+        ])
+        exported_blob = export_response[1]['Ok_']['blob']
+
+        assert _post_demo_server([
+            {},
+            {'fn.saveVariables': {'variables': {'c': 9}}},
+        ]) == [{}, {'Ok_': {}}]
+        assert _post_demo_server([
+            {},
+            {'fn.evaluate': {'expression': {'Variable': {'name': 'c'}}}},
+        ]) == [{}, {'Ok_': {
+            'result': 9,
+            'saveResult': {'fn.saveVariable': {'name': 'result', 'value': 9}},
+        }}]
+
+        assert _post_demo_server([
+            {},
+            {'fn.import': {'blob': exported_blob}},
+        ]) == [{}, {'Ok_': {}}]
+
+        variables_response = _post_demo_server([
+            {},
+            {'fn.getVariables': {}},
+        ])
+        assert variables_response == [{}, {'Ok_': {'variables': [
+            {'name': 'a', 'value': 2},
+            {'name': 'b', 'value': 4},
+        ]}}]
+
+        tape_response = _post_demo_server([
+            {},
+            {'fn.getPaperTape': {}},
+        ])
+        assert tape_response == [{}, {'Ok_': {'tape': [{
+            'expression': {'Add': {
+                'left': {'Variable': {'name': 'a'}},
+                'right': {'Variable': {'name': 'b'}},
+            }},
+            'result': 6,
+            'timestamp': tape_response[1]['Ok_']['tape'][0]['timestamp'],
+            'successful': True,
+        }]}}]
+    finally:
+        p.terminate()
+        try:
+            p.communicate(timeout=5)
+        except subprocess.TimeoutExpired:
+            p.kill()
+            p.communicate(timeout=5)
+
+
+def test_demo_server_export_import_replaces_authenticated_namespace() -> None:
+    p = subprocess.Popen(['uv', 'run', 'telepact', 'demo-server'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, cwd='tests/tmp')
+
+    try:
+        time.sleep(1)
+
+        alice_headers = _demo_auth_headers('alice')
+
+        assert _post_demo_server([
+            {},
+            {'fn.saveVariables': {'variables': {'shared': 1}}},
+        ]) == [{}, {'Ok_': {}}]
+
+        assert _post_demo_server([
+            alice_headers,
+            {'fn.saveVariables': {'variables': {'x': 3}}},
+        ]) == [{}, {'Ok_': {}}]
+        assert _post_demo_server([
+            alice_headers,
+            {'fn.evaluate': {'expression': {'Variable': {'name': 'x'}}}},
+        ]) == [{}, {'Ok_': {
+            'result': 3,
+            'saveResult': {'fn.saveVariable': {'name': 'result', 'value': 3}},
+        }}]
+
+        export_response = _post_demo_server([
+            alice_headers,
+            {'fn.export': {}},
+        ])
+        exported_blob = export_response[1]['Ok_']['blob']
+
+        assert _post_demo_server([
+            alice_headers,
+            {'fn.saveVariables': {'variables': {'y': 7}}},
+        ]) == [{}, {'Ok_': {}}]
+        assert _post_demo_server([
+            alice_headers,
+            {'fn.evaluate': {'expression': {'Variable': {'name': 'y'}}}},
+        ]) == [{}, {'Ok_': {
+            'result': 7,
+            'saveResult': {'fn.saveVariable': {'name': 'result', 'value': 7}},
+        }}]
+
+        assert _post_demo_server([
+            alice_headers,
+            {'fn.import': {'blob': exported_blob}},
+        ]) == [{}, {'Ok_': {}}]
+
+        authenticated_variables = _post_demo_server([
+            alice_headers,
+            {'fn.getVariables': {}},
+        ])
+        assert authenticated_variables == [{}, {'Ok_': {'variables': [
+            {'name': 'x', 'value': 3},
+        ]}}]
+
+        authenticated_tape = _post_demo_server([
+            alice_headers,
+            {'fn.getPaperTape': {}},
+        ])
+        assert authenticated_tape == [{}, {'Ok_': {'tape': [{
+            'expression': {'Variable': {'name': 'x'}},
+            'result': 3,
+            'timestamp': authenticated_tape[1]['Ok_']['tape'][0]['timestamp'],
+            'successful': True,
+        }]}}]
+
+        shared_variables = _post_demo_server([
+            {},
+            {'fn.getVariables': {}},
+        ])
+        assert shared_variables == [{}, {'Ok_': {'variables': [
+            {'name': 'shared', 'value': 1},
+        ]}}]
     finally:
         p.terminate()
         try:

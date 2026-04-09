@@ -515,6 +515,17 @@ def demo_server(port: int) -> None:
             'successful': successful,
         })
 
+    def export_namespace(username: str) -> bytes:
+        return json.dumps({
+            'variables': get_user_variables(username),
+            'evaluations': get_user_evaluations(username),
+        }, separators=(',', ':'), sort_keys=True).encode('utf-8')
+
+    def replace_namespace(username: str, blob: bytes) -> None:
+        namespace = cast(dict[str, object], json.loads(blob.decode('utf-8')))
+        user_variables[username] = dict(cast(dict[str, float], namespace['variables']))
+        user_evaluations[username] = list(cast(list[dict[str, object]], namespace['evaluations']))
+
     def evaluate_expression(expression: dict[str, object], variables: dict[str, float]) -> tuple[float, list[str], bool]:
         kind, payload = next(iter(expression.items()))
         payload_dict = cast(dict[str, object], payload)
@@ -679,6 +690,21 @@ def demo_server(port: int) -> None:
             evaluations = evaluations[:limit]
         return Message({}, {'Ok_': {'tape': evaluations}})
 
+    async def export_route(function_name: str, request_message: Message) -> Message:
+        arguments = cast(dict[str, object], request_message.body[function_name])
+        unavailable_response, username = await require_namespace(request_message)
+        if unavailable_response is not None:
+            return unavailable_response
+        return Message({}, {'Ok_': {'blob': export_namespace(cast(str, username))}})
+
+    async def import_route(function_name: str, request_message: Message) -> Message:
+        arguments = cast(dict[str, object], request_message.body[function_name])
+        unavailable_response, username = await require_namespace(request_message)
+        if unavailable_response is not None:
+            return unavailable_response
+        replace_namespace(cast(str, username), cast(bytes, arguments['blob']))
+        return Message({}, {'Ok_': {}})
+
     function_routes = {
         'fn.add': add_route,
         'fn.login': login_route,
@@ -691,6 +717,8 @@ def demo_server(port: int) -> None:
         'fn.deleteVariables': delete_variables_route,
         'fn.evaluate': evaluate_route,
         'fn.getPaperTape': get_paper_tape_route,
+        'fn.export': export_route,
+        'fn.import': import_route,
     }
 
 
