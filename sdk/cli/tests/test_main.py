@@ -71,13 +71,25 @@ def _demo_auth_headers(username: str) -> dict[str, object]:
     return {'@auth_': {'Ephemeral': {'username': username}}}
 
 
+def _wait_for_demo_server(*, port: int = 8000) -> None:
+    for _ in range(20):
+        try:
+            response = requests.post(f'http://localhost:{port}/api', data=json.dumps([{}, {'fn.ping_': {}}]))
+            if response.status_code == 200 and response.json() != [{}, {'ErrorUnavailable': {}}]:
+                return
+        except requests.exceptions.RequestException:
+            pass
+        time.sleep(0.1)
+    raise AssertionError('Demo server did not become ready after repeated retries')
+
+
 def test_demo_server_and_fetch_and_mock() -> None:
     p = subprocess.Popen(['uv', 'run', 'telepact', 'demo-server'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, cwd='tests/tmp')
     p_mock: subprocess.Popen | None = None
 
     try:
         # Check if the server is running
-        time.sleep(1)
+        _wait_for_demo_server()
         response = requests.post('http://localhost:8000/api', data=json.dumps([{}, {'fn.ping_': {}}]))
         assert response.status_code == 200
         assert response.json() == [{}, {'Ok_': {}}]
@@ -146,7 +158,7 @@ def test_demo_server_uses_shared_namespace_without_auth() -> None:
     p = subprocess.Popen(['uv', 'run', 'telepact', 'demo-server'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, cwd='tests/tmp')
 
     try:
-        time.sleep(1)
+        _wait_for_demo_server()
 
         save_response = _post_demo_server([
             {},
@@ -207,7 +219,7 @@ def test_demo_server_export_import_replaces_shared_namespace() -> None:
     p = subprocess.Popen(['uv', 'run', 'telepact', 'demo-server'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, cwd='tests/tmp')
 
     try:
-        time.sleep(1)
+        _wait_for_demo_server()
 
         assert _post_demo_server([
             {},
@@ -282,7 +294,7 @@ def test_demo_server_export_import_replaces_authenticated_namespace() -> None:
     p = subprocess.Popen(['uv', 'run', 'telepact', 'demo-server'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, cwd='tests/tmp')
 
     try:
-        time.sleep(1)
+        _wait_for_demo_server()
 
         alice_headers = _demo_auth_headers('alice')
 
