@@ -19,7 +19,9 @@ from pathlib import Path
 from importlib.metadata import version as package_version
 import traceback
 import asyncio
+import base64
 import pytest
+import msgpack
 from click.testing import CliRunner
 # Adjust the import path according to your project structure
 from telepact_cli.cli import main, get_api_from_http, _demo_unavailable_response
@@ -81,6 +83,14 @@ def _wait_for_demo_server(*, port: int = 8000) -> None:
             pass
         time.sleep(0.1)
     raise AssertionError('Demo server did not become ready after repeated retries')
+
+
+def _decode_demo_blob(blob: object) -> dict[str, object]:
+    assert isinstance(blob, str)
+    decoded = base64.b64decode(blob)
+    unpacked = msgpack.unpackb(decoded, raw=False, strict_map_key=False)
+    assert isinstance(unpacked, dict)
+    return unpacked
 
 
 def test_demo_server_and_fetch_and_mock() -> None:
@@ -241,6 +251,19 @@ def test_demo_server_export_import_replaces_shared_namespace() -> None:
             {'fn.export': {}},
         ])
         exported_blob = export_response[1]['Ok_']['blob']
+        unpacked_blob = _decode_demo_blob(exported_blob)
+        assert unpacked_blob == {
+            'variables': {'a': 2, 'b': 4},
+            'evaluations': [{
+                'expression': {'Add': {
+                    'left': {'Variable': {'name': 'a'}},
+                    'right': {'Variable': {'name': 'b'}},
+                }},
+                'result': 6,
+                'timestamp': unpacked_blob['evaluations'][0]['timestamp'],
+                'successful': True,
+            }],
+        }
 
         assert _post_demo_server([
             {},
@@ -320,6 +343,16 @@ def test_demo_server_export_import_replaces_authenticated_namespace() -> None:
             {'fn.export': {}},
         ])
         exported_blob = export_response[1]['Ok_']['blob']
+        unpacked_blob = _decode_demo_blob(exported_blob)
+        assert unpacked_blob == {
+            'variables': {'x': 3},
+            'evaluations': [{
+                'expression': {'Variable': {'name': 'x'}},
+                'result': 3,
+                'timestamp': unpacked_blob['evaluations'][0]['timestamp'],
+                'successful': True,
+            }],
+        }
 
         assert _post_demo_server([
             alice_headers,

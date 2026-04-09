@@ -19,6 +19,7 @@ import os
 import json
 import argparse
 import json
+import msgpack
 import shutil
 import yaml
 from typing import cast, Pattern
@@ -516,24 +517,24 @@ def demo_server(port: int) -> None:
         })
 
     def export_namespace(username: str) -> bytes:
-        return json.dumps({
+        return msgpack.packb({
             'variables': get_user_variables(username),
             'evaluations': get_user_evaluations(username),
-        }, separators=(',', ':'), sort_keys=True).encode('utf-8')
+        }, use_bin_type=True)
 
     def parse_namespace_blob(blob: bytes) -> tuple[dict[str, float], list[dict[str, object]]]:
         try:
-            namespace = json.loads(blob.decode('utf-8'))
-        except (UnicodeDecodeError, json.JSONDecodeError) as e:
-            raise ValueError('Imported namespace blob must be valid UTF-8 JSON.') from e
+            namespace = msgpack.unpackb(blob, raw=False, strict_map_key=False)
+        except (ValueError, msgpack.ExtraData, msgpack.FormatError, msgpack.StackError) as e:
+            raise ValueError('Imported namespace blob must use the expected msgpack format.') from e
         if not isinstance(namespace, dict):
-            raise ValueError('Imported namespace blob must decode to a JSON object.')
+            raise ValueError('Imported namespace blob must decode to a msgpack object.')
         variables = namespace.get('variables')
         evaluations = namespace.get('evaluations')
         if not isinstance(variables, dict):
-            raise ValueError('Imported namespace blob must include a variables JSON object.')
+            raise ValueError('Imported namespace blob must include a variables object.')
         if not isinstance(evaluations, list):
-            raise ValueError('Imported namespace blob must include an evaluations JSON array.')
+            raise ValueError('Imported namespace blob must include an evaluations list.')
 
         parsed_variables: dict[str, float] = {}
         for name, value in variables.items():
@@ -547,7 +548,7 @@ def demo_server(port: int) -> None:
         parsed_evaluations: list[dict[str, object]] = []
         for evaluation in evaluations:
             if not isinstance(evaluation, dict):
-                raise ValueError('Imported namespace evaluations must be JSON objects.')
+                raise ValueError('Imported namespace evaluations must be objects.')
             parsed_evaluations.append(cast(dict[str, object], evaluation))
 
         return parsed_variables, parsed_evaluations
