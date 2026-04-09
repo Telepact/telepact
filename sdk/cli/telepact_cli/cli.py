@@ -691,18 +691,18 @@ def demo_server(port: int) -> None:
         return Message({}, {'Ok_': {'tape': evaluations}})
 
     async def export_route(function_name: str, request_message: Message) -> Message:
-        arguments = cast(dict[str, object], request_message.body[function_name])
         unavailable_response, username = await require_namespace(request_message)
         if unavailable_response is not None:
             return unavailable_response
         return Message({}, {'Ok_': {'blob': export_namespace(cast(str, username))}})
 
     async def import_route(function_name: str, request_message: Message) -> Message:
-        arguments = cast(dict[str, object], request_message.body[function_name])
         unavailable_response, username = await require_namespace(request_message)
         if unavailable_response is not None:
             return unavailable_response
-        replace_namespace(cast(str, username), cast(bytes, arguments['blob']))
+        replace_namespace(
+            cast(str, username),
+            cast(bytes, cast(dict[str, object], request_message.body[function_name])['blob']))
         return Message({}, {'Ok_': {}})
 
     function_routes = {
