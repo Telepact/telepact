@@ -1,0 +1,6 @@
+# MkDocs build output
+site/
+
+# Copied doc files (populated by build.sh)
+docs/guide/
+docs/learn-by-example/

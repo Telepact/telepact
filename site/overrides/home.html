@@ -1,0 +1,239 @@
+{% extends "main.html" %}
+
+{% block tabs %}
+  {{ super() }}
+
+  <section class="tp-hero">
+    <div class="tp-hero__inner md-grid">
+      <div class="tp-hero__content">
+        <h1 class="tp-hero__title">
+          The API Ecosystem for<br>
+          <span class="tp-hero__accent">Bridging Programs</span>
+        </h1>
+        <p class="tp-hero__tagline">
+          Telepact takes the strengths of REST, gRPC, and GraphQL and combines
+          them into a single, transport-agnostic API ecosystem.
+          <strong>JSON in, JSON out</strong> — with optional binary, code
+          generation, field selection, and built-in mocking.
+        </p>
+        <div class="tp-hero__actions">
+          <a href="guide/" class="md-button md-button--primary tp-btn">
+            Read the Docs
+          </a>
+          <a href="learn-by-example/" class="md-button tp-btn tp-btn--outline">
+            Learn by Example
+          </a>
+          <a href="https://github.com/Telepact/telepact" class="md-button tp-btn tp-btn--outline">
+            <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8z"/></svg></span>
+            GitHub
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quick example -->
+  <section class="tp-example">
+    <div class="tp-example__inner md-grid">
+      <h2 class="tp-section__title">It's Just JSON</h2>
+      <p class="tp-section__subtitle">
+        No query params. No binary field IDs. No required client libraries.
+      </p>
+      <div class="tp-example__cols">
+        <div class="tp-example__col">
+          <h3>Schema</h3>
+          <div class="highlight"><pre><code class="language-yaml"><span class="p">-</span> <span class="nt">fn.helloWorld</span><span class="p">:</span> <span class="p">{}</span>
+  <span class="nt">-></span><span class="p">:</span>
+    <span class="p">-</span> <span class="nt">Ok_</span><span class="p">:</span>
+        <span class="nt">msg</span><span class="p">:</span> <span class="l">string</span></code></pre></div>
+        </div>
+        <div class="tp-example__col">
+          <h3>Request</h3>
+          <div class="highlight"><pre><code class="language-json"><span class="p">[{},</span> <span class="p">{</span><span class="nt">"fn.helloWorld"</span><span class="p">:</span> <span class="p">{}}]</span></code></pre></div>
+          <h3>Response</h3>
+          <div class="highlight"><pre><code class="language-json"><span class="p">[{},</span> <span class="p">{</span><span class="nt">"Ok_"</span><span class="p">:</span> <span class="p">{</span><span class="nt">"msg"</span><span class="p">:</span> <span class="s2">"Hello world!"</span><span class="p">}}]</span></code></pre></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Three innovations -->
+  <section class="tp-features">
+    <div class="tp-features__inner md-grid">
+      <h2 class="tp-section__title">Three Key Innovations</h2>
+      <p class="tp-section__subtitle">
+        Telepact combines the differentiating features of the industry's most
+        popular API technologies through three key innovations.
+      </p>
+      <div class="tp-features__grid">
+        <div class="tp-card">
+          <div class="tp-card__icon">&#123; &#125;</div>
+          <h3 class="tp-card__title">JSON as a Query Language</h3>
+          <p class="tp-card__text">
+            API calls and <code>SELECT</code>-style queries are all achieved
+            with JSON abstractions, giving first-class status to clients
+            wielding only a JSON library.
+          </p>
+        </div>
+        <div class="tp-card">
+          <div class="tp-card__icon">⚡</div>
+          <h3 class="tp-card__title">Binary Without Code Generation</h3>
+          <p class="tp-card__text">
+            Binary protocols are established through runtime handshakes rather
+            than build-time code generation, offering binary efficiency to
+            clients that want to skip codegen toolchains.
+          </p>
+        </div>
+        <div class="tp-card">
+          <div class="tp-card__icon">🔗</div>
+          <h3 class="tp-card__title">Hypermedia Without HTTP</h3>
+          <p class="tp-card__text">
+            API calls can return functions with pre-filled arguments —
+            approximating a link that can be followed — all achieved with
+            pure JSON abstractions and no transport coupling.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Capability comparison -->
+  <section class="tp-compare">
+    <div class="tp-compare__inner md-grid">
+      <h2 class="tp-section__title">How Telepact Compares</h2>
+      <p class="tp-section__subtitle">
+        See how Telepact stacks up against OpenAPI, JSON-RPC, gRPC, and GraphQL.
+      </p>
+      <div class="tp-compare__table-wrap">
+        <table class="tp-compare__table">
+          <thead>
+            <tr>
+              <th>Capability</th>
+              <th>OpenAPI</th>
+              <th>JSON-RPC</th>
+              <th>gRPC</th>
+              <th>GraphQL</th>
+              <th class="tp-compare__highlight">Telepact</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>No transport restrictions</td><td>❌</td><td>🤔</td><td>❌</td><td>🤔</td><td class="tp-compare__highlight">✅</td></tr>
+            <tr><td>No transport details leaked into API</td><td>❌</td><td>✅</td><td>✅</td><td>✅</td><td class="tp-compare__highlight">✅</td></tr>
+            <tr><td>Out-of-band headers / metadata</td><td>✅</td><td>❌</td><td>✅</td><td>🤔</td><td class="tp-compare__highlight">✅</td></tr>
+            <tr><td>No string parsing / splicing</td><td>❌</td><td>✅</td><td>✅</td><td>✅</td><td class="tp-compare__highlight">✅</td></tr>
+            <tr><td>Low development burden for servers</td><td>✅</td><td>✅</td><td>✅</td><td>❌</td><td class="tp-compare__highlight">✅</td></tr>
+            <tr><td>No required libraries for clients</td><td>✅</td><td>✅</td><td>❌</td><td>❌</td><td class="tp-compare__highlight">✅</td></tr>
+            <tr><td>Type-safe generated code</td><td>🤔</td><td>❌</td><td>✅</td><td>✅</td><td class="tp-compare__highlight">✅</td></tr>
+            <tr><td>Human-editable wire format</td><td>✅</td><td>✅</td><td>❌</td><td>🤔</td><td class="tp-compare__highlight">✅</td></tr>
+            <tr><td>Built-in binary serialization</td><td>❌</td><td>❌</td><td>✅</td><td>❌</td><td class="tp-compare__highlight">✅</td></tr>
+            <tr><td>Built-in dynamic response shaping</td><td>❌</td><td>❌</td><td>❌</td><td>✅</td><td class="tp-compare__highlight">✅</td></tr>
+            <tr><td>No required ABI</td><td>✅</td><td>✅</td><td>❌</td><td>✅</td><td class="tp-compare__highlight">✅</td></tr>
+            <tr><td>Expressive null vs. undefined</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td class="tp-compare__highlight">✅</td></tr>
+            <tr><td>Built-in API doc distribution</td><td>🤔</td><td>❌</td><td>❌</td><td>✅</td><td class="tp-compare__highlight">✅</td></tr>
+            <tr><td>Built-in mocking for tests</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td class="tp-compare__highlight">✅</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="text-align:center;margin-top:1rem;">
+        <a href="guide/motivation/" class="md-button tp-btn tp-btn--outline tp-btn--sm">
+          Read the full motivation &rarr;
+        </a>
+      </p>
+    </div>
+  </section>
+
+  <!-- Client experience -->
+  <section class="tp-upgrade">
+    <div class="tp-upgrade__inner md-grid">
+      <h2 class="tp-section__title">Start Simple, Upgrade When Ready</h2>
+      <p class="tp-section__subtitle">
+        Telepact is designed for the minimalist consumer while giving clients
+        the option to enrich the experience at their own pace.
+      </p>
+      <div class="tp-features__grid">
+        <div class="tp-card tp-card--small">
+          <h3 class="tp-card__title">🎯 Field Selection</h3>
+          <p class="tp-card__text">Select only the fields you need to reduce response sizes.</p>
+        </div>
+        <div class="tp-card tp-card--small">
+          <h3 class="tp-card__title">🔧 Code Generation</h3>
+          <p class="tp-card__text">Generate type-safe bindings for increased safety.</p>
+        </div>
+        <div class="tp-card tp-card--small">
+          <h3 class="tp-card__title">📦 Binary Serialization</h3>
+          <p class="tp-card__text">Use the built-in binary protocol for compact payloads.</p>
+        </div>
+        <div class="tp-card tp-card--small">
+          <h3 class="tp-card__title">🧪 Built-in Mocking</h3>
+          <p class="tp-card__text">Mock any Telepact server for tests — stubs, verification, and more.</p>
+        </div>
+        <div class="tp-card tp-card--small">
+          <h3 class="tp-card__title">🌐 Transport-Agnostic</h3>
+          <p class="tp-card__text">HTTP, WebSockets, NATS, stdio — bring your own transport.</p>
+        </div>
+        <div class="tp-card tp-card--small">
+          <h3 class="tp-card__title">📖 Self-Documenting</h3>
+          <p class="tp-card__text">Every server distributes its own schema and documentation.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Language support -->
+  <section class="tp-langs">
+    <div class="tp-langs__inner md-grid">
+      <h2 class="tp-section__title">Multi-Language Libraries &amp; SDKs</h2>
+      <p class="tp-section__subtitle">
+        Server libraries, a CLI, a browser console, and a Prettier plugin.
+      </p>
+      <div class="tp-langs__grid">
+        <a href="https://github.com/Telepact/telepact/tree/main/lib/py" class="tp-lang">
+          <strong>Python</strong><br><code>pip install telepact</code>
+        </a>
+        <a href="https://github.com/Telepact/telepact/tree/main/lib/ts" class="tp-lang">
+          <strong>TypeScript</strong><br><code>npm i telepact</code>
+        </a>
+        <a href="https://github.com/Telepact/telepact/tree/main/lib/java" class="tp-lang">
+          <strong>Java</strong><br><code>io.github.telepact</code>
+        </a>
+        <a href="https://github.com/Telepact/telepact/tree/main/lib/go" class="tp-lang">
+          <strong>Go</strong><br><code>go get telepact</code>
+        </a>
+        <a href="https://github.com/Telepact/telepact/tree/main/sdk/cli" class="tp-lang">
+          <strong>CLI</strong><br><code>telepact-cli</code>
+        </a>
+        <a href="https://github.com/Telepact/telepact/tree/main/sdk/console" class="tp-lang">
+          <strong>Console</strong><br><code>telepact-console</code>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="tp-cta">
+    <div class="tp-cta__inner md-grid">
+      <h2 class="tp-section__title">Ready to Get Started?</h2>
+      <p class="tp-section__subtitle">
+        Explore the docs, try the interactive tutorial, or dive straight into the code.
+      </p>
+      <div class="tp-hero__actions">
+        <a href="guide/" class="md-button md-button--primary tp-btn">
+          Documentation
+        </a>
+        <a href="learn-by-example/" class="md-button tp-btn tp-btn--outline">
+          Learn by Example
+        </a>
+        <a href="guide/example/" class="md-button tp-btn tp-btn--outline">
+          Full-Stack Example
+        </a>
+        <a href="https://github.com/Telepact/telepact" class="md-button tp-btn tp-btn--outline">
+          View on GitHub
+        </a>
+      </div>
+    </div>
+  </section>
+
+{% endblock %}
+
+{% block content %}
+{% endblock %}

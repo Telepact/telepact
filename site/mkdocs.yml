@@ -1,0 +1,135 @@
+site_name: Telepact
+site_url: https://telepact.github.io/telepact
+site_description: >-
+  Telepact is an API ecosystem for bridging programs across inter-process
+  communication boundaries. JSON in, JSON out — with optional binary,
+  code generation, field selection, and built-in mocking.
+site_author: Telepact
+
+repo_url: https://github.com/Telepact/telepact
+repo_name: Telepact/telepact
+
+copyright: >-
+  Copyright &copy; Telepact contributors &mdash;
+  Licensed under the Apache License 2.0
+
+theme:
+  name: material
+  custom_dir: overrides
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: deep purple
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: deep purple
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  font:
+    text: Inter
+    code: Fira Code
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - navigation.indexes
+    - search.highlight
+    - search.share
+    - content.code.copy
+    - content.tabs.link
+    - toc.follow
+  icon:
+    repo: fontawesome/brands/github
+
+extra_css:
+  - stylesheets/extra.css
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.betterem
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+plugins:
+  - search
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/Telepact/telepact
+
+nav:
+  - Home: index.md
+  - Documentation:
+      - guide/index.md
+      - Schema Guide: guide/schema-guide.md
+      - Transport Guide: guide/transports.md
+      - Production Guide: guide/production-guide.md
+      - Full-Stack Example: guide/example.md
+      - Extensions: guide/extensions.md
+      - Runtime Errors: guide/runtime-errors.md
+      - FAQ: guide/faq.md
+      - Motivation: guide/motivation.md
+      - Versions: guide/versions.md
+  - Learn by Example:
+      - learn-by-example/index.md
+      - Installation: learn-by-example/00-installation.md
+      - Ping: learn-by-example/01-ping.md
+      - Schema & fn.add: learn-by-example/02-schema-and-add.md
+      - Data Type Validation: learn-by-example/03-data-type-validation.md
+      - Scalar Types: learn-by-example/04-scalar-types.md
+      - Collection Types: learn-by-example/05-collection-types.md
+      - Structs: learn-by-example/06-structs.md
+      - Unions: learn-by-example/07-unions.md
+      - Functions: learn-by-example/08-functions.md
+      - Service Errors: learn-by-example/09-service-errors.md
+      - Headers: learn-by-example/10-headers.md
+      - Comments: learn-by-example/11-comments.md
+      - Select: learn-by-example/12-select.md
+      - Binary: learn-by-example/13-binary.md
+      - Mock Server: learn-by-example/14-mock-server.md
+      - Stock Mock: learn-by-example/15-stock-mock.md
+      - Stubs: learn-by-example/16-stubs.md
+      - Verify: learn-by-example/17-verify.md
+      - Auth: learn-by-example/18-auth.md
+      - Minimum Python Client: learn-by-example/19-minimum-python-client.md
+      - Automatic Binary Negotiation: learn-by-example/20-automatic-binary-negotiation.md
+      - Code Generation: learn-by-example/21-code-generation.md
+      - Minimum Server: learn-by-example/22-minimum-server.md
+      - Logging: learn-by-example/23-logging.md
+      - Server Auth: learn-by-example/24-server-auth.md
+      - Managed Auth: learn-by-example/25-managed-auth.md
+      - Schema Evolution: learn-by-example/26-schema-evolution.md
+      - Server Best Practices: learn-by-example/27-server-best-practices.md
