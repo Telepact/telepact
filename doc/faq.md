@@ -48,8 +48,18 @@ suffix.
 This design constraint helps distinguish header fields from struct fields.
 Headers significantly differ from structs in that any undeclared field is valid
 at runtime, something strictly disallowed with normal structs. When users see
-the `@` prefix, they know they are working with headers, a psuedo-struct where
+the `@` prefix, they know they are working with headers, a pseudo-struct where
 everything is optional, and new runtime fields are not disallowed.
+
+## What headers should I define in the schema?
+
+Define all headers that clients might be expected to use directly. If a client
+is supposed to send a header, inspect a header, or otherwise rely on it as part
+of the API contract, it should be present in the schema.
+
+If a header is only used to pass data between server transports, middleware,
+and function handlers, but the header is never actually exposed to the client
+on the wire, do not define it in the schema since that will distract clients.
 
 ## Why does my unauthenticated server fail to start?
 
