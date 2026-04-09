@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 #|
 #|  Copyright The Telepact Authors
 #|
@@ -17,7 +19,9 @@
 set -euo pipefail
 
 if ! command -v uv >/dev/null 2>&1; then
-  curl -LsSf https://astral.sh/uv/install.sh | env UV_UNMANAGED_INSTALL="/usr/local/bin" sh
+  curl -LsSf https://astral.sh/uv/install.sh -o /tmp/uv-installer.sh
+  env UV_UNMANAGED_INSTALL="/usr/local/bin" sh /tmp/uv-installer.sh
+  rm -f /tmp/uv-installer.sh
 fi
 
 packages=(nats-server)
@@ -43,6 +47,7 @@ fi
 sudo apt-get update
 sudo apt-get install -y "${packages[@]}"
 
+echo "Installing telepact-project-cli for repo automation..."
 make install-project-cli
 
 cd sdk/console
