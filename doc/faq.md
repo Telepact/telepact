@@ -57,11 +57,9 @@ Define all headers that clients might be expected to use directly. If a client
 is supposed to send a header, inspect a header, or otherwise rely on it as part
 of the API contract, it should be present in the schema.
 
-Leave server-dedicated convenience headers undefined. If a header only exists to
-pass transport, auth, request-id, or middleware data around inside server code,
-do not promote it into the schema just for convenience. That keeps internal
-plumbing out of the public contract while still allowing the server to use those
-runtime headers.
+If a header is only used to pass data between server transports, middleware,
+and function handlers, but the header is never actually exposed to the client
+on the wire, do not define it in the schema since that will distract clients.
 
 ## Why does my unauthenticated server fail to start?
 
