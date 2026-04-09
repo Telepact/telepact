@@ -14,7 +14,7 @@
 #|  limitations under the License.
 #|
 
-EXAMPLES := java-http-basic ts-http-cookie-auth go-websocket py-select java-binary py-links
+EXAMPLES := py-binary py-http-cookie-auth py-links py-select py-websocket
 
 .PHONY: list check run
 

@@ -1,30 +1,15 @@
 {
   "changed_paths": [
-    "AGENTS.md",
-    "example/ts-http-cookie-auth/Makefile",
-    "example/ts-http-cookie-auth/package-lock.json",
-    "lib/py/telepact/internal/generation/GenerateRandomUnion.py",
-    "lib/py/telepact/internal/schema/GetAuthTelepactJson.py",
-    "lib/py/telepact/internal/schema/GetInternalTelepactJson.py",
-    "lib/py/telepact/internal/schema/GetMockTelepactJson.py",
+    "sdk/cli/telepact_cli/calculator.telepact.yaml",
     "sdk/cli/telepact_cli/cli.py",
-    "sdk/cli/telepact_cli/resources.py",
-    "sdk/cli/tests/test_resources.py",
-    "sdk/console/package-lock.json",
-    "sdk/console/package.json",
-    "sdk/console/proxy-server.cjs",
-    "test/runner/README.md"
+    "sdk/cli/tests/test_main.py"
   ],
   "direct_targets": [
-    "cli",
-    "console",
-    "py"
+    "cli"
   ],
-  "pr_number": 338,
+  "pr_number": 346,
   "targets": [
-    "cli",
-    "console",
-    "py"
+    "cli"
   ],
-  "version": "1.0.0-alpha.247"
+  "version": "1.0.0-alpha.251"
 }

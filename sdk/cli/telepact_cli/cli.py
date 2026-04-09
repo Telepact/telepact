@@ -18,7 +18,7 @@ import click
 import os
 import json
 import argparse
-import json
+import msgpack
 import shutil
 import yaml
 from typing import cast, Pattern
@@ -465,6 +465,7 @@ def demo_server(port: int) -> None:
     Start a demo Telepact server.
     """
 
+    shared_namespace = '__unauthenticated__'
     user_variables: dict[str, dict[str, float]] = {}
     user_evaluations: dict[str, list[dict[str, object]]] = {}
     session_tokens: dict[str, str] = {}
@@ -495,6 +496,17 @@ def demo_server(port: int) -> None:
     def unauthorized_response(message: str) -> Message:
         return Message({}, {'ErrorUnauthorized_': {'message!': message}})
 
+    async def require_namespace(request_message: Message) -> tuple[Message | None, str | None]:
+        unavailable_response = _demo_unavailable_response()
+        if unavailable_response is not None:
+            return unavailable_response, None
+        if '@auth_' not in request_message.headers:
+            return None, shared_namespace
+        username = get_username(request_message)
+        if username is None:
+            return unauthenticated_response(), None
+        return None, username
+
     def record_evaluation(username: str, expression: dict[str, object], result: float, successful: bool) -> None:
         get_user_evaluations(username).append({
             'expression': expression,
@@ -502,6 +514,48 @@ def demo_server(port: int) -> None:
             'timestamp': int(time.time()),
             'successful': successful,
         })
+
+    def export_namespace(username: str) -> bytes:
+        return msgpack.packb({
+            'variables': get_user_variables(username),
+            'evaluations': get_user_evaluations(username),
+        }, use_bin_type=True)
+
+    def parse_namespace_blob(blob: bytes) -> tuple[dict[str, float], list[dict[str, object]]]:
+        try:
+            namespace = msgpack.unpackb(blob, raw=False, strict_map_key=False)
+        except (ValueError, msgpack.ExtraData, msgpack.FormatError, msgpack.StackError) as e:
+            raise ValueError('Imported namespace blob must use the expected msgpack format.') from e
+        if not isinstance(namespace, dict):
+            raise ValueError('Imported namespace blob must decode to a msgpack object.')
+        variables = namespace.get('variables')
+        evaluations = namespace.get('evaluations')
+        if not isinstance(variables, dict):
+            raise ValueError('Imported namespace blob must include a variables object.')
+        if not isinstance(evaluations, list):
+            raise ValueError('Imported namespace blob must include an evaluations list.')
+
+        parsed_variables: dict[str, float] = {}
+        for name, value in variables.items():
+            if not isinstance(name, str):
+                raise ValueError('Imported namespace variable names must be strings.')
+            # Reject bool explicitly because bool is a subclass of int in Python.
+            if isinstance(value, bool) or not isinstance(value, (int, float)):
+                raise ValueError('Imported namespace variable values must be numbers.')
+            parsed_variables[name] = float(value)
+
+        parsed_evaluations: list[dict[str, object]] = []
+        for evaluation in evaluations:
+            if not isinstance(evaluation, dict):
+                raise ValueError('Imported namespace evaluations must be objects.')
+            parsed_evaluations.append(cast(dict[str, object], evaluation))
+
+        return parsed_variables, parsed_evaluations
+
+    def replace_namespace(username: str, blob: bytes) -> None:
+        variables, evaluations = parse_namespace_blob(blob)
+        user_variables[username] = variables
+        user_evaluations[username] = evaluations
 
     def evaluate_expression(expression: dict[str, object], variables: dict[str, float]) -> tuple[float, list[str], bool]:
         kind, payload = next(iter(expression.items()))
@@ -581,18 +635,9 @@ def demo_server(port: int) -> None:
         user_evaluations.pop(username, None)
         return Message({}, {'Ok_': {}})
 
-    async def require_username(request_message: Message) -> tuple[Message | None, str | None]:
-        unavailable_response = _demo_unavailable_response()
-        if unavailable_response is not None:
-            return unavailable_response, None
-        username = get_username(request_message)
-        if username is None:
-            return unauthenticated_response(), None
-        return None, username
-
     async def save_variable_route(function_name: str, request_message: Message) -> Message:
         arguments = cast(dict[str, object], request_message.body[function_name])
-        unavailable_response, username = await require_username(request_message)
+        unavailable_response, username = await require_namespace(request_message)
         if unavailable_response is not None:
             return unavailable_response
         get_user_variables(cast(str, username))[cast(str, arguments['name'])] = cast(float, arguments['value'])
@@ -600,7 +645,7 @@ def demo_server(port: int) -> None:
 
     async def save_variables_route(function_name: str, request_message: Message) -> Message:
         arguments = cast(dict[str, object], request_message.body[function_name])
-        unavailable_response, username = await require_username(request_message)
+        unavailable_response, username = await require_namespace(request_message)
         if unavailable_response is not None:
             return unavailable_response
         get_user_variables(cast(str, username)).update(cast(dict[str, float], arguments['variables']))
@@ -608,7 +653,7 @@ def demo_server(port: int) -> None:
 
     async def get_variable_route(function_name: str, request_message: Message) -> Message:
         arguments = cast(dict[str, object], request_message.body[function_name])
-        unavailable_response, username = await require_username(request_message)
+        unavailable_response, username = await require_namespace(request_message)
         if unavailable_response is not None:
             return unavailable_response
         value = get_user_variables(cast(str, username)).get(cast(str, arguments['name']))
@@ -618,7 +663,7 @@ def demo_server(port: int) -> None:
 
     async def get_variables_route(function_name: str, request_message: Message) -> Message:
         arguments = cast(dict[str, object], request_message.body[function_name])
-        unavailable_response, username = await require_username(request_message)
+        unavailable_response, username = await require_namespace(request_message)
         if unavailable_response is not None:
             return unavailable_response
         variables = [
@@ -629,7 +674,7 @@ def demo_server(port: int) -> None:
 
     async def delete_variable_route(function_name: str, request_message: Message) -> Message:
         arguments = cast(dict[str, object], request_message.body[function_name])
-        unavailable_response, username = await require_username(request_message)
+        unavailable_response, username = await require_namespace(request_message)
         if unavailable_response is not None:
             return unavailable_response
         get_user_variables(cast(str, username)).pop(cast(str, arguments['name']), None)
@@ -637,7 +682,7 @@ def demo_server(port: int) -> None:
 
     async def delete_variables_route(function_name: str, request_message: Message) -> Message:
         arguments = cast(dict[str, object], request_message.body[function_name])
-        unavailable_response, username = await require_username(request_message)
+        unavailable_response, username = await require_namespace(request_message)
         if unavailable_response is not None:
             return unavailable_response
         these_variables = get_user_variables(cast(str, username))
@@ -647,7 +692,7 @@ def demo_server(port: int) -> None:
 
     async def evaluate_route(function_name: str, request_message: Message) -> Message:
         arguments = cast(dict[str, object], request_message.body[function_name])
-        unavailable_response, username = await require_username(request_message)
+        unavailable_response, username = await require_namespace(request_message)
         if unavailable_response is not None:
             return unavailable_response
         expression = cast(dict[str, object], arguments['expression'])
@@ -667,7 +712,7 @@ def demo_server(port: int) -> None:
 
     async def get_paper_tape_route(function_name: str, request_message: Message) -> Message:
         arguments = cast(dict[str, object], request_message.body[function_name])
-        unavailable_response, username = await require_username(request_message)
+        unavailable_response, username = await require_namespace(request_message)
         if unavailable_response is not None:
             return unavailable_response
         limit = cast(int | None, arguments.get('limit!'))
@@ -675,6 +720,20 @@ def demo_server(port: int) -> None:
         if limit is not None:
             evaluations = evaluations[:limit]
         return Message({}, {'Ok_': {'tape': evaluations}})
+
+    async def export_route(function_name: str, request_message: Message) -> Message:
+        unavailable_response, username = await require_namespace(request_message)
+        if unavailable_response is not None:
+            return unavailable_response
+        return Message({}, {'Ok_': {'blob': export_namespace(cast(str, username))}})
+
+    async def import_route(function_name: str, request_message: Message) -> Message:
+        unavailable_response, username = await require_namespace(request_message)
+        if unavailable_response is not None:
+            return unavailable_response
+        blob = cast(bytes, cast(dict[str, object], request_message.body[function_name])['blob'])
+        replace_namespace(cast(str, username), blob)
+        return Message({}, {'Ok_': {}})
 
     function_routes = {
         'fn.add': add_route,
@@ -688,6 +747,8 @@ def demo_server(port: int) -> None:
         'fn.deleteVariables': delete_variables_route,
         'fn.evaluate': evaluate_route,
         'fn.getPaperTape': get_paper_tape_route,
+        'fn.export': export_route,
+        'fn.import': import_route,
     }
 
 
