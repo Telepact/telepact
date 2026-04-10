@@ -51,7 +51,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Navbar scroll effect
   const navbar = document.getElementById('navbar');
-  let lastScroll = 0;
 
   window.addEventListener('scroll', () => {
     const currentScroll = window.pageYOffset;
@@ -61,8 +60,6 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
       navbar.style.background = 'rgba(10, 10, 15, 0.85)';
     }
-
-    lastScroll = currentScroll;
   });
 
   // Intersection Observer for fade-in animations

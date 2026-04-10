@@ -502,13 +502,11 @@ code {
 /* ===== Code Windows ===== */
 .code-window {
   border: 1px solid var(--color-border);
-  border-radius: 0 0 0 0;
   overflow: hidden;
   background: var(--color-bg-code);
 }
 
 .tab-panel .code-window {
-  border-radius: 0;
   border-top: none;
 }
 
