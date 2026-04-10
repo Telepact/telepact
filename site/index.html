@@ -52,7 +52,7 @@
   <!-- Inter font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
 
   <style>
     /* ============ Reset & Base ============ */
@@ -789,7 +789,7 @@
     /* ============ Tools Section ============ */
     .tools-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
       gap: 24px;
       margin-top: 48px;
     }
@@ -827,6 +827,13 @@
       font-size: 0.8rem;
       color: var(--accent);
       overflow-x: auto;
+    }
+    .card-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
     }
 
     /* ============ CTA Section ============ */
@@ -896,8 +903,7 @@
 
     /* ============ Responsive ============ */
     @media (max-width: 900px) {
-      .pillars-grid,
-      .tools-grid { grid-template-columns: 1fr; }
+      .pillars-grid { grid-template-columns: 1fr; }
       .lang-grid { grid-template-columns: repeat(2, 1fr); }
       .demo-grid { grid-template-columns: 1fr; }
       .hero-payloads,
@@ -952,8 +958,9 @@
       <li><a href="#features">Features</a></li>
       <li><a href="#demo">Demo</a></li>
       <li><a href="#compare">Compare</a></li>
-      <li><a href="#languages">Languages</a></li>
+      <li><a href="#examples">Examples</a></li>
       <li><a href="#tools">Tools</a></li>
+      <li><a href="#docs">Docs</a></li>
       <li><a href="https://github.com/telepact/telepact" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
         GitHub
@@ -982,9 +989,9 @@
       JSON&nbsp;in,&nbsp;JSON&nbsp;out &mdash; with optional binary efficiency, dynamic response shaping, and type&#8209;safe code generation.
     </p>
     <div class="hero-buttons">
-      <a href="https://github.com/telepact/telepact" class="btn btn-primary" target="_blank" rel="noopener noreferrer">
+      <a href="https://github.com/telepact/telepact/blob/main/doc/index.md" class="btn btn-primary" target="_blank" rel="noopener noreferrer">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-        Get Started
+        Browse Docs
       </a>
       <a href="#demo" class="btn btn-secondary">See examples</a>
     </div>
@@ -1278,7 +1285,7 @@ headers: {
   "@pac_": true
 }
 
-body: <MessagePack bytes></code></pre>
+body: &lt;MessagePack bytes&gt;</code></pre>
           </div>
         </div>
         <div class="feature-callout">
@@ -1379,6 +1386,7 @@ body: <MessagePack bytes></code></pre>
             </tr>
           </tbody>
         </table>
+      </div>
     </div>
   </div>
 </section>
@@ -1569,12 +1577,12 @@ func main() {
       <div class="lang-card">
         <div class="lang-card-icon">🐍</div>
         <h4>Python</h4>
-        <p>pip install telepact</p>
+        <p>pip install --pre telepact</p>
       </div>
       <div class="lang-card">
         <div class="lang-card-icon">🔵</div>
         <h4>Go</h4>
-        <p>go get github.com/<br>telepact/telepact</p>
+        <p>go get github.com/<br>telepact/telepact/lib/go</p>
       </div>
       <div class="lang-card">
         <div class="lang-card-icon">☕</div>
@@ -1592,14 +1600,14 @@ func main() {
       <div class="section-label">Developer Experience</div>
       <h2 class="section-title">Built-in <span class="gradient-text">tooling</span></h2>
       <p class="section-subtitle" style="margin: 0 auto;">
-        Code generation, interactive console, mock servers, schema validation, and more &mdash; batteries included.
+        CLI workflows, an interactive console, mock servers, schema formatting, and more &mdash; batteries included.
       </p>
     </div>
     <div class="tools-grid">
       <div class="tool-card fade-in">
         <h4>&#x1F6E0;&#xFE0F; CLI</h4>
-        <p>Generate type-safe bindings, compare schemas for backwards compatibility, start mock servers, and validate schemas.</p>
-        <code>uv tool install telepact-cli</code>
+        <p>Fetch schemas, generate type-safe bindings, compare compatibility, and run mock or demo servers from one command line tool.</p>
+        <code>uv tool install --prerelease=allow telepact-cli</code>
       </div>
       <div class="tool-card fade-in">
         <h4>&#x1F4BB; Console</h4>
@@ -1609,7 +1617,57 @@ func main() {
       <div class="tool-card fade-in">
         <h4>&#x1F9EA; Mock Server</h4>
         <p>Spin up a fully-functional mock server from your schema. Perfect for frontend development and testing.</p>
-        <code>telepact mock --schema-dir ./api</code>
+        <code>telepact mock --dir ./api</code>
+      </div>
+      <div class="tool-card fade-in">
+        <h4>&#x2728; Prettier Plugin</h4>
+        <p>Format Telepact schemas consistently, especially when teams still keep checked-in <code>*.telepact.json</code> files.</p>
+        <code>npm install prettier-plugin-telepact</code>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Docs Hub ============ -->
+<section id="docs" class="section">
+  <div class="container">
+    <div class="fade-in" style="text-align: center;">
+      <div class="section-label">Docs Hub</div>
+      <h2 class="section-title">Use the repo's <span class="gradient-text">canonical guides</span></h2>
+      <p class="section-subtitle" style="margin: 0 auto;">
+        The repo already organizes its guidance around a docs landing page, published versions table, runnable examples, and operational guides. The website now points to those same entrypoints.
+      </p>
+    </div>
+    <div class="tools-grid">
+      <div class="tool-card fade-in">
+        <h4>Docs Landing Page</h4>
+        <p>Start here for schema writing, language library references, SDK tools, further reading, and the main docs map.</p>
+        <a class="card-link" href="https://github.com/telepact/telepact/blob/main/doc/index.md" target="_blank" rel="noopener noreferrer">Open doc/index.md</a>
+      </div>
+      <div class="tool-card fade-in">
+        <h4>Published Versions</h4>
+        <p>Check the generated versions table for the latest published package versions across Go, Java, Python, TypeScript, CLI, Console, and Prettier.</p>
+        <a class="card-link" href="https://github.com/telepact/telepact/blob/main/doc/versions.md" target="_blank" rel="noopener noreferrer">Open doc/versions.md</a>
+      </div>
+      <div class="tool-card fade-in">
+        <h4>Runnable Examples</h4>
+        <p>Walk through end-to-end examples for binary negotiation, auth, links, field selection, and WebSocket request/reply.</p>
+        <a class="card-link" href="https://github.com/telepact/telepact/blob/main/example/README.md" target="_blank" rel="noopener noreferrer">Open example/README.md</a>
+      </div>
+      <div class="tool-card fade-in">
+        <h4>Transport Guide</h4>
+        <p>See the concrete transport wiring patterns for HTTP, WebSockets, and other request/response boundaries.</p>
+        <a class="card-link" href="https://github.com/telepact/telepact/blob/main/doc/transports.md" target="_blank" rel="noopener noreferrer">Open doc/transports.md</a>
+      </div>
+      <div class="tool-card fade-in">
+        <h4>Production Guide</h4>
+        <p>Read the repo's current guidance for rollout, compatibility, auth, deployment, and observability decisions.</p>
+        <a class="card-link" href="https://github.com/telepact/telepact/blob/main/doc/production-guide.md" target="_blank" rel="noopener noreferrer">Open doc/production-guide.md</a>
+      </div>
+      <div class="tool-card fade-in">
+        <h4>Runtime Errors</h4>
+        <p>Use the focused runtime error guide when local development or production traffic surfaces Telepact failures.</p>
+        <a class="card-link" href="https://github.com/telepact/telepact/blob/main/doc/runtime-errors.md" target="_blank" rel="noopener noreferrer">Open doc/runtime-errors.md</a>
       </div>
     </div>
   </div>
@@ -1620,13 +1678,13 @@ func main() {
   <div class="container">
     <div class="cta-box fade-in">
       <h2>Ready to build <span class="gradient-text">universal APIs</span>?</h2>
-      <p>Check out the documentation, explore the source, and start building with Telepact today.</p>
+      <p>Start with the docs landing page, check the published versions table, and explore the source when you are ready to go deeper.</p>
       <div class="cta-buttons">
-        <a href="https://github.com/telepact/telepact" class="btn btn-primary" target="_blank" rel="noopener noreferrer">
+        <a href="https://github.com/telepact/telepact/blob/main/doc/index.md" class="btn btn-primary" target="_blank" rel="noopener noreferrer">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-          View on GitHub
+          Browse Docs
         </a>
-        <a href="https://github.com/telepact/telepact#readme" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">Read the Docs</a>
+        <a href="https://github.com/telepact/telepact" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">View on GitHub</a>
       </div>
     </div>
   </div>
@@ -1637,7 +1695,7 @@ func main() {
   <div class="container">
     <ul class="footer-links">
       <li><a href="https://github.com/telepact/telepact" target="_blank" rel="noopener noreferrer">GitHub</a></li>
-      <li><a href="https://github.com/telepact/telepact#readme" target="_blank" rel="noopener noreferrer">Documentation</a></li>
+      <li><a href="https://github.com/telepact/telepact/blob/main/doc/index.md" target="_blank" rel="noopener noreferrer">Documentation</a></li>
       <li><a href="https://github.com/telepact/telepact/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">Apache 2.0 License</a></li>
     </ul>
     <p>&copy; Telepact Contributors. Open source under the Apache 2.0 License.</p>
