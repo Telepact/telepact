@@ -1,44 +1,10 @@
 {
   "changed_paths": [
-    "common/internal.telepact.yaml",
-    "doc/learn-by-example/23-logging.md",
-    "lib/go/Server.go",
-    "lib/go/TelepactError.go",
-    "lib/go/internal/HandleMessage.go",
-    "lib/go/internal/ProcessBytes.go",
-    "lib/go/internal/UnknownError.go",
-    "lib/go/internal/schema/do_not_edit/internal.telepact.json",
-    "lib/java/src/main/java/io/github/telepact/TelepactError.java",
-    "lib/java/src/main/java/io/github/telepact/internal/HandleMessage.java",
-    "lib/java/src/main/java/io/github/telepact/internal/ProcessBytes.java",
-    "lib/java/src/main/java/io/github/telepact/internal/UnknownError.java",
-    "lib/py/telepact/TelepactError.py",
-    "lib/py/telepact/internal/HandleMessage.py",
-    "lib/py/telepact/internal/ProcessBytes.py",
-    "lib/py/telepact/internal/UnknownError.py",
-    "lib/ts/src/TelepactError.ts",
-    "lib/ts/src/internal/HandleMessage.ts",
-    "lib/ts/src/internal/ProcessBytes.ts",
-    "lib/ts/src/internal/UnknownError.ts",
-    "test/runner/parameters/api_examples_cases.py",
-    "test/runner/parameters/cases.py",
-    "test/runner/util.py"
+    "README.md",
+    "doc/index.md"
   ],
-  "direct_targets": [
-    "go",
-    "java",
-    "py",
-    "ts"
-  ],
-  "pr_number": 348,
-  "targets": [
-    "cli",
-    "console",
-    "dart",
-    "go",
-    "java",
-    "py",
-    "ts"
-  ],
-  "version": "1.0.0-alpha.253"
+  "direct_targets": [],
+  "pr_number": 350,
+  "targets": [],
+  "version": "1.0.0-alpha.254"
 }
