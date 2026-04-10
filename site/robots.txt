@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://telepact.github.io/sitemap.xml
+Sitemap: https://telepact.github.io/telepact/sitemap.xml

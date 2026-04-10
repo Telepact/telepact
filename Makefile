@@ -48,6 +48,7 @@ local-ci:
 	$(MAKE) example-check
 	$(MAKE) test
 	$(MAKE) console-self-hosted
+	$(MAKE) site-docs
 	$(MAKE) license-header
 	$(MAKE) version
 
@@ -141,7 +142,7 @@ test-trace-go:
 deploy-go:
 	$(MAKE) -C lib/go deploy
 
-.PHONY: test prepare-test-java test-java-run prepare-test-py test-py-run prepare-test-ts test-ts-run prepare-test-go test-go-run
+.PHONY: test prepare-test-java test-java-run prepare-test-py test-py-run prepare-test-ts test-ts-run prepare-test-go test-go-run site-docs
 test:
 	$(MAKE) -C test/runner test
 
@@ -213,6 +214,9 @@ deploy-console:
 
 console-self-hosted:
 	$(MAKE) -C test/console-self-hosted
+
+site-docs:
+	python3 site/build_docs.py
 
 clean-console-self-hosted:
 	$(MAKE) -C test/console-self-hosted clean
