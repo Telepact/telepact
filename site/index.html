@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Telepact — The API Ecosystem for Bridging Programs</title>
+  <meta name="description" content="Telepact combines the best of REST, gRPC, and GraphQL into one API ecosystem. JSON as a query language, binary without code generation, and hypermedia without HTTP.">
+  <meta name="keywords" content="Telepact, API, RPC, JSON, binary serialization, code generation, GraphQL alternative, gRPC alternative, REST alternative, API framework, schema, transport-agnostic">
+  <link rel="canonical" href="https://telepact.github.io/telepact/">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Telepact — The API Ecosystem for Bridging Programs">
+  <meta property="og:description" content="JSON in, JSON out. Binary without code generation. Hypermedia without HTTP. Telepact takes the best of REST, gRPC, and GraphQL and combines them.">
+  <meta property="og:url" content="https://telepact.github.io/telepact/">
+  <meta property="og:site_name" content="Telepact">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Telepact — The API Ecosystem for Bridging Programs">
+  <meta name="twitter:description" content="JSON in, JSON out. Binary without code generation. Hypermedia without HTTP.">
+
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Telepact",
+    "url": "https://telepact.github.io/telepact/",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Cross-platform",
+    "description": "An API ecosystem for bridging programs across inter-process communication boundaries. Combines the best of REST, gRPC, and GraphQL.",
+    "license": "https://www.apache.org/licenses/LICENSE-2.0",
+    "codeRepository": "https://github.com/Telepact/telepact",
+    "programmingLanguage": ["TypeScript", "Python", "Java", "Go"]
+  }
+  </script>
+
+  <base href="/telepact/">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="#" class="nav-logo">
+        <span class="logo-text">Telepact</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#features">Features</a></li>
+        <li><a href="#how-it-works">How It Works</a></li>
+        <li><a href="#comparison">Comparison</a></li>
+        <li><a href="#examples">Examples</a></li>
+        <li><a href="#ecosystem">Ecosystem</a></li>
+        <li><a href="https://github.com/Telepact/telepact" class="nav-github" target="_blank" rel="noopener">
+          <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+          GitHub
+        </a></li>
+      </ul>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="hero">
+    <div class="hero-bg">
+      <div class="hero-grid"></div>
+    </div>
+    <div class="hero-container">
+      <div class="hero-badge">Open Source &middot; Apache 2.0</div>
+      <h1 class="hero-title">
+        The API ecosystem for
+        <span class="gradient-text">bridging programs</span>
+      </h1>
+      <p class="hero-subtitle">
+        Telepact takes the differentiating features of the industry's most popular API technologies
+        and combines them through 3 key innovations.
+      </p>
+      <div class="hero-actions">
+        <a href="https://github.com/Telepact/telepact" class="btn btn-primary" target="_blank" rel="noopener">
+          <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+          View on GitHub
+        </a>
+        <a href="#how-it-works" class="btn btn-secondary">See How It Works</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat">
+          <span class="stat-value">4</span>
+          <span class="stat-label">Languages</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value">3</span>
+          <span class="stat-label">SDK Tools</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value">0</span>
+          <span class="stat-label">Required Client Libraries</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Innovations Section -->
+  <section class="innovations" id="features">
+    <div class="container">
+      <div class="section-header">
+        <h2>Three Key Innovations</h2>
+        <p>Each innovation targets a different axis of API design, creating an ecosystem that is simultaneously accessible, efficient, and expressive.</p>
+      </div>
+      <div class="innovation-cards">
+        <div class="innovation-card" data-aos="fade-up">
+          <div class="card-icon card-icon-json">{ }</div>
+          <h3>JSON as a Query Language</h3>
+          <p>API calls and <code>SELECT</code>-style queries are all achieved with JSON abstractions, giving first-class status to clients wielding only a JSON library.</p>
+          <div class="card-highlight">No query params. No string parsing. Just JSON in, JSON out.</div>
+        </div>
+        <div class="innovation-card" data-aos="fade-up" data-aos-delay="100">
+          <div class="card-icon card-icon-binary">01</div>
+          <h3>Binary Without Code Generation</h3>
+          <p>Binary protocols are established through runtime handshakes, rather than build-time code generation, offering binary efficiency without code generation toolchains.</p>
+          <div class="card-highlight">No field IDs in your schema. No ABI leaking into your API.</div>
+        </div>
+        <div class="innovation-card" data-aos="fade-up" data-aos-delay="200">
+          <div class="card-icon card-icon-link">&#8594;</div>
+          <h3>Hypermedia Without HTTP</h3>
+          <p>API calls can return functions with pre-filled arguments, approximating a link that can be followed, achieved with pure JSON abstractions over any transport.</p>
+          <div class="card-highlight">Navigate your API like a graph. Transport-agnostic links.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section class="how-it-works" id="how-it-works">
+    <div class="container">
+      <div class="section-header">
+        <h2>It's Just JSON</h2>
+        <p>No query params. No binary field IDs. No required client libraries. It's just JSON in, and JSON out.</p>
+      </div>
+
+      <div class="demo-tabs">
+        <div class="tab-buttons">
+          <button class="tab-btn active" data-tab="schema">1. Define Schema</button>
+          <button class="tab-btn" data-tab="server">2. Serve It</button>
+          <button class="tab-btn" data-tab="client">3. Call It</button>
+        </div>
+
+        <div class="tab-panel active" id="tab-schema">
+          <div class="code-window">
+            <div class="code-header">
+              <span class="code-dot red"></span>
+              <span class="code-dot yellow"></span>
+              <span class="code-dot green"></span>
+              <span class="code-filename">api/math.telepact.yaml</span>
+            </div>
+<pre class="code-block"><code><span class="code-comment">- ///: Divide two integers, `x` and `y`.</span>
+  <span class="code-key">fn.divide</span>:
+    <span class="code-field">x</span>: <span class="code-string">"integer"</span>
+    <span class="code-field">y</span>: <span class="code-string">"integer"</span>
+  <span class="code-key">-></span>:
+    - <span class="code-tag">Ok_</span>:
+        <span class="code-field">result</span>: <span class="code-string">"number"</span>
+    - <span class="code-tag">ErrorCannotDivideByZero</span>: {}</code></pre>
+          </div>
+          <div class="step-caption">
+            <strong>Define your API</strong> with a clean, YAML-based schema. Functions have typed arguments and tagged result unions.
+          </div>
+        </div>
+
+        <div class="tab-panel" id="tab-server">
+          <div class="code-window">
+            <div class="code-header">
+              <span class="code-dot red"></span>
+              <span class="code-dot yellow"></span>
+              <span class="code-dot green"></span>
+              <span class="code-filename">server.py</span>
+            </div>
+<pre class="code-block"><code><span class="code-keyword">from</span> <span class="code-module">telepact</span> <span class="code-keyword">import</span> TelepactSchemaFiles, TelepactSchema, Server, Message
+
+<span class="code-keyword">async def</span> <span class="code-func">divide</span>(function_name, request_message):
+    arguments = request_message.body[function_name]
+    x = arguments[<span class="code-string">'x'</span>]
+    y = arguments[<span class="code-string">'y'</span>]
+    <span class="code-keyword">if</span> y == <span class="code-number">0</span>:
+        <span class="code-keyword">return</span> Message({}, {<span class="code-string">'ErrorCannotDivideByZero'</span>: {}})
+    result = x / y
+    <span class="code-keyword">return</span> Message({}, {<span class="code-string">'Ok_'</span>: {<span class="code-string">'result'</span>: result}})
+
+schema_files = TelepactSchemaFiles(<span class="code-string">'./api'</span>)
+api = TelepactSchema.from_file_json_map(schema_files.filenames_to_json)
+server = Server(api, {<span class="code-string">'fn.divide'</span>: divide}, options)</code></pre>
+          </div>
+          <div class="step-caption">
+            <strong>Serve it</strong> using one of the Telepact libraries (Python, TypeScript, Java, or Go) over any transport.
+          </div>
+        </div>
+
+        <div class="tab-panel" id="tab-client">
+          <div class="code-window">
+            <div class="code-header">
+              <span class="code-dot red"></span>
+              <span class="code-dot yellow"></span>
+              <span class="code-dot green"></span>
+              <span class="code-filename">client.js</span>
+            </div>
+<pre class="code-block"><code><span class="code-comment">// No Telepact library needed — just fetch + JSON</span>
+<span class="code-keyword">let</span> request = [{}, {<span class="code-string">"fn.divide"</span>: { <span class="code-field">x</span>: <span class="code-number">6</span>, <span class="code-field">y</span>: <span class="code-number">3</span> }}];
+
+<span class="code-keyword">let</span> response = <span class="code-keyword">await</span> <span class="code-func">fetch</span>(
+    <span class="code-string">"http://localhost:8000/api/telepact"</span>,
+    {
+        <span class="code-field">method</span>: <span class="code-string">"POST"</span>,
+        <span class="code-field">headers</span>: { <span class="code-string">'Content-Type'</span>: <span class="code-string">'application/json'</span> },
+        <span class="code-field">body</span>: JSON.<span class="code-func">stringify</span>(request),
+    },
+);
+
+console.<span class="code-func">log</span>(<span class="code-keyword">await</span> response.<span class="code-func">json</span>());
+<span class="code-comment">// [{}, {"Ok_": {"result": 2}}]</span></code></pre>
+          </div>
+          <div class="step-caption">
+            <strong>Call it</strong> from any language with nothing but a JSON library and an HTTP client. No Telepact dependency needed.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Live Wire Example -->
+  <section class="wire-demo">
+    <div class="container">
+      <div class="section-header">
+        <h2>See It on the Wire</h2>
+        <p>Every Telepact message is a two-element JSON array: headers and body. Click through a real conversation.</p>
+      </div>
+      <div class="wire-conversation">
+        <div class="wire-message wire-request" data-step="1">
+          <div class="wire-label">
+            <span class="wire-direction">&#8594; Request</span>
+            <span class="wire-desc">Simple function call</span>
+          </div>
+<pre class="wire-code"><code>[{}, {<span class="code-string">"fn.divide"</span>: {<span class="code-field">"x"</span>: <span class="code-number">6</span>, <span class="code-field">"y"</span>: <span class="code-number">3</span>}}]</code></pre>
+        </div>
+        <div class="wire-message wire-response" data-step="2">
+          <div class="wire-label">
+            <span class="wire-direction">&#8592; Response</span>
+            <span class="wire-desc">Tagged result union</span>
+          </div>
+<pre class="wire-code"><code>[{}, {<span class="code-tag">"Ok_"</span>: {<span class="code-field">"result"</span>: <span class="code-number">2</span>}}]</code></pre>
+        </div>
+        <div class="wire-message wire-request" data-step="3">
+          <div class="wire-label">
+            <span class="wire-direction">&#8594; Request</span>
+            <span class="wire-desc">Error case — divide by zero</span>
+          </div>
+<pre class="wire-code"><code>[{}, {<span class="code-string">"fn.divide"</span>: {<span class="code-field">"x"</span>: <span class="code-number">6</span>, <span class="code-field">"y"</span>: <span class="code-number">0</span>}}]</code></pre>
+        </div>
+        <div class="wire-message wire-response wire-error" data-step="4">
+          <div class="wire-label">
+            <span class="wire-direction">&#8592; Response</span>
+            <span class="wire-desc">Typed error — no status codes, no guessing</span>
+          </div>
+<pre class="wire-code"><code>[{}, {<span class="code-tag">"ErrorCannotDivideByZero"</span>: {}}]</code></pre>
+        </div>
+        <div class="wire-message wire-request" data-step="5">
+          <div class="wire-label">
+            <span class="wire-direction">&#8594; Request</span>
+            <span class="wire-desc">Select only specific fields from response</span>
+          </div>
+<pre class="wire-code"><code>[{<span class="code-field">"@select_"</span>: {<span class="code-string">"->"</span>: {<span class="code-string">"Ok_"</span>: [<span class="code-string">"result"</span>]}}},
+ {<span class="code-string">"fn.evaluate"</span>: {<span class="code-field">"expression"</span>: {<span class="code-string">"Add"</span>: ...}}}]</code></pre>
+        </div>
+        <div class="wire-message wire-response" data-step="6">
+          <div class="wire-label">
+            <span class="wire-direction">&#8592; Response</span>
+            <span class="wire-desc">Only selected fields returned — like GraphQL, but JSON</span>
+          </div>
+<pre class="wire-code"><code>[{}, {<span class="code-tag">"Ok_"</span>: {<span class="code-field">"result"</span>: <span class="code-number">42</span>}}]</code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Comparison Table -->
+  <section class="comparison" id="comparison">
+    <div class="container">
+      <div class="section-header">
+        <h2>How Telepact Compares</h2>
+        <p>See how Telepact stacks up against the industry's most popular API technologies.</p>
+      </div>
+      <div class="table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Capability</th>
+              <th>REST/<wbr>OpenAPI</th>
+              <th>JSON-RPC</th>
+              <th>gRPC</th>
+              <th>GraphQL</th>
+              <th class="highlight-col">Telepact</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>No transport restrictions</td>
+              <td class="no">&#10060;</td>
+              <td class="maybe">&#129300;</td>
+              <td class="no">&#10060;</td>
+              <td class="maybe">&#129300;</td>
+              <td class="yes highlight-col">&#9989;</td>
+            </tr>
+            <tr>
+              <td>No transport details leaked into API</td>
+              <td class="no">&#10060;</td>
+              <td class="yes">&#9989;</td>
+              <td class="yes">&#9989;</td>
+              <td class="yes">&#9989;</td>
+              <td class="yes highlight-col">&#9989;</td>
+            </tr>
+            <tr>
+              <td>Out-of-band headers / metadata</td>
+              <td class="yes">&#9989;</td>
+              <td class="no">&#10060;</td>
+              <td class="yes">&#9989;</td>
+              <td class="maybe">&#129300;</td>
+              <td class="yes highlight-col">&#9989;</td>
+            </tr>
+            <tr>
+              <td>No string parsing / splicing</td>
+              <td class="no">&#10060;</td>
+              <td class="yes">&#9989;</td>
+              <td class="yes">&#9989;</td>
+              <td class="yes">&#9989;</td>
+              <td class="yes highlight-col">&#9989;</td>
+            </tr>
+            <tr>
+              <td>Low development burden for servers</td>
+              <td class="yes">&#9989;</td>
+              <td class="yes">&#9989;</td>
+              <td class="yes">&#9989;</td>
+              <td class="no">&#10060;</td>
+              <td class="yes highlight-col">&#9989;</td>
+            </tr>
+            <tr>
+              <td>No required libraries for clients</td>
+              <td class="yes">&#9989;</td>
+              <td class="yes">&#9989;</td>
+              <td class="no">&#10060;</td>
+              <td class="no">&#10060;</td>
+              <td class="yes highlight-col">&#9989;</td>
+            </tr>
+            <tr>
+              <td>Type-safe generated code</td>
+              <td class="maybe">&#129300;</td>
+              <td class="no">&#10060;</td>
+              <td class="yes">&#9989;</td>
+              <td class="yes">&#9989;</td>
+              <td class="yes highlight-col">&#9989;</td>
+            </tr>
+            <tr>
+              <td>Human-editable wire format</td>
+              <td class="yes">&#9989;</td>
+              <td class="yes">&#9989;</td>
+              <td class="no">&#10060;</td>
+              <td class="maybe">&#129300;</td>
+              <td class="yes highlight-col">&#9989;</td>
+            </tr>
+            <tr>
+              <td>Built-in binary serialization</td>
+              <td class="no">&#10060;</td>
+              <td class="no">&#10060;</td>
+              <td class="yes">&#9989;</td>
+              <td class="no">&#10060;</td>
+              <td class="yes highlight-col">&#9989;</td>
+            </tr>
+            <tr>
+              <td>Built-in dynamic response shaping</td>
+              <td class="no">&#10060;</td>
+              <td class="no">&#10060;</td>
+              <td class="no">&#10060;</td>
+              <td class="yes">&#9989;</td>
+              <td class="yes highlight-col">&#9989;</td>
+            </tr>
+            <tr>
+              <td>No required ABI</td>
+              <td class="yes">&#9989;</td>
+              <td class="yes">&#9989;</td>
+              <td class="no">&#10060;</td>
+              <td class="yes">&#9989;</td>
+              <td class="yes highlight-col">&#9989;</td>
+            </tr>
+            <tr>
+              <td>Expressive null vs. undefined</td>
+              <td class="no">&#10060;</td>
+              <td class="no">&#10060;</td>
+              <td class="no">&#10060;</td>
+              <td class="no">&#10060;</td>
+              <td class="yes highlight-col">&#9989;</td>
+            </tr>
+            <tr>
+              <td>Built-in API documentation distribution</td>
+              <td class="maybe">&#129300;</td>
+              <td class="no">&#10060;</td>
+              <td class="no">&#10060;</td>
+              <td class="yes">&#9989;</td>
+              <td class="yes highlight-col">&#9989;</td>
+            </tr>
+            <tr>
+              <td>Built-in mocking for tests</td>
+              <td class="no">&#10060;</td>
+              <td class="no">&#10060;</td>
+              <td class="no">&#10060;</td>
+              <td class="no">&#10060;</td>
+              <td class="yes highlight-col">&#9989;</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Feature Deep-Dive -->
+  <section class="features-deep" id="examples">
+    <div class="container">
+      <div class="section-header">
+        <h2>Standout Features</h2>
+        <p>Explore the capabilities that set Telepact apart.</p>
+      </div>
+
+      <div class="feature-block">
+        <div class="feature-text">
+          <h3>&#127919; Dynamic Response Shaping</h3>
+          <p>Like GraphQL's field selection, but with pure JSON. Use the <code>@select_</code> header to trim response fields — no special query language needed.</p>
+        </div>
+        <div class="feature-code">
+          <div class="code-window">
+            <div class="code-header">
+              <span class="code-dot red"></span>
+              <span class="code-dot yellow"></span>
+              <span class="code-dot green"></span>
+              <span class="code-filename">Select only what you need</span>
+            </div>
+<pre class="code-block"><code><span class="code-comment">// Request: only return "result" from Ok_</span>
+[
+  {<span class="code-field">"@select_"</span>: {
+    <span class="code-string">"->"</span>: {<span class="code-string">"Ok_"</span>: [<span class="code-string">"result"</span>]}
+  }},
+  {<span class="code-string">"fn.evaluate"</span>: {
+    <span class="code-field">"expression"</span>: {<span class="code-string">"Add"</span>: {
+      <span class="code-field">"left"</span>: {<span class="code-string">"Constant"</span>: {<span class="code-field">"value"</span>: <span class="code-number">1</span>}},
+      <span class="code-field">"right"</span>: {<span class="code-string">"Variable"</span>: {<span class="code-field">"name"</span>: <span class="code-string">"x"</span>}}
+    }}
+  }}
+]
+
+<span class="code-comment">// Response: only selected fields</span>
+[{}, {<span class="code-tag">"Ok_"</span>: {<span class="code-field">"result"</span>: <span class="code-number">42</span>}}]</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="feature-block feature-block-reverse">
+        <div class="feature-text">
+          <h3>&#128279; Hypermedia Links</h3>
+          <p>Responses can include pre-populated function calls as typed links. Clients can follow them to navigate the API, just like clicking a link on a webpage.</p>
+        </div>
+        <div class="feature-code">
+          <div class="code-window">
+            <div class="code-header">
+              <span class="code-dot red"></span>
+              <span class="code-dot yellow"></span>
+              <span class="code-dot green"></span>
+              <span class="code-filename">API links in responses</span>
+            </div>
+<pre class="code-block"><code><span class="code-comment">// Response includes a link to save the result</span>
+[{}, {<span class="code-tag">"Ok_"</span>: {
+  <span class="code-field">"result"</span>: <span class="code-number">10</span>,
+  <span class="code-field">"saveResult"</span>: {
+    <span class="code-string">"fn.saveVariable"</span>: {
+      <span class="code-field">"name"</span>: <span class="code-string">"result"</span>,
+      <span class="code-field">"value"</span>: <span class="code-number">10</span>
+    }
+  }
+}}]
+
+<span class="code-comment">// Client can "follow" the link by sending it as a request</span>
+[{}, {<span class="code-string">"fn.saveVariable"</span>: {
+  <span class="code-field">"name"</span>: <span class="code-string">"result"</span>,
+  <span class="code-field">"value"</span>: <span class="code-number">10</span>
+}}]</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="feature-block">
+        <div class="feature-text">
+          <h3>&#9889; Binary Without Field IDs</h3>
+          <p>Telepact negotiates binary encoding at runtime through a client-server handshake. No field IDs in your schema, no ABI drift, no generated code required.</p>
+        </div>
+        <div class="feature-code">
+          <div class="code-window">
+            <div class="code-header">
+              <span class="code-dot red"></span>
+              <span class="code-dot yellow"></span>
+              <span class="code-dot green"></span>
+              <span class="code-filename">Automatic binary negotiation</span>
+            </div>
+<pre class="code-block"><code><span class="code-comment">// Client opts in with a single header</span>
+[{<span class="code-field">"@bin_"</span>: {}}, {<span class="code-string">"fn.divide"</span>: {<span class="code-field">"x"</span>: <span class="code-number">6</span>, <span class="code-field">"y"</span>: <span class="code-number">3</span>}}]
+
+<span class="code-comment">// Telepact automatically negotiates MessagePack encoding</span>
+<span class="code-comment">// Subsequent messages are compact binary</span>
+<span class="code-comment">// No schema field IDs. No code generation. Just smaller payloads.</span>
+
+<span class="code-comment">// The server handles it transparently:</span>
+response = <span class="code-keyword">await</span> server.process(request_bytes)
+<span class="code-comment">// ^ works for both JSON and binary requests</span></code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="feature-block feature-block-reverse">
+        <div class="feature-text">
+          <h3>&#129514; Built-in Mock Server</h3>
+          <p>Test against a full mock server with programmable stubs and call verification — all part of the Telepact protocol. No extra test frameworks needed.</p>
+        </div>
+        <div class="feature-code">
+          <div class="code-window">
+            <div class="code-header">
+              <span class="code-dot red"></span>
+              <span class="code-dot yellow"></span>
+              <span class="code-dot green"></span>
+              <span class="code-filename">Mock server with stubs</span>
+            </div>
+<pre class="code-block"><code><span class="code-comment">// Create a stub</span>
+[{}, {<span class="code-string">"fn.createStub_"</span>: {<span class="code-field">"stub"</span>: {
+  <span class="code-string">"fn.getUser"</span>: {<span class="code-field">"id"</span>: <span class="code-string">"user-1"</span>},
+  <span class="code-string">"->"</span>: {<span class="code-tag">"Ok_"</span>: {<span class="code-field">"user"</span>: {
+    <span class="code-field">"id"</span>: <span class="code-string">"user-1"</span>, <span class="code-field">"name"</span>: <span class="code-string">"Ada"</span>
+  }}}
+}}}]
+
+<span class="code-comment">// Verify a call was made</span>
+[{}, {<span class="code-string">"fn.verify_"</span>: {<span class="code-field">"call"</span>: {
+  <span class="code-string">"fn.getUser"</span>: {<span class="code-field">"id"</span>: <span class="code-string">"user-1"</span>}
+}}}]
+<span class="code-comment">// -> [{}, {"Ok_": {}}] ✓ verified!</span></code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Ecosystem -->
+  <section class="ecosystem" id="ecosystem">
+    <div class="container">
+      <div class="section-header">
+        <h2>The Ecosystem</h2>
+        <p>Server libraries, SDK tools, and everything you need to build, test, and operate Telepact APIs.</p>
+      </div>
+      <div class="ecosystem-grid">
+        <div class="eco-category">
+          <h3>Server Libraries</h3>
+          <p>Pick your language. Serve your API.</p>
+          <div class="eco-items">
+            <a href="https://github.com/Telepact/telepact/tree/main/lib/ts" class="eco-item" target="_blank" rel="noopener">
+              <span class="eco-lang">TS</span>
+              <span>TypeScript</span>
+            </a>
+            <a href="https://github.com/Telepact/telepact/tree/main/lib/py" class="eco-item" target="_blank" rel="noopener">
+              <span class="eco-lang">Py</span>
+              <span>Python</span>
+            </a>
+            <a href="https://github.com/Telepact/telepact/tree/main/lib/java" class="eco-item" target="_blank" rel="noopener">
+              <span class="eco-lang">Jv</span>
+              <span>Java</span>
+            </a>
+            <a href="https://github.com/Telepact/telepact/tree/main/lib/go" class="eco-item" target="_blank" rel="noopener">
+              <span class="eco-lang">Go</span>
+              <span>Go</span>
+            </a>
+          </div>
+        </div>
+        <div class="eco-category">
+          <h3>SDK Tools</h3>
+          <p>Develop, debug, and format.</p>
+          <div class="eco-items">
+            <a href="https://github.com/Telepact/telepact/tree/main/sdk/cli" class="eco-item" target="_blank" rel="noopener">
+              <span class="eco-lang">&gt;_</span>
+              <span>CLI</span>
+            </a>
+            <a href="https://github.com/Telepact/telepact/tree/main/sdk/console" class="eco-item" target="_blank" rel="noopener">
+              <span class="eco-lang">&#9638;</span>
+              <span>Console</span>
+            </a>
+            <a href="https://github.com/Telepact/telepact/tree/main/sdk/prettier" class="eco-item" target="_blank" rel="noopener">
+              <span class="eco-lang">&#10024;</span>
+              <span>Prettier</span>
+            </a>
+          </div>
+        </div>
+        <div class="eco-category">
+          <h3>Client Experience</h3>
+          <p>Start simple. Upgrade when ready.</p>
+          <div class="eco-upgrade-path">
+            <div class="upgrade-step">
+              <div class="upgrade-icon">&#128230;</div>
+              <strong>Minimal</strong>
+              <p>Any JSON library + HTTP client</p>
+            </div>
+            <div class="upgrade-arrow">&#8594;</div>
+            <div class="upgrade-step">
+              <div class="upgrade-icon">&#128269;</div>
+              <strong>Select</strong>
+              <p>Omit fields to reduce payload sizes</p>
+            </div>
+            <div class="upgrade-arrow">&#8594;</div>
+            <div class="upgrade-step">
+              <div class="upgrade-icon">&#128736;</div>
+              <strong>Codegen</strong>
+              <p>Generate typed code for your language</p>
+            </div>
+            <div class="upgrade-arrow">&#8594;</div>
+            <div class="upgrade-step">
+              <div class="upgrade-icon">&#9889;</div>
+              <strong>Binary</strong>
+              <p>Compact MessagePack serialization</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Principles -->
+  <section class="principles">
+    <div class="container">
+      <div class="section-header">
+        <h2>Design Principles</h2>
+      </div>
+      <div class="principles-grid">
+        <div class="principle">
+          <div class="principle-icon">&#127760;</div>
+          <h3>Accessibility</h3>
+          <p>Whether you bring sophisticated toolchains or a minimalist setup, you can participate in Telepact with the complexity level you need.</p>
+        </div>
+        <div class="principle">
+          <div class="principle-icon">&#128230;</div>
+          <h3>Portability</h3>
+          <p>Telepact definitions are currency in the ecosystem, unlocking documentation, code completion, mocking, and code generation.</p>
+        </div>
+        <div class="principle">
+          <div class="principle-icon">&#128274;</div>
+          <h3>Trust</h3>
+          <p>Features are governed by the ecosystem itself, so clients can confidently integrate with all Telepact servers with robust expectations.</p>
+        </div>
+        <div class="principle">
+          <div class="principle-icon">&#9875;</div>
+          <h3>Stability</h3>
+          <p>A carefully curated list of paradigms ensures API designs don't fall victim to common API evolution pitfalls.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta">
+    <div class="container">
+      <h2>Ready to Get Started?</h2>
+      <p>Explore the full documentation, runnable examples, and start building your first Telepact API.</p>
+      <div class="cta-actions">
+        <a href="https://github.com/Telepact/telepact" class="btn btn-primary btn-large" target="_blank" rel="noopener">
+          <svg width="24" height="24" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+          View on GitHub
+        </a>
+        <a href="https://github.com/Telepact/telepact/tree/main/doc" class="btn btn-secondary btn-large" target="_blank" rel="noopener">Read the Docs</a>
+        <a href="https://github.com/Telepact/telepact/tree/main/example" class="btn btn-secondary btn-large" target="_blank" rel="noopener">Browse Examples</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <span class="logo-text">Telepact</span>
+          <p>The API ecosystem for bridging programs across inter-process communication boundaries.</p>
+        </div>
+        <div class="footer-links">
+          <div class="footer-col">
+            <h4>Resources</h4>
+            <ul>
+              <li><a href="https://github.com/Telepact/telepact/blob/main/doc/schema-guide.md" target="_blank" rel="noopener">Schema Guide</a></li>
+              <li><a href="https://github.com/Telepact/telepact/blob/main/doc/transports.md" target="_blank" rel="noopener">Transport Guide</a></li>
+              <li><a href="https://github.com/Telepact/telepact/blob/main/doc/production-guide.md" target="_blank" rel="noopener">Production Guide</a></li>
+              <li><a href="https://github.com/Telepact/telepact/blob/main/doc/faq.md" target="_blank" rel="noopener">FAQ</a></li>
+            </ul>
+          </div>
+          <div class="footer-col">
+            <h4>Ecosystem</h4>
+            <ul>
+              <li><a href="https://github.com/Telepact/telepact/tree/main/lib" target="_blank" rel="noopener">Server Libraries</a></li>
+              <li><a href="https://github.com/Telepact/telepact/tree/main/sdk/cli" target="_blank" rel="noopener">CLI Tool</a></li>
+              <li><a href="https://github.com/Telepact/telepact/tree/main/sdk/console" target="_blank" rel="noopener">Browser Console</a></li>
+              <li><a href="https://github.com/Telepact/telepact/tree/main/example" target="_blank" rel="noopener">Examples</a></li>
+            </ul>
+          </div>
+          <div class="footer-col">
+            <h4>Community</h4>
+            <ul>
+              <li><a href="https://github.com/Telepact/telepact" target="_blank" rel="noopener">GitHub</a></li>
+              <li><a href="https://github.com/Telepact/telepact/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener">Contributing</a></li>
+              <li><a href="https://github.com/Telepact/telepact/blob/main/LICENSE" target="_blank" rel="noopener">License (Apache 2.0)</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; Telepact contributors. Licensed under Apache 2.0.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+</html>
