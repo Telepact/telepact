@@ -1,9 +1,50 @@
 {
   "changed_paths": [
-    "site/src/build.py"
+    "doc/example.md",
+    "doc/learn-by-example/22-minimum-server.md",
+    "doc/production-guide.md",
+    "doc/transports.md",
+    "example/py-binary/server.py",
+    "example/py-http-cookie-auth/server.py",
+    "example/py-links/server.py",
+    "example/py-select/server.py",
+    "example/py-websocket/server.py",
+    "lib/go/MockServer.go",
+    "lib/go/README.md",
+    "lib/go/Server.go",
+    "lib/java/README.md",
+    "lib/java/src/main/java/io/github/telepact/MockServer.java",
+    "lib/java/src/main/java/io/github/telepact/Server.java",
+    "lib/py/README.md",
+    "lib/py/telepact/MockServer.py",
+    "lib/py/telepact/Server.py",
+    "lib/ts/README.md",
+    "lib/ts/src/MockServer.ts",
+    "lib/ts/src/Server.ts",
+    "sdk/cli/telepact_cli/cli.py",
+    "site/src/snippets/examples/divide.server.py",
+    "skills/telepact-server/SKILL.md",
+    "test/lib/go/cmd/dispatcher/main.go",
+    "test/lib/java/src/main/java/telepacttest/Main.java",
+    "test/lib/py/telepact_test/test_server.py",
+    "test/lib/ts/src/main.ts"
   ],
-  "direct_targets": [],
-  "pr_number": 355,
-  "targets": [],
-  "version": "1.0.0-alpha.259"
+  "direct_targets": [
+    "cli",
+    "go",
+    "java",
+    "py",
+    "ts"
+  ],
+  "pr_number": 356,
+  "targets": [
+    "cli",
+    "console",
+    "dart",
+    "go",
+    "java",
+    "py",
+    "ts"
+  ],
+  "version": "1.0.0-alpha.260"
 }
