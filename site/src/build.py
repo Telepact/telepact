@@ -603,6 +603,8 @@ def nav_groups(pages: dict[Path, Page]) -> list[tuple[str, list[Page]]]:
     }
     grouped: dict[str, list[Page]] = {}
     for page in pages.values():
+        if page.rel_source.startswith("example/") and page.rel_source != "example/README.md":
+            continue
         grouped.setdefault(page.section, []).append(page)
 
     def page_sort_key(page: Page) -> tuple[int, int, str]:
