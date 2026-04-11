@@ -14,18 +14,47 @@
 <!--|  limitations under the License.                                            |-->
 <!--|                                                                            |-->
 
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" type="image/x-icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<script src="/theme-bootstrap.js"></script>
-		<script type="module" src="/override.js"></script>
-	</head>
-	<body>
-		<div id="app-root" style="display: contents"></div>
-		<script type="module" src="/src/main.tsx"></script>
-	</body>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Page Not Found — Telepact</title>
+  <link rel="icon" href="./favicon.ico" sizes="any">
+  <link rel="icon" type="image/x-icon" href="./favicon.ico">
+  <style>
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: #0B0F1A;
+      color: #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      text-align: center;
+    }
+    h1 { font-size: 4rem; margin-bottom: 8px; color: #38BDF8; }
+    p { color: #94a3b8; margin-bottom: 24px; }
+    a {
+      display: inline-block;
+      color: #0B0F1A;
+      background: #38BDF8;
+      padding: 10px 24px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      margin: 0 6px;
+    }
+    a:hover { background: #7dd3fc; }
+  </style>
+</head>
+<body>
+  <div>
+    <h1>404</h1>
+    <p>This page doesn't exist.</p>
+    <a href="./">Back to Telepact</a>
+    <a href="./docs/">Browse Docs</a>
+  </div>
+</body>
 </html>

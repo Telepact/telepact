@@ -1,0 +1,17 @@
+[
+  {
+    "@select_": {
+      "Ok_": {
+        "user": {
+          "name": true,
+          "email": true
+        }
+      }
+    }
+  },
+  {
+    "fn.getUser": {
+      "id": 42
+    }
+  }
+]

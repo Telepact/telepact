@@ -1,0 +1,11 @@
+[
+  {
+    "@bin_": [],
+    "@pac_": true
+  },
+  {
+    "fn.listEvents": {
+      "limit": 100
+    }
+  }
+]

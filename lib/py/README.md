@@ -24,10 +24,9 @@ API:
 Server:
 
 ```py
-from telepact import Client, Message, Serializer, Server, TelepactSchema, TelepactSchemaFiles
+from telepact import Client, Message, Serializer, Server, TelepactSchema
 
-files = TelepactSchemaFiles('/directory/containing/api/files')
-schema = TelepactSchema.from_file_json_map(files.filenames_to_json)
+schema = TelepactSchema.from_directory('/directory/containing/api/files')
 
 # The schema directory may contain multiple *.telepact.yaml and
 # *.telepact.json files. Subdirectories are rejected.

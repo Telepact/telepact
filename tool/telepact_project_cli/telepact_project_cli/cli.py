@@ -36,6 +36,7 @@ from .release_plan import (
 )
 
 yaml = YAML()
+LICENSE_HEADER_IGNORE_FILE = ".license-header-ignore"
 
 
 def _write_json(path: str, data: dict) -> None:
@@ -69,6 +70,26 @@ def bump_version(version: str) -> str:
     major, minor, patch = map(int, version.split('.'))
     patch += 1
     return f"{major}.{minor}.{patch}"
+
+
+def _license_header_supported(file_path: str) -> bool:
+    file_extension = os.path.splitext(file_path)[1].lower()
+    file_name = os.path.basename(file_path)
+
+    return (
+        (file_name != 'pubspec.yaml' and file_extension in ['.py', '.java', '.ts', '.dart', '.sh', '.js', '.yaml', '.yml', '.html', '.css', '.svelte'])
+        or file_name == 'Dockerfile'
+        or file_name == 'Makefile'
+    )
+
+
+def _license_header_ignored(file_path: str) -> bool:
+    path = Path(file_path)
+    for directory in path.parents:
+        if (directory / LICENSE_HEADER_IGNORE_FILE).exists():
+            return True
+
+    return False
 
 
 @click.group()
@@ -367,19 +388,23 @@ def license_header(license_header_path):
 
         return True
 
+    license_header_lines = read_license_header(license_header_path)
     cli_command = subprocess.run(['git', 'ls-files'], stdout=subprocess.PIPE, text=True)
     files = cli_command.stdout.splitlines()
 
     updated_files = 0
     for file_path in files:
-        license_header = read_license_header(license_header_path)
+        if _license_header_ignored(file_path):
+            continue
+        if not _license_header_supported(file_path):
+            continue
+
         file_extension = os.path.splitext(file_path)[1].lower()
         file_name = os.path.basename(file_path)
-        if file_name != 'pubspec.yaml' and file_extension in ['.py', '.java', '.ts', '.dart', '.sh', '.js', '.yaml', '.yml', '.html', '.css', '.svelte'] or file_name == 'Dockerfile' or file_name == 'Makefile':
-            start_comment_syntax, end_comment_syntax = get_comment_syntax(file_extension, file_name)
-            updated = update_file(file_path, license_header, start_comment_syntax, end_comment_syntax)
-            if updated:
-                updated_files += 1
+        start_comment_syntax, end_comment_syntax = get_comment_syntax(file_extension, file_name)
+        updated = update_file(file_path, license_header_lines, start_comment_syntax, end_comment_syntax)
+        if updated:
+            updated_files += 1
 
     if updated_files == 0:
         print("All files are up-to-date.")

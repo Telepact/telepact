@@ -30,11 +30,10 @@ Create `server.py`:
 import asyncio
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
-from telepact import Message, Server, TelepactSchema, TelepactSchemaFiles
+from telepact import Message, Server, TelepactSchema
 
 
-files = TelepactSchemaFiles('./api')
-schema = TelepactSchema.from_file_json_map(files.filenames_to_json)
+schema = TelepactSchema.from_directory('./api')
 
 options = Server.Options()
 options.auth_required = False
