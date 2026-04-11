@@ -1,4 +1,4 @@
-# Docs
+# Home
 
 Welcome to the Telepact docs. Use this page to find the guides, references, and
 tools you need to design, serve, and operate a Telepact API.

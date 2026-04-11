@@ -274,6 +274,10 @@ class Page:
     @property
     def section(self) -> str:
         rel = self.rel_source
+        if rel == "doc/learn-by-example/README.md":
+            return "Documentation"
+        if rel == "example/README.md":
+            return "Documentation"
         if rel.startswith("doc/learn-by-example/"):
             return "Learn by Example"
         if rel.startswith("doc/"):
@@ -601,16 +605,22 @@ def nav_groups(pages: dict[Path, Page]) -> list[tuple[str, list[Page]]]:
     for page in pages.values():
         grouped.setdefault(page.section, []).append(page)
 
+    def page_sort_key(page: Page) -> tuple[int, int, str]:
+        rel = page.rel_source
+        priority = {
+            "doc/index.md": 0,
+            "doc/learn-by-example/README.md": 1,
+            "example/README.md": 2,
+        }.get(rel, 3)
+        return (
+            priority,
+            rel.count("/"),
+            rel,
+        )
+
     result: list[tuple[str, list[Page]]] = []
     for group, items in grouped.items():
-        sorted_items = sorted(
-            items,
-            key=lambda page: (
-                page.rel_source != "doc/index.md",
-                page.rel_source.count("/"),
-                page.rel_source,
-            ),
-        )
+        sorted_items = sorted(items, key=page_sort_key)
         result.append((group, sorted_items))
     result.sort(key=lambda item: order.get(item[0], 99))
     return result
