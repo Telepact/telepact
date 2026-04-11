@@ -48,7 +48,7 @@ local-ci:
 	$(MAKE) example-check
 	$(MAKE) test
 	$(MAKE) console-self-hosted
-	$(MAKE) site-docs
+	$(MAKE) site
 	$(MAKE) license-header
 	$(MAKE) version
 
@@ -142,7 +142,7 @@ test-trace-go:
 deploy-go:
 	$(MAKE) -C lib/go deploy
 
-.PHONY: test prepare-test-java test-java-run prepare-test-py test-py-run prepare-test-ts test-ts-run prepare-test-go test-go-run site-docs
+.PHONY: test prepare-test-java test-java-run prepare-test-py test-py-run prepare-test-ts test-ts-run prepare-test-go test-go-run site
 test:
 	$(MAKE) -C test/runner test
 
