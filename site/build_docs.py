@@ -618,16 +618,6 @@ def page_shell(page: Page, body_html: str, pages: dict[Path, Page]) -> str:
 
   <main class="docs-layout container">
     <aside class="docs-sidebar">
-      <div class="sidebar-card intro-card">
-        <div class="sidebar-label">Documentation</div>
-        <h2>{html.escape(page.title)}</h2>
-        <p>Generated from the repository Markdown so GitHub Pages serves the same canonical docs in-site.</p>
-        <div class="sidebar-actions">
-          <a class="btn btn-primary" href="{docs_home_href}">Docs home</a>
-          <a class="btn btn-secondary" href="{github_blob_url(page.source)}" target="_blank" rel="noopener noreferrer">View source</a>
-        </div>
-        <div class="source-path">{html.escape(page.rel_source)}</div>
-      </div>
       {render_nav(page, pages)}
     </aside>
 
