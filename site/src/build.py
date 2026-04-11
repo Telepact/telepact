@@ -67,7 +67,20 @@ def normalize_base_url(value: str) -> str:
     return value.rstrip("/") + "/"
 
 
-BASE_URL = normalize_base_url(os.environ.get("TELEPACT_SITE_BASE_URL", DEFAULT_BASE_URL))
+def normalize_domain(value: str) -> str:
+    value = value.strip().lower()
+    value = re.sub(r"^https?://", "", value)
+    return value.strip("/").strip()
+
+
+CUSTOM_DOMAIN = normalize_domain(os.environ.get("TELEPACT_SITE_CUSTOM_DOMAIN", ""))
+DEFAULT_PROJECT_BASE_URL = os.environ.get(
+    "TELEPACT_SITE_BASE_URL",
+    DEFAULT_BASE_URL,
+)
+BASE_URL = normalize_base_url(
+    f"https://{CUSTOM_DOMAIN}/" if CUSTOM_DOMAIN else DEFAULT_PROJECT_BASE_URL
+)
 REPO_URL = os.environ.get("TELEPACT_SITE_REPO_URL", DEFAULT_REPO_URL).strip().rstrip("/") or DEFAULT_REPO_URL
 
 
@@ -234,6 +247,12 @@ def write_robots() -> None:
         "",
     ])
     (SITE_DIR / "robots.txt").write_text(robots, encoding="utf-8")
+
+
+def write_cname() -> None:
+    if not CUSTOM_DOMAIN:
+        return
+    (SITE_DIR / "CNAME").write_text(CUSTOM_DOMAIN + "\n", encoding="utf-8")
 
 
 @dataclass
@@ -1147,6 +1166,7 @@ def main() -> None:
     DOCS_DIR.mkdir(parents=True, exist_ok=True)
     write_css()
     write_pages(pages, resources)
+    write_cname()
     write_robots()
     write_sitemap(pages)
     print(
