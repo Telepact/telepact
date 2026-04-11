@@ -567,16 +567,7 @@ def page_shell(page: Page, body_html: str, pages: dict[Path, Page]) -> str:
     css_href = relative_href(page.output_file.parent, DOCS_DIR / "assets" / "docs.css")
     home_href = relative_href(page.output_file.parent, SITE_DIR / "index.html")
     docs_home_href = relative_href(page.output_file.parent, DOCS_DIR / "index.html", trailing_slash=True)
-    favicon = (
-        "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'>"
-        "<rect width='24' height='24' rx='5' fill='%230B0F1A'/>"
-        "<g fill='none' stroke='%2338BDF8' stroke-width='1'>"
-        "<path d='M 2.093 6.908 C 0.414 4.35 1.447 0.938 3 1 C 3.67 1.171 3.799 1.352 4.057 1.946 "
-        "C 4.833 4.117 4 11 2 23 L 16 23 M 18 2 A 1 1 0 0 0 17 1 L 3 1 M 18 2 L 18 5 "
-        "M 16 23 C 16.619 20.297 16.959 17.314 17.252 15.902'/>"
-        "<g stroke='%23EAB308'><path d='M 10 17 L 15 10 L 15 12 L 19 8 L 19.008 9.317 "
-        "L 23 6 L 18 13 L 18 11 L 14 15 L 13.996 13.561 L 10 17'/></g></g></svg>"
-    )
+    favicon_href = relative_href(page.output_file.parent, SITE_DIR / "favicon.ico")
     canonical = posixpath.join(BASE_URL.rstrip("/"), page.url.lstrip("/"))
     prism_scripts = "\n".join(f'<script src="{src}"></script>' for src in PRISM_JS)
     return f"""<!DOCTYPE html>
@@ -587,7 +578,8 @@ def page_shell(page: Page, body_html: str, pages: dict[Path, Page]) -> str:
   <title>{html.escape(page.title)} | Telepact Documentation</title>
   <meta name="description" content="{html.escape(page_excerpt(page))}">
   <link rel="canonical" href="{html.escape(canonical)}">
-  <link rel="icon" href="{favicon}" type="image/svg+xml">
+  <link rel="icon" href="{favicon_href}" sizes="any">
+  <link rel="icon" type="image/x-icon" href="{favicon_href}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
