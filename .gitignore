@@ -12,4 +12,4 @@ node_modules/
 target/
 demo/
 sdk/go.sum
-site/index.html
+site/

@@ -30,11 +30,13 @@ from typing import Callable
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
+SOURCE_DIR = REPO_ROOT / "site-src"
 SITE_DIR = REPO_ROOT / "site"
 DOCS_DIR = SITE_DIR / "docs"
-INDEX_TEMPLATE = SITE_DIR / "index.template.html"
+INDEX_TEMPLATE = SOURCE_DIR / "index.template.html"
 INDEX_OUTPUT = SITE_DIR / "index.html"
-SNIPPETS_DIR = SITE_DIR / "snippets"
+SNIPPETS_DIR = SOURCE_DIR / "snippets"
+STATIC_FILES = (".nojekyll", "404.html", "robots.txt", "favicon.ico")
 BASE_URL = "https://telepact.github.io/telepact/"
 REPO_URL = "https://github.com/Telepact/telepact"
 ALLOWED_PREFIXES = ("doc/", "example/", "lib/", "sdk/", "common/")
@@ -177,7 +179,7 @@ def resolve_snippet_path(raw_path: str) -> Path:
     try:
         snippet_path.relative_to(SNIPPETS_DIR.resolve())
     except ValueError as exc:
-        raise ValueError(f"Snippet path escapes site/snippets: {raw_path}") from exc
+        raise ValueError(f"Snippet path escapes site-src/snippets: {raw_path}") from exc
     if not snippet_path.is_file():
         raise FileNotFoundError(f"Missing snippet file: {snippet_path}")
     return snippet_path
@@ -202,6 +204,11 @@ def write_home_page() -> int:
     rendered = SNIPPET_PATTERN.sub(replace, template)
     INDEX_OUTPUT.write_text(rendered, encoding="utf-8")
     return replacements
+
+
+def copy_static_files() -> None:
+    for name in STATIC_FILES:
+        shutil.copy2(SOURCE_DIR / name, SITE_DIR / name)
 
 
 @dataclass
@@ -1106,10 +1113,12 @@ def write_sitemap(pages: dict[Path, Page]) -> None:
 
 
 def main() -> None:
+    if SITE_DIR.exists():
+        shutil.rmtree(SITE_DIR)
+    SITE_DIR.mkdir(parents=True, exist_ok=True)
+    copy_static_files()
     snippet_count = write_home_page()
     pages, resources = discover_pages()
-    if DOCS_DIR.exists():
-        shutil.rmtree(DOCS_DIR)
     DOCS_DIR.mkdir(parents=True, exist_ok=True)
     write_css()
     write_pages(pages, resources)

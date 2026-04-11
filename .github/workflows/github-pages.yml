@@ -29,7 +29,7 @@ on:
       - common/**
       - lib/**/README.md
       - sdk/**/README.md
-      - site/**
+      - site-src/**
   workflow_dispatch:
 
 permissions:
