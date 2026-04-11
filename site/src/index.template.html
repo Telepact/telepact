@@ -218,6 +218,11 @@
       cursor: pointer;
       font-family: var(--font);
     }
+    .btn svg {
+      width: 1.65em;
+      height: 1.65em;
+      flex: none;
+    }
     .btn-primary {
       background: var(--accent);
       color: #0B0F1A;
@@ -1017,33 +1022,14 @@
     </p>
     <div class="hero-buttons">
       <a href="#docs" class="btn btn-primary">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M4.75 5.75A2.75 2.75 0 0 1 7.5 3h11.75v15.25H7.5a2.75 2.75 0 0 0-2.75 2.75V5.75Z" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/>
+          <path d="M7.5 3A2.75 2.75 0 0 0 4.75 5.75V21a2.75 2.75 0 0 1 2.75-2.75h11.75" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/>
+          <path d="M8.75 7.75h6.5M8.75 11.25h6.5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
+        </svg>
         Documentation
       </a>
-      <a href="#demo" class="btn btn-secondary">See examples</a>
-    </div>
-
-    <div class="hero-visual">
-      <div class="hero-code-window">
-        <div class="code-window-header">
-          <div class="code-window-dot"></div>
-          <div class="code-window-dot"></div>
-          <div class="code-window-dot"></div>
-          <span class="code-window-title">hello.telepact.yaml</span>
-        </div>
-        <div class="code-window-body">
-          <!-- SNIPPET: hero/hello.telepact.yaml | yaml -->
-        </div>
-      </div>
-      <div class="hero-payloads">
-        <div class="payload-card">
-          <div class="payload-card-header">Request</div>
-          <!-- SNIPPET: hero/hello.request.json | json -->
-        </div>
-        <div class="payload-card">
-          <div class="payload-card-header">Response</div>
-          <!-- SNIPPET: hero/hello.response.json | json -->
-        </div>
-      </div>
+      <a href="#demo" class="btn btn-secondary">Show me</a>
     </div>
   </div>
 </header>
@@ -1052,8 +1038,7 @@
 <section id="features" class="section">
   <div class="container">
     <div class="fade-in" style="text-align: center;">
-      <div class="section-label">Core Innovation</div>
-      <h2 class="section-title">Three pillars, <span class="gradient-text">zero compromises</span></h2>
+      <h2 class="section-title">Capability,<span class="gradient-text"> without Compromise</span></h2>
       <p class="section-subtitle" style="margin: 0 auto;">
         Telepact combines the best ideas from REST, gRPC, and GraphQL into one cohesive ecosystem &mdash; without their trade-offs.
       </p>
@@ -1172,7 +1157,7 @@
         <summary class="feature-summary">
           <div>
             <h3>4. Opt-in binary protocol</h3>
-            <p>Clients can opt into a binary protocol at runtime with any Telepact server. No build-time code generation or schema compilation is needed; the binary protocol is negotiated on-the-fly.</p>
+            <p>Clients can opt into efficient binary exchanges with any Telepact server, using a just-in-time negotiation handled cleanly by the Telepact runtime.</p>
           </div>
           <span class="feature-summary-note">Same data, smaller wire format</span>
         </summary>
@@ -1190,7 +1175,7 @@
             <!-- SNIPPET: features/binary.plain-response.json | json -->
           </div>
           <div class="feature-panel">
-            <div class="feature-panel-header">Negotiated Binary Request · shown as JSON</div>
+            <div class="feature-panel-header">Binary Request (After Negotiation)</div>
             <!-- SNIPPET: features/binary.negotiated-request.json | json -->
           </div>
           <div class="feature-panel">
@@ -1199,7 +1184,7 @@
           </div>
         </div>
         <div class="feature-callout">
-          <strong>In this example, binary protocol reduces payload sizes by ~60%, all without code generation.</strong> Traditional RPC frameworks embed the binary encoding into generated code, creating rigid toolchains and brittle wire compatibility. Telepact suffers from neither issue; clients can negotiate binary without managing generated client code, and enjoy the wire compatibility resilience that comes with on-the-fly binary negotiation.
+          <strong>Cut your payload size in half, without the hassle.</strong> Convention says you can't have binary without rigid code generation toolchains. Now you can, with Telepact.
         </div>
       </details>
     </div>
@@ -1421,6 +1406,11 @@
       <p>Read the documentation to get started!</p>
       <div class="cta-buttons">
         <a href="docs/" class="btn btn-primary">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M4.75 5.75A2.75 2.75 0 0 1 7.5 3h11.75v15.25H7.5a2.75 2.75 0 0 0-2.75 2.75V5.75Z" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/>
+            <path d="M7.5 3A2.75 2.75 0 0 0 4.75 5.75V21a2.75 2.75 0 0 1 2.75-2.75h11.75" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/>
+            <path d="M8.75 7.75h6.5M8.75 11.25h6.5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
+          </svg>
           Documentation
         </a>
       </div>
