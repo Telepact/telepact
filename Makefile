@@ -218,6 +218,9 @@ console-self-hosted:
 site:
 	$(MAKE) -C site
 
+clean-site:
+	$(MAKE) -C site clean
+
 clean-console-self-hosted:
 	$(MAKE) -C test/console-self-hosted clean
 
