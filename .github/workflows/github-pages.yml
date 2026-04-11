@@ -44,12 +44,23 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    environment: bot
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Generate GitHub App token
+        id: generate-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ vars.TELEPACT_BOT_APP_ID }}
+          private-key: ${{ secrets.TELEPACT_BOT_PRIVATE_KEY }}
+
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
+        with:
+          token: ${{ steps.generate-token.outputs.token }}
+          enablement: true
 
       - name: Build site
         env:
