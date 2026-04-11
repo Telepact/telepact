@@ -408,6 +408,11 @@ jobs:
       - name: Check for changes
         run: |
           if git status --porcelain | grep .; then
+            echo "Version changes:"
+            git --no-pager diff --stat HEAD
+            echo
+            git --no-pager diff HEAD
+            echo
             echo "ERROR: Misaligned versions.\nTo fix, run 'make version' and git commit the changes."
             false
           else
