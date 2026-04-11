@@ -74,7 +74,8 @@ func main() {
         defer log.Printf("Function finished: %s", functionName)
         return functionRouter.Route(request)
     }
-	server, err := telepact.NewServer(schema, functionRoutes, serverOptions)
+	functionRouter := telepact.NewFunctionRouter(functionRoutes)
+	server, err := telepact.NewServer(schema, functionRouter, serverOptions)
 	if err != nil {
 		log.Fatal(err)
     }

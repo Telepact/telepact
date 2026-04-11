@@ -24,7 +24,7 @@ API:
 Server:
 
 ```py
-from telepact import Client, Message, Serializer, Server, TelepactSchema
+from telepact import Client, FunctionRouter, Message, Serializer, Server, TelepactSchema
 
 schema = TelepactSchema.from_directory('/directory/containing/api/files')
 
@@ -50,7 +50,8 @@ options = Server.Options()
 # Set this to False when your schema does not define union.Auth_.
 options.auth_required = False
 options.middleware = middleware
-server = Server(schema, {'fn.greet': greet}, options)
+function_router = FunctionRouter({'fn.greet': greet})
+server = Server(schema, function_router, options)
 
 
 # Wire up request/response bytes from your transport of choice

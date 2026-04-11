@@ -121,6 +121,7 @@ Schema loading and server setup:
 import * as fs from 'fs';
 import * as path from 'path';
 import {
+    FunctionRouter,
     Message,
     Server,
     ServerOptions,
@@ -131,15 +132,17 @@ import {
 const files = new TelepactSchemaFiles('/path/to/schema/dir', fs, path);
 const schema = TelepactSchema.fromFileJsonMap(files.filenamesToJson);
 
-const handler = async (requestMessage: Message): Promise<Message> => {
-    const functionName = Object.keys(requestMessage.body)[0];
-    const args = requestMessage.body[functionName];
-    return new Message({}, { Ok_: {} });
+const functionRoutes = {
+    'fn.example': async (functionName: string, requestMessage: Message): Promise<Message> => {
+        const args = requestMessage.body[functionName];
+        return new Message({}, { Ok_: {} });
+    },
 };
 
 const options = new ServerOptions();
 options.authRequired = false;
-const telepactServer = new Server(schema, handler, options);
+const functionRouter = new FunctionRouter(functionRoutes);
+const telepactServer = new Server(schema, functionRouter, options);
 
 // Assuming `transport` is defined elsewhere
 transport.receive(async (requestBytes: Uint8Array): Promise<Uint8Array> => {
@@ -153,19 +156,21 @@ transport.receive(async (requestBytes: Uint8Array): Promise<Uint8Array> => {
 Schema loading and server setup:
 
 ```py
-from telepact import Message, Server, TelepactSchema, TelepactSchemaFiles
+from telepact import FunctionRouter, Message, Server, TelepactSchema, TelepactSchemaFiles
 
 files = TelepactSchemaFiles('/path/to/schema/dir')
 schema = TelepactSchema.from_file_json_map(files.filenames_to_json)
 
-async def handler(request_message: 'Message') -> 'Message':
+async def example(request_message: 'Message') -> 'Message':
     function_name = next(iter(request_message.body))
     args = request_message.body[function_name]
     return Message({}, {'Ok_': {}})
 
 options = Server.Options()
 options.auth_required = False
-telepactServer = Server(schema, handler, options)
+function_routes = {'fn.example': lambda function_name, request_message: example(request_message)}
+function_router = FunctionRouter(function_routes)
+telepactServer = Server(schema, function_router, options)
 
 # Assuming `transport` is defined elsewhere
 async def transport_handler(request_bytes: bytes) -> bytes:
@@ -183,15 +188,18 @@ Schema loading and server setup:
 var files = new TelepactSchemaFiles("/path/to/schema/dir");
 var schema = TelepactSchema.fromFileJsonMap(files.filenamesToJson);
 
-Function<Message, Message> handler = (requestMessage) -> {
-    var functionName = requestMessage.body.keySet().stream().findAny().orElseThrow();
-    var args = (Map<String, Object>) requestMessage.body.get(functionName);
-    return new Message(Map.of(), Map.of("Ok_", Map.of()));
-};
+Map<String, Server.FunctionRoute> functionRoutes = Map.of(
+    "fn.example",
+    (functionName, requestMessage) -> {
+        var args = (Map<String, Object>) requestMessage.body.get(functionName);
+        return new Message(Map.of(), Map.of("Ok_", Map.of()));
+    }
+);
 
 var options = new Server.Options();
 options.authRequired = false;
-var telepactServer = new Server(schema, handler, options);
+var functionRouter = new Server.FunctionRouter(functionRoutes);
+var telepactServer = new Server(schema, functionRouter, options);
 
 // Assuming `transport` is defined elsewhere
 transport.receive((requestBytes) -> {
@@ -215,10 +223,11 @@ if err != nil {
     return err
 }
 
-handler := func(request telepact.Message) (telepact.Message, error) {
-    functionName, err := request.BodyTarget()
-    if err != nil {
-        return telepact.Message{}, err
+functionRoutes := map[string]telepact.FunctionRoute{
+    "fn.example": func(functionName string, request telepact.Message) (telepact.Message, error) {
+	functionName, err := request.BodyTarget()
+	if err != nil {
+		return telepact.Message{}, err
     }
 
     args, err := request.BodyPayload()
@@ -229,15 +238,17 @@ handler := func(request telepact.Message) (telepact.Message, error) {
     _ = functionName
     _ = args
 
-    return telepact.NewMessage(
-        map[string]any{},
-        map[string]any{"Ok_": map[string]any{}},
-    ), nil
+	return telepact.NewMessage(
+		map[string]any{},
+		map[string]any{"Ok_": map[string]any{}},
+	), nil
+    },
 }
 
 telepactOptions := telepact.NewServerOptions()
 telepactOptions.AuthRequired = false
-telepactServer, err := telepact.NewServer(schema, handler, telepactOptions)
+functionRouter := telepact.NewFunctionRouter(functionRoutes)
+telepactServer, err := telepact.NewServer(schema, functionRouter, telepactOptions)
 if err != nil {
     return err
 }
@@ -264,7 +275,7 @@ transport.Receive(func(requestBytes []byte) ([]byte, error) {
 1. Locate the already-authored schema directory or schema file set.
 2. Load those schema files into the language's `TelepactSchema`.
 3. Write a handler that dispatches on the called function name.
-4. Construct `Server(schema, handler, options)`.
+4. Construct a `FunctionRouter` from your function routes, then pass it to `Server(schema, functionRouter, options)`.
 5. Connect your transport's incoming raw bytes to `server.process(...)`.
 6. Return `response.bytes` directly to the caller.
 7. Only add transport-level details outside the server, such as route registration, connection setup, or content-type mapping.
@@ -531,12 +542,13 @@ Prefer complete runnable server code over abstract guidance when the user asks t
 load schema files
 build TelepactSchema
 
-define handler(message):
+define functionRoutes mapping fn.* names to handlers:
     inspect called fn.*
     run business logic
     return Message(headers, resultUnion)
 
-telepactServer = Server(schema, handler, options)
+functionRouter = FunctionRouter(functionRoutes)
+telepactServer = Server(schema, functionRouter, options)
 
 transport.on_request(requestBytes):
     response = telepactServer.process(requestBytes)

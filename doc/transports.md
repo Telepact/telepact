@@ -75,7 +75,7 @@ HTTP is the most common Telepact deployment shape. A typical setup is:
 ### HTTP server example (Python + Starlette)
 
 ```py
-from telepact import Message, Server, TelepactSchema
+from telepact import FunctionRouter, Message, Server, TelepactSchema
 from starlette.applications import Starlette
 from starlette.responses import Response
 from starlette.routing import Route
@@ -90,7 +90,8 @@ async def greet(function_name: str, request_message: Message) -> Message:
 
 options = Server.Options()
 options.auth_required = False
-server = Server(schema, {'fn.greet': greet}, options)
+function_router = FunctionRouter({'fn.greet': greet})
+server = Server(schema, function_router, options)
 
 async def http_handler(request):
     request_bytes = await request.body()
@@ -162,7 +163,7 @@ response per WebSocket message.
 ### WebSocket server example (Python + Starlette)
 
 ```py
-from telepact import Message, Server, TelepactSchema
+from telepact import FunctionRouter, Message, Server, TelepactSchema
 from starlette.applications import Starlette
 from starlette.routing import WebSocketRoute
 import uvicorn
@@ -176,7 +177,8 @@ async def greet(function_name: str, request_message: Message) -> Message:
 
 options = Server.Options()
 options.auth_required = False
-server = Server(schema, {'fn.greet': greet}, options)
+function_router = FunctionRouter({'fn.greet': greet})
+server = Server(schema, function_router, options)
 
 async def websocket_handler(websocket):
     await websocket.accept()

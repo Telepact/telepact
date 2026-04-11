@@ -39,7 +39,7 @@ import time
 import secrets
 import random
 import uvicorn
-from .telepact import Client, Server, Message, Serializer, TelepactSchema, MockTelepactSchema, MockServer, SerializationError
+from .telepact import Client, FunctionRouter, Server, Message, Serializer, TelepactSchema, MockTelepactSchema, MockServer, SerializationError
 import asyncio
 import requests
 
@@ -759,7 +759,8 @@ def demo_server(port: int) -> None:
     server_options = Server.Options()
     server_options.auth_required = True
     server_options.on_error = lambda e: print(e)
-    telepact_server = Server(telepact_schema, function_routes, server_options)
+    function_router = FunctionRouter(function_routes)
+    telepact_server = Server(telepact_schema, function_router, server_options)
 
     print('Telepact Server running at /api')
 

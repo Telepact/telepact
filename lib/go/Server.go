@@ -100,13 +100,13 @@ type Server struct {
 	serializer     *Serializer
 }
 
-// NewServer constructs a Server using the supplied schema, function routes, and options.
-func NewServer(telepactSchema *TelepactSchema, functionRoutes map[string]FunctionRoute, options *ServerOptions) (*Server, error) {
+// NewServer constructs a Server using the supplied schema, function router, and options.
+func NewServer(telepactSchema *TelepactSchema, functionRouter *FunctionRouter, options *ServerOptions) (*Server, error) {
 	if telepactSchema == nil {
 		return nil, NewTelepactError("telepact: schema must not be nil")
 	}
-	if functionRoutes == nil {
-		return nil, NewTelepactError("telepact: function routes must not be nil")
+	if functionRouter == nil {
+		return nil, NewTelepactError("telepact: function router must not be nil")
 	}
 
 	if options == nil {
@@ -150,7 +150,7 @@ func NewServer(telepactSchema *TelepactSchema, functionRoutes map[string]Functio
 	}
 
 	return &Server{
-		functionRouter: NewFunctionRouter(functionRoutes),
+		functionRouter: functionRouter,
 		middleware:     options.Middleware,
 		onError:        options.OnError,
 		onRequest:      options.OnRequest,

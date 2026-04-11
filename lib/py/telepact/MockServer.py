@@ -42,7 +42,7 @@ class MockServer:
             self.generated_collection_length_max: int = 3
 
     def __init__(self, mock_telepact_schema: 'MockTelepactSchema', options: Options) -> None:
-        from .Server import Server
+        from .Server import FunctionRouter, Server
         from .RandomGenerator import RandomGenerator
         from .TelepactSchema import TelepactSchema
 
@@ -61,10 +61,11 @@ class MockServer:
         server_options.middleware = lambda request_message, function_router: self._handle(request_message)
 
         telepact_schema = TelepactSchema(mock_telepact_schema.original, mock_telepact_schema.full, mock_telepact_schema.parsed,
-                                       mock_telepact_schema.parsed_request_headers, mock_telepact_schema.parsed_response_headers)
+                                        mock_telepact_schema.parsed_request_headers, mock_telepact_schema.parsed_response_headers)
+        function_router = FunctionRouter({})
 
         self.server = Server(
-            telepact_schema, {}, server_options)
+            telepact_schema, function_router, server_options)
 
     async def process(self, message: bytes) -> bytes:
         """

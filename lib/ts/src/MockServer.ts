@@ -51,7 +51,8 @@ export class MockServer {
             mockTelepactSchema.parsedResponseHeaders,
         );
 
-        this.server = new Server(telepactSchema, {}, serverOptions);
+        const functionRouter = new FunctionRouter({});
+        this.server = new Server(telepactSchema, functionRouter, serverOptions);
     }
 
     private random: RandomGenerator;

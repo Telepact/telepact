@@ -1,4 +1,4 @@
-from telepact import Message, Server, TelepactSchema
+from telepact import FunctionRouter, Message, Server, TelepactSchema
 
 schema = TelepactSchema.from_directory('./api')
 
@@ -11,7 +11,8 @@ async def divide(function_name: str, request_message: Message) -> Message:
 
 options = Server.Options()
 options.auth_required = False
-server = Server(schema, {'fn.divide': divide}, options)
+function_router = FunctionRouter({'fn.divide': divide})
+server = Server(schema, function_router, options)
 
 # Plug into any framework — Starlette, Flask, FastAPI...
 async def http_handler(request):

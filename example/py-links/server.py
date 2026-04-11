@@ -17,7 +17,7 @@
 import asyncio
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
-from telepact import Message, Server, TelepactSchema, TelepactSchemaFiles
+from telepact import FunctionRouter, Message, Server, TelepactSchema, TelepactSchemaFiles
 
 files = TelepactSchemaFiles('api')
 schema = TelepactSchema.from_file_json_map(files.filenames_to_json)
@@ -52,10 +52,11 @@ async def get_follow_up(function_name: str, request_message: Message) -> Message
     })
 
 
-telepact_server = Server(schema, {
+function_router = FunctionRouter({
     'fn.createIssueLink': create_issue_link,
     'fn.getFollowUp': get_follow_up,
-}, options)
+})
+telepact_server = Server(schema, function_router, options)
 
 
 def create_http_server(host: str = '127.0.0.1', port: int = 0) -> ThreadingHTTPServer:
