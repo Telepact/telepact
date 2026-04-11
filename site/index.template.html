@@ -576,11 +576,17 @@
       gap: 20px;
       padding: 0 24px 24px;
     }
+    .feature-grid-binary {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
     .feature-panel {
       border-radius: 10px;
       border: 1px solid var(--border);
       overflow: hidden;
       background: rgba(0,0,0,0.18);
+    }
+    .feature-panel-span-2 {
+      grid-column: 1 / -1;
     }
     .feature-panel-header {
       padding: 12px 16px;
@@ -1165,27 +1171,27 @@
       <details class="feature-demo fade-in">
         <summary class="feature-summary">
           <div>
-            <h3>4. Opt-in binary at runtime</h3>
-            <p>Clients can request binary negotiation by sending <code>@bin_</code>. The server responds with negotiated encoding metadata and can switch the body to compact binary without code generation.</p>
+            <h3>4. Opt-in binary protocol</h3>
+            <p>Clients can opt into a binary protocol at runtime with any Telepact server. No build-time code generation or schema compilation is needed; the binary protocol is negotiated on-the-fly.</p>
           </div>
-          <span class="feature-summary-note">Client-side opt in</span>
+          <span class="feature-summary-note">Same data, smaller wire format</span>
         </summary>
-        <div class="feature-grid">
-          <div class="feature-panel">
+        <div class="feature-grid feature-grid-binary">
+          <div class="feature-panel feature-panel-span-2">
             <div class="feature-panel-header">Schema</div>
             <!-- SNIPPET: features/binary.telepact.yaml | yaml -->
           </div>
           <div class="feature-panel">
-            <div class="feature-panel-header">Request</div>
-            <!-- SNIPPET: features/binary.request.json | json -->
+            <div class="feature-panel-header">Plain JSON Wire Exchange · 37 B Request · 469 B Response</div>
+            <!-- SNIPPET: features/binary.json-exchange.txt | text -->
           </div>
           <div class="feature-panel">
-            <div class="feature-panel-header">Response</div>
-            <!-- SNIPPET: features/binary.response.txt | bash -->
+            <div class="feature-panel-header">Negotiated Binary Wire Exchange · 36 B Request · 169 B Response</div>
+            <!-- SNIPPET: features/binary.binary-exchange.txt | text -->
           </div>
         </div>
         <div class="feature-callout">
-          <strong>Binary is opt-in from the client at runtime.</strong> No codegen is required, no server flag is needed, and for larger payloads it can often cut payload size and network latency roughly in half.
+          <strong>Reduce payload sizes by over 60% without code generation.</strong> Traditional RPC frameworks cannot do this, which forces the binary protocol into generated code, requiring integration through rigid and inconvenient code generation toolchain paths. Telepact offers comparable bandwidth savings without any of the friction.
         </div>
       </details>
     </div>
