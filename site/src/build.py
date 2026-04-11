@@ -853,7 +853,7 @@ a:hover { color: #7dd3fc; }
 .navbar-links a.active,
 .navbar-links a:hover { color: var(--text); }
 
-.btn {
+.navbar .btn {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -867,19 +867,19 @@ a:hover { color: #7dd3fc; }
   font-family: var(--font);
 }
 
-.btn svg {
+.navbar .btn svg {
   width: 1.65em;
   height: 1.65em;
   flex: none;
 }
 
-.btn-secondary {
+.navbar .btn-secondary {
   background: transparent;
   color: var(--text);
   border: 1px solid var(--border);
 }
 
-.btn-secondary:hover {
+.navbar .btn-secondary:hover {
   border-color: var(--accent);
   background: rgba(56, 189, 248, 0.08);
 }
