@@ -250,4 +250,4 @@ version:
 	$(MAKE) doc-versions
 
 license-header:
-	telepact-project license-header NOTICE
+	UV_CACHE_DIR=/tmp/uv-cache uv run --project tool/telepact_project_cli telepact-project license-header NOTICE

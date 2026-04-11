@@ -61,13 +61,13 @@ def _write_notice(path: Path) -> None:
 
 
 class LicenseHeaderTests(unittest.TestCase):
-    def test_license_header_ignores_files_beneath_directory_marker(self) -> None:
+    def test_license_header_ignores_files_beneath_real_snippets_directory_marker(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             repo_root = Path(tmp_dir)
             _init_git_repo(repo_root)
             _write_notice(repo_root / "NOTICE")
 
-            ignored_file = repo_root / "site" / "snippets" / "hero" / "example.ts"
+            ignored_file = repo_root / "site" / "src" / "snippets" / "hero" / "example.ts"
             ignored_file.parent.mkdir(parents=True)
             ignored_original = "export const ignored = true;\n"
             ignored_file.write_text(ignored_original, encoding="utf-8")
@@ -76,7 +76,7 @@ class LicenseHeaderTests(unittest.TestCase):
             updated_file.parent.mkdir(parents=True)
             updated_file.write_text("export const kept = true;\n", encoding="utf-8")
 
-            (repo_root / "site" / "snippets" / ".license-header-ignore").touch()
+            (repo_root / "site" / "src" / "snippets" / ".license-header-ignore").touch()
 
             subprocess.run(["git", "add", "."], cwd=repo_root, check=True)
 
@@ -88,7 +88,7 @@ class LicenseHeaderTests(unittest.TestCase):
             self.assertEqual(ignored_file.read_text(encoding="utf-8"), ignored_original)
             self.assertNotEqual(updated_file.read_text(encoding="utf-8"), "export const kept = true;\n")
             self.assertTrue(updated_file.read_text(encoding="utf-8").startswith("//|"))
-            self.assertNotIn("site/snippets/hero/example.ts", result.output)
+            self.assertNotIn("site/src/snippets/hero/example.ts", result.output)
             self.assertIn("sdk/cli/example.ts", result.output)
 
     def test_license_header_updates_files_when_no_directory_marker_exists(self) -> None:
