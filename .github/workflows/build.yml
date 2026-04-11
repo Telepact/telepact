@@ -413,7 +413,9 @@ jobs:
             echo
             git --no-pager diff HEAD
             echo
-            echo "ERROR: Misaligned versions.\nTo fix, run 'make version' and git commit the changes."
+            printf '%s\n' \
+              "ERROR: Misaligned versions." \
+              "To fix, run 'make version' and git commit the changes."
             false
           else
             echo "Versions up-to-date."
