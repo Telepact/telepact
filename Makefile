@@ -215,8 +215,8 @@ deploy-console:
 console-self-hosted:
 	$(MAKE) -C test/console-self-hosted
 
-site-docs:
-	python3 site/src/build_docs.py
+site:
+	$(MAKE) -C site
 
 clean-console-self-hosted:
 	$(MAKE) -C test/console-self-hosted clean
