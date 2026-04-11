@@ -216,7 +216,7 @@ console-self-hosted:
 	$(MAKE) -C test/console-self-hosted
 
 site-docs:
-	python3 site-src/build_docs.py
+	python3 site/src/build_docs.py
 
 clean-console-self-hosted:
 	$(MAKE) -C test/console-self-hosted clean

@@ -29,9 +29,10 @@ from pathlib import Path
 from typing import Callable
 
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
-SOURCE_DIR = REPO_ROOT / "site-src"
-SITE_DIR = REPO_ROOT / "site"
+REPO_ROOT = Path(__file__).resolve().parents[2]
+SITE_ROOT = REPO_ROOT / "site"
+SOURCE_DIR = SITE_ROOT / "src"
+SITE_DIR = SITE_ROOT / "dist"
 DOCS_DIR = SITE_DIR / "docs"
 INDEX_TEMPLATE = SOURCE_DIR / "index.template.html"
 INDEX_OUTPUT = SITE_DIR / "index.html"
@@ -179,7 +180,7 @@ def resolve_snippet_path(raw_path: str) -> Path:
     try:
         snippet_path.relative_to(SNIPPETS_DIR.resolve())
     except ValueError as exc:
-        raise ValueError(f"Snippet path escapes site-src/snippets: {raw_path}") from exc
+        raise ValueError(f"Snippet path escapes site/src/snippets: {raw_path}") from exc
     if not snippet_path.is_file():
         raise FileNotFoundError(f"Missing snippet file: {snippet_path}")
     return snippet_path
