@@ -371,7 +371,8 @@ public class Main {
             System.err.flush();
         };
         options.authRequired = false;
-        var server = new Server(telepact, functionRoutes, options);
+        var functionRouter = new Server.FunctionRouter(functionRoutes);
+        var server = new Server(telepact, functionRouter, options);
 
         var dispatcher = connection.createDispatcher((msg) -> {
             var requestBytes = msg.getData();
@@ -526,7 +527,8 @@ public class Main {
         options.middleware = middleware;
         options.authRequired = authRequired;
 
-        var server = new Server(telepact, Map.of(), options);
+        var functionRouter = new Server.FunctionRouter(Map.of());
+        var server = new Server(telepact, functionRouter, options);
 
         var alternateOptions = new Server.Options();
         alternateOptions.onError = (e) -> e.printStackTrace();
@@ -534,7 +536,8 @@ public class Main {
         alternateOptions.middleware = middleware;
         alternateOptions.authRequired = authRequired;
 
-        var alternateServer = new Server(alternateTelepact, Map.of(), alternateOptions);
+        var alternateFunctionRouter = new Server.FunctionRouter(Map.of());
+        var alternateServer = new Server(alternateTelepact, alternateFunctionRouter, alternateOptions);
 
         var dispatcher = connection.createDispatcher((msg) -> {
 

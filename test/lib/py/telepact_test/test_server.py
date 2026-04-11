@@ -35,7 +35,7 @@ import json
 from nats.aio.client import Client as NATSClient, Subscription
 import asyncio
 import nats
-from telepact import SerializationError, Message, Serializer, Client, Server, TelepactSchema, MockTelepactSchema, MockServer, TelepactSchemaFiles, TelepactSchemaParseError, TestClient
+from telepact import FunctionRouter, SerializationError, Message, Serializer, Client, Server, TelepactSchema, MockTelepactSchema, MockServer, TelepactSchemaFiles, TelepactSchemaParseError, TestClient
 import traceback
 import sys
 from concurrent.futures import ThreadPoolExecutor
@@ -281,7 +281,8 @@ async def start_schema_test_server(connection: NatsClient, metrics: CollectorReg
     options = Server.Options()
     options.on_error = on_err
     options.auth_required = False
-    server = Server(telepact, {"fn.validateSchema": validate_schema_route}, options)
+    function_router = FunctionRouter({"fn.validateSchema": validate_schema_route})
+    server = Server(telepact, function_router, options)
 
     async def handle_message(msg: Msg) -> None:
         nonlocal server
@@ -387,14 +388,16 @@ async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, 
     options.middleware = lambda request_message, function_router: handler(request_message)
     options.auth_required = auth_required
 
-    server = Server(telepact, {}, options)
+    function_router = FunctionRouter({})
+    server = Server(telepact, function_router, options)
     alternate_options = Server.Options()
     alternate_options.on_error = on_err
     alternate_options.on_auth = on_auth
     alternate_options.middleware = lambda request_message, function_router: handler(request_message)
     alternate_options.auth_required = auth_required
+    alternate_function_router = FunctionRouter({})
     alternate_server = Server(
-        alternate_telepact, {}, alternate_options)
+        alternate_telepact, alternate_function_router, alternate_options)
 
     async def handle_test_message(msg: Msg) -> None:
         nonlocal serve_alternate_server

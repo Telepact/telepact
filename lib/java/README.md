@@ -56,7 +56,8 @@ options.middleware = (requestMessage, functionRouter) -> {
         log.info("Function finished", Map.of("function", functionName));
     }
 };
-var server = new Server(schema, functionRoutes, options);
+var functionRouter = new Server.FunctionRouter(functionRoutes);
+var server = new Server(schema, functionRouter, options);
 
 
 // Wire up request/response bytes from your transport of choice

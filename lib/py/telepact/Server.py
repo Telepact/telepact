@@ -64,13 +64,13 @@ class Server:
             self.auth_required = True
             self.serialization = DefaultSerialization()
 
-    def __init__(self, telepact_schema: 'TelepactSchema', function_routes: dict[str, FunctionRoute], options: Options):
+    def __init__(self, telepact_schema: 'TelepactSchema', function_router: FunctionRouter, options: Options):
         """
-        Create a server with the given telepact schema and function routes.
+        Create a server with the given telepact schema and function router.
         """
         from .internal.binary.ConstructBinaryEncoding import construct_binary_encoding
 
-        self.function_router = FunctionRouter(function_routes)
+        self.function_router = function_router
         self.middleware = options.middleware
         self.on_error = options.on_error
         self.on_request = options.on_request

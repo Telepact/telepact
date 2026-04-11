@@ -180,7 +180,8 @@ options.middleware = async (requestMessage, functionRouter) => {
   }
 };
 
-const server = new Server(schema, functionRoutes, options);
+const functionRouter = new FunctionRouter(functionRoutes);
+const server = new Server(schema, functionRouter, options);
 ```
 
 The important point is the placement: transport code stays bytes in / bytes out,

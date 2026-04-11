@@ -14,7 +14,7 @@
 #|  limitations under the License.
 #|
 
-from telepact import Message, Server, TelepactSchema, TelepactSchemaFiles
+from telepact import FunctionRouter, Message, Server, TelepactSchema, TelepactSchemaFiles
 
 
 async def get_numbers(function_name: str, request_message: Message) -> Message:
@@ -32,4 +32,5 @@ def build_telepact_server() -> Server:
     schema = TelepactSchema.from_file_json_map(files.filenames_to_json)
     options = Server.Options()
     options.auth_required = False
-    return Server(schema, {'fn.getNumbers': get_numbers}, options)
+    function_router = FunctionRouter({'fn.getNumbers': get_numbers})
+    return Server(schema, function_router, options)

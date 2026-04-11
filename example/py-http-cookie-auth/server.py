@@ -18,7 +18,7 @@ import asyncio
 from http.cookies import SimpleCookie
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
-from telepact import Message, Server, TelepactSchema, TelepactSchemaFiles
+from telepact import FunctionRouter, Message, Server, TelepactSchema, TelepactSchemaFiles
 
 VALID_SESSION = 'demo-session'
 
@@ -53,7 +53,8 @@ async def me(function_name: str, request_message: Message) -> Message:
     })
 
 
-telepact_server = Server(schema, {'fn.me': me}, options)
+function_router = FunctionRouter({'fn.me': me})
+telepact_server = Server(schema, function_router, options)
 
 
 def read_session_cookie(cookie_header: str | None) -> str | None:
