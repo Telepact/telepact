@@ -277,13 +277,13 @@ class Page:
         if rel == "doc/learn-by-example/README.md":
             return "Documentation"
         if rel == "example/README.md":
-            return "Documentation"
+            return "Demos"
         if rel.startswith("doc/learn-by-example/"):
             return "Learn by Example"
         if rel.startswith("doc/"):
             return "Documentation"
         if rel.startswith("example/"):
-            return "Examples"
+            return "Demos"
         if rel.startswith("lib/"):
             return "Libraries"
         if rel.startswith("sdk/"):
@@ -596,10 +596,10 @@ def nav_groups(pages: dict[Path, Page]) -> list[tuple[str, list[Page]]]:
     order = {
         "Documentation": 0,
         "Learn by Example": 1,
-        "Examples": 2,
-        "Libraries": 3,
-        "SDK Tools": 4,
-        "Resources": 5,
+        "Libraries": 2,
+        "SDK Tools": 3,
+        "Resources": 4,
+        "Demos": 5,
     }
     grouped: dict[str, list[Page]] = {}
     for page in pages.values():
@@ -609,8 +609,9 @@ def nav_groups(pages: dict[Path, Page]) -> list[tuple[str, list[Page]]]:
         rel = page.rel_source
         priority = {
             "doc/index.md": 0,
-            "doc/learn-by-example/README.md": 1,
-            "example/README.md": 2,
+            "doc/example.md": 1,
+            "doc/learn-by-example/README.md": 2,
+            "example/README.md": 999,
         }.get(rel, 3)
         return (
             priority,

@@ -250,6 +250,6 @@ if (response.getBodyTarget() === 'Ok_') {
 
 ## See also
 
-- [Example](./example.md)
+- [Quickstart](./example.md)
 - [FAQ](./faq.md)
 - [Runtime Error Guide](./runtime-errors.md)

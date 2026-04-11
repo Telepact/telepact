@@ -33,8 +33,7 @@ For transport wiring patterns and concrete HTTP/WebSocket examples, see the
 auth, and observability guidance, see the
 [Production Guide](./production-guide.md).
 
-For runnable end-to-end examples, see the
-[Examples landing page](../example/README.md).
+For runnable end-to-end demos, see the [Demos page](../example/README.md).
 
 For debugging local/runtime
 failures, see the [Runtime Error Guide](./runtime-errors.md).

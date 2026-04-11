@@ -1,4 +1,4 @@
-# Example
+# Quickstart
 
 The minimum Telepact API ecosystem is established by a server defining a
 Telepact API schema,and serving it using one of the Telepact libraries.
