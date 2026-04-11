@@ -122,14 +122,14 @@ public class Server {
     private final Serializer serializer;
 
     /**
-     * Create a server with the given telepact schema and function routes.
+     * Create a server with the given telepact schema and function router.
      * 
      * @param telepactSchema The schema to be used by the server.
-     * @param functionRoutes The function routes to handle incoming messages.
+     * @param functionRouter The function router to handle incoming messages.
      * @param options The options for configuring the server.
      */
-    public Server(TelepactSchema telepactSchema, Map<String, FunctionRoute> functionRoutes, Options options) {
-        this.functionRouter = new FunctionRouter(functionRoutes);
+    public Server(TelepactSchema telepactSchema, FunctionRouter functionRouter, Options options) {
+        this.functionRouter = functionRouter;
         this.middleware = options.middleware;
         this.onError = options.onError;
         this.onRequest = options.onRequest;

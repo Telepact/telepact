@@ -29,7 +29,7 @@ $ cat ./server.py
 ```
 
 ```py
-from telepact import TelepactSchema, Server, Message
+from telepact import FunctionRouter, TelepactSchema, Server, Message
 from starlette.applications import Starlette
 from starlette.responses import Response
 from starlette.routing import Route
@@ -51,7 +51,8 @@ options = Server.Options()
 options.auth_required = False
 
 api = TelepactSchema.from_directory('./api')
-server = Server(api, {'fn.divide': divide}, options)
+function_router = FunctionRouter({'fn.divide': divide})
+server = Server(api, function_router, options)
 
 async def http_handler(request):
     request_bytes = await request.body()

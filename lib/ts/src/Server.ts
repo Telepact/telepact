@@ -58,8 +58,8 @@ export class Server {
     telepactSchema: TelepactSchema;
     serializer: Serializer;
 
-    constructor(telepactSchema: TelepactSchema, functionRoutes: FunctionRoutes, options: ServerOptions) {
-        this.functionRouter = new FunctionRouter(functionRoutes);
+    constructor(telepactSchema: TelepactSchema, functionRouter: FunctionRouter, options: ServerOptions) {
+        this.functionRouter = functionRouter;
         this.middleware = options.middleware;
         this.onError = options.onError;
         this.onRequest = options.onRequest;

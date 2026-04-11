@@ -91,7 +91,8 @@ func NewMockServer(mockSchema *MockTelepactSchema, options *MockServerOptions) (
 		mockSchema.ParsedResponseHeaders,
 	)
 
-	server, err := NewServer(telepactSchema, map[string]FunctionRoute{}, serverOptions)
+	functionRouter := NewFunctionRouter(map[string]FunctionRoute{})
+	server, err := NewServer(telepactSchema, functionRouter, serverOptions)
 	if err != nil {
 		return nil, err
 	}

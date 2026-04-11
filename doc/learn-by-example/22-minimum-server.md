@@ -30,7 +30,7 @@ Create `server.py`:
 import asyncio
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
-from telepact import Message, Server, TelepactSchema
+from telepact import FunctionRouter, Message, Server, TelepactSchema
 
 
 schema = TelepactSchema.from_directory('./api')
@@ -44,7 +44,8 @@ async def hello(function_name: str, request_message: Message) -> Message:
     return Message({}, {'Ok_': {'message': f'Hello, {name}!'}})
 
 
-telepact_server = Server(schema, {'fn.hello': hello}, options)
+function_router = FunctionRouter({'fn.hello': hello})
+telepact_server = Server(schema, function_router, options)
 
 
 class Handler(BaseHTTPRequestHandler):
