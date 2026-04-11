@@ -1440,26 +1440,20 @@ body: &lt;MessagePack bytes&gt;</code></pre>
 
       <!-- Python -->
       <div id="tab-python" class="code-tab-content">
-        <pre><code class="language-python">from telepact import Message, Server, TelepactSchema, TelepactSchemaFiles
+        <pre><code class="language-python">from telepact import Message, Server, TelepactSchema
 
-files = TelepactSchemaFiles('./api')
-schema = TelepactSchema.from_file_json_map(files.filenames_to_json)
+schema = TelepactSchema.from_directory('./api')
 
-async def handler(request_message: Message) -> Message:
-    fn = request_message.get_body_target()
-    args = request_message.body[fn]
-
-    if fn == 'fn.divide':
-        x, y = args['x'], args['y']
-        if y == 0:
-            return Message({}, {'ErrorCannotDivideByZero': {}})
-        return Message({}, {'Ok_': {'result': x / y}})
-
-    raise Exception(f'Unknown function: {fn}')
+async def divide(function_name: str, request_message: Message) -> Message:
+    args = request_message.body[function_name]
+    x, y = args['x'], args['y']
+    if y == 0:
+        return Message({}, {'ErrorCannotDivideByZero': {}})
+    return Message({}, {'Ok_': {'result': x / y}})
 
 options = Server.Options()
 options.auth_required = False
-server = Server(schema, handler, options)
+server = Server(schema, {'fn.divide': divide}, options)
 
 # Plug into any framework — Starlette, Flask, FastAPI...
 async def http_handler(request):

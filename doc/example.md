@@ -29,7 +29,7 @@ $ cat ./server.py
 ```
 
 ```py
-from telepact import TelepactSchemaFiles, TelepactSchema, Server, Message
+from telepact import TelepactSchema, Server, Message
 from starlette.applications import Starlette
 from starlette.responses import Response
 from starlette.routing import Route
@@ -50,8 +50,7 @@ async def divide(function_name, request_message):
 options = Server.Options()
 options.auth_required = False
 
-schema_files = TelepactSchemaFiles('./api')
-api = TelepactSchema.from_file_json_map(schema_files.filenames_to_json)
+api = TelepactSchema.from_directory('./api')
 server = Server(api, {'fn.divide': divide}, options)
 
 async def http_handler(request):

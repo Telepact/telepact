@@ -17,14 +17,13 @@ import asyncio
 import logging
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
-from telepact import Message, Server, TelepactError, TelepactSchema, TelepactSchemaFiles
+from telepact import Message, Server, TelepactError, TelepactSchema
 
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger('hello-server')
 
-files = TelepactSchemaFiles('./api')
-schema = TelepactSchema.from_file_json_map(files.filenames_to_json)
+schema = TelepactSchema.from_directory('./api')
 
 options = Server.Options()
 options.auth_required = False
