@@ -277,13 +277,13 @@ class Page:
         if rel == "doc/learn-by-example/README.md":
             return "Documentation"
         if rel == "example/README.md":
-            return "Demos"
+            return "Documentation"
         if rel.startswith("doc/learn-by-example/"):
             return "Learn by Example"
         if rel.startswith("doc/"):
             return "Documentation"
         if rel.startswith("example/"):
-            return "Demos"
+            return "Documentation"
         if rel.startswith("lib/"):
             return "Libraries"
         if rel.startswith("sdk/"):
@@ -599,7 +599,6 @@ def nav_groups(pages: dict[Path, Page]) -> list[tuple[str, list[Page]]]:
         "Libraries": 2,
         "SDK Tools": 3,
         "Resources": 4,
-        "Demos": 5,
     }
     grouped: dict[str, list[Page]] = {}
     for page in pages.values():

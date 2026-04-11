@@ -3,6 +3,9 @@
 Welcome to the Telepact docs. Use this page to find the guides, references, and
 tools you need to design, serve, and operate a Telepact API.
 
+To get started quickly, read the [Quickstart](./example.md). For a guided tour,
+continue with [Learn Telepact by Example](./learn-by-example/README.md).
+
 To learn how to write Telepact APIs, start with the
 [API Schema Guide](./schema-guide.md). A
 [JSON Schema](../common/json-schema.json) is available for validation.
