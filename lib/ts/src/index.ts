@@ -16,6 +16,7 @@
 
 export * from './RandomGenerator.js';
 export * from './Client.js';
+export * from './FunctionRouter.js';
 export * from './Server.js';
 export * from './TestClient.js';
 export * from './MockServer.js';

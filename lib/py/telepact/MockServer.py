@@ -42,7 +42,8 @@ class MockServer:
             self.generated_collection_length_max: int = 3
 
     def __init__(self, mock_telepact_schema: 'MockTelepactSchema', options: Options) -> None:
-        from .Server import FunctionRouter, Server
+        from .FunctionRouter import FunctionRouter
+        from .Server import Server
         from .RandomGenerator import RandomGenerator
         from .TelepactSchema import TelepactSchema
 
