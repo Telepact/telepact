@@ -37,9 +37,9 @@ DOCS_DIR = SITE_DIR / "docs"
 INDEX_TEMPLATE = SOURCE_DIR / "index.template.html"
 INDEX_OUTPUT = SITE_DIR / "index.html"
 SNIPPETS_DIR = SOURCE_DIR / "snippets"
-STATIC_FILES = (".nojekyll", "404.html", "robots.txt", "favicon.ico")
-BASE_URL = "https://telepact.github.io/telepact/"
-REPO_URL = "https://github.com/Telepact/telepact"
+STATIC_FILES = (".nojekyll", "404.html", "favicon.ico")
+DEFAULT_BASE_URL = "https://telepact.github.io/telepact/"
+DEFAULT_REPO_URL = "https://github.com/Telepact/telepact"
 ALLOWED_PREFIXES = ("doc/", "example/", "lib/", "sdk/", "common/")
 PRISM_CSS = (
     "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/"
@@ -58,6 +58,17 @@ PRISM_JS = [
 SNIPPET_PATTERN = re.compile(
     r'(?P<indent>[ \t]*)<!--\s*SNIPPET:\s*(?P<path>[^|]+?)\s*\|\s*(?P<lang>[a-zA-Z0-9_-]+)\s*-->'
 )
+
+
+def normalize_base_url(value: str) -> str:
+    value = value.strip()
+    if not value:
+        return DEFAULT_BASE_URL
+    return value.rstrip("/") + "/"
+
+
+BASE_URL = normalize_base_url(os.environ.get("TELEPACT_SITE_BASE_URL", DEFAULT_BASE_URL))
+REPO_URL = os.environ.get("TELEPACT_SITE_REPO_URL", DEFAULT_REPO_URL).strip().rstrip("/") or DEFAULT_REPO_URL
 
 
 def slugify(value: str) -> str:
@@ -203,6 +214,8 @@ def write_home_page() -> int:
         return f'{match.group("indent")}{render_snippet(match.group("path"), match.group("lang"))}'
 
     rendered = SNIPPET_PATTERN.sub(replace, template)
+    rendered = rendered.replace("{{BASE_URL}}", BASE_URL)
+    rendered = rendered.replace("{{REPO_URL}}", REPO_URL)
     INDEX_OUTPUT.write_text(rendered, encoding="utf-8")
     return replacements
 
@@ -210,6 +223,17 @@ def write_home_page() -> int:
 def copy_static_files() -> None:
     for name in STATIC_FILES:
         shutil.copy2(SOURCE_DIR / name, SITE_DIR / name)
+
+
+def write_robots() -> None:
+    robots = "\n".join([
+        "User-agent: *",
+        "Allow: /",
+        "",
+        f"Sitemap: {posixpath.join(BASE_URL.rstrip('/'), 'sitemap.xml')}",
+        "",
+    ])
+    (SITE_DIR / "robots.txt").write_text(robots, encoding="utf-8")
 
 
 @dataclass
@@ -1123,6 +1147,7 @@ def main() -> None:
     DOCS_DIR.mkdir(parents=True, exist_ok=True)
     write_css()
     write_pages(pages, resources)
+    write_robots()
     write_sitemap(pages)
     print(
         f"Generated home page from {snippet_count} snippets, "

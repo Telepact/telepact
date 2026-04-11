@@ -1,7 +1,7 @@
 <!--
   Source template for the Telepact home page.
   Code snippets are sourced from site/src/snippets/ and rendered into site/dist/index.html
-  by site/src/build_docs.py.
+  by site/src/build.py.
 -->
 <!--|                                                                            |-->
 <!--|  Copyright The Telepact Authors                                            |-->
@@ -32,18 +32,18 @@
   <meta name="keywords" content="API, RPC, JSON, binary serialization, code generation, TypeScript, Python, Go, Java, gRPC alternative, GraphQL alternative, REST alternative, inter-process communication, IPC, telepact, transport-agnostic API">
   <meta name="author" content="Telepact">
   <meta name="robots" content="index, follow">
-  <link rel="canonical" href="https://telepact.github.io/telepact/">
+  <link rel="canonical" href="{{BASE_URL}}">
 
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://telepact.github.io/telepact/">
+  <meta property="og:url" content="{{BASE_URL}}">
   <meta property="og:title" content="Telepact — The Universal API Ecosystem">
   <meta property="og:description" content="JSON in, JSON out — with optional binary efficiency, dynamic response shaping, and type-safe code generation across any transport.">
   <meta property="og:site_name" content="Telepact">
 
   <!-- Twitter -->
   <meta property="twitter:card" content="summary_large_image">
-  <meta property="twitter:url" content="https://telepact.github.io/telepact/">
+  <meta property="twitter:url" content="{{BASE_URL}}">
   <meta property="twitter:title" content="Telepact — The Universal API Ecosystem">
   <meta property="twitter:description" content="JSON in, JSON out — with optional binary efficiency, dynamic response shaping, and type-safe code generation across any transport.">
 
@@ -54,8 +54,8 @@
     "@type": "SoftwareSourceCode",
     "name": "Telepact",
     "description": "An API ecosystem for bridging programs across inter-process communication boundaries. JSON in, JSON out — with optional binary efficiency, dynamic response shaping, and type-safe code generation.",
-    "url": "https://telepact.github.io/telepact/",
-    "codeRepository": "https://github.com/telepact/telepact",
+    "url": "{{BASE_URL}}",
+    "codeRepository": "{{REPO_URL}}",
     "programmingLanguage": ["TypeScript", "Python", "Go", "Java"],
     "license": "https://www.apache.org/licenses/LICENSE-2.0",
     "applicationCategory": "DeveloperApplication",

@@ -17,7 +17,7 @@
 .PHONY: all clean
 
 all:
-	python3 src/build_docs.py
+	python3 src/build.py
 
 clean:
 	rm -rf dist
