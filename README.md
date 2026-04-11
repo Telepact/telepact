@@ -37,7 +37,7 @@ Schema:
 ```
 Request:
 ```json
-[{}, {"fn.helloWorld":{}}]
+[{}, {"fn.helloWorld": {}}]
 ```
 Response:
 ```json
