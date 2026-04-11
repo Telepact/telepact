@@ -32,6 +32,9 @@ from typing import Callable
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SITE_DIR = REPO_ROOT / "site"
 DOCS_DIR = SITE_DIR / "docs"
+INDEX_TEMPLATE = SITE_DIR / "index.template.html"
+INDEX_OUTPUT = SITE_DIR / "index.html"
+SNIPPETS_DIR = SITE_DIR / "snippets"
 BASE_URL = "https://telepact.github.io/telepact/"
 REPO_URL = "https://github.com/Telepact/telepact"
 ALLOWED_PREFIXES = ("doc/", "example/", "lib/", "sdk/", "common/")
@@ -49,6 +52,9 @@ PRISM_JS = [
     "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js",
     "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js",
 ]
+SNIPPET_PATTERN = re.compile(
+    r'(?P<indent>[ \t]*)<!--\s*SNIPPET:\s*(?P<path>[^|]+?)\s*\|\s*(?P<lang>[a-zA-Z0-9_-]+)\s*-->'
+)
 
 
 def slugify(value: str) -> str:
@@ -164,6 +170,38 @@ def resolve_local_target(source: Path, raw_target: str) -> tuple[Path | None, st
             resolved = index_md
 
     return resolved, frag
+
+
+def resolve_snippet_path(raw_path: str) -> Path:
+    snippet_path = (SNIPPETS_DIR / raw_path.strip()).resolve()
+    try:
+        snippet_path.relative_to(SNIPPETS_DIR.resolve())
+    except ValueError as exc:
+        raise ValueError(f"Snippet path escapes site/snippets: {raw_path}") from exc
+    if not snippet_path.is_file():
+        raise FileNotFoundError(f"Missing snippet file: {snippet_path}")
+    return snippet_path
+
+
+def render_snippet(raw_path: str, lang: str) -> str:
+    snippet_path = resolve_snippet_path(raw_path)
+    snippet_text = snippet_path.read_text(encoding="utf-8").rstrip("\n")
+    snippet_html = snippet_text.replace("&", "&amp;").replace("<", "&lt;")
+    return f'<pre><code class="language-{lang}">{snippet_html}</code></pre>'
+
+
+def write_home_page() -> int:
+    template = INDEX_TEMPLATE.read_text(encoding="utf-8")
+    replacements = 0
+
+    def replace(match: re.Match[str]) -> str:
+        nonlocal replacements
+        replacements += 1
+        return f'{match.group("indent")}{render_snippet(match.group("path"), match.group("lang"))}'
+
+    rendered = SNIPPET_PATTERN.sub(replace, template)
+    INDEX_OUTPUT.write_text(rendered, encoding="utf-8")
+    return replacements
 
 
 @dataclass
@@ -1068,6 +1106,7 @@ def write_sitemap(pages: dict[Path, Page]) -> None:
 
 
 def main() -> None:
+    snippet_count = write_home_page()
     pages, resources = discover_pages()
     if DOCS_DIR.exists():
         shutil.rmtree(DOCS_DIR)
@@ -1075,7 +1114,10 @@ def main() -> None:
     write_css()
     write_pages(pages, resources)
     write_sitemap(pages)
-    print(f"Generated {len(pages)} documentation pages and {len(resources)} copied resources into {DOCS_DIR}")
+    print(
+        f"Generated home page from {snippet_count} snippets, "
+        f"{len(pages)} documentation pages, and {len(resources)} copied resources into {SITE_DIR}"
+    )
 
 
 if __name__ == "__main__":

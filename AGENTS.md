@@ -43,7 +43,7 @@ The entire project uses a hierarchical `Makefile` system. The root `Makefile` de
 
 ### Final Verification
 
--   Before calling a task done, run `make local-ci` from the repository root.
+-   If you have made changes to `lib/`, it is a good idea to run `make local-ci` from the repository root.
     This target cleans the shared workspace, rebuilds the primary CI targets in order, and catches issues that only show up when the repo is exercised end-to-end in one environment.
 
 ### Key Files & Directories

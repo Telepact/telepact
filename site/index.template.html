@@ -1,19 +1,3 @@
-<!--|                                                                            |-->
-<!--|  Copyright The Telepact Authors                                            |-->
-<!--|                                                                            |-->
-<!--|  Licensed under the Apache License, Version 2.0 (the "License");           |-->
-<!--|  you may not use this file except in compliance with the License.          |-->
-<!--|  You may obtain a copy of the License at                                   |-->
-<!--|                                                                            |-->
-<!--|  https://www.apache.org/licenses/LICENSE-2.0                               |-->
-<!--|                                                                            |-->
-<!--|  Unless required by applicable law or agreed to in writing, software       |-->
-<!--|  distributed under the License is distributed on an "AS IS" BASIS,         |-->
-<!--|  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  |-->
-<!--|  See the License for the specific language governing permissions and       |-->
-<!--|  limitations under the License.                                            |-->
-<!--|                                                                            |-->
-
 <!--
   Source template for the Telepact home page.
   Code snippets are sourced from site/snippets/ and rendered into site/index.html
@@ -1041,32 +1025,17 @@
           <span class="code-window-title">hello.telepact.yaml</span>
         </div>
         <div class="code-window-body">
-          <pre><code class="language-yaml">- fn.helloWorld: {}
-  ->:
-    - Ok_:
-        msg: string</code></pre>
+          <!-- SNIPPET: hero/hello.telepact.yaml | yaml -->
         </div>
       </div>
       <div class="hero-payloads">
         <div class="payload-card">
           <div class="payload-card-header">Request</div>
-          <pre><code class="language-json">[
-  {},
-  {
-    "fn.helloWorld": {}
-  }
-]</code></pre>
+          <!-- SNIPPET: hero/hello.request.json | json -->
         </div>
         <div class="payload-card">
           <div class="payload-card-header">Response</div>
-          <pre><code class="language-json">[
-  {},
-  {
-    "Ok_": {
-      "msg": "Hello world!"
-    }
-  }
-]</code></pre>
+          <!-- SNIPPET: hero/hello.response.json | json -->
         </div>
       </div>
     </div>
@@ -1123,30 +1092,15 @@
         <div class="feature-grid">
           <div class="feature-panel">
             <div class="feature-panel-header">Schema</div>
-            <pre><code class="language-yaml">- fn.helloWorld: {}
-  ->:
-    - Ok_:
-        msg: string</code></pre>
+            <!-- SNIPPET: hero/hello.telepact.yaml | yaml -->
           </div>
           <div class="feature-panel">
             <div class="feature-panel-header">Request</div>
-            <pre><code class="language-json">[
-  {},
-  {
-    "fn.helloWorld": {}
-  }
-]</code></pre>
+            <!-- SNIPPET: hero/hello.request.json | json -->
           </div>
           <div class="feature-panel">
             <div class="feature-panel-header">Response</div>
-            <pre><code class="language-json">[
-  {},
-  {
-    "Ok_": {
-      "msg": "Hello world!"
-    }
-  }
-]</code></pre>
+            <!-- SNIPPET: hero/hello.response.json | json -->
           </div>
         </div>
         <div class="feature-callout">
@@ -1165,51 +1119,15 @@
         <div class="feature-grid">
           <div class="feature-panel">
             <div class="feature-panel-header">Schema</div>
-            <pre><code class="language-yaml">- struct.User:
-    id: integer
-    name: string
-    email: string
-    bio: string
-
-- fn.getUser:
-    id: integer
-  ->:
-    - Ok_:
-        user: struct.User</code></pre>
+            <!-- SNIPPET: features/select.telepact.yaml | yaml -->
           </div>
           <div class="feature-panel">
             <div class="feature-panel-header">Request</div>
-            <pre><code class="language-json">[
-  {
-    "@select_": {
-      "Ok_": {
-        "user": {
-          "name": true,
-          "email": true
-        }
-      }
-    }
-  },
-  {
-    "fn.getUser": {
-      "id": 42
-    }
-  }
-]</code></pre>
+            <!-- SNIPPET: features/select.request.json | json -->
           </div>
           <div class="feature-panel">
             <div class="feature-panel-header">Response</div>
-            <pre><code class="language-json">[
-  {},
-  {
-    "Ok_": {
-      "user": {
-        "name": "Ada",
-        "email": "ada@example.com"
-      }
-    }
-  }
-]</code></pre>
+            <!-- SNIPPET: features/select.response.json | json -->
           </div>
         </div>
         <div class="feature-callout">
@@ -1228,45 +1146,15 @@
         <div class="feature-grid">
           <div class="feature-panel">
             <div class="feature-panel-header">Schema</div>
-            <pre><code class="language-yaml">- fn.getTicket:
-    id: string
-  ->:
-    - Ok_:
-        title: string
-
-- fn.createTicket:
-    title: string
-  ->:
-    - Ok_:
-        id: string
-        view: fn.getTicket</code></pre>
+            <!-- SNIPPET: features/hypermedia.telepact.yaml | yaml -->
           </div>
           <div class="feature-panel">
             <div class="feature-panel-header">Request</div>
-            <pre><code class="language-json">[
-  {},
-  {
-    "fn.createTicket": {
-      "title": "Fix mobile layout"
-    }
-  }
-]</code></pre>
+            <!-- SNIPPET: features/hypermedia.request.json | json -->
           </div>
           <div class="feature-panel">
             <div class="feature-panel-header">Response</div>
-            <pre><code class="language-json">[
-  {},
-  {
-    "Ok_": {
-      "id": "ticket-7",
-      "view": {
-        "fn.getTicket": {
-          "id": "ticket-7"
-        }
-      }
-    }
-  }
-]</code></pre>
+            <!-- SNIPPET: features/hypermedia.response.json | json -->
           </div>
         </div>
         <div class="feature-callout">
@@ -1285,43 +1173,15 @@
         <div class="feature-grid">
           <div class="feature-panel">
             <div class="feature-panel-header">Schema</div>
-            <pre><code class="language-yaml">- struct.Event:
-    id: integer
-    title: string
-    status: string
-
-- fn.listEvents:
-    limit: integer
-  ->:
-    - Ok_:
-        events: [struct.Event]</code></pre>
+            <!-- SNIPPET: features/binary.telepact.yaml | yaml -->
           </div>
           <div class="feature-panel">
             <div class="feature-panel-header">Request</div>
-            <pre><code class="language-json">[
-  {
-    "@bin_": [],
-    "@pac_": true
-  },
-  {
-    "fn.listEvents": {
-      "limit": 100
-    }
-  }
-]</code></pre>
+            <!-- SNIPPET: features/binary.request.json | json -->
           </div>
           <div class="feature-panel">
             <div class="feature-panel-header">Response</div>
-            <pre><code class="language-bash">HTTP 200
-Content-Type: application/octet-stream
-
-headers: {
-  "@bin_": [38194217],
-  "@enc_": { ... negotiated field ids ... },
-  "@pac_": true
-}
-
-body: &lt;MessagePack bytes></code></pre>
+            <!-- SNIPPET: features/binary.response.txt | bash -->
           </div>
         </div>
         <div class="feature-callout">
@@ -1448,141 +1308,27 @@ body: &lt;MessagePack bytes></code></pre>
 
       <!-- Schema -->
       <div id="tab-schema" class="code-tab-content active">
-        <pre><code class="language-yaml"># divide.telepact.yaml
-
-- fn.divide:
-    x: integer
-    y: integer
-  ->:
-    - Ok_:
-        result: number
-    - ErrorCannotDivideByZero: {}</code></pre>
+        <!-- SNIPPET: examples/divide.telepact.yaml | yaml -->
       </div>
 
       <!-- Python -->
       <div id="tab-python" class="code-tab-content">
-        <pre><code class="language-python">from telepact import Message, Server, TelepactSchema
-
-schema = TelepactSchema.from_directory('./api')
-
-async def divide(function_name: str, request_message: Message) -> Message:
-    args = request_message.body[function_name]
-    x, y = args['x'], args['y']
-    if y == 0:
-        return Message({}, {'ErrorCannotDivideByZero': {}})
-    return Message({}, {'Ok_': {'result': x / y}})
-
-options = Server.Options()
-options.auth_required = False
-server = Server(schema, {'fn.divide': divide}, options)
-
-# Plug into any framework — Starlette, Flask, FastAPI...
-async def http_handler(request):
-    response = await server.process(await request.body())
-    return Response(content=response.bytes)</code></pre>
+        <!-- SNIPPET: examples/divide.server.py | python -->
       </div>
 
       <!-- TypeScript -->
       <div id="tab-ts" class="code-tab-content">
-        <pre><code class="language-typescript">// No Telepact library required
-
-const request = [
-  {},
-  {
-    "fn.divide": {
-      x: 10,
-      y: 2,
-    },
-  },
-];
-
-const response = await fetch("/api/telepact", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify(request),
-});
-
-const [headers, body] = await response.json();
-
-if (body.Ok_) {
-  console.log(body.Ok_.result);
-} else {
-  console.error(headers, body);
-}</code></pre>
+        <!-- SNIPPET: examples/divide.client.ts | typescript -->
       </div>
 
       <!-- Java -->
       <div id="tab-java" class="code-tab-content">
-        <pre><code class="language-java">import io.github.telepact.Client;
-import io.github.telepact.Message;
-import io.github.telepact.Serializer;
-
-BiFunction&lt;Message, Serializer, Future&lt;Message>> adapter = (message, serializer) ->
-    CompletableFuture.supplyAsync(() -> {
-        var requestBytes = serializer.serialize(message);
-        var responseBytes = transport.send(requestBytes);
-        return serializer.deserialize(responseBytes);
-    });
-
-var client = new Client(adapter, new Client.Options());
-var request = new Message(
-    Map.of(),
-    Map.of("fn.divide", Map.of("x", 10, "y", 2))
-);
-var response = client.request(request);
-
-if ("Ok_".equals(response.getBodyTarget())) {
-    System.out.println(response.getBodyPayload().get("result"));
-}</code></pre>
+        <!-- SNIPPET: examples/divide.client.java | java -->
       </div>
 
       <!-- Go -->
       <div id="tab-go" class="code-tab-content">
-        <pre><code class="language-go">// First generate bindings from the schema:
-// telepact codegen --schema-dir ./api --lang go --package calcclient --out ./gen
-
-package main
-
-import (
-    "context"
-    "log"
-
-    calcclient "example.com/project/gen"
-    telepact "github.com/telepact/telepact/lib/go"
-)
-
-func main() {
-    adapter := func(ctx context.Context, request telepact.Message, serializer *telepact.Serializer) (telepact.Message, error) {
-        requestBytes, err := serializer.Serialize(request)
-        if err != nil {
-            return telepact.Message{}, err
-        }
-
-        responseBytes, err := transport.Send(ctx, requestBytes)
-        if err != nil {
-            return telepact.Message{}, err
-        }
-
-        return serializer.Deserialize(responseBytes)
-    }
-
-    client, err := calcclient.NewClient(adapter, telepact.NewClientOptions())
-    if err != nil {
-        log.Fatal(err)
-    }
-
-    response, err := client.Divide(context.Background(), calcclient.FnDivideArgs{
-        X: 10,
-        Y: 2,
-    })
-    if err != nil {
-        log.Fatal(err)
-    }
-
-    log.Printf("result=%v", response.Ok.Result)
-}</code></pre>
+        <!-- SNIPPET: examples/divide.client.go | go -->
       </div>
     </div>
   </div>

@@ -1,0 +1,9 @@
+# divide.telepact.yaml
+
+- fn.divide:
+    x: integer
+    y: integer
+  ->:
+    - Ok_:
+        result: number
+    - ErrorCannotDivideByZero: {}

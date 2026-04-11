@@ -1,0 +1,11 @@
+- struct.User:
+    id: integer
+    name: string
+    email: string
+    bio: string
+
+- fn.getUser:
+    id: integer
+  ->:
+    - Ok_:
+        user: struct.User

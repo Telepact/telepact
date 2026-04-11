@@ -1,0 +1,4 @@
+- fn.helloWorld: {}
+  ->:
+    - Ok_:
+        msg: string

@@ -1,0 +1,12 @@
+- fn.getTicket:
+    id: string
+  ->:
+    - Ok_:
+        title: string
+
+- fn.createTicket:
+    title: string
+  ->:
+    - Ok_:
+        id: string
+        view: fn.getTicket
