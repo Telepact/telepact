@@ -1,0 +1,8 @@
+[
+  {},
+  {
+    "fn.listEvents": {
+      "limit": 8
+    }
+  }
+]
