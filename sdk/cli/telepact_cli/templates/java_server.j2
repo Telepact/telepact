@@ -1,6 +1,7 @@
 package {{ package }};
 
 import io.github.telepact.Message;
+import io.github.telepact.FunctionRoute;
 import io.github.telepact.Server;
 import io.github.telepact.TypedMessage;
 import java.util.Map;
@@ -12,7 +13,7 @@ public abstract class TypedServerHandler {
     public abstract TypedMessage<{{ function_name }}.Output> {{ function_name }}(Map<String, Object> headers, {{ function_name }}.Input input);
     {%- endfor %}
 
-    public Map<String, Server.FunctionRoute> functionRoutes() {
+    public Map<String, FunctionRoute> functionRoutes() {
         return Map.ofEntries(
             {%- for fn in functions %}
             {%- set function_name = fn | replace('fn.', '') %}

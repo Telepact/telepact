@@ -42,6 +42,8 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
 import io.github.telepact.Client;
+import io.github.telepact.FunctionRoute;
+import io.github.telepact.FunctionRouter;
 import io.github.telepact.TestClient;
 import io.github.telepact.Message;
 import io.github.telepact.MockServer;
@@ -327,7 +329,7 @@ public class Main {
 
         var timers = metrics.timer(frontdoorTopic);
 
-        Map<String, Server.FunctionRoute> functionRoutes = Map.of("fn.validateSchema", (functionName, requestMessage) -> {
+        Map<String, FunctionRoute> functionRoutes = Map.of("fn.validateSchema", (functionName, requestMessage) -> {
             var arg = (Map<String, Object>) requestMessage.body.get(functionName);
             var input = (Map<String, Object>) arg.get("input");
 
@@ -371,7 +373,7 @@ public class Main {
             System.err.flush();
         };
         options.authRequired = false;
-        var functionRouter = new Server.FunctionRouter(functionRoutes);
+        var functionRouter = new FunctionRouter(functionRoutes);
         var server = new Server(telepact, functionRouter, options);
 
         var dispatcher = connection.createDispatcher((msg) -> {
@@ -527,7 +529,7 @@ public class Main {
         options.middleware = middleware;
         options.authRequired = authRequired;
 
-        var functionRouter = new Server.FunctionRouter(Map.of());
+        var functionRouter = new FunctionRouter(Map.of());
         var server = new Server(telepact, functionRouter, options);
 
         var alternateOptions = new Server.Options();
@@ -536,7 +538,7 @@ public class Main {
         alternateOptions.middleware = middleware;
         alternateOptions.authRequired = authRequired;
 
-        var alternateFunctionRouter = new Server.FunctionRouter(Map.of());
+        var alternateFunctionRouter = new FunctionRouter(Map.of());
         var alternateServer = new Server(alternateTelepact, alternateFunctionRouter, alternateOptions);
 
         var dispatcher = connection.createDispatcher((msg) -> {
