@@ -1,41 +1,23 @@
 {
   "changed_paths": [
-    "lib/go/FunctionRouter.go",
-    "lib/go/Server.go",
-    "lib/java/README.md",
-    "lib/java/src/main/java/io/github/telepact/FunctionRoute.java",
-    "lib/java/src/main/java/io/github/telepact/FunctionRouter.java",
-    "lib/java/src/main/java/io/github/telepact/MockServer.java",
-    "lib/java/src/main/java/io/github/telepact/Server.java",
-    "lib/java/src/main/java/io/github/telepact/internal/HandleMessage.java",
-    "lib/java/src/main/java/io/github/telepact/internal/ProcessBytes.java",
-    "lib/py/telepact/FunctionRouter.py",
-    "lib/py/telepact/MockServer.py",
-    "lib/py/telepact/Server.py",
-    "lib/py/telepact/__init__.py",
-    "lib/ts/src/FunctionRouter.ts",
-    "lib/ts/src/Server.ts",
-    "lib/ts/src/index.ts",
-    "sdk/cli/telepact_cli/templates/java_server.j2",
-    "skills/telepact-server/SKILL.md",
-    "test/lib/java/src/main/java/telepacttest/Main.java"
+    "lib/go/go.mod",
+    "lib/go/go.sum",
+    "lib/ts/package-lock.json",
+    "sdk/console/package-lock.json",
+    "test/lib/go/go.mod",
+    "test/lib/go/go.sum"
   ],
   "direct_targets": [
-    "cli",
+    "console",
     "go",
-    "java",
-    "py",
     "ts"
   ],
-  "pr_number": 359,
+  "pr_number": 340,
   "targets": [
-    "cli",
     "console",
     "dart",
     "go",
-    "java",
-    "py",
     "ts"
   ],
-  "version": "1.0.0-alpha.263"
+  "version": "1.0.0-alpha.264"
 }
