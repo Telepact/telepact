@@ -70,4 +70,4 @@ Backwards incompatible change(s) found:
 This is the workflow we want in server development: evolve the schema, then let
 `telepact compare` keep us honest.
 
-Next: [27. Best practices for server implementers](./27-server-best-practices.md)
+Next: [27. TDD with TestClient](./27-test-client-tdd.md)
