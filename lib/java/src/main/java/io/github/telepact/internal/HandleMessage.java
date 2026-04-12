@@ -32,8 +32,8 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import io.github.telepact.FunctionRouter;
 import io.github.telepact.Message;
-import io.github.telepact.Server.FunctionRouter;
 import io.github.telepact.Server.Middleware;
 import io.github.telepact.TelepactError;
 import io.github.telepact.TelepactSchema;

@@ -106,7 +106,7 @@ public class MockServer {
         final var telepactSchema = new TelepactSchema(mockTelepactSchema.original, mockTelepactSchema.full, mockTelepactSchema.parsed,
                 mockTelepactSchema.parsedRequestHeaders, mockTelepactSchema.parsedResponseHeaders);
 
-        var functionRouter = new Server.FunctionRouter(Map.of());
+        var functionRouter = new FunctionRouter(Map.of());
         this.server = new Server(telepactSchema, functionRouter, serverOptions);
     }
 

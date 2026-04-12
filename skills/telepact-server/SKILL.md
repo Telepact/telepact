@@ -188,7 +188,7 @@ Schema loading and server setup:
 var files = new TelepactSchemaFiles("/path/to/schema/dir");
 var schema = TelepactSchema.fromFileJsonMap(files.filenamesToJson);
 
-Map<String, Server.FunctionRoute> functionRoutes = Map.of(
+Map<String, FunctionRoute> functionRoutes = Map.of(
     "fn.example",
     (functionName, requestMessage) -> {
         var args = (Map<String, Object>) requestMessage.body.get(functionName);
@@ -198,7 +198,7 @@ Map<String, Server.FunctionRoute> functionRoutes = Map.of(
 
 var options = new Server.Options();
 options.authRequired = false;
-var functionRouter = new Server.FunctionRouter(functionRoutes);
+var functionRouter = new FunctionRouter(functionRoutes);
 var telepactServer = new Server(schema, functionRouter, options);
 
 // Assuming `transport` is defined elsewhere

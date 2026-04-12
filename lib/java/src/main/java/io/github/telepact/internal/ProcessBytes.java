@@ -25,13 +25,13 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import io.github.telepact.FunctionRouter;
 import io.github.telepact.Message;
 import io.github.telepact.Response;
 import io.github.telepact.SerializationError;
 import io.github.telepact.TelepactError;
 import io.github.telepact.TelepactSchema;
 import io.github.telepact.Serializer;
-import io.github.telepact.Server.FunctionRouter;
 import io.github.telepact.Server.Middleware;
 
 public class ProcessBytes {

@@ -26,6 +26,8 @@ API:
 Server:
 ```java
 import io.github.telepact.Client;
+import io.github.telepact.FunctionRoute;
+import io.github.telepact.FunctionRouter;
 import io.github.telepact.Message;
 import io.github.telepact.Serializer;
 import io.github.telepact.Server;
@@ -36,7 +38,7 @@ var files = new TelepactSchemaFiles("./directory/containing/api/files");
 var schema = TelepactSchema.fromFileJsonMap(files.filenamesToJson);
 // The schema directory may contain multiple *.telepact.yaml and
 // *.telepact.json files. Subdirectories are rejected.
-Map<String, Server.FunctionRoute> functionRoutes = Map.of(
+Map<String, FunctionRoute> functionRoutes = Map.of(
     "fn.greet",
     (functionName, requestMessage) -> {
         var arguments = (Map<String, Object>) requestMessage.body.get(functionName);
@@ -56,7 +58,7 @@ options.middleware = (requestMessage, functionRouter) -> {
         log.info("Function finished", Map.of("function", functionName));
     }
 };
-var functionRouter = new Server.FunctionRouter(functionRoutes);
+var functionRouter = new FunctionRouter(functionRoutes);
 var server = new Server(schema, functionRouter, options);
 
 
