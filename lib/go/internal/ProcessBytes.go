@@ -46,16 +46,22 @@ func ProcessBytes(
 
 	responseMessage, err := HandleMessage(requestMessage, updateHeaders, schema, middleware, functionRouter, onError, onAuth)
 	if err != nil {
-		invokeOnError(onError, err)
-		return buildUnknownResponse(serialize)
+		wrapped := wrapUnknownError(err, "telepact server processing failed", "")
+		invokeOnError(onError, wrapped)
+		return buildUnknownResponse(serialize, wrapped.CaseID())
 	}
 
 	safeInvokeMessage(onResponse, responseMessage)
 
 	responseBytes, err := serialize(responseMessage)
 	if err != nil {
-		invokeOnError(onError, fmt.Errorf("telepact response serialization failed: %w", err))
-		return buildUnknownResponse(serialize)
+		wrapped := wrapUnknownError(
+			fmt.Errorf("telepact response serialization failed: %w", err),
+			"telepact response serialization failed",
+			"serialization",
+		)
+		invokeOnError(onError, wrapped)
+		return buildUnknownResponse(serialize, wrapped.CaseID())
 	}
 
 	return responseMessage, responseBytes, nil
@@ -69,11 +75,8 @@ func safeInvokeMessage(callback func(ServerMessage), message ServerMessage) {
 	callback(message)
 }
 
-func buildUnknownResponse(serialize func(ServerMessage) ([]byte, error)) (ServerMessage, []byte, error) {
-	unknownMessage := ServerMessage{
-		Headers: map[string]any{},
-		Body:    map[string]any{"ErrorUnknown_": map[string]any{}},
-	}
+func buildUnknownResponse(serialize func(ServerMessage) ([]byte, error), caseID string) (ServerMessage, []byte, error) {
+	unknownMessage := newUnknownErrorResponse(map[string]any{}, caseID)
 
 	responseBytes, err := serialize(unknownMessage)
 	if err != nil {

@@ -16,7 +16,8 @@
 
 from .RandomGenerator import RandomGenerator
 from .Client import Client
-from .Server import FunctionRouter, Server
+from .FunctionRouter import FunctionRouter
+from .Server import Server
 from .TestClient import TestClient
 from .MockServer import MockServer
 from .Message import Message

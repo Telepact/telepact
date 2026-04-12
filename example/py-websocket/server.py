@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import websockets
 
-from telepact import Message, Server, TelepactSchema, TelepactSchemaFiles
+from telepact import FunctionRouter, Message, Server, TelepactSchema, TelepactSchemaFiles
 
 files = TelepactSchemaFiles('api')
 schema = TelepactSchema.from_file_json_map(files.filenames_to_json)
@@ -36,7 +36,8 @@ async def greet(function_name: str, request_message: Message) -> Message:
     })
 
 
-telepact_server = Server(schema, {'fn.greet': greet}, options)
+function_router = FunctionRouter({'fn.greet': greet})
+telepact_server = Server(schema, function_router, options)
 
 
 async def telepact_websocket(websocket: websockets.ServerConnection) -> None:

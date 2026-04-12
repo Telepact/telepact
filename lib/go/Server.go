@@ -17,48 +17,14 @@
 package telepact
 
 import (
+	"errors"
+
 	telepactinternal "github.com/telepact/telepact/lib/go/internal"
 	"github.com/telepact/telepact/lib/go/internal/binary"
 )
 
-// FunctionRoute processes a request message for a target function and returns a response message.
-type FunctionRoute func(functionName string, requestMessage Message) (Message, error)
-
 // Middleware wraps server-side request handling and can delegate to the supplied function router.
 type Middleware func(Message, *FunctionRouter) (Message, error)
-
-// FunctionRouter routes a request message to the configured function route for its body target.
-type FunctionRouter struct {
-	functionRoutes map[string]FunctionRoute
-}
-
-// NewFunctionRouter constructs a FunctionRouter from the supplied function routes.
-func NewFunctionRouter(functionRoutes map[string]FunctionRoute) *FunctionRouter {
-	clonedRoutes := make(map[string]FunctionRoute, len(functionRoutes))
-	for functionName, functionRoute := range functionRoutes {
-		clonedRoutes[functionName] = functionRoute
-	}
-	return &FunctionRouter{functionRoutes: clonedRoutes}
-}
-
-// Route dispatches a request message to the configured function route for its target.
-func (r *FunctionRouter) Route(requestMessage Message) (Message, error) {
-	if r == nil {
-		return Message{}, NewTelepactError("telepact: function router is nil")
-	}
-
-	functionName, err := requestMessage.BodyTarget()
-	if err != nil {
-		return Message{}, err
-	}
-
-	functionRoute, ok := r.functionRoutes[functionName]
-	if !ok || functionRoute == nil {
-		return Message{}, NewTelepactError("telepact: unknown function route for " + functionName)
-	}
-
-	return functionRoute(functionName, requestMessage)
-}
 
 // ServerOptions configures server behaviour.
 type ServerOptions struct {
@@ -98,13 +64,13 @@ type Server struct {
 	serializer     *Serializer
 }
 
-// NewServer constructs a Server using the supplied schema, function routes, and options.
-func NewServer(telepactSchema *TelepactSchema, functionRoutes map[string]FunctionRoute, options *ServerOptions) (*Server, error) {
+// NewServer constructs a Server using the supplied schema, function router, and options.
+func NewServer(telepactSchema *TelepactSchema, functionRouter *FunctionRouter, options *ServerOptions) (*Server, error) {
 	if telepactSchema == nil {
 		return nil, NewTelepactError("telepact: schema must not be nil")
 	}
-	if functionRoutes == nil {
-		return nil, NewTelepactError("telepact: function routes must not be nil")
+	if functionRouter == nil {
+		return nil, NewTelepactError("telepact: function router must not be nil")
 	}
 
 	if options == nil {
@@ -148,7 +114,7 @@ func NewServer(telepactSchema *TelepactSchema, functionRoutes map[string]Functio
 	}
 
 	return &Server{
-		functionRouter: NewFunctionRouter(functionRoutes),
+		functionRouter: functionRouter,
 		middleware:     options.Middleware,
 		onError:        options.OnError,
 		onRequest:      options.OnRequest,
@@ -186,6 +152,31 @@ func (s *Server) ProcessWithHeaders(requestMessageBytes []byte, updateHeaders fu
 		s.onResponse(NewMessage(message.Headers, message.Body))
 	}
 
+	internalOnError := func(err error) {
+		if err == nil {
+			return
+		}
+
+		var telepactErr *TelepactError
+		if errors.As(err, &telepactErr) {
+			s.onError(telepactErr)
+			return
+		}
+
+		var detailedErr interface {
+			error
+			Kind() string
+			CaseID() string
+		}
+		if errors.As(err, &detailedErr) {
+			wrapped := NewTelepactErrorWithCaseID(err.Error(), detailedErr.Kind(), errors.Unwrap(err), detailedErr.CaseID())
+			s.onError(wrapped)
+			return
+		}
+
+		s.onError(err)
+	}
+
 	internalFunctionRouter := &serverFunctionRouterAdapter{
 		functionRouter: s.functionRouter,
 	}
@@ -204,7 +195,7 @@ func (s *Server) ProcessWithHeaders(requestMessageBytes []byte, updateHeaders fu
 		deserialize,
 		serialize,
 		s.telepactSchema,
-		s.onError,
+		internalOnError,
 		internalOnRequest,
 		internalOnResponse,
 		s.onAuth,

@@ -20,6 +20,7 @@ from ..internal.binary.ServerBase64Decode import server_base64_decode
 
 from ..Message import Message
 from ..TelepactError import TelepactError
+from ..internal.UnknownError import build_unknown_error_message
 from .GetApiDefinitionsWithExamples import get_api_definitions_with_examples
 from .types.TTypeDeclaration import TTypeDeclaration
 
@@ -103,17 +104,16 @@ async def handle_message(
             auth_headers = on_auth(request_headers) or {}
             request_headers.update(auth_headers)
         except Exception as e:
+            wrapped = TelepactError(
+                f"telepact auth handler failed while handling {function_name}",
+                kind="handler",
+                cause=e,
+            )
             try:
-                on_error(
-                    TelepactError(
-                        f"telepact auth handler failed while handling {function_name}",
-                        kind="handler",
-                        cause=e,
-                    )
-                )
+                on_error(wrapped)
             except Exception:
                 pass
-            return Message(response_headers, {"ErrorUnknown_": {}})
+            return build_unknown_error_message(wrapped, response_headers)
 
     if "@bin_" in request_headers:
         client_known_binary_checksums = cast(
@@ -183,17 +183,16 @@ async def handle_message(
         try:
             result_message = await middleware(call_message, function_router)
         except Exception as e:
+            wrapped = TelepactError(
+                f"telepact handler failed while handling {function_name}",
+                kind="handler",
+                cause=e,
+            )
             try:
-                on_error(
-                    TelepactError(
-                        f"telepact handler failed while handling {function_name}",
-                        kind="handler",
-                        cause=e,
-                    )
-                )
+                on_error(wrapped)
             except Exception:
                 pass
-            return Message(response_headers, {"ErrorUnknown_": {}})
+            return build_unknown_error_message(wrapped, response_headers)
 
     result_union: dict[str, object] = result_message.body
 

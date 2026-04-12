@@ -1,0 +1,10 @@
+- struct.Event:
+    id: integer
+    title: string
+    status: string
+
+- fn.listEvents:
+    limit: integer
+  ->:
+    - Ok_:
+        events: [struct.Event]

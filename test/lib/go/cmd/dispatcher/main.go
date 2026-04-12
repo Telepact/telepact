@@ -697,7 +697,8 @@ func startSchemaTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscrip
 	}
 	options.AuthRequired = false
 
-	server, err := telepact.NewServer(schema, functionRoutes, options)
+	functionRouter := telepact.NewFunctionRouter(functionRoutes)
+	server, err := telepact.NewServer(schema, functionRouter, options)
 	if err != nil {
 		return nil, err
 	}
@@ -877,7 +878,8 @@ func startTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscription, 
 	options.OnAuth = onAuth
 	options.Middleware = middleware
 
-	server, err := telepact.NewServer(tele, map[string]telepact.FunctionRoute{}, options)
+	functionRouter := telepact.NewFunctionRouter(map[string]telepact.FunctionRoute{})
+	server, err := telepact.NewServer(tele, functionRouter, options)
 	if err != nil {
 		return nil, err
 	}
@@ -891,7 +893,8 @@ func startTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscription, 
 	}
 	alternateOptions.OnAuth = onAuth
 	alternateOptions.Middleware = middleware
-	alternateServer, err := telepact.NewServer(alternateTele, map[string]telepact.FunctionRoute{}, alternateOptions)
+	alternateFunctionRouter := telepact.NewFunctionRouter(map[string]telepact.FunctionRoute{})
+	alternateServer, err := telepact.NewServer(alternateTele, alternateFunctionRouter, alternateOptions)
 	if err != nil {
 		return nil, err
 	}

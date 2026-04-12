@@ -122,6 +122,20 @@
         tape: ["struct.Evaluation"]
 
 - ///: |
+    Export the saved variables and evaluations for the current namespace as a blob.
+  fn.export: {}
+  ->:
+    - Ok_:
+        blob: "bytes"
+
+- ///: |
+    Replace the saved variables and evaluations for the current namespace using a previously exported blob.
+  fn.import:
+    blob: "bytes"
+  ->:
+    - Ok_: {}
+
+- ///: |
     A record of an evaluated expression, including the original `expression`, the computed `result`, the `timestamp` of evaluation, and whether the evaluation was `successful`.
   struct.Evaluation:
     expression: "union.Expression"

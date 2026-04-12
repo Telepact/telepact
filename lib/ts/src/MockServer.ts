@@ -17,7 +17,7 @@
 import { TelepactSchema } from './TelepactSchema.js';
 import { MockInvocation } from './internal/mock/MockInvocation.js';
 import { MockStub } from './internal/mock/MockStub.js';
-import { Server, ServerOptions as ServerOptions } from './Server.js';
+import { FunctionRouter, Server, ServerOptions as ServerOptions } from './Server.js';
 import { RandomGenerator } from './RandomGenerator.js';
 import { mockHandle } from './internal/mock/MockHandle.js';
 import { MockTelepactSchema } from './MockTelepactSchema.js';
@@ -51,7 +51,8 @@ export class MockServer {
             mockTelepactSchema.parsedResponseHeaders,
         );
 
-        this.server = new Server(telepactSchema, {}, serverOptions);
+        const functionRouter = new FunctionRouter({});
+        this.server = new Server(telepactSchema, functionRouter, serverOptions);
     }
 
     private random: RandomGenerator;

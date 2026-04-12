@@ -18,7 +18,7 @@ import click
 import os
 import json
 import argparse
-import json
+import msgpack
 import shutil
 import yaml
 from typing import cast, Pattern
@@ -39,7 +39,7 @@ import time
 import secrets
 import random
 import uvicorn
-from .telepact import Client, Server, Message, Serializer, TelepactSchema, MockTelepactSchema, MockServer, SerializationError
+from .telepact import Client, FunctionRouter, Server, Message, Serializer, TelepactSchema, MockTelepactSchema, MockServer, SerializationError
 import asyncio
 import requests
 
@@ -515,6 +515,48 @@ def demo_server(port: int) -> None:
             'successful': successful,
         })
 
+    def export_namespace(username: str) -> bytes:
+        return msgpack.packb({
+            'variables': get_user_variables(username),
+            'evaluations': get_user_evaluations(username),
+        }, use_bin_type=True)
+
+    def parse_namespace_blob(blob: bytes) -> tuple[dict[str, float], list[dict[str, object]]]:
+        try:
+            namespace = msgpack.unpackb(blob, raw=False, strict_map_key=False)
+        except (ValueError, msgpack.ExtraData, msgpack.FormatError, msgpack.StackError) as e:
+            raise ValueError('Imported namespace blob must use the expected msgpack format.') from e
+        if not isinstance(namespace, dict):
+            raise ValueError('Imported namespace blob must decode to a msgpack object.')
+        variables = namespace.get('variables')
+        evaluations = namespace.get('evaluations')
+        if not isinstance(variables, dict):
+            raise ValueError('Imported namespace blob must include a variables object.')
+        if not isinstance(evaluations, list):
+            raise ValueError('Imported namespace blob must include an evaluations list.')
+
+        parsed_variables: dict[str, float] = {}
+        for name, value in variables.items():
+            if not isinstance(name, str):
+                raise ValueError('Imported namespace variable names must be strings.')
+            # Reject bool explicitly because bool is a subclass of int in Python.
+            if isinstance(value, bool) or not isinstance(value, (int, float)):
+                raise ValueError('Imported namespace variable values must be numbers.')
+            parsed_variables[name] = float(value)
+
+        parsed_evaluations: list[dict[str, object]] = []
+        for evaluation in evaluations:
+            if not isinstance(evaluation, dict):
+                raise ValueError('Imported namespace evaluations must be objects.')
+            parsed_evaluations.append(cast(dict[str, object], evaluation))
+
+        return parsed_variables, parsed_evaluations
+
+    def replace_namespace(username: str, blob: bytes) -> None:
+        variables, evaluations = parse_namespace_blob(blob)
+        user_variables[username] = variables
+        user_evaluations[username] = evaluations
+
     def evaluate_expression(expression: dict[str, object], variables: dict[str, float]) -> tuple[float, list[str], bool]:
         kind, payload = next(iter(expression.items()))
         payload_dict = cast(dict[str, object], payload)
@@ -679,6 +721,20 @@ def demo_server(port: int) -> None:
             evaluations = evaluations[:limit]
         return Message({}, {'Ok_': {'tape': evaluations}})
 
+    async def export_route(function_name: str, request_message: Message) -> Message:
+        unavailable_response, username = await require_namespace(request_message)
+        if unavailable_response is not None:
+            return unavailable_response
+        return Message({}, {'Ok_': {'blob': export_namespace(cast(str, username))}})
+
+    async def import_route(function_name: str, request_message: Message) -> Message:
+        unavailable_response, username = await require_namespace(request_message)
+        if unavailable_response is not None:
+            return unavailable_response
+        blob = cast(bytes, cast(dict[str, object], request_message.body[function_name])['blob'])
+        replace_namespace(cast(str, username), blob)
+        return Message({}, {'Ok_': {}})
+
     function_routes = {
         'fn.add': add_route,
         'fn.login': login_route,
@@ -691,6 +747,8 @@ def demo_server(port: int) -> None:
         'fn.deleteVariables': delete_variables_route,
         'fn.evaluate': evaluate_route,
         'fn.getPaperTape': get_paper_tape_route,
+        'fn.export': export_route,
+        'fn.import': import_route,
     }
 
 
@@ -701,7 +759,8 @@ def demo_server(port: int) -> None:
     server_options = Server.Options()
     server_options.auth_required = True
     server_options.on_error = lambda e: print(e)
-    telepact_server = Server(telepact_schema, function_routes, server_options)
+    function_router = FunctionRouter(function_routes)
+    telepact_server = Server(telepact_schema, function_router, server_options)
 
     print('Telepact Server running at /api')
 

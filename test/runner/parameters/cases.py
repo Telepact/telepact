@@ -348,7 +348,7 @@ cases = {
         [[{'@unsafe_': True, '@result': {'ErrorExample': {'wrong': 'a'}}}, {'fn.test': {}}], [{}, {'ErrorExample': {'wrong': 'a'}}]],
     ],
     'testApplicationFailure': [
-        [[{'@throw': True}, {'fn.test': {}}], [{}, {'ErrorUnknown_': {}}]],
+        [[{'@throw': True}, {'fn.test': {}}], [{'@assert_': {'assertCaseId': True}}, {'ErrorUnknown_': {'caseId': '<caseId>'}}]],
     ],
     'error': [
         [[{'@error': True}, {'fn.test': {}}], [{}, {'ErrorExample2': {'field1': 'Boom!'}}]],
@@ -363,7 +363,7 @@ cases = {
     'serverHooks': [
         [[{'@ok_': {}, '@onRequestError_': True}, {'fn.test': {}}], [{}, {'Ok_': {}}]],
         [[{'@ok_': {}, '@onResponseError_': True}, {'fn.test': {}}], [{'@onResponseError_': True}, {'Ok_': {}}]],
-        [[{'@ok_': {}, '@throwError_': True}, {'fn.test': {}}], [{}, {'ErrorUnknown_': {}}]],
+        [[{'@ok_': {}, '@throwError_': True}, {'fn.test': {}}], [{'@assert_': {'assertCaseId': True}}, {'ErrorUnknown_': {'caseId': '<caseId>'}}]],
     ],
     'clientHeaders': [
         [[{'@time_': 6000}, {'fn.ping_': {}}], [{}, {'Ok_': {}}]],

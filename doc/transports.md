@@ -75,14 +75,13 @@ HTTP is the most common Telepact deployment shape. A typical setup is:
 ### HTTP server example (Python + Starlette)
 
 ```py
-from telepact import Message, Server, TelepactSchema, TelepactSchemaFiles
+from telepact import FunctionRouter, Message, Server, TelepactSchema
 from starlette.applications import Starlette
 from starlette.responses import Response
 from starlette.routing import Route
 import uvicorn
 
-files = TelepactSchemaFiles('./api')
-schema = TelepactSchema.from_file_json_map(files.filenames_to_json)
+schema = TelepactSchema.from_directory('./api')
 
 async def greet(function_name: str, request_message: Message) -> Message:
     arguments = request_message.body[function_name]
@@ -91,7 +90,8 @@ async def greet(function_name: str, request_message: Message) -> Message:
 
 options = Server.Options()
 options.auth_required = False
-server = Server(schema, {'fn.greet': greet}, options)
+function_router = FunctionRouter({'fn.greet': greet})
+server = Server(schema, function_router, options)
 
 async def http_handler(request):
     request_bytes = await request.body()
@@ -163,13 +163,12 @@ response per WebSocket message.
 ### WebSocket server example (Python + Starlette)
 
 ```py
-from telepact import Message, Server, TelepactSchema, TelepactSchemaFiles
+from telepact import FunctionRouter, Message, Server, TelepactSchema
 from starlette.applications import Starlette
 from starlette.routing import WebSocketRoute
 import uvicorn
 
-files = TelepactSchemaFiles('./api')
-schema = TelepactSchema.from_file_json_map(files.filenames_to_json)
+schema = TelepactSchema.from_directory('./api')
 
 async def greet(function_name: str, request_message: Message) -> Message:
     arguments = request_message.body[function_name]
@@ -178,7 +177,8 @@ async def greet(function_name: str, request_message: Message) -> Message:
 
 options = Server.Options()
 options.auth_required = False
-server = Server(schema, {'fn.greet': greet}, options)
+function_router = FunctionRouter({'fn.greet': greet})
+server = Server(schema, function_router, options)
 
 async def websocket_handler(websocket):
     await websocket.accept()
@@ -252,6 +252,6 @@ if (response.getBodyTarget() === 'Ok_') {
 
 ## See also
 
-- [Example](./example.md)
+- [Quickstart](./example.md)
 - [FAQ](./faq.md)
 - [Runtime Error Guide](./runtime-errors.md)

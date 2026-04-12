@@ -18,6 +18,7 @@ import {
     TelepactSchemaParseError,
     Client,
     ClientOptions,
+    FunctionRouter,
     Server,
     ServerOptions,
     Message,
@@ -358,7 +359,8 @@ function startSchemaTestServer(
     options.onError = (e: Error) => console.error(e);
     options.authRequired = false;
 
-    const server: Server = new Server(telepact, functionRoutes, options);
+    const functionRouter = new FunctionRouter(functionRoutes);
+    const server: Server = new Server(telepact, functionRouter, options);
 
     const sub: Subscription = connection.subscribe(frontdoorTopic);
     (async () => {
@@ -486,14 +488,16 @@ function startTestServer(
     options.middleware = middleware;
     options.authRequired = authRequired;
 
-    const server: Server = new Server(telepact, {}, options);
+    const functionRouter = new FunctionRouter({});
+    const server: Server = new Server(telepact, functionRouter, options);
 
     const alternateOptions = new ServerOptions();
     alternateOptions.onError = (e) => console.error(e);
     alternateOptions.onAuth = onAuth;
     alternateOptions.middleware = middleware;
     alternateOptions.authRequired = authRequired;
-    const alternateServer: Server = new Server(alternateTelepact, {}, alternateOptions);
+    const alternateFunctionRouter = new FunctionRouter({});
+    const alternateServer: Server = new Server(alternateTelepact, alternateFunctionRouter, alternateOptions);
 
     const subscription: Subscription = connection.subscribe(frontdoorTopic);
     (async () => {

@@ -21,7 +21,7 @@ Server:
 ```ts
 import * as fs from 'fs';
 import * as path from 'path';
-import { Message, Server, ServerOptions, TelepactSchema, TelepactSchemaFiles } from 'telepact';
+import { FunctionRouter, Message, Server, ServerOptions, TelepactSchema, TelepactSchemaFiles } from 'telepact';
 
 const files = new TelepactSchemaFiles('/directory/containing/api/files', fs, path);
 const schema = TelepactSchema.fromFileJsonMap(files.filenamesToJson);
@@ -49,7 +49,8 @@ options.middleware = async (requestMessage: Message, functionRouter): Promise<Me
         log.info("Function finished", {function: functionName});
     }
 };
-const server = new Server(schema, functionRoutes, options);
+const functionRouter = new FunctionRouter(functionRoutes);
+const server = new Server(schema, functionRouter, options);
 
 // Wire up request/response bytes from your transport of choice
 transport.receive(async (requestBytes: Uint8Array): Promise<Uint8Array> => {
