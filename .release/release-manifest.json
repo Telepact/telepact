@@ -1,9 +1,9 @@
 {
   "changed_paths": [
-    ".github/workflows/build.yml"
+    "site/src/index.template.html"
   ],
   "direct_targets": [],
-  "pr_number": 357,
+  "pr_number": 358,
   "targets": [],
-  "version": "1.0.0-alpha.261"
+  "version": "1.0.0-alpha.262"
 }
