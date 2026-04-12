@@ -48,6 +48,7 @@ local-ci:
 	$(MAKE) example-check
 	$(MAKE) test
 	$(MAKE) console-self-hosted
+	$(MAKE) site
 	$(MAKE) license-header
 	$(MAKE) version
 
@@ -141,7 +142,7 @@ test-trace-go:
 deploy-go:
 	$(MAKE) -C lib/go deploy
 
-.PHONY: test prepare-test-java test-java-run prepare-test-py test-py-run prepare-test-ts test-ts-run prepare-test-go test-go-run
+.PHONY: test prepare-test-java test-java-run prepare-test-py test-py-run prepare-test-ts test-ts-run prepare-test-go test-go-run site
 test:
 	$(MAKE) -C test/runner test
 
@@ -214,6 +215,12 @@ deploy-console:
 console-self-hosted:
 	$(MAKE) -C test/console-self-hosted
 
+site:
+	$(MAKE) -C site
+
+clean-site:
+	$(MAKE) -C site clean
+
 clean-console-self-hosted:
 	$(MAKE) -C test/console-self-hosted clean
 
@@ -243,4 +250,4 @@ version:
 	$(MAKE) doc-versions
 
 license-header:
-	telepact-project license-header NOTICE
+	UV_CACHE_DIR=/tmp/uv-cache uv run --project tool/telepact_project_cli telepact-project license-header NOTICE

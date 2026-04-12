@@ -19,7 +19,6 @@ package io.github.telepact;
 import static io.github.telepact.internal.ProcessBytes.processBytes;
 import static io.github.telepact.internal.binary.ConstructBinaryEncoding.constructBinaryEncoding;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -33,30 +32,8 @@ import io.github.telepact.internal.binary.ServerBinaryEncoder;
 public class Server {
 
     @FunctionalInterface
-    public interface FunctionRoute {
-        Message apply(String functionName, Message requestMessage);
-    }
-
-    @FunctionalInterface
     public interface Middleware {
         Message apply(Message requestMessage, FunctionRouter functionRouter);
-    }
-
-    public static class FunctionRouter {
-        private final Map<String, FunctionRoute> functionRoutes;
-
-        public FunctionRouter(Map<String, FunctionRoute> functionRoutes) {
-            this.functionRoutes = new HashMap<>(functionRoutes);
-        }
-
-        public Message route(Message requestMessage) {
-            final var functionName = requestMessage.getBodyTarget();
-            final var functionRoute = this.functionRoutes.get(functionName);
-            if (functionRoute == null) {
-                throw new IllegalArgumentException("Unknown function: " + functionName);
-            }
-            return functionRoute.apply(functionName, requestMessage);
-        }
     }
 
     /**
@@ -122,14 +99,14 @@ public class Server {
     private final Serializer serializer;
 
     /**
-     * Create a server with the given telepact schema and function routes.
+     * Create a server with the given telepact schema and function router.
      * 
      * @param telepactSchema The schema to be used by the server.
-     * @param functionRoutes The function routes to handle incoming messages.
+     * @param functionRouter The function router to handle incoming messages.
      * @param options The options for configuring the server.
      */
-    public Server(TelepactSchema telepactSchema, Map<String, FunctionRoute> functionRoutes, Options options) {
-        this.functionRouter = new FunctionRouter(functionRoutes);
+    public Server(TelepactSchema telepactSchema, FunctionRouter functionRouter, Options options) {
+        this.functionRouter = functionRouter;
         this.middleware = options.middleware;
         this.onError = options.onError;
         this.onRequest = options.onRequest;

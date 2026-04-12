@@ -17,6 +17,7 @@
 from typing import Callable, TYPE_CHECKING, Awaitable
 
 from .DefaultSerialization import DefaultSerialization
+from .FunctionRouter import FunctionRoute, FunctionRouter
 from .Serializer import Serializer
 from .internal.binary.ServerBinaryEncoder import ServerBinaryEncoder
 from .internal.binary.ServerBase64Encoder import ServerBase64Encoder
@@ -26,21 +27,8 @@ if TYPE_CHECKING:
     from .TelepactSchema import TelepactSchema
     from .Response import Response
 
-FunctionRoute = Callable[[str, 'Message'], Awaitable['Message']]
 Middleware = Callable[['Message', 'FunctionRouter'], Awaitable['Message']]
 UpdateHeaders = Callable[[dict[str, object]], None]
-
-
-class FunctionRouter:
-    def __init__(self, function_routes: dict[str, FunctionRoute]) -> None:
-        self.function_routes = function_routes
-
-    async def route(self, request_message: 'Message') -> 'Message':
-        function_name = request_message.get_body_target()
-        function_route = self.function_routes.get(function_name)
-        if function_route is None:
-            raise RuntimeError(f"Unknown function: {function_name}")
-        return await function_route(function_name, request_message)
 
 
 async def _default_middleware(request_message: 'Message', function_router: FunctionRouter) -> 'Message':
@@ -64,13 +52,13 @@ class Server:
             self.auth_required = True
             self.serialization = DefaultSerialization()
 
-    def __init__(self, telepact_schema: 'TelepactSchema', function_routes: dict[str, FunctionRoute], options: Options):
+    def __init__(self, telepact_schema: 'TelepactSchema', function_router: FunctionRouter, options: Options):
         """
-        Create a server with the given telepact schema and function routes.
+        Create a server with the given telepact schema and function router.
         """
         from .internal.binary.ConstructBinaryEncoding import construct_binary_encoding
 
-        self.function_router = FunctionRouter(function_routes)
+        self.function_router = function_router
         self.middleware = options.middleware
         self.on_error = options.on_error
         self.on_request = options.on_request

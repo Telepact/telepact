@@ -1,7 +1,7 @@
-# Example
+# Quickstart
 
 The minimum Telepact API ecosystem is established by a server defining a
-Telepact API schema,and serving it using one of the Telepact libraries.
+Telepact API schema, and serving it using one of the Telepact libraries.
 
 Specify your API:
 
@@ -29,7 +29,7 @@ $ cat ./server.py
 ```
 
 ```py
-from telepact import TelepactSchemaFiles, TelepactSchema, Server, Message
+from telepact import FunctionRouter, TelepactSchema, Server, Message
 from starlette.applications import Starlette
 from starlette.responses import Response
 from starlette.routing import Route
@@ -50,9 +50,9 @@ async def divide(function_name, request_message):
 options = Server.Options()
 options.auth_required = False
 
-schema_files = TelepactSchemaFiles('./api')
-api = TelepactSchema.from_file_json_map(schema_files.filenames_to_json)
-server = Server(api, {'fn.divide': divide}, options)
+api = TelepactSchema.from_directory('./api')
+function_router = FunctionRouter({'fn.divide': divide})
+server = Server(api, function_router, options)
 
 async def http_handler(request):
     request_bytes = await request.body()

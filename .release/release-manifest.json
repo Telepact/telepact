@@ -1,14 +1,23 @@
 {
   "changed_paths": [
-    "sdk/cli/telepact_cli/cli.py",
-    "sdk/cli/tests/test_main.py"
+    "lib/go/go.mod",
+    "lib/go/go.sum",
+    "lib/ts/package-lock.json",
+    "sdk/console/package-lock.json",
+    "test/lib/go/go.mod",
+    "test/lib/go/go.sum"
   ],
   "direct_targets": [
-    "cli"
+    "console",
+    "go",
+    "ts"
   ],
-  "pr_number": 343,
+  "pr_number": 340,
   "targets": [
-    "cli"
+    "console",
+    "dart",
+    "go",
+    "ts"
   ],
-  "version": "1.0.0-alpha.249"
+  "version": "1.0.0-alpha.264"
 }

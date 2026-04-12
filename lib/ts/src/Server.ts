@@ -24,29 +24,12 @@ import { processBytes } from './internal/ProcessBytes.js';
 import { Serialization } from './Serialization.js';
 import { ServerBase64Encoder } from './internal/binary/ServerBase64Encoder.js';
 import { Response } from './Response.js';
+import { FunctionRouter } from './FunctionRouter.js';
 
-export type FunctionRoute = (functionName: string, requestMessage: Message) => Promise<Message>;
-export type FunctionRoutes = Record<string, FunctionRoute>;
 export type Middleware = (requestMessage: Message, functionRouter: FunctionRouter) => Promise<Message>;
 export type UpdateHeaders = (headers: Record<string, any>) => void;
-
-export class FunctionRouter {
-    functionRoutes: FunctionRoutes;
-
-    constructor(functionRoutes: FunctionRoutes) {
-        this.functionRoutes = functionRoutes;
-    }
-
-    async route(requestMessage: Message): Promise<Message> {
-        const functionName = requestMessage.getBodyTarget();
-        const functionRoute = this.functionRoutes[functionName];
-        if (functionRoute === undefined) {
-            throw new Error(`Unknown function: ${functionName}`);
-        }
-
-        return await functionRoute(functionName, requestMessage);
-    }
-}
+export { FunctionRouter } from './FunctionRouter.js';
+export type { FunctionRoute, FunctionRoutes } from './FunctionRouter.js';
 
 export class Server {
     functionRouter: FunctionRouter;
@@ -58,8 +41,8 @@ export class Server {
     telepactSchema: TelepactSchema;
     serializer: Serializer;
 
-    constructor(telepactSchema: TelepactSchema, functionRoutes: FunctionRoutes, options: ServerOptions) {
-        this.functionRouter = new FunctionRouter(functionRoutes);
+    constructor(telepactSchema: TelepactSchema, functionRouter: FunctionRouter, options: ServerOptions) {
+        this.functionRouter = functionRouter;
         this.middleware = options.middleware;
         this.onError = options.onError;
         this.onRequest = options.onRequest;
