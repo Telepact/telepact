@@ -82,6 +82,9 @@ export function derivePossibleSelect(fnName: string, result: TUnion): Record<str
 function findNestedTypes(typeDeclaration: TTypeDeclaration, nestedTypes: Record<string, TType>) {
     const typ = typeDeclaration.type;
     if (typ instanceof TUnion) {
+        if (nestedTypes[typ.name] !== undefined) {
+            return;
+        }
         nestedTypes[typ.name] = typ;
         for (const tag of Object.values(typ.tags)) {
             for (const fieldDecl of Object.values(tag.fields)) {
@@ -89,6 +92,9 @@ function findNestedTypes(typeDeclaration: TTypeDeclaration, nestedTypes: Record<
             }
         }
     } else if (typ instanceof TStruct) {
+        if (nestedTypes[typ.name] !== undefined) {
+            return;
+        }
         nestedTypes[typ.name] = typ;
         for (const fieldDecl of Object.values(typ.fields)) {
             findNestedTypes(fieldDecl.typeDeclaration, nestedTypes);
