@@ -1,47 +1,57 @@
 # Home
 
-Welcome to the Telepact docs. Use this page to find the guides, references, and
-tools you need to design, serve, and operate a Telepact API.
+Welcome to the Telepact docs. Use this page to find the right path based on
+what you are trying to do: learn the basics, design a schema, build clients and
+servers, or operate a Telepact API in production.
 
-To get started quickly, read the [Quickstart](./example.md). For a guided tour,
-continue with [Learn Telepact by Example](./learn-by-example/README.md).
+## Start here
 
-To learn how to write Telepact APIs, start with the
-[API Schema Guide](./schema-guide.md). A
-[JSON Schema](../common/json-schema.json) is available for validation.
+- [Quickstart](./example.md) for the fastest end-to-end example
+- [Learn Telepact by Example](./learn-by-example/README.md) for a guided tour
+- [Demos](../example/README.md) for runnable end-to-end examples
 
-To learn how to serve a Telepact API, see the specific library docs:
-- [Typescript](../lib/ts/README.md)
+## Design APIs
+
+- [Schema Writing Guide](./schema-guide.md) for the full schema language
+- [Core Concepts](./core-concepts.md) for Telepact's message model, schema
+  role, headers, links, select, and binary at a high level
+- [Extensions](./extensions.md) for Telepact's reserved `_ext.*_` types
+- [JSON Schema](../common/json-schema.json) for schema-file validation
+
+## Build clients and servers
+
+- [Transport Guide](./transports.md) for HTTP and WebSocket wiring patterns
+- [Client Paths](./client-paths.md) for choosing between plain JSON, client
+  libraries, and generated code
+- [Server Paths](./server-paths.md) for choosing a runtime and wiring a server
+- [Tooling Workflow](./tooling-workflow.md) for `fetch`, `compare`, `mock`, and
+  `codegen`
+
+### Libraries
+
+- [TypeScript](../lib/ts/README.md)
 - [Python](../lib/py/README.md)
 - [Java](../lib/java/README.md)
 - [Go](../lib/go/README.md)
 
-For development assistance, see the SDK tool docs:
+### SDK tools
+
 - [CLI](../sdk/cli/README.md)
-    - Conveniently retrieve API schemas from running live Telepact servers, and
-      use schemas to create mock servers and generate code bindings, all from
-      the command line
+    - Fetch schemas, compare versions, mock APIs, and generate code from the
+      command line
 - [Browser Console](../sdk/console/README.md)
-    - Develop against a live Telepact server by reading rendered docs, drafting
-      requests, and submitting live requests with json-friendly editors
+    - Browse docs and submit live requests against a running Telepact server
 - [Prettier Plugin](../sdk/prettier/README.md)
-    - Consistently format your Telepact api schemas, especially the doc-strings
+    - Format checked-in Telepact schema files consistently
 
-Find the latest versions of all libraries and sdks [here](./versions.md). That
-page tracks published registry versions, which may lag the source tree between
-releases.
+## Operate
 
-For transport wiring patterns and concrete HTTP/WebSocket examples, see the
-[Transport Guide](./transports.md). For deployment, rollout, compatibility,
-auth, and observability guidance, see the
-[Production Guide](./production-guide.md).
+- [Production Guide](./production-guide.md) for rollout, auth, compatibility,
+  and observability guidance
+- [Runtime Error Guide](./runtime-errors.md) for local/runtime debugging
+- [Versions](./versions.md) for the latest published library and SDK versions
 
-For runnable end-to-end demos, see the [Demos page](../example/README.md).
+## Background and reference
 
-For debugging local/runtime
-failures, see the [Runtime Error Guide](./runtime-errors.md).
-
-For further reading, see [Motivation](./motivation.md).
-
-Telepact does have a few unorthodox design decisions. To be best informed, you
-should read the explanations in [the FAQ](./faq.md).
+- [FAQ](./faq.md) for Telepact's more unusual design decisions
+- [Motivation](./motivation.md) for the ecosystem goals and tradeoffs
