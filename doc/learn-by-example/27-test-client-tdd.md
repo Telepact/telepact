@@ -87,8 +87,8 @@ def test_hello_can_keep_going_with_multiple_assertions() -> None:
     greeting = response.body['Ok_']['message']
 
     assert greeting.startswith('Hello, ')
-    name_with_punctuation = greeting.removeprefix('Hello, ')
-    assert name_with_punctuation == 'Telepact!'
+    extracted_name = greeting.removeprefix('Hello, ')
+    assert extracted_name == 'Telepact!'
 ```
 
 ## Run the tests
