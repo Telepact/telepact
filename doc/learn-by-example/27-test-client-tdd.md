@@ -73,7 +73,7 @@ def test_hello_shows_the_actual_payload() -> None:
     assert "Actual: {'Ok_': {'message': 'Telepact'}}" in str(error_info.value)
 
 
-def test_hello_can_keep_going_during_the_red_phase() -> None:
+def test_hello_can_keep_going_with_multiple_assertions() -> None:
     test_client = make_test_client()
 
     response = asyncio.run(
@@ -84,7 +84,11 @@ def test_hello_can_keep_going_during_the_red_phase() -> None:
         )
     )
 
-    assert response.body == {'Ok_': {'message': 'Hello, Telepact!'}}
+    greeting = response.body['Ok_']['message']
+
+    assert greeting.startswith('Hello, ')
+    name_with_punctuation = greeting.removeprefix('Hello, ')
+    assert name_with_punctuation == 'Telepact!'
 ```
 
 ## Run the tests
@@ -96,10 +100,16 @@ pytest -q
 The first test is the usual red phase: the assertion fails, and the error text
 includes the actual payload that came back from the server.
 
-The second test uses `expect_match=False`. That means we currently expect the
-server to *not* match yet. In that case, `TestClient` returns a schema-valid
-response built from the expected payload we supplied, so the test can keep going
-while we shape the rest of the behavior.
+The second test shows the more unusual part. It uses `expect_match=False`,
+which means we currently expect the server to *not* match yet. In that case,
+`TestClient` returns a schema-valid response built from the expected payload we
+supplied, so the test can keep going.
+
+That matters when one assertion depends on the result of an earlier one. Here,
+the server really returned `Telepact`, but `TestClient` hands the test a
+response whose `message` still satisfies the expected shape. That lets us first
+assert `startswith('Hello, ')` and then use that result for the next assertion
+on `Telepact!`, all in one red-phase test.
 
 ## Fix the server
 
