@@ -619,8 +619,15 @@ def page_by_rel_source(pages: dict[Path, Page], rel_source: str) -> Page | None:
     return None
 
 
+def read_markdown_source(source: Path) -> list[str]:
+    try:
+        return source.read_text(encoding="utf-8").splitlines()
+    except OSError as exc:
+        raise RuntimeError(f"Failed to read markdown source: {source}") from exc
+
+
 def first_markdown_heading(source: Path) -> str:
-    for line in source.read_text(encoding="utf-8").splitlines():
+    for line in read_markdown_source(source):
         match = re.match(r"^(#{1,6})\s+(.*)$", line.strip())
         if match:
             return strip_markdown(match.group(2).strip())
@@ -668,7 +675,7 @@ def nav_groups_from_markdown(
     current_group: NavGroupDraft | None = None
     current_subgroup: NavSubgroupDraft | None = None
 
-    for line in source.read_text(encoding="utf-8").splitlines():
+    for line in read_markdown_source(source):
         stripped = line.strip()
         heading = re.match(r"^(#{1,6})\s+(.*)$", stripped)
         if heading:
@@ -704,6 +711,10 @@ def nav_groups_from_markdown(
     ]
 
 
+def nav_items_contain_target(items: list[NavLink], target: str) -> bool:
+    return any(item.target == target for item in items)
+
+
 @lru_cache(maxsize=1)
 def nav_groups() -> list[NavGroup]:
     doc_index = REPO_ROOT / "doc" / "index.md"
@@ -713,7 +724,7 @@ def nav_groups() -> list[NavGroup]:
         subgroup_level=3,
     )
     home_link = NavLink(first_markdown_heading(doc_index), repo_rel(doc_index))
-    if doc_nav and all(item.target != home_link.target for item in doc_nav[0].items):
+    if doc_nav and not nav_items_contain_target(doc_nav[0].items, home_link.target):
         doc_nav[0] = NavGroup(
             heading=doc_nav[0].heading,
             items=[home_link, *doc_nav[0].items],
