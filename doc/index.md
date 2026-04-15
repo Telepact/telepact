@@ -53,5 +53,7 @@ servers, or operate a Telepact API in production.
 
 ## Background and reference
 
+- [Telepact Specification](./specification.md) for an RFC-style, runtime-agnostic
+  statement of the core protocol and schema model
 - [FAQ](./faq.md) for Telepact's more unusual design decisions
 - [Motivation](./motivation.md) for the ecosystem goals and tradeoffs
