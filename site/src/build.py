@@ -633,7 +633,7 @@ def first_markdown_heading(source: Path) -> str:
     for line in read_markdown_source(source):
         match = HEADING_PATTERN.match(line.strip())
         if match:
-            return strip_markdown(match.group(2).strip())
+            return strip_markdown(match.group(2))
     return source.stem
 
 
@@ -656,16 +656,16 @@ def nav_link_from_line(source: Path, line: str) -> NavLink | None:
 
 
 @dataclass
-class NavGroupDraft:
-    heading: str
-    items: list[NavLink] = field(default_factory=list)
-    subgroups: list[NavSubgroup] = field(default_factory=list)
-
-
-@dataclass
 class NavSubgroupDraft:
     heading: str
     items: list[NavLink] = field(default_factory=list)
+
+
+@dataclass
+class NavGroupDraft:
+    heading: str
+    items: list[NavLink] = field(default_factory=list)
+    subgroups: list[NavSubgroupDraft] = field(default_factory=list)
 
 
 def nav_groups_from_markdown(
@@ -683,7 +683,7 @@ def nav_groups_from_markdown(
         heading = HEADING_PATTERN.match(stripped)
         if heading:
             level = len(heading.group(1))
-            text = strip_markdown(heading.group(2).strip())
+            text = strip_markdown(heading.group(2))
             if level == group_level:
                 current_group = NavGroupDraft(heading=text)
                 groups.append(current_group)
@@ -691,9 +691,7 @@ def nav_groups_from_markdown(
                 continue
             if subgroup_level is not None and level == subgroup_level and current_group is not None:
                 current_subgroup = NavSubgroupDraft(heading=text)
-                current_group.subgroups.append(
-                    NavSubgroup(heading=current_subgroup.heading, items=current_subgroup.items)
-                )
+                current_group.subgroups.append(current_subgroup)
                 continue
 
         link = nav_link_from_line(source, line)
@@ -708,7 +706,10 @@ def nav_groups_from_markdown(
         NavGroup(
             heading=group.heading,
             items=group.items,
-            subgroups=group.subgroups,
+            subgroups=[
+                NavSubgroup(heading=subgroup.heading, items=subgroup.items)
+                for subgroup in group.subgroups
+            ],
         )
         for group in groups
     ]
