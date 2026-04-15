@@ -34,26 +34,9 @@ this document are to be interpreted as described in RFC 2119.
 - A **header** is metadata carried in the first object of a message.
 - A **result union** is the response body union for a function.
 
-## 4. Transport model
+## 4. Message envelope
 
-Telepact is transport-agnostic.
-
-- A transport is responsible only for moving request bytes to a server and
-  returning response bytes to a client.
-- Telepact semantics are defined above the transport.
-- A conforming Telepact server MUST accept request bytes, decode them as a
-  Telepact message, validate them against the active schema, execute the target
-  function, validate the response, and return response bytes.
-- A conforming Telepact client MAY use plain JSON tooling, a Telepact runtime
-  library, generated code, or any other transport-capable implementation that
-  emits valid Telepact messages.
-
-No particular transport metadata system is required because Telepact headers are
-carried inside the message envelope itself.
-
-## 5. Message envelope
-
-### 5.1 General shape
+### 4.1 General shape
 
 A Telepact message MUST be a JSON array of exactly two objects:
 
@@ -66,7 +49,7 @@ A Telepact message MUST be a JSON array of exactly two objects:
 
 If a message cannot be parsed into this shape, it is invalid.
 
-### 5.2 Request messages
+### 4.2 Request messages
 
 A request body MUST contain exactly one function call:
 
@@ -77,7 +60,7 @@ A request body MUST contain exactly one function call:
 - the body key MUST name a function defined as `fn.*`
 - the body value MUST validate against that function's argument struct
 
-### 5.3 Response messages
+### 4.3 Response messages
 
 A response body MUST contain exactly one result tag:
 
@@ -91,7 +74,9 @@ A response body MUST contain exactly one result tag:
 Every function result union MUST contain `Ok_`. Any non-`Ok_` tag is treated as
 an error outcome by convention and by Telepact tooling.
 
-## 6. Headers
+## 5. Schema
+
+### 5.1 Headers
 
 Headers occupy the first object in the message.
 
@@ -105,9 +90,9 @@ Headers are intended for metadata and control signals such as authentication,
 correlation ids, timeouts, selection, and binary negotiation. Domain data
 SHOULD remain in the body.
 
-## 7. Schema source model
+### 5.2 Schema source model
 
-### 7.1 Schema directories
+#### 5.2.1 Schema directories
 
 When a Telepact implementation loads a schema directory:
 
@@ -119,15 +104,15 @@ When a Telepact implementation loads a schema directory:
 
 File order MUST NOT affect schema meaning.
 
-### 7.2 YAML and JSON forms
+#### 5.2.2 YAML and JSON forms
 
 Checked-in YAML is an authoring format. The canonical lowered schema model is
 JSON-shaped. YAML and JSON schema files therefore describe the same logical
 definitions.
 
-## 8. Type system
+### 5.3 Type system
 
-### 8.1 Scalar types
+#### 5.3.1 Scalar types
 
 The built-in scalar type expressions are:
 
@@ -143,14 +128,14 @@ The built-in scalar type expressions are:
 `"bytes"` denotes binary data. In JSON form, bytes are represented as strings
 because JSON has no native bytes type.
 
-### 8.2 Collections
+#### 5.3.2 Collections
 
 Telepact collection types are:
 
 - `[T]` for arrays of `T`
 - `{"string": T}` for objects with string keys and values of `T`
 
-### 8.3 Nullability
+#### 5.3.3 Nullability
 
 A scalar type expression MAY be suffixed with `?` to permit `null`:
 
@@ -161,7 +146,7 @@ A scalar type expression MAY be suffixed with `?` to permit `null`:
 Nullability applies to type strings. Arrays and objects are not directly
 nullable in the Telepact type syntax.
 
-### 8.4 Optional fields
+#### 5.3.4 Optional fields
 
 A struct field name MAY be suffixed with `!` to indicate that the field may be
 omitted from instances:
@@ -175,12 +160,12 @@ omitted from instances:
 The `!` suffix is part of the field name on live payloads. For example,
 `"nickname!"` remains the payload key.
 
-## 9. Definition kinds
+### 5.4 Definition kinds
 
 A schema is an array of top-level definitions. The core definition kinds are
 `info.*`, `struct.*`, `union.*`, `fn.*`, `errors.*`, and `headers.*`.
 
-### 9.1 Info definitions
+#### 5.4.1 Info definitions
 
 An `info.*` definition is schema metadata.
 
@@ -188,7 +173,7 @@ An `info.*` definition is schema metadata.
 - it does not participate as a normal data type
 - implementations MAY surface it prominently in documentation and schema browsing
 
-### 9.2 Struct definitions
+#### 5.4.2 Struct definitions
 
 A `struct.*` definition declares a JSON object shape.
 
@@ -196,7 +181,7 @@ A `struct.*` definition declares a JSON object shape.
 - additional fields are not allowed
 - a struct name MAY be referenced as a type expression
 
-### 9.3 Union definitions
+#### 5.4.3 Union definitions
 
 A `union.*` definition declares a tagged sum type.
 
@@ -205,7 +190,7 @@ A `union.*` definition declares a tagged sum type.
 - a union instance MUST contain exactly one tag
 - a union name MAY be referenced as a type expression
 
-### 9.4 Function definitions
+#### 5.4.4 Function definitions
 
 A `fn.*` definition declares one request/response operation.
 
@@ -234,7 +219,7 @@ form, a function value is a pre-populated call object:
 
 This enables Telepact's hypermedia-like link behavior.
 
-### 9.5 Errors definitions
+#### 5.4.5 Errors definitions
 
 An `errors.*` definition declares reusable error tags that are automatically
 appended to the result union of all user-defined functions.
@@ -243,7 +228,7 @@ appended to the result union of all user-defined functions.
 - they are intended for systemic cross-cutting errors, not for domain data that
   is better modeled directly in function results
 
-### 9.6 Headers definitions
+#### 5.4.6 Headers definitions
 
 A `headers.*` definition declares request and response header shapes:
 
@@ -259,17 +244,53 @@ A `headers.*` definition declares request and response header shapes:
 - all declared header fields are optional
 - undeclared header fields remain valid at runtime
 
-### 9.7 Docstrings
+#### 5.4.7 Docstrings
 
 Top-level definitions and union tags MAY include docstrings via `///:`. These
 docstrings are part of the schema authoring model and power documentation
 rendering.
 
-## 10. Standard definitions
+## 6. Extensions
+
+Telepact reserves `_ext.*_` names for built-in extension types.
+
+- they are placeholders rather than ordinary self-describing definitions
+- their valid JSON shape depends on surrounding schema context or runtime mode
+- API authors SHOULD treat them as reserved names rather than as a general
+  schema authoring pattern
+
+### 6.1 Extension model
+
+Normal Telepact definitions are self-describing. Extension types exist for the
+cases where validation rules cannot be expressed as one closed `struct.*`,
+`union.*`, or `fn.*` definition.
+
+This means Telepact implementations MUST interpret reserved `_ext.*_` names with
+runtime-defined validation behavior.
+
+### 6.2 `_ext.Select_`
+
+`_ext.Select_` is the extension type behind the `@select_` header.
+
+- it narrows the response graph rather than the request shape
+- it may target the active result union through `->`
+- it may target reachable `struct.*` and `union.*` types
+
+### 6.3 Mock extensions
+
+Mock-capable Telepact implementations MAY expose additional extension types such
+as `_ext.Call_` and `_ext.Stub_` for mock verification and stub configuration.
+
+### 6.4 Discovery
+
+Reserved extension definitions MAY be discovered through `fn.api_` when internal
+definitions are requested.
+
+## 7. Standard definitions
 
 Telepact automatically extends user schemas with built-in definitions.
 
-### 10.1 Always-present definitions
+### 7.1 Always-present definitions
 
 The standard internal schema includes at least:
 
@@ -283,7 +304,7 @@ The standard internal schema includes at least:
 requested with `includeExamples!`, it also returns deterministic example
 payloads.
 
-### 10.2 Conditional auth definitions
+### 7.2 Conditional auth definitions
 
 If a schema defines `union.Auth_`, Telepact MUST also expose:
 
@@ -291,33 +312,33 @@ If a schema defines `union.Auth_`, Telepact MUST also expose:
 - `ErrorUnauthenticated_`
 - `ErrorUnauthorized_`
 
-### 10.3 Mock definitions
+### 7.3 Mock definitions
 
 Telepact mock servers MAY expose additional mock-control definitions such as
 stub creation and verification, plus reserved extension types used only for mock
 workflows.
 
-## 11. Reserved headers and behaviors
+## 8. Reserved headers and behaviors
 
 This section summarizes the core reserved behaviors exposed through built-in
 headers.
 
-### 11.1 `@id_`
+### 8.1 `@id_`
 
 `@id_` is a correlation header. A conforming server SHOULD reflect the
 client-provided value unchanged in the response.
 
-### 11.2 `@time_`
+### 8.2 `@time_`
 
 `@time_` communicates a client timeout budget in integer form.
 
-### 11.3 `@unsafe_`
+### 8.3 `@unsafe_`
 
 If `@unsafe_` is `true`, a server MAY disable response validation for that
 request. When honored, the response SHOULD reflect the provided `@unsafe_`
 value.
 
-### 11.4 `@select_`
+### 8.4 `@select_`
 
 `@select_` carries an `_ext.Select_` value that narrows the response graph.
 
@@ -325,7 +346,7 @@ value.
 - selection may target the active result union via `->`
 - selection may target reachable `struct.*` and `union.*` types
 
-### 11.5 `@bin_`, `@enc_`, and `@pac_`
+### 8.5 `@bin_`, `@enc_`, and `@pac_`
 
 Telepact binary support is negotiated at runtime rather than through a required
 code-generation ABI.
@@ -337,9 +358,9 @@ code-generation ABI.
 - a response MAY be encoded in binary
 - `@pac_` indicates use of packed binary encoding strategy
 
-## 12. Validation and failure model
+## 9. Validation and failure model
 
-### 12.1 Request validation
+### 9.1 Request validation
 
 A server MUST validate:
 
@@ -349,13 +370,13 @@ A server MUST validate:
 Invalid requests MUST produce schema-level error results rather than entering the
 user function logic.
 
-### 12.2 Response validation
+### 9.2 Response validation
 
 A server MUST validate the response headers and body it is about to send, unless
 response validation has been explicitly disabled for that request by supported
 runtime behavior such as `@unsafe_`.
 
-### 12.3 Standard failure outcomes
+### 9.3 Standard failure outcomes
 
 The standard internal schema defines canonical failures for:
 
@@ -369,7 +390,24 @@ The standard internal schema defines canonical failures for:
 These failures are part of the wire contract, independent of local runtime
 exception shapes.
 
-## 13. Compatibility model
+## 10. Transport model
+
+Telepact is transport-agnostic.
+
+- A transport is responsible only for moving request bytes to a server and
+  returning response bytes to a client.
+- Telepact semantics are defined above the transport.
+- A conforming Telepact server MUST accept request bytes, decode them as a
+  Telepact message, validate them against the active schema, execute the target
+  function, validate the response, and return response bytes.
+- A conforming Telepact client MAY use plain JSON tooling, a Telepact runtime
+  library, generated code, or any other transport-capable implementation that
+  emits valid Telepact messages.
+
+No particular transport metadata system is required because Telepact headers are
+carried inside the message envelope itself.
+
+## 11. Compatibility model
 
 Telepact is designed for schema-first evolution.
 
@@ -389,7 +427,7 @@ Incompatible changes generally include:
 Telepact tooling is expected to compare an older schema to a newer one and
 report backwards-incompatible changes.
 
-## 14. Design intent
+## 12. Design intent
 
 Telepact combines several goals:
 
@@ -402,7 +440,7 @@ Telepact combines several goals:
 
 These properties are consequences of the schema and message model defined above.
 
-## 15. Related documents
+## 13. Related documents
 
 - [Core Concepts](./core-concepts.md)
 - [Schema Writing Guide](./schema-guide.md)
