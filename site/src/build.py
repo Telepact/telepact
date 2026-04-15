@@ -710,6 +710,7 @@ def nav_groups() -> list[NavGroup]:
         NavGroup(
             heading="Design APIs",
             items=[
+                NavLink("Telepact Specification", "doc/specification.md"),
                 NavLink("Schema Writing Guide", "doc/schema-guide.md"),
                 NavLink("Core Concepts", "doc/core-concepts.md"),
                 NavLink("Extensions", "doc/extensions.md"),

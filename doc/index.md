@@ -12,6 +12,8 @@ servers, or operate a Telepact API in production.
 
 ## Design APIs
 
+- [Telepact Specification](./specification.md) for a language-agnostic,
+  RFC-like description of the protocol contract
 - [Schema Writing Guide](./schema-guide.md) for the full schema language
 - [Core Concepts](./core-concepts.md) for Telepact's message model, schema
   role, headers, links, select, and binary at a high level
