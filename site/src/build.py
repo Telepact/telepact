@@ -742,6 +742,8 @@ def nav_groups() -> list[NavGroup]:
     )
     if not doc_nav:
         return [learn_group]
+    # Keep the dedicated Learn by Example sidebar section directly after Start Here,
+    # while still sourcing the section contents from the markdown docs.
     return [doc_nav[0], learn_group, *doc_nav[1:]]
 
 
