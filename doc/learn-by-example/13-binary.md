@@ -77,6 +77,7 @@ curl -s localhost:8000/api -d '[{"@bin_": []}, {"fn.getPaperTape": {}}]' > /tmp/
 wc -c < /tmp/papertape-first.bin
 python - <<'PY'
 from pathlib import Path
+# Show non-UTF-8 bytes as replacement characters so the payload stays printable.
 print(Path('/tmp/papertape-first.bin').read_bytes().decode('utf-8', 'replace'))
 PY
 ```
@@ -123,6 +124,7 @@ curl -s localhost:8000/api -d "[{\"@bin_\": [$checksum]}, {\"fn.getPaperTape\": 
 wc -c < /tmp/papertape-steady.bin
 python - <<'PY'
 from pathlib import Path
+# Show non-UTF-8 bytes as replacement characters so the payload stays printable.
 print(Path('/tmp/papertape-steady.bin').read_bytes().decode('utf-8', 'replace'))
 PY
 ```
