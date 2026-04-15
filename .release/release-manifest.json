@@ -1,25 +1,14 @@
 {
   "changed_paths": [
-    "lib/go/internal/schema/DerivePossibleSelects.go",
-    "lib/java/src/main/java/io/github/telepact/internal/schema/DerivePossibleSelects.java",
-    "lib/ts/src/internal/schema/DerivePossibleSelect.ts",
-    "sdk/console/package-lock.json",
-    "sdk/console/package.json",
-    "test/runner/parameters/parse_cases.py"
+    "doc/client-paths.md",
+    "doc/core-concepts.md",
+    "doc/index.md",
+    "doc/server-paths.md",
+    "doc/tooling-workflow.md",
+    "site/src/build.py"
   ],
-  "direct_targets": [
-    "console",
-    "go",
-    "java",
-    "ts"
-  ],
-  "pr_number": 360,
-  "targets": [
-    "console",
-    "dart",
-    "go",
-    "java",
-    "ts"
-  ],
-  "version": "1.0.0-alpha.266"
+  "direct_targets": [],
+  "pr_number": 361,
+  "targets": [],
+  "version": "1.0.0-alpha.267"
 }
