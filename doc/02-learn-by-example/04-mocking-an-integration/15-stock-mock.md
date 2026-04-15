@@ -46,4 +46,4 @@ The exact value will vary, but the important part is stable:
 
 If we need specific values, we'll add stubs next.
 
-Next: [16. Stubs](16-stubs.md)
+Next: [16. Stubs](./16-stubs.md)

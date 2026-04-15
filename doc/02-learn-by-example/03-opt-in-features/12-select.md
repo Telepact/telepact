@@ -52,4 +52,4 @@ curl -s localhost:8000/api -d '[{"@select_": {"->": {"Ok_": ["result"]}}}, {"fn.
 Nothing about the function changed. We just told the server which response fields
 we wanted back.
 
-Next: [13. Binary](13-binary.md)
+Next: [13. Binary](./13-binary.md)

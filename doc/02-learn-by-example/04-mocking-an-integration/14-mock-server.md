@@ -58,4 +58,4 @@ curl -s localhost:8001/api -d '[{}, {"fn.api_": {"includeInternal!": true}}]'
 
 That extra surface is the mock's control plane.
 
-Next: [15. Stock mock](15-stock-mock.md)
+Next: [15. Stock mock](./15-stock-mock.md)
