@@ -14,10 +14,13 @@
 #|  limitations under the License.
 #|
 
-.PHONY: all clean
+.PHONY: all dev clean
 
 all:
 	python3 src/build.py
+
+dev:
+	npx serve dist
 
 clean:
 	rm -rf dist
