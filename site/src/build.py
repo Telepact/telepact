@@ -25,6 +25,7 @@ import re
 import shutil
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
+from functools import lru_cache
 from pathlib import Path
 from typing import Callable
 
@@ -618,148 +619,103 @@ def page_by_rel_source(pages: dict[Path, Page], rel_source: str) -> Page | None:
     return None
 
 
-def nav_groups() -> list[NavGroup]:
-    learn_by_example_groups = [
-        NavSubgroup(
-            heading="Getting started",
-            items=[
-                NavLink("00. Installation", "doc/learn-by-example/00-installation.md"),
-                NavLink("01. Ping", "doc/learn-by-example/01-ping.md"),
-                NavLink("02. Schema and `fn.add`", "doc/learn-by-example/02-schema-and-add.md"),
-                NavLink("03. Data type validation", "doc/learn-by-example/03-data-type-validation.md"),
-            ],
-        ),
-        NavSubgroup(
-            heading="Schema",
-            items=[
-                NavLink("04. Scalar types", "doc/learn-by-example/04-scalar-types.md"),
-                NavLink("05. Collection types", "doc/learn-by-example/05-collection-types.md"),
-                NavLink("06. Structs", "doc/learn-by-example/06-structs.md"),
-                NavLink("07. Unions", "doc/learn-by-example/07-unions.md"),
-                NavLink("08. Functions", "doc/learn-by-example/08-functions.md"),
-                NavLink("09. Service errors", "doc/learn-by-example/09-service-errors.md"),
-                NavLink("10. Headers", "doc/learn-by-example/10-headers.md"),
-                NavLink("11. Comments", "doc/learn-by-example/11-comments.md"),
-            ],
-        ),
-        NavSubgroup(
-            heading="Opt-in features",
-            items=[
-                NavLink("12. Select", "doc/learn-by-example/12-select.md"),
-                NavLink("13. Binary", "doc/learn-by-example/13-binary.md"),
-            ],
-        ),
-        NavSubgroup(
-            heading="Mocking an integration",
-            items=[
-                NavLink("14. Mock server", "doc/learn-by-example/14-mock-server.md"),
-                NavLink("15. Stock mock", "doc/learn-by-example/15-stock-mock.md"),
-                NavLink("16. Stubs", "doc/learn-by-example/16-stubs.md"),
-                NavLink("17. Verify", "doc/learn-by-example/17-verify.md"),
-            ],
-        ),
-        NavSubgroup(
-            heading="Auth",
-            items=[
-                NavLink("18. Auth", "doc/learn-by-example/18-auth.md"),
-            ],
-        ),
-        NavSubgroup(
-            heading="Using Telepact client library code",
-            items=[
-                NavLink("19. Minimum Python client", "doc/learn-by-example/19-minimum-python-client.md"),
-                NavLink("20. Automatic binary negotiation", "doc/learn-by-example/20-automatic-binary-negotiation.md"),
-            ],
-        ),
-        NavSubgroup(
-            heading="Code generation",
-            items=[
-                NavLink("21. Code generation", "doc/learn-by-example/21-code-generation.md"),
-            ],
-        ),
-        NavSubgroup(
-            heading="Running our own server",
-            items=[
-                NavLink("22. Minimum server", "doc/learn-by-example/22-minimum-server.md"),
-                NavLink("23. Logging", "doc/learn-by-example/23-logging.md"),
-                NavLink("24. Server auth", "doc/learn-by-example/24-server-auth.md"),
-                NavLink("25. Managed auth", "doc/learn-by-example/25-managed-auth.md"),
-                NavLink("26. Schema evolution", "doc/learn-by-example/26-schema-evolution.md"),
-                NavLink("27. Best practices for server implementers", "doc/learn-by-example/27-server-best-practices.md"),
-            ],
-        ),
-    ]
+def first_markdown_heading(source: Path) -> str:
+    for line in source.read_text(encoding="utf-8").splitlines():
+        match = re.match(r"^(#{1,6})\s+(.*)$", line.strip())
+        if match:
+            return strip_markdown(match.group(2).strip())
+    return source.stem
+
+
+def nav_link_from_line(line: str) -> NavLink | None:
+    match = re.match(r"^\s*(?:[-*+]|\d+\.)\s+(.*)$", line)
+    if match is None:
+        return None
+    link = re.search(r"\[([^\]]+)\]\(([^)]+)\)", match.group(1))
+    if link is None:
+        return None
+    return NavLink(strip_markdown(link.group(1)), link.group(2).strip())
+
+
+@dataclass
+class NavGroupDraft:
+    heading: str
+    items: list[NavLink] = field(default_factory=list)
+    subgroups: list[NavSubgroup] = field(default_factory=list)
+
+
+@dataclass
+class NavSubgroupDraft:
+    heading: str
+    items: list[NavLink] = field(default_factory=list)
+
+
+def nav_groups_from_markdown(
+    source: Path,
+    *,
+    group_level: int,
+    subgroup_level: int | None = None,
+) -> list[NavGroup]:
+    groups: list[NavGroupDraft] = []
+    current_group: NavGroupDraft | None = None
+    current_subgroup: NavSubgroupDraft | None = None
+
+    for line in source.read_text(encoding="utf-8").splitlines():
+        stripped = line.strip()
+        heading = re.match(r"^(#{1,6})\s+(.*)$", stripped)
+        if heading:
+            level = len(heading.group(1))
+            text = strip_markdown(heading.group(2).strip())
+            if level == group_level:
+                current_group = NavGroupDraft(heading=text)
+                groups.append(current_group)
+                current_subgroup = None
+                continue
+            if subgroup_level is not None and level == subgroup_level and current_group is not None:
+                current_subgroup = NavSubgroupDraft(heading=text)
+                current_group.subgroups.append(
+                    NavSubgroup(heading=current_subgroup.heading, items=current_subgroup.items)
+                )
+                continue
+
+        link = nav_link_from_line(line)
+        if link is None or current_group is None:
+            continue
+        if current_subgroup is not None:
+            current_subgroup.items.append(link)
+        else:
+            current_group.items.append(link)
 
     return [
         NavGroup(
-            heading="Start Here",
-            items=[
-                NavLink("Home", "doc/index.md"),
-                NavLink("Quickstart", "doc/example.md"),
-                NavLink("Learn Telepact by Example", "doc/learn-by-example/README.md"),
-                NavLink("Demos", "example/README.md"),
-            ],
-        ),
-        NavGroup(
-            heading="Learn by Example",
-            items=[
-                NavLink("Learn Telepact by Example", "doc/learn-by-example/README.md"),
-            ],
-            subgroups=learn_by_example_groups,
-        ),
-        NavGroup(
-            heading="Design APIs",
-            items=[
-                NavLink("Schema Writing Guide", "doc/schema-guide.md"),
-                NavLink("Core Concepts", "doc/core-concepts.md"),
-                NavLink("Extensions", "doc/extensions.md"),
-            ],
-        ),
-        NavGroup(
-            heading="Build Clients & Servers",
-            items=[
-                NavLink("Transport Guide", "doc/transports.md"),
-                NavLink("Client Paths", "doc/client-paths.md"),
-                NavLink("Server Paths", "doc/server-paths.md"),
-                NavLink("Tooling Workflow", "doc/tooling-workflow.md"),
-            ],
-            subgroups=[
-                NavSubgroup(
-                    heading="Libraries",
-                    items=[
-                        NavLink("Telepact Library for TypeScript", "lib/ts/README.md"),
-                        NavLink("Telepact Library for Python", "lib/py/README.md"),
-                        NavLink("Telepact Library for Java", "lib/java/README.md"),
-                        NavLink("Telepact Library for Go", "lib/go/README.md"),
-                    ],
-                ),
-                NavSubgroup(
-                    heading="SDK Tools",
-                    items=[
-                        NavLink("Telepact CLI", "sdk/cli/README.md"),
-                        NavLink("Telepact Console", "sdk/console/README.md"),
-                        NavLink("Telepact Prettier Plugin", "sdk/prettier/README.md"),
-                    ],
-                ),
-            ],
-        ),
-        NavGroup(
-            heading="Operate",
-            items=[
-                NavLink("Production Guide", "doc/production-guide.md"),
-                NavLink("Runtime Error Guide", "doc/runtime-errors.md"),
-                NavLink("Versions", "doc/versions.md"),
-            ],
-        ),
-        NavGroup(
-            heading="Background & Reference",
-            items=[
-                NavLink("FAQ", "doc/faq.md"),
-                NavLink("Motivation", "doc/motivation.md"),
-                NavLink("JSON Schema", "common/json-schema.json"),
-            ],
-        ),
+            heading=group.heading,
+            items=group.items,
+            subgroups=group.subgroups,
+        )
+        for group in groups
     ]
+
+
+@lru_cache(maxsize=1)
+def nav_groups() -> list[NavGroup]:
+    doc_nav = nav_groups_from_markdown(
+        REPO_ROOT / "doc" / "index.md",
+        group_level=2,
+        subgroup_level=3,
+    )
+    learn_source = REPO_ROOT / "doc" / "learn-by-example" / "README.md"
+    learn_subgroups = [
+        NavSubgroup(heading=group.heading, items=group.items)
+        for group in nav_groups_from_markdown(learn_source, group_level=3)
+    ]
+    learn_group = NavGroup(
+        heading="Learn by Example",
+        items=[NavLink(first_markdown_heading(learn_source), repo_rel(learn_source))],
+        subgroups=learn_subgroups,
+    )
+    if not doc_nav:
+        return [learn_group]
+    return [doc_nav[0], learn_group, *doc_nav[1:]]
 
 
 def render_nav_link(current: Page, pages: dict[Path, Page], resources: set[Path], item: NavLink) -> str:

@@ -4,7 +4,7 @@ Welcome to the Telepact docs. Use this page to find the right path based on
 what you are trying to do: learn the basics, design a schema, build clients and
 servers, or operate a Telepact API in production.
 
-## Start here
+## Start Here
 
 - [Quickstart](./example.md) for the fastest end-to-end example
 - [Learn Telepact by Example](./learn-by-example/README.md) for a guided tour
@@ -18,7 +18,7 @@ servers, or operate a Telepact API in production.
 - [Extensions](./extensions.md) for Telepact's reserved `_ext.*_` types
 - [JSON Schema](../common/json-schema.json) for schema-file validation
 
-## Build clients and servers
+## Build Clients & Servers
 
 - [Transport Guide](./transports.md) for HTTP and WebSocket wiring patterns
 - [Client Paths](./client-paths.md) for choosing between plain JSON, client
@@ -34,7 +34,7 @@ servers, or operate a Telepact API in production.
 - [Java](../lib/java/README.md)
 - [Go](../lib/go/README.md)
 
-### SDK tools
+### SDK Tools
 
 - [CLI](../sdk/cli/README.md)
     - Fetch schemas, compare versions, mock APIs, and generate code from the
@@ -51,7 +51,7 @@ servers, or operate a Telepact API in production.
 - [Runtime Error Guide](./runtime-errors.md) for local/runtime debugging
 - [Versions](./versions.md) for the latest published library and SDK versions
 
-## Background and reference
+## Background & Reference
 
 - [FAQ](./faq.md) for Telepact's more unusual design decisions
 - [Motivation](./motivation.md) for the ecosystem goals and tradeoffs
