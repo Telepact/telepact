@@ -59,6 +59,7 @@ PRISM_JS = [
 SNIPPET_PATTERN = re.compile(
     r'(?P<indent>[ \t]*)<!--\s*SNIPPET:\s*(?P<path>[^|]+?)\s*\|\s*(?P<lang>[a-zA-Z0-9_-]+)\s*-->'
 )
+HEADING_PATTERN = re.compile(r"^(#{1,6})\s+(.*)$")
 
 
 def normalize_base_url(value: str) -> str:
@@ -628,7 +629,7 @@ def read_markdown_source(source: Path) -> list[str]:
 
 def first_markdown_heading(source: Path) -> str:
     for line in read_markdown_source(source):
-        match = re.match(r"^(#{1,6})\s+(.*)$", line.strip())
+        match = HEADING_PATTERN.match(line.strip())
         if match:
             return strip_markdown(match.group(2).strip())
     return source.stem
@@ -677,7 +678,7 @@ def nav_groups_from_markdown(
 
     for line in read_markdown_source(source):
         stripped = line.strip()
-        heading = re.match(r"^(#{1,6})\s+(.*)$", stripped)
+        heading = HEADING_PATTERN.match(stripped)
         if heading:
             level = len(heading.group(1))
             text = strip_markdown(heading.group(2).strip())
