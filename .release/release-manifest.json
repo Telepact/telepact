@@ -1,12 +1,9 @@
 {
   "changed_paths": [
-    "doc/learn-by-example/26-schema-evolution.md",
-    "doc/learn-by-example/27-test-client-tdd.md",
-    "doc/learn-by-example/28-server-best-practices.md",
-    "doc/learn-by-example/README.md"
+    "doc/learn-by-example/13-binary.md"
   ],
   "direct_targets": [],
-  "pr_number": 362,
+  "pr_number": 365,
   "targets": [],
-  "version": "1.0.0-alpha.268"
+  "version": "1.0.0-alpha.269"
 }
