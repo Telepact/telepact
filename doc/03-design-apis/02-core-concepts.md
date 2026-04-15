@@ -27,7 +27,7 @@ Responses usually look like:
 ```
 
 For a more complete walkthrough, start with the
-[Quickstart](../01-start-here/01-quickstart.md) or [Learn Telepact by Example](../02-learn-by-example/README.md).
+[Quickstart](../quickstart.md) or [Learn Telepact by Example](../02-learn-by-example/README.md).
 
 ## Schema role
 

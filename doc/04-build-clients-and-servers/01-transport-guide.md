@@ -252,6 +252,6 @@ if (response.getBodyTarget() === 'Ok_') {
 
 ## See also
 
-- [Quickstart](../01-start-here/01-quickstart.md)
+- [Quickstart](../quickstart.md)
 - [FAQ](../06-background-and-reference/01-faq.md)
 - [Runtime Error Guide](../05-operate/02-runtime-error-guide.md)

@@ -24,7 +24,7 @@ WebSockets, or another IPC boundary that moves bytes.
 
 If you want the fastest path to a running server:
 
-- follow the [Quickstart](../01-start-here/01-quickstart.md)
+- follow the [Quickstart](../quickstart.md)
 - continue with [Learn by Example: Minimum server](../02-learn-by-example/08-running-our-own-server/22-minimum-server.md)
 - use the runtime README for your language
 

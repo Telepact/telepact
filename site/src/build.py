@@ -696,10 +696,14 @@ def nav_groups() -> list[NavGroup]:
         return []
 
     home_link = NavLink(first_markdown_heading(docs_root / "index.md"), repo_rel(docs_root / "index.md"))
+    quickstart_link = NavLink(
+        first_markdown_heading(docs_root / "quickstart.md"),
+        repo_rel(docs_root / "quickstart.md"),
+    )
     first_group = groups[0]
     groups[0] = NavGroup(
         heading=first_group.heading,
-        items=[home_link, *first_group.items],
+        items=[home_link, quickstart_link, *first_group.items],
         subgroups=first_group.subgroups,
     )
     return groups

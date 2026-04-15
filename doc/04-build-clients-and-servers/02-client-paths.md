@@ -20,7 +20,7 @@ This path works well when you want:
 
 Start here:
 
-- [Quickstart](../01-start-here/01-quickstart.md)
+- [Quickstart](../quickstart.md)
 - [Core Concepts](../03-design-apis/02-core-concepts.md)
 - [Transport Guide](../01-transport-guide.md)
 
