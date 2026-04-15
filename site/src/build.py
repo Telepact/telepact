@@ -60,6 +60,8 @@ SNIPPET_PATTERN = re.compile(
     r'(?P<indent>[ \t]*)<!--\s*SNIPPET:\s*(?P<path>[^|]+?)\s*\|\s*(?P<lang>[a-zA-Z0-9_-]+)\s*-->'
 )
 HEADING_PATTERN = re.compile(r"^(#{1,6})\s+(.*)$")
+LIST_ITEM_PATTERN = re.compile(r"^\s*(?:[-*+]|\d+\.)\s+(.*)$")
+MARKDOWN_LINK_PATTERN = re.compile(r"\[([^\]]+)\]\(([^)]+)\)")
 
 
 def normalize_base_url(value: str) -> str:
@@ -636,10 +638,10 @@ def first_markdown_heading(source: Path) -> str:
 
 
 def nav_link_from_line(source: Path, line: str) -> NavLink | None:
-    match = re.match(r"^\s*(?:[-*+]|\d+\.)\s+(.*)$", line)
+    match = LIST_ITEM_PATTERN.match(line)
     if match is None:
         return None
-    link = re.search(r"\[([^\]]+)\]\(([^)]+)\)", match.group(1))
+    link = MARKDOWN_LINK_PATTERN.search(match.group(1))
     if link is None:
         return None
     target = link.group(2).strip()
