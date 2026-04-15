@@ -642,7 +642,7 @@ def nav_link_from_line(source: Path, line: str) -> NavLink | None:
                 target = repo_rel(resolved)
             except ValueError:
                 pass
-    return NavLink(strip_markdown(link.group(1)), target)
+    return NavLink(link.group(1), target)
 
 
 @dataclass
@@ -706,11 +706,19 @@ def nav_groups_from_markdown(
 
 @lru_cache(maxsize=1)
 def nav_groups() -> list[NavGroup]:
+    doc_index = REPO_ROOT / "doc" / "index.md"
     doc_nav = nav_groups_from_markdown(
-        REPO_ROOT / "doc" / "index.md",
+        doc_index,
         group_level=2,
         subgroup_level=3,
     )
+    home_link = NavLink(first_markdown_heading(doc_index), repo_rel(doc_index))
+    if doc_nav and all(item.target != home_link.target for item in doc_nav[0].items):
+        doc_nav[0] = NavGroup(
+            heading=doc_nav[0].heading,
+            items=[home_link, *doc_nav[0].items],
+            subgroups=doc_nav[0].subgroups,
+        )
     learn_source = REPO_ROOT / "doc" / "learn-by-example" / "README.md"
     learn_subgroups = [
         NavSubgroup(heading=group.heading, items=group.items)
