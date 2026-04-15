@@ -25,7 +25,6 @@ import re
 import shutil
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from functools import lru_cache
 from pathlib import Path
 from typing import Callable
 
@@ -60,8 +59,6 @@ SNIPPET_PATTERN = re.compile(
     r'(?P<indent>[ \t]*)<!--\s*SNIPPET:\s*(?P<path>[^|]+?)\s*\|\s*(?P<lang>[a-zA-Z0-9_-]+)\s*-->'
 )
 HEADING_PATTERN = re.compile(r"^(#{1,6})\s+(.*)$")
-LIST_ITEM_PATTERN = re.compile(r"^\s*(?:[-*+]|\d+\.)\s+(.*)$")
-MARKDOWN_LINK_PATTERN = re.compile(r"\[([^\]]+)\]\(([^)]+)\)")
 
 
 def normalize_base_url(value: str) -> str:
@@ -637,118 +634,75 @@ def first_markdown_heading(source: Path) -> str:
     return source.stem
 
 
-def nav_link_from_line(source: Path, line: str) -> NavLink | None:
-    match = LIST_ITEM_PATTERN.match(line)
-    if match is None:
-        return None
-    link = MARKDOWN_LINK_PATTERN.search(match.group(1))
-    if link is None:
-        return None
-    target = link.group(2).strip()
-    if not is_external_link(target) and not target.startswith("#"):
-        resolved, _ = resolve_local_target(source, target)
-        if resolved is not None:
-            try:
-                target = repo_rel(resolved)
-            except ValueError:
-                pass
-    return NavLink(link.group(1), target)
+def nav_markdown_pages(directory: Path) -> list[Path]:
+    return sorted(
+        path
+        for path in directory.iterdir()
+        if path.is_file() and path.suffix.lower() == ".md" and path.name != "README.md"
+    )
 
 
-@dataclass
-class NavSubgroupDraft:
-    heading: str
-    items: list[NavLink] = field(default_factory=list)
+def nav_subdirectories(directory: Path) -> list[Path]:
+    return sorted(
+        path
+        for path in directory.iterdir()
+        if path.is_dir() and (path / "README.md").is_file()
+    )
 
 
-@dataclass
-class NavGroupDraft:
-    heading: str
-    items: list[NavLink] = field(default_factory=list)
-    subgroups: list[NavSubgroupDraft] = field(default_factory=list)
+def nav_links_for_directory(directory: Path) -> list[NavLink]:
+    pages = nav_markdown_pages(directory)
+    if pages:
+        return [
+            NavLink(first_markdown_heading(page), repo_rel(page))
+            for page in pages
+        ]
+
+    readme = directory / "README.md"
+    if readme.is_file():
+        return [NavLink(first_markdown_heading(readme), repo_rel(readme))]
+    return []
 
 
-def nav_groups_from_markdown(
-    source: Path,
-    *,
-    group_level: int,
-    subgroup_level: int | None = None,
-) -> list[NavGroup]:
-    groups: list[NavGroupDraft] = []
-    current_group: NavGroupDraft | None = None
-    current_subgroup: NavSubgroupDraft | None = None
-
-    for line in read_markdown_source(source):
-        stripped = line.strip()
-        heading = HEADING_PATTERN.match(stripped)
-        if heading:
-            level = len(heading.group(1))
-            text = strip_markdown(heading.group(2))
-            if level == group_level:
-                current_group = NavGroupDraft(heading=text)
-                groups.append(current_group)
-                current_subgroup = None
-                continue
-            if subgroup_level is not None and level == subgroup_level and current_group is not None:
-                current_subgroup = NavSubgroupDraft(heading=text)
-                current_group.subgroups.append(current_subgroup)
-                continue
-
-        link = nav_link_from_line(source, line)
-        if link is None or current_group is None:
-            continue
-        if current_subgroup is not None:
-            current_subgroup.items.append(link)
-        else:
-            current_group.items.append(link)
-
-    return [
-        NavGroup(
-            heading=group.heading,
-            items=group.items,
-            subgroups=[
-                NavSubgroup(heading=subgroup.heading, items=subgroup.items)
-                for subgroup in group.subgroups
-            ],
+def nav_group_from_directory(directory: Path) -> NavGroup:
+    readme = directory / "README.md"
+    subgroups = []
+    for subdirectory in nav_subdirectories(directory):
+        subgroup_readme = subdirectory / "README.md"
+        subgroups.append(
+            NavSubgroup(
+                heading=first_markdown_heading(subgroup_readme),
+                items=nav_links_for_directory(subdirectory),
+            )
         )
-        for group in groups
-    ]
+    return NavGroup(
+        heading=first_markdown_heading(readme),
+        items=nav_links_for_directory(directory),
+        subgroups=subgroups,
+    )
 
 
-def nav_items_contain_target(items: list[NavLink], target: str) -> bool:
-    return any(item.target == target for item in items)
-
-
-@lru_cache(maxsize=1)
 def nav_groups() -> list[NavGroup]:
-    doc_index = REPO_ROOT / "doc" / "index.md"
-    doc_nav = nav_groups_from_markdown(
-        doc_index,
-        group_level=2,
-        subgroup_level=3,
-    )
-    home_link = NavLink(first_markdown_heading(doc_index), repo_rel(doc_index))
-    if doc_nav and not nav_items_contain_target(doc_nav[0].items, home_link.target):
-        doc_nav[0] = NavGroup(
-            heading=doc_nav[0].heading,
-            items=[home_link, *doc_nav[0].items],
-            subgroups=doc_nav[0].subgroups,
+    docs_root = REPO_ROOT / "doc"
+    groups = [
+        nav_group_from_directory(directory)
+        for directory in sorted(
+            path
+            for path in docs_root.iterdir()
+            if path.is_dir() and (path / "README.md").is_file()
         )
-    learn_source = REPO_ROOT / "doc" / "learn-by-example" / "README.md"
-    learn_subgroups = [
-        NavSubgroup(heading=group.heading, items=group.items)
-        for group in nav_groups_from_markdown(learn_source, group_level=3)
     ]
-    learn_group = NavGroup(
-        heading="Learn by Example",
-        items=[NavLink(first_markdown_heading(learn_source), repo_rel(learn_source))],
-        subgroups=learn_subgroups,
+    if not groups:
+        return []
+
+    home_link = NavLink(first_markdown_heading(docs_root / "index.md"), repo_rel(docs_root / "index.md"))
+    first_group = groups[0]
+    groups[0] = NavGroup(
+        heading=first_group.heading,
+        items=[home_link, *first_group.items],
+        subgroups=first_group.subgroups,
     )
-    if not doc_nav:
-        return [learn_group]
-    # Keep the dedicated Learn by Example sidebar section directly after Start Here,
-    # while still sourcing the section contents from the markdown docs.
-    return [doc_nav[0], learn_group, *doc_nav[1:]]
+    return groups
 
 
 def render_nav_link(current: Page, pages: dict[Path, Page], resources: set[Path], item: NavLink) -> str:
