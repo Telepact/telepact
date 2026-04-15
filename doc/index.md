@@ -16,7 +16,7 @@ servers, or operate a Telepact API in production.
 - [Core Concepts](./02-design-apis/02-core-concepts.md) for Telepact's message model, schema
   role, headers, links, select, and binary at a high level
 - [Extensions](./02-design-apis/03-extensions.md) for Telepact's reserved `_ext.*_` types
-- [JSON Schema](./05-background-and-reference/03-json-schema.md) for schema-file validation
+- [JSON Schema](../common/json-schema.json) for schema-file validation
 
 ## Build clients and servers
 
