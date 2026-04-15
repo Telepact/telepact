@@ -636,7 +636,7 @@ def parse_nav_groups(source: Path) -> list[NavGroup]:
             continue
 
         nav_link = NavLink(
-            label=strip_markdown(item.group(1)),
+            label=item.group(1).strip(),
             source=source,
             target=item.group(2).strip(),
         )
