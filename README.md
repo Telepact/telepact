@@ -54,5 +54,5 @@ library references, SDK tools, version information, and further reading.
 # Licensing
 
 Telepact is licensed under the Apache License, Version 2.0. See
-[LICENSE](LICENSE) for the full license text. See [NOTICE](NOTICE) for
+[LICENSE](./LICENSE) for the full license text. See [NOTICE](./NOTICE) for
 additional information regarding copyright ownership.

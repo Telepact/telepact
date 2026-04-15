@@ -20,9 +20,9 @@ This path works well when you want:
 
 Start here:
 
-- [Quickstart](./example.md)
-- [Core Concepts](./core-concepts.md)
-- [Transport Guide](./transports.md)
+- [Quickstart](../example.md)
+- [Core Concepts](../02-design-apis/02-core-concepts.md)
+- [Transport Guide](./01-transports.md)
 
 ## Path 2: Telepact client library
 
@@ -31,10 +31,10 @@ serialization, validation-aware workflows, and binary negotiation.
 
 Available library docs:
 
-- [TypeScript](../lib/ts/README.md)
-- [Python](../lib/py/README.md)
-- [Java](../lib/java/README.md)
-- [Go](../lib/go/README.md)
+- [TypeScript](../../lib/ts/README.md)
+- [Python](../../lib/py/README.md)
+- [Java](../../lib/java/README.md)
+- [Go](../../lib/go/README.md)
 
 This path works well when you want:
 
@@ -55,9 +55,9 @@ This path works well when you want:
 
 Start here:
 
-- [Learn by Example: Code generation](./learn-by-example/21-code-generation.md)
-- [Tooling Workflow](./tooling-workflow.md)
-- [Telepact CLI](../sdk/cli/README.md)
+- [Learn by Example: Code generation](../01-learn-by-example/07-code-generation/21-code-generation.md)
+- [Tooling Workflow](./04-tooling-workflow.md)
+- [Telepact CLI](../../sdk/cli/README.md)
 
 ## Choosing between them
 

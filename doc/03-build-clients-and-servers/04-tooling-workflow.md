@@ -17,7 +17,7 @@ This is useful when you want to:
 
 See:
 
-- [Telepact CLI](../sdk/cli/README.md)
+- [Telepact CLI](../../sdk/cli/README.md)
 
 ## Compare schema versions
 
@@ -32,8 +32,8 @@ This is useful when you want to:
 
 See:
 
-- [Production Guide](./production-guide.md)
-- [Telepact CLI](../sdk/cli/README.md)
+- [Production Guide](../04-operate/01-production-guide.md)
+- [Telepact CLI](../../sdk/cli/README.md)
 
 ## Mock an API
 
@@ -48,10 +48,10 @@ This is useful when you want to:
 
 See:
 
-- [Learn by Example: Mock server](./learn-by-example/14-mock-server.md)
-- [Learn by Example: Stock mock](./learn-by-example/15-stock-mock.md)
-- [Learn by Example: Stubs](./learn-by-example/16-stubs.md)
-- [Learn by Example: Verify](./learn-by-example/17-verify.md)
+- [Learn by Example: Mock server](../01-learn-by-example/04-mocking-an-integration/14-mock-server.md)
+- [Learn by Example: Stock mock](../01-learn-by-example/04-mocking-an-integration/15-stock-mock.md)
+- [Learn by Example: Stubs](../01-learn-by-example/04-mocking-an-integration/16-stubs.md)
+- [Learn by Example: Verify](../01-learn-by-example/04-mocking-an-integration/17-verify.md)
 
 ## Generate code
 
@@ -65,12 +65,12 @@ This is useful when you want:
 
 See:
 
-- [Learn by Example: Code generation](./learn-by-example/21-code-generation.md)
-- [Client Paths](./client-paths.md)
-- [Telepact CLI](../sdk/cli/README.md)
+- [Learn by Example: Code generation](../01-learn-by-example/07-code-generation/21-code-generation.md)
+- [Client Paths](./02-client-paths.md)
+- [Telepact CLI](../../sdk/cli/README.md)
 
 ## Use the browser console
 
-Use the [Telepact Console](../sdk/console/README.md) when you want interactive
+Use the [Telepact Console](../../sdk/console/README.md) when you want interactive
 documentation, request drafting, and live requests against a running Telepact
 server.

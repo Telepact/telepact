@@ -40,4 +40,4 @@ That `///` key is just a comment. Any struct-like definition can have one:
 These comments are informational only. They help people and tools, but they do
 not change request or response behavior.
 
-Next: [12. Select](./12-select.md)
+Next: [12. Select](../03-opt-in-features/12-select.md)

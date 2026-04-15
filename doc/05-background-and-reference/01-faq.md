@@ -83,7 +83,7 @@ transport abstraction. So implementers keep both the freedom and the
 responsibility that come with their chosen transport.
 
 For concrete HTTP and WebSocket examples, see the
-[Transport Guide](./transports.md).
+[Transport Guide](../03-build-clients-and-servers/01-transports.md).
 
 ## Why are there no transport adapters included with Telepact?
 
@@ -94,7 +94,7 @@ boilerplate, and it preserves clarity at a critical component boundary.
 Because of that, Telepact prefers to keep the transport layer explicit rather
 than wrap it in a heavier abstraction that obscures how the system is actually
 wired. For examples of what that explicit code looks like in practice, see the
-[Transport Guide](./transports.md).
+[Transport Guide](../03-build-clients-and-servers/01-transports.md).
 
 ## Why can I not define nullable arrays or objects?
 

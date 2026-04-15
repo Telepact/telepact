@@ -66,4 +66,4 @@ So codegen is very lightweight:
 2. generate bindings
 3. use them with the Telepact runtime library
 
-Next: [22. Minimum server](./22-minimum-server.md)
+Next: [22. Minimum server](../08-running-our-own-server/22-minimum-server.md)

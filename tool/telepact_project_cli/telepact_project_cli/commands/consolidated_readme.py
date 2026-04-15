@@ -149,7 +149,7 @@ def consolidate_readme_impl(readme_path: Path, output_path: Path, include_skill_
     
     for full_match, link_text, link_path in links:
         # Resolve the relative path
-        # link_path is like "./doc/motivation.md"
+        # link_path is like "./doc/05-background-and-reference/02-motivation.md"
         resolved_path = base_dir / link_path[2:]  # Remove "./" prefix
         
         if link_path in link_map:

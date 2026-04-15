@@ -94,4 +94,4 @@ This login/logout pair is specific to the demo server. Other Telepact services
 can choose different auth policies. The common convention is that auth travels
 through `@auth_`.
 
-Next: [19. Minimum Python client](./19-minimum-python-client.md)
+Next: [19. Minimum Python client](../06-using-telepact-client-library-code/19-minimum-python-client.md)
