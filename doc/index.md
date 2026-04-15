@@ -29,19 +29,19 @@ servers, or operate a Telepact API in production.
 
 ### Libraries
 
-- [TypeScript](./03-build-clients-and-servers/05-libraries/01-typescript.md)
-- [Python](./03-build-clients-and-servers/05-libraries/02-python.md)
-- [Java](./03-build-clients-and-servers/05-libraries/03-java.md)
-- [Go](./03-build-clients-and-servers/05-libraries/04-go.md)
+- [TypeScript](../lib/ts/README.md)
+- [Python](../lib/py/README.md)
+- [Java](../lib/java/README.md)
+- [Go](../lib/go/README.md)
 
 ### SDK tools
 
-- [CLI](./03-build-clients-and-servers/06-sdk-tools/01-cli.md)
+- [CLI](../sdk/cli/README.md)
     - Fetch schemas, compare versions, mock APIs, and generate code from the
       command line
-- [Browser Console](./03-build-clients-and-servers/06-sdk-tools/02-browser-console.md)
+- [Browser Console](../sdk/console/README.md)
     - Browse docs and submit live requests against a running Telepact server
-- [Prettier Plugin](./03-build-clients-and-servers/06-sdk-tools/03-prettier-plugin.md)
+- [Prettier Plugin](../sdk/prettier/README.md)
     - Format checked-in Telepact schema files consistently
 
 ## Operate
