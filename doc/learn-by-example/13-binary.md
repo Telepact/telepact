@@ -27,7 +27,7 @@ curl -s localhost:8000/api -d '[{}, {"fn.evaluate": {"expression": {"Variable": 
 ```
 
 We will make the same `fn.getPaperTape` call three times and compare what goes
-over the wire.
+over the wire. The `!` means `limit` is optional, as in the earlier examples.
 
 ## 1. Plain JSON
 
@@ -134,9 +134,9 @@ body: <MessagePack bytes>
 | Negotiated binary response | binary body + `@bin_` | 91 B |
 
 ```text
-Plain JSON                  444 B  ████████████████████████████████
-First binary response       546 B  ███████████████████████████████████████
-Negotiated binary response   91 B  ███████
+Plain JSON                  444 B  ██████████████████████
+First binary response       546 B  ███████████████████████████
+Negotiated binary response   91 B  █████
 ```
 
 So the protocol works like this:
