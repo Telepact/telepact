@@ -19,7 +19,7 @@
     contains exactly one non-internal `fn.*` matcher plus a matching `->`
     result payload that the mock should return.
 
-    See https://raw.githubusercontent.com/Telepact/telepact/main/doc/extensions.md
+    See https://raw.githubusercontent.com/Telepact/telepact/main/doc/03-design-apis/03-extensions.md
     for full `_ext.Stub_` rules and end-to-end examples.
   _ext.Stub_: {}
 
@@ -28,7 +28,7 @@
     failures. It contains exactly one non-internal `fn.*` key whose value is
     that function's argument object.
 
-    See https://raw.githubusercontent.com/Telepact/telepact/main/doc/extensions.md
+    See https://raw.githubusercontent.com/Telepact/telepact/main/doc/03-design-apis/03-extensions.md
     for full `_ext.Call_` rules and end-to-end examples.
   _ext.Call_: {}
 

@@ -202,7 +202,7 @@ Example response:
 `@select_` lets the client ask the server to trim response payloads.
 
 For the full `_ext.Select_` shape and more end-to-end examples, see:
-https://raw.githubusercontent.com/Telepact/telepact/main/doc/extensions.md
+https://raw.githubusercontent.com/Telepact/telepact/main/doc/03-design-apis/03-extensions.md
 
 Common patterns:
 
@@ -269,7 +269,7 @@ Install the matching library first:
 
 - Go: `go get github.com/telepact/telepact/lib/go`
 
-Latest library versions can be found at [doc/versions.md](https://github.com/Telepact/telepact/blob/main/doc/versions.md).
+Latest library versions can be found at [doc/05-operate/03-versions.md](https://github.com/Telepact/telepact/blob/main/doc/05-operate/03-versions.md).
 
 Then implement the same three-part pattern in that language:
 

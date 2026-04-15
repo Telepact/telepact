@@ -270,7 +270,7 @@ def write_doc_versions(
     "--output",
     type=click.Path(path_type=Path),
     default=None,
-    help="Where to write the markdown file (default: doc/versions.md at repo root).",
+    help="Where to write the markdown file (default: doc/05-operate/03-versions.md at repo root).",
 )
 def doc_versions(repo_root: Path, output: Path | None) -> None:
     write_doc_versions(repo_root, output)

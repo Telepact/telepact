@@ -1,10 +1,10 @@
 {
   "changed_paths": [
-    "doc/client-paths.md",
-    "doc/core-concepts.md",
+    "doc/04-build-clients-and-servers/02-client-paths.md",
+    "doc/03-design-apis/02-core-concepts.md",
     "doc/index.md",
-    "doc/server-paths.md",
-    "doc/tooling-workflow.md",
+    "doc/04-build-clients-and-servers/03-server-paths.md",
+    "doc/04-build-clients-and-servers/04-tooling-workflow.md",
     "site/src/build.py"
   ],
   "direct_targets": [],

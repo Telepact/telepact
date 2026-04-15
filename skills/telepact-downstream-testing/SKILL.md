@@ -49,7 +49,7 @@ Install the Telepact CLI first:
 uv tool install --prerelease=allow telepact-cli
 ```
 
-Latest CLI versions can be found at [doc/versions.md](https://github.com/Telepact/telepact/blob/main/doc/versions.md).
+Latest CLI versions can be found at [doc/05-operate/03-versions.md](https://github.com/Telepact/telepact/blob/main/doc/05-operate/03-versions.md).
 
 ## First Step
 
@@ -155,7 +155,7 @@ The most important ones are:
 
 The exact `_ext.Stub_`, `_ext.Call_`, and `@select_` shapes used by these mock
 controls are documented here:
-https://raw.githubusercontent.com/Telepact/telepact/main/doc/extensions.md
+https://raw.githubusercontent.com/Telepact/telepact/main/doc/03-design-apis/03-extensions.md
 
 Use generated responses by default. Add explicit stubs only when the test needs a very specific downstream behavior.
 

@@ -39,9 +39,9 @@ Install the matching Telepact library first:
 
 - Go: `go get github.com/telepact/telepact/lib/go`
 
-Latest library versions can be found at [doc/versions.md](https://github.com/Telepact/telepact/blob/main/doc/versions.md).
+Latest library versions can be found at [doc/05-operate/03-versions.md](https://github.com/Telepact/telepact/blob/main/doc/05-operate/03-versions.md).
 For Telepact design decisions around auth, optional headers, and transport
-ownership, see the [FAQ](https://github.com/Telepact/telepact/blob/main/doc/faq.md).
+ownership, see the [FAQ](https://github.com/Telepact/telepact/blob/main/doc/06-background-and-reference/01-faq.md).
 
 Then implement the same four-part pattern in that language:
 
@@ -478,7 +478,7 @@ Clients may request struct field selection using `@select_`.
 
 For the full `_ext.Select_` shape and worked examples of how selection changes
 response payloads, see:
-https://raw.githubusercontent.com/Telepact/telepact/main/doc/extensions.md
+https://raw.githubusercontent.com/Telepact/telepact/main/doc/03-design-apis/03-extensions.md
 
 Your server code should not implement custom pruning logic. Return the full schema-valid response and let the Telepact runtime shape the response according to the selection header.
 

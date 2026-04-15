@@ -44,7 +44,7 @@ Response:
 [{}, {"Ok_": {"msg": "Hello world!"}}]
 ```
 
-Check out the [full-stack example](./doc/example.md).
+Check out the [full-stack example](doc/01-start-here/01-quickstart.md).
 
 # Explore
 

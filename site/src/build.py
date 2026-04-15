@@ -278,11 +278,11 @@ class Page:
     @property
     def section(self) -> str:
         rel = self.rel_source
-        if rel == "doc/learn-by-example/README.md":
+        if rel == "doc/02-learn-by-example/README.md":
             return "Documentation"
         if rel == "example/README.md":
             return "Documentation"
-        if rel.startswith("doc/learn-by-example/"):
+        if rel.startswith("doc/02-learn-by-example/"):
             return "Learn by Example"
         if rel.startswith("doc/"):
             return "Documentation"
