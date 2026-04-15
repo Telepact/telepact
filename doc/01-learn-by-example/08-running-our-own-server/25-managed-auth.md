@@ -22,7 +22,9 @@ pip install --pre telepact
 Here is the key pattern:
 
 ```py
+import asyncio
 from http.cookies import SimpleCookie
+from http.server import BaseHTTPRequestHandler
 
 
 def read_session_cookie(cookie_header: str | None) -> str | None:
@@ -35,13 +37,17 @@ def read_session_cookie(cookie_header: str | None) -> str | None:
     return session.value if session is not None else None
 
 
-def update_headers(headers: dict[str, object]) -> None:
-    session_token = read_session_cookie(raw_cookie_header)
-    if session_token is not None:
-        headers['@auth_'] = {'Token': {'token': session_token}}
+class RequestHandler(BaseHTTPRequestHandler):
+    def do_POST(self) -> None:
+        content_length = int(self.headers.get('Content-Length', '0'))
+        request_bytes = self.rfile.read(content_length)
+        session_token = read_session_cookie(self.headers.get('Cookie'))
 
+        def update_headers(headers: dict[str, object]) -> None:
+            if session_token is not None:
+                headers['@auth_'] = {'Token': {'token': session_token}}
 
-response = asyncio.run(telepact_server.process(request_bytes, update_headers))
+        response = asyncio.run(telepact_server.process(request_bytes, update_headers))
 ```
 
 Now the rest of our auth story can stay the same:
