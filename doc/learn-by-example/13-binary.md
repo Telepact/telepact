@@ -1,6 +1,7 @@
 # 13. Binary
 
-Telepact can also switch the whole message envelope into a compact binary form.
+Telepact can switch the same message envelope into a compact binary form. The
+key idea is that binary is **opt-in** and negotiated **at runtime**.
 
 ## Start the demo server
 
@@ -15,38 +16,76 @@ curl -s localhost:8000/api -d '[{}, {"fn.evaluate": {"expression": {"Add": {"lef
 curl -s localhost:8000/api -d '[{}, {"fn.evaluate": {"expression": {"Variable": {"name": "x"}}}}]'
 ```
 
-## Measure plain JSON first
+## The call we are measuring
 
-```sh
-curl -s localhost:8000/api -d '[{}, {"fn.getPaperTape": {}}]' | wc -c
+```yaml
+- fn.getPaperTape:
+    limit!: integer
+  ->:
+    - Ok_:
+        tape: [struct.Evaluation]
 ```
 
-On one run, that was:
+We will make the same `fn.getPaperTape` call three times and compare what goes
+over the wire.
+
+## 1. Plain JSON
+
+```sh
+curl -s localhost:8000/api -d '[{}, {"fn.getPaperTape": {}}]' > /tmp/papertape.json
+wc -c < /tmp/papertape.json
+```
+
+On one run:
 
 ```text
 444
 ```
 
-## Do the binary handshake
+Visualization:
 
-First request:
+```text
+Request
+[{}, {"fn.getPaperTape": {}}]
+
+Response · 444 B
+[{}, {"Ok_": {"tape": [...]}}]
+```
+
+## 2. First binary response: negotiate field ids
 
 ```sh
 curl -s localhost:8000/api -d '[{"@bin_": []}, {"fn.getPaperTape": {}}]' > /tmp/papertape-first.bin
 wc -c < /tmp/papertape-first.bin
-xxd -g 1 -l 64 /tmp/papertape-first.bin
 ```
 
-On one run, that first binary response was larger:
+On one run, the first binary response was larger:
 
 ```text
 546
 ```
 
-That is expected. We told the server we had no negotiated binary policy yet, so
-it returned binary data *plus* the field map in `@enc_`.
+Visualization:
 
-Now let's extract the negotiated checksum:
+```text
+Request
+[{"@bin_": []}, {"fn.getPaperTape": {}}]
+
+Response · 546 B
+headers: {
+  "@bin_": [checksum],
+  "@enc_": { ... negotiated field ids ... }
+}
+
+body: <MessagePack bytes>
+```
+
+That first response is larger because the server has to send the negotiated
+field map in `@enc_` along with the binary checksum in `@bin_`.
+
+## 3. Steady-state binary: reuse the checksum
+
+Extract the negotiated checksum:
 
 ```sh
 checksum=$(uv run --with msgpack python - <<'PY'
@@ -59,12 +98,11 @@ PY
 echo "$checksum"
 ```
 
-And use it on the next request:
+Now send it back:
 
 ```sh
 curl -s localhost:8000/api -d "[{\"@bin_\": [$checksum]}, {\"fn.getPaperTape\": {}}]" > /tmp/papertape-steady.bin
 wc -c < /tmp/papertape-steady.bin
-xxd -g 1 -l 64 /tmp/papertape-steady.bin
 ```
 
 On one run, the steady-state binary response dropped to:
@@ -73,12 +111,45 @@ On one run, the steady-state binary response dropped to:
 91
 ```
 
-That is the differentiator: Telepact negotiates binary **at runtime** instead of
-forcing us into a codegen-managed ABI workflow.
+Visualization:
+
+```text
+Request
+[{"@bin_": [checksum]}, {"fn.getPaperTape": {}}]
+
+Response · 91 B
+headers: {
+  "@bin_": [checksum]
+}
+
+body: <MessagePack bytes>
+```
+
+## What changed on the wire?
+
+| Wire format | What the server includes | Example size |
+| --- | --- | --- |
+| Plain JSON | JSON body only | 444 B |
+| First binary response | binary body + `@bin_` + `@enc_` | 546 B |
+| Negotiated binary response | binary body + `@bin_` | 91 B |
+
+```text
+Plain JSON                  444 B  ████████████████████████████████
+First binary response       546 B  ███████████████████████████████████████
+Negotiated binary response   91 B  ███████
+```
+
+So the protocol works like this:
+
+1. the client opts into binary with `@bin_`: `[]`
+2. the server replies with binary bytes plus the field-id map in `@enc_`
+3. the client caches the checksum from `@bin_` and reuses it
+4. later messages stay compact because `@enc_` no longer needs to be resent
 
 Under the hood, this binary format is powered by [MessagePack](https://msgpack.org/).
 
 In normal client code, we should not handcraft `@bin_` like this. A Telepact
-runtime client can do the negotiation and caching for us automatically.
+runtime client can do the negotiation and caching for us automatically, which is
+what we will do next.
 
 Next: [14. Mock server](./14-mock-server.md)
