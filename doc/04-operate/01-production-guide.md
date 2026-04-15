@@ -11,7 +11,7 @@ layers:
 - your surrounding service, which owns deployment topology, middleware,
   auth, observability, rollout controls, and incident response
 
-For byte-level transport patterns, see the [Transport Guide](./transports.md).
+For byte-level transport patterns, see the [Transport Guide](../03-build-clients-and-servers/01-transports.md).
 
 ## 1. Deployment topology
 
@@ -130,7 +130,7 @@ headers while calling `server.process(...)`. For example, an HTTP adapter can
 read a session cookie and apply it with `updateHeaders`:
 
 A runnable minimal version of this pattern lives in
-[`example/py-http-cookie-auth`](../example/py-http-cookie-auth/README.md).
+[`example/py-http-cookie-auth`](../../example/py-http-cookie-auth/README.md).
 
 ```ts
 const response = await server.process(requestBytes, (headers) => {

@@ -84,4 +84,4 @@ clients can trust the pattern.
 We *could* learn a service by trial and error like this, but now we're ready for
 the nicer path: learning to read the schema directly.
 
-Next: [04. Scalar types](./04-scalar-types.md)
+Next: [04. Scalar types](../02-schema/04-scalar-types.md)

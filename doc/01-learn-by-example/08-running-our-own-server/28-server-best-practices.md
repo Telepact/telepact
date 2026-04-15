@@ -15,7 +15,7 @@ Prefer expressive data over HTTP-shaped habits:
 - let Telepact handle request validation instead of inventing a generic "400"
 - use function-specific errors for real business rules
 
-The [FAQ](../faq.md) is worth reading end to end here.
+The [FAQ](../../05-background-and-reference/01-faq.md) is worth reading end to end here.
 
 ## 3. Log on the server
 
@@ -42,4 +42,4 @@ of tooling they want:
 That breadth is one of Telepact's best qualities: clients can start simple and
 grow into richer tooling without the server changing its basic contract style.
 
-Next: [Back to the start](./00-installation.md)
+Next: [Back to the start](../01-getting-started/00-installation.md)

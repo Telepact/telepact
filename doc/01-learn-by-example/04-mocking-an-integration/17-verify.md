@@ -33,7 +33,7 @@ The entry looks like this:
 }
 ```
 
-For the `_ext.Call_` shape, see the [extensions guide](../extensions.md).
+For the `_ext.Call_` shape, see the [extensions guide](../../02-design-apis/03-extensions.md).
 
 ## Verify before the call
 
@@ -66,4 +66,4 @@ Response:
 So `fn.verify_` is our way to confirm that our side of the integration reached
 out when we expected it to.
 
-Next: [18. Auth](./18-auth.md)
+Next: [18. Auth](../05-auth/18-auth.md)

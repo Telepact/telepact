@@ -11,7 +11,7 @@ uv tool install --prerelease=allow telepact-cli
 
 Published PyPI releases are currently prereleases. To pin a specific CLI
 release, use the exact version from
-[doc/versions.md](https://github.com/Telepact/telepact/blob/main/doc/versions.md).
+[doc/04-operate/03-versions.md](https://github.com/Telepact/telepact/blob/main/doc/04-operate/03-versions.md).
 
 ## Usage
 

@@ -271,25 +271,6 @@ class Page:
     def url(self) -> str:
         return url_from_output(self.output_file)
 
-    @property
-    def section(self) -> str:
-        rel = self.rel_source
-        if rel == "doc/learn-by-example/README.md":
-            return "Documentation"
-        if rel == "example/README.md":
-            return "Documentation"
-        if rel.startswith("doc/learn-by-example/"):
-            return "Learn by Example"
-        if rel.startswith("doc/"):
-            return "Documentation"
-        if rel.startswith("example/"):
-            return "Documentation"
-        if rel.startswith("lib/"):
-            return "Libraries"
-        if rel.startswith("sdk/"):
-            return "SDK Tools"
-        return "Resources"
-
 
 @dataclass(frozen=True)
 class NavLink:
@@ -308,6 +289,92 @@ class NavGroup:
     heading: str
     items: list[NavLink] = field(default_factory=list)
     subgroups: list[NavSubgroup] = field(default_factory=list)
+
+
+ORDERED_NAME_RE = re.compile(r"^(?P<order>\d+)(?:[-_.]|$)(?P<name>.*)$")
+DISPLAY_TOKEN_MAP = {
+    "api": "API",
+    "apis": "APIs",
+    "cli": "CLI",
+    "go": "Go",
+    "http": "HTTP",
+    "https": "HTTPS",
+    "json": "JSON",
+    "sdk": "SDK",
+    "telepact": "Telepact",
+    "tdd": "TDD",
+    "typescript": "TypeScript",
+    "websocket": "WebSocket",
+}
+LOWERCASE_DISPLAY_TOKENS = {"a", "an", "and", "by", "for", "in", "of", "on", "or", "the", "to", "with"}
+
+
+def split_ordered_name(name: str) -> tuple[int, str]:
+    match = ORDERED_NAME_RE.match(name)
+    if match:
+        remainder = match.group("name") or name
+        return int(match.group("order")), remainder
+    return 10**9, name
+
+
+def sort_nav_paths(paths: list[Path]) -> list[Path]:
+    return sorted(
+        paths,
+        key=lambda path: (
+            split_ordered_name(path.stem if path.is_file() else path.name)[0],
+            split_ordered_name(path.stem if path.is_file() else path.name)[1].lower(),
+        ),
+    )
+
+
+def display_name(path: Path) -> str:
+    raw_name = path.stem if path.is_file() else path.name
+    _, remainder = split_ordered_name(raw_name)
+    tokens = [token for token in remainder.split("-") if token]
+    if not tokens:
+        return remainder or raw_name
+    rendered: list[str] = []
+    for index, token in enumerate(tokens):
+        mapped = DISPLAY_TOKEN_MAP.get(token.lower())
+        if mapped is not None:
+            rendered.append(mapped)
+        elif index > 0 and token.lower() in LOWERCASE_DISPLAY_TOKENS:
+            rendered.append(token.lower())
+        else:
+            rendered.append(token.capitalize())
+    return " ".join(rendered)
+
+
+def page_for_source(pages: dict[Path, Page], source: Path) -> Page | None:
+    return pages.get(source)
+
+
+def directory_landing_page(pages: dict[Path, Page], directory: Path) -> Page | None:
+    for name in ("README.md", "index.md"):
+        page = page_for_source(pages, directory / name)
+        if page is not None:
+            return page
+    return None
+
+
+def nav_links_for_directory(pages: dict[Path, Page], directory: Path) -> list[NavLink]:
+    links: list[NavLink] = []
+    landing = directory_landing_page(pages, directory)
+    if landing is not None:
+        links.append(NavLink(landing.title, landing.rel_source))
+
+    children = [
+        child for child in directory.iterdir()
+        if child.is_file()
+        and child.suffix == ".md"
+        and child.name not in {"README.md", "index.md"}
+    ]
+    for child in sort_nav_paths(children):
+        page = page_for_source(pages, child)
+        if page is None:
+            continue
+        links.append(NavLink(page.title, page.rel_source))
+    return links
 
 
 def discover_pages() -> tuple[dict[Path, Page], set[Path]]:
@@ -618,148 +685,51 @@ def page_by_rel_source(pages: dict[Path, Page], rel_source: str) -> Page | None:
     return None
 
 
-def nav_groups() -> list[NavGroup]:
-    learn_by_example_groups = [
-        NavSubgroup(
-            heading="Getting started",
-            items=[
-                NavLink("00. Installation", "doc/learn-by-example/00-installation.md"),
-                NavLink("01. Ping", "doc/learn-by-example/01-ping.md"),
-                NavLink("02. Schema and `fn.add`", "doc/learn-by-example/02-schema-and-add.md"),
-                NavLink("03. Data type validation", "doc/learn-by-example/03-data-type-validation.md"),
-            ],
-        ),
-        NavSubgroup(
-            heading="Schema",
-            items=[
-                NavLink("04. Scalar types", "doc/learn-by-example/04-scalar-types.md"),
-                NavLink("05. Collection types", "doc/learn-by-example/05-collection-types.md"),
-                NavLink("06. Structs", "doc/learn-by-example/06-structs.md"),
-                NavLink("07. Unions", "doc/learn-by-example/07-unions.md"),
-                NavLink("08. Functions", "doc/learn-by-example/08-functions.md"),
-                NavLink("09. Service errors", "doc/learn-by-example/09-service-errors.md"),
-                NavLink("10. Headers", "doc/learn-by-example/10-headers.md"),
-                NavLink("11. Comments", "doc/learn-by-example/11-comments.md"),
-            ],
-        ),
-        NavSubgroup(
-            heading="Opt-in features",
-            items=[
-                NavLink("12. Select", "doc/learn-by-example/12-select.md"),
-                NavLink("13. Binary", "doc/learn-by-example/13-binary.md"),
-            ],
-        ),
-        NavSubgroup(
-            heading="Mocking an integration",
-            items=[
-                NavLink("14. Mock server", "doc/learn-by-example/14-mock-server.md"),
-                NavLink("15. Stock mock", "doc/learn-by-example/15-stock-mock.md"),
-                NavLink("16. Stubs", "doc/learn-by-example/16-stubs.md"),
-                NavLink("17. Verify", "doc/learn-by-example/17-verify.md"),
-            ],
-        ),
-        NavSubgroup(
-            heading="Auth",
-            items=[
-                NavLink("18. Auth", "doc/learn-by-example/18-auth.md"),
-            ],
-        ),
-        NavSubgroup(
-            heading="Using Telepact client library code",
-            items=[
-                NavLink("19. Minimum Python client", "doc/learn-by-example/19-minimum-python-client.md"),
-                NavLink("20. Automatic binary negotiation", "doc/learn-by-example/20-automatic-binary-negotiation.md"),
-            ],
-        ),
-        NavSubgroup(
-            heading="Code generation",
-            items=[
-                NavLink("21. Code generation", "doc/learn-by-example/21-code-generation.md"),
-            ],
-        ),
-        NavSubgroup(
-            heading="Running our own server",
-            items=[
-                NavLink("22. Minimum server", "doc/learn-by-example/22-minimum-server.md"),
-                NavLink("23. Logging", "doc/learn-by-example/23-logging.md"),
-                NavLink("24. Server auth", "doc/learn-by-example/24-server-auth.md"),
-                NavLink("25. Managed auth", "doc/learn-by-example/25-managed-auth.md"),
-                NavLink("26. Schema evolution", "doc/learn-by-example/26-schema-evolution.md"),
-                NavLink("27. Best practices for server implementers", "doc/learn-by-example/27-server-best-practices.md"),
-            ],
-        ),
-    ]
+def nav_groups(pages: dict[Path, Page]) -> list[NavGroup]:
+    doc_root = REPO_ROOT / "doc"
+    groups: list[NavGroup] = []
 
-    return [
-        NavGroup(
-            heading="Start Here",
-            items=[
-                NavLink("Home", "doc/index.md"),
-                NavLink("Quickstart", "doc/example.md"),
-                NavLink("Learn Telepact by Example", "doc/learn-by-example/README.md"),
-                NavLink("Demos", "example/README.md"),
-            ],
-        ),
-        NavGroup(
-            heading="Learn by Example",
-            items=[
-                NavLink("Learn Telepact by Example", "doc/learn-by-example/README.md"),
-            ],
-            subgroups=learn_by_example_groups,
-        ),
-        NavGroup(
-            heading="Design APIs",
-            items=[
-                NavLink("Schema Writing Guide", "doc/schema-guide.md"),
-                NavLink("Core Concepts", "doc/core-concepts.md"),
-                NavLink("Extensions", "doc/extensions.md"),
-            ],
-        ),
-        NavGroup(
-            heading="Build Clients & Servers",
-            items=[
-                NavLink("Transport Guide", "doc/transports.md"),
-                NavLink("Client Paths", "doc/client-paths.md"),
-                NavLink("Server Paths", "doc/server-paths.md"),
-                NavLink("Tooling Workflow", "doc/tooling-workflow.md"),
-            ],
-            subgroups=[
-                NavSubgroup(
-                    heading="Libraries",
-                    items=[
-                        NavLink("Telepact Library for TypeScript", "lib/ts/README.md"),
-                        NavLink("Telepact Library for Python", "lib/py/README.md"),
-                        NavLink("Telepact Library for Java", "lib/java/README.md"),
-                        NavLink("Telepact Library for Go", "lib/go/README.md"),
-                    ],
-                ),
-                NavSubgroup(
-                    heading="SDK Tools",
-                    items=[
-                        NavLink("Telepact CLI", "sdk/cli/README.md"),
-                        NavLink("Telepact Console", "sdk/console/README.md"),
-                        NavLink("Telepact Prettier Plugin", "sdk/prettier/README.md"),
-                    ],
-                ),
-            ],
-        ),
-        NavGroup(
-            heading="Operate",
-            items=[
-                NavLink("Production Guide", "doc/production-guide.md"),
-                NavLink("Runtime Error Guide", "doc/runtime-errors.md"),
-                NavLink("Versions", "doc/versions.md"),
-            ],
-        ),
-        NavGroup(
-            heading="Background & Reference",
-            items=[
-                NavLink("FAQ", "doc/faq.md"),
-                NavLink("Motivation", "doc/motivation.md"),
-                NavLink("JSON Schema", "common/json-schema.json"),
-            ],
-        ),
+    root_items: list[NavLink] = []
+    home_page = page_for_source(pages, doc_root / "index.md")
+    if home_page is not None:
+        root_items.append(NavLink(home_page.title, home_page.rel_source))
+
+    root_files = [
+        child for child in doc_root.iterdir()
+        if child.is_file()
+        and child.suffix == ".md"
+        and child.name not in {"README.md", "index.md"}
     ]
+    for child in sort_nav_paths(root_files):
+        page = page_for_source(pages, child)
+        if page is None:
+            continue
+        root_items.append(NavLink(page.title, page.rel_source))
+    if root_items:
+        groups.append(NavGroup(heading="Start Here", items=root_items))
+
+    top_level_dirs = [
+        child for child in doc_root.iterdir()
+        if child.is_dir() and split_ordered_name(child.name)[0] != 10**9
+    ]
+    for directory in sort_nav_paths(top_level_dirs):
+        landing = directory_landing_page(pages, directory)
+        heading = landing.title if landing is not None else display_name(directory)
+        items = nav_links_for_directory(pages, directory)
+        subgroups: list[NavSubgroup] = []
+        child_dirs = [child for child in directory.iterdir() if child.is_dir()]
+        for child_dir in sort_nav_paths(child_dirs):
+            links = nav_links_for_directory(pages, child_dir)
+            if not links:
+                continue
+            subgroups.append(
+                NavSubgroup(
+                    heading=display_name(child_dir),
+                    items=links,
+                )
+            )
+        groups.append(NavGroup(heading=heading, items=items, subgroups=subgroups))
+    return groups
 
 
 def render_nav_link(current: Page, pages: dict[Path, Page], resources: set[Path], item: NavLink) -> str:
@@ -783,7 +753,7 @@ def render_nav_link(current: Page, pages: dict[Path, Page], resources: set[Path]
 
 def render_nav(current: Page, pages: dict[Path, Page], resources: set[Path]) -> str:
     groups: list[str] = []
-    for group in nav_groups():
+    for group in nav_groups(pages):
         parts: list[str] = []
         if group.items:
             links = [

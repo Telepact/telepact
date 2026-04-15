@@ -7,24 +7,24 @@ servers, or operate a Telepact API in production.
 ## Start here
 
 - [Quickstart](./example.md) for the fastest end-to-end example
-- [Learn Telepact by Example](./learn-by-example/README.md) for a guided tour
-- [Demos](../example/README.md) for runnable end-to-end examples
+- [Learn Telepact by Example](./01-learn-by-example/README.md) for a guided tour
+- [Demos](./demos.md) for runnable end-to-end examples
 
 ## Design APIs
 
-- [Schema Writing Guide](./schema-guide.md) for the full schema language
-- [Core Concepts](./core-concepts.md) for Telepact's message model, schema
+- [Schema Writing Guide](./02-design-apis/01-schema-guide.md) for the full schema language
+- [Core Concepts](./02-design-apis/02-core-concepts.md) for Telepact's message model, schema
   role, headers, links, select, and binary at a high level
-- [Extensions](./extensions.md) for Telepact's reserved `_ext.*_` types
+- [Extensions](./02-design-apis/03-extensions.md) for Telepact's reserved `_ext.*_` types
 - [JSON Schema](../common/json-schema.json) for schema-file validation
 
 ## Build clients and servers
 
-- [Transport Guide](./transports.md) for HTTP and WebSocket wiring patterns
-- [Client Paths](./client-paths.md) for choosing between plain JSON, client
+- [Transport Guide](./03-build-clients-and-servers/01-transports.md) for HTTP and WebSocket wiring patterns
+- [Client Paths](./03-build-clients-and-servers/02-client-paths.md) for choosing between plain JSON, client
   libraries, and generated code
-- [Server Paths](./server-paths.md) for choosing a runtime and wiring a server
-- [Tooling Workflow](./tooling-workflow.md) for `fetch`, `compare`, `mock`, and
+- [Server Paths](./03-build-clients-and-servers/03-server-paths.md) for choosing a runtime and wiring a server
+- [Tooling Workflow](./03-build-clients-and-servers/04-tooling-workflow.md) for `fetch`, `compare`, `mock`, and
   `codegen`
 
 ### Libraries
@@ -46,12 +46,12 @@ servers, or operate a Telepact API in production.
 
 ## Operate
 
-- [Production Guide](./production-guide.md) for rollout, auth, compatibility,
+- [Production Guide](./04-operate/01-production-guide.md) for rollout, auth, compatibility,
   and observability guidance
-- [Runtime Error Guide](./runtime-errors.md) for local/runtime debugging
-- [Versions](./versions.md) for the latest published library and SDK versions
+- [Runtime Error Guide](./04-operate/02-runtime-errors.md) for local/runtime debugging
+- [Versions](./04-operate/03-versions.md) for the latest published library and SDK versions
 
 ## Background and reference
 
-- [FAQ](./faq.md) for Telepact's more unusual design decisions
-- [Motivation](./motivation.md) for the ecosystem goals and tradeoffs
+- [FAQ](./05-background-and-reference/01-faq.md) for Telepact's more unusual design decisions
+- [Motivation](./05-background-and-reference/02-motivation.md) for the ecosystem goals and tradeoffs

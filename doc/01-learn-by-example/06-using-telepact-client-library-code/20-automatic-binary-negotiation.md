@@ -77,4 +77,4 @@ This is the normal way to use binary with Telepact. If the schema changes, the
 runtime client can re-negotiate instead of forcing us through a codegen ABI
 pipeline.
 
-Next: [21. Code generation](./21-code-generation.md)
+Next: [21. Code generation](../07-code-generation/21-code-generation.md)

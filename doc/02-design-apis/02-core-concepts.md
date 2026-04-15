@@ -27,7 +27,7 @@ Responses usually look like:
 ```
 
 For a more complete walkthrough, start with the
-[Quickstart](./example.md) or [Learn Telepact by Example](./learn-by-example/README.md).
+[Quickstart](../example.md) or [Learn Telepact by Example](../01-learn-by-example/README.md).
 
 ## Schema role
 
@@ -48,7 +48,7 @@ That one schema also powers:
 - mock servers
 - compatibility checks
 
-For the full language, see the [Schema Writing Guide](./schema-guide.md).
+For the full language, see the [Schema Writing Guide](./01-schema-guide.md).
 
 ## Headers versus body
 
@@ -65,9 +65,9 @@ As a rule of thumb:
 
 For more detail, see:
 
-- [Transport Guide](./transports.md)
-- [Production Guide](./production-guide.md)
-- [FAQ](./faq.md)
+- [Transport Guide](../03-build-clients-and-servers/01-transports.md)
+- [Production Guide](../04-operate/01-production-guide.md)
+- [FAQ](../05-background-and-reference/01-faq.md)
 
 ## Function links
 
@@ -79,8 +79,8 @@ link formats.
 
 See:
 
-- [Learn by Example: Functions](./learn-by-example/08-functions.md)
-- [Demos](../example/README.md)
+- [Learn by Example: Functions](../01-learn-by-example/02-schema/08-functions.md)
+- [Demos](../../example/README.md)
 
 ## Select
 
@@ -90,8 +90,8 @@ language.
 
 See:
 
-- [Learn by Example: Select](./learn-by-example/12-select.md)
-- [Extensions](./extensions.md)
+- [Learn by Example: Select](../01-learn-by-example/03-opt-in-features/12-select.md)
+- [Extensions](./03-extensions.md)
 
 ## Binary
 
@@ -101,12 +101,12 @@ when it wants more efficiency.
 
 See:
 
-- [Learn by Example: Binary](./learn-by-example/13-binary.md)
-- [Learn by Example: Automatic binary negotiation](./learn-by-example/20-automatic-binary-negotiation.md)
+- [Learn by Example: Binary](../01-learn-by-example/03-opt-in-features/13-binary.md)
+- [Learn by Example: Automatic binary negotiation](../01-learn-by-example/06-using-telepact-client-library-code/20-automatic-binary-negotiation.md)
 
 ## Where to go next
 
-- If you are designing an API, go to the [Schema Writing Guide](./schema-guide.md).
-- If you are building a client, go to [Client Paths](./client-paths.md).
-- If you are building a server, go to [Server Paths](./server-paths.md).
-- If you want the CLI and related workflows, go to [Tooling Workflow](./tooling-workflow.md).
+- If you are designing an API, go to the [Schema Writing Guide](./01-schema-guide.md).
+- If you are building a client, go to [Client Paths](../03-build-clients-and-servers/02-client-paths.md).
+- If you are building a server, go to [Server Paths](../03-build-clients-and-servers/03-server-paths.md).
+- If you want the CLI and related workflows, go to [Tooling Workflow](../03-build-clients-and-servers/04-tooling-workflow.md).

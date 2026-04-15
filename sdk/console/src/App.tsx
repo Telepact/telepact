@@ -667,7 +667,7 @@ export default function App() {
 										<h1 className="pb-4 text-xl font-semibold text-gray-900 dark:text-gray-100">Schema (JSON)</h1>
 										{!readonlyEditor ? (
 											<div className="flex space-x-2">
-												<a href="https://github.com/Telepact/telepact/blob/main/doc/schema-guide.md">
+												<a href="https://github.com/Telepact/telepact/blob/main/doc/02-design-apis/01-schema-guide.md">
 													<button className="flex items-center rounded-md bg-gray-200 px-3 py-2 text-sm font-semibold text-gray-900 hover:bg-gray-300 hover:underline dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600">
 														<span>Writing Guide</span>
 														<svg

@@ -11,10 +11,10 @@ Every Telepact server follows the same basic shape:
 
 Telepact currently ships server libraries for:
 
-- [TypeScript](../lib/ts/README.md)
-- [Python](../lib/py/README.md)
-- [Java](../lib/java/README.md)
-- [Go](../lib/go/README.md)
+- [TypeScript](../../lib/ts/README.md)
+- [Python](../../lib/py/README.md)
+- [Java](../../lib/java/README.md)
+- [Go](../../lib/go/README.md)
 
 Pick the runtime that fits the service you are already building. Telepact is
 transport-agnostic, so the same schema and server shape can sit behind HTTP,
@@ -24,8 +24,8 @@ WebSockets, or another IPC boundary that moves bytes.
 
 If you want the fastest path to a running server:
 
-- follow the [Quickstart](./example.md)
-- continue with [Learn by Example: Minimum server](./learn-by-example/22-minimum-server.md)
+- follow the [Quickstart](../example.md)
+- continue with [Learn by Example: Minimum server](../01-learn-by-example/08-running-our-own-server/22-minimum-server.md)
 - use the runtime README for your language
 
 ## Transport adapter path
@@ -38,7 +38,7 @@ Its job is usually just:
 - call `server.process(...)`
 - send response bytes back through the transport
 
-See the [Transport Guide](./transports.md) for concrete HTTP and WebSocket
+See the [Transport Guide](./01-transports.md) for concrete HTTP and WebSocket
 patterns.
 
 ## Middleware and auth path
@@ -53,10 +53,10 @@ Put request-level concerns near the Telepact runtime boundary:
 
 Start here:
 
-- [Learn by Example: Auth](./learn-by-example/18-auth.md)
-- [Learn by Example: Server auth](./learn-by-example/24-server-auth.md)
-- [Learn by Example: Managed auth](./learn-by-example/25-managed-auth.md)
-- [Production Guide](./production-guide.md)
+- [Learn by Example: Auth](../01-learn-by-example/05-auth/18-auth.md)
+- [Learn by Example: Server auth](../01-learn-by-example/08-running-our-own-server/24-server-auth.md)
+- [Learn by Example: Managed auth](../01-learn-by-example/08-running-our-own-server/25-managed-auth.md)
+- [Production Guide](../04-operate/01-production-guide.md)
 
 ## Production path
 
@@ -69,6 +69,6 @@ Before rollout, focus on:
 
 Start here:
 
-- [Production Guide](./production-guide.md)
-- [Runtime Error Guide](./runtime-errors.md)
-- [Versions](./versions.md)
+- [Production Guide](../04-operate/01-production-guide.md)
+- [Runtime Error Guide](../04-operate/02-runtime-errors.md)
+- [Versions](../04-operate/03-versions.md)

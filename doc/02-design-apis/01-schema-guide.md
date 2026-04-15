@@ -347,7 +347,7 @@ rules come from Telepact runtime behavior and surrounding schema context.
 You can find all mock definitions
 [here](https://raw.githubusercontent.com/Telepact/telepact/refs/heads/main/common/mock-internal.telepact.yaml).
 There is also a guide to Telepact extension types, including mock extensions,
-[here](https://raw.githubusercontent.com/Telepact/telepact/main/doc/extensions.md).
+[here](https://raw.githubusercontent.com/Telepact/telepact/main/doc/02-design-apis/03-extensions.md).
 
 ## Full Example
 

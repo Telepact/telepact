@@ -22,7 +22,7 @@ $ cat ./api/math.telepact.yaml
 
 Serve it with one of the Telepact libraries over a transport of your choice.
 For more concrete HTTP and WebSocket patterns, see the
-[Transport Guide](./transports.md).
+[Transport Guide](./03-build-clients-and-servers/01-transports.md).
 
 ```sh
 $ cat ./server.py

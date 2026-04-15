@@ -144,4 +144,4 @@ Under the hood, this binary format is powered by [MessagePack](https://msgpack.o
 In normal client code, we should not handcraft `@bin_` like this. A Telepact
 runtime client can do the negotiation and caching for us automatically.
 
-Next: [14. Mock server](./14-mock-server.md)
+Next: [14. Mock server](../04-mocking-an-integration/14-mock-server.md)
