@@ -627,14 +627,22 @@ def first_markdown_heading(source: Path) -> str:
     return source.stem
 
 
-def nav_link_from_line(line: str) -> NavLink | None:
+def nav_link_from_line(source: Path, line: str) -> NavLink | None:
     match = re.match(r"^\s*(?:[-*+]|\d+\.)\s+(.*)$", line)
     if match is None:
         return None
     link = re.search(r"\[([^\]]+)\]\(([^)]+)\)", match.group(1))
     if link is None:
         return None
-    return NavLink(strip_markdown(link.group(1)), link.group(2).strip())
+    target = link.group(2).strip()
+    if not is_external_link(target) and not target.startswith("#"):
+        resolved, _ = resolve_local_target(source, target)
+        if resolved is not None:
+            try:
+                target = repo_rel(resolved)
+            except ValueError:
+                pass
+    return NavLink(strip_markdown(link.group(1)), target)
 
 
 @dataclass
@@ -678,7 +686,7 @@ def nav_groups_from_markdown(
                 )
                 continue
 
-        link = nav_link_from_line(line)
+        link = nav_link_from_line(source, line)
         if link is None or current_group is None:
             continue
         if current_subgroup is not None:
