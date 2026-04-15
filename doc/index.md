@@ -15,6 +15,8 @@ servers, or operate a Telepact API in production.
 - [Schema Writing Guide](./schema-guide.md) for the full schema language
 - [Core Concepts](./core-concepts.md) for Telepact's message model, schema
   role, headers, links, select, and binary at a high level
+- [Wire Specification](./wire-spec.md) for the runtime-agnostic on-the-wire
+  contract, including JSON, binary negotiation, and standard wire errors
 - [Extensions](./extensions.md) for Telepact's reserved `_ext.*_` types
 - [JSON Schema](../common/json-schema.json) for schema-file validation
 

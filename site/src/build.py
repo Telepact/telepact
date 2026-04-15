@@ -712,6 +712,7 @@ def nav_groups() -> list[NavGroup]:
             items=[
                 NavLink("Schema Writing Guide", "doc/schema-guide.md"),
                 NavLink("Core Concepts", "doc/core-concepts.md"),
+                NavLink("Wire Specification", "doc/wire-spec.md"),
                 NavLink("Extensions", "doc/extensions.md"),
             ],
         ),
