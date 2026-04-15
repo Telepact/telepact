@@ -58,6 +58,8 @@ PRISM_JS = [
 SNIPPET_PATTERN = re.compile(
     r'(?P<indent>[ \t]*)<!--\s*SNIPPET:\s*(?P<path>[^|]+?)\s*\|\s*(?P<lang>[a-zA-Z0-9_-]+)\s*-->'
 )
+NAV_HEADING_PATTERN = re.compile(r"^(#{2,3})\s+(.*)$")
+NAV_LIST_LINK_PATTERN = re.compile(r"^\s*(?:[-*+]|\d+\.)\s+\[([^\]]+)\]\(([^)]+)\)")
 
 
 def normalize_base_url(value: str) -> str:
@@ -619,7 +621,7 @@ def parse_nav_groups(source: Path) -> list[NavGroup]:
 
     for line in source.read_text(encoding="utf-8").splitlines():
         stripped = line.strip()
-        heading = re.match(r"^(#{2,3})\s+(.*)$", stripped)
+        heading = NAV_HEADING_PATTERN.match(stripped)
         if heading:
             title = strip_markdown(heading.group(2))
             if len(heading.group(1)) == 2:
@@ -631,7 +633,7 @@ def parse_nav_groups(source: Path) -> list[NavGroup]:
                 current_group.subgroups.append(current_subgroup)
             continue
 
-        item = re.match(r"^\s*(?:[-*+]|\d+\.)\s+\[([^\]]+)\]\(([^)]+)\)", stripped)
+        item = NAV_LIST_LINK_PATTERN.match(stripped)
         if item is None or current_group is None:
             continue
 
