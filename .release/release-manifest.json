@@ -1,14 +1,12 @@
 {
   "changed_paths": [
-    "doc/client-paths.md",
-    "doc/core-concepts.md",
-    "doc/index.md",
-    "doc/server-paths.md",
-    "doc/tooling-workflow.md",
-    "site/src/build.py"
+    "doc/learn-by-example/26-schema-evolution.md",
+    "doc/learn-by-example/27-test-client-tdd.md",
+    "doc/learn-by-example/28-server-best-practices.md",
+    "doc/learn-by-example/README.md"
   ],
   "direct_targets": [],
-  "pr_number": 361,
+  "pr_number": 362,
   "targets": [],
-  "version": "1.0.0-alpha.267"
+  "version": "1.0.0-alpha.268"
 }

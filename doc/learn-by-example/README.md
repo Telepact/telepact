@@ -55,6 +55,7 @@ concrete requests and watching the schema explain what is happening.
 25. [24. Server auth](./24-server-auth.md)
 26. [25. Managed auth](./25-managed-auth.md)
 27. [26. Schema evolution](./26-schema-evolution.md)
-28. [27. Best practices for server implementers](./27-server-best-practices.md)
+28. [27. TDD with TestClient](./27-test-client-tdd.md)
+29. [28. Best practices for server implementers](./28-server-best-practices.md)
 
 Next: [00. Installation](./00-installation.md)

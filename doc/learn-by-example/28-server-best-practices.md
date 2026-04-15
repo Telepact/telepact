@@ -1,4 +1,4 @@
-# 27. Best practices for server implementers
+# 28. Best practices for server implementers
 
 Let's finish by pulling the server-side lessons together.
 
