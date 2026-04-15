@@ -8,7 +8,10 @@ Now let's add an explicit auth story to our own server.
 pip install --pre telepact
 ```
 
-## Add `union.Auth_` to the schema
+## Extend the minimum server schema
+
+Starting from [22. Minimum server](./22-minimum-server.md), update
+`api/hello.telepact.yaml` to add `union.Auth_` and a protected function:
 
 ```yaml
 - union.Auth_:
@@ -21,7 +24,10 @@ pip install --pre telepact
         message: string
 ```
 
-## Implement `on_auth`
+## Add auth handling in `server.py`
+
+In `server.py`, keep the same `schema`, `function_router`, and HTTP handler shape
+from lesson 22, then add `on_auth` and a protected `secret` handler:
 
 ```py
 from telepact import Message, Server

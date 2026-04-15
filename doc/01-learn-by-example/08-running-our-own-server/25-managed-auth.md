@@ -19,9 +19,13 @@ pip install --pre telepact
 
 ## Inject `@auth_` from the transport layer
 
+Capture the incoming cookie header in your HTTP adapter, then pass a callback to
+`telepact_server.process(...)` that copies the session into `@auth_`.
+
 Here is the key pattern:
 
 ```py
+import asyncio
 from http.cookies import SimpleCookie
 
 
@@ -35,13 +39,13 @@ def read_session_cookie(cookie_header: str | None) -> str | None:
     return session.value if session is not None else None
 
 
-def update_headers(headers: dict[str, object]) -> None:
-    session_token = read_session_cookie(raw_cookie_header)
-    if session_token is not None:
-        headers['@auth_'] = {'Token': {'token': session_token}}
+def process_http_request(request_bytes: bytes, raw_cookie_header: str | None):
+    def update_headers(headers: dict[str, object]) -> None:
+        session_token = read_session_cookie(raw_cookie_header)
+        if session_token is not None:
+            headers['@auth_'] = {'Token': {'token': session_token}}
 
-
-response = asyncio.run(telepact_server.process(request_bytes, update_headers))
+    return asyncio.run(telepact_server.process(request_bytes, update_headers))
 ```
 
 Now the rest of our auth story can stay the same:
