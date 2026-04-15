@@ -107,7 +107,12 @@ func findNestedTypes(typeDeclaration *types.TTypeDeclaration, nestedTypes map[st
 
 	switch typed := typeDeclaration.Type.(type) {
 	case *types.TUnion:
-		nestedTypes[typed.Name] = typed
+		if typed.Name != "" {
+			if nestedTypes[typed.Name] != nil {
+				return
+			}
+			nestedTypes[typed.Name] = typed
+		}
 		for _, tag := range typed.Tags {
 			if tag == nil {
 				continue
@@ -117,7 +122,12 @@ func findNestedTypes(typeDeclaration *types.TTypeDeclaration, nestedTypes map[st
 			}
 		}
 	case *types.TStruct:
-		nestedTypes[typed.Name] = typed
+		if typed.Name != "" {
+			if nestedTypes[typed.Name] != nil {
+				return
+			}
+			nestedTypes[typed.Name] = typed
+		}
 		for _, fieldDecl := range typed.Fields {
 			findNestedTypes(fieldDecl.TypeDeclaration, nestedTypes)
 		}

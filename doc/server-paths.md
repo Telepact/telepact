@@ -1,0 +1,74 @@
+# Server Paths
+
+Every Telepact server follows the same basic shape:
+
+1. define a schema directory
+2. load that schema with a Telepact runtime
+3. route validated requests to function handlers
+4. connect the runtime to a transport boundary
+
+## Choose a runtime
+
+Telepact currently ships server libraries for:
+
+- [TypeScript](../lib/ts/README.md)
+- [Python](../lib/py/README.md)
+- [Java](../lib/java/README.md)
+- [Go](../lib/go/README.md)
+
+Pick the runtime that fits the service you are already building. Telepact is
+transport-agnostic, so the same schema and server shape can sit behind HTTP,
+WebSockets, or another IPC boundary that moves bytes.
+
+## Minimal server path
+
+If you want the fastest path to a running server:
+
+- follow the [Quickstart](./example.md)
+- continue with [Learn by Example: Minimum server](./learn-by-example/22-minimum-server.md)
+- use the runtime README for your language
+
+## Transport adapter path
+
+Keep the transport adapter thin.
+
+Its job is usually just:
+
+- receive request bytes
+- call `server.process(...)`
+- send response bytes back through the transport
+
+See the [Transport Guide](./transports.md) for concrete HTTP and WebSocket
+patterns.
+
+## Middleware and auth path
+
+Put request-level concerns near the Telepact runtime boundary:
+
+- auth normalization
+- request ids
+- logging
+- metrics
+- other policy checks
+
+Start here:
+
+- [Learn by Example: Auth](./learn-by-example/18-auth.md)
+- [Learn by Example: Server auth](./learn-by-example/24-server-auth.md)
+- [Learn by Example: Managed auth](./learn-by-example/25-managed-auth.md)
+- [Production Guide](./production-guide.md)
+
+## Production path
+
+Before rollout, focus on:
+
+- schema compatibility policy
+- observability
+- deployment topology
+- exact runtime/tool versioning
+
+Start here:
+
+- [Production Guide](./production-guide.md)
+- [Runtime Error Guide](./runtime-errors.md)
+- [Versions](./versions.md)
