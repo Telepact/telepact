@@ -1,23 +1,17 @@
 {
   "changed_paths": [
-    "lib/go/go.mod",
-    "lib/go/go.sum",
-    "lib/ts/package-lock.json",
-    "sdk/console/package-lock.json",
-    "test/lib/go/go.mod",
-    "test/lib/go/go.sum"
+    "bind/dart/pubspec.lock",
+    "lib/ts/package-lock.json"
   ],
   "direct_targets": [
-    "console",
-    "go",
+    "dart",
     "ts"
   ],
-  "pr_number": 340,
+  "pr_number": 341,
   "targets": [
     "console",
     "dart",
-    "go",
     "ts"
   ],
-  "version": "1.0.0-alpha.264"
+  "version": "1.0.0-alpha.265"
 }
