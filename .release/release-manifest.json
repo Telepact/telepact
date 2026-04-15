@@ -1,17 +1,25 @@
 {
   "changed_paths": [
-    "bind/dart/pubspec.lock",
-    "lib/ts/package-lock.json"
+    "lib/go/internal/schema/DerivePossibleSelects.go",
+    "lib/java/src/main/java/io/github/telepact/internal/schema/DerivePossibleSelects.java",
+    "lib/ts/src/internal/schema/DerivePossibleSelect.ts",
+    "sdk/console/package-lock.json",
+    "sdk/console/package.json",
+    "test/runner/parameters/parse_cases.py"
   ],
   "direct_targets": [
-    "dart",
+    "console",
+    "go",
+    "java",
     "ts"
   ],
-  "pr_number": 341,
+  "pr_number": 360,
   "targets": [
     "console",
     "dart",
+    "go",
+    "java",
     "ts"
   ],
-  "version": "1.0.0-alpha.265"
+  "version": "1.0.0-alpha.266"
 }

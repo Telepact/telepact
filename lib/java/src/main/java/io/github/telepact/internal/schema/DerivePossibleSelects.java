@@ -86,14 +86,24 @@ public class DerivePossibleSelects {
     private static void findNestedTypes(TTypeDeclaration typeDeclaration, Map<String, TType> nestedTypes) {
         final var typ = typeDeclaration.type;
         if (typ instanceof TUnion u) {
-            nestedTypes.put(u.name, typ);
+            if (!u.name.isEmpty()) {
+                if (nestedTypes.containsKey(u.name)) {
+                    return;
+                }
+                nestedTypes.put(u.name, typ);
+            }
             for (final var tag : u.tags.values()) {
                 for (final var fieldDecl : tag.fields.values()) {
                     findNestedTypes(fieldDecl.typeDeclaration, nestedTypes);
                 }
             }
         } else if (typ instanceof TStruct s) {
-            nestedTypes.put(s.name, typ);
+            if (!s.name.isEmpty()) {
+                if (nestedTypes.containsKey(s.name)) {
+                    return;
+                }
+                nestedTypes.put(s.name, typ);
+            }
             for (final var fieldDecl : s.fields.values()) {
                 findNestedTypes(fieldDecl.typeDeclaration, nestedTypes);
             }
