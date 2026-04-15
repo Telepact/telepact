@@ -649,7 +649,7 @@ def parse_nav_groups(source: Path) -> list[NavGroup]:
 
 
 def is_landing_page_link(source: Path, target: str) -> bool:
-    resolved, _ = resolve_local_target(source, target)
+    resolved, _fragment = resolve_local_target(source, target)
     if resolved is None:
         return False
     return resolved.name in {"README.md", "index.md"}
@@ -663,7 +663,7 @@ def nav_groups() -> list[NavGroup]:
         item = group.items[0]
         if not is_landing_page_link(item.source, item.target):
             continue
-        resolved, _ = resolve_local_target(item.source, item.target)
+        resolved, _fragment = resolve_local_target(item.source, item.target)
         if resolved is None or not resolved.exists():
             continue
         nested_groups = parse_nav_groups(resolved)
