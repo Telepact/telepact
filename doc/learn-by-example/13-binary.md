@@ -79,8 +79,8 @@ headers: {
 }
 
 payload (ASCII view):
-...@enc_..,.Add..Constant..Div..Mul..Ok_..Sub..Variable..api..bl
-ob..expression..fn.add..fn.api_.
+...@enc_..,.Add..Constant..Div..Mul..Ok_..Sub..Variable..api..
+blob..expression..fn.add..fn.api_.
 ```
 
 That first response is larger because the server has to send the negotiated
