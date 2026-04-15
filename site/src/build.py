@@ -296,17 +296,18 @@ class Page:
 @dataclass(frozen=True)
 class NavLink:
     label: str
+    # The markdown file that declared this link, used to resolve relative targets.
     source: Path
     target: str
 
 
-@dataclass
+@dataclass(frozen=True)
 class NavSubgroup:
     heading: str
     items: list[NavLink] = field(default_factory=list)
 
 
-@dataclass
+@dataclass(frozen=True)
 class NavGroup:
     heading: str
     items: list[NavLink] = field(default_factory=list)
@@ -615,6 +616,9 @@ def page_excerpt(page: Page) -> str:
 
 
 def parse_nav_groups(source: Path) -> list[NavGroup]:
+    if not source.is_file():
+        raise FileNotFoundError(f"Missing navigation source: {source}")
+
     groups: list[NavGroup] = []
     current_group: NavGroup | None = None
     current_subgroup: NavSubgroup | None = None
@@ -668,13 +672,15 @@ def nav_groups() -> list[NavGroup]:
         resolved, _fragment = resolve_local_target(item.source, item.target)
         if resolved is None or not resolved.exists():
             continue
+        # A group with a single landing-page link can pull its nested sidebar
+        # structure from that landing page's own markdown headings and lists.
         nested_groups = parse_nav_groups(resolved)
         if len(nested_groups) == 1 and not nested_groups[0].items:
-            group.subgroups = nested_groups[0].subgroups
+            group.subgroups.extend(nested_groups[0].subgroups)
         elif nested_groups:
             nested_group = nested_groups[0]
             group.items.extend(nested_group.items)
-            group.subgroups = nested_group.subgroups
+            group.subgroups.extend(nested_group.subgroups)
     return groups
 
 
