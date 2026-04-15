@@ -45,12 +45,16 @@ On one run:
 
 Visualization:
 
-```text
-Request
-[{}, {"fn.getPaperTape": {}}]
+Request:
 
-Response · 289 B
-[{}, {"Ok_": {"tape": [{"expression": {"Variable": {"name": "x"}}, "result": 0.0, "timestamp": 1776266103, "successful": false}, {"expression": {"Add": {"left": {"Constant": {"value": 2}}, "right": {"Constant": {"value": 3}}}}, "result": 5, "timestamp": 1776266103, "successful": true}]}}]
+```text
+[{}, {"fn.getPaperTape": {}}]
+```
+
+Response · 289 B:
+
+```text
+[{}, {"Ok_": {"tape": [{"expression": {"Variable": {"name": "x"}}, "result": 0.0, "timestamp": 1776274818, "successful": false}, {"expression": {"Add": {"left": {"Constant": {"value": 2}}, "right": {"Constant": {"value": 3}}}}, "result": 5, "timestamp": 1776274818, "successful": true}]}}]
 ```
 
 ## 2. First binary response: negotiate field ids
@@ -68,19 +72,23 @@ On one run, the first binary response was larger:
 
 Visualization:
 
-```text
-Request
-[{"@bin_": []}, {"fn.getPaperTape": {}}]
+Request:
 
-Response · 527 B
+```text
+[{"@bin_": []}, {"fn.getPaperTape": {}}]
+```
+
+Response · 527 B:
+
+```text
 headers: {
   "@bin_": [900069279],
   "@enc_": { ... negotiated field ids ... }
 }
 
-payload (ASCII view):
-...@enc_..,.Add..Constant..Div..Mul..Ok_..Sub..Variable..api..
-blob..expression..fn.add..fn.api_.
+response bytes (UTF-8 excerpt):
+���@enc_��,�Add��Constant��Div��Mul��Ok_��Sub��Variable��api��blob��expression��
+fn.add��fn.api_�
 ```
 
 That first response is larger because the server has to send the negotiated
@@ -116,17 +124,21 @@ On one run, the steady-state binary response dropped to:
 
 Visualization:
 
-```text
-Request
-[{"@bin_": [900069279]}, {"fn.getPaperTape": {}}]
+Request:
 
-Response · 72 B
+```text
+[{"@bin_": [900069279]}, {"fn.getPaperTape": {}}]
+```
+
+Response · 72 B:
+
+```text
 headers: {
   "@bin_": [900069279]
 }
 
-payload (ASCII view):
-...@bin_..5......#........x.........$.i..w"..........'....'...$.i..w".
+response bytes (UTF-8 view):
+���@bin_��5������#��������x����������$�i�͂"��������'� ���'���$�i�͂"�
 ```
 
 ## What changed on the wire?
