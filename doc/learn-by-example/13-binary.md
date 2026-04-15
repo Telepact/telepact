@@ -1,6 +1,9 @@
 # 13. Binary
 
-Telepact can also switch the whole message envelope into a compact binary form.
+Telepact can switch the whole message envelope into a compact binary form.
+The nice part is that it is **opt-in at runtime**: the client asks for binary,
+the server negotiates a field map once, and the steady-state payload gets much
+smaller.
 
 ## Start the demo server
 
@@ -15,38 +18,83 @@ curl -s localhost:8000/api -d '[{}, {"fn.evaluate": {"expression": {"Add": {"lef
 curl -s localhost:8000/api -d '[{}, {"fn.evaluate": {"expression": {"Variable": {"name": "x"}}}}]'
 ```
 
-## Measure plain JSON first
+## The function we are calling
+
+```yaml
+- fn.getPaperTape:
+    limit!: integer
+  ->:
+    - Ok_:
+        tape: [struct.Evaluation]
+```
+
+## Visualize the negotiation
+
+| Step | Request header | What comes back | Size from one run |
+| --- | --- | --- | --- |
+| Plain JSON | none | readable JSON | 289 B |
+| First binary response | `"@bin_": []` | binary body + `@enc_` map | 527 B |
+| Negotiated binary response | `"@bin_": [900069279]` | compact binary body only | 72 B |
+
+The first binary response is bigger because the server has to teach us the
+encoding map. After that, the checksum in `@bin_` is enough.
+
+## 1. Plain JSON baseline
+
+Request body:
+
+```json
+[{}, {"fn.getPaperTape": {}}]
+```
+
+Run it:
 
 ```sh
-curl -s localhost:8000/api -d '[{}, {"fn.getPaperTape": {}}]' | wc -c
+curl -s localhost:8000/api -d '[{}, {"fn.getPaperTape": {}}]' > /tmp/papertape-plain.json
+wc -c < /tmp/papertape-plain.json
+cat /tmp/papertape-plain.json
 ```
 
-On one run, that was:
+On one run:
 
 ```text
-444
+289
+[{}, {"Ok_": {"tape": [{"expression": {"Variable": {"name": "x"}}, "result": 0.0, "timestamp": 1776277463, "successful": false}, {"expression": {"Add": {"left": {"Constant": {"value": 2}}, "right": {"Constant": {"value": 3}}}}, "result": 5, "timestamp": 1776277463, "successful": true}]}}]
 ```
 
-## Do the binary handshake
+## 2. Ask for binary
 
-First request:
+First binary request body:
+
+```json
+[{"@bin_": []}, {"fn.getPaperTape": {}}]
+```
+
+Run it:
 
 ```sh
 curl -s localhost:8000/api -d '[{"@bin_": []}, {"fn.getPaperTape": {}}]' > /tmp/papertape-first.bin
 wc -c < /tmp/papertape-first.bin
-xxd -g 1 -l 64 /tmp/papertape-first.bin
+python - <<'PY'
+from pathlib import Path
+# Show non-UTF-8 bytes as replacement characters so the payload stays printable.
+print(Path('/tmp/papertape-first.bin').read_bytes().decode('utf-8', 'replace'))
+PY
 ```
 
-On one run, that first binary response was larger:
+On one run, the response looked like this:
 
 ```text
-546
+527
+���@enc_�·,�Add·�Constant·�Div·�Mul·�Ok_·�Sub·�Variable·�api·�blob·�expression�fn.add
+�fn.api_·�fn.deleteVariable·�fn.deleteVariables·�fn.evaluate·�fn.export·�fn.getPaperTape·�fn.getVariable·�fn.getVariables·�fn.import·�fn.login·�fn.logout·�fn.ping_·�fn.saveVariable·�fn.saveVariables·�includeExamples!·�includeInternal!·�left·�limit!·�name·�names·�result·�right �saveResult!�successful"�tape#�timestamp$�token%�username&�value'�variable!(�variables)�x*�y+�@bin_��5����·�#���·�·�x·�········$�i���"·�·�·�·�'· �·�'···$�i���"�
 ```
 
-That is expected. We told the server we had no negotiated binary policy yet, so
-it returned binary data *plus* the field map in `@enc_`.
+That noisy `@enc_` section is the one-time negotiation payload.
 
-Now let's extract the negotiated checksum:
+## 3. Reuse the negotiated checksum
+
+Extract the checksum that came back in `@bin_`:
 
 ```sh
 checksum=$(uv run --with msgpack python - <<'PY'
@@ -59,22 +107,37 @@ PY
 echo "$checksum"
 ```
 
-And use it on the next request:
+On one run:
+
+```text
+900069279
+```
+
+Now send that checksum back:
+
+```json
+[{"@bin_": [900069279]}, {"fn.getPaperTape": {}}]
+```
 
 ```sh
 curl -s localhost:8000/api -d "[{\"@bin_\": [$checksum]}, {\"fn.getPaperTape\": {}}]" > /tmp/papertape-steady.bin
 wc -c < /tmp/papertape-steady.bin
-xxd -g 1 -l 64 /tmp/papertape-steady.bin
+python - <<'PY'
+from pathlib import Path
+# Show non-UTF-8 bytes as replacement characters so the payload stays printable.
+print(Path('/tmp/papertape-steady.bin').read_bytes().decode('utf-8', 'replace'))
+PY
 ```
 
-On one run, the steady-state binary response dropped to:
+On one run, the negotiated binary response dropped to:
 
 ```text
-91
+72
+���@bin_��5����·�#���·�·�x·�········$�i���"·�·�·�·�'· �·�'···$�i���"�
 ```
 
-That is the differentiator: Telepact negotiates binary **at runtime** instead of
-forcing us into a codegen-managed ABI workflow.
+That is the win: the payload shrank from 289 B of JSON to 72 B of negotiated
+binary, while still representing the same response.
 
 Under the hood, this binary format is powered by [MessagePack](https://msgpack.org/).
 
