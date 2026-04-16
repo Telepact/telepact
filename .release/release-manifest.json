@@ -1,17 +1,19 @@
 {
   "changed_paths": [
-    "doc/demos.md",
+    "doc/02-design-apis/01-schema-guide.md",
+    "doc/example.md",
     "doc/index.md",
     "example/README.md",
-    "example/py-binary/README.md",
-    "example/py-http-cookie-auth/README.md",
-    "example/py-links/README.md",
-    "example/py-select/README.md",
-    "example/py-websocket/README.md",
-    "site/src/build.py"
+    "lib/ts/README.md"
   ],
-  "direct_targets": [],
-  "pr_number": 376,
-  "targets": [],
-  "version": "1.0.0-alpha.275"
+  "direct_targets": [
+    "ts"
+  ],
+  "pr_number": 379,
+  "targets": [
+    "console",
+    "dart",
+    "ts"
+  ],
+  "version": "1.0.0-alpha.277"
 }
