@@ -78,9 +78,7 @@ wheel: $(DEP_TAR_GZ) $(SRC_FILES)
 	mv tmp/*/telepact telepact_cli/telepact
 	rm -rf tmp
 	uv sync --all-groups
-	telepact-project gitignore --remove telepact_cli/telepact
 	uv build --wheel
-	telepact-project gitignore --add telepact_cli/telepact
 	rm -rf build telepact_cli/telepact
 	rm -f LICENSE NOTICE
 

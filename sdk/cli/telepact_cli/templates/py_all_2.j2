@@ -325,7 +325,7 @@ class Select_:
         {%- set fn_name = fn | regex_replace('^.*\\.', '') %}
 
     @staticmethod
-    def {{ fn_name }}(self, select: '{{ fn_name }}.Select_') -> 'Select_':
+    def {{ fn_name }}(select: '{{ fn_name }}.Select_') -> 'Select_':
         return Select_(select.pseudo_json)
 
     {%- endfor -%}
