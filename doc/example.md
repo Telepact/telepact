@@ -110,3 +110,13 @@ console.log(`Response: ${JSON.stringify(await response.json())}`);
 $ node ./client.js
 Response: [{},{"Ok_":{"result":2}}]
 ```
+
+## Next steps
+
+- [Transport Guide](./03-build-clients-and-servers/01-transports.md) for the recommended browser + Node HTTP and WebSocket patterns
+- [Client Paths](./03-build-clients-and-servers/02-client-paths.md) for choosing between plain JSON, runtime libraries, and generated code
+- [Auth Guide](./03-build-clients-and-servers/05-auth.md) when the API needs caller identity
+- [Tooling Workflow](./03-build-clients-and-servers/04-tooling-workflow.md) for `fetch`, `compare`, `mock`, and `codegen`
+- [Production Guide](./04-operate/01-production-guide.md) for rollout, compatibility, and observability
+- [Demos](../example/README.md) for runnable end-to-end examples
+- [Docs home](./index.md) for the rest of the documentation map

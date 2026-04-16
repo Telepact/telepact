@@ -14,8 +14,9 @@
 #|  limitations under the License.
 #|
 
-- struct.Auth_:
-    sessionToken: "string"
+- union.Auth_:
+    - Session:
+        token: "string"
 - fn.me: {}
   ->:
     - Ok_:

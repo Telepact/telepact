@@ -1,6 +1,8 @@
 # 24. Server auth
 
-Now let's add an explicit auth story to our own server.
+Now let's add one piece of Telepact's recommended auth model to our own server.
+For the full canonical path, see the
+[Auth Guide](../../03-build-clients-and-servers/05-auth.md).
 
 ## Install the Python library
 
@@ -49,7 +51,9 @@ The important shape here is:
 
 1. read credentials from `@auth_`
 2. validate them in `on_auth`
-3. return identity or authorization headers for later handlers
+3. return normalized identity or authorization headers for later handlers
+
+That normalization step is the core Telepact server-side auth pattern.
 
 ## Call it
 
@@ -65,7 +69,7 @@ With auth:
 curl -s localhost:8002/api/telepact -d '[{"@auth_": {"Password": {"password": "swordfish"}}}, {"fn.secret": {}}]'
 ```
 
-This keeps the auth policy in the schema and the authentication logic in one
-clear place.
+This keeps the public credential shape in the schema and the auth normalization
+logic in one clear place.
 
 Next: [25. Managed auth](./25-managed-auth.md)
