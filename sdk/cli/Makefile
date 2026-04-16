@@ -14,7 +14,7 @@
 #|  limitations under the License.
 #|
 
-.PHONY: all dep clean
+.PHONY: all dep clean wheel
 
 VERSION := $(shell cat ../../VERSION.txt)
 
@@ -69,6 +69,20 @@ old-test:
 	uv run telepact codegen --schema-dir tests/data --lang java --out tests/output/java --package output
 	uv run telepact codegen --schema-dir tests/data --lang py --out tests/output/py
 	uv run telepact codegen --schema-dir tests/data --lang ts --out tests/output/ts
+
+wheel: $(DEP_TAR_GZ) $(SRC_FILES)
+	cp ../../LICENSE ../../NOTICE ./
+	rm -rf tmp dist build telepact_cli/telepact
+	mkdir -p tmp
+	tar -xzvf $(DEP_TAR_GZ) -C tmp
+	mv tmp/*/telepact telepact_cli/telepact
+	rm -rf tmp
+	uv sync --all-groups
+	telepact-project gitignore --remove telepact_cli/telepact
+	uv build --wheel
+	telepact-project gitignore --add telepact_cli/telepact
+	rm -rf build telepact_cli/telepact
+	rm -f LICENSE NOTICE
 
 deploy: $(TAR_GZ)
 	# TODO: Get "include" to work in pyproject.toml

@@ -360,6 +360,22 @@ jobs:
       - name: Run example checks
         run: make example-check
 
+      - name: Check for example codegen changes
+        run: |
+          if git status --porcelain | grep .; then
+            echo "Example changes:"
+            git --no-pager diff --stat HEAD
+            echo
+            git --no-pager diff HEAD
+            echo
+            printf '%s\n' \
+              "ERROR: Example codegen output is out of date." \
+              "To fix, run 'make example-check' and git commit the generated changes."
+            false
+          else
+            echo "Example codegen output up-to-date."
+          fi
+
   check-license-header:
     name: Check License Header
     runs-on: ubuntu-latest

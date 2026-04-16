@@ -14,19 +14,18 @@
 #|  limitations under the License.
 #|
 
-EXAMPLES := py-binary py-codegen py-http-cookie-auth py-links py-select py-websocket
+SHELL := /bin/bash
+PYTHON := .venv/bin/python
+TELEPACT := .venv/bin/telepact
 
-.PHONY: list check run
-
-list:
-	@printf '%s\n' $(EXAMPLES)
-
-check:
-	@for example in $(EXAMPLES); do \
-		echo "==> $$example"; \
-		$(MAKE) -C $$example run || exit $$?; \
-	done
+.PHONY: run
 
 run:
-	@test -n "$(EXAMPLE)" || (echo "Usage: make run EXAMPLE=<name>" && exit 1)
-	@$(MAKE) -C $(EXAMPLE) run
+	@set -euo pipefail; \
+		$(MAKE) -C ../../lib/py; \
+		$(MAKE) -C ../../sdk/cli wheel; \
+		rm -rf .venv gen; \
+		uv venv --python python3.11 .venv; \
+		uv pip install --python $(PYTHON) pytest ../../lib/py/dist/*.tar.gz ../../sdk/cli/dist/*.whl; \
+		$(TELEPACT) codegen --schema-dir api --lang py --out gen; \
+		$(PYTHON) -m pytest -q
