@@ -73,7 +73,22 @@ def on_auth(request_headers: dict[str, object]) -> dict[str, object]:
     if token == "unauthorized":
         return {"@result": {"ErrorUnauthorized_": {"message!": "a"}}}
     return {"@result": {"ErrorUnauthenticated_": {"message!": "a"}}}
-    
+
+
+def is_function_route_name(type_name: str) -> bool:
+    return type_name.startswith("fn.") and not type_name.endswith(".->") and not type_name.endswith("_")
+
+
+def create_function_routes(telepact: TelepactSchema, route: Callable[[Message], Any]) -> dict[str, Callable[[str, Message], Any]]:
+    async def function_route(function_name: str, request_message: Message) -> Message:
+        return await route(request_message)
+
+    return {
+        type_name: function_route
+        for type_name in telepact.parsed.keys()
+        if is_function_route_name(type_name)
+    }
+
 
 def find_bytes(obj):
   if isinstance(obj, bytes):
@@ -327,15 +342,10 @@ async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, 
 
     code_gen_handler = CodeGenHandler()
 
-    executor = ThreadPoolExecutor()
-
     class ThisError(RuntimeError):
         pass
 
-    async def handler(request_message: 'Message') -> 'Message':
-        nonlocal serve_alternate_server
-        nonlocal executor
-
+    async def forward_request(request_message: 'Message') -> 'Message':
         request_headers = request_message.headers
         request_body = request_message.body
         request_pseudo_json = [request_headers, request_body]
@@ -346,34 +356,35 @@ async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, 
             raise TypeError(f"Object of type {type(obj)} is not JSON serializable")
 
         request_bytes = json.dumps(request_pseudo_json, default=default_serializer).encode('utf-8')
+        print(f"    <-s {request_bytes}")
+
+        nats_response_message: Msg = await connection.request(
+            backdoor_topic, request_bytes, timeout=5)
+
+        response_bytes = nats_response_message.data
+
+        print(f"    ->s {response_bytes}")
+
+        response_pseudo_json = json.loads(response_bytes.decode('utf-8'))
+
+        response_headers = response_pseudo_json[0]
+        response_body = response_pseudo_json[1]
+
+        return Message(response_headers, response_body)
+
+    async def middleware(request_message: 'Message', function_router: FunctionRouter) -> 'Message':
+        nonlocal serve_alternate_server
+
+        message = await function_router.route(request_message)
 
         if use_codegen:
-            print(f"     :H {request_bytes}")
-            message = await code_gen_handler.handler(request_message)
-            message.headers['@codegens_'] = True
-        else:
-            print(f"    <-s {request_bytes}")
+            message.headers["@codegens_"] = True
 
-            nats_response_message: Msg = await connection.request(
-                backdoor_topic, request_bytes, timeout=5)
-
-            response_bytes = nats_response_message.data
-
-            print(f"    ->s {response_bytes}")
-
-            response_pseudo_json = json.loads(response_bytes.decode('utf-8'))
-
-            response_headers = response_pseudo_json[0]
-            response_body = response_pseudo_json[1]
-
-            message = Message(response_headers, response_body)
-
-        toggle_alternate_server = request_headers.get(
-            "@toggleAlternateServer_")
+        toggle_alternate_server = request_message.headers.get("@toggleAlternateServer_")
         if toggle_alternate_server == True:
             serve_alternate_server = not serve_alternate_server
 
-        throw_error = request_headers.get("@throwError_")
+        throw_error = request_message.headers.get("@throwError_")
         if throw_error == True:
             raise ThisError()
 
@@ -385,17 +396,19 @@ async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, 
     options.on_request = on_request_err
     options.on_response = on_response_err
     options.on_auth = on_auth
-    options.middleware = lambda request_message, function_router: handler(request_message)
+    options.middleware = middleware
     options.auth_required = auth_required
 
-    function_router = FunctionRouter({})
+    function_routes = code_gen_handler.function_routes() if use_codegen else create_function_routes(telepact, forward_request)
+    function_router = FunctionRouter(function_routes)
     server = Server(telepact, function_router, options)
     alternate_options = Server.Options()
     alternate_options.on_error = on_err
     alternate_options.on_auth = on_auth
-    alternate_options.middleware = lambda request_message, function_router: handler(request_message)
+    alternate_options.middleware = middleware
     alternate_options.auth_required = auth_required
-    alternate_function_router = FunctionRouter({})
+    alternate_function_routes = code_gen_handler.function_routes() if use_codegen else create_function_routes(alternate_telepact, forward_request)
+    alternate_function_router = FunctionRouter(alternate_function_routes)
     alternate_server = Server(
         alternate_telepact, alternate_function_router, alternate_options)
 
