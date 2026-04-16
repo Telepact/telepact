@@ -128,7 +128,7 @@ class Select_:
         self.pseudo_json = pseudo_json
 
     @staticmethod
-    def greet(self, select: 'greet.Select_') -> 'Select_':
+    def greet(select: 'greet.Select_') -> 'Select_':
         return Select_(select.pseudo_json)
 
 class TypedClient:
