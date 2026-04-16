@@ -1,18 +1,17 @@
 {
   "changed_paths": [
-    "CONTRIBUTING.md",
-    "lib/py/telepact/internal/binary/ServerBase64Encoder.py",
-    "sdk/cli/README.md",
-    "sdk/cli/telepact_cli/calculator.telepact.yaml"
+    "doc/demos.md",
+    "doc/index.md",
+    "example/README.md",
+    "example/py-binary/README.md",
+    "example/py-http-cookie-auth/README.md",
+    "example/py-links/README.md",
+    "example/py-select/README.md",
+    "example/py-websocket/README.md",
+    "site/src/build.py"
   ],
-  "direct_targets": [
-    "cli",
-    "py"
-  ],
-  "pr_number": 369,
-  "targets": [
-    "cli",
-    "py"
-  ],
-  "version": "1.0.0-alpha.274"
+  "direct_targets": [],
+  "pr_number": 376,
+  "targets": [],
+  "version": "1.0.0-alpha.275"
 }
