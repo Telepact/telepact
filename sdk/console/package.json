@@ -1,6 +1,6 @@
 {
   "name": "telepact-console",
-  "version": "1.0.0-alpha.271",
+  "version": "1.0.0-alpha.272",
   "description": "A web-based interface for inspecting and testing Telepact APIs.",
   "license": "Apache-2.0",
   "repository": {

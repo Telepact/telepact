@@ -1,9 +1,9 @@
 {
   "changed_paths": [
-    "doc/01-learn-by-example/08-running-our-own-server/25-managed-auth.md"
+    "site/src/sitemap.xml"
   ],
   "direct_targets": [],
-  "pr_number": 370,
+  "pr_number": 371,
   "targets": [],
-  "version": "1.0.0-alpha.271"
+  "version": "1.0.0-alpha.272"
 }
