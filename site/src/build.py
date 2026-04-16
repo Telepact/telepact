@@ -733,22 +733,22 @@ def nav_groups(pages: dict[Path, Page]) -> list[NavGroup]:
 
     if example_root.exists():
         items = nav_links_for_directory(pages, example_root)
-        subgroups: list[NavSubgroup] = []
+        example_subgroups: list[NavSubgroup] = []
         child_dirs = [child for child in example_root.iterdir() if child.is_dir()]
         for child_dir in sort_nav_paths(child_dirs):
             links = nav_links_for_directory(pages, child_dir)
             if not links:
                 continue
-            subgroups.append(
+            example_subgroups.append(
                 NavSubgroup(
                     heading=display_name(child_dir),
                     items=links,
                 )
             )
-        if items or subgroups:
+        if items or example_subgroups:
             landing = directory_landing_page(pages, example_root)
             heading = landing.title if landing is not None else display_name(example_root)
-            groups.append(NavGroup(heading=heading, items=items, subgroups=subgroups))
+            groups.append(NavGroup(heading=heading, items=items, subgroups=example_subgroups))
     return groups
 
 
