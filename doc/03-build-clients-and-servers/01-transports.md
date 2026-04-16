@@ -21,10 +21,10 @@ This guide shows concrete examples for two common transports:
 - HTTP
 - WebSockets
 
-Runnable counterparts live under [`example/`](../../example), including
-[`example/py-links`](../../example/py-links/README.md),
-[`example/py-http-cookie-auth`](../../example/py-http-cookie-auth/README.md), and
-[`example/py-websocket`](../../example/py-websocket/README.md).
+Runnable counterparts live under [`site/example/`](../../site/example), including
+[`site/example/py-links`](../../site/example/py-links/README.md),
+[`site/example/py-http-cookie-auth`](../../site/example/py-http-cookie-auth/README.md), and
+[`site/example/py-websocket`](../../site/example/py-websocket/README.md).
 
 The same pattern applies to NATS, stdio, queues, custom RPC layers, and other
 IPC boundaries.

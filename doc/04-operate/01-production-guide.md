@@ -140,7 +140,7 @@ and the explicit Telepact-vs-service ownership boundary, see the
 [Auth Guide](../03-build-clients-and-servers/05-auth.md).
 
 A runnable cookie-based example lives in
-[`example/py-http-cookie-auth`](../../example/py-http-cookie-auth/README.md).
+[`site/example/py-http-cookie-auth`](../../site/example/py-http-cookie-auth/README.md).
 
 ### Observability
 

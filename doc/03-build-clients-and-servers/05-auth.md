@@ -141,7 +141,7 @@ shape internally.
 See:
 
 - [Learn by Example: Managed auth](../01-learn-by-example/08-running-our-own-server/25-managed-auth.md)
-- [`example/py-http-cookie-auth`](../../example/py-http-cookie-auth/README.md)
+- [`site/example/py-http-cookie-auth`](../../site/example/py-http-cookie-auth/README.md)
 
 ## Recommended service-to-service flow
 

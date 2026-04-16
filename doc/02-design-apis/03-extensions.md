@@ -202,7 +202,7 @@ The data values did not change. Only the reachable fields selected by the
 header remained in the encoded response.
 
 For a runnable minimal version of this pattern, see
-[`example/py-select`](../../example/py-select/README.md).
+[`site/example/py-select`](../../site/example/py-select/README.md).
 
 ## `_ext.Call_`
 
