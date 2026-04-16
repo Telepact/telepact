@@ -1,9 +1,9 @@
 {
   "changed_paths": [
-    "site/src/index.template.html"
+    "doc/04-operate/01-production-guide.md"
   ],
   "direct_targets": [],
-  "pr_number": 378,
+  "pr_number": 381,
   "targets": [],
-  "version": "1.0.0-alpha.276"
+  "version": "1.0.0-alpha.280"
 }
