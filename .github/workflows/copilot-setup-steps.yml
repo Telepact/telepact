@@ -34,8 +34,14 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
-        with:
-          fetch-depth: 0
+
+      - name: Fetch full git history
+        run: |
+          if [ "$(git rev-parse --is-shallow-repository)" = "true" ]; then
+            git fetch --prune --unshallow --tags origin +refs/heads/*:refs/remotes/origin/*
+          else
+            git fetch --prune --tags origin +refs/heads/*:refs/remotes/origin/*
+          fi
 
       - name: Set up Node.js
         uses: actions/setup-node@v5
