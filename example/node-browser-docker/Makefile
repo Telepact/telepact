@@ -14,19 +14,29 @@
 #|  limitations under the License.
 #|
 
-EXAMPLES := node-browser-docker py-binary py-http-cookie-auth py-links py-select py-websocket
+LIB_TAR_GZ := ../../lib/ts/dist-tgz/*.tgz
+TAR_GZ := telepact.tgz
+NPM_STAMP := node_modules/.package-lock.stamp
 
-.PHONY: list check run
+.PHONY: run clean
 
-list:
-	@printf '%s\n' $(EXAMPLES)
+run: $(NPM_STAMP)
+	npm test
 
-check:
-	@for example in $(EXAMPLES); do \
-		echo "==> $$example"; \
-		$(MAKE) -C $$example run || exit $$?; \
-	done
+$(TAR_GZ):
+	$(MAKE) -C ../../lib/ts
+	cp $(LIB_TAR_GZ) $(TAR_GZ)
 
-run:
-	@test -n "$(EXAMPLE)" || (echo "Usage: make run EXAMPLE=<name>" && exit 1)
-	@$(MAKE) -C $(EXAMPLE) run
+$(NPM_STAMP): package.json package-lock.json $(TAR_GZ)
+	$(MAKE) -C ../../sdk/cli
+	$(MAKE) -C ../.. install-cli
+	npm install --ignore-scripts
+	npm install --ignore-scripts --no-save ./$(TAR_GZ)
+	mkdir -p node_modules
+	touch $(NPM_STAMP)
+
+clean:
+	rm -rf node_modules
+	rm -rf playwright-report
+	rm -rf test-results
+	rm -f $(TAR_GZ)

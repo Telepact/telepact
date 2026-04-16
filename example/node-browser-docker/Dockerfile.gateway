@@ -14,19 +14,12 @@
 #|  limitations under the License.
 #|
 
-EXAMPLES := node-browser-docker py-binary py-http-cookie-auth py-links py-select py-websocket
+FROM node:20-bookworm-slim
 
-.PHONY: list check run
-
-list:
-	@printf '%s\n' $(EXAMPLES)
-
-check:
-	@for example in $(EXAMPLES); do \
-		echo "==> $$example"; \
-		$(MAKE) -C $$example run || exit $$?; \
-	done
-
-run:
-	@test -n "$(EXAMPLE)" || (echo "Usage: make run EXAMPLE=<name>" && exit 1)
-	@$(MAKE) -C $(EXAMPLE) run
+WORKDIR /app
+COPY package.json telepact.tgz ./
+RUN npm install --omit=dev --ignore-scripts --no-save ./telepact.tgz
+COPY gateway-api ./gateway-api
+COPY public ./public
+COPY gateway.js ./gateway.js
+CMD ["node", "gateway.js"]

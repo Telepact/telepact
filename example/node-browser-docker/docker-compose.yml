@@ -14,19 +14,20 @@
 #|  limitations under the License.
 #|
 
-EXAMPLES := node-browser-docker py-binary py-http-cookie-auth py-links py-select py-websocket
-
-.PHONY: list check run
-
-list:
-	@printf '%s\n' $(EXAMPLES)
-
-check:
-	@for example in $(EXAMPLES); do \
-		echo "==> $$example"; \
-		$(MAKE) -C $$example run || exit $$?; \
-	done
-
-run:
-	@test -n "$(EXAMPLE)" || (echo "Usage: make run EXAMPLE=<name>" && exit 1)
-	@$(MAKE) -C $(EXAMPLE) run
+services:
+  catalog:
+    build:
+      context: .
+      dockerfile: Dockerfile.catalog
+    ports:
+      - '8081:8081'
+  gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile.gateway
+    environment:
+      CATALOG_BASE_URL: http://catalog:8081
+    depends_on:
+      - catalog
+    ports:
+      - '8080:8080'

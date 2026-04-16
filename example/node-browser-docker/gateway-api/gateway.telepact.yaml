@@ -1,0 +1,49 @@
+#|
+#|  Copyright The Telepact Authors
+#|
+#|  Licensed under the Apache License, Version 2.0 (the "License");
+#|  you may not use this file except in compliance with the License.
+#|  You may obtain a copy of the License at
+#|
+#|  https://www.apache.org/licenses/LICENSE-2.0
+#|
+#|  Unless required by applicable law or agreed to in writing, software
+#|  distributed under the License is distributed on an "AS IS" BASIS,
+#|  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#|  See the License for the specific language governing permissions and
+#|  limitations under the License.
+#|
+
+- union.Auth_:
+    - Session:
+        sessionToken: string
+- struct.Viewer:
+    id: string
+    name: string
+    plan: string
+    avatar: bytes
+- struct.OrderSummary:
+    id: string
+    status: string
+    totalCents: integer
+- struct.OrderDetails:
+    id: string
+    status: string
+    totalCents: integer
+    shippingEta: string
+    receipt: bytes
+- fn.getDashboard: {}
+  ->:
+    - Ok_:
+        viewer: struct.Viewer
+        orders: [struct.OrderSummary]
+        firstOrderDetails!: fn.getOrderDetails
+    - ErrorUnauthenticated_:
+        message!: string
+- fn.getOrderDetails:
+    orderId: string
+  ->:
+    - Ok_:
+        order: struct.OrderDetails
+    - ErrorUnauthenticated_:
+        message!: string

@@ -14,19 +14,30 @@
 #|  limitations under the License.
 #|
 
-EXAMPLES := node-browser-docker py-binary py-http-cookie-auth py-links py-select py-websocket
-
-.PHONY: list check run
-
-list:
-	@printf '%s\n' $(EXAMPLES)
-
-check:
-	@for example in $(EXAMPLES); do \
-		echo "==> $$example"; \
-		$(MAKE) -C $$example run || exit $$?; \
-	done
-
-run:
-	@test -n "$(EXAMPLE)" || (echo "Usage: make run EXAMPLE=<name>" && exit 1)
-	@$(MAKE) -C $(EXAMPLE) run
+- struct.Viewer:
+    id: string
+    name: string
+    plan: string
+    avatar: bytes
+- struct.OrderSummary:
+    id: string
+    status: string
+    totalCents: integer
+- struct.OrderDetails:
+    id: string
+    status: string
+    totalCents: integer
+    shippingEta: string
+    receipt: bytes
+- fn.loadViewerDashboard:
+    viewerId: string
+  ->:
+    - Ok_:
+        viewer: struct.Viewer
+        orders: [struct.OrderSummary]
+- fn.getOrderDetails:
+    viewerId: string
+    orderId: string
+  ->:
+    - Ok_:
+        order: struct.OrderDetails

@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Telepact browser + Node + Docker example</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        margin: 2rem;
+        max-width: 60rem;
+      }
+      button {
+        margin-right: 0.75rem;
+        margin-bottom: 0.75rem;
+      }
+      pre {
+        background: #f4f4f4;
+        padding: 1rem;
+        overflow-x: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Telepact browser + Node + Docker example</h1>
+    <p>
+      This demo uses a browser Telepact client against a Node gateway that bridges
+      a session cookie into <code>@auth_</code> and fans out to a backing Telepact
+      service.
+    </p>
+    <div>
+      <button id="start-session">1. Start demo session</button>
+      <button id="load-dashboard">2. Load dashboard with @select_</button>
+      <button id="follow-link">3. Follow function link</button>
+    </div>
+    <p id="session-status">Session: not started</p>
+    <p id="binary-status">Binary responses observed: 0</p>
+    <pre id="dashboard-output">Dashboard output will appear here.</pre>
+    <pre id="details-output">Order details will appear here.</pre>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

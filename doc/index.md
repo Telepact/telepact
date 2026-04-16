@@ -8,6 +8,7 @@ servers, or operate a Telepact API in production.
 
 - [Quickstart](./example.md) for the fastest end-to-end example
 - [Learn Telepact by Example](./01-learn-by-example/README.md) for a guided tour
+- [Canonical browser + Node + Docker example](../example/node-browser-docker/README.md) for the recommended production-style browser-to-gateway-to-service path
 - [Demos](./demos.md) for runnable end-to-end examples
 
 ## Design APIs
