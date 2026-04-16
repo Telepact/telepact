@@ -2,7 +2,7 @@
 
 Welcome to the Telepact docs. Use this page to find the right path based on
 what you are trying to do: learn the basics, design a schema, build clients and
-servers, or operate a Telepact API in production.
+servers, or place Telepact inside a larger service.
 
 ## Start here
 
@@ -20,10 +20,10 @@ servers, or operate a Telepact API in production.
   - [Client Paths](./03-build-clients-and-servers/02-client-paths.md) for choosing between plain JSON, runtime libraries, and generated code
   - [TypeScript library README](../lib/ts/README.md) for the runtime client/server API
 - **I need auth**
-  - [Auth Guide](./03-build-clients-and-servers/05-auth.md) for the canonical auth model
-  - [`example/py-http-cookie-auth`](../example/py-http-cookie-auth/README.md) for the recommended browser/session-cookie flow
-- **I need production guidance**
-  - [Production Guide](./04-operate/01-production-guide.md)
+  - [Auth Guide](./03-build-clients-and-servers/05-auth.md) for Telepact's canonical auth convention
+  - [`example/py-http-cookie-auth`](../example/py-http-cookie-auth/README.md) for one browser/session-cookie example
+- **I need operating-boundary guidance**
+  - [Operating Boundary Guide](./04-operate/01-production-guide.md)
   - [Runtime Error Guide](./04-operate/02-runtime-errors.md)
 - **I need tooling or code generation**
   - [Tooling Workflow](./03-build-clients-and-servers/04-tooling-workflow.md)
@@ -47,7 +47,7 @@ servers, or operate a Telepact API in production.
 - [Client Paths](./03-build-clients-and-servers/02-client-paths.md) for choosing between plain JSON, client
   libraries, and generated code
 - [Server Paths](./03-build-clients-and-servers/03-server-paths.md) for choosing a runtime and wiring a server
-- [Auth Guide](./03-build-clients-and-servers/05-auth.md) for Telepact's canonical auth model and recommended flows
+- [Auth Guide](./03-build-clients-and-servers/05-auth.md) for Telepact's canonical auth convention
 - [Tooling Workflow](./03-build-clients-and-servers/04-tooling-workflow.md) for `fetch`, `compare`, `mock`, and
   `codegen`
 
@@ -70,8 +70,8 @@ servers, or operate a Telepact API in production.
 
 ## Operate
 
-- [Production Guide](./04-operate/01-production-guide.md) for rollout, auth, compatibility,
-  and observability guidance
+- [Operating Boundary Guide](./04-operate/01-production-guide.md) for Telepact-specific auth,
+  compatibility, and observability boundaries
 - [Runtime Error Guide](./04-operate/02-runtime-errors.md) for local/runtime debugging
 - [Versions](./04-operate/03-versions.md) for the latest published library and SDK versions
 
