@@ -14,19 +14,19 @@
 #|  limitations under the License.
 #|
 
-EXAMPLES := py-binary py-codegen py-http-cookie-auth py-links py-select py-websocket
+SHELL := /bin/bash
+PYTHON := .venv/bin/python
 
-.PHONY: list check run
+.PHONY: run dep codegen clean
 
-list:
-	@printf '%s\n' $(EXAMPLES)
+run: codegen
+	@set -euo pipefail; rm -rf .venv; uv venv --python python3.11 .venv; uv pip install --python $(PYTHON) pytest ../../lib/py/dist/*.tar.gz; $(PYTHON) -m pytest -q
 
-check:
-	@for example in $(EXAMPLES); do \
-		echo "==> $$example"; \
-		$(MAKE) -C $$example run || exit $$?; \
-	done
+dep:
+	@$(MAKE) -C ../../lib/py
 
-run:
-	@test -n "$(EXAMPLE)" || (echo "Usage: make run EXAMPLE=<name>" && exit 1)
-	@$(MAKE) -C $(EXAMPLE) run
+codegen: dep
+	@set -euo pipefail; rm -rf ../../sdk/cli/telepact_cli/telepact; cp -r ../../lib/py/telepact ../../sdk/cli/telepact_cli/telepact; rm -rf gen; uv run --project ../../sdk/cli telepact codegen --schema-dir api --lang py --out gen
+
+clean:
+	@rm -rf .venv gen

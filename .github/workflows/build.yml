@@ -360,6 +360,22 @@ jobs:
       - name: Run example checks
         run: make example-check
 
+      - name: Check example codegen changes
+        run: |
+          if git status --porcelain | grep .; then
+            echo "Generated example changes:"
+            git --no-pager diff --stat HEAD
+            echo
+            git --no-pager diff HEAD
+            echo
+            printf '%s\n' \
+              "ERROR: Example codegen produced tracked changes." \
+              "Run 'make example-check' and git commit the generated files."
+            false
+          else
+            echo "Example codegen is up-to-date."
+          fi
+
   check-license-header:
     name: Check License Header
     runs-on: ubuntu-latest
