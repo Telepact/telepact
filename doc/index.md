@@ -10,6 +10,29 @@ servers, or operate a Telepact API in production.
 - [Learn Telepact by Example](./01-learn-by-example/README.md) for a guided tour
 - [Demos](../example/README.md) for runnable end-to-end examples
 
+## Common paths
+
+- **I want the quickest possible start**
+  - [Quickstart](./example.md)
+  - Then [Learn Telepact by Example](./01-learn-by-example/README.md)
+- **I want browser + Node usage**
+  - [Transport Guide](./03-build-clients-and-servers/01-transports.md) for browser TypeScript + `fetch` and WebSocket patterns
+  - [Client Paths](./03-build-clients-and-servers/02-client-paths.md) for choosing between plain JSON, runtime libraries, and generated code
+  - [TypeScript library README](../lib/ts/README.md) for the runtime client/server API
+- **I need auth**
+  - [Auth Guide](./03-build-clients-and-servers/05-auth.md) for the canonical auth model
+  - [`example/py-http-cookie-auth`](../example/py-http-cookie-auth/README.md) for the recommended browser/session-cookie flow
+- **I need production guidance**
+  - [Production Guide](./04-operate/01-production-guide.md)
+  - [Runtime Error Guide](./04-operate/02-runtime-errors.md)
+- **I need tooling or code generation**
+  - [Tooling Workflow](./03-build-clients-and-servers/04-tooling-workflow.md)
+  - [CLI](../sdk/cli/README.md)
+  - [Learn by Example: Code generation](./01-learn-by-example/07-code-generation/21-code-generation.md)
+- **I want runnable examples**
+  - [Demos](../example/README.md)
+  - [Transport Guide](./03-build-clients-and-servers/01-transports.md) for the guide-to-demo mapping
+
 ## Design APIs
 
 - [Schema Writing Guide](./02-design-apis/01-schema-guide.md) for the full schema language

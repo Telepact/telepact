@@ -86,4 +86,8 @@ if (response.getBodyTarget() === 'Ok_') {
 }
 ```
 
-For more concrete usage examples, [see the tests](https://github.com/Telepact/telepact/blob/main/test/lib/ts/src/main.ts).
+## See also
+
+- [Transport Guide](../../doc/03-build-clients-and-servers/01-transports.md) for browser TypeScript + `fetch` and WebSocket examples
+- [Client Paths](../../doc/03-build-clients-and-servers/02-client-paths.md) for choosing between plain JSON, the runtime library, and generated code
+- [Demos](../../example/README.md) for runnable end-to-end examples

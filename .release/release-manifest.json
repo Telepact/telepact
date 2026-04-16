@@ -1,18 +1,19 @@
 {
   "changed_paths": [
-    "CONTRIBUTING.md",
-    "lib/py/telepact/internal/binary/ServerBase64Encoder.py",
-    "sdk/cli/README.md",
-    "sdk/cli/telepact_cli/calculator.telepact.yaml"
+    "doc/02-design-apis/01-schema-guide.md",
+    "doc/example.md",
+    "doc/index.md",
+    "example/README.md",
+    "lib/ts/README.md"
   ],
   "direct_targets": [
-    "cli",
-    "py"
+    "ts"
   ],
-  "pr_number": 369,
+  "pr_number": 379,
   "targets": [
-    "cli",
-    "py"
+    "console",
+    "dart",
+    "ts"
   ],
-  "version": "1.0.0-alpha.274"
+  "version": "1.0.0-alpha.277"
 }
