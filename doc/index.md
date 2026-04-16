@@ -50,6 +50,7 @@ servers, or operate a Telepact API in production.
   and observability guidance
 - [Runtime Error Guide](./04-operate/02-runtime-errors.md) for local/runtime debugging
 - [Versions](./04-operate/03-versions.md) for the latest published library and SDK versions
+- [Release Readiness](./04-operate/04-release-readiness.md) for explicit 1.0 go / no-go criteria
 
 ## Background and reference
 

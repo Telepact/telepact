@@ -3,6 +3,9 @@
 This guide collects the operational guidance that teams usually need before they
 put a Telepact API into production.
 
+For a repo-level release gate for Telepact itself, see the
+[Release Readiness](./04-release-readiness.md) guide.
+
 Telepact is transport-agnostic, so production concerns split cleanly into two
 layers:
 
