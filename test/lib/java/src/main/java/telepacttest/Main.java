@@ -140,23 +140,6 @@ public class Main {
         return functionRoutes;
     }
 
-    private static Map<String, FunctionRoute> codegenFunctionRoutes(CodeGenHandler codeGenHandler) {
-        var functionRoutes = new HashMap<String, FunctionRoute>();
-        for (var entry : codeGenHandler.functionRoutes().entrySet()) {
-            var functionRoute = entry.getValue();
-            functionRoutes.put(entry.getKey(), (functionName, requestMessage) -> {
-                var message = functionRoute.apply(functionName, requestMessage);
-                var headers = new HashMap<String, Object>();
-                if (message.headers != null) {
-                    headers.putAll(message.headers);
-                }
-                headers.put("@codegens_", true);
-                return new Message(headers, message.body);
-            });
-        }
-        return functionRoutes;
-    }
-
     public static Dispatcher startClientTestServer(io.nats.client.Connection connection, MetricRegistry metrics,
             String clientFrontdoorTopic,
             String clientBackdoorTopic, boolean defaultBinary, boolean useCodeGen,
@@ -522,6 +505,10 @@ public class Main {
             try {
                 var message = functionRouter.route(requestMessage);
 
+                if (useCodeGen) {
+                    message.headers.put("@codegens_", true);
+                }
+
                 var toggleAlternateServer = requestMessage.headers.get("@toggleAlternateServer_");
                 if (Objects.equals(true, toggleAlternateServer)) {
                     serveAlternateServer.set(!serveAlternateServer.get());
@@ -560,7 +547,7 @@ public class Main {
         options.middleware = middleware;
         options.authRequired = authRequired;
 
-        var functionRoutes = useCodeGen ? codegenFunctionRoutes(codeGenHandler)
+        var functionRoutes = useCodeGen ? codeGenHandler.functionRoutes()
                 : schemaFunctionRoutes(telepact, backdoorRoute);
         var functionRouter = new FunctionRouter(functionRoutes);
         var server = new Server(telepact, functionRouter, options);
@@ -571,7 +558,7 @@ public class Main {
         alternateOptions.middleware = middleware;
         alternateOptions.authRequired = authRequired;
 
-        var alternateFunctionRoutes = useCodeGen ? codegenFunctionRoutes(codeGenHandler)
+        var alternateFunctionRoutes = useCodeGen ? codeGenHandler.functionRoutes()
                 : schemaFunctionRoutes(alternateTelepact, backdoorRoute);
         var alternateFunctionRouter = new FunctionRouter(alternateFunctionRoutes);
         var alternateServer = new Server(alternateTelepact, alternateFunctionRouter, alternateOptions);

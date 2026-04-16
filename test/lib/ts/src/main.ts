@@ -101,21 +101,6 @@ function createFunctionRoutes(
     );
 }
 
-function wrapCodegenFunctionRoutes(
-    functionRoutes: Record<string, (functionName: string, requestMessage: Message) => Promise<Message>>,
-): Record<string, (functionName: string, requestMessage: Message) => Promise<Message>> {
-    return Object.fromEntries(
-        Object.entries(functionRoutes).map(([functionName, functionRoute]) => [
-            functionName,
-            async (routeFunctionName: string, requestMessage: Message): Promise<Message> => {
-                const message = await functionRoute(routeFunctionName, requestMessage);
-                message.headers["@codegens_"] = true;
-                return message;
-            },
-        ]),
-    );
-}
-
 function findUint8Array(obj: any): boolean {
   if (obj instanceof Uint8Array) {
     return true;
@@ -486,6 +471,10 @@ function startTestServer(
     const middleware = async (requestMessage: Message, functionRouter: FunctionRouter): Promise<Message> => {
         const message = await functionRouter.route(requestMessage);
 
+        if (useCodegen) {
+            message.headers["@codegens_"] = true;
+        }
+
         if (requestMessage.headers["@toggleAlternateServer_"] === true) {
             serveAlternateServer.value = !serveAlternateServer.value;
         }
@@ -519,7 +508,7 @@ function startTestServer(
     options.authRequired = authRequired;
 
     const functionRoutes = useCodegen
-        ? wrapCodegenFunctionRoutes(codeGenHandler.functionRoutes())
+        ? codeGenHandler.functionRoutes()
         : createFunctionRoutes(telepact, forwardRequest);
     const functionRouter = new FunctionRouter(functionRoutes);
     const server: Server = new Server(telepact, functionRouter, options);
@@ -530,7 +519,7 @@ function startTestServer(
     alternateOptions.middleware = middleware;
     alternateOptions.authRequired = authRequired;
     const alternateFunctionRoutes = useCodegen
-        ? wrapCodegenFunctionRoutes(codeGenHandler.functionRoutes())
+        ? codeGenHandler.functionRoutes()
         : createFunctionRoutes(alternateTelepact, forwardRequest);
     const alternateFunctionRouter = new FunctionRouter(alternateFunctionRoutes);
     const alternateServer: Server = new Server(alternateTelepact, alternateFunctionRouter, alternateOptions);

@@ -833,6 +833,13 @@ func startTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscription, 
 			return telepact.Message{}, err
 		}
 
+		if cfg.UseCodegen {
+			if msg.Headers == nil {
+				msg.Headers = map[string]any{}
+			}
+			msg.Headers["@codegens_"] = true
+		}
+
 		if boolValue(reqHeaders["@toggleAlternateServer_"]) {
 			serveAlternate.Store(!serveAlternate.Load())
 		}

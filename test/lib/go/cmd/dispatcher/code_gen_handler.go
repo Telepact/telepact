@@ -43,26 +43,7 @@ func (c *codeGenHandler) FunctionRoutes() map[string]telepact.FunctionRoute {
 		return nil
 	}
 
-	routes := make(map[string]telepact.FunctionRoute)
-	for functionName, functionRoute := range c.handler.FunctionRoutes() {
-		route := functionRoute
-		routes[functionName] = func(functionName string, requestMessage telepact.Message) (telepact.Message, error) {
-			response, err := route(functionName, requestMessage)
-			if err != nil {
-				return telepact.Message{}, err
-			}
-
-			headers := response.Headers
-			if headers == nil {
-				headers = map[string]any{}
-			}
-			headers["@codegens_"] = true
-
-			return telepact.NewMessage(headers, response.Body), nil
-		}
-	}
-
-	return routes
+	return c.handler.FunctionRoutes()
 }
 
 type typedCodeGenServer struct{}

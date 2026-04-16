@@ -90,20 +90,6 @@ def create_function_routes(telepact: TelepactSchema, route: Callable[[Message], 
     }
 
 
-def wrap_codegen_function_routes(function_routes: dict[str, Callable[[str, Message], Any]]) -> dict[str, Callable[[str, Message], Any]]:
-    wrapped_routes: dict[str, Callable[[str, Message], Any]] = {}
-
-    for function_name, function_route in function_routes.items():
-        async def wrapped_route(route_function_name: str, request_message: Message, function_route=function_route) -> Message:
-            message = await function_route(route_function_name, request_message)
-            message.headers["@codegens_"] = True
-            return message
-
-        wrapped_routes[function_name] = wrapped_route
-
-    return wrapped_routes
-
-
 def find_bytes(obj):
   if isinstance(obj, bytes):
     return True
@@ -391,6 +377,9 @@ async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, 
 
         message = await function_router.route(request_message)
 
+        if use_codegen:
+            message.headers["@codegens_"] = True
+
         toggle_alternate_server = request_message.headers.get("@toggleAlternateServer_")
         if toggle_alternate_server == True:
             serve_alternate_server = not serve_alternate_server
@@ -410,7 +399,7 @@ async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, 
     options.middleware = middleware
     options.auth_required = auth_required
 
-    function_routes = wrap_codegen_function_routes(code_gen_handler.function_routes()) if use_codegen else create_function_routes(telepact, forward_request)
+    function_routes = code_gen_handler.function_routes() if use_codegen else create_function_routes(telepact, forward_request)
     function_router = FunctionRouter(function_routes)
     server = Server(telepact, function_router, options)
     alternate_options = Server.Options()
@@ -418,7 +407,7 @@ async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, 
     alternate_options.on_auth = on_auth
     alternate_options.middleware = middleware
     alternate_options.auth_required = auth_required
-    alternate_function_routes = wrap_codegen_function_routes(code_gen_handler.function_routes()) if use_codegen else create_function_routes(alternate_telepact, forward_request)
+    alternate_function_routes = code_gen_handler.function_routes() if use_codegen else create_function_routes(alternate_telepact, forward_request)
     alternate_function_router = FunctionRouter(alternate_function_routes)
     alternate_server = Server(
         alternate_telepact, alternate_function_router, alternate_options)
