@@ -96,15 +96,15 @@ logs describe connections and byte-level behavior; Telepact logs can describe
 which Telepact function ran and how it completed.
 
 One Telepact-specific pitfall: avoid dumping whole request or response `Message`
-objects just because they are available. Even when `@auth_` is treated
-carefully, application payloads may still contain sensitive data.
+objects just because they are available. Even though `@auth_` is treated
+carefully by Telepact, application payloads may still contain sensitive data.
 
 ### Request ids and tracing
 
-Telepact can carry correlation data in headers, but it does not define your
-organization's tracing policy. The important Telepact point is simply to keep
-the ids consistent across the transport boundary and the Telepact middleware
-boundary so the same request can be correlated in both places.
+Telepact can carry correlation data in headers, but it does not define a tracing
+policy. The important Telepact point is simply to keep the ids consistent across
+the transport boundary and the Telepact middleware boundary so the same request
+can be correlated in both places.
 
 ## 4. Compatibility and upgrades
 
