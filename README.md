@@ -51,6 +51,15 @@ Check out the [full-stack example](./doc/example.md).
 Start with the [docs landing page](./doc/index.md) for guides, examples,
 library references, SDK tools, version information, and further reading.
 
+Recommended paths:
+
+- [Quickstart](./doc/example.md) for the fastest end-to-end path
+- [Browser + Node usage](./doc/03-build-clients-and-servers/01-transports.md) for `fetch`, WebSockets, and TypeScript client adapters
+- [Auth](./doc/03-build-clients-and-servers/05-auth.md) for the canonical `@auth_` model and browser/session-cookie flow
+- [Production guidance](./doc/04-operate/01-production-guide.md) for rollout, compatibility, and observability
+- [Tooling and code generation](./doc/03-build-clients-and-servers/04-tooling-workflow.md) for `fetch`, `compare`, `mock`, and `codegen`
+- [Runnable examples](./example/README.md) for concrete end-to-end demos
+
 # Licensing
 
 Telepact is licensed under the Apache License, Version 2.0. See
