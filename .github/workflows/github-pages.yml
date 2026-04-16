@@ -25,7 +25,7 @@ on:
       - Makefile
       - README.md
       - doc/**
-      - site/example/**
+      - example/**
       - common/**
       - lib/**/README.md
       - sdk/**/README.md

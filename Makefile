@@ -156,7 +156,7 @@ clean-test:
 	$(MAKE) -C test/lib/ts-nodenext clean
 
 example-check:
-	$(MAKE) -C site/example check
+	$(MAKE) -C example check
 
 dart:
 	$(MAKE) -C bind/dart

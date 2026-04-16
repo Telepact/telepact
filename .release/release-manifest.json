@@ -8,9 +8,9 @@
     "doc/03-build-clients-and-servers/05-auth.md",
     "doc/04-operate/01-production-guide.md",
     "doc/index.md",
-    "site/example/py-http-cookie-auth/README.md",
-    "site/example/py-http-cookie-auth/api/auth.telepact.yaml",
-    "site/example/py-http-cookie-auth/server.py"
+    "example/py-http-cookie-auth/README.md",
+    "example/py-http-cookie-auth/api/auth.telepact.yaml",
+    "example/py-http-cookie-auth/server.py"
   ],
   "direct_targets": [],
   "pr_number": 372,

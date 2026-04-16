@@ -271,13 +271,13 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://telepact.github.io/telepact/docs/examples/</loc>
+    <loc>https://telepact.github.io/telepact/docs/example/</loc>
     <lastmod>2026-04-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://telepact.github.io/telepact/docs/examples/py-binary/</loc>
+    <loc>https://telepact.github.io/telepact/docs/examples/</loc>
     <lastmod>2026-04-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>

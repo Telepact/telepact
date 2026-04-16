@@ -40,7 +40,7 @@ SNIPPETS_DIR = SOURCE_DIR / "snippets"
 STATIC_FILES = (".nojekyll", "404.html", "favicon.ico")
 DEFAULT_BASE_URL = "https://telepact.github.io/telepact/"
 DEFAULT_REPO_URL = "https://github.com/Telepact/telepact"
-ALLOWED_PREFIXES = ("doc/", "site/example/", "lib/", "sdk/", "common/")
+ALLOWED_PREFIXES = ("doc/", "example/", "lib/", "sdk/", "common/")
 PRISM_CSS = (
     "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/"
     "prism-tomorrow.min.css"
@@ -136,8 +136,8 @@ def output_html_path(source: Path) -> Path:
     rel = repo_rel(source)
     if rel.startswith("doc/"):
         rel = rel[len("doc/") :]
-    elif rel.startswith("site/example/"):
-        rel = "examples/" + rel[len("site/example/") :]
+    elif rel.startswith("example/"):
+        rel = "examples/" + rel[len("example/") :]
     if rel.endswith("/README.md"):
         rel = rel[: -len("README.md")]
     elif rel == "index.md":
@@ -150,10 +150,7 @@ def output_html_path(source: Path) -> Path:
 
 
 def output_resource_path(source: Path) -> Path:
-    rel = repo_rel(source)
-    if rel.startswith("site/example/"):
-        rel = "examples/" + rel[len("site/example/") :]
-    return DOCS_DIR / rel
+    return DOCS_DIR / repo_rel(source)
 
 
 def url_from_output(output_file: Path) -> str:

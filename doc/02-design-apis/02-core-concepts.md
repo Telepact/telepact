@@ -80,7 +80,7 @@ link formats.
 See:
 
 - [Learn by Example: Functions](../01-learn-by-example/02-schema/08-functions.md)
-- [Demos](../../site/example/README.md)
+- [Demos](../../example/README.md)
 
 ## Select
 
