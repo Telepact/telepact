@@ -57,6 +57,7 @@ Recommended responsibilities by layer:
   - map Telepact response bytes back to the transport response
   - preserve deadlines, cancellation, and transport-specific status mapping
   - stay thin and focused on bytes in / bytes out
+  - inject credentials from the transport if applicable, e.g. cookies
 - **Telepact middleware + function routes**
   - middleware for request-level policy and observability
   - domain validation
