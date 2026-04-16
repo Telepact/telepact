@@ -15,5 +15,5 @@ Related guides:
 - Start with the [Quickstart](./example.md) if you want the shortest end-to-end path.
 - See the [Transport Guide](./03-build-clients-and-servers/01-transports.md) for the HTTP and WebSocket patterns
   behind these examples.
-- See the [Production Guide auth section](./04-operate/01-production-guide.md#3-auth-and-observability-patterns)
-  for the recommended production version of the cookie-auth pattern.
+- See the [Auth Guide](./03-build-clients-and-servers/05-auth.md) for the recommended production version of the
+  cookie-auth pattern.

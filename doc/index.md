@@ -27,8 +27,9 @@ servers, or operate a Telepact API in production.
 
 ### I want auth guidance
 
-- [Production Guide](./04-operate/01-production-guide.md#3-auth-and-observability-patterns) for the recommended
-  production auth boundary
+- [Auth Guide](./03-build-clients-and-servers/05-auth.md) for the canonical `@auth_` / `onAuth` model
+- [Production Guide](./04-operate/01-production-guide.md) for rollout and operating guidance around auth and
+  observability
 - [Learn by Example: Auth](./01-learn-by-example/05-auth/18-auth.md) for the `@auth_` convention from the client
   side
 - [Cookie auth example](../example/py-http-cookie-auth/README.md) for a minimal transport-to-`@auth_` example
@@ -65,6 +66,7 @@ servers, or operate a Telepact API in production.
 - [Client Paths](./03-build-clients-and-servers/02-client-paths.md) for choosing between plain JSON, client
   libraries, and generated code
 - [Server Paths](./03-build-clients-and-servers/03-server-paths.md) for choosing a runtime and wiring a server
+- [Auth Guide](./03-build-clients-and-servers/05-auth.md) for Telepact's canonical auth model and recommended flows
 - [Tooling Workflow](./03-build-clients-and-servers/04-tooling-workflow.md) for `fetch`, `compare`, `mock`, and
   `codegen`
 

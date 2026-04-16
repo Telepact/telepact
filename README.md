@@ -55,8 +55,8 @@ Recommended paths:
 - [Quickstart](./doc/example.md) for the fastest end-to-end path
 - [Browser + Node usage](./doc/03-build-clients-and-servers/02-client-paths.md) for choosing between plain JSON,
   the TypeScript library, and generated clients
-- [Auth guidance](./doc/04-operate/01-production-guide.md#3-auth-and-observability-patterns) for `@auth_`,
-  middleware, and transport-boundary patterns
+- [Auth guidance](./doc/03-build-clients-and-servers/05-auth.md) for `@auth_`, `onAuth`, and
+  transport-boundary patterns
 - [Production guidance](./doc/04-operate/01-production-guide.md) for rollout, compatibility, auth, and
   observability
 - [Tooling and code generation](./doc/03-build-clients-and-servers/04-tooling-workflow.md) for `fetch`,

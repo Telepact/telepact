@@ -121,12 +121,22 @@ metrics, then delegate to the target function route.
 
 ### Auth
 
-Recommended pattern:
+The recommended auth model is:
 
-- validate bearer tokens, sessions, or cookies before the target function runs
-- translate the authenticated caller into the specific Telepact headers or
-  request context your schema expects
+- model caller credentials in `union.Auth_`
+- carry them in `@auth_`
+- extract transport-specific credentials into `@auth_` at the transport boundary
+- use `onAuth` to normalize authenticated identity into internal request headers
 - keep authorization decisions close to the business logic that owns the data
+
+Use the standard auth errors consistently:
+
+- `ErrorUnauthenticated_` for missing or invalid credentials
+- `ErrorUnauthorized_` for authenticated callers who are not allowed to perform the action
+
+For the canonical schema shape, browser cookie flow, service-to-service flow,
+and the explicit Telepact-vs-service ownership boundary, see the
+[Auth Guide](../03-build-clients-and-servers/05-auth.md).
 
 If credentials arrive through the transport layer, copy them into Telepact
 headers while calling `server.process(...)`. For example, an HTTP adapter can
