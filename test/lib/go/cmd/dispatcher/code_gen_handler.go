@@ -38,6 +38,14 @@ func (c *codeGenHandler) Handle(message telepact.Message) (telepact.Message, err
 	return telepact.NewMessage(headers, response.Body), nil
 }
 
+func (c *codeGenHandler) FunctionRoutes() map[string]telepact.FunctionRoute {
+	if c == nil || c.handler == nil {
+		return nil
+	}
+
+	return c.handler.FunctionRoutes()
+}
+
 type typedCodeGenServer struct{}
 
 func (s *typedCodeGenServer) CircularLink1(headers map[string]any, input gen.CircularLink1Input) (telepact.TypedMessage[gen.CircularLink1Output], error) {

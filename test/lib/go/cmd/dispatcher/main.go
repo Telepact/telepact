@@ -828,6 +828,17 @@ func startTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscription, 
 
 	middleware := func(message telepact.Message, functionRouter *telepact.FunctionRouter) (telepact.Message, error) {
 		reqHeaders := message.Headers
+		msg, err := functionRouter.Route(message)
+		if err != nil {
+			return telepact.Message{}, err
+		}
+
+		if cfg.UseCodegen {
+			if msg.Headers == nil {
+				msg.Headers = map[string]any{}
+			}
+			msg.Headers["@codegens_"] = true
+		}
 
 		if boolValue(reqHeaders["@toggleAlternateServer_"]) {
 			serveAlternate.Store(!serveAlternate.Load())
@@ -835,24 +846,6 @@ func startTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscription, 
 
 		if boolValue(reqHeaders["@throwError_"]) {
 			return telepact.Message{}, fmt.Errorf("telepact: requested server error")
-		}
-
-		var msg telepact.Message
-		var err error
-		if codegenHandler != nil {
-			msg, err = codegenHandler.Handle(message)
-			if err != nil {
-				return telepact.Message{}, err
-			}
-		} else {
-			if cfg.BackdoorTopic == "" {
-				return telepact.Message{}, fmt.Errorf("telepact: backdoor topic not configured")
-			}
-
-			msg, err = forwardRequest(message)
-			if err != nil {
-				return telepact.Message{}, err
-			}
 		}
 
 		return msg, nil
@@ -878,7 +871,13 @@ func startTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscription, 
 	options.OnAuth = onAuth
 	options.Middleware = middleware
 
-	functionRouter := telepact.NewFunctionRouter(map[string]telepact.FunctionRoute{})
+	functionRoutes := codegenHandler.FunctionRoutes()
+	if functionRoutes == nil {
+		functionRoutes = schemaFunctionRoutes(tele, func(functionName string, requestMessage telepact.Message) (telepact.Message, error) {
+			return forwardRequest(requestMessage)
+		})
+	}
+	functionRouter := telepact.NewFunctionRouter(functionRoutes)
 	server, err := telepact.NewServer(tele, functionRouter, options)
 	if err != nil {
 		return nil, err
@@ -893,7 +892,13 @@ func startTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscription, 
 	}
 	alternateOptions.OnAuth = onAuth
 	alternateOptions.Middleware = middleware
-	alternateFunctionRouter := telepact.NewFunctionRouter(map[string]telepact.FunctionRoute{})
+	alternateFunctionRoutes := codegenHandler.FunctionRoutes()
+	if alternateFunctionRoutes == nil {
+		alternateFunctionRoutes = schemaFunctionRoutes(alternateTele, func(functionName string, requestMessage telepact.Message) (telepact.Message, error) {
+			return forwardRequest(requestMessage)
+		})
+	}
+	alternateFunctionRouter := telepact.NewFunctionRouter(alternateFunctionRoutes)
 	alternateServer, err := telepact.NewServer(alternateTele, alternateFunctionRouter, alternateOptions)
 	if err != nil {
 		return nil, err
@@ -1210,6 +1215,26 @@ func cloneStringStringMap(source map[string]string) map[string]string {
 		result[key] = value
 	}
 	return result
+}
+
+func isFunctionRouteName(typeName string) bool {
+	return strings.HasPrefix(typeName, "fn.") &&
+		!strings.HasSuffix(typeName, ".->") &&
+		!strings.HasSuffix(typeName, "_")
+}
+
+func schemaFunctionRoutes(schema *telepact.TelepactSchema, route telepact.FunctionRoute) map[string]telepact.FunctionRoute {
+	if schema == nil || route == nil {
+		return nil
+	}
+
+	routes := make(map[string]telepact.FunctionRoute)
+	for typeName := range schema.Parsed {
+		if isFunctionRouteName(typeName) {
+			routes[typeName] = route
+		}
+	}
+	return routes
 }
 
 func firstKey(m map[string]any) string {
