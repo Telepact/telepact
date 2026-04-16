@@ -1,6 +1,6 @@
 # Auth Guide
 
-This is Telepact's recommended auth path.
+This page describes Telepact's auth convention.
 
 The canonical model is:
 
@@ -61,7 +61,7 @@ When `union.Auth_` exists, Telepact adds these standard definitions:
         message!: string
 ```
 
-Recommended schema rule:
+Schema rule of thumb:
 
 - put client-visible credential variants in `union.Auth_`
 - keep normalized identity headers such as `@userId` or `@tenantId` out of the public schema unless clients are meant to send or inspect them directly
@@ -124,7 +124,7 @@ Typical normalized headers are internal values like:
 Keep these normalized headers service-specific. They are usually internal
 server-to-handler data, not public client contract.
 
-## Recommended browser / session-cookie flow
+## Browser / session-cookie flow
 
 For browser sessions:
 
@@ -134,7 +134,7 @@ For browser sessions:
 4. `onAuth` looks up the session and returns normalized identity headers
 5. handlers authorize with those normalized headers
 
-This is the recommended cookie pattern because the browser does not need to
+This is a common cookie pattern because the browser does not need to
 handcraft `@auth_`, while the Telepact server still receives one canonical auth
 shape internally.
 
@@ -143,10 +143,10 @@ See:
 - [Learn by Example: Managed auth](../01-learn-by-example/08-running-our-own-server/25-managed-auth.md)
 - [`example/py-http-cookie-auth`](../../example/py-http-cookie-auth/README.md)
 
-## Recommended service-to-service flow
+## Service-to-service flow
 
-For service-to-service calls, prefer explicit `@auth_` whenever the caller is
-already constructing Telepact messages.
+For service-to-service calls, a common shape is explicit `@auth_` when the
+caller is already constructing Telepact messages.
 
 That usually means:
 
@@ -159,7 +159,7 @@ If an intermediary gateway or transport already owns the raw credential, it can
 still translate that transport-specific credential into `@auth_` before the
 Telepact server processes the request.
 
-## Recommended path in one sentence
+## In one sentence
 
 Model caller credentials in `union.Auth_`, move them through `@auth_`, normalize
 them with `onAuth`, authorize on normalized identity, and keep transport- and

@@ -27,12 +27,11 @@ a new schema.
 This is useful when you want to:
 
 - gate schema changes in CI
-- protect staggered rollouts
 - make compatibility an explicit release check
 
 See:
 
-- [Production Guide](../04-operate/01-production-guide.md)
+- [Operating Boundary Guide](../04-operate/01-production-guide.md)
 - [Telepact CLI](../../sdk/cli/README.md)
 
 ## Mock an API

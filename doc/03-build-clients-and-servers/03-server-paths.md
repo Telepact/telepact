@@ -57,19 +57,19 @@ Start here:
 - [Learn by Example: Auth](../01-learn-by-example/05-auth/18-auth.md)
 - [Learn by Example: Server auth](../01-learn-by-example/08-running-our-own-server/24-server-auth.md)
 - [Learn by Example: Managed auth](../01-learn-by-example/08-running-our-own-server/25-managed-auth.md)
-- [Production Guide](../04-operate/01-production-guide.md)
+- [Operating Boundary Guide](../04-operate/01-production-guide.md)
 
-## Production path
+## Operating boundary path
 
-Before rollout, focus on:
+When placing Telepact inside a larger service, focus on:
 
 - schema compatibility policy
-- observability
-- deployment topology
+- where auth and observability hooks attach
+- transport responsibilities versus Telepact responsibilities
 - exact runtime/tool versioning
 
 Start here:
 
-- [Production Guide](../04-operate/01-production-guide.md)
+- [Operating Boundary Guide](../04-operate/01-production-guide.md)
 - [Runtime Error Guide](../04-operate/02-runtime-errors.md)
 - [Versions](../04-operate/03-versions.md)
