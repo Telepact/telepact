@@ -83,6 +83,39 @@ class Registry {
     }
 }
 
+function isFunctionRouteName(typeName: string): boolean {
+    return typeName.startsWith("fn.") && !typeName.endsWith(".->") && !typeName.endsWith("_");
+}
+
+function createFunctionRoutes(
+    telepact: TelepactSchema,
+    route: (requestMessage: Message) => Promise<Message>,
+): Record<string, (functionName: string, requestMessage: Message) => Promise<Message>> {
+    return Object.fromEntries(
+        Object.keys(telepact.parsed)
+            .filter(isFunctionRouteName)
+            .map((functionName) => [
+                functionName,
+                async (_functionName: string, requestMessage: Message): Promise<Message> => await route(requestMessage),
+            ]),
+    );
+}
+
+function wrapCodegenFunctionRoutes(
+    functionRoutes: Record<string, (functionName: string, requestMessage: Message) => Promise<Message>>,
+): Record<string, (functionName: string, requestMessage: Message) => Promise<Message>> {
+    return Object.fromEntries(
+        Object.entries(functionRoutes).map(([functionName, functionRoute]) => [
+            functionName,
+            async (routeFunctionName: string, requestMessage: Message): Promise<Message> => {
+                const message = await functionRoute(routeFunctionName, requestMessage);
+                message.headers["@codegens_"] = true;
+                return message;
+            },
+        ]),
+    );
+}
+
 function findUint8Array(obj: any): boolean {
   if (obj instanceof Uint8Array) {
     return true;
@@ -430,37 +463,34 @@ function startTestServer(
         return {};
     };
 
-    const middleware = async (requestMessage: Message): Promise<Message> => {
+    const forwardRequest = async (requestMessage: Message): Promise<Message> => {
         const requestHeaders = requestMessage.headers;
         const requestBody = requestMessage.body;
         const requestPseudoJson = [requestHeaders, requestBody];
         const requestJson = JSON.stringify(requestPseudoJson, uint8ArrayToBase64Replacer);
         const requestBytes = new TextEncoder().encode(requestJson);
 
-        let message: Message;
-        if (useCodegen) {
-            console.log(`     :H ${new TextDecoder().decode(requestBytes)}`);
-            message = await codeGenHandler.handler(requestMessage);
-            message.headers["@codegens_"] = true;
-        } else {
-            console.log(`    <-s ${new TextDecoder().decode(requestBytes)}`);
-            const natsResponseMessage = await connection.request(backdoorTopic, requestBytes, { timeout: 5000 });
+        console.log(`    <-s ${new TextDecoder().decode(requestBytes)}`);
+        const natsResponseMessage = await connection.request(backdoorTopic, requestBytes, { timeout: 5000 });
 
-            console.log(`    ->s ${new TextDecoder().decode(natsResponseMessage.data)}`);
+        console.log(`    ->s ${new TextDecoder().decode(natsResponseMessage.data)}`);
 
-            const responseJson = new TextDecoder().decode(natsResponseMessage.data);
-            const responsePseudoJson = JSON.parse(responseJson);
-            const responseHeaders = responsePseudoJson[0] as { [key: string]: any };
-            const responseBody = responsePseudoJson[1] as { [key: string]: any };
+        const responseJson = new TextDecoder().decode(natsResponseMessage.data);
+        const responsePseudoJson = JSON.parse(responseJson);
+        const responseHeaders = responsePseudoJson[0] as { [key: string]: any };
+        const responseBody = responsePseudoJson[1] as { [key: string]: any };
 
-            message = new Message(responseHeaders, responseBody);
-        }
+        return new Message(responseHeaders, responseBody);
+    };
 
-        if (requestHeaders["@toggleAlternateServer_"] === true) {
+    const middleware = async (requestMessage: Message, functionRouter: FunctionRouter): Promise<Message> => {
+        const message = await functionRouter.route(requestMessage);
+
+        if (requestMessage.headers["@toggleAlternateServer_"] === true) {
             serveAlternateServer.value = !serveAlternateServer.value;
         }
 
-        if (requestHeaders["@throwError_"] === true) {
+        if (requestMessage.headers["@throwError_"] === true) {
             throw new ThisError();
         }
 
@@ -488,7 +518,10 @@ function startTestServer(
     options.middleware = middleware;
     options.authRequired = authRequired;
 
-    const functionRouter = new FunctionRouter({});
+    const functionRoutes = useCodegen
+        ? wrapCodegenFunctionRoutes(codeGenHandler.functionRoutes())
+        : createFunctionRoutes(telepact, forwardRequest);
+    const functionRouter = new FunctionRouter(functionRoutes);
     const server: Server = new Server(telepact, functionRouter, options);
 
     const alternateOptions = new ServerOptions();
@@ -496,7 +529,10 @@ function startTestServer(
     alternateOptions.onAuth = onAuth;
     alternateOptions.middleware = middleware;
     alternateOptions.authRequired = authRequired;
-    const alternateFunctionRouter = new FunctionRouter({});
+    const alternateFunctionRoutes = useCodegen
+        ? wrapCodegenFunctionRoutes(codeGenHandler.functionRoutes())
+        : createFunctionRoutes(alternateTelepact, forwardRequest);
+    const alternateFunctionRouter = new FunctionRouter(alternateFunctionRoutes);
     const alternateServer: Server = new Server(alternateTelepact, alternateFunctionRouter, alternateOptions);
 
     const subscription: Subscription = connection.subscribe(frontdoorTopic);

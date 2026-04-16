@@ -126,6 +126,37 @@ public class Main {
         return false;
     }
 
+    private static boolean isFunctionRouteName(String typeName) {
+        return typeName.startsWith("fn.") && !typeName.endsWith(".->") && !typeName.endsWith("_");
+    }
+
+    private static Map<String, FunctionRoute> schemaFunctionRoutes(TelepactSchema telepact, FunctionRoute route) {
+        var functionRoutes = new HashMap<String, FunctionRoute>();
+        for (var typeName : telepact.parsed.keySet()) {
+            if (isFunctionRouteName(typeName)) {
+                functionRoutes.put(typeName, route);
+            }
+        }
+        return functionRoutes;
+    }
+
+    private static Map<String, FunctionRoute> codegenFunctionRoutes(CodeGenHandler codeGenHandler) {
+        var functionRoutes = new HashMap<String, FunctionRoute>();
+        for (var entry : codeGenHandler.functionRoutes().entrySet()) {
+            var functionRoute = entry.getValue();
+            functionRoutes.put(entry.getKey(), (functionName, requestMessage) -> {
+                var message = functionRoute.apply(functionName, requestMessage);
+                var headers = new HashMap<String, Object>();
+                if (message.headers != null) {
+                    headers.putAll(message.headers);
+                }
+                headers.put("@codegens_", true);
+                return new Message(headers, message.body);
+            });
+        }
+        return functionRoutes;
+    }
+
     public static Dispatcher startClientTestServer(io.nats.client.Connection connection, MetricRegistry metrics,
             String clientFrontdoorTopic,
             String clientBackdoorTopic, boolean defaultBinary, boolean useCodeGen,
@@ -455,7 +486,7 @@ public class Main {
             return Map.of();
         };
 
-        Server.Middleware middleware = (requestMessage, functionRouter) -> {
+        FunctionRoute backdoorRoute = (functionName, requestMessage) -> {
             try {
                 var requestHeaders = requestMessage.headers;
                 var requestBody = requestMessage.body;
@@ -463,40 +494,40 @@ public class Main {
 
                 var requestBytes = objectMapper.writeValueAsBytes(requestPseudoJson);
 
-                Message message;
-                if (useCodeGen) {
-                    System.out.println("     :H %s".formatted(objectMapper.writeValueAsString(requestPseudoJson)));
-                    message = codeGenHandler.handler(requestMessage);
-                    message.headers.put("@codegens_", true);
-                } else {
-                    System.out.println("    <-s %s".formatted(new String(requestBytes)));
-                    System.out.flush();
+                System.out.println("    <-s %s".formatted(new String(requestBytes)));
+                System.out.flush();
 
-                    io.nats.client.Message natsResponseMessage;
-                    try {
-                        natsResponseMessage = connection.request(backdoorTopic, requestBytes, Duration.ofSeconds(5));
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                    var responseBytes = natsResponseMessage.getData();
-
-                    System.out.println("    ->s %s".formatted(new String(responseBytes)));
-                    System.out.flush();
-
-                    var responsePseudoJson = objectMapper.readValue(responseBytes, List.class);
-                    var responseHeaders = (Map<String, Object>) responsePseudoJson.get(0);
-                    var responseBody = (Map<String, Object>) responsePseudoJson.get(1);
-
-                    message = new Message(responseHeaders, responseBody);
-
+                io.nats.client.Message natsResponseMessage;
+                try {
+                    natsResponseMessage = connection.request(backdoorTopic, requestBytes, Duration.ofSeconds(5));
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
                 }
+                var responseBytes = natsResponseMessage.getData();
 
-                var toggleAlternateServer = requestHeaders.get("@toggleAlternateServer_");
+                System.out.println("    ->s %s".formatted(new String(responseBytes)));
+                System.out.flush();
+
+                var responsePseudoJson = objectMapper.readValue(responseBytes, List.class);
+                var responseHeaders = (Map<String, Object>) responsePseudoJson.get(0);
+                var responseBody = (Map<String, Object>) responsePseudoJson.get(1);
+
+                return new Message(responseHeaders, responseBody);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        };
+
+        Server.Middleware middleware = (requestMessage, functionRouter) -> {
+            try {
+                var message = functionRouter.route(requestMessage);
+
+                var toggleAlternateServer = requestMessage.headers.get("@toggleAlternateServer_");
                 if (Objects.equals(true, toggleAlternateServer)) {
                     serveAlternateServer.set(!serveAlternateServer.get());
                 }
 
-                var throwError = requestHeaders.get("@throwError_");
+                var throwError = requestMessage.headers.get("@throwError_");
                 if (Objects.equals(true, throwError)) {
                     throw new ThisError();
                 }
@@ -529,7 +560,9 @@ public class Main {
         options.middleware = middleware;
         options.authRequired = authRequired;
 
-        var functionRouter = new FunctionRouter(Map.of());
+        var functionRoutes = useCodeGen ? codegenFunctionRoutes(codeGenHandler)
+                : schemaFunctionRoutes(telepact, backdoorRoute);
+        var functionRouter = new FunctionRouter(functionRoutes);
         var server = new Server(telepact, functionRouter, options);
 
         var alternateOptions = new Server.Options();
@@ -538,7 +571,9 @@ public class Main {
         alternateOptions.middleware = middleware;
         alternateOptions.authRequired = authRequired;
 
-        var alternateFunctionRouter = new FunctionRouter(Map.of());
+        var alternateFunctionRoutes = useCodeGen ? codegenFunctionRoutes(codeGenHandler)
+                : schemaFunctionRoutes(alternateTelepact, backdoorRoute);
+        var alternateFunctionRouter = new FunctionRouter(alternateFunctionRoutes);
         var alternateServer = new Server(alternateTelepact, alternateFunctionRouter, alternateOptions);
 
         var dispatcher = connection.createDispatcher((msg) -> {

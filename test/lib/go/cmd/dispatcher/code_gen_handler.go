@@ -38,6 +38,33 @@ func (c *codeGenHandler) Handle(message telepact.Message) (telepact.Message, err
 	return telepact.NewMessage(headers, response.Body), nil
 }
 
+func (c *codeGenHandler) FunctionRoutes() map[string]telepact.FunctionRoute {
+	if c == nil || c.handler == nil {
+		return nil
+	}
+
+	routes := make(map[string]telepact.FunctionRoute)
+	for functionName, functionRoute := range c.handler.FunctionRoutes() {
+		route := functionRoute
+		routes[functionName] = func(functionName string, requestMessage telepact.Message) (telepact.Message, error) {
+			response, err := route(functionName, requestMessage)
+			if err != nil {
+				return telepact.Message{}, err
+			}
+
+			headers := response.Headers
+			if headers == nil {
+				headers = map[string]any{}
+			}
+			headers["@codegens_"] = true
+
+			return telepact.NewMessage(headers, response.Body), nil
+		}
+	}
+
+	return routes
+}
+
 type typedCodeGenServer struct{}
 
 func (s *typedCodeGenServer) CircularLink1(headers map[string]any, input gen.CircularLink1Input) (telepact.TypedMessage[gen.CircularLink1Output], error) {
