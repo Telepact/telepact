@@ -1,24 +1,9 @@
 {
   "changed_paths": [
-    ".github/workflows/build.yml",
-    "example/Makefile",
-    "example/README.md",
-    "example/py-codegen/Makefile",
-    "example/py-codegen/README.md",
-    "example/py-codegen/api/greet.telepact.yaml",
-    "example/py-codegen/gen/.license-header-ignore",
-    "example/py-codegen/gen/__init__.py",
-    "example/py-codegen/gen/gen_types.py",
-    "example/py-codegen/server.py",
-    "example/py-codegen/test_example.py",
-    "sdk/cli/telepact_cli/templates/py_all_2.j2"
+    "example/README.md"
   ],
-  "direct_targets": [
-    "cli"
-  ],
-  "pr_number": 384,
-  "targets": [
-    "cli"
-  ],
-  "version": "1.0.0-alpha.283"
+  "direct_targets": [],
+  "pr_number": 385,
+  "targets": [],
+  "version": "1.0.0-alpha.284"
 }
