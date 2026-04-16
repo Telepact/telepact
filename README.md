@@ -50,7 +50,7 @@ Check out the [full-stack example](./doc/example.md).
 
 Start with the [docs landing page](./doc/index.md) for guides, examples,
 library references, SDK tools, version information, and further reading. The
-published docs are available at [telepact.github.io/telepact](https://telepact.github.io/telepact/).
+published docs are available at [telepact.github.io/telepact](https://telepact.github.io/telepact).
 
 # Licensing
 
