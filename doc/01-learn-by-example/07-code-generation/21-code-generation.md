@@ -55,7 +55,10 @@ import { TypedClient, add } from "./gen/genTypes.js";
 
 const typedClient = new TypedClient(client);
 const response = await typedClient.add({}, add.Input.from({ x: 2, y: 3 }));
-console.log(response.body.getTaggedValue().value.result());
+const tagged = response.body.getTaggedValue();
+if (tagged.tag === "Ok_") {
+    console.log(tagged.value.result());
+}
 ```
 
 The value of codegen is not a different transport or protocol. The value is a
