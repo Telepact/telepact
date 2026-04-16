@@ -24,6 +24,7 @@ servers, or operate a Telepact API in production.
 - [Client Paths](./03-build-clients-and-servers/02-client-paths.md) for choosing between plain JSON, client
   libraries, and generated code
 - [Server Paths](./03-build-clients-and-servers/03-server-paths.md) for choosing a runtime and wiring a server
+- [Auth Guide](./03-build-clients-and-servers/05-auth.md) for Telepact's canonical auth model and recommended flows
 - [Tooling Workflow](./03-build-clients-and-servers/04-tooling-workflow.md) for `fetch`, `compare`, `mock`, and
   `codegen`
 

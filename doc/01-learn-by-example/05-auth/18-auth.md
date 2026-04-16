@@ -2,6 +2,10 @@
 
 Let's look at Telepact's auth convention from the client's side.
 
+For the recommended end-to-end production path, including transport extraction,
+`onAuth` normalization, browser cookies, and service-to-service credentials, see
+the [Auth Guide](../../03-build-clients-and-servers/05-auth.md).
+
 ## Start the demo server
 
 ```sh
@@ -91,7 +95,8 @@ curl -s localhost:8000/api -d '[{"@auth_": {"Session": {"token": "nj-tuNyu6XVA7T
 ```
 
 This login/logout pair is specific to the demo server. Other Telepact services
-can choose different auth policies. The common convention is that auth travels
-through `@auth_`.
+can choose different auth policies. The common convention is that caller
+credentials travel through `@auth_`, with `union.Auth_` as the canonical public
+schema shape.
 
 Next: [19. Minimum Python client](../06-using-telepact-client-library-code/19-minimum-python-client.md)
