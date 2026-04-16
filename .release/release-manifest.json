@@ -1,17 +1,9 @@
 {
   "changed_paths": [
-    "doc/demos.md",
-    "doc/index.md",
-    "example/README.md",
-    "example/py-binary/README.md",
-    "example/py-http-cookie-auth/README.md",
-    "example/py-links/README.md",
-    "example/py-select/README.md",
-    "example/py-websocket/README.md",
-    "site/src/build.py"
+    "site/src/index.template.html"
   ],
   "direct_targets": [],
-  "pr_number": 376,
+  "pr_number": 378,
   "targets": [],
-  "version": "1.0.0-alpha.275"
+  "version": "1.0.0-alpha.276"
 }
