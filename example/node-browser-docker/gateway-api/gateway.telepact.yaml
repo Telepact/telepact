@@ -38,12 +38,8 @@
         viewer: struct.Viewer
         orders: [struct.OrderSummary]
         firstOrderDetails!: fn.getOrderDetails
-    - ErrorUnauthenticated_:
-        message!: string
 - fn.getOrderDetails:
     orderId: string
   ->:
     - Ok_:
         order: struct.OrderDetails
-    - ErrorUnauthenticated_:
-        message!: string

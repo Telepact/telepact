@@ -14,68 +14,41 @@
 //|  limitations under the License.
 //|
 
-import { Client, ClientOptions, Message } from '/vendor/telepact/index.esm.js';
-
 const sessionStatus = document.querySelector('#session-status');
 const binaryStatus = document.querySelector('#binary-status');
 const dashboardOutput = document.querySelector('#dashboard-output');
 const detailsOutput = document.querySelector('#details-output');
 
-let binaryResponsesObserved = 0;
 let nextCall = null;
 
-function replaceBinary(_, value) {
-  if (value instanceof Uint8Array) {
-    return {
-      type: 'bytes',
-      length: value.length,
-      preview: new TextDecoder().decode(value),
-    };
-  }
-  return value;
-}
-
 function render(element, message) {
-  element.textContent = JSON.stringify(message, replaceBinary, 2);
+  element.textContent = JSON.stringify(message, null, 2);
 }
 
-const adapter = async (message, serializer) => {
-  const requestBytes = serializer.serialize(message);
+async function telepactRequest(headers, body) {
   const response = await fetch('/api/telepact', {
     method: 'POST',
     credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: requestBytes,
+    body: JSON.stringify([headers, body]),
   });
-
-  const responseBytes = new Uint8Array(await response.arrayBuffer());
-  const telepactResponse = serializer.deserialize(responseBytes);
-  if ('@bin_' in telepactResponse.headers) {
-    binaryResponsesObserved += 1;
-    binaryStatus.textContent = `Binary responses observed: ${binaryResponsesObserved}`;
-  }
-  return telepactResponse;
-};
-
-const options = new ClientOptions();
-options.useBinary = true;
-options.alwaysSendJson = false;
-options.localStorageCacheNamespace = 'telepact-example-node-browser-docker';
-const client = new Client(adapter, options);
+  const binaryCount = response.headers.get('X-Telepact-Server-Binary-Count') ?? '0';
+  binaryStatus.textContent = `Gateway binary responses observed: ${binaryCount}`;
+  return await response.json();
+}
 
 async function requestDashboard() {
-  const response = await client.request(new Message({
+  const response = await telepactRequest({
     '@select_': {
       'struct.OrderSummary': ['id', 'status'],
     },
   }, {
     'fn.getDashboard': {},
-  }));
-
-  render(dashboardOutput, [response.headers, response.body]);
-  nextCall = response.getBodyPayload()['firstOrderDetails!'] ?? null;
+  });
+  render(dashboardOutput, response);
+  nextCall = response[1]?.Ok_?.['firstOrderDetails!'] ?? null;
 }
 
 async function requestDetails() {
@@ -84,8 +57,8 @@ async function requestDetails() {
     return;
   }
 
-  const response = await client.request(new Message({}, nextCall));
-  render(detailsOutput, [response.headers, response.body]);
+  const response = await telepactRequest({}, nextCall);
+  render(detailsOutput, response);
 }
 
 document.querySelector('#start-session').addEventListener('click', async () => {

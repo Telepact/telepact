@@ -17,10 +17,11 @@
 LIB_TAR_GZ := ../../lib/ts/dist-tgz/*.tgz
 TAR_GZ := telepact.tgz
 NPM_STAMP := node_modules/.package-lock.stamp
+PLAYWRIGHT_STAMP := node_modules/.playwright-install.stamp
 
 .PHONY: run clean
 
-run: $(NPM_STAMP)
+run: $(PLAYWRIGHT_STAMP)
 	npm test
 
 $(TAR_GZ):
@@ -34,6 +35,10 @@ $(NPM_STAMP): package.json package-lock.json $(TAR_GZ)
 	npm install --ignore-scripts --no-save ./$(TAR_GZ)
 	mkdir -p node_modules
 	touch $(NPM_STAMP)
+
+$(PLAYWRIGHT_STAMP): $(NPM_STAMP)
+	npx playwright install --with-deps chromium
+	touch $(PLAYWRIGHT_STAMP)
 
 clean:
 	rm -rf node_modules

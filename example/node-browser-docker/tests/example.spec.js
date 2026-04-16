@@ -30,25 +30,10 @@ function dockerCompose(...args) {
   });
 }
 
-async function waitForOk(url) {
-  const deadline = Date.now() + 120000;
-  while (Date.now() < deadline) {
-    try {
-      const response = await fetch(url);
-      if (response.ok) {
-        return;
-      }
-    } catch (error) {}
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-  }
-  throw new Error(`Timed out waiting for ${url}`);
-}
-
 test.beforeAll(async () => {
   dockerCompose('down', '-v', '--remove-orphans');
   dockerCompose('up', '--build', '-d');
-  await waitForOk('http://127.0.0.1:8080/health');
-  await waitForOk('http://127.0.0.1:8081/health');
+  await new Promise((resolve) => setTimeout(resolve, 5000));
 });
 
 test.afterAll(async () => {
@@ -74,8 +59,8 @@ test('runs the browser + node + docker flow end to end', async ({ page }) => {
 
   await page.getByRole('button', { name: '3. Follow function link' }).click();
   await expect(page.locator('#details-output')).toContainText('shippingEta');
-  await expect(page.locator('#details-output')).toContainText('receipt:order-1001');
-  await expect(page.locator('#binary-status')).not.toContainText('0');
+  await expect(page.locator('#details-output')).toContainText('cmVjZWlwdDp');
+  await expect(page.locator('#binary-status')).not.toContainText(': 0');
 
   const fetchedDir = fs.mkdtempSync(path.join(os.tmpdir(), 'telepact-node-browser-docker-'));
   execFileSync('telepact', [

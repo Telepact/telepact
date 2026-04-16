@@ -25,6 +25,7 @@ const gatewayPort = Number(process.env.PORT ?? 8080);
 const catalogBaseUrl = process.env.CATALOG_BASE_URL ?? 'http://127.0.0.1:8081';
 const validSessionToken = 'demo-session';
 const viewerId = 'viewer-1';
+let binaryResponsesObserved = 0;
 
 function createTelepactHttpClient(baseUrl) {
   const adapter = async (message, serializer) => {
@@ -35,7 +36,11 @@ function createTelepactHttpClient(baseUrl) {
       body: requestBytes,
     });
     const responseBytes = new Uint8Array(await response.arrayBuffer());
-    return serializer.deserialize(responseBytes);
+    const responseMessage = serializer.deserialize(responseBytes);
+    if ('@bin_' in responseMessage.headers) {
+      binaryResponsesObserved += 1;
+    }
+    return responseMessage;
   };
 
   const options = new ClientOptions();
@@ -170,20 +175,6 @@ const server = createServer(async (request, response) => {
     return;
   }
 
-  if (request.method === 'GET' && requestUrl.pathname.startsWith('/vendor/telepact/')) {
-    const filename = requestUrl.pathname.replace('/vendor/telepact/', '');
-    const distDir = path.join(__dirname, 'node_modules', 'telepact', 'dist');
-    const assetPath = path.resolve(distDir, filename);
-    const relativeAssetPath = path.relative(distDir, assetPath);
-    if (relativeAssetPath.startsWith('..') || path.isAbsolute(relativeAssetPath) || !fs.existsSync(assetPath)) {
-      writeResponse(response, 404, 'not found');
-      return;
-    }
-
-    sendStaticFile(response, path.relative(__dirname, assetPath), 'text/javascript; charset=utf-8');
-    return;
-  }
-
   if (request.method === 'GET' && requestUrl.pathname === '/session/demo') {
     writeResponse(response, 204, '', 'text/plain; charset=utf-8', {
       'Set-Cookie': `session=${validSessionToken}; Path=/; HttpOnly; SameSite=Lax`,
@@ -208,7 +199,9 @@ const server = createServer(async (request, response) => {
     }
   });
   const contentType = '@bin_' in telepactResponse.headers ? 'application/octet-stream' : 'application/json';
-  writeResponse(response, 200, Buffer.from(telepactResponse.bytes), contentType);
+  writeResponse(response, 200, Buffer.from(telepactResponse.bytes), contentType, {
+    'X-Telepact-Server-Binary-Count': String(binaryResponsesObserved),
+  });
 });
 
 server.listen(gatewayPort, '0.0.0.0', () => {

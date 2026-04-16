@@ -12,9 +12,9 @@ This example shows one production-style shape:
 The flow demonstrates:
 
 - checked-in Telepact schemas in `gateway-api/` and `catalog-api/`
-- browser client usage with the TypeScript Telepact client library
+- browser client usage from a plain browser `fetch` client
 - server-to-server Telepact calls from the gateway to the backing service
-- automatic binary negotiation on both client hops
+- automatic binary negotiation on the gateway-to-service Telepact hop
 - `@select_` to trim `struct.OrderSummary` fields in the browser response
 - function links via `firstOrderDetails!`
 - cookie/session auth bridging from the browser transport into `@auth_`
