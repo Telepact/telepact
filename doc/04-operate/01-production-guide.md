@@ -203,9 +203,10 @@ questions:
 - Telepact request logs tell you which Telepact function ran, for which caller,
   with which outcome
 
-Do not log the entire `Message` object by default. Headers can carry
-credentials, so prefer selective structured fields instead of dumping the full
-request or response.
+Be careful if logging the entire `Message` object. While credentials passed
+through the `@auth_` header are stripped prior to middleware and function
+routes, your application data may still contain sensitive data, so prefer
+selective structured fields instead of dumping the full request or response.
 
 Good default fields are:
 
