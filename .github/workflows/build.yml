@@ -362,7 +362,9 @@ jobs:
 
       - name: Check example codegen changes
         run: |
-          if git status --porcelain | grep .; then
+          changes="$(git status --porcelain)"
+          if [[ -n "$changes" ]]; then
+            printf '%s\n' "$changes"
             echo "Generated example changes:"
             git --no-pager diff --stat HEAD
             echo
