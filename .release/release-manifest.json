@@ -1,9 +1,19 @@
 {
   "changed_paths": [
-    "site/src/sitemap.xml"
+    "doc/01-learn-by-example/05-auth/18-auth.md",
+    "doc/01-learn-by-example/08-running-our-own-server/24-server-auth.md",
+    "doc/01-learn-by-example/08-running-our-own-server/25-managed-auth.md",
+    "doc/02-design-apis/01-schema-guide.md",
+    "doc/03-build-clients-and-servers/03-server-paths.md",
+    "doc/03-build-clients-and-servers/05-auth.md",
+    "doc/04-operate/01-production-guide.md",
+    "doc/index.md",
+    "example/py-http-cookie-auth/README.md",
+    "example/py-http-cookie-auth/api/auth.telepact.yaml",
+    "example/py-http-cookie-auth/server.py"
   ],
   "direct_targets": [],
-  "pr_number": 371,
+  "pr_number": 372,
   "targets": [],
-  "version": "1.0.0-alpha.272"
+  "version": "1.0.0-alpha.273"
 }

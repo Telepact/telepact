@@ -118,75 +118,29 @@ metrics, then delegate to the target function route.
 
 ### Auth
 
-Recommended pattern:
+The recommended auth model is:
 
-- validate bearer tokens, sessions, or cookies before the target function runs
-- translate the authenticated caller into the specific Telepact headers or
-  request context your schema expects
-- keep authorization decisions close to the business logic that owns the data
+- model caller credentials in `union.Auth_`
+- carry them in `@auth_`
+- extract transport-specific credentials into `@auth_` at the transport boundary
+- use `onAuth` to normalize authenticated identity into internal request headers
+- keep authorization decisions near the business logic that owns the data
 
-If credentials arrive through the transport layer, copy them into Telepact
-headers while calling `server.process(...)`. For example, an HTTP adapter can
-read a session cookie and apply it with `updateHeaders`:
+The important operational point is the placement: transport code stays bytes in
+/ bytes out, Telepact server hooks normalize auth and attach request metadata,
+and function routes enforce business authorization.
 
-A runnable minimal version of this pattern lives in
+Use the standard auth errors consistently:
+
+- `ErrorUnauthenticated_` for missing or invalid credentials
+- `ErrorUnauthorized_` for authenticated callers who are not allowed to perform the action
+
+For the canonical schema shape, browser cookie flow, service-to-service flow,
+and the explicit Telepact-vs-service ownership boundary, see the
+[Auth Guide](../03-build-clients-and-servers/05-auth.md).
+
+A runnable cookie-based example lives in
 [`example/py-http-cookie-auth`](../../example/py-http-cookie-auth/README.md).
-
-```ts
-const response = await server.process(requestBytes, (headers) => {
-  headers['@auth_'] = { sessionToken: readSessionCookie(request) };
-  headers['@id_'] = request.id;
-});
-```
-
-Inside the server, use `options.onAuth` to normalize credentials into request
-headers and `options.middleware` to wrap routing. An illustrative TypeScript
-sketch looks like this:
-
-```ts
-const options = new ServerOptions();
-options.onAuth = (headers) => {
-  const auth = headers['@auth_'];
-  const userId = lookupUserIdFromSession(auth?.sessionToken);
-  return userId ? { '@userId': userId } : {};
-};
-
-const functionRoutes = {
-  'fn.greet': async (functionName, requestMessage) => {
-    const argument = requestMessage.body[functionName];
-    const userId = requestMessage.headers['@userId'];
-
-    if (!userId) {
-      return new Message({}, {
-        ErrorUnauthenticated_: { message: 'missing credentials' },
-      });
-    }
-
-    return await greetUser(userId, argument.subject);
-  },
-};
-
-options.middleware = async (requestMessage, functionRouter) => {
-  const startedAt = Date.now();
-  const target = requestMessage.getBodyTarget();
-  try {
-    return await functionRouter.route(requestMessage);
-  } finally {
-    logger.info('telepact_request', {
-      requestId: requestMessage.headers['@id_'],
-      function: target,
-      durationMs: Date.now() - startedAt,
-    });
-  }
-};
-
-const functionRouter = new FunctionRouter(functionRoutes);
-const server = new Server(schema, functionRouter, options);
-```
-
-The important point is the placement: transport code stays bytes in / bytes out,
-while auth normalization and other request policy live in Telepact server hooks
-and middleware, while business logic lives in function routes.
 
 ### Observability
 
