@@ -53,6 +53,7 @@ Put request-level concerns near the Telepact runtime boundary:
 
 Start here:
 
+- [Auth Guide](./05-auth.md)
 - [Learn by Example: Auth](../01-learn-by-example/05-auth/18-auth.md)
 - [Learn by Example: Server auth](../01-learn-by-example/08-running-our-own-server/24-server-auth.md)
 - [Learn by Example: Managed auth](../01-learn-by-example/08-running-our-own-server/25-managed-auth.md)

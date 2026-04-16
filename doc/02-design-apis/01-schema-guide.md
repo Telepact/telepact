@@ -323,15 +323,19 @@ You can find all standard definitions
 
 Auth definitions include the `@auth_` header and the `ErrorUnauthenticated_` and
 `ErrorUnauthorized_` errors. These are included conditionally if the API writer
-defines a `union.Auth_` definition in their schema, for the auth header
+defines a `union.Auth_` definition in their schema, because the auth header
 definition data type references it, as in `"@auth_": "union.Auth_"`.
 
-API writers are strongly encouraged to place auth-related credential variants in
-the standard `union.Auth_`, as the `@auth_` header is treated with greater
-sensitivity throughout the Telepact ecosystem.
+The canonical Telepact auth contract is to place client-visible credential
+variants in `union.Auth_` and carry them in `@auth_`. API writers are strongly
+encouraged to reuse that shape rather than inventing a separate public auth
+header, because `@auth_` is treated with greater sensitivity throughout the
+Telepact ecosystem.
 
 You can find details about auth definitions
 [here](https://raw.githubusercontent.com/Telepact/telepact/refs/heads/main/common/auth.telepact.yaml).
+For the recommended end-to-end auth model, including transport extraction and
+server normalization, see the [Auth Guide](../03-build-clients-and-servers/05-auth.md).
 
 ### Mock Definitions
 

@@ -30,7 +30,8 @@ options.auth_required = False
 
 def on_auth(headers: dict[str, object]) -> dict[str, object]:
     auth = headers.get('@auth_')
-    if isinstance(auth, dict) and auth.get('sessionToken') == VALID_SESSION:
+    session = auth.get('Session') if isinstance(auth, dict) else None
+    if isinstance(session, dict) and session.get('token') == VALID_SESSION:
         return {'@userId': 'user-123'}
     return {}
 
@@ -81,7 +82,7 @@ def create_http_server(host: str = '127.0.0.1', port: int = 0) -> ThreadingHTTPS
 
             def update_headers(headers: dict[str, object]) -> None:
                 if session_token is not None:
-                    headers['@auth_'] = {'sessionToken': session_token}
+                    headers['@auth_'] = {'Session': {'token': session_token}}
 
             response = asyncio.run(telepact_server.process(request_bytes, update_headers))
             content_type = 'application/octet-stream' if '@bin_' in response.headers else 'application/json'
