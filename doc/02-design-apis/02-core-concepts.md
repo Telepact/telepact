@@ -66,7 +66,7 @@ As a rule of thumb:
 For more detail, see:
 
 - [Transport Guide](../03-build-clients-and-servers/01-transports.md)
-- [Production Guide](../04-operate/01-production-guide.md)
+- [Operating Boundary Guide](../04-operate/01-production-guide.md)
 - [FAQ](../05-background-and-reference/01-faq.md)
 
 ## Function links

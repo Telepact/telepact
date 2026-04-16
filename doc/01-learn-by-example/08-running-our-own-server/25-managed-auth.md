@@ -3,8 +3,8 @@
 Sometimes the client is not going to handcraft `@auth_` at all. Cookies are the
 common example.
 
-This page shows the browser/session-cookie branch of Telepact's recommended auth
-model. For the full canonical path, see the
+This page shows one browser/session-cookie branch of Telepact's auth
+convention. For the full canonical path, see the
 [Auth Guide](../../03-build-clients-and-servers/05-auth.md).
 
 ## Install the Python library

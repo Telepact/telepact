@@ -1,6 +1,6 @@
 # 24. Server auth
 
-Now let's add one piece of Telepact's recommended auth model to our own server.
+Now let's add one piece of Telepact's auth convention to our own server.
 For the full canonical path, see the
 [Auth Guide](../../03-build-clients-and-servers/05-auth.md).
 

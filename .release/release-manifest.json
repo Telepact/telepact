@@ -1,13 +1,19 @@
 {
   "changed_paths": [
-    "test/lib/go/cmd/dispatcher/code_gen_handler.go",
-    "test/lib/go/cmd/dispatcher/main.go",
-    "test/lib/java/src/main/java/telepacttest/Main.java",
-    "test/lib/py/telepact_test/test_server.py",
-    "test/lib/ts/src/main.ts"
+    "doc/01-learn-by-example/05-auth/18-auth.md",
+    "doc/01-learn-by-example/08-running-our-own-server/24-server-auth.md",
+    "doc/01-learn-by-example/08-running-our-own-server/25-managed-auth.md",
+    "doc/02-design-apis/01-schema-guide.md",
+    "doc/02-design-apis/02-core-concepts.md",
+    "doc/03-build-clients-and-servers/03-server-paths.md",
+    "doc/03-build-clients-and-servers/04-tooling-workflow.md",
+    "doc/03-build-clients-and-servers/05-auth.md",
+    "doc/04-operate/01-production-guide.md",
+    "doc/example.md",
+    "doc/index.md"
   ],
   "direct_targets": [],
-  "pr_number": 382,
+  "pr_number": 383,
   "targets": [],
-  "version": "1.0.0-alpha.281"
+  "version": "1.0.0-alpha.282"
 }
