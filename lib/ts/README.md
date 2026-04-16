@@ -86,4 +86,16 @@ if (response.getBodyTarget() === 'Ok_') {
 }
 ```
 
-For more concrete usage examples, [see the tests](https://github.com/Telepact/telepact/blob/main/test/lib/ts/src/main.ts).
+For browser + Node paths, start with:
+
+- [Client Paths](../../doc/03-build-clients-and-servers/02-client-paths.md)
+- [Transport Guide](../../doc/03-build-clients-and-servers/01-transports.md)
+- [Demos](../../doc/demos.md)
+
+For generated TypeScript bindings, see:
+
+- [Tooling Workflow](../../doc/03-build-clients-and-servers/04-tooling-workflow.md)
+- [Learn by Example: Code generation](../../doc/01-learn-by-example/07-code-generation/21-code-generation.md)
+
+The TypeScript tests also contain lower-level examples:
+[test/lib/ts/src/main.ts](../../test/lib/ts/src/main.ts).

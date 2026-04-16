@@ -8,7 +8,48 @@ servers, or operate a Telepact API in production.
 
 - [Quickstart](./example.md) for the fastest end-to-end example
 - [Learn Telepact by Example](./01-learn-by-example/README.md) for a guided tour
-- [Demos](./demos.md) for runnable end-to-end examples
+- [Demos](./demos.md) for runnable focused examples
+
+## Common paths
+
+### I want the fastest quickstart
+
+- [Quickstart](./example.md)
+- [Learn Telepact by Example](./01-learn-by-example/README.md)
+
+### I want browser or Node clients
+
+- [Client Paths](./03-build-clients-and-servers/02-client-paths.md) to choose between plain JSON, the client
+  library, and generated code
+- [Transport Guide](./03-build-clients-and-servers/01-transports.md) for browser `fetch`, WebSocket, and server
+  transport wiring
+- [TypeScript library README](../lib/ts/README.md) for runtime API usage
+
+### I want auth guidance
+
+- [Production Guide](./04-operate/01-production-guide.md#3-auth-and-observability-patterns) for the recommended
+  production auth boundary
+- [Learn by Example: Auth](./01-learn-by-example/05-auth/18-auth.md) for the `@auth_` convention from the client
+  side
+- [Cookie auth example](../example/py-http-cookie-auth/README.md) for a minimal transport-to-`@auth_` example
+
+### I want production guidance
+
+- [Production Guide](./04-operate/01-production-guide.md)
+- [Runtime Error Guide](./04-operate/02-runtime-errors.md)
+- [Versions](./04-operate/03-versions.md)
+
+### I want tooling or code generation
+
+- [Tooling Workflow](./03-build-clients-and-servers/04-tooling-workflow.md)
+- [Learn by Example: Code generation](./01-learn-by-example/07-code-generation/21-code-generation.md)
+- [Telepact CLI](../sdk/cli/README.md)
+- [Browser Console](../sdk/console/README.md)
+
+### I want runnable examples
+
+- [Demos](./demos.md)
+- [Example directory index](../example/README.md)
 
 ## Design APIs
 

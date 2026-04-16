@@ -79,6 +79,9 @@ telepact compare \
   --new-schema-dir path/to/current-schema
 ```
 
+For the broader toolchain around `compare`, including `fetch`, `mock`, and
+`codegen`, see the [Tooling Workflow](../03-build-clients-and-servers/04-tooling-workflow.md).
+
 If your schema baseline usually lives on `main`, you can materialize that older
 version with `git` before running the compare. For a schema directory, one
 practical pattern is:
@@ -131,6 +134,9 @@ read a session cookie and apply it with `updateHeaders`:
 
 A runnable minimal version of this pattern lives in
 [`example/py-http-cookie-auth`](../../example/py-http-cookie-auth/README.md).
+
+If you want the client-side `@auth_` walkthrough first, see
+[Learn by Example: Auth](../01-learn-by-example/05-auth/18-auth.md).
 
 ```ts
 const response = await server.process(requestBytes, (headers) => {

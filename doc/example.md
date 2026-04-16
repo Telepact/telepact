@@ -110,3 +110,16 @@ console.log(`Response: ${JSON.stringify(await response.json())}`);
 $ node ./client.js
 Response: [{},{"Ok_":{"result":2}}]
 ```
+
+
+## Next steps
+
+- For browser or Node client options beyond raw JSON, see [Client Paths](./03-build-clients-and-servers/02-client-paths.md),
+  [Transport Guide](./03-build-clients-and-servers/01-transports.md), and the
+  [TypeScript library README](../lib/ts/README.md).
+- For auth at the transport boundary, see the
+  [Production Guide](./04-operate/01-production-guide.md#3-auth-and-observability-patterns) and
+  [`example/py-http-cookie-auth`](../example/py-http-cookie-auth/README.md).
+- For tooling and generated bindings, see [Tooling Workflow](./03-build-clients-and-servers/04-tooling-workflow.md)
+  and [Learn by Example: Code generation](./01-learn-by-example/07-code-generation/21-code-generation.md).
+- For more runnable examples, see [Demos](./demos.md).

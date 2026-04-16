@@ -48,8 +48,20 @@ Check out the [full-stack example](./doc/example.md).
 
 # Explore
 
-Start with the [docs landing page](./doc/index.md) for guides, examples,
-library references, SDK tools, version information, and further reading.
+Start with the [docs landing page](./doc/index.md) for the full guide map.
+
+Recommended paths:
+
+- [Quickstart](./doc/example.md) for the fastest end-to-end path
+- [Browser + Node usage](./doc/03-build-clients-and-servers/02-client-paths.md) for choosing between plain JSON,
+  the TypeScript library, and generated clients
+- [Auth guidance](./doc/04-operate/01-production-guide.md#3-auth-and-observability-patterns) for `@auth_`,
+  middleware, and transport-boundary patterns
+- [Production guidance](./doc/04-operate/01-production-guide.md) for rollout, compatibility, auth, and
+  observability
+- [Tooling and code generation](./doc/03-build-clients-and-servers/04-tooling-workflow.md) for `fetch`,
+  `compare`, `mock`, `codegen`, and the browser console
+- [Examples](./doc/demos.md) for runnable focused demos
 
 # Licensing
 
