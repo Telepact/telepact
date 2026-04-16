@@ -8,6 +8,14 @@ flow:
 - translate it into `@auth_`
 - normalize it in `on_auth`
 
+Browse the files:
+
+- [`api/auth.telepact.yaml`](./api/auth.telepact.yaml) - Telepact schema
+- [`server.py`](./server.py) - server implementation
+- [`test_example.py`](./test_example.py) - example test
+- [`test_support.py`](./test_support.py) - test helpers
+- [`Makefile`](./Makefile) - local run target
+
 Run it:
 
 ```bash
