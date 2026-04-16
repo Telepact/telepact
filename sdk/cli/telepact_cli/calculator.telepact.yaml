@@ -160,7 +160,7 @@
     - Ok_: {}
 
 - ///: |
-    Errors related to general avaiability.
+    Errors related to general availability.
   errors.Availability:
     - ErrorUnavailable: {}
 

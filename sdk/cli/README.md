@@ -100,5 +100,5 @@ Options:
 NOTE: The `mock` command is an empowering development tool for clients. You do
 not need to develop against a live server; you can use the `mock` command to
 set up a "middle-man" server that will validate requests for schema compliance
-and return schema-compliant auto-generated responses (which can be overrideen
+and return schema-compliant auto-generated responses (which can be overridden
 with manual stubs if desired.)

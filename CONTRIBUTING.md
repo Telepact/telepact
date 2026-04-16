@@ -2,11 +2,11 @@
 
 ## Folder Structure
 
-The Telepact project is structed as a monorepo.
+The Telepact project is structured as a monorepo.
 
 -   `common` - files commonly used across the Telepact ecosystem
 -   `bind` - contains lightweight wrapper libraries that use bindings to expose
-    a formal Telepact implementation in a language not yet targetted by a formal
+    a formal Telepact implementation in a language not yet targeted by a formal
     Telepact implementation.
 -   `lib` - contains all formal library implementations of Telepact in various
     programming languages

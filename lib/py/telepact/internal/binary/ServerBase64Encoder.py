@@ -24,7 +24,7 @@ if TYPE_CHECKING:
 class ServerBase64Encoder(Base64Encoder):
 
     def decode(self, message: list[object]) -> list[object]:
-        # Server manaully runs it decode logic after validation
+        # Server manually runs its decode logic after validation
         return message
     
     def encode(self, message: list[object]) -> list[object]:
