@@ -1,9 +1,13 @@
 {
   "changed_paths": [
-    "doc/04-operate/01-production-guide.md"
+    "test/lib/go/cmd/dispatcher/code_gen_handler.go",
+    "test/lib/go/cmd/dispatcher/main.go",
+    "test/lib/java/src/main/java/telepacttest/Main.java",
+    "test/lib/py/telepact_test/test_server.py",
+    "test/lib/ts/src/main.ts"
   ],
   "direct_targets": [],
-  "pr_number": 381,
+  "pr_number": 382,
   "targets": [],
-  "version": "1.0.0-alpha.280"
+  "version": "1.0.0-alpha.281"
 }
