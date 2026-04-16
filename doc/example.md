@@ -110,3 +110,8 @@ console.log(`Response: ${JSON.stringify(await response.json())}`);
 $ node ./client.js
 Response: [{},{"Ok_":{"result":2}}]
 ```
+
+That plain JSON `fetch` example is the fastest way to prove the endpoint works.
+For a production browser TypeScript client, move next to the recommended
+[`telepact` TypeScript path](../lib/ts/README.md) and the
+[Client Paths guide](./03-build-clients-and-servers/02-client-paths.md).

@@ -116,25 +116,45 @@ uvicorn.run(app, host='0.0.0.0', port=8000)
 
 ### HTTP client example (browser TypeScript + fetch)
 
+For browser clients, this is the recommended default transport shape: one small
+`fetch` adapter per Telepact endpoint and one long-lived `Client` reused by the
+application.
+
 ```ts
 import { Client, ClientOptions, Message, Serializer } from 'telepact';
 
-const adapter = async (message: Message, serializer: Serializer): Promise<Message> => {
-  const requestBytes = serializer.serialize(message);
+function createTelepactFetchAdapter(
+  url: string,
+  baseInit: RequestInit = {},
+) {
+  return async (message: Message, serializer: Serializer): Promise<Message> => {
+    const requestBytes = serializer.serialize(message);
 
-  const response = await fetch('http://localhost:8000/api/telepact', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: requestBytes,
-  });
+    const response = await fetch(url, {
+      ...baseInit,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/octet-stream',
+        ...(baseInit.headers ?? {}),
+      },
+      body: requestBytes,
+    });
 
-  const responseBytes = new Uint8Array(await response.arrayBuffer());
-  return serializer.deserialize(responseBytes);
-};
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status} ${response.statusText}`);
+    }
 
-const client = new Client(adapter, new ClientOptions());
+    const responseBytes = new Uint8Array(await response.arrayBuffer());
+    return serializer.deserialize(responseBytes);
+  };
+}
+
+const client = new Client(
+  createTelepactFetchAdapter('http://localhost:8000/api/telepact', {
+    credentials: 'include',
+  }),
+  new ClientOptions(),
+);
 
 const response = await client.request(
   new Message({}, { 'fn.greet': { subject: 'World' } }),
@@ -147,8 +167,14 @@ if (response.getBodyTarget() === 'Ok_') {
 
 ### HTTP notes
 
+- Keep the adapter transport-only: URL, credentials, retry, metrics, and HTTP
+  status handling belong here; Telepact union handling does not.
 - `fetch` accepts binary request bodies, so the same client can work with JSON
-  or binary Telepact payloads.
+  or negotiated binary Telepact payloads.
+- Browser cookie propagation should happen through `credentials`, not by
+  manually setting `Cookie` headers in application code.
+- Once you use the TypeScript `Client`, always read the response as bytes with
+  `arrayBuffer()`, not `response.json()`.
 - Reverse proxies, CORS configuration, and other HTTP concerns still remain
   possible around a Telepact endpoint when your application needs them.
 
@@ -156,6 +182,9 @@ if (response.getBodyTarget() === 'Ok_') {
 
 WebSockets work well when you want a long-lived connection but still want your
 application to exchange discrete Telepact request and response messages.
+
+Prefer HTTP plus `fetch` first for browser onboarding. Move to WebSockets only
+when the application actually benefits from a long-lived channel.
 
 A common pattern is one Telepact request per WebSocket message and one Telepact
 response per WebSocket message.
