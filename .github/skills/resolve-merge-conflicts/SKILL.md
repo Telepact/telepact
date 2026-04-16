@@ -12,7 +12,7 @@ Use this skill when the user asks to resolve merge conflicts, complete a merge, 
 1. Identify the branches involved and inspect the current repository state with git status.
 2. Make sure the repository has enough history to inspect the conflict correctly.
 3. If the repository is shallow, first run `git fetch --unshallow origin`.
-4. Fetch the target branch explicitly, for example `git fetch origin main:refs/remotes/origin/main`.
+4. Fetch the target branch explicitly, for example `git fetch origin main`.
 5. If `git fetch --unshallow origin` fails because of a transient network issue, retry up to 3 times before giving up.
 
 Do not try to resolve merge conflicts from a shallow repository or without fetching the branch you need to compare against.
