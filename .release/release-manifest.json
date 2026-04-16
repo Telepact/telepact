@@ -1,9 +1,9 @@
 {
   "changed_paths": [
-    ".github/skills/resolve-merge-conflicts/SKILL.md"
+    "doc/04-operate/01-production-guide.md"
   ],
   "direct_targets": [],
-  "pr_number": 377,
+  "pr_number": 381,
   "targets": [],
-  "version": "1.0.0-alpha.279"
+  "version": "1.0.0-alpha.280"
 }
