@@ -26,6 +26,8 @@ servers, or operate a Telepact API in production.
 - [Server Paths](./03-build-clients-and-servers/03-server-paths.md) for choosing a runtime and wiring a server
 - [Tooling Workflow](./03-build-clients-and-servers/04-tooling-workflow.md) for `fetch`, `compare`, `mock`, and
   `codegen`
+- [Learn by Example: Code generation](./01-learn-by-example/07-code-generation/21-code-generation.md) for a
+  practical generated-bindings walkthrough, including TypeScript
 
 ### Libraries
 

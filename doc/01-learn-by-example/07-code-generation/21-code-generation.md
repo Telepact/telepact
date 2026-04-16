@@ -1,6 +1,18 @@
 # 21. Code generation
 
-Telepact also lets us generate bindings straight from a running service.
+Telepact also lets us generate bindings straight from a running service or from
+a checked-in schema.
+
+## When code generation is worth it
+
+Code generation is the right upgrade when:
+
+- a supported language already has a Telepact runtime library
+- the schema is shared widely enough to treat bindings as a real project asset
+- raw `Message` construction is starting to feel repetitive
+
+For TypeScript in particular, generated bindings turn stringly-typed function
+names and hand-built payloads into a client API that follows the schema.
 
 ## Start the demo server
 
@@ -8,7 +20,48 @@ Telepact also lets us generate bindings straight from a running service.
 telepact demo-server --port 8000
 ```
 
-## Generate Python bindings
+## Generate TypeScript bindings
+
+The generated TypeScript source still depends on the normal `telepact` npm
+package at runtime:
+
+```sh
+npm install telepact
+mkdir -p ./src/gen
+telepact codegen --schema-http-url http://localhost:8000/api --lang ts --out ./src/gen
+```
+
+That gives us local source files we can import from our application. The CLI is
+just the generator; the runtime package for Node is still `telepact`.
+
+## Manual client vs generated TypeScript client
+
+Without code generation, we stay close to raw Telepact messages:
+
+```ts
+import { Client, Message } from "telepact";
+
+const response = await client.request(
+    new Message({}, { "fn.add": { x: 2, y: 3 } }),
+);
+```
+
+That is still valid and often a good fit for simple integrations.
+
+With generated bindings, we keep the same runtime client but call a typed API:
+
+```ts
+import { TypedClient, add } from "./gen/genTypes.js";
+
+const typedClient = new TypedClient(client);
+const response = await typedClient.add({}, add.Input.from({ x: 2, y: 3 }));
+console.log(response.body.getTaggedValue().value.result());
+```
+
+The value of codegen is not a different transport or protocol. The value is a
+better application-facing API on top of the existing Telepact runtime.
+
+## Generate Python bindings too
 
 ```sh
 mkdir -p ./gen
@@ -63,7 +116,11 @@ Example output:
 So codegen is very lightweight:
 
 1. point at a Telepact server
-2. generate bindings
-3. use them with the Telepact runtime library
+2. generate bindings from that schema
+3. use them with the Telepact runtime library for your language
+
+In practice, many teams first `fetch` a schema, then `mock` and `codegen` from
+that checked-in copy so the whole workflow stays reproducible in CI and local
+development.
 
 Next: [22. Minimum server](../08-running-our-own-server/22-minimum-server.md)

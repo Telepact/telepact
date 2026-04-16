@@ -6,6 +6,22 @@
 npm install telepact
 ```
 
+Use this package for the runtime client and server APIs.
+
+If you also want generated bindings, install the CLI separately and generate
+local source into your project:
+
+```sh
+uv tool install --prerelease=allow telepact-cli
+telepact codegen --schema-dir ./api --lang ts --out ./src/gen
+```
+
+That generated code imports this `telepact` package at runtime. See:
+
+- [Client Paths](../../doc/03-build-clients-and-servers/02-client-paths.md)
+- [Tooling Workflow](../../doc/03-build-clients-and-servers/04-tooling-workflow.md)
+- [Learn by Example: Code generation](../../doc/01-learn-by-example/07-code-generation/21-code-generation.md)
+
 ## Usage
 
 API:

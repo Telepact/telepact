@@ -1,7 +1,8 @@
 # Telepact CLI
 
-The CLI is a tool for various development jobs, such as fetching API schemas,
-generating code, and starting up mock servers for testing purposes.
+The CLI is the schema workflow tool for Telepact. Use it to fetch a schema from
+an API, compare revisions, start a mock server, and generate bindings from that
+same contract.
 
 ## Installation
 
@@ -12,6 +13,38 @@ uv tool install --prerelease=allow telepact-cli
 Published PyPI releases are currently prereleases. To pin a specific CLI
 release, use the exact version from
 [doc/04-operate/03-versions.md](https://github.com/Telepact/telepact/blob/main/doc/04-operate/03-versions.md).
+
+## Recommended workflow
+
+The CLI becomes most useful when you treat the schema as a checked-in artifact:
+
+1. `telepact fetch` a live schema into your repo
+2. `telepact compare` schema revisions in CI
+3. `telepact mock` from that schema while clients and tests are in progress
+4. `telepact codegen` from that same schema when a supported language would
+   benefit from generated bindings
+
+For the surrounding docs, see:
+
+- [Tooling Workflow](../../doc/03-build-clients-and-servers/04-tooling-workflow.md)
+- [Client Paths](../../doc/03-build-clients-and-servers/02-client-paths.md)
+- [Learn by Example: Code generation](../../doc/01-learn-by-example/07-code-generation/21-code-generation.md)
+
+## Node-first projects
+
+If your application is a Node or TypeScript project:
+
+- install the CLI with `uv tool install --prerelease=allow telepact-cli`
+- install the runtime library with `npm install telepact`
+- generate local source files into your app, for example `./src/gen`
+
+The packages have different jobs:
+
+- `telepact-cli` is the generator and schema-tooling package
+- `telepact` is the runtime library your generated TypeScript code imports
+
+That means generated bindings fit naturally into a Node project even though the
+CLI itself is distributed from PyPI.
 
 ## Usage
 
@@ -45,6 +78,16 @@ Options:
   --package TEXT          Package name (required when --lang is "java" or "go")
   --help                  Show this message and exit.
 ```
+
+Example TypeScript workflow:
+
+```sh
+telepact fetch --http-url http://localhost:8000/api --output-dir ./api
+telepact codegen --schema-dir ./api --lang ts --out ./src/gen
+```
+
+The generated TypeScript files are intended to be imported by your app while the
+runtime behavior still comes from `npm install telepact`.
 
 ### `telepact compare --help`
 ```
