@@ -29,12 +29,8 @@ options.auth_required = False
 class GreetingHandler(TypedServerHandler):
 
     async def greet(self, headers: dict[str, object], input: greet.Input) -> TypedMessage[greet.Output]:
-        response_headers = {}
-        request_id = headers.get('x-request-id')
-        if isinstance(request_id, str):
-            response_headers['x-request-id'] = request_id
         return TypedMessage(
-            response_headers,
+            {},
             greet.Output.from_Ok_(message=f'Hello {input.subject()} from generated code!'),
         )
 

@@ -29,4 +29,4 @@ codegen: dep
 	@set -euo pipefail; rm -rf ../../sdk/cli/telepact_cli/telepact; cp -r ../../lib/py/telepact ../../sdk/cli/telepact_cli/telepact; rm -rf gen; uv run --project ../../sdk/cli telepact codegen --schema-dir api --lang py --out gen
 
 clean:
-	@rm -rf .venv gen
+	@rm -rf .venv

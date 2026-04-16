@@ -62,14 +62,14 @@ async def run_example() -> None:
 
         client = TypedClient(Client(adapter, Client.Options()))
         response = await client.greet(
-            {'x-request-id': 'req-1'},
+            {},
             greet.Input.from_(subject='Telepact'),
         )
 
         ok = response.body.get_tagged_value()
         assert ok.tag == 'Ok_'
         assert ok.value.message() == 'Hello Telepact from generated code!'
-        assert response.headers == {'x-request-id': 'req-1'}
+        assert response.headers == {}
     finally:
         stop_server(server, thread)
 

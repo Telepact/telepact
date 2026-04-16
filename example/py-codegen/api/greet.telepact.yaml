@@ -1,5 +1,5 @@
 - fn.greet:
-    subject: string
+    subject: "string"
   ->:
-    Ok_:
-      message: string
+    - Ok_:
+        message: "string"
