@@ -17,7 +17,7 @@
 version: 2
 
 multi-ecosystem-groups:
-  all-weekly-updates:
+  dart-weekly-updates:
     schedule:
       interval: "weekly"
       day: "monday"
@@ -26,55 +26,86 @@ multi-ecosystem-groups:
       - "dependabot"
     open-pull-requests-limit: 1
 
+  ts-weekly-updates:
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+    update-types: ["patch", "minor"]
+    labels:
+      - "dependabot"
+    open-pull-requests-limit: 1
+
+  py-weekly-updates:
+    schedule:
+      interval: "weekly"
+      day: "wednesday"
+    update-types: ["patch", "minor"]
+    labels:
+      - "dependabot"
+    open-pull-requests-limit: 1
+
+  java-weekly-updates:
+    schedule:
+      interval: "weekly"
+      day: "thursday"
+    update-types: ["patch", "minor"]
+    labels:
+      - "dependabot"
+    open-pull-requests-limit: 1
+
+  go-weekly-updates:
+    schedule:
+      interval: "weekly"
+      day: "friday"
+    update-types: ["patch", "minor"]
+    labels:
+      - "dependabot"
+    open-pull-requests-limit: 1
+
 updates:
   - package-ecosystem: "npm"
     directory: "/bind/dart"
-    multi-ecosystem-group: "all-weekly-updates"
+    multi-ecosystem-group: "dart-weekly-updates"
     patterns: ["*"]
 
   - package-ecosystem: "npm"
     directory: "/lib/ts"
-    multi-ecosystem-group: "all-weekly-updates"
+    multi-ecosystem-group: "ts-weekly-updates"
     patterns: ["*"]
 
   - package-ecosystem: "npm"
     directory: "/sdk/prettier"
-    multi-ecosystem-group: "all-weekly-updates"
+    multi-ecosystem-group: "ts-weekly-updates"
     patterns: ["*"]
 
   - package-ecosystem: "npm"
     directory: "/sdk/console"
-    multi-ecosystem-group: "all-weekly-updates"
+    multi-ecosystem-group: "ts-weekly-updates"
     patterns: ["*"]
 
   - package-ecosystem: "npm"
     directory: "/test/console-self-hosted"
-    multi-ecosystem-group: "all-weekly-updates"
+    multi-ecosystem-group: "ts-weekly-updates"
     patterns: ["*"]
 
   - package-ecosystem: "npm"
     directory: "/test/lib/ts"
-    multi-ecosystem-group: "all-weekly-updates"
-    patterns: ["*"]
-
-  - package-ecosystem: "npm"
-    directory: "/test/console-self-hosted"
-    multi-ecosystem-group: "all-weekly-updates"
+    multi-ecosystem-group: "ts-weekly-updates"
     patterns: ["*"]
 
   - package-ecosystem: "pip"
     directory: "/lib/py"
-    multi-ecosystem-group: "all-weekly-updates"
+    multi-ecosystem-group: "py-weekly-updates"
     patterns: ["*"]
 
   - package-ecosystem: "pip"
     directory: "/sdk/cli"
-    multi-ecosystem-group: "all-weekly-updates"
+    multi-ecosystem-group: "py-weekly-updates"
     patterns: ["*"]
 
   - package-ecosystem: "pip"
     directory: "/test/lib/py"
-    multi-ecosystem-group: "all-weekly-updates"
+    multi-ecosystem-group: "py-weekly-updates"
     patterns: ["*"]
     ignore:
       - dependency-name: "telepact"
@@ -82,35 +113,35 @@ updates:
 
   - package-ecosystem: "pip"
     directory: "/test/runner"
-    multi-ecosystem-group: "all-weekly-updates"
+    multi-ecosystem-group: "py-weekly-updates"
     patterns: ["*"]
 
   - package-ecosystem: "pip"
     directory: "/tool/telepact_project_cli"
-    multi-ecosystem-group: "all-weekly-updates"
+    multi-ecosystem-group: "py-weekly-updates"
     patterns: ["*"]
 
   - package-ecosystem: "maven"
     directory: "/lib/java"
-    multi-ecosystem-group: "all-weekly-updates"
+    multi-ecosystem-group: "java-weekly-updates"
     patterns: ["*"]
 
   - package-ecosystem: "maven"
     directory: "/test/lib/java"
-    multi-ecosystem-group: "all-weekly-updates"
+    multi-ecosystem-group: "java-weekly-updates"
     patterns: ["*"]
 
   - package-ecosystem: "gomod"
     directory: "/lib/go"
-    multi-ecosystem-group: "all-weekly-updates"
+    multi-ecosystem-group: "go-weekly-updates"
     patterns: ["*"]
 
   - package-ecosystem: "gomod"
     directory: "/test/lib/go"
-    multi-ecosystem-group: "all-weekly-updates"
+    multi-ecosystem-group: "go-weekly-updates"
     patterns: ["*"]
 
   - package-ecosystem: "pub"
     directory: "/bind/dart"
-    multi-ecosystem-group: "all-weekly-updates"
+    multi-ecosystem-group: "dart-weekly-updates"
     patterns: ["*"]
