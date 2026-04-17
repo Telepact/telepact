@@ -133,9 +133,16 @@ def _regex_replace(s: str, find: str, replace: str) -> str:
 
 
 def _normalize_typescript_codegen_output(output: str) -> str:
-    normalized = '\n'.join(line.rstrip() for line in output.splitlines())
-    normalized = re.sub(r'\n(?:[ \t]*\n){2,}', '\n\n', normalized)
-    return f'{normalized}\n' if normalized else ''
+    normalized_lines: list[str] = []
+    previous_line_was_blank = False
+    for line in output.splitlines():
+        stripped_line = line.rstrip()
+        line_is_blank = stripped_line == ''
+        if line_is_blank and previous_line_was_blank:
+            continue
+        normalized_lines.append(stripped_line)
+        previous_line_was_blank = line_is_blank
+    return '\n'.join(normalized_lines) + '\n' if normalized_lines else ''
 
 
 def _find_schema_key(schema_data: dict[str, object]) -> str:
