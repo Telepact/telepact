@@ -33,8 +33,6 @@ from telepact import FunctionRouter, TelepactSchema, Server, Message
 from starlette.applications import Starlette
 from starlette.responses import Response
 from starlette.routing import Route
-from starlette.middleware import Middleware
-from starlette.middleware.cors import CORSMiddleware
 import uvicorn
 
 async def divide(function_name, request_message):
@@ -65,11 +63,7 @@ routes = [
     Route('/api/telepact', endpoint=http_handler, methods=['POST']),
 ]
 
-middleware = [
-    Middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
-]
-
-app = Starlette(routes=routes, middleware=middleware)
+app = Starlette(routes=routes)
 
 uvicorn.run(app, host='0.0.0.0', port=8000)
 ```

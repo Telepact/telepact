@@ -19,8 +19,8 @@ npx telepact-console -p 8080
 Then you can access the UI in your browser at http://localhost:8080.
 
 When launched through the npm CLI, the Console proxies absolute live HTTP and
-WebSocket URLs through its own localhost server first. This avoids browser CORS
-limits while keeping the self-hosted build unchanged for same-domain embeds.
+WebSocket URLs through its own localhost server first while keeping the
+self-hosted build unchanged for same-domain embeds.
 
 ## Docker
 
