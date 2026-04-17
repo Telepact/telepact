@@ -44,6 +44,11 @@ This is useful when you want to:
 - unblock client development
 - test against schema-valid responses
 - add stubs and verification around expected calls
+- make mock-first integration validation your default workflow
+
+For many integrations, this is the best default confidence path: point your
+consumer at a Telepact mock first, let the mock validate the requests you
+actually send, then switch to the live server later.
 
 See:
 
@@ -61,6 +66,11 @@ This is useful when you want:
 - stronger typing in supported languages
 - generated request/response models
 - less manual client boilerplate
+- a more ergonomic static API than the runtime client alone
+
+Code generation is optional. Start with plain JSON or a Telepact runtime
+library, use the mock server for schema-backed validation, and add generated
+bindings only when the extra static ergonomics are worth the toolchain cost.
 
 See:
 

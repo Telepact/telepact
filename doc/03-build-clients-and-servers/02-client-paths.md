@@ -29,6 +29,11 @@ Start here:
 Use a Telepact client library when you want help with message construction,
 serialization, validation-aware workflows, and binary negotiation.
 
+This is the best default path when you want more than raw JSON but do not want
+to commit to generated bindings yet. Pair it with a Telepact mock when you want
+schema-backed confidence that your integration will succeed before you point at
+the live server.
+
 Available library docs:
 
 - [TypeScript](../../lib/ts/README.md)
@@ -45,13 +50,15 @@ This path works well when you want:
 ## Path 3: Generated client code
 
 Use generated code when you want the strongest typing and the most ergonomic
-application-level API for your target language.
+application-level API for your target language. This is an optional upgrade on
+top of the runtime client path, not the recommended starting point.
 
 This path works well when you want:
 
 - compile-time feedback in supported languages
 - stable generated bindings for a shared schema
 - less hand-written request boilerplate
+- an SDK-like API surface for humans, IDEs, and static analysis
 
 Start here:
 
@@ -66,9 +73,13 @@ Use plain JSON when simplicity matters most.
 Use a library when you want the Telepact runtime to handle more of the protocol
 details for you.
 
+Use a mock when you want to validate real requests against the schema, generate
+schema-valid responses, and verify expected calls during integration work.
+
 Use generated code when you want the most type-safe and ergonomic application
 integration on top of a supported language runtime.
 
 These paths are complementary rather than exclusive. Many teams start with
-plain JSON or a library, then add generated code only for the callers that
-benefit from it most.
+plain JSON or a library, use a mock for schema-backed confidence, then add
+generated code only for the callers that benefit from stronger static
+ergonomics.

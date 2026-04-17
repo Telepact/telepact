@@ -20,7 +20,8 @@ key innovations:
 These innovations allow Telepact to design for the minimalist consumer while
 giving clients the option to enrich the consumer experience by:
 - Selecting less fields to reduce response sizes
-- Generating code to increase type safety
+- Using schema-backed mocks to validate integrations before switching to live servers
+- Generating code when stronger static ergonomics are worth the extra tooling
 - Using binary serialization to reduce request/response sizes
 
 # It's just JSON
