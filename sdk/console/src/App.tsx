@@ -16,6 +16,7 @@
 
 import { useEffect, useMemo, useRef, useState, type FocusEvent, type FormEvent, type KeyboardEvent } from 'react';
 import * as monaco from 'monaco-editor';
+import { jsonDefaults } from 'monaco-editor/esm/vs/language/json/monaco.contribution';
 
 import DocCard from './components/DocCard';
 import MonacoEditor, { type MonacoEditorHandle } from './components/MonacoEditor';
@@ -224,7 +225,7 @@ export default function App() {
 		if (!telepactSchema) return;
 
 		const requestJsonSchema = createJsonSchema(telepactSchema);
-		monaco.json.jsonDefaults.setDiagnosticsOptions({
+		jsonDefaults.setDiagnosticsOptions({
 			schemas: [
 				{
 					uri: 'internal://server/jsonschema-telepact.json',

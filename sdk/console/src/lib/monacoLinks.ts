@@ -15,6 +15,7 @@
 //|
 
 import * as monaco from 'monaco-editor';
+import { typescriptDefaults } from 'monaco-editor/esm/vs/language/typescript/monaco.contribution';
 
 type RequestLinkHandler = (requestBody: unknown) => void;
 
@@ -29,7 +30,7 @@ export function ensureTelepactJsonLinksRegistered() {
 	if (registered) return;
 	registered = true;
 
-	monaco.typescript.typescriptDefaults.setEagerModelSync(true);
+	typescriptDefaults.setEagerModelSync(true);
 
 	monaco.languages.registerLinkProvider('json', {
 		provideLinks: (model) => {
