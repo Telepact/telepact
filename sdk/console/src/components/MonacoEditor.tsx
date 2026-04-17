@@ -26,6 +26,7 @@ export type MonacoEditorHandle = {
 export type MonacoEditorProps = {
 	id: string;
 	json: string;
+	language?: string;
 	readOnly: boolean;
 	allowLinks?: boolean;
 	filename: string;
@@ -131,7 +132,7 @@ const MonacoEditor = forwardRef<MonacoEditorHandle, MonacoEditorProps>(function 
 
 		const model = monaco.editor.createModel(
 			props.json,
-			'json',
+			props.language ?? 'json',
 			monaco.Uri.parse(`internal://server/${props.filename}`)
 		);
 		editor.setModel(model);

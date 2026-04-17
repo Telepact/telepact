@@ -26,6 +26,7 @@ import TerminalIcon from './components/icons/TerminalIcon';
 import {
 	genExample,
 	minifyJson,
+	minifySchemaDraft,
 	parseTelepactSchema,
 	unMinifyJson,
 	type TypeData
@@ -333,7 +334,7 @@ export default function App() {
 	const handleSchemaSave = () => {
 		const schemaText = schemaEditor.current?.getContent();
 		if (!schemaText) return;
-		const minifiedSchema = minifyJson(schemaText);
+		const minifiedSchema = minifySchemaDraft(schemaText);
 		const q = new URLSearchParams(url.searchParams.toString());
 		q.set('s', '');
 		q.set('sd', minifiedSchema);
@@ -663,8 +664,8 @@ export default function App() {
 						{activeViews.includes('s') ? (
 							<div className={`flex h-[calc(100vh-4em)] ${getSectionClass(activeViews, 's', activeViews.length)}`}>
 								<div className="flex w-full flex-col p-6">
-									<div className="flex justify-between">
-										<h1 className="pb-4 text-xl font-semibold text-gray-900 dark:text-gray-100">Schema (JSON)</h1>
+								<div className="flex justify-between">
+										<h1 className="pb-4 text-xl font-semibold text-gray-900 dark:text-gray-100">Schema (YAML)</h1>
 										{!readonlyEditor ? (
 											<div className="flex space-x-2">
 												<a href="https://github.com/Telepact/telepact/blob/main/doc/02-design-apis/01-schema-guide.md">
@@ -700,8 +701,9 @@ export default function App() {
 											id="schema"
 											readOnly={readonlyEditor}
 											json={schemaDraft}
+											language="plaintext"
 											ctrlEnter={handleSchemaSave}
-											filename="schema.telepact.json"
+											filename="schema.telepact.yaml"
 											ariaLabel="schema"
 											ref={schemaEditor}
 										/>
