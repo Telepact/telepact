@@ -51,7 +51,7 @@ This path works well when you want:
 
 Use generated code when you want the strongest typing and the most ergonomic
 application-level API for your target language. This is an optional upgrade on
-top of the runtime client path, not the required starting point.
+top of the runtime client path, not the recommended starting point.
 
 This path works well when you want:
 
