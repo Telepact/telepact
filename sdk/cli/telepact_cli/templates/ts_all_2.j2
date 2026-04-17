@@ -216,16 +216,13 @@ export namespace {{ type_display }} {
     {{ union('Output', data['///'], data['->'], type_display + '.') | indent }}
 
     export class Select_ {
-
         pseudoJson: Record<string, any> = {};
+{%- for key in fn_selects %}
+{%- if key.startswith('struct') %}
+{%- set name = key | regex_replace('^.*\\.', '') %}
+{%- set fields = fn_selects[key] %}
+{%- for field in fields %}
 
-{% for key in fn_selects %}
-            {% if key.startswith('struct') %}
-                {% set name = key | regex_replace('^.*\\.', '') %}
-                {% set fields = fn_selects[key] %}
-
-                {% for field in fields %}
-        
         {{ name }}{{ field | replace('!', '') }}(): Select_ {
             const theseFields = this.pseudoJson["{{ key }}"] ?? [];
             if (!theseFields.includes('{{field}}')) {
@@ -235,17 +232,14 @@ export namespace {{ type_display }} {
 
             return this;
         }
-                {% endfor %}
+{%- endfor %}
+{%- elif key.startswith('union') %}
+{%- set name = key | regex_replace('^.*\\.', '') %}
+{%- set tags = fn_selects[key] %}
+{%- for tag in tags %}
+{%- set fields = tags[tag] %}
+{%- for field in fields %}
 
-            {% elif key.startswith('union') %}
-                {% set name = key | regex_replace('^.*\\.', '') %}
-                {% set tags = fn_selects[key] %}
-
-                {% for tag in tags %}
-                    {% set fields = tags[tag] %}
-
-                    {% for field in fields %}
-        
         {{ name }}{{ tag }}{{ field | replace('!', '') }}(): Select_ {
             const theseTags = this.pseudoJson["{{ key }}"] ?? {};
             const theseFields = theseTags["{{ tag }}"] ?? [];
@@ -257,14 +251,12 @@ export namespace {{ type_display }} {
 
             return this;
         }
+{%- endfor %}
+{%- endfor %}
+{%- elif key == '->' %}
+{%- set okFields = fn_selects['->']['Ok_'] %}
+{%- for okField in okFields %}
 
-                    {% endfor %}
-                {% endfor %}
-            
-            {% elif key == '->' %}
-                {% set okFields = fn_selects['->']['Ok_'] %}
-                {% for okField in okFields %}
-            
         ok{{ okField | replace('!', '') }}(): Select_ {
             const resultUnion = this.pseudoJson["->"] ?? {};
             const theseFields = resultUnion["Ok_"] ?? [];
@@ -275,50 +267,43 @@ export namespace {{ type_display }} {
             this.pseudoJson["->"] = resultUnion;
             return this;
         }
-
-                {% endfor %}
-            {% endif %}
-
-{% endfor %}
+{%- endfor %}
+{%- endif %}
+{%- endfor %}
     }
-
 }
 {%- endmacro -%}
 
-{%- macro select(possible_fn_selects) %} 
-
+{%- macro select(possible_fn_selects) %}
 export class Select_ {
     pseudoJson: Record<string, any> = {};
 
     constructor(pseudoJson: Record<string, any>) {
         this.pseudoJson = pseudoJson;
     }
-
-{% for fn in possible_fn_selects %}
-    {% set fn_name = fn | regex_replace('^.*\\.', '') %}
+{%- for fn in possible_fn_selects %}
+{%- set fn_name = fn | regex_replace('^.*\\.', '') %}
 
     static for_{{fn_name}}(select: {{fn_name}}.Select_): Select_ {
         return new Select_(select.pseudoJson);
     }
-
-{% endfor %}
+{%- endfor %}
 }
 
 {%- endmacro %}
 
 {%- for schema_entry in input %}
-    {%- set schema_key = schema_entry | find_schema_key %}
-    {%- set ts_name = schema_key | regex_replace('^.*\\.', '') %}
-    {%- if schema_key.startswith('struct') %}
-        {{ struct(ts_name, schema_entry['///'], schema_entry[schema_key], '') }}
-    {%- elif schema_key.startswith('union') %}
-        {{ union(ts_name, schema_entry['///'], schema_entry[schema_key], '') }}
-    {%- elif schema_key.startswith('fn') %}
-        {%- set fn_selects = possible_fn_selects[schema_key] %}
-        {{ function(ts_name, schema_entry, schema_key, fn_selects) }}
-    {%- endif %}
-{% endfor %}
-
+{%- set schema_key = schema_entry | find_schema_key %}
+{%- set ts_name = schema_key | regex_replace('^.*\\.', '') %}
+{%- if schema_key.startswith('struct') %}
+{{ struct(ts_name, schema_entry['///'], schema_entry[schema_key], '') }}
+{%- elif schema_key.startswith('union') %}
+{{ union(ts_name, schema_entry['///'], schema_entry[schema_key], '') }}
+{%- elif schema_key.startswith('fn') %}
+{%- set fn_selects = possible_fn_selects[schema_key] %}
+{{ function(ts_name, schema_entry, schema_key, fn_selects) }}
+{%- endif -%}
+{%- endfor %}
 {{ select(possible_fn_selects) }}
 
 export class TypedClient {
@@ -328,7 +313,7 @@ export class TypedClient {
         this.client = client;
     }
 
-    {% for fn in functions %}
+    {%- for fn in functions %}
     {%- set function_name = fn | replace('fn.', '') %}
     async {{ function_name }}(headers: Record<string, any>, input: {{ function_name }}.Input): Promise<TypedMessage<{{ function_name }}.Output>> {
         const message = await this.client.request(new Message(headers, input.pseudoJson));
@@ -338,7 +323,7 @@ export class TypedClient {
 }
 
 export class TypedServerHandler {
-    {% for fn in functions %}
+    {%- for fn in functions %}
     {%- set function_name = fn | replace('fn.', '') %}
     async {{ function_name }}(headers: Record<string, any>, input: {{ function_name }}.Input): Promise<TypedMessage<{{ function_name }}.Output>> {
         throw new Error('Not implemented');
@@ -347,7 +332,7 @@ export class TypedServerHandler {
 
     functionRoutes(): Record<string, (functionName: string, requestMessage: Message) => Promise<Message>> {
         return {
-            {% for fn in functions %}
+            {%- for fn in functions %}
             {%- set function_name = fn | replace('fn.', '') %}
             "{{ fn }}": async (functionName: string, requestMessage: Message): Promise<Message> => {
                 const argument = requestMessage.body[functionName];
