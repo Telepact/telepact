@@ -41,6 +41,8 @@ The entire project uses a hierarchical `Makefile` system. The root `Makefile` de
 -   Be careful running `uv run python -m pytest ...` directly in `test/runner` after a library change.
     That is only reliable if the corresponding `test/lib/<lang>` consumer has already been rebuilt.
 
+-   Do not create tests in `lib/` or in `test/lib`. All test cases should be defined in `test/runner`, and test harnesses in `test/lib`.
+
 ### Final Verification
 
 -   If you have made changes to `lib/`, it is a good idea to run `make local-ci` from the repository root.
