@@ -1,9 +1,26 @@
 {
   "changed_paths": [
-    "AGENTS.md"
+    ".devcontainer/post-create.sh",
+    ".github/workflows/build.yml",
+    ".github/workflows/copilot-setup-steps.yml",
+    ".github/workflows/pr-close-hooks.yml",
+    ".github/workflows/pr-hooks.yml",
+    ".github/workflows/pr.yml",
+    ".github/workflows/publish.yml",
+    ".github/workflows/release.yml",
+    "Makefile",
+    "lib/py/Makefile",
+    "sdk/cli/Makefile",
+    "tool/telepact-project"
   ],
-  "direct_targets": [],
-  "pr_number": 387,
-  "targets": [],
-  "version": "1.0.0-alpha.287"
+  "direct_targets": [
+    "cli",
+    "py"
+  ],
+  "pr_number": 390,
+  "targets": [
+    "cli",
+    "py"
+  ],
+  "version": "1.0.0-alpha.288"
 }
