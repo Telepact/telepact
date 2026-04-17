@@ -47,9 +47,6 @@ fi
 sudo apt-get update
 sudo apt-get install -y "${packages[@]}"
 
-echo "Installing telepact-project-cli for repo automation..."
-make install-project-cli
-
 cd sdk/console
 npm ci --ignore-scripts
 npx playwright install --with-deps --force

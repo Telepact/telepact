@@ -78,9 +78,6 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v6
 
-      - name: Install Project CLI
-        run: make install-project-cli
-
       - name: Configure git identity
         run: |
           git config --global user.name "telepact-notary[bot]"
@@ -92,7 +89,7 @@ jobs:
       - name: Bump version
         env:
           PR_NUMBER: ${{ needs.get-pr-close-info.outputs.pr_number }}
-        run: telepact-project bump
+        run: ./tool/telepact-project bump
 
       - name: git log
         run: git log -n 1
