@@ -22,7 +22,7 @@ COPY telepact-console.tgz ./
 
 RUN npm init -y
 RUN npm install --ignore-scripts --omit=dev ./telepact-console.tgz
-RUN TELEPACT_CONSOLE_ROOT="$(node --input-type=module -e 'import { selfHostedRoot } from \"telepact-console/self-hosted\"; process.stdout.write(selfHostedRoot)')" && \
+RUN TELEPACT_CONSOLE_ROOT="$(node --input-type=module -e 'import { selfHostedRoot } from "telepact-console/self-hosted"; process.stdout.write(selfHostedRoot)')" && \
     mkdir -p /out && \
     cp -R "$TELEPACT_CONSOLE_ROOT"/. /out/
 
