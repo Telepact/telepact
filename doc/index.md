@@ -17,15 +17,19 @@ servers, or place Telepact inside a larger service.
   - Then [Learn Telepact by Example](./01-learn-by-example/README.md)
 - **I want browser + Node usage**
   - [Transport Guide](./03-build-clients-and-servers/01-transports.md) for browser TypeScript + `fetch` and WebSocket patterns
-  - [Client Paths](./03-build-clients-and-servers/02-client-paths.md) for choosing between plain JSON, runtime libraries, and generated code
+  - [Client Paths](./03-build-clients-and-servers/02-client-paths.md) for choosing between plain JSON, runtime libraries, schema-backed mocks, and optional generated code
   - [TypeScript library README](../lib/ts/README.md) for the runtime client/server API
+- **I want schema-backed integration confidence**
+  - [Tooling Workflow](./03-build-clients-and-servers/04-tooling-workflow.md) for the fetch/compare/mock/codegen workflow
+  - [Learn by Example: Mock server](./01-learn-by-example/04-mocking-an-integration/14-mock-server.md)
+  - [Learn by Example: Verify](./01-learn-by-example/04-mocking-an-integration/17-verify.md)
 - **I need auth**
   - [Auth Guide](./03-build-clients-and-servers/05-auth.md) for Telepact's canonical auth convention
   - [`example/py-http-cookie-auth`](../example/py-http-cookie-auth/README.md) for one browser/session-cookie example
 - **I need operating-boundary guidance**
   - [Operating Boundary Guide](./04-operate/01-production-guide.md)
   - [Runtime Error Guide](./04-operate/02-runtime-errors.md)
-- **I need tooling or code generation**
+- **I need tooling or optional code generation**
   - [Tooling Workflow](./03-build-clients-and-servers/04-tooling-workflow.md)
   - [CLI](../sdk/cli/README.md)
   - [Learn by Example: Code generation](./01-learn-by-example/07-code-generation/21-code-generation.md)
@@ -45,7 +49,7 @@ servers, or place Telepact inside a larger service.
 
 - [Transport Guide](./03-build-clients-and-servers/01-transports.md) for HTTP and WebSocket wiring patterns
 - [Client Paths](./03-build-clients-and-servers/02-client-paths.md) for choosing between plain JSON, client
-  libraries, and generated code
+  libraries, schema-backed mocks, and optional generated code
 - [Server Paths](./03-build-clients-and-servers/03-server-paths.md) for choosing a runtime and wiring a server
 - [Auth Guide](./03-build-clients-and-servers/05-auth.md) for Telepact's canonical auth convention
 - [Tooling Workflow](./03-build-clients-and-servers/04-tooling-workflow.md) for `fetch`, `compare`, `mock`, and
@@ -61,8 +65,8 @@ servers, or place Telepact inside a larger service.
 ### SDK tools
 
 - [CLI](../sdk/cli/README.md)
-    - Fetch schemas, compare versions, mock APIs, and generate code from the
-      command line
+    - Fetch schemas, compare versions, run schema-backed mocks, and optionally
+      generate code from the command line
 - [Browser Console](../sdk/console/README.md)
     - Browse docs and submit live requests against a running Telepact server
 - [Prettier Plugin](../sdk/prettier/README.md)

@@ -2,6 +2,11 @@
 
 Telepact also lets us generate bindings straight from a running service.
 
+This is an optional ergonomic upgrade. Many integrations can stop at the
+runtime client plus a schema-backed mock server, which already gives strong
+confidence that requests and responses are valid. Reach for code generation when
+you want stronger compile-time feedback and a more SDK-like application API.
+
 ## Start the demo server
 
 ```sh
@@ -65,5 +70,8 @@ So codegen is very lightweight:
 1. point at a Telepact server
 2. generate bindings
 3. use them with the Telepact runtime library
+
+Use it when those generated bindings are genuinely helpful. Otherwise, it is
+fine to stay with the runtime client and mock-driven validation workflow.
 
 Next: [22. Minimum server](../08-running-our-own-server/22-minimum-server.md)
