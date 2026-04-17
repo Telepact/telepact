@@ -1,76 +1,76 @@
 {
-	"name": "telepact-console",
-	"version": "1.0.0-alpha.284",
-	"description": "A web-based interface for inspecting and testing Telepact APIs.",
-	"license": "Apache-2.0",
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/telepact/telepact.git",
-		"directory": "sdk/console"
-	},
-	"keywords": [
-		"telepact",
-		"console",
-		"api",
-		"developer-tools"
-	],
-	"bugs": {
-		"url": "https://github.com/telepact/telepact/issues"
-	},
-	"homepage": "https://github.com/Telepact/telepact/blob/main/sdk/console/README.md",
-	"author": {
-		"name": "Telepact Authors",
-		"email": "telepact@googlegroups.com"
-	},
-	"bin": "cli.js",
-	"scripts": {
-		"dev": "vite dev --force",
-		"dev:test": "vite dev --port 3001 --force",
-		"build": "vite build",
-		"preview": "vite preview",
-		"test": "npm run build && playwright test",
-		"check": "tsc --noEmit",
-		"check:watch": "tsc --noEmit --watch",
-		"lint": "prettier --check .",
-		"format": "prettier --write ."
-	},
-	"devDependencies": {
-		"@playwright/test": "^1.55.1",
-		"@tailwindcss/forms": "^0.5.7",
-		"@tailwindcss/typography": "^0.5.19",
-		"@tailwindcss/vite": "^4.2.2",
-		"@types/node": "^25.0.3",
-		"@types/react": "^19.0.12",
-		"@types/react-dom": "^19.0.5",
-		"@vitejs/plugin-react": "^6.0.1",
-		"autoprefixer": "^10.4.17",
-		"jsdom": "^29.0.0",
-		"postcss": "^8.5.6",
-		"prettier-plugin-tailwindcss": "^0.7.1",
-		"tailwindcss": "^4.1.13",
-		"tslib": "^2.4.1",
-		"typescript": "^5.9.3",
-		"vite": "^8.0.8"
-	},
-	"type": "module",
-	"dependencies": {
-		"@prettier/sync": "^0.6.1",
-		"commander": "^14.0.1",
-		"crc-32": "^1.2.2",
-		"dompurify": "^3.2.7",
-		"express": "^5.1.0",
-		"http-proxy-middleware": "^3.0.3",
-		"marked": "^17.0.0",
-		"monaco-editor": "^0.55.1",
-		"msgpackr": "^1.11.5",
-		"prettier": "^3.6.2",
-		"react": "^19.1.1",
-		"react-dom": "^19.1.1"
-	},
-	"files": [
-		"build",
-		"cli.js",
-		"LICENSE",
-		"NOTICE"
-	]
+  "name": "telepact-console",
+  "version": "1.0.0-alpha.284",
+  "description": "A web-based interface for inspecting and testing Telepact APIs.",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/telepact/telepact.git",
+    "directory": "sdk/console"
+  },
+  "keywords": [
+    "telepact",
+    "console",
+    "api",
+    "developer-tools"
+  ],
+  "bugs": {
+    "url": "https://github.com/telepact/telepact/issues"
+  },
+  "homepage": "https://github.com/Telepact/telepact/blob/main/sdk/console/README.md",
+  "author": {
+    "name": "Telepact Authors",
+    "email": "telepact@googlegroups.com"
+  },
+  "bin": "cli.js",
+  "scripts": {
+    "dev": "vite dev --force",
+    "dev:test": "vite dev --port 3001 --force",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "npm run build && playwright test",
+    "check": "tsc --noEmit",
+    "check:watch": "tsc --noEmit --watch",
+    "lint": "prettier --check .",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.55.1",
+    "@tailwindcss/forms": "^0.5.7",
+    "@tailwindcss/typography": "^0.5.19",
+    "@tailwindcss/vite": "^4.2.2",
+    "@types/node": "^25.0.3",
+    "@types/react": "^19.0.12",
+    "@types/react-dom": "^19.0.5",
+    "@vitejs/plugin-react": "^6.0.1",
+    "autoprefixer": "^10.4.17",
+    "jsdom": "^29.0.0",
+    "postcss": "^8.5.6",
+    "prettier-plugin-tailwindcss": "^0.7.1",
+    "tailwindcss": "^4.1.13",
+    "tslib": "^2.4.1",
+    "typescript": "^5.9.3",
+    "vite": "^8.0.8"
+  },
+  "type": "module",
+  "dependencies": {
+    "@prettier/sync": "^0.6.1",
+    "commander": "^14.0.1",
+    "crc-32": "^1.2.2",
+    "dompurify": "^3.2.7",
+    "express": "^5.1.0",
+    "http-proxy-middleware": "^3.0.3",
+    "marked": "^17.0.0",
+    "monaco-editor": "^0.55.1",
+    "msgpackr": "^1.11.5",
+    "prettier": "^3.6.2",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
+  },
+  "files": [
+    "build",
+    "cli.js",
+    "LICENSE",
+    "NOTICE"
+  ]
 }
