@@ -23,30 +23,3 @@ if ! command -v uv >/dev/null 2>&1; then
   env UV_UNMANAGED_INSTALL="/usr/local/bin" sh /tmp/uv-installer.sh
   rm -f /tmp/uv-installer.sh
 fi
-
-packages=(nats-server)
-
-if ! command -v dart >/dev/null 2>&1; then
-  curl -fsSL https://dl-ssl.google.com/linux/linux_signing_key.pub \
-    | gpg --dearmor \
-    | sudo tee /usr/share/keyrings/dart.gpg >/dev/null
-  echo "deb [signed-by=/usr/share/keyrings/dart.gpg] https://storage.googleapis.com/download.dartlang.org/linux/debian stable main" \
-    | sudo tee /etc/apt/sources.list.d/dart_stable.list >/dev/null
-  packages+=(dart)
-fi
-
-if ! command -v google-chrome >/dev/null 2>&1 && ! command -v google-chrome-stable >/dev/null 2>&1; then
-  curl -fsSL https://dl.google.com/linux/linux_signing_key.pub \
-    | gpg --dearmor \
-    | sudo tee /usr/share/keyrings/google-chrome.gpg >/dev/null
-  echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/google-chrome.gpg] https://dl.google.com/linux/chrome/deb/ stable main" \
-    | sudo tee /etc/apt/sources.list.d/google-chrome.list >/dev/null
-  packages+=(google-chrome-stable)
-fi
-
-sudo apt-get update
-sudo apt-get install -y "${packages[@]}"
-
-cd sdk/console
-npm ci --ignore-scripts
-npx playwright install --with-deps --force
