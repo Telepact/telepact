@@ -1,19 +1,14 @@
 {
   "changed_paths": [
-    "README.md",
-    "doc/01-learn-by-example/07-code-generation/21-code-generation.md",
-    "doc/02-design-apis/02-core-concepts.md",
-    "doc/03-build-clients-and-servers/02-client-paths.md",
-    "doc/03-build-clients-and-servers/04-tooling-workflow.md",
-    "doc/index.md",
-    "sdk/cli/README.md"
+    "example/ts-codegen/gen/genTypes.ts",
+    "sdk/cli/telepact_cli/templates/ts_all_2.j2"
   ],
   "direct_targets": [
     "cli"
   ],
-  "pr_number": 394,
+  "pr_number": 395,
   "targets": [
     "cli"
   ],
-  "version": "1.0.0-alpha.293"
+  "version": "1.0.0-alpha.294"
 }
