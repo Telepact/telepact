@@ -61,7 +61,7 @@
     "express": "^5.1.0",
     "http-proxy-middleware": "^3.0.3",
     "marked": "^17.0.0",
-    "monaco-editor": "^0.55.1",
+    "monaco-editor": "^0.53.0",
     "msgpackr": "^1.11.5",
     "prettier": "^3.6.2",
     "react": "^19.1.1",
@@ -71,9 +71,6 @@
     "follow-redirects": "^1.16.0",
     "micromatch": {
       "picomatch": "^2.3.2"
-    },
-    "monaco-editor": {
-      "dompurify": "^3.4.0"
     },
     "qs": "^6.15.1",
     "router": {
