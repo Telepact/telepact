@@ -16,3 +16,11 @@ Run it:
 ```bash
 make run
 ```
+
+The committed generated bindings also type-check in strict modern ESM setups
+without special compiler concessions:
+
+```bash
+npm run build
+npm run build:bundler
+```
