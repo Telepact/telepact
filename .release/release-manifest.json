@@ -1,12 +1,9 @@
 {
   "changed_paths": [
-    "doc/01-learn-by-example/03-opt-in-features/12-select.md",
-    "doc/05-background-and-reference/01-faq.md",
-    "example/py-select/README.md",
-    "site/src/snippets/features/select.request.json"
+    "README.md"
   ],
   "direct_targets": [],
-  "pr_number": 386,
+  "pr_number": 388,
   "targets": [],
-  "version": "1.0.0-alpha.285"
+  "version": "1.0.0-alpha.286"
 }
