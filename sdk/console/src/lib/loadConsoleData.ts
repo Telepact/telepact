@@ -47,6 +47,11 @@ export type LoadedConsoleData = {
 	authManaged: boolean;
 };
 
+type ConsoleProxyConfig = {
+	httpPath: string;
+	wsPath: string;
+};
+
 declare global {
 	interface Window {
 		overrideAuthHeader?: (
@@ -54,6 +59,7 @@ declare global {
 			next: (newAuthHeader: Record<string, object>) => Promise<Message>
 		) => Promise<Message>;
 		overrideDefaultSchema?: () => string;
+		telepactConsoleProxy?: ConsoleProxyConfig;
 	}
 }
 
@@ -63,6 +69,37 @@ function inferProtocolFromUrl(value: string): ProtocolOption {
 		return 'ws';
 	}
 	return 'http';
+}
+
+function resolveProxyHttpUrl(schemaSource: string): string {
+	if (window.telepactConsoleProxy === undefined) {
+		return schemaSource;
+	}
+
+	const lowerSource = schemaSource.toLowerCase();
+	if (!lowerSource.startsWith('http://') && !lowerSource.startsWith('https://')) {
+		return schemaSource;
+	}
+
+	const proxyUrl = new URL(window.telepactConsoleProxy.httpPath, window.location.href);
+	proxyUrl.searchParams.set('target', schemaSource);
+	return proxyUrl.toString();
+}
+
+function resolveProxyWebSocketUrl(schemaSource: string): string {
+	if (window.telepactConsoleProxy === undefined) {
+		return schemaSource;
+	}
+
+	const lowerSource = schemaSource.toLowerCase();
+	if (!lowerSource.startsWith('ws://') && !lowerSource.startsWith('wss://')) {
+		return schemaSource;
+	}
+
+	const proxyUrl = new URL(window.telepactConsoleProxy.wsPath, window.location.href);
+	proxyUrl.protocol = proxyUrl.protocol === 'https:' ? 'wss:' : 'ws:';
+	proxyUrl.searchParams.set('target', schemaSource);
+	return proxyUrl.toString();
 }
 
 export async function loadConsoleData(url: URL): Promise<LoadedConsoleData> {
@@ -130,7 +167,10 @@ export async function loadConsoleData(url: URL): Promise<LoadedConsoleData> {
 
 			const finish = async () => {
 				const req = s.serialize(m);
-				const res = await fetch(schemaSource, { method: 'POST', body: req });
+				const res = await fetch(resolveProxyHttpUrl(schemaSource), {
+					method: 'POST',
+					body: req
+				});
 				const buf = await res.arrayBuffer();
 				const responseBytes = new Uint8Array(buf);
 				return s.deserialize(responseBytes);
@@ -180,7 +220,7 @@ export async function loadConsoleData(url: URL): Promise<LoadedConsoleData> {
 			if (socket && socket.readyState === WebSocket.OPEN) return;
 			if (connecting) return connecting;
 
-			const ws = new WebSocket(schemaSource);
+			const ws = new WebSocket(resolveProxyWebSocketUrl(schemaSource));
 			ws.binaryType = 'arraybuffer';
 			socket = ws;
 			let ready = false;
