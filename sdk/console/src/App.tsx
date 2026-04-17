@@ -16,7 +16,6 @@
 
 import { useEffect, useMemo, useRef, useState, type FocusEvent, type FormEvent, type KeyboardEvent } from 'react';
 import * as monaco from 'monaco-editor';
-import 'monaco-editor/esm/vs/language/json/monaco.contribution';
 
 import DocCard from './components/DocCard';
 import MonacoEditor, { type MonacoEditorHandle } from './components/MonacoEditor';
@@ -44,14 +43,6 @@ type AsyncState<T> =
 	| { status: 'loading' }
 	| { status: 'ready'; value: T }
 	| { status: 'error'; error: unknown };
-
-const monacoLanguagesWithJson = monaco.languages as typeof monaco.languages & {
-	json: {
-		jsonDefaults: {
-			setDiagnosticsOptions: (options: unknown) => void;
-		};
-	};
-};
 
 function inferProtocolFromUrl(value: string): ProtocolOption {
 	const lowerValue = value.toLowerCase();
@@ -233,7 +224,7 @@ export default function App() {
 		if (!telepactSchema) return;
 
 		const requestJsonSchema = createJsonSchema(telepactSchema);
-		monacoLanguagesWithJson.json.jsonDefaults.setDiagnosticsOptions({
+		monaco.json.jsonDefaults.setDiagnosticsOptions({
 			schemas: [
 				{
 					uri: 'internal://server/jsonschema-telepact.json',
