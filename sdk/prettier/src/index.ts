@@ -38,6 +38,10 @@ function isTelepactFieldName(key: string): boolean {
     return /^@[a-z][a-zA-Z0-9_]*$/.test(key) || /^[a-z][a-zA-Z0-9_]*!?$/.test(key);
 }
 
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+    return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+
 function splitLeadingPreamble(text: string): { preamble: string; body: string } {
     const normalizedText = text.replace(/\r\n/g, '\n');
     const match = normalizedText.match(/^(?:(?:[ \t]*#.*|[ \t]*)\n)*/);
@@ -79,8 +83,11 @@ function formatInlineJson(value: unknown): string {
         return `[${value.map((entry) => formatInlineJson(entry)).join(', ')}]`;
     }
 
-    if (value !== null && typeof value === 'object') {
-        return `{${Object.entries(value).map(([key, entry]) => `${JSON.stringify(key)}: ${formatInlineJson(entry)}`).join(', ')}}`;
+    if (isPlainObject(value)) {
+        const formattedEntries = Object.entries(value)
+            .map(([key, entry]) => `${JSON.stringify(key)}: ${formatInlineJson(entry)}`)
+            .join(', ');
+        return `{${formattedEntries}}`;
     }
 
     return JSON.stringify(value);
@@ -131,7 +138,7 @@ async function formatYamlValue(value: unknown, level: number, forceInlineJson = 
         return lines.join('\n');
     }
 
-    if (value !== null && typeof value === 'object') {
+    if (isPlainObject(value)) {
         const entries = Object.entries(value);
 
         if (entries.length === 0) {
@@ -154,7 +161,7 @@ async function formatYamlValue(value: unknown, level: number, forceInlineJson = 
             const useInlineJson = isTelepactFieldName(key);
             const isInlineCollection =
                 (Array.isArray(entry) && entry.length === 0) ||
-                (entry !== null && typeof entry === 'object' && Object.keys(entry).length === 0);
+                (isPlainObject(entry) && Object.keys(entry).length === 0);
 
             if (useInlineJson || isInlineScalar(entry) || isInlineCollection) {
                 lines.push(`${indent(level)}${formattedKey}: ${await formatYamlValue(entry, level + 1, useInlineJson)}`);
