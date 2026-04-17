@@ -204,7 +204,7 @@ def write_doc_versions(
 
     version_by_target = _latest_released_versions(
         repo_root,
-        targets=["go", "java", "py", "ts", "cli", "console", "prettier"],
+        targets=["go", "java", "py", "ts", "cli", "console"],
         pending_version=pending_version,
         pending_targets=pending_targets,
     )
@@ -216,7 +216,6 @@ def write_doc_versions(
 
     cli_package = _read_pyproject_name(repo_root / "sdk/cli/pyproject.toml")
     console_package = _read_package_json_name(repo_root / "sdk/console/package.json")
-    prettier_package = _read_package_json_name(repo_root / "sdk/prettier/package.json")
 
     def fmt_version(target: str) -> str:
         version = version_by_target.get(target)
@@ -235,7 +234,6 @@ def write_doc_versions(
         ("Library (TypeScript)", ts_package, "npm", fmt_version("ts")),
         ("SDK (CLI)", cli_package, "PyPI", fmt_version("cli")),
         ("SDK (Console)", console_package, "npm", fmt_version("console")),
-        ("SDK (Prettier)", prettier_package, "npm", fmt_version("prettier")),
     ]
 
     out_lines = [

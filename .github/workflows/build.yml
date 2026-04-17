@@ -197,43 +197,11 @@ jobs:
           path: bind/dart/dist
           retention-days: 1
 
-  build-prettier:
-    name: Build Prettier Plugin
-    runs-on: ubuntu-latest
-    timeout-minutes: 1
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v5
-        with:
-          node-version-file: .nvmrc
-
-      - name: Install dependencies
-        env:
-          NPM_INSTALL: ci --ignore-scripts
-        run: make prettier
-
-      - name: Upload prettier build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-prettier
-          path: sdk/prettier/dist
-          retention-days: 1
-
-      - name: Upload prettier-tgz build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-prettier-tgz
-          path: sdk/prettier/dist-tgz
-          retention-days: 1
-
   build-console:
     name: Build Console
     runs-on: ubuntu-latest
     timeout-minutes: 8
-    needs: [build-ts, build-cli, build-prettier]
+    needs: [build-ts, build-cli]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -258,12 +226,6 @@ jobs:
           name: build-cli
           path: sdk/cli/dist
 
-      - name: Download prettier build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: build-prettier
-          path: sdk/prettier/dist
-      
       - name: Install CLI
         run: make install-cli
 

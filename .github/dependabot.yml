@@ -38,11 +38,6 @@ updates:
     patterns: ["*"]
 
   - package-ecosystem: "npm"
-    directory: "/sdk/prettier"
-    multi-ecosystem-group: "all-weekly-updates"
-    patterns: ["*"]
-
-  - package-ecosystem: "npm"
     directory: "/sdk/console"
     multi-ecosystem-group: "all-weekly-updates"
     patterns: ["*"]

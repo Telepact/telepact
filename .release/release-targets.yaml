@@ -44,8 +44,3 @@ projects:
   console:
     paths:
       - sdk/console
-  prettier:
-    paths:
-      - sdk/prettier
-    is_dependency_for:
-      - console

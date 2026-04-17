@@ -84,9 +84,6 @@ class ReleasePlanTests(unittest.TestCase):
                         paths: [sdk/console]
                       dart:
                         paths: [bind/dart]
-                      prettier:
-                        paths: [sdk/prettier]
-                        is_dependency_for: [console]
                     """
                 ).strip()
                 + "\n",
@@ -97,7 +94,6 @@ class ReleasePlanTests(unittest.TestCase):
                 repo_root,
                 changed_paths=[
                     "lib/ts/src/main.ts",
-                    "sdk/prettier/package.json",
                     "README.md",
                 ],
                 version="1.0.0-alpha.215",
@@ -106,12 +102,11 @@ class ReleasePlanTests(unittest.TestCase):
             manifest_path = write_release_manifest(repo_root, manifest)
             loaded = load_release_manifest(repo_root)
 
-            self.assertEqual(manifest.direct_targets, ("prettier", "ts"))
-            self.assertEqual(loaded["targets"], ["console", "dart", "prettier", "ts"])
+            self.assertEqual(manifest.direct_targets, ("ts",))
+            self.assertEqual(loaded["targets"], ["console", "dart", "ts"])
             self.assertEqual(loaded["changed_paths"], [
                 "README.md",
                 "lib/ts/src/main.ts",
-                "sdk/prettier/package.json",
             ])
             self.assertEqual(manifest_path.resolve(), (repo_root / ".release" / "release-manifest.json").resolve())
 
@@ -140,9 +135,6 @@ class ReleasePlanTests(unittest.TestCase):
                         paths: [sdk/cli]
                       console:
                         paths: [sdk/console]
-                      prettier:
-                        paths: [sdk/prettier]
-                        is_dependency_for: [console]
                     force_all_if_changed:
                       - .release/force-all.md
                     """
@@ -160,7 +152,7 @@ class ReleasePlanTests(unittest.TestCase):
 
             self.assertEqual(
                 manifest.direct_targets,
-                ("cli", "console", "dart", "go", "java", "prettier", "py", "ts"),
+                ("cli", "console", "dart", "go", "java", "py", "ts"),
             )
             self.assertEqual(manifest.targets, manifest.direct_targets)
 
@@ -206,7 +198,6 @@ class ReleasePlanTests(unittest.TestCase):
                     "publish_console=false",
                     "publish_go=false",
                     "publish_java=false",
-                    "publish_prettier=false",
                     "publish_py=true",
                     "publish_ts=false",
                 ],
