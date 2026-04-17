@@ -34,10 +34,3 @@ Most of these commands simply delegate to a `Makefile` in the related
 subproject. In some cases, it may be simpler to change your working directory to
 the related subproject for greater control over the build tools in that
 subproject.
-
-## Dev Container
-
-The checked-in dev container intentionally provisions only Astral `uv`.
-If you need additional language runtimes, browsers, or local services for your
-workflow, add them in your own local dev container customization before running
-the relevant `make` targets.
