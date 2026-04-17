@@ -428,7 +428,7 @@ wheels = [
 
 [[package]]
 name = "telepact-cli"
-version = "1.0.0a285"
+version = "1.0.0a286"
 source = { editable = "." }
 dependencies = [
     { name = "click" },
