@@ -230,8 +230,10 @@ with the needs of evolving software.
 
 ## Why can I not omit fn.\* fields using the `"@select_"` header?
 
-The `"@select_"` header is used to omit fields from structs, which includes
-union structs, but not the argument struct included with function definitions.
+The `"@select_"` header is used to omit fields from the response result graph:
+the active result union, reachable structs, and reachable union payload
+structs. It does not apply to the argument struct included with function
+definitions.
 
 The function type exists so that API providers may incorporate "links" into
 their API design, such that the appearance of a function type payload can simply

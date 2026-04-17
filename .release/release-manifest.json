@@ -1,19 +1,12 @@
 {
   "changed_paths": [
-    "doc/01-learn-by-example/05-auth/18-auth.md",
-    "doc/01-learn-by-example/08-running-our-own-server/24-server-auth.md",
-    "doc/01-learn-by-example/08-running-our-own-server/25-managed-auth.md",
-    "doc/02-design-apis/01-schema-guide.md",
-    "doc/02-design-apis/02-core-concepts.md",
-    "doc/03-build-clients-and-servers/03-server-paths.md",
-    "doc/03-build-clients-and-servers/04-tooling-workflow.md",
-    "doc/03-build-clients-and-servers/05-auth.md",
-    "doc/04-operate/01-production-guide.md",
-    "doc/example.md",
-    "doc/index.md"
+    "doc/01-learn-by-example/03-opt-in-features/12-select.md",
+    "doc/05-background-and-reference/01-faq.md",
+    "example/py-select/README.md",
+    "site/src/snippets/features/select.request.json"
   ],
   "direct_targets": [],
-  "pr_number": 383,
+  "pr_number": 386,
   "targets": [],
-  "version": "1.0.0-alpha.282"
+  "version": "1.0.0-alpha.285"
 }
