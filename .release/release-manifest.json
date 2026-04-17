@@ -1,14 +1,43 @@
 {
   "changed_paths": [
-    "example/ts-codegen/gen/genTypes.ts",
-    "sdk/cli/telepact_cli/templates/ts_all_2.j2"
+    ".github/dependabot.yml",
+    ".github/workflows/build.yml",
+    ".github/workflows/copilot-setup-steps.yml",
+    ".github/workflows/publish.yml",
+    ".github/workflows/release.yml",
+    ".prettierrc",
+    ".release/release-targets.yaml",
+    "AGENTS.md",
+    "Makefile",
+    "doc/04-operate/03-versions.md",
+    "doc/index.md",
+    "sdk/console/.gitignore",
+    "sdk/console/Makefile",
+    "sdk/console/package-lock.json",
+    "sdk/console/package.json",
+    "sdk/console/src/lib/loadConsoleData.ts",
+    "sdk/console/tests/constants.ts",
+    "sdk/prettier/.gitignore",
+    "sdk/prettier/Makefile",
+    "sdk/prettier/README.md",
+    "sdk/prettier/package-lock.json",
+    "sdk/prettier/package.json",
+    "sdk/prettier/rollup.config.js",
+    "sdk/prettier/src/index.d.ts",
+    "sdk/prettier/src/index.ts",
+    "sdk/prettier/tsconfig.json",
+    "site/src/sitemap.xml",
+    "tool/telepact_project_cli/telepact_project_cli/cli.py",
+    "tool/telepact_project_cli/telepact_project_cli/commands/doc_versions.py",
+    "tool/telepact_project_cli/telepact_project_cli/release_plan.py",
+    "tool/telepact_project_cli/tests/test_release_plan.py"
   ],
   "direct_targets": [
-    "cli"
+    "console"
   ],
-  "pr_number": 395,
+  "pr_number": 398,
   "targets": [
-    "cli"
+    "console"
   ],
-  "version": "1.0.0-alpha.294"
+  "version": "1.0.0-alpha.295"
 }
