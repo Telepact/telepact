@@ -42,7 +42,7 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
     return value !== null && typeof value === 'object' && !Array.isArray(value);
 }
 
-function splitLeadingPreamble(text: string): { preamble: string; body: string } {
+function splitPreamble(text: string): { preamble: string; body: string } {
     const normalizedText = text.replace(/\r\n/g, '\n');
     const match = normalizedText.match(/^(?:(?:[ \t]*#.*|[ \t]*)\n)*/);
     const preamble = match?.[0] ?? '';
@@ -95,6 +95,10 @@ function formatInlineJson(value: unknown): string {
 
 function formatScalar(value: unknown): string {
     if (typeof value === 'string') {
+        if (/[\n\r\t\b\f]/.test(value)) {
+            return JSON.stringify(value);
+        }
+
         return `'${value.replace(/'/g, "''")}'`;
     }
 
@@ -179,7 +183,7 @@ async function formatYamlValue(value: unknown, level: number, forceInlineJson = 
 }
 
 async function formatTelepactYaml(text: string): Promise<string> {
-    const { preamble, body } = splitLeadingPreamble(text);
+    const { preamble, body } = splitPreamble(text);
     const trimmedBody = body.trim();
 
     if (trimmedBody.length === 0) {
