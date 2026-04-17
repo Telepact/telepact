@@ -101,11 +101,6 @@ export namespace greet {
     export class Select_ {
 
         pseudoJson: Record<string, any> = {};
-
-
-            
-                
-                
             
         okmessage(): Select_ {
             const resultUnion = this.pseudoJson["->"] ?? {};
@@ -117,15 +112,9 @@ export namespace greet {
             this.pseudoJson["->"] = resultUnion;
             return this;
         }
-
-                
-            
-
-
     }
 
 }
-
 
  
 
@@ -136,14 +125,9 @@ export class Select_ {
         this.pseudoJson = pseudoJson;
     }
 
-
-    
-
     static for_greet(select: greet.Select_): Select_ {
         return new Select_(select.pseudoJson);
     }
-
-
 }
 
 export class TypedClient {
