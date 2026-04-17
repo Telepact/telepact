@@ -26,10 +26,6 @@ export namespace greet {
     
     export class Input {
         
-        /**
-         * Raw wire-aligned payload. Optional fields keep the `!` suffix here; prefer
-         * `.from(...)` and typed accessors over manual `pseudoJson` construction.
-         */
         pseudoJson: Record<string, any>;
 
         constructor(pseudoJson: Record<string, any>) {
@@ -53,10 +49,6 @@ export namespace greet {
     
     export class Output {
         
-        /**
-         * Raw wire-aligned payload. Optional fields keep the `!` suffix here; prefer
-         * generated builders over manual `pseudoJson` construction.
-         */
         pseudoJson: Record<string, any>;
 
         constructor(pseudoJson: Record<string, any>) {
@@ -84,10 +76,6 @@ export namespace greet {
         
         export class Ok_ {
             
-            /**
-             * Raw wire-aligned payload. Optional fields keep the `!` suffix here; prefer
-             * `.from(...)` and typed accessors over manual `pseudoJson` construction.
-             */
             pseudoJson: Record<string, any>;
 
             constructor(pseudoJson: Record<string, any>) {
@@ -112,10 +100,6 @@ export namespace greet {
 
     export class Select_ {
 
-        /**
-         * Raw wire-aligned select payload. Optional field names in selections
-         * still use their wire keys, including any `!` suffix.
-         */
         pseudoJson: Record<string, any> = {};
             
         okmessage(): Select_ {
@@ -135,10 +119,6 @@ export namespace greet {
  
 
 export class Select_ {
-    /**
-     * Raw wire-aligned select payload. Optional field names in selections still
-     * use their wire keys, including any `!` suffix.
-     */
     pseudoJson: Record<string, any> = {};
 
     constructor(pseudoJson: Record<string, any>) {

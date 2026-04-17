@@ -29,7 +29,6 @@ def validate_struct_fields(fields: dict[str, 'TFieldDeclaration'],
                            actual_struct: dict[str, object],
                            ctx: 'ValidateContext') -> list['ValidationFailure']:
     validation_failures = []
-    optional_wire_key_hints = _get_optional_wire_key_hints(fields)
 
     missing_fields = []
     for field_name, field_declaration in fields.items():
@@ -51,19 +50,6 @@ def validate_struct_fields(fields: dict[str, 'TFieldDeclaration'],
                 [field_name], "ObjectKeyDisallowed", {})
 
             validation_failures.append(validation_failure)
-            optional_wire_key_hint = optional_wire_key_hints.get(field_name)
-            if optional_wire_key_hint is not None:
-                validation_failures.append(ValidationFailure(
-                    [field_name],
-                    "ExtensionValidationFailed",
-                    {
-                        "reason": "Optional struct fields keep the ! suffix on the wire; prefer generated helpers to set them.",
-                        "data!": {
-                            "receivedKey": field_name,
-                            "expectedWireKey": optional_wire_key_hint,
-                        },
-                    },
-                ))
             continue
 
         ref_field_type_declaration = reference_field.type_declaration
@@ -85,12 +71,3 @@ def validate_struct_fields(fields: dict[str, 'TFieldDeclaration'],
         validation_failures.extend(nested_validation_failures_with_path)
 
     return validation_failures
-
-
-def _get_optional_wire_key_hints(fields: dict[str, 'TFieldDeclaration']) -> dict[str, str]:
-    optional_wire_key_hints: dict[str, str] = {}
-    for field_name in fields:
-        if not field_name.endswith('!'):
-            continue
-        optional_wire_key_hints[field_name[:-1]] = field_name
-    return optional_wire_key_hints
