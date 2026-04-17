@@ -217,8 +217,8 @@ export namespace {{ type_display }} {
 
     export class Select_ {
         pseudoJson: Record<string, any> = {};
-{%- for key in fn_selects %}
-{%- if key.startswith('struct') %}
+{%- for key in fn_selects -%}
+{%- if key.startswith('struct') -%}
 {%- set name = key | regex_replace('^.*\\.', '') %}
 {%- set fields = fn_selects[key] %}
 {%- for field in fields %}
@@ -233,7 +233,7 @@ export namespace {{ type_display }} {
             return this;
         }
 {%- endfor %}
-{%- elif key.startswith('union') %}
+{%- elif key.startswith('union') -%}
 {%- set name = key | regex_replace('^.*\\.', '') %}
 {%- set tags = fn_selects[key] %}
 {%- for tag in tags %}
@@ -253,7 +253,7 @@ export namespace {{ type_display }} {
         }
 {%- endfor %}
 {%- endfor %}
-{%- elif key == '->' %}
+{%- elif key == '->' -%}
 {%- set okFields = fn_selects['->']['Ok_'] %}
 {%- for okField in okFields %}
 
@@ -281,7 +281,7 @@ export class Select_ {
     constructor(pseudoJson: Record<string, any>) {
         this.pseudoJson = pseudoJson;
     }
-{%- for fn in possible_fn_selects %}
+{%- for fn in possible_fn_selects -%}
 {%- set fn_name = fn | regex_replace('^.*\\.', '') %}
 
     static for_{{fn_name}}(select: {{fn_name}}.Select_): Select_ {
