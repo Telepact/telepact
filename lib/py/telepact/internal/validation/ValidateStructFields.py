@@ -58,7 +58,7 @@ def validate_struct_fields(fields: dict[str, 'TFieldDeclaration'],
                     "ExtensionValidationFailed",
                     {
                         "reason": "Optional struct fields keep the ! suffix on the wire; prefer generated helpers to set them.",
-                        "data": {
+                        "data!": {
                             "receivedKey": field_name,
                             "expectedWireKey": optional_wire_key_hint,
                         },

@@ -69,7 +69,7 @@ public class ValidateStructFields {
                             Map.of(
                                     "reason",
                                     "Optional struct fields keep the ! suffix on the wire; prefer generated helpers to set them.",
-                                    "data",
+                                    "data!",
                                     Map.of(
                                             "receivedKey", fieldName,
                                             "expectedWireKey", expectedWireKey))));

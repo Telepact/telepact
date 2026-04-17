@@ -80,8 +80,8 @@ func validateStructFields(fields map[string]*TFieldDeclaration, selectedFields [
 					"ExtensionValidationFailed",
 					map[string]any{
 						"reason": "Optional struct fields keep the ! suffix on the wire; prefer generated helpers to set them.",
-						"data": map[string]any{
-							"receivedKey":    fieldName,
+						"data!": map[string]any{
+							"receivedKey":     fieldName,
 							"expectedWireKey": expectedWireKey,
 						},
 					},

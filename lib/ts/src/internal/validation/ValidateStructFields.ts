@@ -57,7 +57,7 @@ export function validateStructFields(
                     'ExtensionValidationFailed',
                     {
                         reason: 'Optional struct fields keep the ! suffix on the wire; prefer generated helpers to set them.',
-                        data: {
+                        'data!': {
                             receivedKey: fieldName,
                             expectedWireKey: optionalWireKeyHint,
                         },
