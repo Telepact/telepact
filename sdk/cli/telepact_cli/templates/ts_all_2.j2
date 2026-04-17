@@ -122,6 +122,10 @@ export class UntypedTaggedValue_ {
 {%- macro struct(type_display, doc, fields, type_prefix, fn) %}
 export class {{ type_display }} {
     {{ docstring(doc) | indent }}
+    /**
+     * Raw wire-aligned payload. Optional fields keep the `!` suffix here; prefer
+     * `.from(...)` and typed accessors over manual `pseudoJson` construction.
+     */
     pseudoJson: Record<string, any>;
 
     constructor(pseudoJson: Record<string, any>) {
@@ -164,6 +168,10 @@ export class {{ type_display }} {
     {%- set tag_prefix = type_prefix + type_display + '.' %}
 export class {{ type_display }} {
     {{ docstring(doc) | indent }}
+    /**
+     * Raw wire-aligned payload. Optional fields keep the `!` suffix here; prefer
+     * generated builders over manual `pseudoJson` construction.
+     */
     pseudoJson: Record<string, any>;
 
     constructor(pseudoJson: Record<string, any>) {
@@ -217,6 +225,10 @@ export namespace {{ type_display }} {
 
     export class Select_ {
 
+        /**
+         * Raw wire-aligned select payload. Optional field names in selections
+         * still use their wire keys, including any `!` suffix.
+         */
         pseudoJson: Record<string, any> = {};
 
         {%- for key in fn_selects %}
@@ -288,6 +300,10 @@ export namespace {{ type_display }} {
 {%- macro select(possible_fn_selects) %} 
 
 export class Select_ {
+    /**
+     * Raw wire-aligned select payload. Optional field names in selections still
+     * use their wire keys, including any `!` suffix.
+     */
     pseudoJson: Record<string, any> = {};
 
     constructor(pseudoJson: Record<string, any>) {

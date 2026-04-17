@@ -25,6 +25,7 @@ export function validateStructFields(
     ctx: ValidateContext,
 ): ValidationFailure[] {
     const validationFailures: ValidationFailure[] = [];
+    const optionalWireKeyHints = getOptionalWireKeyHints(fields);
 
     const missingFields: string[] = [];
     for (const [fieldName, fieldDeclaration] of Object.entries(fields)) {
@@ -49,6 +50,20 @@ export function validateStructFields(
             const validationFailure = new ValidationFailure([fieldName], 'ObjectKeyDisallowed', {});
 
             validationFailures.push(validationFailure);
+            const optionalWireKeyHint = optionalWireKeyHints[fieldName];
+            if (optionalWireKeyHint !== undefined) {
+                validationFailures.push(new ValidationFailure(
+                    [fieldName],
+                    'ExtensionValidationFailed',
+                    {
+                        reason: 'Optional struct fields keep the ! suffix on the wire; prefer generated helpers to set them.',
+                        data: {
+                            receivedKey: fieldName,
+                            expectedWireKey: optionalWireKeyHint,
+                        },
+                    },
+                ));
+            }
             continue;
         }
 
@@ -71,4 +86,15 @@ export function validateStructFields(
     }
 
     return validationFailures;
+}
+
+function getOptionalWireKeyHints(fields: Record<string, TFieldDeclaration>): Record<string, string> {
+    const optionalWireKeyHints: Record<string, string> = {};
+    for (const fieldName of Object.keys(fields)) {
+        if (!fieldName.endsWith('!')) {
+            continue;
+        }
+        optionalWireKeyHints[fieldName.slice(0, -1)] = fieldName;
+    }
+    return optionalWireKeyHints;
 }

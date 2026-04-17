@@ -30,6 +30,7 @@ public class ValidateStructFields {
             List<String> selectedFields,
             Map<String, Object> actualStruct, ValidateContext ctx) {
         final var validationFailures = new ArrayList<ValidationFailure>();
+        final var optionalWireKeyHints = getOptionalWireKeyHints(fields);
 
         final var missingFields = new ArrayList<String>();
         for (final var entry : fields.entrySet()) {
@@ -60,6 +61,19 @@ public class ValidateStructFields {
                         Map.of());
 
                 validationFailures.add(validationFailure);
+                final var expectedWireKey = optionalWireKeyHints.get(fieldName);
+                if (expectedWireKey != null) {
+                    validationFailures.add(new ValidationFailure(
+                            List.of(fieldName),
+                            "ExtensionValidationFailed",
+                            Map.of(
+                                    "reason",
+                                    "Optional struct fields keep the ! suffix on the wire; prefer generated helpers to set them.",
+                                    "data",
+                                    Map.of(
+                                            "receivedKey", fieldName,
+                                            "expectedWireKey", expectedWireKey))));
+                }
                 continue;
             }
 
@@ -83,5 +97,16 @@ public class ValidateStructFields {
         }
 
         return validationFailures;
+    }
+
+    private static Map<String, String> getOptionalWireKeyHints(Map<String, TFieldDeclaration> fields) {
+        final var optionalWireKeyHints = new HashMap<String, String>();
+        for (final var fieldName : fields.keySet()) {
+            if (!fieldName.endsWith("!")) {
+                continue;
+            }
+            optionalWireKeyHints.put(fieldName.substring(0, fieldName.length() - 1), fieldName);
+        }
+        return optionalWireKeyHints;
     }
 }

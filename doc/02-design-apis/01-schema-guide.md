@@ -78,6 +78,13 @@ definitions may be used in any type expression.
 
 The `!` symbol can be appended to a field name to indicate that it is optional.
 
+> [!IMPORTANT]
+> Optionality is encoded in the field key itself. Raw Telepact wire JSON must
+> keep the `!` suffix (for example `"optionalField!"`), even when the field is
+> present only sometimes. Generated SDK helpers may expose friendlier property
+> names without the suffix, but their underlying wire-aligned payloads still use
+> the suffixed key.
+
 ```yaml
 - struct.ExampleStruct1:
     field: "boolean"
@@ -96,6 +103,9 @@ A struct definition itself can be used as a type reference.
 | `"struct.ExampleStruct1"`   | `{"field": true, "anotherField": ["text1", "text2"]}` | `null`, `{}`                       |
 | `"struct.ExampleStruct2"`   | `{"optionalField!": true}`, `{}`                      | `null`, `{"wrongField": true}`     |
 | `["struct.ExampleStruct2"]` | `[{"optionalField!": true}]`                          | `[null]`, `[{"wrongField": true}]` |
+
+Writing `{"optionalField": true}` on the wire is invalid; the correct wire key
+is still `"optionalField!"`.
 
 ### Union
 

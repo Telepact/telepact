@@ -41,6 +41,7 @@ func ValidateStruct(value any, name string, fields map[string]*TFieldDeclaration
 
 func validateStructFields(fields map[string]*TFieldDeclaration, selectedFields []string, actual map[string]any, ctx *ValidateContext) []*ValidationFailure {
 	failures := make([]*ValidationFailure, 0)
+	optionalWireKeyHints := getOptionalWireKeyHints(fields)
 
 	selectedSet := make(map[string]struct{}, len(selectedFields))
 	for _, field := range selectedFields {
@@ -73,6 +74,19 @@ func validateStructFields(fields map[string]*TFieldDeclaration, selectedFields [
 		referenceField, exists := fields[fieldName]
 		if !exists {
 			failures = append(failures, NewValidationFailure([]any{fieldName}, "ObjectKeyDisallowed", map[string]any{}))
+			if expectedWireKey, ok := optionalWireKeyHints[fieldName]; ok {
+				failures = append(failures, NewValidationFailure(
+					[]any{fieldName},
+					"ExtensionValidationFailed",
+					map[string]any{
+						"reason": "Optional struct fields keep the ! suffix on the wire; prefer generated helpers to set them.",
+						"data": map[string]any{
+							"receivedKey":    fieldName,
+							"expectedWireKey": expectedWireKey,
+						},
+					},
+				))
+			}
 			continue
 		}
 
@@ -88,6 +102,17 @@ func validateStructFields(fields map[string]*TFieldDeclaration, selectedFields [
 
 	sortValidationFailures(failures)
 	return failures
+}
+
+func getOptionalWireKeyHints(fields map[string]*TFieldDeclaration) map[string]string {
+	optionalWireKeyHints := make(map[string]string)
+	for fieldName := range fields {
+		if !strings.HasSuffix(fieldName, "!") {
+			continue
+		}
+		optionalWireKeyHints[strings.TrimSuffix(fieldName, "!")] = fieldName
+	}
+	return optionalWireKeyHints
 }
 
 // ValidateUnion mirrors the Python implementation for union validation.
