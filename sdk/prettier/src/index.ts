@@ -16,7 +16,7 @@
 
 import { format as prettierFormat, type Parser, type ParserOptions, type Plugin, type Printer, type SupportLanguage } from 'prettier';
 import markdownPlugin from 'prettier/plugins/markdown';
-import { parseDocument } from 'yaml';
+import { parseDocument, stringify as yamlStringify } from 'yaml';
 
 type TelepactAst = {
     formattedText: string;
@@ -40,6 +40,14 @@ function isTelepactFieldName(key: string): boolean {
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
     return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+
+function isInlineCollection(value: unknown): boolean {
+    return (Array.isArray(value) && value.length === 0) || (isPlainObject(value) && Object.keys(value).length === 0);
+}
+
+function shouldUseInlineFormat(key: string, value: unknown): boolean {
+    return isTelepactFieldName(key) || isInlineScalar(value) || isInlineCollection(value);
 }
 
 function splitPreamble(text: string): { preamble: string; body: string } {
@@ -95,11 +103,7 @@ function formatInlineJson(value: unknown): string {
 
 function formatScalar(value: unknown): string {
     if (typeof value === 'string') {
-        if (/[\n\r\t\b\f]/.test(value)) {
-            return JSON.stringify(value);
-        }
-
-        return `'${value.replace(/'/g, "''")}'`;
+        return yamlStringify(value, { defaultStringType: 'QUOTE_SINGLE' }).trim();
     }
 
     return JSON.stringify(value);
@@ -163,11 +167,8 @@ async function formatYamlValue(value: unknown, level: number, forceInlineJson = 
             }
 
             const useInlineJson = isTelepactFieldName(key);
-            const isInlineCollection =
-                (Array.isArray(entry) && entry.length === 0) ||
-                (isPlainObject(entry) && Object.keys(entry).length === 0);
 
-            if (useInlineJson || isInlineScalar(entry) || isInlineCollection) {
+            if (shouldUseInlineFormat(key, entry)) {
                 lines.push(`${indent(level)}${formattedKey}: ${await formatYamlValue(entry, level + 1, useInlineJson)}`);
                 continue;
             }
@@ -185,9 +186,10 @@ async function formatYamlValue(value: unknown, level: number, forceInlineJson = 
 async function formatTelepactYaml(text: string): Promise<string> {
     const { preamble, body } = splitPreamble(text);
     const trimmedBody = body.trim();
+    const trimmedPreamble = preamble.trimEnd();
 
     if (trimmedBody.length === 0) {
-        return preamble.trimEnd().length === 0 ? '' : `${preamble.trimEnd()}\n`;
+        return trimmedPreamble.length === 0 ? '' : `${trimmedPreamble}\n`;
     }
 
     const document = parseDocument(trimmedBody);
@@ -197,7 +199,7 @@ async function formatTelepactYaml(text: string): Promise<string> {
     }
 
     const formattedBody = await formatYamlValue(document.toJSON(), 0);
-    const normalizedPreamble = preamble.length === 0 ? '' : `${preamble.trimEnd()}\n\n`;
+    const normalizedPreamble = preamble.length === 0 ? '' : `${trimmedPreamble}\n\n`;
 
     return `${normalizedPreamble}${formattedBody}\n`;
 }
