@@ -32,8 +32,6 @@ from starlette.requests import Request
 from starlette.responses import Response
 from starlette.routing import Route, WebSocketRoute
 from starlette.websockets import WebSocket, WebSocketDisconnect, WebSocketState
-from starlette.middleware import Middleware
-from starlette.middleware.cors import CORSMiddleware
 
 import time
 import secrets
@@ -781,11 +779,7 @@ def demo_server(port: int) -> None:
         Route('/api', endpoint=api_endpoint, methods=['POST']),
     ]
 
-    middleware = [
-        Middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
-    ]
-
-    app = Starlette(routes=routes, middleware=middleware)
+    app = Starlette(routes=routes)
 
     uvicorn.run(app, host='0.0.0.0', port=port)
 
@@ -976,11 +970,7 @@ def mock(
         WebSocketRoute(normalized_path, endpoint=mock_ws_endpoint),
     ]
 
-    middleware = [
-        Middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
-    ]
-
-    app = Starlette(routes=routes, middleware=middleware)
+    app = Starlette(routes=routes)
 
     print(f"Starting mock server on port {port} at path '{normalized_path}' (HTTP & WebSocket)...")
     uvicorn.run(app, host='0.0.0.0', port=port)
