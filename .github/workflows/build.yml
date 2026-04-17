@@ -111,9 +111,6 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v6
 
-      - name: Install Project CLI
-        run: make install-project-cli
-
       - name: Build py
         run: make py
 
@@ -141,9 +138,6 @@ jobs:
         with:
           name: build-py
           path: lib/py/dist
-
-      - name: Install Project CLI
-        run: make install-project-cli
 
       - name: Build cli
         run: make cli
@@ -354,9 +348,6 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v6
 
-      - name: Install Project CLI
-        run: make install-project-cli
-
       - name: Run example checks
         run: make example-check
 
@@ -389,9 +380,6 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v6
 
-      - name: Install Project CLI
-        run: make install-project-cli
-
       - name: Run license check
         run: make license-header
 
@@ -416,9 +404,6 @@ jobs:
 
       - name: Install uv
         uses: astral-sh/setup-uv@v6
-
-      - name: Install Project CLI
-        run: make install-project-cli
 
       - name: Run version check
         run: make version

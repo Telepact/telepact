@@ -44,9 +44,6 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v6
 
-      - name: Install Project CLI
-        run: make install-project-cli
-
       - name: Update PR labels
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -54,4 +51,4 @@ jobs:
           PR_NUMBER: ${{ github.event.pull_request.number }}
           BASE_BRANCH: ${{ github.event.pull_request.base.ref }}
           HEAD_SHA: ${{ github.sha }}
-        run: telepact-project github-labels
+        run: ./tool/telepact-project github-labels
