@@ -132,6 +132,12 @@ def _regex_replace(s: str, find: str, replace: str) -> str:
     return re.sub(find, replace, s)
 
 
+def _normalize_typescript_codegen_output(output: str) -> str:
+    normalized = '\n'.join(line.rstrip() for line in output.splitlines())
+    normalized = re.sub(r'\n(?:[ \t]*\n){2,}', '\n\n', normalized)
+    return f'{normalized}\n' if normalized else ''
+
+
 def _find_schema_key(schema_data: dict[str, object]) -> str:
     for key in schema_data:
         if key.startswith("struct") or key.startswith("union") or key.startswith("fn") or key.startswith("headers") or key.startswith('info') or key.startswith('errors'):
@@ -368,6 +374,7 @@ def _generate_internal(schema_data: list[dict[str, object]], possible_fn_selects
             'functions': functions,
             'possible_fn_selects': possible_fn_selects
         })
+        output = _normalize_typescript_codegen_output(output)
 
         # Write the output to a file
         if output_dir:
