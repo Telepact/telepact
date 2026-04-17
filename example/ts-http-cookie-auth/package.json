@@ -1,0 +1,15 @@
+{
+  "name": "telepact-example-ts-http-cookie-auth",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "test": "node --test dist/test_example.js"
+  },
+  "dependencies": {
+    "telepact": "file:telepact.tgz"
+  },
+  "devDependencies": {
+    "@types/node": "^25.0.3",
+    "typescript": "^5.9.2"
+  }
+}

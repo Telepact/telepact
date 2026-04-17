@@ -14,19 +14,18 @@
 #|  limitations under the License.
 #|
 
-EXAMPLES := py-binary py-codegen py-http-cookie-auth py-links py-select py-websocket ts-binary ts-codegen ts-http-cookie-auth ts-links ts-select ts-websocket
+SHELL := /bin/bash
 
-.PHONY: list check run
-
-list:
-	@printf '%s\n' $(EXAMPLES)
-
-check:
-	@for example in $(EXAMPLES); do \
-		echo "==> $$example"; \
-		$(MAKE) -C $$example run || exit $$?; \
-	done
+.PHONY: run clean
 
 run:
-	@test -n "$(EXAMPLE)" || (echo "Usage: make run EXAMPLE=<name>" && exit 1)
-	@$(MAKE) -C $(EXAMPLE) run
+	@set -euo pipefail; \
+	$(MAKE) -C ../../lib/ts; \
+	rm -rf node_modules dist telepact.tgz; \
+	cp ../../lib/ts/dist-tgz/*.tgz telepact.tgz; \
+	npm install --ignore-scripts --no-package-lock; \
+	npm run build; \
+	npm test
+
+clean:
+	@rm -rf dist node_modules telepact.tgz
