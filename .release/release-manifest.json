@@ -1,45 +1,21 @@
 {
   "changed_paths": [
-    ".github/dependabot.yml",
-    ".github/workflows/build.yml",
-    ".github/workflows/copilot-setup-steps.yml",
-    ".github/workflows/publish.yml",
-    ".github/workflows/release.yml",
-    ".prettierrc",
-    ".release/release-targets.yaml",
-    "AGENTS.md",
-    "Makefile",
-    "doc/04-operate/03-versions.md",
-    "doc/index.md",
-    "sdk/console/.gitignore",
-    "sdk/console/Makefile",
+    "bind/dart/pubspec.lock",
+    "lib/ts/package-lock.json",
     "sdk/console/package-lock.json",
-    "sdk/console/package.json",
-    "sdk/console/src/lib/loadConsoleData.ts",
-    "sdk/console/tests/constants.ts",
-    "sdk/prettier/.gitignore",
-    "sdk/prettier/Makefile",
-    "sdk/prettier/README.md",
-    "sdk/prettier/package-lock.json",
-    "sdk/prettier/package.json",
-    "sdk/prettier/rollup.config.js",
-    "sdk/prettier/src/index.d.ts",
-    "sdk/prettier/src/index.ts",
-    "sdk/prettier/tsconfig.json",
-    "site/src/sitemap.xml",
-    "tool/telepact_project_cli/telepact_project_cli/cli.py",
-    "tool/telepact_project_cli/telepact_project_cli/commands/doc_versions.py",
-    "tool/telepact_project_cli/telepact_project_cli/release_plan.py",
-    "tool/telepact_project_cli/tests/test_release_plan.py"
+    "test/lib/go/go.mod",
+    "test/lib/go/go.sum"
   ],
   "direct_targets": [
     "console",
-    "prettier"
+    "dart",
+    "ts"
   ],
-  "pr_number": 400,
+  "pr_number": 402,
   "targets": [
     "console",
-    "prettier"
+    "dart",
+    "ts"
   ],
-  "version": "1.0.0-alpha.296"
+  "version": "1.0.0-alpha.297"
 }
