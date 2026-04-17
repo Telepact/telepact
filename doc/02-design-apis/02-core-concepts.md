@@ -44,8 +44,8 @@ That one schema also powers:
 
 - server-side validation
 - documentation rendering
-- client code generation
 - mock servers
+- optional client code generation
 - compatibility checks
 
 For the full language, see the [Schema Writing Guide](./01-schema-guide.md).
