@@ -16,16 +16,7 @@ $ uv add telepact uvicorn starlette
 Specify your API:
 
 ```sh
-$ cat > ./api/math.telepact.yaml <<'EOF'
-- ///: Divide two integers, `x` and `y`.
-  fn.divide:
-    x: "integer"
-    y: "integer"
-  ->:
-    - Ok_:
-        result: "number"
-    - ErrorCannotDivideByZero: {}
-EOF
+$ cat ./api/math.telepact.yaml
 ```
 
 ```yaml
@@ -44,51 +35,7 @@ For more concrete HTTP and WebSocket patterns, see the
 [Transport Guide](./03-build-clients-and-servers/01-transports.md).
 
 ```sh
-$ cat > ./server.py <<'EOF'
-from telepact import FunctionRouter, TelepactSchema, Server, Message
-from starlette.applications import Starlette
-from starlette.responses import Response
-from starlette.routing import Route
-from starlette.middleware import Middleware
-from starlette.middleware.cors import CORSMiddleware
-import uvicorn
-
-async def divide(function_name, request_message):
-    arguments = request_message.body[function_name]
-    x = arguments['x']
-    y = arguments['y']
-    if y == 0:
-        return Message({}, {'ErrorCannotDivideByZero': {}})
-
-    result = x / y
-    return Message({}, {'Ok_': {'result': result}})
-
-options = Server.Options()
-options.auth_required = False
-
-api = TelepactSchema.from_directory('./api')
-function_router = FunctionRouter({'fn.divide': divide})
-server = Server(api, function_router, options)
-
-async def http_handler(request):
-    request_bytes = await request.body()
-    response = await server.process(request_bytes)
-    response_bytes = response.bytes
-    media_type = 'application/octet-stream' if '@bin_' in response.headers else 'application/json'
-    return Response(content=response_bytes, media_type=media_type)
-
-routes = [
-    Route('/api/telepact', endpoint=http_handler, methods=['POST']),
-]
-
-middleware = [
-    Middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
-]
-
-app = Starlette(routes=routes, middleware=middleware)
-
-uvicorn.run(app, host='0.0.0.0', port=8000)
-EOF
+$ cat ./server.py
 ```
 
 ```py
@@ -146,25 +93,7 @@ minimal tooling. If you want to run the JavaScript example below, make sure
 Node.js 18+ is installed:
 
 ```sh
-$ cat > ./client.js <<'EOF'
-let header = {};
-let body = {
-    "fn.divide": {
-        x: 6,
-        y: 3,
-    }
-};
-let request = [header, body];
-let response = await fetch(
-    "http://localhost:8000/api/telepact",
-    {
-        method: "POST",
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(request),
-    },
-);
-console.log(`Response: ${JSON.stringify(await response.json())}`);
-EOF
+$ cat ./client.js
 ```
 
 ```js
