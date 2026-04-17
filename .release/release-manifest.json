@@ -1,18 +1,19 @@
 {
   "changed_paths": [
-    "doc/03-build-clients-and-servers/01-transports.md",
-    "doc/example.md",
-    "sdk/cli/telepact_cli/cli.py",
-    "sdk/console/README.md"
+    "README.md",
+    "doc/01-learn-by-example/07-code-generation/21-code-generation.md",
+    "doc/02-design-apis/02-core-concepts.md",
+    "doc/03-build-clients-and-servers/02-client-paths.md",
+    "doc/03-build-clients-and-servers/04-tooling-workflow.md",
+    "doc/index.md",
+    "sdk/cli/README.md"
   ],
   "direct_targets": [
-    "cli",
-    "console"
+    "cli"
   ],
-  "pr_number": 393,
+  "pr_number": 394,
   "targets": [
-    "cli",
-    "console"
+    "cli"
   ],
-  "version": "1.0.0-alpha.292"
+  "version": "1.0.0-alpha.293"
 }
