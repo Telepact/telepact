@@ -176,7 +176,6 @@ def bump() -> None:
         'bind/dart/pubspec.yaml',
         'bind/dart/package.json',
         'sdk/cli/pyproject.toml',
-        'sdk/prettier/package.json',
         'sdk/console/package.json',
     ]
 
@@ -420,7 +419,6 @@ def github_labels() -> None:
         "bind/dart": "dart",
         "sdk/cli": "cli",
         "sdk/console": "console",
-        "sdk/prettier": "prettier"
     }
 
     def get_modified_files(base_branch, head_sha):
@@ -502,7 +500,6 @@ def release() -> None:
         "dart": ["bind/dart/dist"],
         "cli": ["sdk/cli/dist", "sdk/cli/dist-docker"],
         "console": ["sdk/console/dist-tgz", "sdk/console/dist-docker"],
-        "prettier": ["sdk/prettier/dist-tgz"]
     }
 
     MAX_ASSETS = 10  # Maximum number of assets to upload
@@ -662,8 +659,6 @@ def automerge():
         "sdk/cli/pyproject.toml",
         "sdk/console/package-lock.json",
         "sdk/console/package.json",
-        "sdk/prettier/package-lock.json",
-        "sdk/prettier/package.json",
         "test/console-self-hosted/package.json",
         "test/lib/java/pom.xml",
         "test/lib/py/pyproject.toml",
