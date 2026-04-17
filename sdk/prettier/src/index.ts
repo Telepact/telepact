@@ -14,196 +14,216 @@
 //|  limitations under the License.
 //|
 
-import { parsers as babelParsers } from "prettier/plugins/babel";
-import markdownPlugin from "prettier/plugins/markdown";
-import { Plugin, Parser, ParserOptions, SupportLanguage, format as prettierFormat, doc, Printer, getSupportInfo } from "prettier";
+import { format as prettierFormat, type Parser, type ParserOptions, type Plugin, type Printer, type SupportLanguage } from 'prettier';
+import markdownPlugin from 'prettier/plugins/markdown';
+import { parseDocument } from 'yaml';
 
-function padLength(strings: string[]): string[] {
-    const paddedStrings = strings.map((str) => {
-        const paddingLength = Math.max(0, 80 - str.length);
-        return " " + str.padEnd(str.length + paddingLength);
-    });
-    return paddedStrings;
+type TelepactAst = {
+    formattedText: string;
+};
+
+function indent(level: number): string {
+    return '  '.repeat(level);
 }
 
-async function formatDocstrings(obj: any): Promise<any> {
-    if (Array.isArray(obj)) {
-        let newArr = [];
-        for (const e of obj) {
-            let formatted = await formatDocstrings(e);
-            newArr.push(formatted);
-        }
-        return newArr;
-    } else if (typeof obj === "object" && obj !== null) {
-        let newObj: any = {};
-        for (const [k, v] of Object.entries(obj)) {
-            if (k === "///") {
-                let docstring;
-                if (typeof v === "string") {
-                    docstring = v;
-                } else {
-                    docstring = (v as Array<string>).map((e: string) => e.trim()).join("\n");
-                }
-
-                const formattedWhole = await prettierFormat(docstring, {
-                    parser: "markdown",
-                    printWidth: 78,
-                    proseWrap: "always",
-                    plugins: [markdownPlugin],
-                });
-
-                const formatted = formattedWhole.split("\n");
-
-                formatted.pop();
-
-                if (formatted.length === 1) {
-                    newObj[k] = " " + formatted[0] + " ";
-                } else {
-                    newObj[k] = padLength(formatted);
-                }
-            } else {
-                newObj[k] = await formatDocstrings(v);
-            }
-        }
-        return newObj;
-    } else {
-        return obj;
-    }
+function isPlainKey(key: string): boolean {
+    return /^(\/\/\/|->|[A-Za-z0-9_@.-][A-Za-z0-9_@.-!]*?)$/.test(key);
 }
 
-async function preprocess(text: string): Promise<string> {
-    let json = JSON.parse(text);
-
-    const newJson = await formatDocstrings(json);
-
-    const result = JSON.stringify(newJson, null, 4);
-
-    return result;
+function formatKey(key: string): string {
+    return isPlainKey(key) ? key : JSON.stringify(key);
 }
 
-const { group, line, softline, hardline, join, indent } = doc.builders;
+function isTelepactFieldName(key: string): boolean {
+    return /^@[a-z][a-zA-Z0-9_]*$/.test(key) || /^[a-z][a-zA-Z0-9_]*!?$/.test(key);
+}
 
-function printJsonAst(path: any, options: any, print: any): any {
-    const node = path.getValue();
+function splitLeadingPreamble(text: string): { preamble: string; body: string } {
+    const normalizedText = text.replace(/\r\n/g, '\n');
+    const match = normalizedText.match(/^(?:(?:[ \t]*#.*|[ \t]*)\n)*/);
+    const preamble = match?.[0] ?? '';
+    return {
+        preamble,
+        body: normalizedText.slice(preamble.length),
+    };
+}
 
-    if (node.type === "JsonRoot") {
-        return path.call(print, "node");
+function normalizeDocstringValue(value: unknown): string {
+    if (Array.isArray(value)) {
+        return value
+            .map((entry) => String(entry).trim())
+            .join('\n')
+            .trim();
     }
 
-    if (node.type === "ArrayExpression") {
-        const parent = path.getParentNode();
-        const isRoot = parent.type === "JsonRoot";
-        const isComment = parent && parent.type === "ObjectProperty" && parent.key.value === "///";
-        const isUnion = parent && parent.type === "ObjectProperty" && (parent.key.value.includes("union.") || parent.key.value.includes("errors.") || parent.key.value === "->");
+    return String(value ?? '').trim();
+}
 
-        if (isRoot || isComment || isUnion) {
-            return [
-                "[",
-                indent(group([hardline, join(group([",", hardline]), path.map(print, "elements"))])),
-                hardline,
-                "]",
-            ];
-        } else {
-            return group(["[", join(", ", path.map(print, "elements")), "]"]);
+async function formatDocstring(value: unknown, level: number): Promise<string> {
+    const normalizedDocstring = normalizeDocstringValue(value);
+    const formattedMarkdown = (
+        await prettierFormat(normalizedDocstring, {
+            parser: 'markdown',
+            printWidth: 80,
+            proseWrap: 'always',
+            plugins: [markdownPlugin],
+        })
+    ).trimEnd();
+
+    const lines = formattedMarkdown.length === 0 ? [''] : formattedMarkdown.split('\n');
+    return ['|', ...lines.map((line) => `${indent(level + 1)}${line}`)].join('\n');
+}
+
+function formatInlineJson(value: unknown): string {
+    if (Array.isArray(value)) {
+        return `[${value.map((entry) => formatInlineJson(entry)).join(', ')}]`;
+    }
+
+    if (value !== null && typeof value === 'object') {
+        return `{${Object.entries(value).map(([key, entry]) => `${JSON.stringify(key)}: ${formatInlineJson(entry)}`).join(', ')}}`;
+    }
+
+    return JSON.stringify(value);
+}
+
+function formatScalar(value: unknown): string {
+    if (typeof value === 'string') {
+        return `'${value.replace(/'/g, "''")}'`;
+    }
+
+    return JSON.stringify(value);
+}
+
+function isInlineScalar(value: unknown): boolean {
+    return value === null || ['string', 'number', 'boolean'].includes(typeof value);
+}
+
+async function formatYamlValue(value: unknown, level: number, forceInlineJson = false): Promise<string> {
+    if (forceInlineJson) {
+        return formatInlineJson(value);
+    }
+
+    if (Array.isArray(value)) {
+        if (value.length === 0) {
+            return '[]';
         }
-    }
 
-    if (node.type === "ObjectExpression") {
-        const isDownstreamOfLowercaseKey = () => {
-            const stack = path.stack;
-            const currentNode = stack[stack.length - 1];
+        const lines: string[] = [];
 
-            const startLine = currentNode.loc ? currentNode.loc.start.line : 'N/A';
-            const startCol = currentNode.loc ? currentNode.loc.start.column : 'N/A';
-
-            for (let i = stack.length - 2; i >= 0; i--) {
-                const parentNode = stack[i];
-
-                if (parentNode.type === "ObjectProperty") {
-                    const key = parentNode.key;
-                    // For JSON, keys are always string literals, so we use key.value
-                    const keyName = key.value;
-
-                    const isLowercase = /^@[a-z][a-zA-Z0-9_]*$/.test(keyName) || /^([a-z][a-zA-Z0-9_]*)(!)?$/.test(keyName);
-
-                    if (isLowercase) {
-                        return true;
-                    }
-
-                }
+        for (const entry of value) {
+            if (isInlineScalar(entry)) {
+                lines.push(`${indent(level)}- ${formatScalar(entry)}`);
+                continue;
             }
 
-            return false;
+            if (entry === null) {
+                lines.push(`${indent(level)}- null`);
+                continue;
+            }
+
+            const formattedEntry = await formatYamlValue(entry, level + 1);
+            const [firstLine, ...rest] = formattedEntry.split('\n');
+
+            if (rest.length === 0) {
+                lines.push(`${indent(level)}- ${firstLine.trimStart()}`);
+                continue;
+            }
+
+            lines.push(`${indent(level)}- ${firstLine.trimStart()}`);
+            lines.push(...rest);
+        }
+
+        return lines.join('\n');
+    }
+
+    if (value !== null && typeof value === 'object') {
+        const entries = Object.entries(value);
+
+        if (entries.length === 0) {
+            return '{}';
+        }
+
+        const lines: string[] = [];
+
+        for (const [key, entry] of entries) {
+            const formattedKey = formatKey(key);
+
+            if (key === '///') {
+                const formattedDocstring = await formatDocstring(entry, level);
+                const [firstLine, ...rest] = formattedDocstring.split('\n');
+                lines.push(`${indent(level)}${formattedKey}: ${firstLine}`);
+                lines.push(...rest);
+                continue;
+            }
+
+            const useInlineJson = isTelepactFieldName(key);
+            const isInlineCollection =
+                (Array.isArray(entry) && entry.length === 0) ||
+                (entry !== null && typeof entry === 'object' && Object.keys(entry).length === 0);
+
+            if (useInlineJson || isInlineScalar(entry) || entry === null || isInlineCollection) {
+                lines.push(`${indent(level)}${formattedKey}: ${await formatYamlValue(entry, level + 1, useInlineJson)}`);
+                continue;
+            }
+
+            lines.push(`${indent(level)}${formattedKey}:`);
+            lines.push(await formatYamlValue(entry, level + 1, useInlineJson));
+        }
+
+        return lines.join('\n');
+    }
+
+    return formatScalar(value);
+}
+
+async function formatTelepactYaml(text: string): Promise<string> {
+    const { preamble, body } = splitLeadingPreamble(text);
+    const trimmedBody = body.trim();
+
+    if (trimmedBody.length === 0) {
+        return preamble.trimEnd().length === 0 ? '' : `${preamble.trimEnd()}\n`;
+    }
+
+    const document = parseDocument(trimmedBody);
+
+    if (document.errors.length > 0) {
+        throw document.errors[0];
+    }
+
+    const formattedBody = await formatYamlValue(document.toJSON(), 0);
+    const normalizedPreamble = preamble.length === 0 ? '' : `${preamble.trimEnd()}\n\n`;
+
+    return `${normalizedPreamble}${formattedBody}\n`;
+}
+
+const telepactParser: Parser<TelepactAst> = {
+    astFormat: 'telepact-yaml',
+    parse: async (text: string, _options: ParserOptions) => {
+        return {
+            formattedText: await formatTelepactYaml(text),
         };
-
-        const properties = path.map(print, "properties");
-
-        if (node.properties.length === 0 || isDownstreamOfLowercaseKey()) {
-            return ["{", join(", ", properties), "}"];
-        } else {
-            return [
-                "{",
-                indent(group([hardline, join(group([",", hardline]), properties)])),
-                hardline,
-                "}",
-            ];
-        }
-    }
-
-    if (node.type === "StringLiteral") {
-        return JSON.stringify(node.value);
-    }
-
-    if (node.type === "NumericLiteral") {
-        return JSON.stringify(node.value);
-    }
-
-    if (node.type === "BooleanLiteral") {
-        return node.value ? "true" : "false";
-    }
-
-    if (node.type === "NullLiteral") {
-        return "null";
-    }
-
-    if (node.type === "ObjectProperty") {
-        return group([path.call(print, "key"), ": ", path.call(print, "value")]);
-    }
-
-    return "";
-}
-
-const jsonParser = babelParsers["json-stringify"];
-
-const jsonExtendedPrinter: Printer = {
-    print: printJsonAst,
-};
-
-const { parse } = jsonParser;
-
-const jsonExtendedParser: Parser = {
-    ...jsonParser,
-    parse: async (text: string, options: ParserOptions) => {
-        const preprocessedText = await preprocess(text);
-        const ast = parse(preprocessedText, options);
-        return ast;
     },
-    astFormat: "telepact-ast",
+    locStart: () => 0,
+    locEnd: (node) => node.formattedText.length,
 };
 
-const jsonExtended: SupportLanguage = {
-    name: "telepact",
-    parsers: ["telepact-parse"],
-    extensions: [".telepact.json"],
+const telepactPrinter: Printer<TelepactAst> = {
+    print: (path) => path.getValue().formattedText,
 };
 
-const plugin: Plugin = {
-    languages: [jsonExtended],
+const telepactLanguage: SupportLanguage = {
+    name: 'telepact',
+    parsers: ['telepact-parse'],
+    extensions: ['.telepact.yaml', '.telepact.yml'],
+};
+
+const plugin: Plugin<TelepactAst> = {
+    languages: [telepactLanguage],
     parsers: {
-        "telepact-parse": jsonExtendedParser,
+        'telepact-parse': telepactParser,
     },
     printers: {
-        "telepact-ast": jsonExtendedPrinter,
+        'telepact-yaml': telepactPrinter,
     },
 };
 
