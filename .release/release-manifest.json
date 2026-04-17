@@ -1,9 +1,9 @@
 {
   "changed_paths": [
-    "README.md"
+    "AGENTS.md"
   ],
   "direct_targets": [],
-  "pr_number": 388,
+  "pr_number": 387,
   "targets": [],
-  "version": "1.0.0-alpha.286"
+  "version": "1.0.0-alpha.287"
 }
