@@ -30,9 +30,9 @@ $(TAR_GZ): $(SRC_FILES) $(COMMON_SCHEMA_FILES)
 	uv sync --all-groups
 
 	# TODO: Get "include" to work in pyproject.toml
-	telepact-project gitignore --remove telepact/json
+	../../tool/telepact-project gitignore --remove telepact/json
 	uv build
-	telepact-project gitignore --add telepact/json
+	../../tool/telepact-project gitignore --add telepact/json
 
 clean:
 	rm -rf dist

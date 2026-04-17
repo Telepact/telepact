@@ -1,12 +1,18 @@
 {
   "changed_paths": [
-    "doc/01-learn-by-example/03-opt-in-features/12-select.md",
-    "doc/05-background-and-reference/01-faq.md",
-    "example/py-select/README.md",
-    "site/src/snippets/features/select.request.json"
+    "sdk/console/README.md",
+    "sdk/console/cli.js",
+    "sdk/console/package-lock.json",
+    "sdk/console/package.json",
+    "sdk/console/src/lib/loadConsoleData.ts",
+    "sdk/console/tests/test.ts"
   ],
-  "direct_targets": [],
-  "pr_number": 386,
-  "targets": [],
-  "version": "1.0.0-alpha.285"
+  "direct_targets": [
+    "console"
+  ],
+  "pr_number": 389,
+  "targets": [
+    "console"
+  ],
+  "version": "1.0.0-alpha.289"
 }
