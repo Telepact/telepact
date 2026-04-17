@@ -309,8 +309,8 @@ jobs:
       - name: Download console build artifacts
         uses: actions/download-artifact@v4
         with:
-          name: build-console-docker
-          path: sdk/console/dist-docker
+          name: build-console-tgz
+          path: sdk/console/dist-tgz
 
       - name: Build test environment
         run: make console-self-hosted

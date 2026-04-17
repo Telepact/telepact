@@ -30,7 +30,7 @@ export default defineConfig({
   timeout: 60 * 1000, // 1 minute
 	webServer: [
 		{
-			command: `docker run --name telepact_console_self_host_test -p 8082:8080 telepact-console-self-host:${VERSION}`,
+			command: `docker run --name telepact_console_self_host_test -p 8082:80 telepact-console-self-host:${VERSION}`,
 			port: 8082,
 		}
 	],

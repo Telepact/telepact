@@ -14,9 +14,19 @@
 #|  limitations under the License.
 #|
 
-ARG TELEPACT_VERSION=latest
+FROM node:22-alpine AS console
 
-FROM telepact-console:${TELEPACT_VERSION}
+WORKDIR /work
 
+COPY telepact-console.tgz ./
+
+RUN npm init -y
+RUN npm install --ignore-scripts --omit=dev ./telepact-console.tgz
+RUN TELEPACT_CONSOLE_ROOT="$(node --input-type=module -e 'import { selfHostedRoot } from \"telepact-console/self-hosted\"; process.stdout.write(selfHostedRoot)')" && \
+    mkdir -p /out && \
+    cp -R "$TELEPACT_CONSOLE_ROOT"/. /out/
+
+FROM nginx:alpine
+
+COPY --from=console /out/ /usr/share/nginx/html/
 COPY override.js /usr/share/nginx/html/override.js
-

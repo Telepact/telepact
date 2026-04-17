@@ -23,6 +23,10 @@
     "email": "telepact@googlegroups.com"
   },
   "bin": "cli.js",
+  "exports": {
+    "./package.json": "./package.json",
+    "./self-hosted": "./self-hosted.js"
+  },
   "scripts": {
     "dev": "vite dev --force",
     "dev:test": "vite dev --port 3001 --force",
@@ -70,6 +74,7 @@
   "files": [
     "build",
     "cli.js",
+    "self-hosted.js",
     "LICENSE",
     "NOTICE"
   ]

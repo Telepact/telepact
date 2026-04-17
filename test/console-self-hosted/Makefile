@@ -16,8 +16,8 @@
 
 VERSION := $(shell cat ../../VERSION.txt)
 
-LIB_TAR_GZ := ../../sdk/console/dist-docker/*.tar.gz
-TAR_GZ := telepact-console.tar.gz
+LIB_TAR_GZ := ../../sdk/console/dist-tgz/*.tgz
+TAR_GZ := telepact-console.tgz
 NPM_INSTALL_STAMP := node_modules/.package-lock.stamp
 
 all: telepact-console-self-host.image
@@ -32,8 +32,7 @@ $(NPM_INSTALL_STAMP): package.json
 	touch $(NPM_INSTALL_STAMP)
 
 telepact-console-self-host.image: $(TAR_GZ) Dockerfile $(NPM_INSTALL_STAMP)
-	docker load < $(TAR_GZ)
-	docker build --progress=plain --no-cache -f Dockerfile -t telepact-console-self-host:${VERSION} --build-arg TELEPACT_VERSION=${VERSION} .
+	docker build --progress=plain --no-cache -f Dockerfile -t telepact-console-self-host:${VERSION} .
 	touch telepact-console-self-host.image
 
 clean:
