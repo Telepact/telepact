@@ -116,11 +116,6 @@ async function formatYamlValue(value: unknown, level: number, forceInlineJson = 
                 continue;
             }
 
-            if (entry === null) {
-                lines.push(`${indent(level)}- null`);
-                continue;
-            }
-
             const formattedEntry = await formatYamlValue(entry, level + 1);
             const [firstLine, ...rest] = formattedEntry.split('\n');
 
@@ -161,7 +156,7 @@ async function formatYamlValue(value: unknown, level: number, forceInlineJson = 
                 (Array.isArray(entry) && entry.length === 0) ||
                 (entry !== null && typeof entry === 'object' && Object.keys(entry).length === 0);
 
-            if (useInlineJson || isInlineScalar(entry) || entry === null || isInlineCollection) {
+            if (useInlineJson || isInlineScalar(entry) || isInlineCollection) {
                 lines.push(`${indent(level)}${formattedKey}: ${await formatYamlValue(entry, level + 1, useInlineJson)}`);
                 continue;
             }
