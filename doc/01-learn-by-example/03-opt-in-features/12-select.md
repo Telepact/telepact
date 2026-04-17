@@ -52,4 +52,10 @@ curl -s localhost:8000/api -d '[{"@select_": {"->": {"Ok_": ["result"]}}}, {"fn.
 Nothing about the function changed. We just told the server which response fields
 we wanted back.
 
+`@select_` always uses the same shape:
+
+- `->` selects fields on the active result union
+- `struct.*` selects fields on reachable structs
+- `union.*` selects fields for reachable union tags
+
 Next: [13. Binary](./13-binary.md)
