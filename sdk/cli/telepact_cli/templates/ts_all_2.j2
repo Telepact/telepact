@@ -219,12 +219,12 @@ export namespace {{ type_display }} {
 
         pseudoJson: Record<string, any> = {};
 
-{% for key in fn_selects %}
-            {% if key.startswith('struct') %}
-                {% set name = key | regex_replace('^.*\\.', '') %}
-                {% set fields = fn_selects[key] %}
+        {%- for key in fn_selects %}
+            {%- if key.startswith('struct') %}
+                {%- set name = key | regex_replace('^.*\\.', '') %}
+                {%- set fields = fn_selects[key] %}
 
-                {% for field in fields %}
+                {%- for field in fields %}
         
         {{ name }}{{ field | replace('!', '') }}(): Select_ {
             const theseFields = this.pseudoJson["{{ key }}"] ?? [];
@@ -235,16 +235,16 @@ export namespace {{ type_display }} {
 
             return this;
         }
-                {% endfor %}
+                {%- endfor %}
 
-            {% elif key.startswith('union') %}
-                {% set name = key | regex_replace('^.*\\.', '') %}
-                {% set tags = fn_selects[key] %}
+            {%- elif key.startswith('union') %}
+                {%- set name = key | regex_replace('^.*\\.', '') %}
+                {%- set tags = fn_selects[key] %}
 
-                {% for tag in tags %}
-                    {% set fields = tags[tag] %}
+                {%- for tag in tags %}
+                    {%- set fields = tags[tag] %}
 
-                    {% for field in fields %}
+                    {%- for field in fields %}
         
         {{ name }}{{ tag }}{{ field | replace('!', '') }}(): Select_ {
             const theseTags = this.pseudoJson["{{ key }}"] ?? {};
@@ -258,12 +258,12 @@ export namespace {{ type_display }} {
             return this;
         }
 
-                    {% endfor %}
-                {% endfor %}
+                    {%- endfor %}
+                {%- endfor %}
             
-            {% elif key == '->' %}
-                {% set okFields = fn_selects['->']['Ok_'] %}
-                {% for okField in okFields %}
+            {%- elif key == '->' %}
+                {%- set okFields = fn_selects['->']['Ok_'] %}
+                {%- for okField in okFields %}
             
         ok{{ okField | replace('!', '') }}(): Select_ {
             const resultUnion = this.pseudoJson["->"] ?? {};
@@ -276,10 +276,10 @@ export namespace {{ type_display }} {
             return this;
         }
 
-                {% endfor %}
-            {% endif %}
+                {%- endfor %}
+            {%- endif %}
 
-{% endfor %}
+        {%- endfor %}
     }
 
 }
@@ -294,17 +294,17 @@ export class Select_ {
         this.pseudoJson = pseudoJson;
     }
 
-{% for fn in possible_fn_selects %}
-    {% set fn_name = fn | regex_replace('^.*\\.', '') %}
+    {%- for fn in possible_fn_selects %}
+        {%- set fn_name = fn | regex_replace('^.*\\.', '') %}
 
     static for_{{fn_name}}(select: {{fn_name}}.Select_): Select_ {
         return new Select_(select.pseudoJson);
     }
 
-{% endfor %}
+    {%- endfor %}
 }
 
-{%- endmacro %}
+{%- endmacro -%}
 
 {%- for schema_entry in input %}
     {%- set schema_key = schema_entry | find_schema_key %}
@@ -317,7 +317,7 @@ export class Select_ {
         {%- set fn_selects = possible_fn_selects[schema_key] %}
         {{ function(ts_name, schema_entry, schema_key, fn_selects) }}
     {%- endif %}
-{% endfor %}
+{%- endfor %}
 
 {{ select(possible_fn_selects) }}
 
