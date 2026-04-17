@@ -14,38 +14,24 @@
 #|  limitations under the License.
 #|
 
-force_all_if_changed:
-  - .release/force-all.md
+NPM_INSTALL ?= install --ignore-scripts
+TAR_GZ := dist-tgz/*.tgz
 
-projects:
-  java:
-    paths:
-      - lib/java
-  py:
-    paths:
-      - lib/py
-    is_dependency_for:
-      - cli
-  ts:
-    paths:
-      - lib/ts
-    is_dependency_for:
-      - dart
-      - console
-  go:
-    paths:
-      - lib/go
-  dart:
-    paths:
-      - bind/dart
-  cli:
-    paths:
-      - sdk/cli
-  console:
-    paths:
-      - sdk/console
-  prettier:
-    paths:
-      - sdk/prettier
-    is_dependency_for:
-      - console
+$(TAR_GZ):
+	rm -rf dist
+	mkdir -p dist
+	cp ../../LICENSE ../../NOTICE dist
+
+	mkdir -p dist-tgz
+
+	npm $(NPM_INSTALL)
+	npm run build
+	npm pack --pack-destination ./dist-tgz
+
+clean:
+	rm -rf dist
+	rm -rf dist-tgz
+	rm -rf node_modules
+
+deploy: $(TAR_GZ)
+	npm publish

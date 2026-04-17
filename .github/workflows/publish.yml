@@ -31,6 +31,7 @@ jobs:
       publish_go: ${{ steps.resolve.outputs.publish_go }}
       publish_cli: ${{ steps.resolve.outputs.publish_cli }}
       publish_console: ${{ steps.resolve.outputs.publish_console }}
+      publish_prettier: ${{ steps.resolve.outputs.publish_prettier }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -183,3 +184,27 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_INSTALL: ci --ignore-scripts
         run: make deploy-console
+
+  publish-prettier:
+    runs-on: ubuntu-latest
+    environment: publish
+    needs: [resolve-release-plan]
+    if: ${{ needs.resolve-release-plan.outputs.publish_prettier == 'true' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.target_commitish }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          registry-url: "https://registry.npmjs.org/"
+
+      - name: Publish to npm
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_INSTALL: ci --ignore-scripts
+        run: make deploy-prettier

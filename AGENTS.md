@@ -57,3 +57,4 @@ The entire project uses a hierarchical `Makefile` system. The root `Makefile` de
 -   `common/*.telepact.yaml`: The common schema files that define the internal APIs used by Telepact itself.
 -   `sdk/console`: A React and Vite TypeScript project for the developer console.
 -   `sdk/cli`: A Python/uv project for the command-line interface.
+-   `sdk/prettier`: A project for the Prettier plugin.
