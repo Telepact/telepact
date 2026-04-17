@@ -29,7 +29,7 @@ RELEASE_CONFIG_RELATIVE_PATH = Path(".release/release-targets.yaml")
 RELEASE_MANIFEST_RELATIVE_PATH = Path(".release/release-manifest.json")
 
 
-PUBLISH_TARGETS = ("java", "ts", "py", "go", "cli", "console")
+PUBLISH_TARGETS = ("java", "ts", "py", "go", "cli", "console", "prettier")
 
 
 @dataclass(frozen=True)

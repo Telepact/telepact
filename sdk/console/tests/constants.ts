@@ -14,59 +14,55 @@
 //|  limitations under the License.
 //|
 
-export const schema = JSON.stringify(
-	[
-		{
-			'info.DevConsole': {}
-		},
-		{
-			'fn.fn1': {
-				input1: 'string',
-				input2: 'integer'
-			},
-			'->': [
-				{
-					Ok_: {
-						output1: ['struct.Struct1']
-					}
-				}
-			]
-		},
-		{
-			'fn.fnA': {},
-			'->': [
-				{
-					Ok_: {
-						linkA: 'fn.fn1'
-					}
-				}
-			]
-		},
-		{
-			'struct.Pad1': {
-				field1: 'string',
-				field2: 'integer'
-			}
-		},
-		{
-			'struct.Pad2': {
-				field1: 'string',
-				field2: 'integer'
-			}
-		},
-		{
-			'struct.Pad3': {
-				field1: 'string',
-				field2: 'integer'
-			}
-		},
-		{
-			'struct.Struct1': {
-				field1: 'string',
-				field2: 'integer'
-			}
-		}
-	],
-	null,
-	2
-);
+export const schema = `[
+  {
+    "info.DevConsole": {}
+  },
+  {
+    "fn.fn1": {
+      "input1": "string",
+      "input2": "integer"
+    },
+    "->": [
+      {
+        "Ok_": {
+          "output1": ["struct.Struct1"]
+        }
+      }
+    ]
+  },
+  {
+    "fn.fnA": {},
+    "->": [
+      {
+        "Ok_": {
+          "linkA": "fn.fn1"
+        }
+      }
+    ]
+  },
+  {
+    "struct.Pad1": {
+      "field1": "string",
+      "field2": "integer"
+    }
+  },
+  {
+    "struct.Pad2": {
+      "field1": "string",
+      "field2": "integer"
+    }
+  },
+  {
+    "struct.Pad3": {
+      "field1": "string",
+      "field2": "integer"
+    }
+  },
+  {
+    "struct.Struct1": {
+      "field1": "string",
+      "field2": "integer"
+    }
+  }
+]`;

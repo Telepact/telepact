@@ -33,6 +33,7 @@ local-ci:
 	$(MAKE) clean-dart
 	$(MAKE) clean-cli
 	$(MAKE) clean-console
+	$(MAKE) clean-prettier
 	$(MAKE) clean-console-self-hosted
 	$(MAKE) clean-test
 	$(MAKE) java
@@ -43,6 +44,7 @@ local-ci:
 	$(MAKE) cli
 	$(MAKE) install-cli
 	$(MAKE) console
+	$(MAKE) prettier
 	$(MAKE) example-check
 	$(MAKE) test
 	$(MAKE) console-self-hosted
@@ -183,6 +185,15 @@ install-cli:
 uninstall-cli:
 	uv tool uninstall telepact-cli
 
+prettier:
+	$(MAKE) -C sdk/prettier
+
+clean-prettier:
+	$(MAKE) -C sdk/prettier clean
+
+deploy-prettier:
+	$(MAKE) -C sdk/prettier deploy
+
 console:
 	$(MAKE) -C sdk/console
 
@@ -237,6 +248,7 @@ version:
 	cd lib/ts && $(abspath $(PROJECT_CLI)) set-version ${VERSION}
 	cd bind/dart && $(abspath $(PROJECT_CLI)) set-version ${VERSION}
 	cd sdk/cli && $(abspath $(PROJECT_CLI)) set-version ${VERSION}
+	cd sdk/prettier && $(abspath $(PROJECT_CLI)) set-version ${VERSION}
 	cd sdk/console && $(abspath $(PROJECT_CLI)) set-version ${VERSION}
 	$(MAKE) doc-versions
 

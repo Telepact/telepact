@@ -14,6 +14,13 @@
 //|  limitations under the License.
 //|
 
+import prettier from 'prettier/standalone';
+import markdownPlugin from 'prettier/plugins/markdown';
+import estreePlugin from 'prettier/plugins/estree';
+import babelPlugin from 'prettier/plugins/babel';
+
+import telepactPlugin from './prettier-plugin-telepact/index.esm.js';
+
 import {
 	Client,
 	ClientOptions,
@@ -399,7 +406,15 @@ export async function loadConsoleData(url: URL): Promise<LoadedConsoleData> {
 		return true;
 	});
 
-	const schemaDraft = JSON.stringify(filteredSchemaPseudoJson, null, 2);
+	const filteredJson = JSON.stringify(filteredSchemaPseudoJson, null, 2);
+	const schemaDraft = (
+		await prettier.format(filteredJson, {
+			parser: 'telepact-parse',
+			printWidth: 78,
+			proseWrap: 'always',
+			plugins: [babelPlugin, estreePlugin, markdownPlugin, telepactPlugin]
+		})
+	).trimEnd();
 
 	return {
 		client,
