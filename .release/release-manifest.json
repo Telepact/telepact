@@ -33,11 +33,13 @@
     "tool/telepact_project_cli/tests/test_release_plan.py"
   ],
   "direct_targets": [
-    "console"
+    "console",
+    "prettier"
   ],
-  "pr_number": 398,
+  "pr_number": 400,
   "targets": [
-    "console"
+    "console",
+    "prettier"
   ],
-  "version": "1.0.0-alpha.295"
+  "version": "1.0.0-alpha.296"
 }
