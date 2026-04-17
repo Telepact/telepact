@@ -1,12 +1,15 @@
 [
   {
     "@select_": {
-      "Ok_": {
-        "user": {
-          "name": true,
-          "email": true
-        }
-      }
+      "->": {
+        "Ok_": [
+          "user"
+        ]
+      },
+      "struct.User": [
+        "name",
+        "email"
+      ]
     }
   },
   {

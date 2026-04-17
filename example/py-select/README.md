@@ -15,3 +15,18 @@ Run it:
 ```bash
 make run
 ```
+
+The request uses the runtime-supported `@select_` shape:
+
+```json
+[
+  {
+    "@select_": {
+      "struct.User": ["id"]
+    }
+  },
+  {
+    "fn.listUsers": {}
+  }
+]
+```

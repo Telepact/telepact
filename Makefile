@@ -15,13 +15,14 @@
 #|
 
 VERSION := $(shell cat VERSION.txt)
+PROJECT_CLI := ./tool/telepact-project
 
 noop:
 	@echo "No-op. Specify a target."
 
 .PHONY: doc-versions
 doc-versions:
-	telepact-project doc-versions
+	$(PROJECT_CLI) doc-versions
 
 .PHONY: local-ci
 local-ci:
@@ -35,7 +36,6 @@ local-ci:
 	$(MAKE) clean-prettier
 	$(MAKE) clean-console-self-hosted
 	$(MAKE) clean-test
-	$(MAKE) install-project-cli
 	$(MAKE) java
 	$(MAKE) py
 	$(MAKE) ts
@@ -237,20 +237,20 @@ clean-project-cli:
 	$(MAKE) -C tool/telepact_project_cli clean
 
 install-project-cli:
-	uv tool install --force tool/telepact_project_cli
+	@echo "No installation required. Use $(PROJECT_CLI) directly."
 
 uninstall-project-cli:
 	uv tool uninstall telepact-project-cli
 
 version:
-	cd lib/java && telepact-project set-version ${VERSION}
-	cd lib/py && telepact-project set-version ${VERSION}
-	cd lib/ts && telepact-project set-version ${VERSION}
-	cd bind/dart && telepact-project set-version ${VERSION}
-	cd sdk/cli && telepact-project set-version ${VERSION}
-	cd sdk/prettier && telepact-project set-version ${VERSION}
-	cd sdk/console && telepact-project set-version ${VERSION}
+	cd lib/java && $(abspath $(PROJECT_CLI)) set-version ${VERSION}
+	cd lib/py && $(abspath $(PROJECT_CLI)) set-version ${VERSION}
+	cd lib/ts && $(abspath $(PROJECT_CLI)) set-version ${VERSION}
+	cd bind/dart && $(abspath $(PROJECT_CLI)) set-version ${VERSION}
+	cd sdk/cli && $(abspath $(PROJECT_CLI)) set-version ${VERSION}
+	cd sdk/prettier && $(abspath $(PROJECT_CLI)) set-version ${VERSION}
+	cd sdk/console && $(abspath $(PROJECT_CLI)) set-version ${VERSION}
 	$(MAKE) doc-versions
 
 license-header:
-	UV_CACHE_DIR=/tmp/uv-cache uv run --project tool/telepact_project_cli telepact-project license-header NOTICE
+	UV_CACHE_DIR=/tmp/uv-cache $(PROJECT_CLI) license-header NOTICE
