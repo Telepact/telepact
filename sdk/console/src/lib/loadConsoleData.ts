@@ -49,7 +49,7 @@ export type LoadedConsoleData = {
 async function formatSchemaDraft(schemaDraft: string): Promise<string> {
 	return (
 		await prettier.format(schemaDraft, {
-			filepath: 'schema.telepact.yaml',
+			filepath: 'telepact-draft.telepact.yaml',
 			parser: 'telepact-parse',
 			printWidth: 78,
 			proseWrap: 'always',

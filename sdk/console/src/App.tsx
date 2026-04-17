@@ -664,7 +664,7 @@ export default function App() {
 						{activeViews.includes('s') ? (
 							<div className={`flex h-[calc(100vh-4em)] ${getSectionClass(activeViews, 's', activeViews.length)}`}>
 								<div className="flex w-full flex-col p-6">
-								<div className="flex justify-between">
+									<div className="flex justify-between">
 										<h1 className="pb-4 text-xl font-semibold text-gray-900 dark:text-gray-100">Schema (YAML)</h1>
 										{!readonlyEditor ? (
 											<div className="flex space-x-2">
