@@ -15,30 +15,27 @@
 #|
 
 VERSION := $(shell cat ../../VERSION.txt)
-
-LIB_TAR_GZ := ../../sdk/console/dist-tgz/*.tgz
-TAR_GZ := telepact-console.tgz
 NPM_INSTALL_STAMP := node_modules/.package-lock.stamp
+CONSOLE_BUILD_STAMP := ../../sdk/console/build/index.html
+CONSOLE_PACKAGE_FILES := ../../sdk/console/package.json ../../sdk/console/cli.js ../../sdk/console/self-hosted.js ../../sdk/console/LICENSE ../../sdk/console/NOTICE $(CONSOLE_BUILD_STAMP)
 
 all: telepact-console-self-host.image
 
-
-$(TAR_GZ):
-	cp $(LIB_TAR_GZ) $(TAR_GZ)
-
-$(NPM_INSTALL_STAMP): package.json
+$(NPM_INSTALL_STAMP): package.json package-lock.json
 	npm install --ignore-scripts
 	mkdir -p node_modules
 	touch $(NPM_INSTALL_STAMP)
 
-telepact-console-self-host.image: $(TAR_GZ) Dockerfile $(NPM_INSTALL_STAMP)
-	docker build --progress=plain --no-cache -f Dockerfile -t telepact-console-self-host:${VERSION} .
+$(CONSOLE_BUILD_STAMP):
+	$(MAKE) -C ../../sdk/console
+
+telepact-console-self-host.image: $(CONSOLE_PACKAGE_FILES) Dockerfile $(NPM_INSTALL_STAMP)
+	docker build --progress=plain --no-cache -f Dockerfile -t telepact-console-self-host:${VERSION} ../..
 	touch telepact-console-self-host.image
 
 clean:
 	rm -rf node_modules
 	rm -f package-lock.json
-	rm -f $(TAR_GZ)
 	rm -f telepact-console-self-host.image
 
 test: telepact-console-self-host.image

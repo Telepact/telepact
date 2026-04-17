@@ -18,10 +18,15 @@ FROM node:22-alpine AS console
 
 WORKDIR /work
 
-COPY telepact-console.tgz ./
+COPY sdk/console/package.json /work/sdk/console/package.json
+COPY sdk/console/cli.js /work/sdk/console/cli.js
+COPY sdk/console/self-hosted.js /work/sdk/console/self-hosted.js
+COPY sdk/console/LICENSE /work/sdk/console/LICENSE
+COPY sdk/console/NOTICE /work/sdk/console/NOTICE
+COPY sdk/console/build /work/sdk/console/build
 
 RUN npm init -y
-RUN npm install --ignore-scripts --omit=dev ./telepact-console.tgz
+RUN npm install --ignore-scripts --omit=dev /work/sdk/console
 RUN TELEPACT_CONSOLE_ROOT="$(node --input-type=module -e 'import { selfHostedRoot } from "telepact-console/self-hosted"; process.stdout.write(selfHostedRoot)')" && \
     mkdir -p /out && \
     cp -R "$TELEPACT_CONSOLE_ROOT"/. /out/
@@ -29,4 +34,4 @@ RUN TELEPACT_CONSOLE_ROOT="$(node --input-type=module -e 'import { selfHostedRoo
 FROM nginx:alpine
 
 COPY --from=console /out/ /usr/share/nginx/html/
-COPY override.js /usr/share/nginx/html/override.js
+COPY test/console-self-hosted/override.js /usr/share/nginx/html/override.js
