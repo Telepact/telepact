@@ -19,7 +19,7 @@ import { once } from 'node:events';
 import { AddressInfo } from 'node:net';
 import test from 'node:test';
 import { WebSocket } from 'ws';
-import { createWebSocketServer } from './server';
+import { createWebSocketServer } from './server.js';
 
 test('websocket example runs end to end', async () => {
     const server = await createWebSocketServer();
@@ -35,7 +35,7 @@ test('websocket example runs end to end', async () => {
         await once(websocket, 'close');
     } finally {
         await new Promise<void>((resolve, reject) => {
-            server.close((error) => {
+            server.close((error?: Error) => {
                 if (error) {
                     reject(error);
                     return;

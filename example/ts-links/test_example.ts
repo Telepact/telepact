@@ -17,8 +17,8 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { AddressInfo } from 'node:net';
-import { createHttpServer } from './server';
-import { postJson, runServer, stopServer } from './test_support';
+import { createHttpServer } from './server.js';
+import { postJson, runServer, stopServer } from './test_support.js';
 
 const INDEX_MESSAGE_BODY = 1;
 

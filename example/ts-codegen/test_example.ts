@@ -18,8 +18,8 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { AddressInfo } from 'node:net';
 import { Client, ClientOptions, Message, Serializer } from 'telepact';
-import { TypedClient, greet } from './gen/genTypes';
-import { createHttpServer } from './server';
+import { TypedClient, greet } from './gen/genTypes.js';
+import { createHttpServer } from './server.js';
 
 async function runServer(server: ReturnType<typeof createHttpServer>): Promise<void> {
     await new Promise<void>((resolve) => {
@@ -45,7 +45,7 @@ async function postBytes(url: string, requestBytes: Uint8Array): Promise<Uint8Ar
         headers: {
             'Content-Type': 'application/json',
         },
-        body: requestBytes,
+        body: Buffer.from(requestBytes),
     });
     return new Uint8Array(await response.arrayBuffer());
 }

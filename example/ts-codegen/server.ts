@@ -18,7 +18,7 @@ import { createServer, IncomingMessage, Server as HttpServer, ServerResponse } f
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { FunctionRouter, Response, Server, ServerOptions, TelepactSchema, TelepactSchemaFiles, TypedMessage } from 'telepact';
-import { TypedServerHandler, greet } from './gen/genTypes';
+import { TypedServerHandler, greet } from './gen/genTypes.js';
 
 const files = new TelepactSchemaFiles('api', fs, path);
 const schema = TelepactSchema.fromFileJsonMap(files.filenamesToJson);

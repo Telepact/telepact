@@ -17,7 +17,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { Client, ClientOptions, Message, Serializer } from 'telepact';
-import { buildTelepactServer } from './server';
+import { buildTelepactServer } from './server.js';
 
 test('binary example runs end to end', async () => {
     const telepactServer = buildTelepactServer();

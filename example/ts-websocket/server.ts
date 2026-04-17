@@ -18,7 +18,8 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { once } from 'node:events';
 import { FunctionRouter, Message, Server, ServerOptions, TelepactSchema, TelepactSchemaFiles } from 'telepact';
-import { RawData, WebSocket, WebSocketServer } from 'ws';
+import { WebSocket, WebSocketServer } from 'ws';
+import type { RawData } from 'ws';
 
 const files = new TelepactSchemaFiles('api', fs, path);
 const schema = TelepactSchema.fromFileJsonMap(files.filenamesToJson);
