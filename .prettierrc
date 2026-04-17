@@ -1,7 +1,14 @@
 {
     "tabWidth": 4,
     "printWidth": 120,
+    "plugins": ["prettier-plugin-telepact"],
     "overrides": [
+        {
+            "files": "*.telepact.json",
+            "options": {
+                "parser": "telepact-parse"
+            }
+        },
         {
             "files": [".ts"],
             "options": {

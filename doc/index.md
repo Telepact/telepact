@@ -69,6 +69,8 @@ servers, or place Telepact inside a larger service.
       generate code from the command line
 - [Browser Console](../sdk/console/README.md)
     - Browse docs and submit live requests against a running Telepact server
+- [Prettier Plugin](../sdk/prettier/README.md)
+    - Format checked-in Telepact schema files consistently
 
 ## Operate
 

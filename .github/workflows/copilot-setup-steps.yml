@@ -43,6 +43,7 @@ jobs:
             bind/dart/package-lock.json
             lib/ts/package-lock.json
             sdk/console/package-lock.json
+            sdk/prettier/package-lock.json
             test/console-self-hosted/package-lock.json
 
       - name: Set up Java

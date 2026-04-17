@@ -107,6 +107,12 @@ jobs:
           name: build-cli-docker
           path: sdk/cli/dist-docker
 
+      - name: Download prettier artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-prettier-tgz
+          path: sdk/prettier/dist-tgz
+
       - name: Download console-docker artifacts
         uses: actions/download-artifact@v4
         with:

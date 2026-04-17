@@ -342,4 +342,10 @@
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
+  <url>
+    <loc>https://telepact.github.io/telepact/docs/sdk/prettier/</loc>
+    <lastmod>2026-04-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
 </urlset>
