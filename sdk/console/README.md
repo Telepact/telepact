@@ -18,11 +18,15 @@ npx telepact-console -p 8080
 
 Then you can access the UI in your browser at http://localhost:8080.
 
+When launched through the npm CLI, the Console proxies absolute live HTTP and
+WebSocket URLs through its own localhost server first. This avoids browser CORS
+limits while keeping the self-hosted build unchanged for same-domain embeds.
+
 ## Docker
 
-The Console is also available as a docker image, which can be installed directly from
-[Releases](https://github.com/Telepact/telepact/releases). You can copy the link
-for the Console from the release assets.
+The Console is also available as a docker image, which can be installed directly
+from [Releases](https://github.com/Telepact/telepact/releases). You can copy the
+link for the Console from the release assets.
 
 Example:
 
@@ -39,4 +43,3 @@ docker run -p 8080:8080 telepact-console:{version}
 
 For a more concrete usage example, see
 [self-hosting example](https://github.com/Telepact/telepact/blob/main/test/console-self-hosted/).
-
