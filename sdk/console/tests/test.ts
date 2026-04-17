@@ -57,6 +57,62 @@ const transports = [
 	}
 ] as const;
 
+test.describe('CLI runtime proxy', () => {
+	test('uses the localhost HTTP proxy for absolute live URLs', async ({ page }) => {
+		let remoteHttpRequests = 0;
+
+		await page.route('http://localhost:8085/api', async (route) => {
+			remoteHttpRequests += 1;
+			await route.continue();
+		});
+
+		await page.goto('/');
+		await expect(page.getByRole('heading', { name: 'Telepact' })).toBeVisible();
+
+		const proxyConfig = await page.evaluate(() => window.telepactConsoleProxy);
+		expect(proxyConfig).toEqual({
+			httpPath: '/__telepact_proxy/http',
+			wsPath: '/__telepact_proxy/ws'
+		});
+
+		const source = page.getByRole('textbox', { name: 'Live URL' });
+		await source.fill('http://localhost:8085/api');
+
+		const proxyResponse = page.waitForResponse((response) => {
+			return (
+				response.url().includes('/__telepact_proxy/http?target=') &&
+				response.request().method() === 'POST'
+			);
+		});
+
+		await page.getByRole('button', { name: 'Load' }).click();
+		await proxyResponse;
+		await expect(page.getByRole('heading', { name: 'Schema' })).toBeVisible();
+		expect(remoteHttpRequests).toBe(0);
+	});
+
+	test('uses the localhost WebSocket proxy for absolute live URLs', async ({ page }) => {
+		const browserSocketUrls: string[] = [];
+		page.on('websocket', (socket) => {
+			browserSocketUrls.push(socket.url());
+		});
+
+		await page.goto('/');
+		await expect(page.getByRole('heading', { name: 'Telepact' })).toBeVisible();
+
+		const protocolButton = page.getByRole('button', { name: 'Select protocol' });
+		await protocolButton.click();
+		await page.getByRole('option', { name: 'ws' }).click();
+
+		const source = page.getByRole('textbox', { name: 'Live URL' });
+		await source.fill('ws://localhost:8085/api');
+		await page.getByRole('button', { name: 'Load' }).click();
+
+		await expect(page.getByRole('heading', { name: 'Schema' })).toBeVisible();
+		expect(browserSocketUrls).not.toContain('ws://localhost:8085/api');
+	});
+});
+
 for (const transport of transports) {
 	test.describe(`Loading from demo server (${transport.label})`, () => {
 		test.beforeEach(async ({ page }) => {
@@ -174,7 +230,9 @@ function defineConsoleTests() {
 			);
 		});
 
-		test('accepts secure websocket URLs when the WebSocket protocol is selected', async ({ page }) => {
+		test('accepts secure websocket URLs when the WebSocket protocol is selected', async ({
+			page
+		}) => {
 			const liveUrlInput = page.getByRole('textbox', { name: 'Live URL' });
 			const protocolButton = page.getByRole('button', { name: 'Select protocol' });
 
@@ -191,29 +249,22 @@ function defineConsoleTests() {
 
 	test('Schema editor works correctly', async ({ page }) => {
 		let docButton = page.getByRole('button', { name: 'Toggle Documentation', pressed: true });
-		await expect(
-			docButton,
-			"Documentation should be visible by default"
-		).toBeVisible();
+		await expect(docButton, 'Documentation should be visible by default').toBeVisible();
 
 		await docButton.hover();
-		await expect(
-			page.getByRole('tooltip', { name: 'Documentation' }),
-		).toBeVisible();
+		await expect(page.getByRole('tooltip', { name: 'Documentation' })).toBeVisible();
 
 		let schemaButton = page.getByRole('button', { name: 'Toggle Schema', pressed: false });
 		await schemaButton.hover();
-		await expect(
-			page.getByRole('tooltip', { name: 'Schema' }),
-		).toBeVisible();
+		await expect(page.getByRole('tooltip', { name: 'Schema' })).toBeVisible();
 
 		await schemaButton.click();
 		await expect(
 			page.getByRole('button', { name: 'Toggle Schema', pressed: true }),
-			"Schema should be visible after clicking the button"
+			'Schema should be visible after clicking the button'
 		).toBeVisible();
-		
-		let textAreaElement = page.getByRole('textbox', { name: 'schema'});
+
+		let textAreaElement = page.getByRole('textbox', { name: 'schema' });
 
 		// TODO: This check fails despite the element being visible. Investigate why.
 		// await expect(
@@ -222,64 +273,54 @@ function defineConsoleTests() {
 		// ).toBeVisible();
 
 		expect(
-			await selectAllCopyAndGet(page, textAreaElement.locator("..")),
-			"Clipboard should contain the schema text"
+			await selectAllCopyAndGet(page, textAreaElement.locator('..')),
+			'Clipboard should contain the schema text'
 		).toBe(schema);
-	
-		await textAreaElement.locator(".." ).click();
+
+		await textAreaElement.locator('..').click();
 		await page.keyboard.press('a');
-	
+
 		expect(
-			await selectAllCopyAndGet(page, textAreaElement.locator("..")),
-			"Editor should not have changed since it is not editable"
+			await selectAllCopyAndGet(page, textAreaElement.locator('..')),
+			'Editor should not have changed since it is not editable'
 		).toBe(schema);
 	});
 
 	test('Doc UI shows examples correctly', async ({ page }) => {
+		await expect(page.getByRole('heading', { name: 'Schema' })).toBeVisible();
 
-		await expect(page.getByRole('heading', {name: 'Schema'})).toBeVisible();
-	
-		let infoCard = page.getByRole('region', { name: 'info.DevConsole'});
+		let infoCard = page.getByRole('region', { name: 'info.DevConsole' });
+		await expect(infoCard, 'DevConsole info should be visible').toBeVisible();
+
+		let fnCard = page.getByRole('region', { name: 'fn.fn1' });
+		await expect(fnCard, 'fn1 function should be visible').toBeVisible();
+
+		let fnArguments = fnCard.getByRole('region', { name: 'Arguments' });
+		await expect(fnArguments, 'Arguments section should be visible').toBeVisible();
+
 		await expect(
-			infoCard,
-			"DevConsole info should be visible"
-		).toBeVisible();
-	
-		let fnCard = page.getByRole('region', { name: 'fn.fn1'});
-		await expect(
-			fnCard,
-			"fn1 function should be visible"
-		).toBeVisible();
-	
-		let fnArguments = fnCard.getByRole('region', { name: 'Arguments'});
-		await expect(
-			fnArguments,
-			"Arguments section should be visible"
-		).toBeVisible();
-	
-		await expect(
-			fnArguments.getByRole('button', { name: 'Regenerate'}),
-			"Regenerate button should be hidden before example is shown"
+			fnArguments.getByRole('button', { name: 'Regenerate' }),
+			'Regenerate button should be hidden before example is shown'
 		).toBeHidden();
-	
-		await fnArguments.getByRole('button', { name: 'Example'}).click();
-	
+
+		await fnArguments.getByRole('button', { name: 'Example' }).click();
+
 		await expect(
 			fnArguments.getByRole('button', { name: 'Example', exact: true }),
-			"Example button should toggle after clicking"
+			'Example button should toggle after clicking'
 		).toBeHidden();
-	
+
 		await expect(
-			fnArguments.getByRole('button', { name: 'Hide Example'}),
-			"Example button should toggle after clicking"
+			fnArguments.getByRole('button', { name: 'Hide Example' }),
+			'Example button should toggle after clicking'
 		).toBeVisible();
-	
+
 		await expect(
-			fnArguments.getByRole('button', { name: 'Regenerate'}),
-			"Regenerate button should be visible after example is shown"
+			fnArguments.getByRole('button', { name: 'Regenerate' }),
+			'Regenerate button should be visible after example is shown'
 		).toBeVisible();
-	
-		let fnArgumentsExample = fnArguments.getByRole('textbox', { name: 'fn.fn1.example'});
+
+		let fnArgumentsExample = fnArguments.getByRole('textbox', { name: 'fn.fn1.example' });
 
 		// TODO: This check fails despite the element being visible. Investigate why.
 		// await expect(
@@ -287,54 +328,47 @@ function defineConsoleTests() {
 		// 	"Example text area should be visible after clicking the button"
 		// ).toBeVisible();
 
-		let fnArgExampleText = await selectAllCopyAndGet(page, fnArgumentsExample.locator(".."));
-	
+		let fnArgExampleText = await selectAllCopyAndGet(page, fnArgumentsExample.locator('..'));
+
 		let fnArgExamplePsuedoJson = JSON.parse(fnArgExampleText);
-	
-		expect(
-			fnArgExamplePsuedoJson,
-			"Example text should be valid JSON"
-		).toMatchObject({
-			"fn.fn1": {
-			}
+
+		expect(fnArgExamplePsuedoJson, 'Example text should be valid JSON').toMatchObject({
+			'fn.fn1': {}
 		});
-	
-		if ("limit!" in fnArgExamplePsuedoJson["fn.fn1"]) {
+
+		if ('limit!' in fnArgExamplePsuedoJson['fn.fn1']) {
 			expect(
-				typeof fnArgExamplePsuedoJson["fn.fn1"]["limit!"],
-				"Generated example should have correct types"
+				typeof fnArgExamplePsuedoJson['fn.fn1']['limit!'],
+				'Generated example should have correct types'
 			).toBe('number');
 		}
 
-		let fnResult = fnCard.getByRole('region', { name: 'Result'});
-		await expect(
-			fnResult,
-			"Result section should be visible"
-		).toBeVisible();
+		let fnResult = fnCard.getByRole('region', { name: 'Result' });
+		await expect(fnResult, 'Result section should be visible').toBeVisible();
 
 		await expect(
-			fnResult.getByRole('button', { name: 'Regenerate'}),
-			"Regenerate button should be hidden before example is shown"
+			fnResult.getByRole('button', { name: 'Regenerate' }),
+			'Regenerate button should be hidden before example is shown'
 		).toBeHidden();
-		
-		await fnResult.getByRole('button', { name: 'Example'}).click();
+
+		await fnResult.getByRole('button', { name: 'Example' }).click();
 
 		await expect(
 			fnResult.getByRole('button', { name: 'Example', exact: true }),
-			"Example button should toggle after clicking"
+			'Example button should toggle after clicking'
 		).toBeHidden();
 
 		await expect(
-			fnResult.getByRole('button', { name: 'Hide Example'}),
-			"Example button should toggle after clicking"
+			fnResult.getByRole('button', { name: 'Hide Example' }),
+			'Example button should toggle after clicking'
 		).toBeVisible();
 
 		await expect(
-			fnResult.getByRole('button', { name: 'Regenerate'}),
-			"Regenerate button should be visible after example is shown"
+			fnResult.getByRole('button', { name: 'Regenerate' }),
+			'Regenerate button should be visible after example is shown'
 		).toBeVisible();
 
-		let fnResultExample = fnResult.getByRole('textbox', { name: 'fn.fn1.result.example'});
+		let fnResultExample = fnResult.getByRole('textbox', { name: 'fn.fn1.result.example' });
 
 		// TODO: This check fails despite the element being visible. Investigate why.
 		// await expect(
@@ -342,92 +376,74 @@ function defineConsoleTests() {
 		// 	"Example text area should be visible after clicking the button"
 		// ).toBeVisible();
 
-		let fnResultExampleText = await selectAllCopyAndGet(page, fnResultExample.locator(".."));
+		let fnResultExampleText = await selectAllCopyAndGet(page, fnResultExample.locator('..'));
 
 		let fnResultExamplePsuedoJson = JSON.parse(fnResultExampleText);
 
-		expect(
-			fnResultExamplePsuedoJson,
-			"Example text should be valid JSON"
-		).toMatchObject({
-			"Ok_": {
-				"output1": [
+		expect(fnResultExamplePsuedoJson, 'Example text should be valid JSON').toMatchObject({
+			Ok_: {
+				output1: [
 					{
-						"field1": expect.any(String),
-						"field2": expect.any(Number)
+						field1: expect.any(String),
+						field2: expect.any(Number)
 					},
 					{
-						"field1": expect.any(String),
-						"field2": expect.any(Number)
+						field1: expect.any(String),
+						field2: expect.any(Number)
 					}
 				]
 			}
 		});
-		
 	});
 
 	test('Doc UI follows links correctly', async ({ page }) => {
-			
-		let fnCard = page.getByRole('region', { name: 'fn.fn1'});
-		await expect(
-			fnCard,
-			"fn1 function should be visible"
-		).toBeVisible();
+		let fnCard = page.getByRole('region', { name: 'fn.fn1' });
+		await expect(fnCard, 'fn1 function should be visible').toBeVisible();
 
 		await expect(
-			page.getByRole('region', { name: 'struct.Struct1'}),
-			"Struct1 struct should not yet be visible"
+			page.getByRole('region', { name: 'struct.Struct1' }),
+			'Struct1 struct should not yet be visible'
 		).not.toBeInViewport();
 
-		await fnCard.getByRole('link', { name: 'Struct1'}).first().click();
+		await fnCard.getByRole('link', { name: 'Struct1' }).first().click();
 
 		await expect(
-			page.getByRole('region', { name: 'struct.Struct1'}),
-			"Struct1 struct should be visible"
+			page.getByRole('region', { name: 'struct.Struct1' }),
+			'Struct1 struct should be visible'
 		).toBeInViewport();
-	
 	});
 
 	test('Doc UI shows internal API correctly', async ({ page }) => {
-		let fnCard = page.getByRole('region', { name: 'fn.ping_'});
-		await expect(
-			fnCard,
-			"ping_ function should not be visible"
-		).not.toBeVisible();
+		let fnCard = page.getByRole('region', { name: 'fn.ping_' });
+		await expect(fnCard, 'ping_ function should not be visible').not.toBeVisible();
 
-		await page.getByRole('button', { name: 'Show Internal API'} ).click();
+		await page.getByRole('button', { name: 'Show Internal API' }).click();
 
-		await expect(
-			fnCard,
-			"ping_ function should be visible"
-		).toBeVisible();
-	});	
+		await expect(fnCard, 'ping_ function should be visible').toBeVisible();
+	});
 
 	test('Doc UI correctly navigates to simulation', async ({ page }) => {
-	
-		let fnCard = page.getByRole('region', { name: 'fn.fn1'});
-		await expect(
-			fnCard,
-			"fn1 function should be visible"
-		).toBeVisible();
+		let fnCard = page.getByRole('region', { name: 'fn.fn1' });
+		await expect(fnCard, 'fn1 function should be visible').toBeVisible();
 
-		let simulationButton = page.getByRole('button', { name: 'Toggle Simulation', pressed: false });
+		let simulationButton = page.getByRole('button', {
+			name: 'Toggle Simulation',
+			pressed: false
+		});
 
 		await expect(simulationButton).toBeVisible();
 
 		await simulationButton.hover();
-		await expect(
-			page.getByRole('tooltip', { name: 'Example' }),
-		).toBeVisible();
+		await expect(page.getByRole('tooltip', { name: 'Example' })).toBeVisible();
 
-		await fnCard.getByRole('button', { name: 'Simulate'}).click();
+		await fnCard.getByRole('button', { name: 'Simulate' }).click();
 
 		await expect(
 			page.getByRole('button', { name: 'Toggle Simulation', pressed: true }),
-			"Schema should be visible after navigating to simulation"
+			'Schema should be visible after navigating to simulation'
 		).toBeVisible();
 
-		let requestSimulation = page.getByRole('textbox', { name: 'requestExample'});
+		let requestSimulation = page.getByRole('textbox', { name: 'requestExample' });
 
 		// TODO: This check fails despite the element being visible. Investigate why.
 		// await expect(
@@ -435,22 +451,27 @@ function defineConsoleTests() {
 		// 	"Request simulation should be visible"
 		// ).toBeVisible();
 
-		let requestSimulationText = await selectAllCopyAndGet(page, requestSimulation.locator(".."));
-	
+		let requestSimulationText = await selectAllCopyAndGet(
+			page,
+			requestSimulation.locator('..')
+		);
+
 		let requestSimulationPseudoJson = JSON.parse(requestSimulationText);
-	
+
 		expect(
 			requestSimulationPseudoJson,
-			"Request simluation should be valid json"
-		).toMatchObject([{
-		}, {
-			"fn.fn1": {
-				"input1": expect.any(String),
-				"input2": expect.any(Number)
+			'Request simluation should be valid json'
+		).toMatchObject([
+			{},
+			{
+				'fn.fn1': {
+					input1: expect.any(String),
+					input2: expect.any(Number)
+				}
 			}
-		}]);
-		
-		let responseSimulation = page.getByRole('textbox', { name: 'responseExample'});
+		]);
+
+		let responseSimulation = page.getByRole('textbox', { name: 'responseExample' });
 
 		// TODO: This check fails despite the element being visible. Investigate why.
 		// await expect(
@@ -458,53 +479,55 @@ function defineConsoleTests() {
 		// 	"Response simluation should be visible"
 		// ).toBeVisible();
 
-		let responseSimulationText = await selectAllCopyAndGet(page, responseSimulation.locator(".."));
-	
+		let responseSimulationText = await selectAllCopyAndGet(
+			page,
+			responseSimulation.locator('..')
+		);
+
 		let responseSimulationPseudoJson = JSON.parse(responseSimulationText);
-	
+
 		expect(
 			responseSimulationPseudoJson,
-			"Response simulation should be valid json"
-		).toMatchObject([{}, {
-			"Ok_": {
-				"output1": [
-				{
-					"field1": expect.any(String),
-					"field2": expect.any(Number)
-				},
-				{
-					"field1": expect.any(String),
-					"field2": expect.any(Number)
+			'Response simulation should be valid json'
+		).toMatchObject([
+			{},
+			{
+				Ok_: {
+					output1: [
+						{
+							field1: expect.any(String),
+							field2: expect.any(Number)
+						},
+						{
+							field1: expect.any(String),
+							field2: expect.any(Number)
+						}
+					]
 				}
-			]
-		}
-		}]);			
-		
+			}
+		]);
 	});
 
 	test('Terminal functions corectly', async ({ page }) => {
-
-		await expect(page.getByRole('heading', {name: 'Request'})).not.toBeVisible();
+		await expect(page.getByRole('heading', { name: 'Request' })).not.toBeVisible();
 
 		let terminalButton = page.getByRole('button', { name: 'Toggle Terminal', pressed: false });
 		await expect(terminalButton).toBeVisible();
-		
+
 		await terminalButton.hover();
-		
-		await expect(
-			page.getByRole('tooltip', { name: 'Terminal' }),
-		).toBeVisible();
+
+		await expect(page.getByRole('tooltip', { name: 'Terminal' })).toBeVisible();
 
 		await terminalButton.click();
 
-		await expect(page.getByRole('heading', {name: 'Request'})).toBeVisible();
+		await expect(page.getByRole('heading', { name: 'Request' })).toBeVisible();
 
 		await expect(
 			page.getByRole('button', { name: 'Toggle Terminal', pressed: true }),
-			"Terminal should be visible after clicking the button"
+			'Terminal should be visible after clicking the button'
 		).toBeVisible();
 
-		let request = page.getByRole('textbox', { name: 'request'});
+		let request = page.getByRole('textbox', { name: 'request' });
 
 		// TODO: This check fails despite the element being visible. Investigate why.
 		// await expect(
@@ -512,42 +535,40 @@ function defineConsoleTests() {
 		// 	"Request simulation should be visible"
 		// ).toBeVisible();
 
-		let requestText = await selectAllCopyAndGet(page, request.locator(".."));
-	
-		let requestPseudoJson = JSON.parse(requestText);
-	
-		expect(
-			requestPseudoJson,
-			"Request simluation should be valid json"
-		).toEqual([{
-		}, {
-			"fn.ping_": {
-			}
-		}]);
+		let requestText = await selectAllCopyAndGet(page, request.locator('..'));
 
-		await expect(page.getByRole('heading', { name: 'Response'})).not.toBeVisible();
+		let requestPseudoJson = JSON.parse(requestText);
+
+		expect(requestPseudoJson, 'Request simluation should be valid json').toEqual([
+			{},
+			{
+				'fn.ping_': {}
+			}
+		]);
+
+		await expect(page.getByRole('heading', { name: 'Response' })).not.toBeVisible();
 
 		let resultsButton = page.getByRole('button', { name: 'Toggle Results', pressed: false });
 		await expect(resultsButton).toBeVisible();
 
 		await resultsButton.hover();
-		await expect(
-			page.getByRole('tooltip', { name: 'Results' }),
-		).toBeVisible();
+		await expect(page.getByRole('tooltip', { name: 'Results' })).toBeVisible();
 
 		let promptCount = 0;
-		page.on('dialog', async dialog => {
+		page.on('dialog', async (dialog) => {
 			promptCount += 1;
 			await dialog.accept();
 		});
-		
-		await page.getByRole('button', { name: 'Submit (live)'}).click();
 
-		await expect(page.getByRole('heading', { name: 'Response'})).toBeVisible();
+		await page.getByRole('button', { name: 'Submit (live)' }).click();
 
-		await expect(page.getByRole('button', {name: 'Toggle Results', pressed: true})).toBeVisible();
+		await expect(page.getByRole('heading', { name: 'Response' })).toBeVisible();
 
-		let response = page.getByRole('textbox', { name: 'response'});
+		await expect(
+			page.getByRole('button', { name: 'Toggle Results', pressed: true })
+		).toBeVisible();
+
+		let response = page.getByRole('textbox', { name: 'response' });
 
 		// TODO: This check fails despite the element being visible. Investigate why.
 		// await expect(
@@ -555,19 +576,17 @@ function defineConsoleTests() {
 		// 	"response should be visible"
 		// ).toBeVisible();
 
-		let responseText = await selectAllCopyAndGet(page, response.locator(".."));
-	
+		let responseText = await selectAllCopyAndGet(page, response.locator('..'));
+
 		let responsePseudoJson = JSON.parse(responseText);
-	
-		expect(
-			responsePseudoJson,
-			"response should be valid json"
-		).toEqual([{
-		}, {
-			"Ok_": {
+
+		expect(responsePseudoJson, 'response should be valid json').toEqual([
+			{},
+			{
+				Ok_: {}
 			}
-		}]);
-		
+		]);
+
 		await request.locator('..').click();
 
 		if (process.platform === 'darwin') {
@@ -580,84 +599,79 @@ function defineConsoleTests() {
 
 		await page.keyboard.type('[{}, {"fn.fnA": {}}]');
 
-		await page.getByRole('button', { name: 'Submit (live)'}).click();
+		await page.getByRole('button', { name: 'Submit (live)' }).click();
 
-		let response2 = page.getByRole('textbox', { name: 'response'});
-	
-		let response2Text = await selectAllCopyAndGet(page, response2.locator(".."));
-	
+		let response2 = page.getByRole('textbox', { name: 'response' });
+
+		let response2Text = await selectAllCopyAndGet(page, response2.locator('..'));
+
 		let response2PseudoJson = JSON.parse(response2Text);
 
 		console.log(JSON.stringify(response2PseudoJson));
-	
-		expect(
-			response2PseudoJson,
-			"response should be valid json"
-		).toMatchObject([{}, {
-			"Ok_": {
-				"linkA": {
-					"fn.fn1": {
-						"input1": expect.any(String),
-						"input2": expect.any(Number)
+
+		expect(response2PseudoJson, 'response should be valid json').toMatchObject([
+			{},
+			{
+				Ok_: {
+					linkA: {
+						'fn.fn1': {
+							input1: expect.any(String),
+							input2: expect.any(Number)
+						}
 					}
 				}
 			}
-		}]);
+		]);
 
 		let linkLocator = page.getByText('fn.fn1');
 
-		await expect(
-			linkLocator,
-			"fn.fn1 link should be visible"
-		).toBeVisible();
+		await expect(linkLocator, 'fn.fn1 link should be visible').toBeVisible();
 
 		await ctrlClick(page, linkLocator);
 
-		await expect(page.getByRole('textbox', { name: 'response'})).not.toBeVisible();
+		await expect(page.getByRole('textbox', { name: 'response' })).not.toBeVisible();
 
-		let request2 = page.getByRole('textbox', { name: 'request'});
-		let request2Text = await selectAllCopyAndGet(page, request2.locator(".."));
+		let request2 = page.getByRole('textbox', { name: 'request' });
+		let request2Text = await selectAllCopyAndGet(page, request2.locator('..'));
 		let request2PseudoJson = JSON.parse(request2Text);
-		expect(
-			request2PseudoJson,
-			"request should be valid json"
-		).toEqual([{}, {
-			"fn.fn1": {
-				"input1": expect.any(String),
-				"input2": expect.any(Number)
+		expect(request2PseudoJson, 'request should be valid json').toEqual([
+			{},
+			{
+				'fn.fn1': {
+					input1: expect.any(String),
+					input2: expect.any(Number)
+				}
 			}
-		}]);
+		]);
 
-		await page.getByRole('button', { name: 'Submit (live)'}).click();
+		await page.getByRole('button', { name: 'Submit (live)' }).click();
 
-		let response3 = page.getByRole('textbox', { name: 'response'});
-	
-		let response3Text = await selectAllCopyAndGet(page, response3.locator(".."));
-	
+		let response3 = page.getByRole('textbox', { name: 'response' });
+
+		let response3Text = await selectAllCopyAndGet(page, response3.locator('..'));
+
 		let response3PseudoJson = JSON.parse(response3Text);
 
 		console.log(JSON.stringify(response3PseudoJson));
-	
-		expect(
-			response3PseudoJson,
-			"response should be valid json"
-		).toMatchObject([{}, {
-			"Ok_": {
-				"output1": [
-				{
-					"field1": expect.any(String),
-					"field2": expect.any(Number)
-				},
-				{
-					"field1": expect.any(String),
-					"field2": expect.any(Number)
+
+		expect(response3PseudoJson, 'response should be valid json').toMatchObject([
+			{},
+			{
+				Ok_: {
+					output1: [
+						{
+							field1: expect.any(String),
+							field2: expect.any(Number)
+						},
+						{
+							field1: expect.any(String),
+							field2: expect.any(Number)
+						}
+					]
 				}
-			]
-		}
-		}]);
+			}
+		]);
 
 		expect(promptCount).toBe(1);
 	});
-	
 }
-

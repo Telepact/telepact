@@ -149,8 +149,8 @@ if (response.getBodyTarget() === 'Ok_') {
 
 - `fetch` accepts binary request bodies, so the same client can work with JSON
   or binary Telepact payloads.
-- Reverse proxies, CORS configuration, and other HTTP concerns still remain
-  possible around a Telepact endpoint when your application needs them.
+- Reverse proxies and other HTTP concerns still remain possible around a
+  Telepact endpoint when your application needs them.
 
 ## WebSockets
 

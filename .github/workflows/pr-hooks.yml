@@ -71,12 +71,9 @@ jobs:
           app-id: ${{ vars.TELEPACT_BOT_APP_ID }}
           private-key: ${{ secrets.TELEPACT_BOT_PRIVATE_KEY }}
 
-      - name: Install Project CLI
-        run: make install-project-cli
-
       - name: Approve and auto-merge PR
         env:
           PR_NUMBER: ${{ needs.get-pr-info.outputs.pr_number }}
           GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-        run: telepact-project automerge
+        run: ./tool/telepact-project automerge

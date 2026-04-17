@@ -128,11 +128,8 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v6
 
-      - name: Install Project CLI
-        run: make install-project-cli
-
       - name: Cut release
         env:
           GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-        run: telepact-project release
+        run: ./tool/telepact-project release

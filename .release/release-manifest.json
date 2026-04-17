@@ -1,9 +1,18 @@
 {
   "changed_paths": [
-    "README.md"
+    "doc/03-build-clients-and-servers/01-transports.md",
+    "doc/example.md",
+    "sdk/cli/telepact_cli/cli.py",
+    "sdk/console/README.md"
   ],
-  "direct_targets": [],
-  "pr_number": 388,
-  "targets": [],
-  "version": "1.0.0-alpha.286"
+  "direct_targets": [
+    "cli",
+    "console"
+  ],
+  "pr_number": 393,
+  "targets": [
+    "cli",
+    "console"
+  ],
+  "version": "1.0.0-alpha.292"
 }
