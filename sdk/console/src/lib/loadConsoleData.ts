@@ -97,7 +97,11 @@ function resolveProxyWebSocketUrl(schemaSource: string): string {
 	}
 
 	const proxyUrl = new URL(window.telepactConsoleProxy.wsPath, window.location.href);
-	proxyUrl.protocol = proxyUrl.protocol === 'https:' ? 'wss:' : 'ws:';
+	if (proxyUrl.protocol === 'https:') {
+		proxyUrl.protocol = 'wss:';
+	} else if (proxyUrl.protocol === 'http:') {
+		proxyUrl.protocol = 'ws:';
+	}
 	proxyUrl.searchParams.set('target', schemaSource);
 	return proxyUrl.toString();
 }

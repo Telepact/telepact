@@ -75,7 +75,7 @@ function getTargetUrl(req, protocols) {
 function getProxyPath(req) {
 	const targetUrl = req[proxyTargetSymbol];
 	const path = `${targetUrl.pathname}${targetUrl.search}`;
-	return path === '' ? '/' : path;
+	return path || '/';
 }
 
 function setProxyTarget(req, res, next, protocols) {
@@ -95,9 +95,9 @@ function setProxyTarget(req, res, next, protocols) {
 	next();
 }
 
-function writeUpgradeError(socket, statusCode, message) {
+function writeUpgradeError(socket, statusCode, reasonPhrase, message) {
 	socket.write(
-		`HTTP/1.1 ${statusCode} ${message}\r\n` +
+		`HTTP/1.1 ${statusCode} ${reasonPhrase}\r\n` +
 			'Connection: close\r\n' +
 			'Content-Type: text/plain\r\n' +
 			`\r\n${message}`
@@ -183,7 +183,7 @@ server.on('upgrade', (req, socket, head) => {
 	const targetUrl = parseTargetUrl(parsedUrl.searchParams.get('target'), ['ws:', 'wss:']);
 
 	if (!targetUrl) {
-		writeUpgradeError(socket, 400, 'Invalid target URL');
+		writeUpgradeError(socket, 400, 'Bad Request', 'Invalid target URL');
 		return;
 	}
 
