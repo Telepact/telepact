@@ -24,8 +24,8 @@ import textwrap
 import unittest
 from pathlib import Path
 
-from click.testing import CliRunner
 import click
+from click.testing import CliRunner
 
 PACKAGE_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PACKAGE_ROOT))

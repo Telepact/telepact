@@ -17,10 +17,10 @@
 import click
 import os
 import sys
-import time
 from lxml import etree as ET
 import json
 import toml
+import time
 from ruamel.yaml import YAML
 import subprocess
 from github import Github, GithubException
