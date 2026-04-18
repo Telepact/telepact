@@ -531,8 +531,8 @@ def release() -> None:
             repo.create_git_ref(ref=f"refs/tags/{go_module_tag}", sha=head_commit)
             click.echo(f"Created Go module tag: {go_module_tag}")
 
-    included_prs = [f"- {subject}" for subject in included_commits if isinstance(subject, str) and subject.strip()]
-    included_prs_string = "\n".join(included_prs) if included_prs else "(None)"
+    included_commit_lines = [f"- {subject}" for subject in included_commits if isinstance(subject, str) and subject.strip()]
+    included_prs_string = "\n".join(included_commit_lines) if included_commit_lines else "(None)"
 
     released_projects = ''.join(f'- {target}\n' for target in release_targets) if release_targets else '(None)'
     final_release_body = (

@@ -206,13 +206,27 @@ def changed_paths_for_revision(repo_root: Path | str, revision: str = "HEAD") ->
     )
 
 
+def _latest_version_change_commit(repo_root: Path, head_ref: str = "HEAD") -> str | None:
+    result = subprocess.run(
+        ["git", "log", "--format=%H", head_ref, "--", VERSION_FILE_RELATIVE_PATH.as_posix()],
+        cwd=repo_root,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        check=True,
+    )
+    commits = [line.strip() for line in result.stdout.splitlines() if line.strip()]
+    return commits[0] if commits else None
+
+
 def release_commits_since_last_bump(repo_root: Path | str, head_ref: str = "HEAD") -> list[ReleaseCommit]:
     repo_root = find_repo_root(repo_root)
-    commits_since_last_bump: list[ReleaseCommit] = []
-    for sha, subject in _git_log_subjects(repo_root, head_ref):
-        if VERSION_FILE_RELATIVE_PATH.as_posix() in changed_paths_for_revision(repo_root, sha):
-            break
-        commits_since_last_bump.append(ReleaseCommit(sha=sha, subject=subject))
+    latest_version_change_commit = _latest_version_change_commit(repo_root, head_ref)
+    revision = f"{latest_version_change_commit}..{head_ref}" if latest_version_change_commit else head_ref
+    commits_since_last_bump = [
+        ReleaseCommit(sha=sha, subject=subject)
+        for sha, subject in _git_log_subjects(repo_root, revision)
+    ]
     commits_since_last_bump.reverse()
     return commits_since_last_bump
 
