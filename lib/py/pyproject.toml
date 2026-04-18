@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "telepact"
-version = "1.0.0-alpha.294"
+version = "1.0.0-alpha.300"
 description = "The Python Telepact library"
 readme = "README.md"
 requires-python = ">=3.11"

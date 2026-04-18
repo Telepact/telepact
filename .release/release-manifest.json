@@ -1,14 +1,14 @@
 {
   "changed_paths": [
-    "example/ts-codegen/gen/genTypes.ts",
-    "sdk/cli/telepact_cli/templates/ts_all_2.j2"
+    "sdk/console/package-lock.json",
+    "sdk/console/package.json"
   ],
   "direct_targets": [
-    "cli"
+    "console"
   ],
-  "pr_number": 395,
+  "pr_number": 397,
   "targets": [
-    "cli"
+    "console"
   ],
-  "version": "1.0.0-alpha.294"
+  "version": "1.0.0-alpha.300"
 }
