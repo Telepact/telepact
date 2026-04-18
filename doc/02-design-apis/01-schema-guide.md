@@ -95,7 +95,12 @@ A struct definition itself can be used as a type reference.
 | --------------------------- | ----------------------------------------------------- | ---------------------------------- |
 | `"struct.ExampleStruct1"`   | `{"field": true, "anotherField": ["text1", "text2"]}` | `null`, `{}`                       |
 | `"struct.ExampleStruct2"`   | `{"optionalField!": true}`, `{}`                      | `null`, `{"wrongField": true}`     |
-| `["struct.ExampleStruct2"]` | `[{"optionalField!": true}]`                          | `[null]`, `[{"wrongField": true}]` |
+| `["struct.ExampleStruct2"]` | `[{"optionalField!": true}]`                          | `[null]`, `[{"wrongField": true}]`, `[{"optionalField": true}]` |
+
+> [!IMPORTANT]
+> Optionality is encoded in the field key itself, both in the schema and on
+> the wire. Note that in the above example `{"optionalField": true}` is invalid;
+> it must be `[{"optionalField!": true}]`
 
 ### Union
 

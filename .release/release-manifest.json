@@ -1,14 +1,14 @@
 {
   "changed_paths": [
-    "sdk/console/package-lock.json",
-    "sdk/console/package.json"
+    "sdk/prettier/package-lock.json"
   ],
   "direct_targets": [
-    "console"
+    "prettier"
   ],
-  "pr_number": 397,
+  "pr_number": 406,
   "targets": [
-    "console"
+    "console",
+    "prettier"
   ],
-  "version": "1.0.0-alpha.300"
+  "version": "1.0.0-alpha.301"
 }
