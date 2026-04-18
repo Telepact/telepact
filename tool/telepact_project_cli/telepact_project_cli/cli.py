@@ -83,6 +83,11 @@ def _require_env(name: str) -> str:
     return value
 
 
+def _env_flag(name: str) -> bool:
+    value = os.getenv(name, "")
+    return value.strip().lower() in {"1", "true", "yes", "on"}
+
+
 def _commit_requests_skip_build(commit_message: str) -> bool:
     return MERGE_QUEUE_SKIP_BUILD_PHRASE in commit_message
 
@@ -96,7 +101,10 @@ def _build_bump_commit_message(new_version: str, pr_number: int, skip_build: boo
 
 def _read_commit_metadata(commit_ref: str) -> tuple[str, str, str]:
     raw = _git(["show", "-s", "--format=%B%x00%an%x00%ae", commit_ref], cwd=Path("."))
-    commit_message, author_name, author_email = raw.split("\x00", 2)
+    parts = raw.split("\x00", 2)
+    if len(parts) != 3:
+        raise click.ClickException(f"Unable to parse commit metadata for {commit_ref}.")
+    commit_message, author_name, author_email = parts
     return commit_message, author_name.strip(), author_email.strip()
 
 
@@ -395,7 +403,7 @@ def bump() -> None:
     pr_number = int(pr_number_str)
     _bump_repository_version(
         pr_number,
-        skip_build=os.getenv("TELEPACT_BUMP_SKIP_BUILD", "").strip().lower() in {"1", "true", "yes", "on"},
+        skip_build=_env_flag("TELEPACT_BUMP_SKIP_BUILD"),
     )
 
 
