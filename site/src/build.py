@@ -235,11 +235,6 @@ def write_home_page() -> int:
     rendered = SNIPPET_PATTERN.sub(replace, template)
     rendered = rendered.replace("{{BASE_URL}}", BASE_URL)
     rendered = rendered.replace("{{REPO_URL}}", REPO_URL)
-    rendered = rendered.replace(
-        "</head>",
-        '  <link rel="alternate" type="text/markdown" href="./index.md">\n</head>',
-        1,
-    )
     INDEX_OUTPUT.write_text(rendered, encoding="utf-8")
     return replacements
 
@@ -261,7 +256,7 @@ def markdown_href(
 
     suffix = f"#{frag}" if frag else ""
     if resolved == page.source and not target.startswith("#"):
-        return suffix or "./"
+        return suffix if suffix else "./"
 
     if resolved in pages:
         return relative_href(current_markdown_file.parent, pages[resolved].markdown_file) + suffix
