@@ -41,6 +41,7 @@ STATIC_FILES = (".nojekyll", "404.html", "favicon.ico")
 HOME_MARKDOWN_SOURCE = REPO_ROOT / "README.md"
 DEFAULT_BASE_URL = "https://telepact.github.io/telepact/"
 DEFAULT_REPO_URL = "https://github.com/Telepact/telepact"
+DEFAULT_BRANCH = os.environ.get("TELEPACT_SITE_REPO_BRANCH", "main").strip() or "main"
 ALLOWED_PREFIXES = ("doc/", "example/", "lib/", "sdk/", "common/")
 PRISM_CSS = (
     "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/"
@@ -240,22 +241,21 @@ def write_home_page() -> int:
 
 
 def markdown_href(
-    page: Page,
+    source: Path,
+    current_markdown_file: Path,
     target: str,
     pages: dict[Path, Page],
     resources: set[Path],
-    current_markdown_file: Path | None = None,
 ) -> str:
-    current_markdown_file = current_markdown_file or page.markdown_file
     if is_external_link(target) or target.startswith("#"):
         return target
 
-    resolved, frag = resolve_local_target(page.source, target)
+    resolved, frag = resolve_local_target(source, target)
     if resolved is None:
         return target
 
     suffix = f"#{frag}" if frag else ""
-    if resolved == page.source and not target.startswith("#"):
+    if resolved == source and not target.startswith("#"):
         return suffix if suffix else "./"
 
     if resolved in pages:
@@ -267,20 +267,19 @@ def markdown_href(
     if resolved.exists():
         rel = repo_rel(resolved)
         if resolved.is_dir():
-            return f"{REPO_URL}/tree/main/{rel}{suffix}"
-        return f"{REPO_URL}/blob/main/{rel}{suffix}"
+            return f"{REPO_URL}/tree/{DEFAULT_BRANCH}/{rel}{suffix}"
+        return f"{REPO_URL}/blob/{DEFAULT_BRANCH}/{rel}{suffix}"
 
     return target
 
 
 def rewrite_markdown_links(
-    page: Page,
+    source: Path,
+    current_markdown_file: Path,
     markdown: str,
     pages: dict[Path, Page],
     resources: set[Path],
-    current_markdown_file: Path | None = None,
 ) -> str:
-    current_markdown_file = current_markdown_file or page.markdown_file
     rewritten_lines: list[str] = []
     in_fenced_code = False
 
@@ -297,7 +296,7 @@ def rewrite_markdown_links(
             MARKDOWN_LINK_PATTERN.sub(
                 lambda match: (
                     f'{match.group("prefix")}'
-                    f'{markdown_href(page, match.group("target"), pages, resources, current_markdown_file)}'
+                    f'{markdown_href(source, current_markdown_file, match.group("target"), pages, resources)}'
                     f'{match.group("suffix")}'
                 ),
                 line,
@@ -308,11 +307,10 @@ def rewrite_markdown_links(
 
 
 def write_home_markdown(pages: dict[Path, Page], resources: set[Path]) -> None:
-    home_page = Page(source=HOME_MARKDOWN_SOURCE, output_file=SITE_DIR / "index.html")
     markdown = HOME_MARKDOWN_SOURCE.read_text(encoding="utf-8")
     home_markdown_file = SITE_DIR / "index.md"
     home_markdown_file.write_text(
-        rewrite_markdown_links(home_page, markdown, pages, resources, home_markdown_file),
+        rewrite_markdown_links(HOME_MARKDOWN_SOURCE, home_markdown_file, markdown, pages, resources),
         encoding="utf-8",
     )
 
@@ -749,14 +747,14 @@ class MarkdownRenderer:
         if resolved.exists():
             rel = repo_rel(resolved)
             if resolved.is_dir():
-                return f"{REPO_URL}/tree/main/{rel}{suffix}"
-            return f"{REPO_URL}/blob/main/{rel}{suffix}"
+                return f"{REPO_URL}/tree/{DEFAULT_BRANCH}/{rel}{suffix}"
+            return f"{REPO_URL}/blob/{DEFAULT_BRANCH}/{rel}{suffix}"
 
         return target
 
 
 def github_blob_url(source: Path) -> str:
-    return f"{REPO_URL}/blob/main/{repo_rel(source)}"
+    return f"{REPO_URL}/blob/{DEFAULT_BRANCH}/{repo_rel(source)}"
 
 
 def page_excerpt(page: Page) -> str:
@@ -850,12 +848,12 @@ def render_nav_link(current: Page, pages: dict[Path, Page], resources: set[Path]
             active = ' class="active"' if page.source == current.source else ""
             href = relative_href(current.output_file.parent, page.output_file, trailing_slash=True)
         else:
-            href = f"{REPO_URL}/blob/main/{item.target}"
+            href = f"{REPO_URL}/blob/{DEFAULT_BRANCH}/{item.target}"
     else:
         if target_path in resources:
             href = relative_href(current.output_file.parent, output_resource_path(target_path))
         elif target_path.exists():
-            href = f"{REPO_URL}/blob/main/{item.target}"
+            href = f"{REPO_URL}/blob/{DEFAULT_BRANCH}/{item.target}"
     return f'<li><a{active} href="{html.escape(href)}">{html.escape(item.label)}</a></li>'
 
 
@@ -977,7 +975,7 @@ def page_shell(page: Page, body_html: str, pages: dict[Path, Page], resources: s
       <ul class="footer-links">
         <li><a href="{REPO_URL}" target="_blank" rel="noopener noreferrer">GitHub</a></li>
         <li><a href="{docs_home_href}">Documentation</a></li>
-        <li><a href="{REPO_URL}/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">Apache 2.0 License</a></li>
+        <li><a href="{REPO_URL}/blob/{DEFAULT_BRANCH}/LICENSE" target="_blank" rel="noopener noreferrer">Apache 2.0 License</a></li>
       </ul>
       <p>&copy; Telepact Contributors. Open source under the Apache 2.0 License.</p>
     </div>
@@ -1476,7 +1474,7 @@ def write_pages(pages: dict[Path, Page], resources: set[Path]) -> None:
         page.output_file.parent.mkdir(parents=True, exist_ok=True)
         page.output_file.write_text(page_shell(page, body_html, pages, resources), encoding="utf-8")
         page.markdown_file.write_text(
-            rewrite_markdown_links(page, markdown, pages, resources),
+            rewrite_markdown_links(page.source, page.markdown_file, markdown, pages, resources),
             encoding="utf-8",
         )
 
