@@ -855,7 +855,7 @@ def merge_queue() -> None:
     _ensure_repo_label(
         repo,
         MERGE_QUEUE_LABEL,
-        color="4f81c7",
+        color="1d76db",
         description="Marks a PR that is being merged by the Telepact merge queue.",
     )
     if not _pull_request_has_label(pr, MERGE_QUEUE_LABEL):
