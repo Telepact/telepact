@@ -80,24 +80,30 @@ jobs:
         run: ./tool/telepact-project check-passing-build --head-sha "${{ steps.pr.outputs.head_sha }}"
 
       - name: Check out PR branch
-        env:
-          PR_HEAD_REF: ${{ steps.pr.outputs.head_ref }}
-        run: |
-          git fetch origin "$PR_HEAD_REF"
-          git checkout -B "$PR_HEAD_REF" "origin/$PR_HEAD_REF"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          path: merge-target
+          ref: ${{ steps.pr.outputs.head_ref }}
+          token: ${{ steps.generate-token.outputs.token }}
 
       - name: Apply version bump
+        id: bump
         env:
           PR_NUMBER: ${{ github.event.issue.number }}
-        run: ./tool/telepact-project bump
+        run: |
+          cd merge-target
+          ../tool/telepact-project bump
+          echo "version=$(cat VERSION.txt)" >> "$GITHUB_OUTPUT"
 
       - name: Commit and push bump
         env:
           PR_HEAD_REF: ${{ steps.pr.outputs.head_ref }}
           PR_NUMBER: ${{ github.event.issue.number }}
         run: |
+          cd merge-target
           git add .
-          git commit -m "Bump version to $(cat VERSION.txt) (#$PR_NUMBER) [skip build]"
+          git commit -m "Bump version to ${{ steps.bump.outputs.version }} (#$PR_NUMBER) [skip build]"
           git push origin "HEAD:$PR_HEAD_REF"
 
       - name: Wait for passing PR build after bump
@@ -105,7 +111,9 @@ jobs:
           GITHUB_REPOSITORY: ${{ github.repository }}
           GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
           PR_NUMBER: ${{ github.event.issue.number }}
-        run: ./tool/telepact-project check-passing-build --head-sha "$(git rev-parse HEAD)"
+        run: |
+          cd merge-target
+          ../tool/telepact-project check-passing-build --head-sha "$(git rev-parse HEAD)"
 
       - name: Squash merge PR
         env:
@@ -113,6 +121,7 @@ jobs:
           GH_TOKEN: ${{ steps.generate-token.outputs.token }}
           GITHUB_REPOSITORY: ${{ github.repository }}
         run: |
+          cd merge-target
           gh pr merge "${{ github.event.issue.number }}" \
             --repo "$GITHUB_REPOSITORY" \
             --squash \
