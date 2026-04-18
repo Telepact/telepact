@@ -301,7 +301,7 @@ wheels = [
 
 [[package]]
 name = "telepact"
-version = "1.0.0a301"
+version = "1.0.0a302"
 source = { editable = "." }
 dependencies = [
     { name = "msgpack" },

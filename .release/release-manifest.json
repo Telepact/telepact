@@ -1,14 +1,9 @@
 {
   "changed_paths": [
-    "sdk/prettier/package-lock.json"
+    "doc/02-design-apis/01-schema-guide.md"
   ],
-  "direct_targets": [
-    "prettier"
-  ],
-  "pr_number": 406,
-  "targets": [
-    "console",
-    "prettier"
-  ],
-  "version": "1.0.0-alpha.301"
+  "direct_targets": [],
+  "pr_number": 407,
+  "targets": [],
+  "version": "1.0.0-alpha.302"
 }
