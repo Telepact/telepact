@@ -1,21 +1,14 @@
 {
   "changed_paths": [
-    "bind/dart/pubspec.lock",
-    "lib/ts/package-lock.json",
     "sdk/console/package-lock.json",
-    "test/lib/go/go.mod",
-    "test/lib/go/go.sum"
+    "sdk/console/package.json"
   ],
   "direct_targets": [
-    "console",
-    "dart",
-    "ts"
+    "console"
   ],
-  "pr_number": 402,
+  "pr_number": 397,
   "targets": [
-    "console",
-    "dart",
-    "ts"
+    "console"
   ],
-  "version": "1.0.0-alpha.297"
+  "version": "1.0.0-alpha.300"
 }
