@@ -1,9 +1,9 @@
 {
   "changed_paths": [
-    "doc/02-design-apis/01-schema-guide.md"
+    ".github/workflows/merge-queue.yml"
   ],
   "direct_targets": [],
-  "pr_number": 407,
+  "pr_number": 413,
   "targets": [],
-  "version": "1.0.0-alpha.302"
+  "version": "1.0.0-alpha.303"
 }
