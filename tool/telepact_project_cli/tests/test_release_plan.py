@@ -453,7 +453,7 @@ class ReleasePlanTests(unittest.TestCase):
             self.assertEqual(result.exit_code, 0, msg=result.output)
             self.assertEqual(output_path.read_text(encoding="utf-8"), "skip_build=false\n")
 
-    def test_authorize_merge_request_requires_merge_permission(self) -> None:
+    def test_authorize_merge_request_accepts_write_permission(self) -> None:
         runner = CliRunner()
         fake_repo = mock.Mock()
         fake_repo.get_collaborator_permission.return_value = "write"
@@ -518,6 +518,7 @@ class ReleasePlanTests(unittest.TestCase):
 
         self.assertNotEqual(result.exit_code, 0)
         self.assertIn("Only repository members may enqueue merges", result.output)
+        fake_repo.get_collaborator_permission.assert_not_called()
 
 
 if __name__ == "__main__":
