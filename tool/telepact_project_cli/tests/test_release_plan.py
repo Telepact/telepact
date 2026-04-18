@@ -36,7 +36,9 @@ from telepact_project_cli.release_plan import (
     changed_paths_for_commits,
     compute_release_manifest,
     load_release_manifest,
+    parse_pr_number_from_subject,
     release_commits_since_last_bump,
+    strip_pr_number_suffix,
     write_release_manifest,
 )
 
@@ -167,6 +169,15 @@ class ReleasePlanTests(unittest.TestCase):
                 ("cli", "console", "dart", "go", "java", "prettier", "py", "ts"),
             )
             self.assertEqual(manifest.targets, manifest.direct_targets)
+
+    def test_parse_pr_number_from_subject(self) -> None:
+        self.assertEqual(parse_pr_number_from_subject("Add Python client (#10)"), 10)
+        self.assertIsNone(parse_pr_number_from_subject("Bump version to 1.0.0-alpha.201"))
+        self.assertIsNone(parse_pr_number_from_subject("Malformed suffix (#abc)"))
+
+    def test_strip_pr_number_suffix(self) -> None:
+        self.assertEqual(strip_pr_number_suffix("Update Prettier support (#11)"), "Update Prettier support")
+        self.assertEqual(strip_pr_number_suffix("No suffix here"), "No suffix here")
 
     def test_publish_targets_command_writes_github_outputs(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
