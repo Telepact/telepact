@@ -41,7 +41,9 @@ LICENSE_HEADER_IGNORE_FILE = ".license-header-ignore"
 MERGE_QUEUE_LABEL = "merge-queued"
 MERGE_QUEUE_SKIP_BUILD_PHRASE = "[skip build]"
 MERGE_QUEUE_ALLOWED_COMMENT_ASSOCIATIONS = frozenset({"COLLABORATOR", "MEMBER", "OWNER"})
+POLL_INTERVAL_SECONDS = 3
 PR_WORKFLOW_FILE = "pr.yml"
+WORKFLOW_POLL_INTERVAL_SECONDS = 10
 
 
 def _write_json(path: str, data: dict) -> None:
@@ -106,6 +108,22 @@ def _ensure_repo_label(repo, name: str, color: str, description: str) -> None:
 
 def _pull_request_has_label(pr, label_name: str) -> bool:
     return any(label.name == label_name for label in pr.get_labels())
+
+
+def _should_skip_build_for_pull_request(commit_message: str) -> bool:
+    skip_requested_by_commit = _should_skip_build(commit_message)
+    if not skip_requested_by_commit:
+        return False
+
+    github_token = os.getenv("GITHUB_TOKEN")
+    github_repository = os.getenv("GITHUB_REPOSITORY")
+    pr_number_str = os.getenv("PR_NUMBER")
+    if not (github_token and github_repository and pr_number_str):
+        return True
+
+    repo = Github(github_token).get_repo(github_repository)
+    pr = repo.get_pull(int(pr_number_str))
+    return _pull_request_has_label(pr, MERGE_QUEUE_LABEL)
 
 
 def _load_pyproject() -> dict:
@@ -693,7 +711,7 @@ def _wait_for_pull_request_mergeability(
         if pr.mergeable is not None:
             return pr
         last_state = pr.mergeable_state
-        time.sleep(3)
+        time.sleep(POLL_INTERVAL_SECONDS)
     raise click.ClickException(
         f"Timed out waiting for PR #{pr_number} mergeability during {context}. Last state: {last_state!r}"
     )
@@ -707,7 +725,7 @@ def _wait_for_pull_request_head(
         pr = _refresh_pull_request(repo, pr_number)
         if pr.head.sha == expected_sha:
             return pr
-        time.sleep(3)
+        time.sleep(POLL_INTERVAL_SECONDS)
     raise click.ClickException(f"Timed out waiting for PR #{pr_number} to move to head SHA {expected_sha}.")
 
 
@@ -719,7 +737,7 @@ def _wait_for_pull_request_head_change(
         pr = _refresh_pull_request(repo, pr_number)
         if pr.head.sha != previous_sha:
             return pr
-        time.sleep(3)
+        time.sleep(POLL_INTERVAL_SECONDS)
     raise click.ClickException(f"Timed out waiting for PR #{pr_number} head SHA to change from {previous_sha}.")
 
 
@@ -737,7 +755,7 @@ def _wait_for_pr_workflow_success(repo, head_sha: str, timeout_seconds: int = 18
                 raise click.ClickException(
                     f"PR workflow failed for {head_sha}: conclusion={run.conclusion}, url={run.html_url}"
                 )
-        time.sleep(10)
+        time.sleep(WORKFLOW_POLL_INTERVAL_SECONDS)
     raise click.ClickException(f"Timed out waiting for PR workflow success for {head_sha}.")
 
 
@@ -795,15 +813,7 @@ def _merge_pull_request(repo, pr_number: int, expected_head_sha: str, timeout_se
 @click.option("--github-output", default=None, type=click.Path(dir_okay=False, path_type=Path), help="Write GitHub Actions outputs.")
 def should_skip_build(commit_ref: str, github_output: Path | None) -> None:
     message = _git(["show", "-s", "--format=%B", commit_ref], cwd=Path("."))
-    skip_build = _should_skip_build(message)
-    if skip_build:
-        github_token = os.getenv("GITHUB_TOKEN")
-        github_repository = os.getenv("GITHUB_REPOSITORY")
-        pr_number_str = os.getenv("PR_NUMBER")
-        if github_token and github_repository and pr_number_str:
-            repo = Github(github_token).get_repo(github_repository)
-            pr = repo.get_pull(int(pr_number_str))
-            skip_build = _pull_request_has_label(pr, MERGE_QUEUE_LABEL)
+    skip_build = _should_skip_build_for_pull_request(message)
     line = f"skip_build={'true' if skip_build else 'false'}"
     if github_output is not None:
         github_output.parent.mkdir(parents=True, exist_ok=True)
