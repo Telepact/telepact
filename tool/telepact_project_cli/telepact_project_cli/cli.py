@@ -32,6 +32,7 @@ from .release_plan import (
     compute_release_manifest,
     load_release_manifest,
     parse_legacy_release_info,
+    parse_pr_number_from_subject,
     release_commits_since_last_bump,
     resolve_publish_targets,
     strip_pr_number_suffix,
@@ -570,8 +571,7 @@ def release() -> None:
             click.echo("No release manifest found and the last commit message does not match the expected legacy format.")
             return
         version, release_targets = legacy_info
-        pr_number_str = lines[0].rsplit("(#", 1)[-1].rstrip(")") if lines else ""
-        pr_number = int(pr_number_str) if pr_number_str.isdigit() else None
+        pr_number = parse_pr_number_from_subject(lines[0]) if lines else None
         click.echo("Loaded release metadata from legacy bump commit message")
 
     print(f'release_targets: {release_targets}')

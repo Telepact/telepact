@@ -260,6 +260,46 @@ class ReleasePlanTests(unittest.TestCase):
         )
         self.assertIn("Created pull request #123", result.output)
 
+    def test_create_pull_request_requires_github_token(self) -> None:
+        runner = CliRunner()
+
+        result = runner.invoke(
+            main,
+            [
+                "create-pull-request",
+                "--title",
+                "Example",
+                "--head",
+                "bump-version",
+                "--base",
+                "main",
+            ],
+            env={"GITHUB_REPOSITORY": "Telepact/telepact"},
+        )
+
+        self.assertNotEqual(result.exit_code, 0)
+        self.assertIn("GITHUB_TOKEN environment variable is not set.", result.output)
+
+    def test_create_pull_request_requires_github_repository(self) -> None:
+        runner = CliRunner()
+
+        result = runner.invoke(
+            main,
+            [
+                "create-pull-request",
+                "--title",
+                "Example",
+                "--head",
+                "bump-version",
+                "--base",
+                "main",
+            ],
+            env={"GITHUB_TOKEN": "test-token"},
+        )
+
+        self.assertNotEqual(result.exit_code, 0)
+        self.assertIn("GITHUB_REPOSITORY environment variable is not set", result.output)
+
     def test_latest_released_versions_prefers_manifest_history_and_falls_back_to_legacy_commits(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             repo_root = Path(tmp_dir)
