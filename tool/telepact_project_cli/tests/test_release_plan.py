@@ -427,7 +427,7 @@ class ReleasePlanTests(unittest.TestCase):
             self.assertEqual(result.exit_code, 0, msg=result.output)
             self.assertEqual(output_path.read_text(encoding="utf-8"), "skip_build=true\n")
 
-    def test_should_skip_build_command_rejects_non_bot_phrase(self) -> None:
+    def test_should_skip_build_command_rejects_phrase_from_non_bot_author(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             repo_root = Path(tmp_dir)
             (repo_root / "VERSION.txt").write_text("1.0.0-alpha.214", encoding="utf-8")

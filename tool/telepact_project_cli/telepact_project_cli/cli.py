@@ -101,8 +101,8 @@ def _build_bump_commit_message(new_version: str, pr_number: int, skip_build: boo
 
 def _read_commit_metadata(commit_ref: str) -> tuple[str, str, str]:
     raw = _git(["show", "-s", "--format=%B%x00%an%x00%ae%x00", commit_ref], cwd=Path(".")).rstrip("\n")
-    parts = raw.split("\x00")
-    if len(parts) < 4 or parts[3] != "":
+    parts = raw.split("\x00", 3)
+    if len(parts) != 4 or parts[3] != "":
         raise click.ClickException(f"Unable to parse commit metadata for {commit_ref}.")
     commit_message, author_name, author_email = parts[:3]
     return commit_message.strip(), author_name.strip(), author_email.strip()
