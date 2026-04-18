@@ -162,9 +162,14 @@ test.describe('Live schema YAML rendering', () => {
 			page.getByRole('button', { name: 'Toggle Schema', pressed: true })
 		).toBeVisible();
 
+		const schemaEditor = page.locator('[data-language="yaml"]').filter({
+			has: page.getByRole('textbox', { name: 'schema' })
+		});
+		await expect(schemaEditor).toHaveCount(1);
+
 		const schemaText = await selectAllCopyAndGet(
 			page,
-			page.getByRole('textbox', { name: 'schema' }).locator('..')
+			schemaEditor
 		);
 
 		expect(schemaText.trimStart().startsWith('- ///: |')).toBeTruthy();

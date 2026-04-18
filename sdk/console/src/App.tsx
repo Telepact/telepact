@@ -701,7 +701,7 @@ export default function App() {
 											id="schema"
 											readOnly={readonlyEditor}
 											json={schemaDraft}
-											language="plaintext"
+											language="yaml"
 											ctrlEnter={handleSchemaSave}
 											filename="schema.telepact.yaml"
 											ariaLabel="schema"

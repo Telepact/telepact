@@ -18,6 +18,7 @@ import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
 import * as monaco from 'monaco-editor';
 import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
 import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
+import 'monaco-editor/esm/vs/basic-languages/yaml/yaml.contribution';
 
 export type MonacoEditorHandle = {
 	getContent: () => string;
@@ -40,6 +41,7 @@ export type MonacoEditorProps = {
 const MonacoEditor = forwardRef<MonacoEditorHandle, MonacoEditorProps>(function MonacoEditor(props, ref) {
 	const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
 	const editorElementRef = useRef<HTMLDivElement | null>(null);
+	const language = props.language ?? 'json';
 
 	useImperativeHandle(
 		ref,
@@ -132,7 +134,7 @@ const MonacoEditor = forwardRef<MonacoEditorHandle, MonacoEditorProps>(function 
 
 		const model = monaco.editor.createModel(
 			props.json,
-			props.language ?? 'json',
+			language,
 			monaco.Uri.parse(`internal://server/${props.filename}`)
 		);
 		editor.setModel(model);
@@ -171,7 +173,10 @@ const MonacoEditor = forwardRef<MonacoEditorHandle, MonacoEditorProps>(function 
 	}, []);
 
 	return (
-		<div className={`z-1 relative w-full ${(props.fullHeight ?? true) ? 'h-full' : ''}`}>
+		<div
+			className={`z-1 relative w-full ${(props.fullHeight ?? true) ? 'h-full' : ''}`}
+			data-language={language}
+		>
 			<div ref={editorElementRef} className={(props.fullHeight ?? true) ? 'h-full' : ''} />
 		</div>
 	);
