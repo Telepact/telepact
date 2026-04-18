@@ -21,6 +21,10 @@ on:
     types: [completed]
     workflows: ["PR Close Report"]
 
+permissions:
+  actions: read
+  contents: read
+
 jobs:
   get-pr-close-info:
     name: Get PR Close Information
