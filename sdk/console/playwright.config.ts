@@ -35,6 +35,11 @@ const config: PlaywrightTestConfig = {
 			command: 'telepact mock --port 8085 --dir tests/schema --generated-collection-length-min 2 --generated-collection-length-max 2',
 			port: 8085,
 			stdout: 'pipe'
+		},
+		{
+			command: 'telepact mock --port 8086 --dir tests/schema-demo --generated-collection-length-min 2 --generated-collection-length-max 2',
+			port: 8086,
+			stdout: 'pipe'
 		}
 	],
 	testDir: 'tests',

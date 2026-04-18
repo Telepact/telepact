@@ -44,7 +44,8 @@
     "typescript": "^5.9.3"
   },
   "scripts": {
-    "build": "tsc && rollup -c"
+    "build": "tsc && rollup -c",
+    "test": "npm run build && node --test"
   },
   "files": [
     "dist",

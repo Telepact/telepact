@@ -145,6 +145,39 @@ for (const transport of transports) {
 	});
 }
 
+test.describe('Live schema YAML rendering', () => {
+	test('Live-loaded schemas are displayed as YAML in the schema pane', async ({ page }) => {
+		await page.goto('/');
+		await expect(page.getByRole('heading', { name: 'Telepact' })).toBeVisible();
+
+		const liveUrlInput = page.getByRole('textbox', { name: 'Live URL' });
+		await liveUrlInput.fill('http://localhost:8086/api');
+		await page.getByRole('button', { name: 'Load' }).click();
+
+		await expect(page.getByRole('heading', { name: 'Schema' })).toBeVisible();
+
+		const schemaButton = page.getByRole('button', { name: 'Toggle Schema', pressed: false });
+		await schemaButton.click();
+		await expect(
+			page.getByRole('button', { name: 'Toggle Schema', pressed: true })
+		).toBeVisible();
+
+		const schemaText = await selectAllCopyAndGet(
+			page,
+			page.getByRole('textbox', { name: 'schema' }).locator('..')
+		);
+
+		expect(schemaText.trimStart().startsWith('- ///: |')).toBeTruthy();
+		expect(schemaText).toContain('info.Calculator: {}');
+		expect(schemaText).toContain('fn.getPaperTape:');
+		expect(schemaText).toContain('limit!: "integer"');
+		expect(schemaText).toContain('struct.Evaluation:');
+		expect(schemaText).toContain('successful: "boolean"');
+		expect(schemaText).toContain('union.Expression:');
+		expect(schemaText).not.toContain('[{"Ok_"');
+	});
+});
+
 function defineConsoleTests() {
 	test.describe('Live URL validation', () => {
 		test('accepts blank and relative targets without error', async ({ page }) => {

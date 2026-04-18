@@ -27,7 +27,7 @@ function indent(level: number): string {
 }
 
 function isPlainKey(key: string): boolean {
-    return /^(\/\/\/|->|[A-Za-z0-9_@.][A-Za-z0-9_@.!-]*)$/.test(key);
+    return /^(\/\/\/|->|[A-Za-z0-9_.][A-Za-z0-9_@.!-]*)$/.test(key);
 }
 
 function formatKey(key: string): string {

@@ -1,0 +1,53 @@
+- ///: |
+    A calculator app that provides basic math computation capabilities.
+  info.Calculator: {}
+- ///: |
+    A standard error.
+  errors.Auth_:
+    - ///: |
+        The credentials in the `@auth_` header were missing or invalid.
+      ErrorUnauthenticated_:
+        message!: "string"
+    - ///: |
+        The credentials in the `@auth_` header were insufficient to run the
+        function.
+      ErrorUnauthorized_:
+        message!: "string"
+- ///: |
+    Get previous computations, ordered from most recent to least recent, up to the
+    specified `limit`.
+  fn.getPaperTape:
+    limit!: "integer"
+  ->:
+    - Ok_:
+        tape: ["struct.Evaluation"]
+- ///: |
+    The `@auth_` header is the conventional location for sending credentials to the
+    server for the purpose of authentication and authorization.
+  headers.Auth_:
+    "@auth_": "union.Auth_"
+  ->: {}
+- ///: |
+    A record of an evaluated expression.
+  struct.Evaluation:
+    expression: "union.Expression"
+    result: "number?"
+    timestamp: "integer"
+    successful: "boolean"
+- union.Auth_:
+    - Ephemeral:
+        username: "string"
+    - Session:
+        token: "string"
+- ///: |
+    A mathematical expression, either a `Constant`, a `Variable`, or a binary
+    operation (`Add`, `Sub`, `Mul`, `Div`).
+  union.Expression:
+    - ///: |
+        A constant numeric `value`.
+      Constant:
+        value: "number"
+    - ///: |
+        A variable reference by `name`.
+      Variable:
+        name: "string"
