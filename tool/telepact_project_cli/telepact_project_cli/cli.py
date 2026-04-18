@@ -88,7 +88,7 @@ def _env_flag(name: str) -> bool:
     return value.strip().lower() in {"1", "true", "yes", "on"}
 
 
-def _commit_requests_skip_build(commit_message: str) -> bool:
+def _is_bump_commit_message(commit_message: str) -> bool:
     return MERGE_QUEUE_BUMP_COMMIT_PREFIX in commit_message
 
 
@@ -114,7 +114,7 @@ def _is_merge_queue_bot_author(author_name: str, author_email: str) -> bool:
 
 def _should_skip_build_for_commit(commit_ref: str) -> bool:
     commit_message, author_name, author_email = _read_commit_metadata(commit_ref)
-    if not _commit_requests_skip_build(commit_message):
+    if not _is_bump_commit_message(commit_message):
         return False
 
     return _is_merge_queue_bot_author(author_name, author_email)

@@ -69,7 +69,7 @@ jobs:
           done <<< "$pr_state"
 
           if [ -z "$head_ref" ] || [ -z "$head_sha" ]; then
-            echo "Missing head_ref/head_sha output from ensure-pr-requirements-met." >&2
+            echo "Missing head_ref/head_sha output from ./tool/telepact-project ensure-pr-requirements-met." >&2
             exit 1
           fi
 
