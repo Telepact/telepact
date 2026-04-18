@@ -347,7 +347,11 @@ def _bump_repository_version(pr_number: int, commit: bool = False, skip_build: b
     # Update lock files
     for project_file in project_files:
         if project_file.endswith("package.json") and os.path.exists(os.path.join(os.path.dirname(project_file), "package-lock.json")):
-            subprocess.run(["npm", "install", "--ignore-scripts"], cwd=os.path.dirname(project_file), check=True)
+            subprocess.run(
+                ["npm", "install", "--package-lock-only", "--ignore-scripts"],
+                cwd=os.path.dirname(project_file),
+                check=True,
+            )
             edited_files.append(os.path.join(os.path.dirname(project_file), "package-lock.json"))
             click.echo(f"Updated package-lock.json in {os.path.dirname(project_file)}")
 

@@ -79,13 +79,13 @@ jobs:
           PR_NUMBER: ${{ github.event.issue.number }}
         run: ./tool/telepact-project check-passing-build --head-sha "${{ steps.pr.outputs.head_sha }}"
 
-      - name: Check out PR branch
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          path: merge-target
-          ref: ${{ steps.pr.outputs.head_ref }}
-          token: ${{ steps.generate-token.outputs.token }}
+      - name: Prepare PR worktree
+        env:
+          PR_HEAD_REF: ${{ steps.pr.outputs.head_ref }}
+        run: |
+          rm -rf merge-target
+          git fetch origin "$PR_HEAD_REF"
+          git worktree add --force merge-target "origin/$PR_HEAD_REF"
 
       - name: Apply version bump
         id: bump
@@ -103,7 +103,7 @@ jobs:
         run: |
           cd merge-target
           git add .
-          git commit -m "Bump version to ${{ steps.bump.outputs.version }} (#$PR_NUMBER) [skip build]"
+          git commit -m "Bump version to ${{ steps.bump.outputs.version }} (#${PR_NUMBER}) [skip build]"
           git push origin "HEAD:$PR_HEAD_REF"
 
       - name: Wait for passing PR build after bump
