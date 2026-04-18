@@ -160,6 +160,10 @@ def output_markdown_path(source: Path) -> Path:
     return output_html_path(source).with_suffix(".md")
 
 
+def markdown_output_href(current_markdown_file: Path, target_file: Path) -> str:
+    return relative_href(current_markdown_file.parent, target_file)
+
+
 def url_from_output(output_file: Path) -> str:
     rel = output_file.relative_to(SITE_DIR).as_posix()
     if rel.endswith("/index.html"):
@@ -259,10 +263,10 @@ def markdown_href(
         return suffix if suffix else "./"
 
     if resolved in pages:
-        return relative_href(current_markdown_file.parent, pages[resolved].markdown_file) + suffix
+        return markdown_output_href(current_markdown_file, pages[resolved].markdown_file) + suffix
 
     if resolved in resources:
-        return relative_href(current_markdown_file.parent, output_resource_path(resolved)) + suffix
+        return markdown_output_href(current_markdown_file, output_resource_path(resolved)) + suffix
 
     if resolved.exists():
         rel = repo_rel(resolved)
@@ -281,15 +285,18 @@ def rewrite_markdown_links(
     resources: set[Path],
 ) -> str:
     rewritten_lines: list[str] = []
-    in_fenced_code = False
+    fence_marker: str | None = None
 
     for line in markdown.splitlines(keepends=True):
         stripped = line.lstrip()
-        if stripped.startswith("```"):
-            in_fenced_code = not in_fenced_code
+        current_fence = "```" if stripped.startswith("```") else "~~~" if stripped.startswith("~~~") else None
+        if fence_marker is None and current_fence is not None:
+            fence_marker = current_fence
             rewritten_lines.append(line)
             continue
-        if in_fenced_code:
+        if fence_marker is not None:
+            if current_fence == fence_marker:
+                fence_marker = None
             rewritten_lines.append(line)
             continue
         rewritten_lines.append(
