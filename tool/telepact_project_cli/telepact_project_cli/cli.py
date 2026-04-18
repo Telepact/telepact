@@ -42,7 +42,7 @@ MERGE_QUEUE_ALLOWED_COMMENT_ASSOCIATIONS = frozenset({"COLLABORATOR", "MEMBER", 
 MERGE_QUEUE_ALLOWED_PERMISSION_LEVELS = frozenset({"admin", "maintain", "write"})
 MERGE_QUEUE_BOT_AUTHOR_NAME = "telepact-notary[bot]"
 MERGE_QUEUE_BOT_AUTHOR_EMAIL = "telepact-notary[bot]@users.noreply.github.com"
-MERGE_QUEUE_SKIP_BUILD_PHRASE = "Bump version"
+MERGE_QUEUE_BUMP_COMMIT_PREFIX = "Bump version"
 POLL_INTERVAL_SECONDS = 3
 PR_WORKFLOW_FILE = "pr.yml"
 WORKFLOW_POLL_INTERVAL_SECONDS = 10
@@ -89,12 +89,11 @@ def _env_flag(name: str) -> bool:
 
 
 def _commit_requests_skip_build(commit_message: str) -> bool:
-    return MERGE_QUEUE_SKIP_BUILD_PHRASE in commit_message
+    return MERGE_QUEUE_BUMP_COMMIT_PREFIX in commit_message
 
 
-def _build_bump_commit_message(new_version: str, pr_number: int, skip_build: bool = False) -> str:
-    subject = f"Bump version to {new_version} (#{pr_number})"
-    return subject
+def _build_bump_commit_message(new_version: str, pr_number: int) -> str:
+    return f"Bump version to {new_version} (#{pr_number})"
 
 
 def _read_commit_metadata(commit_ref: str) -> tuple[str, str, str]:
@@ -260,7 +259,7 @@ def set_version(version: str) -> None:
         click.echo("No supported project file found.")
 
 
-def _bump_repository_version(pr_number: int, commit: bool = False, skip_build: bool = False) -> str:
+def _bump_repository_version(pr_number: int, commit: bool = False) -> str:
     version_file = 'VERSION.txt'
 
     project_files = [
@@ -388,7 +387,7 @@ def _bump_repository_version(pr_number: int, commit: bool = False, skip_build: b
     click.echo(f"Updated {repo_relative_doc_versions_path}")
 
     if commit:
-        new_commit_msg = _build_bump_commit_message(new_version, pr_number, skip_build=skip_build)
+        new_commit_msg = _build_bump_commit_message(new_version, pr_number)
         subprocess.run(['git', 'add'] + list(dict.fromkeys(edited_files)))
         subprocess.run(['git', 'commit', '-m', new_commit_msg])
 
@@ -406,7 +405,6 @@ def bump(commit: bool) -> None:
     _bump_repository_version(
         pr_number,
         commit=commit,
-        skip_build=_env_flag("TELEPACT_BUMP_SKIP_BUILD"),
     )
 
 
