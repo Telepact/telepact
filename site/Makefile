@@ -20,7 +20,7 @@ all:
 	python3 src/build.py
 
 dev:
-	npx serve dist
+	python3 src/dev_server.py
 
 clean:
 	rm -rf dist
