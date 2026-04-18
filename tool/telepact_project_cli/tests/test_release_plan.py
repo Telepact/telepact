@@ -593,7 +593,7 @@ class ReleasePlanTests(unittest.TestCase):
                 },
             )
 
-        self.assertNotEqual(result.exit_code, 0)
+        self.assertGreater(result.exit_code, 0)
         self.assertIn("only main is supported", result.output)
         mark_ready.assert_not_called()
 
@@ -667,7 +667,7 @@ class ReleasePlanTests(unittest.TestCase):
                 },
             )
 
-        self.assertNotEqual(result.exit_code, 0)
+        self.assertGreater(result.exit_code, 0)
         self.assertIn("not allowed to enqueue merges", result.output)
 
     def test_authorize_merge_request_rejects_insufficient_association(self) -> None:
@@ -689,7 +689,7 @@ class ReleasePlanTests(unittest.TestCase):
                 },
             )
 
-        self.assertNotEqual(result.exit_code, 0)
+        self.assertGreater(result.exit_code, 0)
         self.assertIn("Only repository members may enqueue merges", result.output)
         fake_repo.get_collaborator_permission.assert_not_called()
 
