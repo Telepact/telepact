@@ -41,7 +41,7 @@ STATIC_FILES = (".nojekyll", "404.html", "favicon.ico")
 HOME_MARKDOWN_SOURCE = REPO_ROOT / "README.md"
 DEFAULT_BASE_URL = "https://telepact.github.io/telepact/"
 DEFAULT_REPO_URL = "https://github.com/Telepact/telepact"
-DEFAULT_BRANCH = os.environ.get("TELEPACT_SITE_REPO_BRANCH", "main").strip() or "main"
+DEFAULT_BRANCH = "main"
 ALLOWED_PREFIXES = ("doc/", "example/", "lib/", "sdk/", "common/")
 PRISM_CSS = (
     "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/"
