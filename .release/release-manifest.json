@@ -1,9 +1,14 @@
 {
   "changed_paths": [
-    ".github/workflows/copilot-setup-steps.yml"
+    "sdk/console/package-lock.json",
+    "sdk/console/package.json"
   ],
-  "direct_targets": [],
-  "pr_number": 405,
-  "targets": [],
-  "version": "1.0.0-alpha.299"
+  "direct_targets": [
+    "console"
+  ],
+  "pr_number": 397,
+  "targets": [
+    "console"
+  ],
+  "version": "1.0.0-alpha.300"
 }
