@@ -475,6 +475,50 @@ class ReleasePlanTests(unittest.TestCase):
         self.assertEqual(result.exit_code, 0, msg=result.output)
         fake_repo.get_collaborator_permission.assert_called_once_with("alice")
 
+    def test_authorize_merge_request_rejects_insufficient_permission(self) -> None:
+        runner = CliRunner()
+        fake_repo = mock.Mock()
+        fake_repo.get_collaborator_permission.return_value = "read"
+        fake_github = mock.Mock()
+        fake_github.get_repo.return_value = fake_repo
+
+        with mock.patch("telepact_project_cli.cli.Github", return_value=fake_github):
+            result = runner.invoke(
+                main,
+                ["authorize-merge-request"],
+                env={
+                    "COMMENT_AUTHOR_ASSOCIATION": "MEMBER",
+                    "COMMENT_AUTHOR_LOGIN": "alice",
+                    "GITHUB_REPOSITORY": "Telepact/telepact",
+                    "GITHUB_TOKEN": "token",
+                },
+            )
+
+        self.assertNotEqual(result.exit_code, 0)
+        self.assertIn("not allowed to enqueue merges", result.output)
+
+    def test_authorize_merge_request_rejects_insufficient_association(self) -> None:
+        runner = CliRunner()
+        fake_repo = mock.Mock()
+        fake_repo.get_collaborator_permission.return_value = "write"
+        fake_github = mock.Mock()
+        fake_github.get_repo.return_value = fake_repo
+
+        with mock.patch("telepact_project_cli.cli.Github", return_value=fake_github):
+            result = runner.invoke(
+                main,
+                ["authorize-merge-request"],
+                env={
+                    "COMMENT_AUTHOR_ASSOCIATION": "CONTRIBUTOR",
+                    "COMMENT_AUTHOR_LOGIN": "alice",
+                    "GITHUB_REPOSITORY": "Telepact/telepact",
+                    "GITHUB_TOKEN": "token",
+                },
+            )
+
+        self.assertNotEqual(result.exit_code, 0)
+        self.assertIn("Only repository members may enqueue merges", result.output)
+
 
 if __name__ == "__main__":
     unittest.main()

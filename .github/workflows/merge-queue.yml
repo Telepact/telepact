@@ -21,6 +21,8 @@ on:
     types:
       - created
 
+permissions: {}
+
 concurrency:
   group: merge-queue
   cancel-in-progress: false

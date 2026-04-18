@@ -94,10 +94,10 @@ def _build_bump_commit_message(new_version: str, pr_number: int, skip_build: boo
     return subject
 
 
-def _read_commit_author(commit_ref: str) -> tuple[str, str]:
-    raw = _git(["show", "-s", "--format=%an%n%ae", commit_ref], cwd=Path("."))
-    author_name, author_email = raw.splitlines()[:2]
-    return author_name.strip(), author_email.strip()
+def _read_commit_metadata(commit_ref: str) -> tuple[str, str, str]:
+    raw = _git(["show", "-s", "--format=%B%x00%an%x00%ae", commit_ref], cwd=Path("."))
+    commit_message, author_name, author_email = raw.split("\x00", 2)
+    return commit_message, author_name.strip(), author_email.strip()
 
 
 def _is_merge_queue_bot_author(author_name: str, author_email: str) -> bool:
@@ -108,11 +108,10 @@ def _is_merge_queue_bot_author(author_name: str, author_email: str) -> bool:
 
 
 def _should_skip_build_for_commit(commit_ref: str) -> bool:
-    commit_message = _git(["show", "-s", "--format=%B", commit_ref], cwd=Path("."))
+    commit_message, author_name, author_email = _read_commit_metadata(commit_ref)
     if not _commit_requests_skip_build(commit_message):
         return False
 
-    author_name, author_email = _read_commit_author(commit_ref)
     return _is_merge_queue_bot_author(author_name, author_email)
 
 
