@@ -34,11 +34,11 @@ class MarkdownNegotiatingHandler(SimpleHTTPRequestHandler):
         super().__init__(*args, directory=str(DIST_DIR), **kwargs)
 
     def end_headers(self) -> None:
-        self.send_header("Vary", "Content-Type")
+        self.send_header("Vary", "Accept, Content-Type")
         super().end_headers()
 
     def send_head(self):
-        if self.headers.get("Content-Type", "").split(";", 1)[0].strip().lower() == "text/markdown":
+        if self.wants_markdown_response():
             markdown_path = self.resolve_markdown_variant()
             if markdown_path is not None:
                 file_handle = markdown_path.open("rb")
@@ -50,6 +50,13 @@ class MarkdownNegotiatingHandler(SimpleHTTPRequestHandler):
                 self.end_headers()
                 return file_handle
         return super().send_head()
+
+    def wants_markdown_response(self) -> bool:
+        content_type = self.headers.get("Content-Type", "").split(";", 1)[0].strip().lower()
+        if content_type == "text/markdown":
+            return True
+        accept = self.headers.get("Accept", "")
+        return any(part.split(";", 1)[0].strip().lower() == "text/markdown" for part in accept.split(","))
 
     def resolve_markdown_variant(self) -> Path | None:
         path = unquote(urlsplit(self.path).path)
