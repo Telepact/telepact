@@ -151,7 +151,7 @@ test.describe('Live schema YAML rendering', () => {
 		await expect(page.getByRole('heading', { name: 'Telepact' })).toBeVisible();
 
 		const liveUrlInput = page.getByRole('textbox', { name: 'Live URL' });
-		await liveUrlInput.fill('http://localhost:8086/api');
+		await liveUrlInput.fill('http://localhost:8085/api');
 		await page.getByRole('button', { name: 'Load' }).click();
 
 		await expect(page.getByRole('heading', { name: 'Schema' })).toBeVisible();
@@ -169,13 +169,13 @@ test.describe('Live schema YAML rendering', () => {
 
 		const schemaText = await selectAllCopyAndGet(page, schemaEditor);
 
-		expect(schemaText.trimStart().startsWith('- ///: |')).toBeTruthy();
-		expect(schemaText).toContain('info.Calculator: {}');
-		expect(schemaText).toContain('fn.getPaperTape:');
-		expect(schemaText).toContain('limit!: "integer"');
-		expect(schemaText).toContain('struct.Evaluation:');
-		expect(schemaText).toContain('successful: "boolean"');
-		expect(schemaText).toContain('union.Expression:');
+		expect(schemaText.trimStart().startsWith('- info.DevConsole: {}')).toBeTruthy();
+		expect(schemaText).toContain('fn.fn1:');
+		expect(schemaText).toContain('input1: "string"');
+		expect(schemaText).toContain('output1: ["struct.Struct1"]');
+		expect(schemaText).toContain('fn.fnA: {}');
+		expect(schemaText).toContain('linkA: "fn.fn1"');
+		expect(schemaText).toContain('struct.Struct1:');
 		expect(schemaText).not.toContain('[{"Ok_"');
 
 		const tokenColors = await schemaEditor.evaluate((editor) => {
