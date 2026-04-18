@@ -14,19 +14,23 @@
 #|  limitations under the License.
 #|
 
-FROM node:22-alpine AS console
-
-WORKDIR /work
-
-COPY telepact-console.tgz ./
-
-RUN npm init -y
-RUN npm install --ignore-scripts --omit=dev ./telepact-console.tgz
-RUN TELEPACT_CONSOLE_ROOT="$(node --input-type=module -e 'import { selfHostedRoot } from "telepact-console/self-hosted"; process.stdout.write(selfHostedRoot)')" && \
-    mkdir -p /out && \
-    cp -R "$TELEPACT_CONSOLE_ROOT"/. /out/
-
 FROM nginx:alpine
 
-COPY --from=console /out/ /usr/share/nginx/html/
-COPY override.js /usr/share/nginx/html/override.js
+COPY build/ /usr/share/nginx/html/
+
+RUN touch /usr/share/nginx/html/override.js
+
+EXPOSE 8080
+
+COPY nginx.conf /etc/nginx/conf.d/nginx.conf
+
+RUN mkdir -p /var/log/nginx && \
+    mkdir -p /var/cache/nginx && \
+    mkdir -p /var/run/nginx && \
+    touch /var/run/nginx.pid && \
+    chown -R nobody:nogroup /var/log/nginx && \
+    chown -R nobody:nogroup /var/cache/nginx && \
+    chown -R nobody:nogroup /var/run/nginx && \
+    chown nobody:nogroup /var/run/nginx.pid
+
+USER nobody

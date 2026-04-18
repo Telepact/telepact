@@ -15,6 +15,7 @@
 #|
 
 NPM_INSTALL ?= install --ignore-scripts
+VERSION := $(shell cat ../../VERSION.txt)
 TAR_GZ := dist-tgz/*.tgz
 DEP_LIB_FILE := ../../lib/ts/dist/index.esm.js
 DEP_PRETTIER_FILE := ../../sdk/prettier/dist/index.esm.js
@@ -48,6 +49,11 @@ $(TAR_GZ): prepare-local-deps $(NPM_STAMP)
 	node clean-index.js
 	npm pack --pack-destination ./dist-tgz
 
+	mkdir -p dist-docker
+
+	docker build --progress=plain --no-cache -f Dockerfile -t telepact-console:${VERSION} .
+	docker save telepact-console:${VERSION} | gzip > dist-docker/docker-image-telepact-console-${VERSION}.tar.gz
+
 $(DEP_LIB_FILE):
 	$(MAKE) -C ../../lib/ts
 
@@ -65,6 +71,7 @@ clean:
 	rm -rf src/lib/telepact
 	rm -rf src/lib/prettier-plugin-telepact
 	rm -rf node_modules
+	rm -rf dist-docker
 	rm -rf dist-tgz
 	rm -rf LICENSE
 	rm -rf NOTICE
