@@ -38,9 +38,11 @@ from .release_plan import (
 
 yaml = YAML()
 LICENSE_HEADER_IGNORE_FILE = ".license-header-ignore"
-MERGE_QUEUE_LABEL = "merge-queued"
-MERGE_QUEUE_SKIP_BUILD_PHRASE = "[skip build]"
 MERGE_QUEUE_ALLOWED_COMMENT_ASSOCIATIONS = frozenset({"COLLABORATOR", "MEMBER", "OWNER"})
+MERGE_QUEUE_ALLOWED_PERMISSION_LEVELS = frozenset({"admin", "maintain", "write"})
+MERGE_QUEUE_BOT_AUTHOR_NAME = "telepact-notary[bot]"
+MERGE_QUEUE_BOT_AUTHOR_EMAIL = "telepact-notary[bot]@users.noreply.github.com"
+MERGE_QUEUE_SKIP_BUILD_PHRASE = "[skip build]"
 POLL_INTERVAL_SECONDS = 3
 PR_WORKFLOW_FILE = "pr.yml"
 WORKFLOW_POLL_INTERVAL_SECONDS = 10
@@ -81,49 +83,55 @@ def _require_env(name: str) -> str:
     return value
 
 
-def _env_flag(name: str) -> bool:
-    value = os.getenv(name, "")
-    return value.strip().lower() in {"1", "true", "yes", "on"}
-
-
-def _should_skip_build(commit_message: str) -> bool:
+def _commit_requests_skip_build(commit_message: str) -> bool:
     return MERGE_QUEUE_SKIP_BUILD_PHRASE in commit_message
 
 
-def _build_bump_commit_message(new_version: str, pr_number: int) -> str:
+def _build_bump_commit_message(new_version: str, pr_number: int, skip_build: bool = False) -> str:
     subject = f"Bump version to {new_version} (#{pr_number})"
-    if _env_flag("TELEPACT_BUMP_SKIP_BUILD"):
+    if skip_build:
         return f"{subject} {MERGE_QUEUE_SKIP_BUILD_PHRASE}"
     return subject
 
 
-def _ensure_repo_label(repo, name: str, color: str, description: str) -> None:
-    try:
-        repo.get_label(name)
-    except GithubException as exc:
-        if exc.status != 404:
-            raise click.ClickException(f"Failed to inspect label {name!r}: {exc}")
-        repo.create_label(name=name, color=color, description=description)
+def _read_commit_author(commit_ref: str) -> tuple[str, str]:
+    raw = _git(["show", "-s", "--format=%an%n%ae", commit_ref], cwd=Path("."))
+    author_name, author_email = raw.splitlines()[:2]
+    return author_name.strip(), author_email.strip()
 
 
-def _pull_request_has_label(pr, label_name: str) -> bool:
-    return any(label.name == label_name for label in pr.get_labels())
+def _is_merge_queue_bot_author(author_name: str, author_email: str) -> bool:
+    return (
+        author_name == MERGE_QUEUE_BOT_AUTHOR_NAME
+        and author_email == MERGE_QUEUE_BOT_AUTHOR_EMAIL
+    )
 
 
-def _should_skip_build_for_pull_request(commit_message: str) -> bool:
-    skip_requested_by_commit = _should_skip_build(commit_message)
-    if not skip_requested_by_commit:
+def _should_skip_build_for_commit(commit_ref: str) -> bool:
+    commit_message = _git(["show", "-s", "--format=%B", commit_ref], cwd=Path("."))
+    if not _commit_requests_skip_build(commit_message):
         return False
 
-    github_token = os.getenv("GITHUB_TOKEN")
-    github_repository = os.getenv("GITHUB_REPOSITORY")
-    pr_number_str = os.getenv("PR_NUMBER")
-    if not (github_token and github_repository and pr_number_str):
-        return True
+    author_name, author_email = _read_commit_author(commit_ref)
+    return _is_merge_queue_bot_author(author_name, author_email)
 
-    repo = Github(github_token).get_repo(github_repository)
-    pr = repo.get_pull(int(pr_number_str))
-    return _pull_request_has_label(pr, MERGE_QUEUE_LABEL)
+
+def _mark_pull_request_ready_for_review(pr: PullRequest) -> None:
+    try:
+        pr._requester.requestJsonAndCheck("POST", f"{pr.url}/ready_for_review")
+    except GithubException as exc:
+        raise click.ClickException(f"Failed to mark PR #{pr.number} ready for review: {exc}")
+
+
+def _ensure_merge_request_authorized(repo, commenter_login: str, commenter_association: str) -> None:
+    if commenter_association not in MERGE_QUEUE_ALLOWED_COMMENT_ASSOCIATIONS:
+        raise click.ClickException("Only repository members may enqueue merges with /merge.")
+
+    permission = repo.get_collaborator_permission(commenter_login)
+    if permission not in MERGE_QUEUE_ALLOWED_PERMISSION_LEVELS:
+        raise click.ClickException(
+            f"User @{commenter_login} is not allowed to enqueue merges (permission={permission!r})."
+        )
 
 
 def _load_pyproject() -> dict:
@@ -247,8 +255,7 @@ def set_version(version: str) -> None:
         click.echo("No supported project file found.")
 
 
-@click.command()
-def bump() -> None:
+def _bump_repository_version(pr_number: int, skip_build: bool = False) -> str:
     version_file = 'VERSION.txt'
 
     project_files = [
@@ -261,12 +268,6 @@ def bump() -> None:
         'sdk/prettier/package.json',
         'sdk/console/package.json',
     ]
-
-    pr_number_str = os.getenv('PR_NUMBER')
-    if not pr_number_str:
-        click.echo("PR_NUMBER environment variable not set.", err=True)
-        sys.exit(1)
-    pr_number = int(pr_number_str)
 
     # Get the paths from the previous commit
     prev_commit_paths = subprocess.run(
@@ -378,11 +379,25 @@ def bump() -> None:
     click.echo(f"Updated {repo_relative_doc_versions_path}")
 
     # Create the new commit message
-    new_commit_msg = _build_bump_commit_message(new_version, pr_number)
+    new_commit_msg = _build_bump_commit_message(new_version, pr_number, skip_build=skip_build)
 
     # Add and commit the changes
     subprocess.run(['git', 'add'] + list(dict.fromkeys(edited_files)))
     subprocess.run(['git', 'commit', '-m', new_commit_msg])
+    return _git(["rev-parse", "HEAD"], cwd=Path(".")).strip()
+
+
+@click.command()
+def bump() -> None:
+    pr_number_str = os.getenv('PR_NUMBER')
+    if not pr_number_str:
+        click.echo("PR_NUMBER environment variable not set.", err=True)
+        sys.exit(1)
+    pr_number = int(pr_number_str)
+    _bump_repository_version(
+        pr_number,
+        skip_build=os.getenv("TELEPACT_BUMP_SKIP_BUILD", "").strip().lower() in {"1", "true", "yes", "on"},
+    )
 
 
 @click.command()
@@ -777,43 +792,11 @@ def _ensure_pull_request_merge_requirements(repo, pr_number: int, expected_head_
     raise click.ClickException(f"Timed out waiting for PR #{pr_number} to satisfy merge requirements.")
 
 
-def _merge_pull_request(repo, pr_number: int, expected_head_sha: str, timeout_seconds: int = 180) -> None:
-    deadline = time.time() + timeout_seconds
-    last_error = None
-    while time.time() < deadline:
-        pr = _refresh_pull_request(repo, pr_number)
-        if pr.state == "closed":
-            click.echo(f"PR #{pr_number} is already closed.")
-            return
-        if pr.head.sha != expected_head_sha:
-            raise click.ClickException(
-                f"PR #{pr_number} head SHA changed unexpectedly from {expected_head_sha} to {pr.head.sha} before merge."
-            )
-        try:
-            result = pr.merge(merge_method="squash")
-        except GithubException as exc:
-            if exc.status in {405, 409}:
-                last_error = str(exc.data) if exc.data else str(exc)
-                time.sleep(5)
-                continue
-            raise click.ClickException(f"Failed to merge PR #{pr_number}: {exc}")
-
-        if result.merged:
-            click.echo(f"Merged PR #{pr_number}: {result.sha}")
-            return
-
-        last_error = result.message
-        time.sleep(5)
-
-    raise click.ClickException(f"Timed out merging PR #{pr_number}. Last error: {last_error}")
-
-
 @click.command(name="should-skip-build")
 @click.option("--commit", "commit_ref", default="HEAD", show_default=True, help="Commit ref to inspect.")
 @click.option("--github-output", default=None, type=click.Path(dir_okay=False, path_type=Path), help="Write GitHub Actions outputs.")
 def should_skip_build(commit_ref: str, github_output: Path | None) -> None:
-    message = _git(["show", "-s", "--format=%B", commit_ref], cwd=Path("."))
-    skip_build = _should_skip_build_for_pull_request(message)
+    skip_build = _should_skip_build_for_commit(commit_ref)
     line = f"skip_build={'true' if skip_build else 'false'}"
     if github_output is not None:
         github_output.parent.mkdir(parents=True, exist_ok=True)
@@ -822,18 +805,30 @@ def should_skip_build(commit_ref: str, github_output: Path | None) -> None:
         click.echo(line)
 
 
-@click.command(name="merge-queue")
-def merge_queue() -> None:
+@click.command(name="authorize-merge-request")
+def authorize_merge_request() -> None:
+    github_token = _require_env("GITHUB_TOKEN")
+    github_repository = _require_env("GITHUB_REPOSITORY")
+    commenter_login = _require_env("COMMENT_AUTHOR_LOGIN")
+    commenter_association = _require_env("COMMENT_AUTHOR_ASSOCIATION").strip().upper()
+
+    repo = Github(github_token).get_repo(github_repository)
+    _ensure_merge_request_authorized(repo, commenter_login, commenter_association)
+    click.echo(f"Authorized merge request from @{commenter_login}.")
+
+
+@click.command(name="prepare-merge")
+@click.option(
+    "--github-output",
+    default=None,
+    type=click.Path(dir_okay=False, path_type=Path),
+    help="Write key=value lines for GitHub Actions outputs.",
+)
+def prepare_merge(github_output: Path | None) -> None:
     pr_number = int(_require_env("PR_NUMBER"))
     github_token = _require_env("GITHUB_TOKEN")
     github_repository = _require_env("GITHUB_REPOSITORY")
-    comment_author_association = _require_env("COMMENT_AUTHOR_ASSOCIATION").strip().upper()
     repo_root = Path(".").resolve()
-
-    if comment_author_association not in MERGE_QUEUE_ALLOWED_COMMENT_ASSOCIATIONS:
-        raise click.ClickException(
-            "Only repository collaborators may enqueue merges with /merge."
-        )
 
     g = Github(github_token)
     repo = g.get_repo(github_repository)
@@ -842,13 +837,11 @@ def merge_queue() -> None:
     if pr.state != "open":
         raise click.ClickException(f"PR #{pr.number} is not open.")
     if pr.draft:
-        raise click.ClickException(f"PR #{pr.number} is still a draft.")
+        click.echo(f"PR #{pr.number} is draft; marking it ready for review.")
+        _mark_pull_request_ready_for_review(pr)
+        pr = _refresh_pull_request(repo, pr.number)
     if pr.base.ref != "main":
         raise click.ClickException(f"PR #{pr.number} targets {pr.base.ref!r}; only main is supported.")
-    if pr.head.repo.full_name != github_repository:
-        raise click.ClickException(
-            f"PR #{pr.number} comes from {pr.head.repo.full_name}; merge queue only supports same-repository branches."
-        )
 
     comparison = repo.compare(pr.base.ref, pr.head.sha)
     if comparison.status == "behind":
@@ -862,30 +855,32 @@ def merge_queue() -> None:
 
     _wait_for_pr_workflow_success(repo, pr.head.sha)
     _ensure_pull_request_merge_requirements(repo, pr.number, pr.head.sha)
-    _ensure_repo_label(
-        repo,
-        MERGE_QUEUE_LABEL,
-        color="1d76db",
-        description="Marks a PR that is being merged by the Telepact merge queue.",
-    )
-    if not _pull_request_has_label(pr, MERGE_QUEUE_LABEL):
-        pr.add_to_labels(MERGE_QUEUE_LABEL)
 
     click.echo(f"Checking out {pr.head.ref} at {pr.head.sha}.")
-    _git(["fetch", "origin", pr.head.ref], cwd=repo_root)
-    _git(["checkout", "-B", pr.head.ref, f"origin/{pr.head.ref}"], cwd=repo_root)
+    remote_ref = f"origin/merge-queue-pr-{pr.number}"
+    _git(
+        ["fetch", "origin", f"pull/{pr.number}/head:refs/remotes/{remote_ref}"],
+        cwd=repo_root,
+    )
+    _git(["checkout", "-B", pr.head.ref, remote_ref], cwd=repo_root)
 
-    bump_env = dict(os.environ)
-    bump_env["PR_NUMBER"] = str(pr.number)
-    bump_env["TELEPACT_BUMP_SKIP_BUILD"] = "true"
-    _run_command([str(repo_root / "tool" / "telepact-project"), "bump"], cwd=repo_root, env=bump_env)
-
-    new_head_sha = _git(["rev-parse", "HEAD"], cwd=repo_root).strip()
+    new_head_sha = _bump_repository_version(pr.number, skip_build=True)
     click.echo(f"Pushing bump commit {new_head_sha} to {pr.head.ref}.")
     _git(["push", "origin", f"HEAD:{pr.head.ref}"], cwd=repo_root)
 
     _wait_for_pull_request_head(repo, pr.number, new_head_sha, timeout_seconds=60)
-    _merge_pull_request(repo, pr.number, new_head_sha)
+    _wait_for_pr_workflow_success(repo, new_head_sha)
+    _ensure_pull_request_merge_requirements(repo, pr.number, new_head_sha)
+
+    if github_output is not None:
+        github_output.parent.mkdir(parents=True, exist_ok=True)
+        github_output.write_text(
+            f"pr_number={pr.number}\nhead_sha={new_head_sha}\n",
+            encoding="utf-8",
+        )
+    else:
+        click.echo(f"pr_number={pr.number}")
+        click.echo(f"head_sha={new_head_sha}")
 
 
 @click.command()
@@ -1005,7 +1000,8 @@ main.add_command(github_labels)
 main.add_command(release)
 main.add_command(publish_targets)
 main.add_command(should_skip_build)
-main.add_command(merge_queue)
+main.add_command(authorize_merge_request)
+main.add_command(prepare_merge)
 main.add_command(automerge)
 main.add_command(gitignore)
 main.add_command(consolidated_readme)

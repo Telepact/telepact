@@ -21,22 +21,49 @@ on:
     types:
       - created
 
-permissions:
-  actions: read
-  checks: read
-  contents: write
-  pull-requests: write
-  statuses: read
+concurrency:
+  group: merge-queue
+  cancel-in-progress: false
 
 jobs:
-  queue-merge:
+  authorize-merge-request:
     if: ${{ github.event.issue.pull_request && github.event.comment.body == '/merge' }}
     runs-on: ubuntu-latest
     environment: bot
+    timeout-minutes: 5
+    steps:
+      - name: Generate GitHub App token
+        id: generate-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ vars.TELEPACT_BOT_APP_ID }}
+          private-key: ${{ secrets.TELEPACT_BOT_PRIVATE_KEY }}
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          token: ${{ steps.generate-token.outputs.token }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Authorize merge request
+        env:
+          COMMENT_AUTHOR_ASSOCIATION: ${{ github.event.comment.author_association }}
+          COMMENT_AUTHOR_LOGIN: ${{ github.event.comment.user.login }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
+        run: ./tool/telepact-project authorize-merge-request
+
+  prepare-merge:
+    needs: [authorize-merge-request]
+    runs-on: ubuntu-latest
+    environment: bot
     timeout-minutes: 40
-    concurrency:
-      group: merge-queue
-      cancel-in-progress: false
+    outputs:
+      pr_number: ${{ steps.prepare.outputs.pr_number }}
+      head_sha: ${{ steps.prepare.outputs.head_sha }}
     steps:
       - name: Generate GitHub App token
         id: generate-token
@@ -64,10 +91,36 @@ jobs:
           git config --global user.name "telepact-notary[bot]"
           git config --global user.email "telepact-notary[bot]@users.noreply.github.com"
 
-      - name: Process queued merge
+      - name: Prepare merge
+        id: prepare
         env:
-          COMMENT_AUTHOR_ASSOCIATION: ${{ github.event.comment.author_association }}
           GITHUB_REPOSITORY: ${{ github.repository }}
           GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
           PR_NUMBER: ${{ github.event.issue.number }}
-        run: ./tool/telepact-project merge-queue
+        run: ./tool/telepact-project prepare-merge --github-output "$GITHUB_OUTPUT"
+
+  merge-pr:
+    needs: [prepare-merge]
+    runs-on: ubuntu-latest
+    environment: bot
+    timeout-minutes: 5
+    steps:
+      - name: Generate GitHub App token
+        id: generate-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ vars.TELEPACT_BOT_APP_ID }}
+          private-key: ${{ secrets.TELEPACT_BOT_PRIVATE_KEY }}
+
+      - name: Squash merge PR
+        env:
+          GH_PROMPT_DISABLED: "1"
+          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          HEAD_SHA: ${{ needs.prepare-merge.outputs.head_sha }}
+          PR_NUMBER: ${{ needs.prepare-merge.outputs.pr_number }}
+        run: |
+          gh pr merge "$PR_NUMBER" \
+            --repo "$GITHUB_REPOSITORY" \
+            --squash \
+            --match-head-commit "$HEAD_SHA"

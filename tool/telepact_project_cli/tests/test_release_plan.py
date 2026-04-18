@@ -23,6 +23,7 @@ import tempfile
 import textwrap
 import unittest
 from pathlib import Path
+from unittest import mock
 
 import click
 from click.testing import CliRunner
@@ -391,7 +392,42 @@ class ReleasePlanTests(unittest.TestCase):
             self.assertEqual(commit_subject, "Bump version to 1.0.0-alpha.215 (#42) [skip build]")
             self.assertEqual(commit_body, "")
 
-    def test_should_skip_build_command_detects_phrase(self) -> None:
+    def test_should_skip_build_command_requires_bot_authorship(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            repo_root = Path(tmp_dir)
+            (repo_root / "VERSION.txt").write_text("1.0.0-alpha.214", encoding="utf-8")
+            subprocess.run(["git", "init"], cwd=repo_root, check=True, capture_output=True, text=True)
+            subprocess.run(["git", "config", "user.name", "Test User"], cwd=repo_root, check=True)
+            subprocess.run(["git", "config", "user.email", "test@example.com"], cwd=repo_root, check=True)
+            (repo_root / "README.md").write_text("hello\n", encoding="utf-8")
+            subprocess.run(["git", "add", "."], cwd=repo_root, check=True)
+            subprocess.run(
+                [
+                    "git",
+                    "-c",
+                    "user.name=telepact-notary[bot]",
+                    "-c",
+                    "user.email=telepact-notary[bot]@users.noreply.github.com",
+                    "commit",
+                    "-m",
+                    "Bump version to 1.0.0-alpha.215 (#42) [skip build]",
+                ],
+                cwd=repo_root,
+                check=True,
+            )
+
+            output_path = repo_root / "github-output.txt"
+            runner = CliRunner()
+            with _pushd(repo_root):
+                result = runner.invoke(
+                    main,
+                    ["should-skip-build", "--github-output", str(output_path)],
+                )
+
+            self.assertEqual(result.exit_code, 0, msg=result.output)
+            self.assertEqual(output_path.read_text(encoding="utf-8"), "skip_build=true\n")
+
+    def test_should_skip_build_command_rejects_non_bot_phrase(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             repo_root = Path(tmp_dir)
             (repo_root / "VERSION.txt").write_text("1.0.0-alpha.214", encoding="utf-8")
@@ -415,7 +451,29 @@ class ReleasePlanTests(unittest.TestCase):
                 )
 
             self.assertEqual(result.exit_code, 0, msg=result.output)
-            self.assertEqual(output_path.read_text(encoding="utf-8"), "skip_build=true\n")
+            self.assertEqual(output_path.read_text(encoding="utf-8"), "skip_build=false\n")
+
+    def test_authorize_merge_request_requires_merge_permission(self) -> None:
+        runner = CliRunner()
+        fake_repo = mock.Mock()
+        fake_repo.get_collaborator_permission.return_value = "write"
+        fake_github = mock.Mock()
+        fake_github.get_repo.return_value = fake_repo
+
+        with mock.patch("telepact_project_cli.cli.Github", return_value=fake_github):
+            result = runner.invoke(
+                main,
+                ["authorize-merge-request"],
+                env={
+                    "COMMENT_AUTHOR_ASSOCIATION": "MEMBER",
+                    "COMMENT_AUTHOR_LOGIN": "alice",
+                    "GITHUB_REPOSITORY": "Telepact/telepact",
+                    "GITHUB_TOKEN": "token",
+                },
+            )
+
+        self.assertEqual(result.exit_code, 0, msg=result.output)
+        fake_repo.get_collaborator_permission.assert_called_once_with("alice")
 
 
 if __name__ == "__main__":
