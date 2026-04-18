@@ -42,7 +42,7 @@ MERGE_QUEUE_ALLOWED_COMMENT_ASSOCIATIONS = frozenset({"COLLABORATOR", "MEMBER", 
 MERGE_QUEUE_ALLOWED_PERMISSION_LEVELS = frozenset({"admin", "maintain", "write"})
 MERGE_QUEUE_BOT_AUTHOR_NAME = "telepact-notary[bot]"
 MERGE_QUEUE_BOT_AUTHOR_EMAIL = "telepact-notary[bot]@users.noreply.github.com"
-MERGE_QUEUE_SKIP_BUILD_PHRASE = "[skip build]"
+MERGE_QUEUE_SKIP_BUILD_PHRASE = "Bump version"
 POLL_INTERVAL_SECONDS = 3
 PR_WORKFLOW_FILE = "pr.yml"
 WORKFLOW_POLL_INTERVAL_SECONDS = 10
@@ -94,8 +94,6 @@ def _commit_requests_skip_build(commit_message: str) -> bool:
 
 def _build_bump_commit_message(new_version: str, pr_number: int, skip_build: bool = False) -> str:
     subject = f"Bump version to {new_version} (#{pr_number})"
-    if skip_build:
-        return f"{subject} {MERGE_QUEUE_SKIP_BUILD_PHRASE}"
     return subject
 
 
@@ -888,9 +886,9 @@ def check_passing_build(head_sha: str | None) -> None:
     g = Github(github_token)
     repo = g.get_repo(github_repository)
 
-    if head_sha is not None:
-        pr = _wait_for_pull_request_head(repo, pr_number, head_sha, timeout_seconds=120)
-        expected_head_sha = head_sha
+    expected_head_sha = head_sha or os.getenv("HEAD_SHA")
+    if expected_head_sha is not None:
+        pr = _wait_for_pull_request_head(repo, pr_number, expected_head_sha, timeout_seconds=120)
     else:
         pr = _refresh_pull_request(repo, pr_number)
         expected_head_sha = pr.head.sha

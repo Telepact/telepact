@@ -47,6 +47,43 @@ jobs:
           fetch-depth: 0
           token: ${{ steps.generate-token.outputs.token }}
 
+      - name: Ensure PR requirements are met
+        id: pr
+        env:
+          COMMENT_AUTHOR_ASSOCIATION: ${{ github.event.comment.author_association }}
+          COMMENT_AUTHOR_LOGIN: ${{ github.event.comment.user.login }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
+          PR_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          pr_state="$(./tool/telepact-project ensure-pr-requirements-met)"
+          echo "$pr_state"
+
+          head_ref=""
+          head_sha=""
+          while IFS='=' read -r key value; do
+            case "$key" in
+              head_ref) head_ref="$value" ;;
+              head_sha) head_sha="$value" ;;
+            esac
+          done <<< "$pr_state"
+
+          if [ -z "$head_ref" ] || [ -z "$head_sha" ]; then
+            echo "Missing head_ref/head_sha output from ensure-pr-requirements-met." >&2
+            exit 1
+          fi
+
+          echo "head_ref=$head_ref" >> "$GITHUB_OUTPUT"
+          echo "head_sha=$head_sha" >> "$GITHUB_OUTPUT"
+
+      - name: Wait for passing PR build
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
+          HEAD_SHA: ${{ steps.pr.outputs.head_sha }}
+          PR_NUMBER: ${{ github.event.issue.number }}
+        run: ./tool/telepact-project check-passing-build
+
       - name: Configure git identity
         run: |
           git config --global user.name "telepact-notary[bot]"
@@ -61,23 +98,6 @@ jobs:
       # Required when bumping lock files that are regenerated from Python package metadata.
       - name: Install uv
         uses: astral-sh/setup-uv@v6
-
-      - name: Ensure PR requirements are met
-        id: pr
-        env:
-          COMMENT_AUTHOR_ASSOCIATION: ${{ github.event.comment.author_association }}
-          COMMENT_AUTHOR_LOGIN: ${{ github.event.comment.user.login }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
-          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
-          PR_NUMBER: ${{ github.event.issue.number }}
-        run: ./tool/telepact-project ensure-pr-requirements-met --github-output "$GITHUB_OUTPUT"
-
-      - name: Wait for passing PR build
-        env:
-          GITHUB_REPOSITORY: ${{ github.repository }}
-          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
-          PR_NUMBER: ${{ github.event.issue.number }}
-        run: ./tool/telepact-project check-passing-build --head-sha "${{ steps.pr.outputs.head_sha }}"
 
       - name: Check out PR branch
         env:
@@ -95,20 +115,23 @@ jobs:
           echo "version=$(cat VERSION.txt)" >> "$GITHUB_OUTPUT"
 
       - name: Commit and push bump
+        id: bump-commit
         env:
           PR_HEAD_REF: ${{ steps.pr.outputs.head_ref }}
           PR_NUMBER: ${{ github.event.issue.number }}
         run: |
           git add .
-          git commit -m "Bump version to ${{ steps.bump.outputs.version }} (#${PR_NUMBER}) [skip build]"
+          git commit -m "Bump version to ${{ steps.bump.outputs.version }} (#${PR_NUMBER})"
           git push origin "HEAD:$PR_HEAD_REF"
+          echo "head_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
       - name: Wait for passing PR build after bump
         env:
           GITHUB_REPOSITORY: ${{ github.repository }}
           GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
+          HEAD_SHA: ${{ steps.bump-commit.outputs.head_sha }}
           PR_NUMBER: ${{ github.event.issue.number }}
-        run: ./tool/telepact-project check-passing-build --head-sha "$(git rev-parse HEAD)"
+        run: ./tool/telepact-project check-passing-build
 
       - name: Squash merge PR
         env:
@@ -119,4 +142,4 @@ jobs:
           gh pr merge "${{ github.event.issue.number }}" \
             --repo "$GITHUB_REPOSITORY" \
             --squash \
-            --match-head-commit "$(git rev-parse HEAD)"
+            --match-head-commit "${{ steps.bump-commit.outputs.head_sha }}"

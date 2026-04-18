@@ -500,7 +500,7 @@ class ReleasePlanTests(unittest.TestCase):
                 text=True,
             ).stdout.strip()
 
-            self.assertEqual(commit_subject, "Bump version to 1.0.0-alpha.215 (#42) [skip build]")
+            self.assertEqual(commit_subject, "Bump version to 1.0.0-alpha.215 (#42)")
             self.assertEqual(commit_body, "")
 
     def test_should_skip_build_command_requires_bot_authorship(self) -> None:
@@ -521,7 +521,7 @@ class ReleasePlanTests(unittest.TestCase):
                     "user.email=telepact-notary[bot]@users.noreply.github.com",
                     "commit",
                     "-m",
-                    "Bump version to 1.0.0-alpha.215 (#42) [skip build]",
+                    "Bump version to 1.0.0-alpha.215 (#42)",
                 ],
                 cwd=repo_root,
                 check=True,
@@ -548,7 +548,7 @@ class ReleasePlanTests(unittest.TestCase):
             (repo_root / "README.md").write_text("hello\n", encoding="utf-8")
             subprocess.run(["git", "add", "."], cwd=repo_root, check=True)
             subprocess.run(
-                ["git", "commit", "-m", "Bump version to 1.0.0-alpha.215 (#42) [skip build]"],
+                ["git", "commit", "-m", "Bump version to 1.0.0-alpha.215 (#42)"],
                 cwd=repo_root,
                 check=True,
             )
@@ -625,6 +625,36 @@ class ReleasePlanTests(unittest.TestCase):
         wait_for_head.assert_called_once_with(fake_repo, 42, "abc123", timeout_seconds=120)
         wait_for_build.assert_called_once_with(fake_repo, "abc123")
         ensure_requirements.assert_called_once_with(fake_repo, 42, "abc123")
+
+    def test_check_passing_build_uses_head_sha_env_var(self) -> None:
+        runner = CliRunner()
+        fake_pr = mock.Mock()
+        fake_pr.number = 42
+        fake_repo = mock.Mock()
+        fake_github = mock.Mock()
+        fake_github.get_repo.return_value = fake_repo
+
+        with (
+            mock.patch("telepact_project_cli.cli.Github", return_value=fake_github),
+            mock.patch("telepact_project_cli.cli._wait_for_pull_request_head", return_value=fake_pr) as wait_for_head,
+            mock.patch("telepact_project_cli.cli._wait_for_pr_workflow_success") as wait_for_build,
+            mock.patch("telepact_project_cli.cli._ensure_pull_request_merge_requirements") as ensure_requirements,
+        ):
+            result = runner.invoke(
+                main,
+                ["check-passing-build"],
+                env={
+                    "GITHUB_REPOSITORY": "Telepact/telepact",
+                    "GITHUB_TOKEN": "token",
+                    "HEAD_SHA": "def456",
+                    "PR_NUMBER": "42",
+                },
+            )
+
+        self.assertEqual(result.exit_code, 0, msg=result.output)
+        wait_for_head.assert_called_once_with(fake_repo, 42, "def456", timeout_seconds=120)
+        wait_for_build.assert_called_once_with(fake_repo, "def456")
+        ensure_requirements.assert_called_once_with(fake_repo, 42, "def456")
 
     def test_authorize_merge_request_accepts_write_permission(self) -> None:
         runner = CliRunner()
