@@ -3,7 +3,7 @@ module github.com/telepact/telepact/test/lib/go
 go 1.25.0
 
 require (
-	github.com/nats-io/nats.go v1.50.0
+	github.com/nats-io/nats.go v1.51.0
 	github.com/prometheus/client_golang v1.23.2
 	github.com/telepact/telepact/lib/go v0.0.0
 	github.com/vmihailenco/msgpack/v5 v5.4.1

@@ -10,7 +10,7 @@ Repository source versions may be ahead of these values between releases.
 | Library (Go) | `github.com/telepact/telepact/lib/go` | Go module (proxy.golang.org) | `v1.0.0-alpha.270` |
 | Library (Java) | `io.github.telepact:telepact` | Maven Central | `1.0.0-alpha.266` |
 | Library (Python) | `telepact` | PyPI | `1.0.0a288` |
-| Library (TypeScript) | `telepact` | npm | `1.0.0-alpha.277` |
+| Library (TypeScript) | `telepact` | npm | `1.0.0-alpha.297` |
 | SDK (CLI) | `telepact-cli` | PyPI | `1.0.0a294` |
-| SDK (Console) | `telepact-console` | npm | `1.0.0-alpha.292` |
-| SDK (Prettier) | `prettier-plugin-telepact` | npm | `1.0.0-alpha.246` |
+| SDK (Console) | `telepact-console` | npm | `1.0.0-alpha.300` |
+| SDK (Prettier) | `prettier-plugin-telepact` | npm | `1.0.0-alpha.296` |
