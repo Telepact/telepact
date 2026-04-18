@@ -167,10 +167,7 @@ test.describe('Live schema YAML rendering', () => {
 		});
 		await expect(schemaEditor).toHaveCount(1);
 
-		const schemaText = await selectAllCopyAndGet(
-			page,
-			schemaEditor
-		);
+		const schemaText = await selectAllCopyAndGet(page, schemaEditor);
 
 		expect(schemaText.trimStart().startsWith('- ///: |')).toBeTruthy();
 		expect(schemaText).toContain('info.Calculator: {}');
@@ -180,6 +177,21 @@ test.describe('Live schema YAML rendering', () => {
 		expect(schemaText).toContain('successful: "boolean"');
 		expect(schemaText).toContain('union.Expression:');
 		expect(schemaText).not.toContain('[{"Ok_"');
+
+		const tokenColors = await schemaEditor.evaluate((editor) => {
+			return [
+				...new Set(
+					[...editor.querySelectorAll('.view-line span')]
+						.map((span) => ({
+							text: span.textContent?.trim() ?? '',
+							color: getComputedStyle(span).color
+						}))
+						.filter(({ text }) => text.length > 0)
+						.map(({ color }) => color)
+				)
+			];
+		});
+		expect(tokenColors.length).toBeGreaterThan(1);
 	});
 });
 

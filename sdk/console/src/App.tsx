@@ -14,7 +14,15 @@
 //|  limitations under the License.
 //|
 
-import { useEffect, useMemo, useRef, useState, type FocusEvent, type FormEvent, type KeyboardEvent } from 'react';
+import {
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+	type FocusEvent,
+	type FormEvent,
+	type KeyboardEvent
+} from 'react';
 import * as monaco from 'monaco-editor';
 
 import DocCard from './components/DocCard';
@@ -32,7 +40,10 @@ import {
 	type TypeData
 } from './lib/console';
 import { createJsonSchema } from './lib/jsonSchema';
-import { ensureTelepactJsonLinksRegistered, setTelepactRequestLinkHandler } from './lib/monacoLinks';
+import {
+	ensureTelepactJsonLinksRegistered,
+	setTelepactRequestLinkHandler
+} from './lib/monacoLinks';
 import { loadConsoleData, type ProtocolOption, type SchemaSourceKind } from './lib/loadConsoleData';
 import { submitRequest } from './lib/submitRequest';
 import { jsonSchema } from './lib/telepact/index.esm.js';
@@ -176,7 +187,9 @@ export default function App() {
 
 	const loadKey = `${schemaSourceParam}|${schemaProtocolParam}|${showInternalApiParam}|${schemaDraftParam}`;
 
-	const [loadState, setLoadState] = useState<AsyncState<Awaited<ReturnType<typeof loadConsoleData>>>>({
+	const [loadState, setLoadState] = useState<
+		AsyncState<Awaited<ReturnType<typeof loadConsoleData>>>
+	>({
 		status: 'loading'
 	});
 
@@ -343,7 +356,10 @@ export default function App() {
 	};
 
 	const handleSubmit = () => {
-		if ((schemaSourceKind === 'http' || schemaSourceKind === 'ws') && !sessionStorage.getItem('telepact-console:live-request-acknowledge')) {
+		if (
+			(schemaSourceKind === 'http' || schemaSourceKind === 'ws') &&
+			!sessionStorage.getItem('telepact-console:live-request-acknowledge')
+		) {
 			if (!confirm('You are about to submit a request to a live server.')) {
 				return;
 			}
@@ -363,7 +379,9 @@ export default function App() {
 	};
 
 	const [simulationSeed, setSimulationSeed] = useState(1);
-	const [simulationState, setSimulationState] = useState<AsyncState<{ request: string; response: string }>>({
+	const [simulationState, setSimulationState] = useState<
+		AsyncState<{ request: string; response: string }>
+	>({
 		status: 'idle'
 	});
 
@@ -394,7 +412,12 @@ export default function App() {
 
 	const docEntries: TypeData[] = useMemo(() => {
 		if (!telepactSchema) return [];
-		const entries = parseTelepactSchema(filteredSchemaPseudoJson, telepactSchema, sortDocCardsAZ, showInternalApi);
+		const entries = parseTelepactSchema(
+			filteredSchemaPseudoJson,
+			telepactSchema,
+			sortDocCardsAZ,
+			showInternalApi
+		);
 		if (showInternalApi) return entries;
 		return entries.filter((entry) => {
 			const tokens = entry.name.split('.');
@@ -426,18 +449,22 @@ export default function App() {
 		<div className="text-gray-800 dark:text-gray-200">
 			<nav className="fixed top-0 z-10 h-16 w-full border-y border-slate-300 bg-slate-100 dark:border-slate-600 dark:bg-slate-800">
 				<div className="flex h-full items-center px-4">
-					<div className={`flex items-center ${liveUrlActive ? 'shrink-0 pr-4' : 'flex-1 min-w-0'}`}>
+					<div
+						className={`flex items-center ${liveUrlActive ? 'shrink-0 pr-4' : 'min-w-0 flex-1'}`}
+					>
 						<div className="flex items-center rounded-md py-2">
 							<div className="text-sky-400">
 								<img src="/favicon.svg" alt="Telepact logo" className="h-8 w-8" />
 							</div>
-							<h1 className="px-2 text-lg font-semibold text-gray-900 dark:text-gray-100">Telepact</h1>
+							<h1 className="px-2 text-lg font-semibold text-gray-900 dark:text-gray-100">
+								Telepact
+							</h1>
 						</div>
 					</div>
 
 					<div
 						id="view-select"
-						className={`flex shrink-0 content-center space-x-2 ${liveUrlActive ? 'ml-4 mr-auto justify-start' : 'mx-auto justify-center'}`}
+						className={`flex shrink-0 content-center space-x-2 ${liveUrlActive ? 'mr-auto ml-4 justify-start' : 'mx-auto justify-center'}`}
 					>
 						<div className="inline-flex rounded-md">
 							<Tooltip text="Schema">
@@ -523,17 +550,17 @@ export default function App() {
 						</div>
 					</div>
 
-					<div className="flex flex-1 min-w-0 items-center justify-end">
+					<div className="flex min-w-0 flex-1 items-center justify-end">
 						<form
-							className={`flex items-center space-x-2 ml-4 ${liveUrlActive ? 'w-full' : ''}`}
+							className={`ml-4 flex items-center space-x-2 ${liveUrlActive ? 'w-full' : ''}`}
 							onSubmit={handleSourceGet}
 						>
 							<div
 								className={`flex items-stretch rounded-md border focus-within:ring-1 focus-within:ring-inset ${
 									urlError
-										? 'border-red-500 focus-within:ring-red-500 ring-1 ring-inset ring-red-500 dark:border-red-400 dark:focus-within:ring-red-400'
+										? 'border-red-500 ring-1 ring-red-500 ring-inset focus-within:ring-red-500 dark:border-red-400 dark:focus-within:ring-red-400'
 										: 'border-gray-300 focus-within:ring-gray-500 dark:border-gray-500 dark:focus-within:ring-gray-400'
-								} ${liveUrlActive ? 'flex-1 min-w-0' : 'w-80'}`}
+								} ${liveUrlActive ? 'min-w-0 flex-1' : 'w-80'}`}
 							>
 								<label
 									htmlFor="url"
@@ -549,7 +576,7 @@ export default function App() {
 								<div className="relative flex content-center">
 									<button
 										type="button"
-										className={`content-center border-l border-gray-300 dark:border-gray-500 flex items-center gap-1 px-2 py-2 text-sm font-medium lowercase focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sky-500 ${
+										className={`flex content-center items-center gap-1 border-l border-gray-300 px-2 py-2 text-sm font-medium lowercase focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:ring-inset dark:border-gray-500 ${
 											urlError
 												? 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300'
 												: 'bg-zinc-200 text-gray-700 dark:bg-zinc-600 dark:text-gray-200'
@@ -561,7 +588,12 @@ export default function App() {
 										onKeyDown={dropdownKeydown}
 									>
 										<span>{sourceUrlProtocol}</span>
-										<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											viewBox="0 0 20 20"
+											fill="currentColor"
+											className="h-4 w-4"
+										>
 											<path
 												fillRule="evenodd"
 												d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 1 1 1.06 1.06l-4.24 4.24a.75.75 0 0 1-1.06 0L5.21 8.29a.75.75 0 0 1 .02-1.08z"
@@ -572,7 +604,7 @@ export default function App() {
 
 									{showDropdown ? (
 										<div
-											className="absolute left-0 top-full z-20 mt-1 w-28 overflow-hidden rounded-md border border-gray-200 bg-white shadow-lg dark:border-zinc-600 dark:bg-zinc-700"
+											className="absolute top-full left-0 z-20 mt-1 w-28 overflow-hidden rounded-md border border-gray-200 bg-white shadow-lg dark:border-zinc-600 dark:bg-zinc-700"
 											role="listbox"
 											aria-label="Select protocol"
 											onKeyDown={dropdownKeydown}
@@ -590,7 +622,9 @@ export default function App() {
 														: 'text-gray-700 hover:bg-sky-100 dark:text-gray-100 dark:hover:bg-zinc-600'
 												}`}
 												role="option"
-												aria-selected={sourceUrlProtocol === 'http' ? 'true' : 'false'}
+												aria-selected={
+													sourceUrlProtocol === 'http' ? 'true' : 'false'
+												}
 											>
 												http
 											</button>
@@ -606,7 +640,9 @@ export default function App() {
 														: 'text-gray-700 hover:bg-sky-100 dark:text-gray-100 dark:hover:bg-zinc-600'
 												}`}
 												role="option"
-												aria-selected={sourceUrlProtocol === 'ws' ? 'true' : 'false'}
+												aria-selected={
+													sourceUrlProtocol === 'ws' ? 'true' : 'false'
+												}
 											>
 												ws
 											</button>
@@ -615,7 +651,7 @@ export default function App() {
 								</div>
 
 								<div
-									className={`${liveUrlActive ? 'flex-1 min-w-0' : ''}`}
+									className={`${liveUrlActive ? 'min-w-0 flex-1' : ''}`}
 									onFocus={() => setLiveUrlActive(true)}
 									onBlur={handleLiveUrlFocusOut}
 								>
@@ -627,13 +663,15 @@ export default function App() {
 											placeholder="None  (draft mode)"
 											value={sourceUrlInput}
 											onChange={(e) => setSourceUrlInput(e.target.value)}
-											className={`w-full rounded-r-md border-0 pl-2 py-2 placeholder:text-gray-400 focus:ring-1 focus:ring-inset ${
+											className={`w-full rounded-r-md border-0 py-2 pl-2 placeholder:text-gray-400 focus:ring-1 focus:ring-inset ${
 												urlError
 													? 'bg-red-50 text-red-800 focus:ring-red-500 dark:bg-red-900/30 dark:text-red-200 dark:focus:ring-red-400'
 													: 'bg-zinc-100 focus:ring-gray-500 dark:bg-zinc-700 dark:focus:ring-gray-400'
 											}`}
 											aria-invalid={urlError ? 'true' : 'false'}
-											aria-describedby={urlError ? 'live-url-error' : undefined}
+											aria-describedby={
+												urlError ? 'live-url-error' : undefined
+											}
 										/>
 									</Tooltip>
 									{urlError ? (
@@ -662,10 +700,14 @@ export default function App() {
 				{loadState.status === 'ready' ? (
 					<>
 						{activeViews.includes('s') ? (
-							<div className={`flex h-[calc(100vh-4em)] ${getSectionClass(activeViews, 's', activeViews.length)}`}>
+							<div
+								className={`flex h-[calc(100vh-4em)] ${getSectionClass(activeViews, 's', activeViews.length)}`}
+							>
 								<div className="flex w-full flex-col p-6">
 									<div className="flex justify-between">
-										<h1 className="pb-4 text-xl font-semibold text-gray-900 dark:text-gray-100">Schema (YAML)</h1>
+										<h1 className="pb-4 text-xl font-semibold text-gray-900 dark:text-gray-100">
+											Schema (YAML)
+										</h1>
 										{!readonlyEditor ? (
 											<div className="flex space-x-2">
 												<a href="https://github.com/Telepact/telepact/blob/main/doc/02-design-apis/01-schema-guide.md">
@@ -713,14 +755,23 @@ export default function App() {
 						) : null}
 
 						{activeViews.includes('d') ? (
-							<div className={`flex overflow-scroll ${getSectionClass(activeViews, 'd', activeViews.length)}`}>
+							<div
+								className={`flex overflow-scroll ${getSectionClass(activeViews, 'd', activeViews.length)}`}
+							>
 								<div className="flex w-full flex-col p-6">
 									<div>
-										<h1 className="pb-4 text-xl font-semibold text-gray-900 dark:text-gray-100">Schema</h1>
+										<h1 className="pb-4 text-xl font-semibold text-gray-900 dark:text-gray-100">
+											Schema
+										</h1>
 									</div>
 
 									{docEntries.map((entry) => (
-										<DocCard key={entry.name} entry={entry} telepactSchema={telepactSchema!} navigate={navigate} />
+										<DocCard
+											key={entry.name}
+											entry={entry}
+											telepactSchema={telepactSchema!}
+											navigate={navigate}
+										/>
 									))}
 
 									<div className="flex justify-center pb-4">
@@ -728,7 +779,9 @@ export default function App() {
 											onClick={toggleShowInternalApi}
 											className="mt-4 rounded-md bg-sky-700 px-3 py-2 text-sm font-semibold text-white hover:bg-sky-600"
 										>
-											{showInternalApi ? 'Hide Internal API' : 'Show Internal API'}
+											{showInternalApi
+												? 'Hide Internal API'
+												: 'Show Internal API'}
 										</button>
 									</div>
 								</div>
@@ -736,10 +789,14 @@ export default function App() {
 						) : null}
 
 						{activeViews.includes('m') ? (
-							<div className={`flex overflow-scroll ${getSectionClass(activeViews, 'm', activeViews.length)}`}>
+							<div
+								className={`flex overflow-scroll ${getSectionClass(activeViews, 'm', activeViews.length)}`}
+							>
 								<div className="flex w-full flex-col p-6">
 									<div className="flex items-start justify-between">
-										<h1 className="pb-4 text-xl font-semibold text-gray-900 dark:text-gray-100">Mocked Example</h1>
+										<h1 className="pb-4 text-xl font-semibold text-gray-900 dark:text-gray-100">
+											Mocked Example
+										</h1>
 										<button
 											onClick={() => setSimulationSeed((v) => v + 1)}
 											className="rounded-md bg-sky-700 px-3 py-2 text-sm font-semibold text-white hover:bg-sky-600"
@@ -795,10 +852,14 @@ export default function App() {
 						) : null}
 
 						{activeViews.includes('t') ? (
-							<div className={`flex h-[calc(100vh-4em)] ${getSectionClass(activeViews, 't', activeViews.length)}`}>
+							<div
+								className={`flex h-[calc(100vh-4em)] ${getSectionClass(activeViews, 't', activeViews.length)}`}
+							>
 								<div className="flex w-full flex-col bg-zinc-100 p-6 dark:bg-zinc-700">
 									<div className="flex justify-between">
-										<h1 className="pb-4 text-xl font-semibold text-gray-900 dark:text-gray-100">Request</h1>
+										<h1 className="pb-4 text-xl font-semibold text-gray-900 dark:text-gray-100">
+											Request
+										</h1>
 										<div>
 											<button
 												onClick={handleSubmit}
@@ -831,10 +892,14 @@ export default function App() {
 						) : null}
 
 						{activeViews.includes('r') ? (
-							<div className={`flex h-[calc(100vh-4em)] ${getSectionClass(activeViews, 'r', activeViews.length)}`}>
+							<div
+								className={`flex h-[calc(100vh-4em)] ${getSectionClass(activeViews, 'r', activeViews.length)}`}
+							>
 								{responsePromise ? (
 									<div className="flex w-full flex-col bg-zinc-100 p-6 dark:bg-zinc-700">
-										<h1 className="mb-4 text-xl font-semibold text-gray-900 dark:text-gray-100">Response</h1>
+										<h1 className="mb-4 text-xl font-semibold text-gray-900 dark:text-gray-100">
+											Response
+										</h1>
 
 										{responseState.status === 'loading' ? (
 											<div className="grid h-full w-full place-content-center">
@@ -871,7 +936,9 @@ export default function App() {
 								) : (
 									<div className="grid h-full w-full place-content-center">
 										<div>
-											<span>Click "Submit" on Request pane to fetch response.</span>
+											<span>
+												Click "Submit" on Request pane to fetch response.
+											</span>
 										</div>
 									</div>
 								)}
