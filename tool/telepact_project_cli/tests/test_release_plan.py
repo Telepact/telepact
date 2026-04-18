@@ -280,7 +280,7 @@ class ReleasePlanTests(unittest.TestCase):
                 },
             )
 
-    def test_bump_commit_message_is_manifest_only_and_can_request_skip_build(self) -> None:
+    def test_bump_updates_files_without_committing_by_default(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             repo_root = Path(tmp_dir)
             (repo_root / "VERSION.txt").write_text("1.0.0-alpha.214", encoding="utf-8")
@@ -367,6 +367,117 @@ class ReleasePlanTests(unittest.TestCase):
                 result = runner.invoke(
                     main,
                     ["bump"],
+                    env={"PR_NUMBER": "42"},
+                )
+
+            self.assertEqual(result.exit_code, 0, msg=result.output)
+            commit_count = subprocess.run(
+                ["git", "rev-list", "--count", "HEAD"],
+                cwd=repo_root,
+                check=True,
+                capture_output=True,
+                text=True,
+            ).stdout.strip()
+            status_lines = subprocess.run(
+                ["git", "status", "--short"],
+                cwd=repo_root,
+                check=True,
+                capture_output=True,
+                text=True,
+            ).stdout.strip().splitlines()
+
+            self.assertTrue((repo_root / ".release" / "release-manifest.json").exists())
+            self.assertEqual(commit_count, "1")
+            self.assertTrue(status_lines)
+            self.assertIn("1.0.0-alpha.215", (repo_root / "VERSION.txt").read_text(encoding="utf-8"))
+
+    def test_bump_can_optionally_commit_with_skip_build(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            repo_root = Path(tmp_dir)
+            (repo_root / "VERSION.txt").write_text("1.0.0-alpha.214", encoding="utf-8")
+            (repo_root / ".release").mkdir()
+            (repo_root / ".release" / "release-targets.yaml").write_text(
+                textwrap.dedent(
+                    """
+                    projects:
+                      ts:
+                        paths: [lib/ts]
+                    """
+                ).strip()
+                + "\n",
+                encoding="utf-8",
+            )
+            (repo_root / "lib" / "go").mkdir(parents=True)
+            (repo_root / "lib" / "go" / "go.mod").write_text(
+                "module github.com/example/telepact/lib/go\n\ngo 1.22\n",
+                encoding="utf-8",
+            )
+            (repo_root / "lib" / "java").mkdir(parents=True)
+            (repo_root / "lib" / "java" / "pom.xml").write_text(
+                textwrap.dedent(
+                    """
+                    <project xmlns="http://maven.apache.org/POM/4.0.0">
+                      <modelVersion>4.0.0</modelVersion>
+                      <groupId>io.github.example</groupId>
+                      <artifactId>telepact</artifactId>
+                      <version>1.0.0-alpha.214</version>
+                    </project>
+                    """
+                ).strip()
+                + "\n",
+                encoding="utf-8",
+            )
+            (repo_root / "lib" / "py").mkdir(parents=True)
+            (repo_root / "lib" / "py" / "pyproject.toml").write_text(
+                textwrap.dedent(
+                    """
+                    [project]
+                    name = "telepact"
+                    version = "1.0.0-alpha.214"
+                    """
+                ).strip()
+                + "\n",
+                encoding="utf-8",
+            )
+            (repo_root / "lib" / "ts").mkdir(parents=True)
+            (repo_root / "lib" / "ts" / "package.json").write_text(
+                json.dumps({"name": "telepact", "version": "1.0.0-alpha.214"}, indent=2) + "\n",
+                encoding="utf-8",
+            )
+            (repo_root / "sdk" / "cli").mkdir(parents=True)
+            (repo_root / "sdk" / "cli" / "pyproject.toml").write_text(
+                textwrap.dedent(
+                    """
+                    [project]
+                    name = "telepact-cli"
+                    version = "1.0.0-alpha.214"
+                    """
+                ).strip()
+                + "\n",
+                encoding="utf-8",
+            )
+            (repo_root / "sdk" / "console").mkdir(parents=True)
+            (repo_root / "sdk" / "console" / "package.json").write_text(
+                json.dumps({"name": "telepact-console", "version": "1.0.0-alpha.214"}, indent=2) + "\n",
+                encoding="utf-8",
+            )
+            (repo_root / "sdk" / "prettier").mkdir(parents=True)
+            (repo_root / "sdk" / "prettier" / "package.json").write_text(
+                json.dumps({"name": "prettier-plugin-telepact", "version": "1.0.0-alpha.214"}, indent=2) + "\n",
+                encoding="utf-8",
+            )
+
+            subprocess.run(["git", "init"], cwd=repo_root, check=True, capture_output=True, text=True)
+            subprocess.run(["git", "config", "user.name", "Test User"], cwd=repo_root, check=True)
+            subprocess.run(["git", "config", "user.email", "test@example.com"], cwd=repo_root, check=True)
+            subprocess.run(["git", "add", "."], cwd=repo_root, check=True)
+            subprocess.run(["git", "commit", "-m", "Initial commit"], cwd=repo_root, check=True)
+
+            runner = CliRunner()
+            with _pushd(repo_root):
+                result = runner.invoke(
+                    main,
+                    ["bump", "--commit"],
                     env={
                         "PR_NUMBER": "42",
                         "TELEPACT_BUMP_SKIP_BUILD": "true",
@@ -452,6 +563,68 @@ class ReleasePlanTests(unittest.TestCase):
 
             self.assertEqual(result.exit_code, 0, msg=result.output)
             self.assertEqual(output_path.read_text(encoding="utf-8"), "skip_build=false\n")
+
+    def test_ensure_pr_requirements_met_rejects_non_main_before_moving_draft(self) -> None:
+        runner = CliRunner()
+        fake_pr = mock.Mock()
+        fake_pr.number = 42
+        fake_pr.state = "open"
+        fake_pr.draft = True
+        fake_pr.base.ref = "release"
+        fake_repo = mock.Mock()
+        fake_repo.get_pull.return_value = fake_pr
+        fake_repo.get_collaborator_permission.return_value = "write"
+        fake_github = mock.Mock()
+        fake_github.get_repo.return_value = fake_repo
+
+        with (
+            mock.patch("telepact_project_cli.cli.Github", return_value=fake_github),
+            mock.patch("telepact_project_cli.cli._mark_pull_request_ready_for_review") as mark_ready,
+        ):
+            result = runner.invoke(
+                main,
+                ["ensure-pr-requirements-met"],
+                env={
+                    "COMMENT_AUTHOR_ASSOCIATION": "MEMBER",
+                    "COMMENT_AUTHOR_LOGIN": "alice",
+                    "GITHUB_REPOSITORY": "Telepact/telepact",
+                    "GITHUB_TOKEN": "token",
+                    "PR_NUMBER": "42",
+                },
+            )
+
+        self.assertNotEqual(result.exit_code, 0)
+        self.assertIn("only main is supported", result.output)
+        mark_ready.assert_not_called()
+
+    def test_check_passing_build_uses_explicit_head_sha(self) -> None:
+        runner = CliRunner()
+        fake_pr = mock.Mock()
+        fake_pr.number = 42
+        fake_repo = mock.Mock()
+        fake_github = mock.Mock()
+        fake_github.get_repo.return_value = fake_repo
+
+        with (
+            mock.patch("telepact_project_cli.cli.Github", return_value=fake_github),
+            mock.patch("telepact_project_cli.cli._wait_for_pull_request_head", return_value=fake_pr) as wait_for_head,
+            mock.patch("telepact_project_cli.cli._wait_for_pr_workflow_success") as wait_for_build,
+            mock.patch("telepact_project_cli.cli._ensure_pull_request_merge_requirements") as ensure_requirements,
+        ):
+            result = runner.invoke(
+                main,
+                ["check-passing-build", "--head-sha", "abc123"],
+                env={
+                    "GITHUB_REPOSITORY": "Telepact/telepact",
+                    "GITHUB_TOKEN": "token",
+                    "PR_NUMBER": "42",
+                },
+            )
+
+        self.assertEqual(result.exit_code, 0, msg=result.output)
+        wait_for_head.assert_called_once_with(fake_repo, 42, "abc123", timeout_seconds=120)
+        wait_for_build.assert_called_once_with(fake_repo, "abc123")
+        ensure_requirements.assert_called_once_with(fake_repo, 42, "abc123")
 
     def test_authorize_merge_request_accepts_write_permission(self) -> None:
         runner = CliRunner()

@@ -262,7 +262,7 @@ def set_version(version: str) -> None:
         click.echo("No supported project file found.")
 
 
-def _bump_repository_version(pr_number: int, skip_build: bool = False) -> str:
+def _bump_repository_version(pr_number: int, commit: bool = False, skip_build: bool = False) -> str:
     version_file = 'VERSION.txt'
 
     project_files = [
@@ -385,17 +385,17 @@ def _bump_repository_version(pr_number: int, skip_build: bool = False) -> str:
     edited_files.append(repo_relative_doc_versions_path)
     click.echo(f"Updated {repo_relative_doc_versions_path}")
 
-    # Create the new commit message
-    new_commit_msg = _build_bump_commit_message(new_version, pr_number, skip_build=skip_build)
+    if commit:
+        new_commit_msg = _build_bump_commit_message(new_version, pr_number, skip_build=skip_build)
+        subprocess.run(['git', 'add'] + list(dict.fromkeys(edited_files)))
+        subprocess.run(['git', 'commit', '-m', new_commit_msg])
 
-    # Add and commit the changes
-    subprocess.run(['git', 'add'] + list(dict.fromkeys(edited_files)))
-    subprocess.run(['git', 'commit', '-m', new_commit_msg])
-    return _git(["rev-parse", "HEAD"], cwd=Path(".")).strip()
+    return new_version
 
 
 @click.command()
-def bump() -> None:
+@click.option("--commit/--no-commit", default=False, help="Also create the bump commit after updating files.")
+def bump(commit: bool) -> None:
     pr_number_str = os.getenv('PR_NUMBER')
     if not pr_number_str:
         click.echo("PR_NUMBER environment variable not set.", err=True)
@@ -403,6 +403,7 @@ def bump() -> None:
     pr_number = int(pr_number_str)
     _bump_repository_version(
         pr_number,
+        commit=commit,
         skip_build=_env_flag("TELEPACT_BUMP_SKIP_BUILD"),
     )
 
@@ -824,31 +825,33 @@ def authorize_merge_request() -> None:
     click.echo(f"Authorized merge request from @{commenter_login}.")
 
 
-@click.command(name="prepare-merge")
+@click.command(name="ensure-pr-requirements-met")
 @click.option(
     "--github-output",
     default=None,
     type=click.Path(dir_okay=False, path_type=Path),
     help="Write key=value lines for GitHub Actions outputs.",
 )
-def prepare_merge(github_output: Path | None) -> None:
+def ensure_pr_requirements_met(github_output: Path | None) -> None:
     pr_number = int(_require_env("PR_NUMBER"))
     github_token = _require_env("GITHUB_TOKEN")
     github_repository = _require_env("GITHUB_REPOSITORY")
-    repo_root = Path(".").resolve()
+    commenter_login = _require_env("COMMENT_AUTHOR_LOGIN")
+    commenter_association = _require_env("COMMENT_AUTHOR_ASSOCIATION").strip().upper()
 
     g = Github(github_token)
     repo = g.get_repo(github_repository)
+    _ensure_merge_request_authorized(repo, commenter_login, commenter_association)
     pr = _refresh_pull_request(repo, pr_number)
 
     if pr.state != "open":
         raise click.ClickException(f"PR #{pr.number} is not open.")
+    if pr.base.ref != "main":
+        raise click.ClickException(f"PR #{pr.number} targets {pr.base.ref!r}; only main is supported.")
     if pr.draft:
         click.echo(f"PR #{pr.number} is draft; marking it ready for review.")
         _mark_pull_request_ready_for_review(pr)
         pr = _refresh_pull_request(repo, pr.number)
-    if pr.base.ref != "main":
-        raise click.ClickException(f"PR #{pr.number} targets {pr.base.ref!r}; only main is supported.")
 
     comparison = repo.compare(pr.base.ref, pr.head.sha)
     if comparison.status == "behind":
@@ -860,34 +863,37 @@ def prepare_merge(github_output: Path | None) -> None:
             raise click.ClickException(f"Failed to update PR #{pr.number} with {pr.base.ref}: {exc}")
         pr = _wait_for_pull_request_head_change(repo, pr.number, old_head_sha, timeout_seconds=180)
 
-    _wait_for_pr_workflow_success(repo, pr.head.sha)
-    _ensure_pull_request_merge_requirements(repo, pr.number, pr.head.sha)
-
-    click.echo(f"Checking out {pr.head.ref} at {pr.head.sha}.")
-    remote_ref = f"origin/merge-queue-pr-{pr.number}"
-    _git(
-        ["fetch", "origin", f"pull/{pr.number}/head:refs/remotes/{remote_ref}"],
-        cwd=repo_root,
-    )
-    _git(["checkout", "-B", pr.head.ref, remote_ref], cwd=repo_root)
-
-    new_head_sha = _bump_repository_version(pr.number, skip_build=True)
-    click.echo(f"Pushing bump commit {new_head_sha} to {pr.head.ref}.")
-    _git(["push", "origin", f"HEAD:{pr.head.ref}"], cwd=repo_root)
-
-    _wait_for_pull_request_head(repo, pr.number, new_head_sha, timeout_seconds=60)
-    _wait_for_pr_workflow_success(repo, new_head_sha)
-    _ensure_pull_request_merge_requirements(repo, pr.number, new_head_sha)
-
     if github_output is not None:
         github_output.parent.mkdir(parents=True, exist_ok=True)
         github_output.write_text(
-            f"pr_number={pr.number}\nhead_sha={new_head_sha}\n",
+            f"head_ref={pr.head.ref}\nhead_sha={pr.head.sha}\n",
             encoding="utf-8",
         )
     else:
-        click.echo(f"pr_number={pr.number}")
-        click.echo(f"head_sha={new_head_sha}")
+        click.echo(f"head_ref={pr.head.ref}")
+        click.echo(f"head_sha={pr.head.sha}")
+
+
+@click.command(name="check-passing-build")
+@click.option("--head-sha", default=None, help="Expected PR head SHA to wait for before checking the build.")
+def check_passing_build(head_sha: str | None) -> None:
+    pr_number = int(_require_env("PR_NUMBER"))
+    github_token = _require_env("GITHUB_TOKEN")
+    github_repository = _require_env("GITHUB_REPOSITORY")
+
+    g = Github(github_token)
+    repo = g.get_repo(github_repository)
+
+    if head_sha is not None:
+        pr = _wait_for_pull_request_head(repo, pr_number, head_sha, timeout_seconds=120)
+        expected_head_sha = head_sha
+    else:
+        pr = _refresh_pull_request(repo, pr_number)
+        expected_head_sha = pr.head.sha
+
+    _wait_for_pr_workflow_success(repo, expected_head_sha)
+    _ensure_pull_request_merge_requirements(repo, pr.number, expected_head_sha)
+    click.echo(f"Passing build confirmed for PR #{pr.number} at {expected_head_sha}.")
 
 
 @click.command()
@@ -1008,7 +1014,8 @@ main.add_command(release)
 main.add_command(publish_targets)
 main.add_command(should_skip_build)
 main.add_command(authorize_merge_request)
-main.add_command(prepare_merge)
+main.add_command(ensure_pr_requirements_met)
+main.add_command(check_passing_build)
 main.add_command(automerge)
 main.add_command(gitignore)
 main.add_command(consolidated_readme)

@@ -28,44 +28,11 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  authorize-merge-request:
+  auto-merge:
     if: ${{ github.event.issue.pull_request && github.event.comment.body == '/merge' }}
     runs-on: ubuntu-latest
     environment: bot
-    timeout-minutes: 5
-    steps:
-      - name: Generate GitHub App token
-        id: generate-token
-        uses: actions/create-github-app-token@v1
-        with:
-          app-id: ${{ vars.TELEPACT_BOT_APP_ID }}
-          private-key: ${{ secrets.TELEPACT_BOT_PRIVATE_KEY }}
-
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
-          token: ${{ steps.generate-token.outputs.token }}
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v6
-
-      - name: Authorize merge request
-        env:
-          COMMENT_AUTHOR_ASSOCIATION: ${{ github.event.comment.author_association }}
-          COMMENT_AUTHOR_LOGIN: ${{ github.event.comment.user.login }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
-          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
-        run: ./tool/telepact-project authorize-merge-request
-
-  prepare-merge:
-    needs: [authorize-merge-request]
-    runs-on: ubuntu-latest
-    environment: bot
     timeout-minutes: 40
-    outputs:
-      pr_number: ${{ steps.prepare.outputs.pr_number }}
-      head_sha: ${{ steps.prepare.outputs.head_sha }}
     steps:
       - name: Generate GitHub App token
         id: generate-token
@@ -80,49 +47,73 @@ jobs:
           fetch-depth: 0
           token: ${{ steps.generate-token.outputs.token }}
 
-      - name: Set up Dart
-        uses: dart-lang/setup-dart@v1
-        with:
-          sdk: 3.6
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v6
-
       - name: Configure git identity
         run: |
           git config --global user.name "telepact-notary[bot]"
           git config --global user.email "telepact-notary[bot]@users.noreply.github.com"
 
-      - name: Prepare merge
-        id: prepare
+      # Required when bumping lock files that are regenerated from Dart package metadata.
+      - name: Set up Dart
+        uses: dart-lang/setup-dart@v1
+        with:
+          sdk: 3.6
+
+      # Required when bumping lock files that are regenerated from Python package metadata.
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Ensure PR requirements are met
+        id: pr
+        env:
+          COMMENT_AUTHOR_ASSOCIATION: ${{ github.event.comment.author_association }}
+          COMMENT_AUTHOR_LOGIN: ${{ github.event.comment.user.login }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
+          PR_NUMBER: ${{ github.event.issue.number }}
+        run: ./tool/telepact-project ensure-pr-requirements-met --github-output "$GITHUB_OUTPUT"
+
+      - name: Wait for passing PR build
         env:
           GITHUB_REPOSITORY: ${{ github.repository }}
           GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
           PR_NUMBER: ${{ github.event.issue.number }}
-        run: ./tool/telepact-project prepare-merge --github-output "$GITHUB_OUTPUT"
+        run: ./tool/telepact-project check-passing-build --head-sha "${{ steps.pr.outputs.head_sha }}"
 
-  merge-pr:
-    needs: [prepare-merge]
-    runs-on: ubuntu-latest
-    environment: bot
-    timeout-minutes: 5
-    steps:
-      - name: Generate GitHub App token
-        id: generate-token
-        uses: actions/create-github-app-token@v1
-        with:
-          app-id: ${{ vars.TELEPACT_BOT_APP_ID }}
-          private-key: ${{ secrets.TELEPACT_BOT_PRIVATE_KEY }}
+      - name: Check out PR branch
+        env:
+          PR_HEAD_REF: ${{ steps.pr.outputs.head_ref }}
+        run: |
+          git fetch origin "$PR_HEAD_REF"
+          git checkout -B "$PR_HEAD_REF" "origin/$PR_HEAD_REF"
+
+      - name: Apply version bump
+        env:
+          PR_NUMBER: ${{ github.event.issue.number }}
+        run: ./tool/telepact-project bump
+
+      - name: Commit and push bump
+        env:
+          PR_HEAD_REF: ${{ steps.pr.outputs.head_ref }}
+          PR_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          git add .
+          git commit -m "Bump version to $(cat VERSION.txt) (#$PR_NUMBER) [skip build]"
+          git push origin "HEAD:$PR_HEAD_REF"
+
+      - name: Wait for passing PR build after bump
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
+          PR_NUMBER: ${{ github.event.issue.number }}
+        run: ./tool/telepact-project check-passing-build --head-sha "$(git rev-parse HEAD)"
 
       - name: Squash merge PR
         env:
           GH_PROMPT_DISABLED: "1"
           GH_TOKEN: ${{ steps.generate-token.outputs.token }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-          HEAD_SHA: ${{ needs.prepare-merge.outputs.head_sha }}
-          PR_NUMBER: ${{ needs.prepare-merge.outputs.pr_number }}
         run: |
-          gh pr merge "$PR_NUMBER" \
+          gh pr merge "${{ github.event.issue.number }}" \
             --repo "$GITHUB_REPOSITORY" \
             --squash \
-            --match-head-commit "$HEAD_SHA"
+            --match-head-commit "$(git rev-parse HEAD)"
