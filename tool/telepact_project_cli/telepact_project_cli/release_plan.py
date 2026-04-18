@@ -267,19 +267,17 @@ def resolve_publish_targets(
     release_tag: str | None = None,
     release_body: str | None = None,
 ) -> dict[str, bool]:
-    targets: set[str]
     manifest_path = release_manifest_path(repo_root)
-    if manifest_path.exists():
-        data = load_release_manifest(repo_root)
-        version = data.get("version")
-        if release_tag and version != release_tag:
-            raise click.ClickException(
-                f"Release manifest version {version!r} does not match release tag {release_tag!r}"
-            )
-        targets = set(data.get("targets", []))
-    else:
-        release_body = release_body or ""
-        targets = {target for target in PUBLISH_TARGETS if f"- {target}" in release_body}
+    if not manifest_path.exists():
+        raise click.ClickException(f"Release manifest not found: {manifest_path}")
+
+    data = load_release_manifest(repo_root)
+    version = data.get("version")
+    if release_tag and version != release_tag:
+        raise click.ClickException(
+            f"Release manifest version {version!r} does not match release tag {release_tag!r}"
+        )
+    targets = set(data.get("targets", []))
 
     return {
         f"publish_{target}": target in targets

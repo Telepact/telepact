@@ -29,9 +29,36 @@ permissions:
   pull-requests: write
 
 jobs:
+  resolve-build-mode:
+    name: Resolve Build Mode
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    outputs:
+      skip_build: ${{ steps.resolve.outputs.skip_build }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Resolve build mode
+        id: resolve
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: ./tool/telepact-project should-skip-build --github-output "$GITHUB_OUTPUT"
+
   build:
     name: Build
+    needs: [resolve-build-mode]
     uses: ./.github/workflows/build.yml
+    with:
+      skip_build: ${{ needs.resolve-build-mode.outputs.skip_build == 'true' }}
 
   update-labels:
     name: Update Labels

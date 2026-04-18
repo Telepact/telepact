@@ -17,16 +17,57 @@
 name: Merge Queue
 
 on:
-  merge_group:
+  issue_comment:
     types:
-      - checks_requested
-    branches:
-      - main
+      - created
 
 permissions:
-  contents: read
+  actions: read
+  checks: read
+  contents: write
+  pull-requests: write
+  statuses: read
 
 jobs:
-  build:
-    name: Build
-    uses: ./.github/workflows/build.yml
+  queue-merge:
+    if: ${{ github.event.issue.pull_request && github.event.comment.body == '/merge' }}
+    runs-on: ubuntu-latest
+    environment: bot
+    timeout-minutes: 40
+    concurrency:
+      group: merge-queue
+      cancel-in-progress: false
+    steps:
+      - name: Generate GitHub App token
+        id: generate-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ vars.TELEPACT_BOT_APP_ID }}
+          private-key: ${{ secrets.TELEPACT_BOT_PRIVATE_KEY }}
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ steps.generate-token.outputs.token }}
+
+      - name: Set up Dart
+        uses: dart-lang/setup-dart@v1
+        with:
+          sdk: 3.6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Configure git identity
+        run: |
+          git config --global user.name "telepact-notary[bot]"
+          git config --global user.email "telepact-notary[bot]@users.noreply.github.com"
+
+      - name: Process queued merge
+        env:
+          COMMENT_AUTHOR_ASSOCIATION: ${{ github.event.comment.author_association }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
+          PR_NUMBER: ${{ github.event.issue.number }}
+        run: ./tool/telepact-project merge-queue

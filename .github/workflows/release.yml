@@ -19,36 +19,11 @@ name: Release
 on:
   push:
     branches:
-      - main  
+      - main
 
 jobs:
-
-  check-version-change:
-    name: Check version change
-    runs-on: ubuntu-latest
-    outputs:
-      version-changed: ${{ steps.check-file.outputs.version_changed }}
-    steps:
-      - name: Checkout repository code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
-
-      - name: Determine if VERSION.txt was modified in the latest commit
-        id: check-file
-        run: |
-          if git show --name-only --pretty="" HEAD | grep -q "VERSION.txt"; then
-            echo "VERSION.txt was changed in the last commit."
-            echo "version_changed=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "VERSION.txt was NOT changed in the last commit. Subsequent jobs will be skipped."
-            echo "version_changed=false" >> "$GITHUB_OUTPUT"
-          fi
-
   build-release:
     name: Build release
-    needs: [check-version-change]
-    if: needs.check-version-change.outputs.version-changed == 'true'
     uses: ./.github/workflows/build.yml
     
   create-release:

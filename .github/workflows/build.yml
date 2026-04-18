@@ -18,10 +18,24 @@ name: Build
 
 on:
   workflow_call:
+    inputs:
+      skip_build:
+        required: false
+        type: boolean
+        default: false
 
 jobs:
+  skip-build:
+    name: Skip Build
+    if: ${{ inputs.skip_build }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Acknowledge skipped build
+        run: echo "Skipping the full build for a merge-queue bump commit."
+
   build-ts:
     name: Build TypeScript
+    if: ${{ !inputs.skip_build }}
     runs-on: ubuntu-latest
     timeout-minutes: 1
     steps:
@@ -54,6 +68,7 @@ jobs:
 
   build-java:
     name: Build Java
+    if: ${{ !inputs.skip_build }}
     runs-on: ubuntu-latest
     timeout-minutes: 1
     steps:
@@ -86,6 +101,7 @@ jobs:
 
   build-go:
     name: Build Go
+    if: ${{ !inputs.skip_build }}
     runs-on: ubuntu-latest
     timeout-minutes: 1
     steps:
@@ -102,6 +118,7 @@ jobs:
 
   build-py:
     name: Build Python
+    if: ${{ !inputs.skip_build }}
     runs-on: ubuntu-latest
     timeout-minutes: 1
     steps:
@@ -123,6 +140,7 @@ jobs:
 
   build-cli:
     name: Build CLI
+    if: ${{ !inputs.skip_build }}
     runs-on: ubuntu-latest
     timeout-minutes: 2
     needs: [build-py]
@@ -161,6 +179,7 @@ jobs:
 
   build-dart:
     name: Build Dart
+    if: ${{ !inputs.skip_build }}
     runs-on: ubuntu-latest
     timeout-minutes: 2
     needs: [build-ts]
@@ -199,6 +218,7 @@ jobs:
 
   build-prettier:
     name: Build Prettier Plugin
+    if: ${{ !inputs.skip_build }}
     runs-on: ubuntu-latest
     timeout-minutes: 1
     steps:
@@ -231,6 +251,7 @@ jobs:
 
   build-console:
     name: Build Console
+    if: ${{ !inputs.skip_build }}
     runs-on: ubuntu-latest
     timeout-minutes: 8
     needs: [build-ts, build-cli, build-prettier]
@@ -294,6 +315,7 @@ jobs:
 
   test-console-self-host:
     name: Test Self-Hosted Console
+    if: ${{ !inputs.skip_build }}
     runs-on: ubuntu-latest
     timeout-minutes: 2
     needs: [build-console]
@@ -323,6 +345,7 @@ jobs:
 
   check-examples:
     name: Check Examples
+    if: ${{ !inputs.skip_build }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -371,6 +394,7 @@ jobs:
 
   check-license-header:
     name: Check License Header
+    if: ${{ !inputs.skip_build }}
     runs-on: ubuntu-latest
     timeout-minutes: 1
     steps:
@@ -394,6 +418,7 @@ jobs:
 
   check-version:
     name: Check Versions
+    if: ${{ !inputs.skip_build }}
     runs-on: ubuntu-latest
     timeout-minutes: 1
     steps:
@@ -426,6 +451,7 @@ jobs:
 
   run-tests:
     name: Test
+    if: ${{ !inputs.skip_build }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     needs: [build-ts, build-java, build-go, build-py, build-cli]
