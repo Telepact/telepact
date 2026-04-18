@@ -1,9 +1,9 @@
 {
   "changed_paths": [
-    ".gitignore"
+    ".github/workflows/copilot-setup-steps.yml"
   ],
   "direct_targets": [],
-  "pr_number": 411,
+  "pr_number": 414,
   "targets": [],
-  "version": "1.0.0-alpha.304"
+  "version": "1.0.0-alpha.305"
 }
