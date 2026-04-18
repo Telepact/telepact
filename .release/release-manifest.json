@@ -1,9 +1,9 @@
 {
   "changed_paths": [
-    ".github/workflows/merge-queue.yml"
+    ".gitignore"
   ],
   "direct_targets": [],
-  "pr_number": 413,
+  "pr_number": 411,
   "targets": [],
-  "version": "1.0.0-alpha.303"
+  "version": "1.0.0-alpha.304"
 }
