@@ -11,5 +11,7 @@ dist/
 node_modules/
 target/
 demo/
-sdk/go.sum
+go.sum
+!/lib/go/go.sum
+!/test/lib/go/go.sum
 site/dist/
