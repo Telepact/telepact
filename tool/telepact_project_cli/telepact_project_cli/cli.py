@@ -31,11 +31,8 @@ from .release_plan import (
     changed_paths_for_commits,
     compute_release_manifest,
     load_release_manifest,
-    parse_legacy_release_info,
-    parse_pr_number_from_subject,
     release_commits_since_last_bump,
     resolve_publish_targets,
-    strip_pr_number_suffix,
     write_release_manifest,
 )
 
@@ -184,12 +181,6 @@ def bump() -> None:
         'sdk/console/package.json',
     ]
 
-    pr_number_str = os.getenv('PR_NUMBER')
-    if not pr_number_str:
-        click.echo("PR_NUMBER environment variable not set.", err=True)
-        sys.exit(1)
-    pr_number = int(pr_number_str)
-
     def bump_version2(version: str) -> str:
         parts = version.split('.')
         parts[-1] = str(int(parts[-1]) + 1)
@@ -268,50 +259,14 @@ def bump() -> None:
 
     included_commits = release_commits_since_last_bump(Path("."))
     changed_paths = changed_paths_for_commits(Path("."), included_commits)
-    if not changed_paths:
-        changed_paths = [
-            path
-            for path in subprocess.run(
-                ['git', 'show', '--name-only', '--pretty=format:', 'HEAD'],
-                stdout=subprocess.PIPE,
-                text=True,
-                check=True,
-            ).stdout.strip().split('\n')
-            if path
-        ]
-
-    print('included_commits:')
-    print([commit.to_dict() for commit in included_commits])
-    print('changed_paths:')
-    print(changed_paths)
 
     release_manifest = compute_release_manifest(
         Path("."),
         changed_paths=changed_paths,
         version=new_version,
-        pr_number=pr_number,
         included_commits=included_commits,
     )
     sorted_release_targets = list(release_manifest.targets)
-    print(f'release_targets: {sorted_release_targets}')
-
-    if included_commits:
-        included_pr_lines = ["Included PR commits:"]
-        for commit in included_commits:
-            if commit.pr_number is not None:
-                included_pr_lines.append(
-                    f"- #{commit.pr_number}: {strip_pr_number_suffix(commit.subject)}"
-                )
-            else:
-                included_pr_lines.append(f"- {commit.subject} ({commit.sha[:7]})")
-    else:
-        included_pr_lines = ["Included PR commits:", "(None)"]
-
-    included_pr_string = "\n".join(included_pr_lines)
-    if sorted_release_targets:
-        release_string = "Release targets:\n" + "\n".join(sorted_release_targets)
-    else:
-        release_string = "No release targets"
 
     manifest_path = write_release_manifest(Path("."), release_manifest)
     repo_relative_manifest_path = os.path.relpath(manifest_path, Path.cwd())
@@ -328,10 +283,8 @@ def bump() -> None:
     edited_files.append(repo_relative_doc_versions_path)
     click.echo(f"Updated {repo_relative_doc_versions_path}")
 
-    # Create the new commit message
-    new_commit_msg = f"Bump version to {new_version}\n\n{included_pr_string}\n\n{release_string}"
+    new_commit_msg = f"Bump version to {new_version}"
 
-    # Add and commit the changes
     subprocess.run(['git', 'add'] + list(dict.fromkeys(edited_files)))
     subprocess.run(['git', 'commit', '-m', new_commit_msg])
 
@@ -549,35 +502,11 @@ def release() -> None:
 
     print(f'head_commit: {head_commit}')
 
-    manifest_file = Path(".release/release-manifest.json")
-    included_commits: list[dict[str, object]] = []
-    if manifest_file.exists():
-        release_manifest = load_release_manifest(Path("."))
-        version = release_manifest["version"]
-        pr_number_value = release_manifest.get("pr_number")
-        pr_number = int(pr_number_value) if pr_number_value is not None else None
-        release_targets = list(release_manifest.get("targets", []))
-        included_commits = list(release_manifest.get("included_commits", []))
-        click.echo("Loaded release metadata from .release/release-manifest.json")
-    else:
-        commit_message = subprocess.run(
-            ['git', 'show', '-s', '--format=%s%n%b', 'HEAD'],
-            stdout=subprocess.PIPE, text=True, check=True
-        ).stdout.strip()
-        print(f'commit_message: {commit_message}')
-        lines = commit_message.splitlines()
-        legacy_info = parse_legacy_release_info(lines[0] if lines else "", "\n".join(lines[1:]))
-        if legacy_info is None:
-            click.echo("No release manifest found and the last commit message does not match the expected legacy format.")
-            return
-        version, release_targets = legacy_info
-        pr_number = parse_pr_number_from_subject(lines[0]) if lines else None
-        click.echo("Loaded release metadata from legacy bump commit message")
-
-    print(f'release_targets: {release_targets}')
-    print(f'version: {version}')
-    print(f'pr_number: {pr_number}')
-    print(f'included_commits: {included_commits}')
+    release_manifest = load_release_manifest(Path("."))
+    version = release_manifest["version"]
+    release_targets = list(release_manifest.get("targets", []))
+    included_commits = list(release_manifest.get("included_commits", []))
+    click.echo("Loaded release metadata from .release/release-manifest.json")
 
     tag_name = version
     release_name = version
@@ -602,28 +531,12 @@ def release() -> None:
             repo.create_git_ref(ref=f"refs/tags/{go_module_tag}", sha=head_commit)
             click.echo(f"Created Go module tag: {go_module_tag}")
 
-    if included_commits:
-        included_prs = []
-        for commit in included_commits:
-            subject = str(commit.get("subject", "")).strip()
-            sha = str(commit.get("sha", "")).strip()
-            commit_pr_number = commit.get("pr_number")
-            if isinstance(commit_pr_number, int):
-                included_prs.append(
-                    f"- {strip_pr_number_suffix(subject)} [(#{commit_pr_number})](https://github.com/{repository}/pull/{commit_pr_number})"
-                )
-            elif subject:
-                included_prs.append(f"- {subject} (`{sha[:7]}`)")
-        included_prs_string = "\n".join(included_prs) if included_prs else "(None)"
-    elif pr_number is not None:
-        pr = repo.get_pull(pr_number)
-        included_prs_string = f"- {pr.title} [(#{pr_number})]({pr.html_url})"
-    else:
-        included_prs_string = "(Unavailable)"
+    included_prs = [f"- {subject}" for subject in included_commits if isinstance(subject, str) and subject.strip()]
+    included_prs_string = "\n".join(included_prs) if included_prs else "(None)"
 
     released_projects = ''.join(f'- {target}\n' for target in release_targets) if release_targets else '(None)'
     final_release_body = (
-        f"### Included Pull Requests\n"
+        f"### Included Commits\n"
         f"{included_prs_string}\n\n"
         f"### Released Projects\n"
         f"{released_projects}"
@@ -668,13 +581,11 @@ def release() -> None:
 
 @click.command(name="publish-targets")
 @click.option("--release-tag", default=None, help="Expected release tag/version for validation.")
-@click.option("--release-body", default=None, help="Legacy fallback release body when no manifest exists.")
 @click.option("--github-output", default=None, type=click.Path(dir_okay=False, path_type=Path), help="Write key=value lines for GitHub Actions outputs.")
-def publish_targets(release_tag: str | None, release_body: str | None, github_output: Path | None) -> None:
+def publish_targets(release_tag: str | None, github_output: Path | None) -> None:
     outputs = resolve_publish_targets(
         Path("."),
         release_tag=release_tag,
-        release_body=release_body,
     )
 
     lines = [f"{key}={'true' if value else 'false'}" for key, value in outputs.items()]

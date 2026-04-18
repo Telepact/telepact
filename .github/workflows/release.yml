@@ -39,9 +39,8 @@ jobs:
         run: |
           author_name="$(git show -s --format=%an HEAD)"
           committer_name="$(git show -s --format=%cn HEAD)"
-          subject="$(git show -s --format=%s HEAD)"
           if git show --name-only --pretty="" HEAD | grep -qx "VERSION.txt" \
-            && [[ "$subject" == Bump\ version\ to* ]] \
+            && git show --name-only --pretty="" HEAD | grep -qx ".release/release-manifest.json" \
             && { [[ "$author_name" == "telepact-notary[bot]" ]] || [[ "$committer_name" == "telepact-notary[bot]" ]]; }; then
             echo "Detected bot-authored version bump commit."
             echo "version_changed=true" >> "$GITHUB_OUTPUT"

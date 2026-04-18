@@ -1,9 +1,5 @@
 {
-  "changed_paths": [
-    ".gitignore"
-  ],
-  "direct_targets": [],
-  "pr_number": 411,
+  "included_commits": [],
   "targets": [],
   "version": "1.0.0-alpha.304"
 }

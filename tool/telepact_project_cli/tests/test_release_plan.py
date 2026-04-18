@@ -36,9 +36,7 @@ from telepact_project_cli.release_plan import (
     changed_paths_for_commits,
     compute_release_manifest,
     load_release_manifest,
-    parse_pr_number_from_subject,
     release_commits_since_last_bump,
-    strip_pr_number_suffix,
     write_release_manifest,
 )
 
@@ -106,18 +104,12 @@ class ReleasePlanTests(unittest.TestCase):
                     "README.md",
                 ],
                 version="1.0.0-alpha.215",
-                pr_number=300,
             )
             manifest_path = write_release_manifest(repo_root, manifest)
             loaded = load_release_manifest(repo_root)
 
-            self.assertEqual(manifest.direct_targets, ("prettier", "ts"))
+            self.assertEqual(manifest.targets, ("console", "dart", "prettier", "ts"))
             self.assertEqual(loaded["targets"], ["console", "dart", "prettier", "ts"])
-            self.assertEqual(loaded["changed_paths"], [
-                "README.md",
-                "lib/ts/src/main.ts",
-                "sdk/prettier/package.json",
-            ])
             self.assertEqual(loaded["included_commits"], [])
             self.assertEqual(manifest_path.resolve(), (repo_root / ".release" / "release-manifest.json").resolve())
 
@@ -161,23 +153,12 @@ class ReleasePlanTests(unittest.TestCase):
                 repo_root,
                 changed_paths=[".release/force-all.md"],
                 version="1.0.0-alpha.215",
-                pr_number=301,
             )
 
             self.assertEqual(
-                manifest.direct_targets,
+                manifest.targets,
                 ("cli", "console", "dart", "go", "java", "prettier", "py", "ts"),
             )
-            self.assertEqual(manifest.targets, manifest.direct_targets)
-
-    def test_parse_pr_number_from_subject(self) -> None:
-        self.assertEqual(parse_pr_number_from_subject("Add Python client (#10)"), 10)
-        self.assertIsNone(parse_pr_number_from_subject("Bump version to 1.0.0-alpha.201"))
-        self.assertIsNone(parse_pr_number_from_subject("Malformed suffix (#abc)"))
-
-    def test_strip_pr_number_suffix(self) -> None:
-        self.assertEqual(strip_pr_number_suffix("Update Prettier support (#11)"), "Update Prettier support")
-        self.assertEqual(strip_pr_number_suffix("No suffix here"), "No suffix here")
 
     def test_publish_targets_command_writes_github_outputs(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
@@ -188,9 +169,6 @@ class ReleasePlanTests(unittest.TestCase):
                 json.dumps(
                     {
                         "version": "1.0.0-alpha.214",
-                        "pr_number": 7,
-                        "changed_paths": ["lib/py/pyproject.toml"],
-                        "direct_targets": ["py"],
                         "included_commits": [],
                         "targets": ["cli", "py"],
                     },
@@ -244,7 +222,7 @@ class ReleasePlanTests(unittest.TestCase):
                     "--title",
                     "Bump version to 1.0.0-alpha.999",
                     "--body",
-                    "Release targets:\npy",
+                    "Automated bump PR",
                     "--head",
                     "bump-version",
                     "--base",
@@ -263,7 +241,7 @@ class ReleasePlanTests(unittest.TestCase):
         fake_github.get_repo.assert_called_once_with("Telepact/telepact")
         fake_repo.create_pull.assert_called_once_with(
             title="Bump version to 1.0.0-alpha.999",
-            body="Release targets:\npy",
+            body="Automated bump PR",
             head="bump-version",
             base="main",
             draft=False,
@@ -337,9 +315,6 @@ class ReleasePlanTests(unittest.TestCase):
                 json.dumps(
                     {
                         "version": "1.0.0-alpha.202",
-                        "pr_number": 2,
-                        "changed_paths": ["lib/py/pyproject.toml"],
-                        "direct_targets": ["py"],
                         "included_commits": [],
                         "targets": ["cli", "py"],
                     },
@@ -378,11 +353,13 @@ class ReleasePlanTests(unittest.TestCase):
             subprocess.run(["git", "add", "VERSION.txt"], cwd=repo_root, check=True)
             subprocess.run(["git", "commit", "-m", "Initial commit"], cwd=repo_root, check=True)
 
+            (repo_root / "VERSION.txt").write_text("1.0.0-alpha.201", encoding="utf-8")
             subprocess.run(
-                ["git", "commit", "--allow-empty", "-m", "Bump version to 1.0.0-alpha.201"],
+                ["git", "add", "VERSION.txt"],
                 cwd=repo_root,
                 check=True,
             )
+            subprocess.run(["git", "commit", "-m", "Advance version file"], cwd=repo_root, check=True)
 
             py_file = repo_root / "lib" / "py" / "client.py"
             py_file.parent.mkdir(parents=True)
@@ -402,10 +379,6 @@ class ReleasePlanTests(unittest.TestCase):
             self.assertEqual(
                 [commit.subject for commit in release_commits],
                 ["Add Python client (#10)", "Update Prettier support (#11)"],
-            )
-            self.assertEqual(
-                [commit.pr_number for commit in release_commits],
-                [10, 11],
             )
             self.assertEqual(
                 changed_paths,

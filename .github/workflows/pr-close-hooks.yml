@@ -31,7 +31,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 1
     outputs:
-      pr_number: ${{ steps.extract-pr-close-details.outputs.pr_number }}
       pr_merged: ${{ steps.extract-pr-close-details.outputs.pr_merged }}
       pr_head_ref: ${{ steps.extract-pr-close-details.outputs.pr_head_ref }}
     steps:
@@ -47,11 +46,9 @@ jobs:
         id: extract-pr-close-details
         run: |
           pr_close_details=$(cat pr-close/details.json)
-          pr_number=$(echo "$pr_close_details" | jq -r '.pr_number')
           pr_merged=$(echo "$pr_close_details" | jq -r '.pr_merged')
           pr_head_ref=$(echo "$pr_close_details" | jq -r '.pr_head_ref')
 
-          echo "pr_number=$pr_number" >> "$GITHUB_OUTPUT"
           echo "pr_merged=$pr_merged" >> "$GITHUB_OUTPUT"
           echo "pr_head_ref=$pr_head_ref" >> "$GITHUB_OUTPUT"
 
@@ -104,25 +101,33 @@ jobs:
             echo "bump_branch_exists=false" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Check whether HEAD already changed VERSION.txt
+        id: check-version-file
+        run: |
+          if git show --name-only --pretty="" HEAD | grep -qx "VERSION.txt"; then
+            echo "version_changed=true" >> "$GITHUB_OUTPUT"
+            echo "VERSION.txt already changed in HEAD. Skipping bump-version PR creation."
+          else
+            echo "version_changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Bump version
-        if: steps.check-bump-branch.outputs.bump_branch_exists != 'true'
-        env:
-          PR_NUMBER: ${{ needs.get-pr-close-info.outputs.pr_number }}
+        if: steps.check-bump-branch.outputs.bump_branch_exists != 'true' && steps.check-version-file.outputs.version_changed != 'true'
         run: ./tool/telepact-project bump
 
       - name: Create bump-version branch
-        if: steps.check-bump-branch.outputs.bump_branch_exists != 'true'
+        if: steps.check-bump-branch.outputs.bump_branch_exists != 'true' && steps.check-version-file.outputs.version_changed != 'true'
         run: |
           git switch -c bump-version
           git push origin HEAD:bump-version
 
       - name: Open bump-version PR
-        if: steps.check-bump-branch.outputs.bump_branch_exists != 'true'
+        if: steps.check-bump-branch.outputs.bump_branch_exists != 'true' && steps.check-version-file.outputs.version_changed != 'true'
         env:
           GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
           GITHUB_REPOSITORY: ${{ github.repository }}
         run: ./tool/telepact-project create-pull-request --title "$(git log -1 --format=%s)" --body "$(git log -1 --format=%b)" --head bump-version --base main --no-draft --no-maintainer-can-modify
 
       - name: git log
-        if: steps.check-bump-branch.outputs.bump_branch_exists != 'true'
+        if: steps.check-bump-branch.outputs.bump_branch_exists != 'true' && steps.check-version-file.outputs.version_changed != 'true'
         run: git log -n 1
