@@ -24,6 +24,7 @@ import toml
 from ruamel.yaml import YAML
 import subprocess
 from github import Github, GithubException
+from github.PullRequest import PullRequest
 from pathlib import Path
 
 from .commands.consolidated_readme import consolidated_readme
@@ -678,11 +679,13 @@ def publish_targets(release_tag: str | None, release_body: str | None, github_ou
     else:
         click.echo("\n".join(lines))
 
-def _refresh_pull_request(repo, pr_number: int):
+def _refresh_pull_request(repo, pr_number: int) -> PullRequest:
     return repo.get_pull(pr_number)
 
 
-def _wait_for_pull_request_mergeability(repo, pr_number: int, timeout_seconds: int, context: str):
+def _wait_for_pull_request_mergeability(
+    repo, pr_number: int, timeout_seconds: int, context: str
+) -> PullRequest:
     deadline = time.time() + timeout_seconds
     last_state = None
     while time.time() < deadline:
@@ -696,7 +699,9 @@ def _wait_for_pull_request_mergeability(repo, pr_number: int, timeout_seconds: i
     )
 
 
-def _wait_for_pull_request_head(repo, pr_number: int, expected_sha: str, timeout_seconds: int):
+def _wait_for_pull_request_head(
+    repo, pr_number: int, expected_sha: str, timeout_seconds: int
+) -> PullRequest:
     deadline = time.time() + timeout_seconds
     while time.time() < deadline:
         pr = _refresh_pull_request(repo, pr_number)
@@ -706,7 +711,9 @@ def _wait_for_pull_request_head(repo, pr_number: int, expected_sha: str, timeout
     raise click.ClickException(f"Timed out waiting for PR #{pr_number} to move to head SHA {expected_sha}.")
 
 
-def _wait_for_pull_request_head_change(repo, pr_number: int, previous_sha: str, timeout_seconds: int):
+def _wait_for_pull_request_head_change(
+    repo, pr_number: int, previous_sha: str, timeout_seconds: int
+) -> PullRequest:
     deadline = time.time() + timeout_seconds
     while time.time() < deadline:
         pr = _refresh_pull_request(repo, pr_number)
