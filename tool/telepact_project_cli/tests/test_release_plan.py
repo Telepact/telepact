@@ -23,6 +23,7 @@ import tempfile
 import textwrap
 import unittest
 from pathlib import Path
+from unittest.mock import MagicMock, patch
 
 from click.testing import CliRunner
 
@@ -215,6 +216,49 @@ class ReleasePlanTests(unittest.TestCase):
                     "publish_ts=false",
                 ],
             )
+
+    def test_create_pull_request_uses_github_sdk(self) -> None:
+        runner = CliRunner()
+        fake_pull_request = MagicMock(number=123, html_url="https://example.test/pr/123")
+        fake_repo = MagicMock()
+        fake_repo.create_pull.return_value = fake_pull_request
+        fake_github = MagicMock()
+        fake_github.get_repo.return_value = fake_repo
+
+        with patch("telepact_project_cli.cli.Github", return_value=fake_github) as github_class:
+            result = runner.invoke(
+                main,
+                [
+                    "create-pull-request",
+                    "--title",
+                    "Bump version to 1.0.0-alpha.999",
+                    "--body",
+                    "Release targets:\npy",
+                    "--head",
+                    "bump-version",
+                    "--base",
+                    "main",
+                    "--no-draft",
+                    "--no-maintainer-can-modify",
+                ],
+                env={
+                    "GITHUB_TOKEN": "test-token",
+                    "GITHUB_REPOSITORY": "Telepact/telepact",
+                },
+            )
+
+        self.assertEqual(result.exit_code, 0, msg=result.output)
+        github_class.assert_called_once_with("test-token")
+        fake_github.get_repo.assert_called_once_with("Telepact/telepact")
+        fake_repo.create_pull.assert_called_once_with(
+            title="Bump version to 1.0.0-alpha.999",
+            body="Release targets:\npy",
+            head="bump-version",
+            base="main",
+            draft=False,
+            maintainer_can_modify=False,
+        )
+        self.assertIn("Created pull request #123", result.output)
 
     def test_latest_released_versions_prefers_manifest_history_and_falls_back_to_legacy_commits(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:

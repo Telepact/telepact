@@ -685,6 +685,47 @@ def publish_targets(release_tag: str | None, release_body: str | None, github_ou
         click.echo("\n".join(lines))
 
 @click.command()
+@click.option("--title", required=True, help="Pull request title.")
+@click.option("--body", default="", help="Pull request body.")
+@click.option("--head", required=True, help="Head branch name.")
+@click.option("--base", required=True, help="Base branch name.")
+@click.option("--draft/--no-draft", default=False, help="Create the pull request as a draft.")
+@click.option(
+    "--maintainer-can-modify/--no-maintainer-can-modify",
+    default=False,
+    help="Allow maintainers to modify the pull request branch.",
+)
+def create_pull_request(
+    title: str,
+    body: str,
+    head: str,
+    base: str,
+    draft: bool,
+    maintainer_can_modify: bool,
+) -> None:
+    github_token = os.getenv("GITHUB_TOKEN")
+    github_repository = os.getenv("GITHUB_REPOSITORY")
+
+    if not github_token:
+        raise click.ClickException("GITHUB_TOKEN environment variable is not set.")
+    if not github_repository:
+        raise click.ClickException("GITHUB_REPOSITORY environment variable is not set (e.g., 'owner/repo').")
+
+    github = Github(github_token)
+    repo = github.get_repo(github_repository)
+    pull_request = repo.create_pull(
+        title=title,
+        body=body,
+        head=head,
+        base=base,
+        draft=draft,
+        maintainer_can_modify=maintainer_can_modify,
+    )
+
+    click.echo(f"Created pull request #{pull_request.number}: {pull_request.html_url}")
+
+
+@click.command()
 def automerge():
     """
     Approves and squashes a Pull Request if the author is on the hardcoded allow list.
@@ -803,6 +844,7 @@ main.add_command(license_header)
 main.add_command(github_labels)
 main.add_command(release)
 main.add_command(publish_targets)
+main.add_command(create_pull_request)
 main.add_command(automerge)
 main.add_command(gitignore)
 main.add_command(consolidated_readme)
