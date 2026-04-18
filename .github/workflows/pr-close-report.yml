@@ -34,7 +34,8 @@ jobs:
           mkdir -p pr-close
           echo "{
             \"pr_number\": \"${{ github.event.pull_request.number }}\",
-            \"pr_merged\": \"${{ github.event.pull_request.merged }}\"
+            \"pr_merged\": \"${{ github.event.pull_request.merged }}\",
+            \"pr_head_ref\": \"${{ github.event.pull_request.head.ref }}\"
           }" > pr-close/details.json
 
       - name: Upload PR Close details

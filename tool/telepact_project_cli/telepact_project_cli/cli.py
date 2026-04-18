@@ -28,10 +28,13 @@ from pathlib import Path
 from .commands.consolidated_readme import consolidated_readme
 from .commands.doc_versions import doc_versions, write_doc_versions
 from .release_plan import (
+    changed_paths_for_commits,
     compute_release_manifest,
     load_release_manifest,
     parse_legacy_release_info,
+    release_commits_since_last_bump,
     resolve_publish_targets,
+    strip_pr_number_suffix,
     write_release_manifest,
 )
 
@@ -186,15 +189,6 @@ def bump() -> None:
         sys.exit(1)
     pr_number = int(pr_number_str)
 
-    # Get the paths from the previous commit
-    prev_commit_paths = subprocess.run(
-        ['git', 'show', '--name-only', '--pretty=format:', 'HEAD'],
-        stdout=subprocess.PIPE, text=True
-    ).stdout.strip().split('\n')
-
-    print('prev_commit_paths:')
-    print(prev_commit_paths)
-
     def bump_version2(version: str) -> str:
         parts = version.split('.')
         parts[-1] = str(int(parts[-1]) + 1)
@@ -271,15 +265,48 @@ def bump() -> None:
             edited_files.append(os.path.join(os.path.dirname(project_file), "pubspec.lock"))
             click.echo(f"Updated pubspec.lock in {os.path.dirname(project_file)}")
 
+    included_commits = release_commits_since_last_bump(Path("."))
+    changed_paths = changed_paths_for_commits(Path("."), included_commits)
+    if not changed_paths:
+        changed_paths = [
+            path
+            for path in subprocess.run(
+                ['git', 'show', '--name-only', '--pretty=format:', 'HEAD'],
+                stdout=subprocess.PIPE,
+                text=True,
+                check=True,
+            ).stdout.strip().split('\n')
+            if path
+        ]
+
+    print('included_commits:')
+    print([commit.to_dict() for commit in included_commits])
+    print('changed_paths:')
+    print(changed_paths)
+
     release_manifest = compute_release_manifest(
         Path("."),
-        changed_paths=prev_commit_paths,
+        changed_paths=changed_paths,
         version=new_version,
         pr_number=pr_number,
+        included_commits=included_commits,
     )
     sorted_release_targets = list(release_manifest.targets)
     print(f'release_targets: {sorted_release_targets}')
 
+    if included_commits:
+        included_pr_lines = ["Included PR commits:"]
+        for commit in included_commits:
+            if commit.pr_number is not None:
+                included_pr_lines.append(
+                    f"- #{commit.pr_number}: {strip_pr_number_suffix(commit.subject)}"
+                )
+            else:
+                included_pr_lines.append(f"- {commit.subject} ({commit.sha[:7]})")
+    else:
+        included_pr_lines = ["Included PR commits:", "(None)"]
+
+    included_pr_string = "\n".join(included_pr_lines)
     if sorted_release_targets:
         release_string = "Release targets:\n" + "\n".join(sorted_release_targets)
     else:
@@ -301,7 +328,7 @@ def bump() -> None:
     click.echo(f"Updated {repo_relative_doc_versions_path}")
 
     # Create the new commit message
-    new_commit_msg = f"Bump version to {new_version} (#{pr_number})\n\n" + release_string
+    new_commit_msg = f"Bump version to {new_version}\n\n{included_pr_string}\n\n{release_string}"
 
     # Add and commit the changes
     subprocess.run(['git', 'add'] + list(dict.fromkeys(edited_files)))
@@ -522,11 +549,14 @@ def release() -> None:
     print(f'head_commit: {head_commit}')
 
     manifest_file = Path(".release/release-manifest.json")
+    included_commits: list[dict[str, object]] = []
     if manifest_file.exists():
         release_manifest = load_release_manifest(Path("."))
         version = release_manifest["version"]
-        pr_number = int(release_manifest["pr_number"])
+        pr_number_value = release_manifest.get("pr_number")
+        pr_number = int(pr_number_value) if pr_number_value is not None else None
         release_targets = list(release_manifest.get("targets", []))
+        included_commits = list(release_manifest.get("included_commits", []))
         click.echo("Loaded release metadata from .release/release-manifest.json")
     else:
         commit_message = subprocess.run(
@@ -541,19 +571,19 @@ def release() -> None:
             return
         version, release_targets = legacy_info
         pr_number_str = lines[0].rsplit("(#", 1)[-1].rstrip(")") if lines else ""
-        pr_number = int(pr_number_str)
+        pr_number = int(pr_number_str) if pr_number_str.isdigit() else None
         click.echo("Loaded release metadata from legacy bump commit message")
 
     print(f'release_targets: {release_targets}')
     print(f'version: {version}')
     print(f'pr_number: {pr_number}')
+    print(f'included_commits: {included_commits}')
 
     tag_name = version
     release_name = version
 
     g = Github(token)
     repo = g.get_repo(repository)
-    pr = repo.get_pull(pr_number)
 
     if 'go' in release_targets:
         go_tag_version = version if version.startswith('v') else f'v{version}'
@@ -572,12 +602,29 @@ def release() -> None:
             repo.create_git_ref(ref=f"refs/tags/{go_module_tag}", sha=head_commit)
             click.echo(f"Created Go module tag: {go_module_tag}")
 
-    # Create the final release body
-    pr_title = pr.title
-    pr_url = pr.html_url
+    if included_commits:
+        included_prs = []
+        for commit in included_commits:
+            subject = str(commit.get("subject", "")).strip()
+            sha = str(commit.get("sha", "")).strip()
+            commit_pr_number = commit.get("pr_number")
+            if isinstance(commit_pr_number, int):
+                included_prs.append(
+                    f"- {strip_pr_number_suffix(subject)} [(#{commit_pr_number})](https://github.com/{repository}/pull/{commit_pr_number})"
+                )
+            elif subject:
+                included_prs.append(f"- {subject} (`{sha[:7]}`)")
+        included_prs_string = "\n".join(included_prs) if included_prs else "(None)"
+    elif pr_number is not None:
+        pr = repo.get_pull(pr_number)
+        included_prs_string = f"- {pr.title} [(#{pr_number})]({pr.html_url})"
+    else:
+        included_prs_string = "(Unavailable)"
+
     released_projects = ''.join(f'- {target}\n' for target in release_targets) if release_targets else '(None)'
     final_release_body = (
-        f"## {pr_title} [(#{pr_number})]({pr_url})\n\n"
+        f"### Included Pull Requests\n"
+        f"{included_prs_string}\n\n"
         f"### Released Projects\n"
         f"{released_projects}"
     ).strip()
@@ -644,13 +691,16 @@ def automerge():
     All necessary information is retrieved from environment variables.
     """
 
-    AUTOMERGE_ALLOWED_AUTHORS = ["dependabot[bot]"]
+    AUTOMERGE_ALLOWED_AUTHORS = ["dependabot[bot]", "telepact-notary[bot]"]
 
     AUTOMERGE_ALLOWED_FILES = [
+        ".release/release-manifest.json",
         "bind/dart/package-lock.json",
         "bind/dart/package.json",
         "bind/dart/pubspec.lock",
         "bind/dart/pubspec.yaml",
+        "VERSION.txt",
+        "doc/04-operate/03-versions.md",
         "lib/java/pom.xml",
         "lib/py/uv.lock",
         "lib/py/pyproject.toml",

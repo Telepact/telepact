@@ -55,7 +55,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: bot
     needs: [get-pr-info]
-    if: needs.get-pr-info.outputs.pr_author == 'dependabot[bot]'
+    if: needs.get-pr-info.outputs.pr_author == 'dependabot[bot]' || needs.get-pr-info.outputs.pr_author == 'telepact-notary[bot]'
     timeout-minutes: 2
     steps:
       - name: Checkout code

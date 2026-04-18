@@ -34,14 +34,19 @@ jobs:
         with:
           fetch-depth: 2
 
-      - name: Determine if VERSION.txt was modified in the latest commit
+      - name: Determine if the latest commit is a bot-authored version bump
         id: check-file
         run: |
-          if git show --name-only --pretty="" HEAD | grep -q "VERSION.txt"; then
-            echo "VERSION.txt was changed in the last commit."
+          author_name="$(git show -s --format=%an HEAD)"
+          committer_name="$(git show -s --format=%cn HEAD)"
+          subject="$(git show -s --format=%s HEAD)"
+          if git show --name-only --pretty="" HEAD | grep -qx "VERSION.txt" \
+            && [[ "$subject" == Bump\ version\ to* ]] \
+            && { [[ "$author_name" == "telepact-notary[bot]" ]] || [[ "$committer_name" == "telepact-notary[bot]" ]]; }; then
+            echo "Detected bot-authored version bump commit."
             echo "version_changed=true" >> "$GITHUB_OUTPUT"
           else
-            echo "VERSION.txt was NOT changed in the last commit. Subsequent jobs will be skipped."
+            echo "Latest commit is not a bot-authored version bump. Subsequent jobs will be skipped."
             echo "version_changed=false" >> "$GITHUB_OUTPUT"
           fi
 

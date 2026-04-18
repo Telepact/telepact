@@ -32,8 +32,10 @@ sys.path.insert(0, str(PACKAGE_ROOT))
 from telepact_project_cli.cli import main
 from telepact_project_cli.commands.doc_versions import _latest_released_versions
 from telepact_project_cli.release_plan import (
+    changed_paths_for_commits,
     compute_release_manifest,
     load_release_manifest,
+    release_commits_since_last_bump,
     write_release_manifest,
 )
 
@@ -113,6 +115,7 @@ class ReleasePlanTests(unittest.TestCase):
                 "lib/ts/src/main.ts",
                 "sdk/prettier/package.json",
             ])
+            self.assertEqual(loaded["included_commits"], [])
             self.assertEqual(manifest_path.resolve(), (repo_root / ".release" / "release-manifest.json").resolve())
 
     def test_compute_release_manifest_marks_all_targets_when_force_all_file_changes(self) -> None:
@@ -176,6 +179,7 @@ class ReleasePlanTests(unittest.TestCase):
                         "pr_number": 7,
                         "changed_paths": ["lib/py/pyproject.toml"],
                         "direct_targets": ["py"],
+                        "included_commits": [],
                         "targets": ["cli", "py"],
                     },
                     indent=2,
@@ -243,6 +247,7 @@ class ReleasePlanTests(unittest.TestCase):
                         "pr_number": 2,
                         "changed_paths": ["lib/py/pyproject.toml"],
                         "direct_targets": ["py"],
+                        "included_commits": [],
                         "targets": ["cli", "py"],
                     },
                     indent=2,
@@ -267,6 +272,51 @@ class ReleasePlanTests(unittest.TestCase):
                     "cli": "1.0.0-alpha.202",
                     "java": "1.0.0-alpha.201",
                 },
+            )
+
+    def test_release_commits_since_last_bump_collects_linear_history_since_previous_bump(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            repo_root = Path(tmp_dir)
+            subprocess.run(["git", "init"], cwd=repo_root, check=True, capture_output=True, text=True)
+            subprocess.run(["git", "config", "user.name", "Test User"], cwd=repo_root, check=True)
+            subprocess.run(["git", "config", "user.email", "test@example.com"], cwd=repo_root, check=True)
+
+            (repo_root / "VERSION.txt").write_text("1.0.0-alpha.200", encoding="utf-8")
+            subprocess.run(["git", "add", "VERSION.txt"], cwd=repo_root, check=True)
+            subprocess.run(["git", "commit", "-m", "Initial commit"], cwd=repo_root, check=True)
+
+            subprocess.run(
+                ["git", "commit", "--allow-empty", "-m", "Bump version to 1.0.0-alpha.201"],
+                cwd=repo_root,
+                check=True,
+            )
+
+            py_file = repo_root / "lib" / "py" / "client.py"
+            py_file.parent.mkdir(parents=True)
+            py_file.write_text("print('py')\n", encoding="utf-8")
+            subprocess.run(["git", "add", "lib/py/client.py"], cwd=repo_root, check=True)
+            subprocess.run(["git", "commit", "-m", "Add Python client (#10)"], cwd=repo_root, check=True)
+
+            prettier_file = repo_root / "sdk" / "prettier" / "index.js"
+            prettier_file.parent.mkdir(parents=True)
+            prettier_file.write_text("export {};\n", encoding="utf-8")
+            subprocess.run(["git", "add", "sdk/prettier/index.js"], cwd=repo_root, check=True)
+            subprocess.run(["git", "commit", "-m", "Update Prettier support (#11)"], cwd=repo_root, check=True)
+
+            release_commits = release_commits_since_last_bump(repo_root)
+            changed_paths = changed_paths_for_commits(repo_root, release_commits)
+
+            self.assertEqual(
+                [commit.subject for commit in release_commits],
+                ["Add Python client (#10)", "Update Prettier support (#11)"],
+            )
+            self.assertEqual(
+                [commit.pr_number for commit in release_commits],
+                [10, 11],
+            )
+            self.assertEqual(
+                changed_paths,
+                ["lib/py/client.py", "sdk/prettier/index.js"],
             )
 
 

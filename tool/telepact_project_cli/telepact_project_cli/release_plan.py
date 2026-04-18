@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import json
+import re
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
@@ -27,6 +28,8 @@ import yaml
 
 RELEASE_CONFIG_RELATIVE_PATH = Path(".release/release-targets.yaml")
 RELEASE_MANIFEST_RELATIVE_PATH = Path(".release/release-manifest.json")
+BUMP_VERSION_SUBJECT_PREFIX = "Bump version to "
+_PR_NUMBER_SUFFIX_RE = re.compile(r"\s+\(#(?P<number>\d+)\)\s*$")
 
 
 PUBLISH_TARGETS = ("java", "ts", "py", "go", "cli", "console", "prettier")
@@ -52,6 +55,7 @@ class ReleaseManifest:
     changed_paths: tuple[str, ...]
     direct_targets: tuple[str, ...]
     targets: tuple[str, ...]
+    included_commits: tuple[dict[str, object], ...] = ()
 
     def to_dict(self) -> dict:
         return {
@@ -60,7 +64,24 @@ class ReleaseManifest:
             "changed_paths": list(self.changed_paths),
             "direct_targets": list(self.direct_targets),
             "targets": list(self.targets),
+            "included_commits": list(self.included_commits),
         }
+
+
+@dataclass(frozen=True)
+class ReleaseCommit:
+    sha: str
+    subject: str
+    pr_number: int | None
+
+    def to_dict(self) -> dict[str, object]:
+        data: dict[str, object] = {
+            "sha": self.sha,
+            "subject": self.subject,
+        }
+        if self.pr_number is not None:
+            data["pr_number"] = self.pr_number
+        return data
 
 
 def find_repo_root(start: Path | str = ".") -> Path:
@@ -78,6 +99,21 @@ def release_manifest_path(repo_root: Path | str = ".") -> Path:
 def _normalize_repo_path(path: str) -> str:
     normalized = path.strip().strip("/")
     return normalized.replace("\\", "/")
+
+
+def is_bump_version_subject(subject: str) -> bool:
+    return subject.startswith(BUMP_VERSION_SUBJECT_PREFIX)
+
+
+def parse_pr_number_from_subject(subject: str) -> int | None:
+    match = _PR_NUMBER_SUFFIX_RE.search(subject.strip())
+    if not match:
+        return None
+    return int(match.group("number"))
+
+
+def strip_pr_number_suffix(subject: str) -> str:
+    return _PR_NUMBER_SUFFIX_RE.sub("", subject).rstrip()
 
 
 def _load_release_target_config_data(repo_root: Path) -> dict:
@@ -165,11 +201,67 @@ def _expand_targets(direct_targets: Iterable[str], rules: dict[str, ReleaseProje
     return sorted(expanded_targets)
 
 
+def _git_log_subjects(repo_root: Path, revision: str = "HEAD") -> list[tuple[str, str]]:
+    result = subprocess.run(
+        ["git", "log", "--format=%H%x1f%s", revision],
+        cwd=repo_root,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        check=True,
+    )
+    commits: list[tuple[str, str]] = []
+    for line in result.stdout.splitlines():
+        if not line:
+            continue
+        sha, _, subject = line.partition("\x1f")
+        commits.append((sha.strip(), subject.strip()))
+    return commits
+
+
+def release_commits_since_last_bump(repo_root: Path | str, head_ref: str = "HEAD") -> list[ReleaseCommit]:
+    repo_root = find_repo_root(repo_root)
+    commits_since_last_bump: list[ReleaseCommit] = []
+    for sha, subject in _git_log_subjects(repo_root, head_ref):
+        if is_bump_version_subject(subject):
+            break
+        commits_since_last_bump.append(
+            ReleaseCommit(
+                sha=sha,
+                subject=subject,
+                pr_number=parse_pr_number_from_subject(subject),
+            )
+        )
+    commits_since_last_bump.reverse()
+    return commits_since_last_bump
+
+
+def changed_paths_for_commits(repo_root: Path | str, commits: Iterable[ReleaseCommit]) -> list[str]:
+    repo_root = find_repo_root(repo_root)
+    changed_paths: set[str] = set()
+    for commit in commits:
+        result = subprocess.run(
+            ["git", "show", "--name-only", "--pretty=format:", commit.sha],
+            cwd=repo_root,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            check=True,
+        )
+        changed_paths.update(
+            _normalize_repo_path(path)
+            for path in result.stdout.splitlines()
+            if _normalize_repo_path(path)
+        )
+    return sorted(changed_paths)
+
+
 def compute_release_manifest(
     repo_root: Path | str,
     changed_paths: Iterable[str],
     version: str,
     pr_number: int,
+    included_commits: Iterable[ReleaseCommit] = (),
 ) -> ReleaseManifest:
     repo_root = find_repo_root(repo_root)
     config = load_release_target_rules(repo_root)
@@ -192,6 +284,7 @@ def compute_release_manifest(
         changed_paths=tuple(normalized_changed_paths),
         direct_targets=tuple(direct_targets),
         targets=tuple(expanded_targets),
+        included_commits=tuple(commit.to_dict() for commit in included_commits),
     )
 
 
@@ -243,11 +336,10 @@ def load_release_manifest_at_commit(repo_root: Path | str, sha: str) -> dict | N
 
 
 def parse_legacy_release_info(subject: str, body: str) -> tuple[str, list[str]] | None:
-    prefix = "Bump version to "
-    if not subject.startswith(prefix):
+    if not subject.startswith(BUMP_VERSION_SUBJECT_PREFIX):
         return None
 
-    version = subject[len(prefix):].split()[0]
+    version = subject[len(BUMP_VERSION_SUBJECT_PREFIX):].split()[0]
     lines = [line.strip() for line in body.splitlines()]
     try:
         header_index = lines.index("Release targets:")
