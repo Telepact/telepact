@@ -77,12 +77,6 @@ jobs:
       - name: Verify pull request requirements before bump
         run: ./tool/telepact-project verify-pr-requirements
 
-      - name: Checkout pull request head
-        uses: actions/checkout@v4
-        with:
-          ref: refs/pull/${{ github.event.issue.number }}/head
-          token: ${{ steps.generate-token.outputs.token }}
-
       - name: Bump version on pull request branch
         run: ./tool/telepact-project bump
 

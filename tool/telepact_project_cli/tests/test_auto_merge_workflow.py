@@ -162,23 +162,29 @@ class AutoMergeWorkflowTests(unittest.TestCase):
         runner = CliRunner()
         with tempfile.TemporaryDirectory() as tmp_dir:
             repo_root = Path(tmp_dir)
-            (repo_root / "VERSION.txt").write_text("1.2.3", encoding="utf-8")
-            (repo_root / ".release").mkdir()
+            manifest_path = Path(".release/release-manifest.json")
+            doc_versions_path = Path("doc-versions.json")
 
-            manifest_path = repo_root / ".release" / "release-manifest.json"
-            doc_versions_path = repo_root / "doc-versions.json"
+            def _fake_materialize_pull_request_head(_repo, _head_sha: str, destination: Path) -> None:
+                (destination / "VERSION.txt").write_text("1.2.3", encoding="utf-8")
+                (destination / ".release").mkdir()
 
             def _fake_write_release_manifest(_repo_root: Path, _manifest) -> Path:
-                manifest_path.write_text('{"version":"1.2.4"}\n', encoding="utf-8")
-                return manifest_path
+                path = _repo_root / manifest_path
+                path.write_text('{"version":"1.2.4"}\n', encoding="utf-8")
+                return path
 
             def _fake_write_doc_versions(*_args, **_kwargs) -> Path:
-                doc_versions_path.write_text('{"version":"1.2.4"}\n', encoding="utf-8")
-                return doc_versions_path
+                path = Path("doc-versions.json")
+                path.write_text('{"version":"1.2.4"}\n', encoding="utf-8")
+                return path
 
             with patch(
                 "telepact_project_cli.cli._get_repo_and_pr",
                 return_value=(None, repo, pr, 20),
+            ), patch(
+                "telepact_project_cli.cli._materialize_pull_request_head",
+                side_effect=_fake_materialize_pull_request_head,
             ), patch(
                 "telepact_project_cli.cli.compute_release_manifest",
                 return_value=SimpleNamespace(targets=("py",)),
@@ -196,7 +202,6 @@ class AutoMergeWorkflowTests(unittest.TestCase):
             ) as subprocess_run, _pushd(repo_root):
                 result = runner.invoke(main, ["bump"])
                 self.assertEqual(result.exit_code, 0, msg=result.output)
-                self.assertEqual((repo_root / "VERSION.txt").read_text(encoding="utf-8"), "1.2.4")
                 commit_files.assert_called_once()
                 _, branch_name, head_sha, edited_files, commit_message = commit_files.call_args.args
                 self.assertEqual(branch_name, "feature-branch")

@@ -14,9 +14,13 @@
 #|  limitations under the License.
 #|
 
+import base64
+import contextlib
 import click
 import os
+import shutil
 import sys
+import tempfile
 import time
 from lxml import etree as ET
 import json
@@ -148,7 +152,17 @@ def _validate_open_main_branch_pull_request(repo, pr, pr_number: int) -> None:
         )
 
 
-def _required_context_results_for_commit(commit) -> dict[str, str]:
+@contextlib.contextmanager
+def _pushd(path: Path):
+    previous = Path.cwd()
+    os.chdir(path)
+    try:
+        yield
+    finally:
+        os.chdir(previous)
+
+
+def _get_required_context_results_for_commit(commit) -> dict[str, str]:
     results: dict[str, str] = {}
 
     combined_status = commit.get_combined_status()
@@ -168,7 +182,7 @@ def _required_context_results_for_commit(commit) -> dict[str, str]:
     return results
 
 
-def _pending_required_contexts(required_contexts: list[str], results: dict[str, str]) -> list[str]:
+def _get_pending_required_contexts(required_contexts: list[str], results: dict[str, str]) -> list[str]:
     pending_states = {"queued", "in_progress", "pending", "requested", "waiting"}
     pending = []
     for context in required_contexts:
@@ -178,7 +192,7 @@ def _pending_required_contexts(required_contexts: list[str], results: dict[str, 
     return pending
 
 
-def _failed_required_contexts(required_contexts: list[str], results: dict[str, str]) -> list[str]:
+def _get_failed_required_contexts(required_contexts: list[str], results: dict[str, str]) -> list[str]:
     acceptable_states = {"success", "neutral", "skipped"}
     pending_states = {"queued", "in_progress", "pending", "requested", "waiting"}
     failed = []
@@ -216,6 +230,25 @@ def _commit_files_via_git_data_api(repo, branch_name: str, head_sha: str, edited
     )
     repo.get_git_ref(f"heads/{branch_name}").edit(new_commit.sha, force=False)
     return new_commit.sha
+
+
+def _materialize_pull_request_head(repo, head_sha: str, destination: Path) -> None:
+    head_commit = repo.get_git_commit(head_sha)
+    git_tree = repo.get_git_tree(head_commit.tree.sha, recursive=True)
+
+    for entry in git_tree.tree:
+        if entry.type != "blob":
+            continue
+
+        target_path = destination / entry.path
+        target_path.parent.mkdir(parents=True, exist_ok=True)
+
+        blob = repo.get_git_blob(entry.sha)
+        if blob.encoding != "base64":
+            raise click.ClickException(
+                f"Unsupported blob encoding '{blob.encoding}' for {entry.path}."
+            )
+        target_path.write_bytes(base64.b64decode(blob.content))
 
 
 @click.group()
@@ -296,104 +329,118 @@ def bump() -> None:
     _, repo, pr, pr_number = _get_repo_and_pr()
     _validate_open_main_branch_pull_request(repo, pr, pr_number)
 
-    version_file = Path('VERSION.txt')
-    if not version_file.exists():
-        raise click.ClickException(f"Version file {version_file} does not exist.")
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        temp_repo_root = Path(tmp_dir)
+        _materialize_pull_request_head(repo, pr.head.sha, temp_repo_root)
 
-    version = version_file.read_text(encoding='utf-8').strip()
-    new_version = bump_version(version)
-    version_file.write_text(new_version, encoding='utf-8')
-    click.echo(f"Updated version file {version_file} to version {new_version}")
+        current_git_dir = Path.cwd() / ".git"
+        if current_git_dir.exists():
+            shutil.copytree(current_git_dir, temp_repo_root / ".git", symlinks=True)
 
-    edited_files = [str(version_file)]
+        with _pushd(temp_repo_root):
+            version_file = Path('VERSION.txt')
+            if not version_file.exists():
+                raise click.ClickException(f"Version file {version_file} does not exist.")
 
-    for project_file in BUMP_PROJECT_FILES:
-        if os.path.exists(project_file):
-            if project_file.endswith("pom.xml"):
-                parser = ET.XMLParser(remove_blank_text=True)
-                tree = ET.parse(project_file, parser)
-                root = tree.getroot()
-                root.find("{http://maven.apache.org/POM/4.0.0}version").text = new_version
-                tree.write(project_file, xml_declaration=True, encoding='utf-8', pretty_print=True)
-            elif project_file.endswith("package.json"):
-                with open(project_file, 'r', encoding='utf-8') as f:
-                    data = json.load(f)
-                data["version"] = new_version
-                _write_json(project_file, data)
-            elif project_file.endswith("pyproject.toml"):
-                with open(project_file, 'r', encoding='utf-8') as f:
-                    data = toml.load(f)
-                data = _set_project_version(data, new_version)
-                with open(project_file, 'w', encoding='utf-8') as f:
-                    toml.dump(data, f)
-            elif project_file.endswith("pubspec.yaml"):
-                with open(project_file, 'r', encoding='utf-8') as f:
-                    data = yaml.load(f)
-                data["version"] = new_version
-                with open(project_file, 'w', encoding='utf-8') as f:
-                    yaml.dump(data, f)
+            version = version_file.read_text(encoding='utf-8').strip()
+            new_version = bump_version(version)
+            version_file.write_text(new_version, encoding='utf-8')
+            click.echo(f"Updated version file {version_file} to version {new_version}")
+
+            edited_files = [str(version_file)]
+
+            for project_file in BUMP_PROJECT_FILES:
+                if os.path.exists(project_file):
+                    if project_file.endswith("pom.xml"):
+                        parser = ET.XMLParser(remove_blank_text=True)
+                        tree = ET.parse(project_file, parser)
+                        root = tree.getroot()
+                        root.find("{http://maven.apache.org/POM/4.0.0}version").text = new_version
+                        tree.write(project_file, xml_declaration=True, encoding='utf-8', pretty_print=True)
+                    elif project_file.endswith("package.json"):
+                        with open(project_file, 'r', encoding='utf-8') as f:
+                            data = json.load(f)
+                        data["version"] = new_version
+                        _write_json(project_file, data)
+                    elif project_file.endswith("pyproject.toml"):
+                        with open(project_file, 'r', encoding='utf-8') as f:
+                            data = toml.load(f)
+                        data = _set_project_version(data, new_version)
+                        with open(project_file, 'w', encoding='utf-8') as f:
+                            toml.dump(data, f)
+                    elif project_file.endswith("pubspec.yaml"):
+                        with open(project_file, 'r', encoding='utf-8') as f:
+                            data = yaml.load(f)
+                        data["version"] = new_version
+                        with open(project_file, 'w', encoding='utf-8') as f:
+                            yaml.dump(data, f)
+                    else:
+                        raise click.ClickException(f"Unsupported project file type: {project_file}")
+                    click.echo(f"Updated {project_file} to version {new_version}")
+                    edited_files.append(project_file)
+                else:
+                    click.echo(f"Project file {project_file} does not exist.")
+
+            for project_file in BUMP_PROJECT_FILES:
+                project_directory = os.path.dirname(project_file)
+                if project_file.endswith("package.json") and os.path.exists(os.path.join(project_directory, "package-lock.json")):
+                    subprocess.run(
+                        ["npm", "install", "--package-lock-only", "--ignore-scripts"],
+                        cwd=project_directory,
+                        check=True,
+                    )
+                    edited_files.append(os.path.join(project_directory, "package-lock.json"))
+                    click.echo(f"Updated package-lock.json in {project_directory}")
+
+                if project_file.endswith("pyproject.toml") and os.path.exists(os.path.join(project_directory, "uv.lock")):
+                    subprocess.run(["uv", "lock"], cwd=project_directory, check=True)
+                    edited_files.append(os.path.join(project_directory, "uv.lock"))
+                    click.echo(f"Updated uv.lock in {project_directory}")
+
+                if project_file.endswith("pubspec.yaml") and os.path.exists(os.path.join(project_directory, "pubspec.lock")):
+                    subprocess.run(["dart", "pub", "get"], cwd=project_directory, check=True)
+                    edited_files.append(os.path.join(project_directory, "pubspec.lock"))
+                    click.echo(f"Updated pubspec.lock in {project_directory}")
+
+            changed_paths = sorted({file.filename for file in pr.get_files()})
+            release_manifest = compute_release_manifest(
+                Path("."),
+                changed_paths=changed_paths,
+                version=new_version,
+                pr_number=pr_number,
+            )
+            sorted_release_targets = list(release_manifest.targets)
+            print(f'release_targets: {sorted_release_targets}')
+
+            if sorted_release_targets:
+                release_string = "Release targets:\n" + "\n".join(sorted_release_targets)
             else:
-                raise click.ClickException(f"Unsupported project file type: {project_file}")
-            click.echo(f"Updated {project_file} to version {new_version}")
-            edited_files.append(project_file)
-        else:
-            click.echo(f"Project file {project_file} does not exist.")
+                release_string = "No release targets"
 
-    for project_file in BUMP_PROJECT_FILES:
-        project_directory = os.path.dirname(project_file)
-        if project_file.endswith("package.json") and os.path.exists(os.path.join(project_directory, "package-lock.json")):
-            subprocess.run(["npm", "install"], cwd=project_directory, check=True)
-            edited_files.append(os.path.join(project_directory, "package-lock.json"))
-            click.echo(f"Updated package-lock.json in {project_directory}")
+            manifest_path = write_release_manifest(Path("."), release_manifest)
+            repo_relative_manifest_path = os.path.relpath(manifest_path, Path.cwd())
+            edited_files.append(repo_relative_manifest_path)
+            click.echo(f"Updated {repo_relative_manifest_path}")
 
-        if project_file.endswith("pyproject.toml") and os.path.exists(os.path.join(project_directory, "uv.lock")):
-            subprocess.run(["uv", "lock"], cwd=project_directory, check=True)
-            edited_files.append(os.path.join(project_directory, "uv.lock"))
-            click.echo(f"Updated uv.lock in {project_directory}")
+            doc_versions_path = write_doc_versions(
+                Path("."),
+                None,
+                pending_version=new_version,
+                pending_targets=sorted_release_targets,
+            )
+            repo_relative_doc_versions_path = os.path.relpath(doc_versions_path, Path.cwd())
+            edited_files.append(repo_relative_doc_versions_path)
+            click.echo(f"Updated {repo_relative_doc_versions_path}")
 
-        if project_file.endswith("pubspec.yaml") and os.path.exists(os.path.join(project_directory, "pubspec.lock")):
-            subprocess.run(["dart", "pub", "get"], cwd=project_directory, check=True)
-            edited_files.append(os.path.join(project_directory, "pubspec.lock"))
-            click.echo(f"Updated pubspec.lock in {project_directory}")
+            commit_message = f"Bump version to {new_version} (#{pr_number})\n\n{release_string}"
+            commit_sha = _commit_files_via_git_data_api(
+                repo,
+                pr.head.ref,
+                pr.head.sha,
+                edited_files,
+                commit_message,
+            )
 
-    changed_paths = sorted({file.filename for file in pr.get_files()})
-    release_manifest = compute_release_manifest(
-        Path("."),
-        changed_paths=changed_paths,
-        version=new_version,
-        pr_number=pr_number,
-    )
-    sorted_release_targets = list(release_manifest.targets)
-    print(f'release_targets: {sorted_release_targets}')
-
-    if sorted_release_targets:
-        release_string = "Release targets:\n" + "\n".join(sorted_release_targets)
-    else:
-        release_string = "No release targets"
-
-    manifest_path = write_release_manifest(Path("."), release_manifest)
-    repo_relative_manifest_path = os.path.relpath(manifest_path, Path.cwd())
-    edited_files.append(repo_relative_manifest_path)
-    click.echo(f"Updated {repo_relative_manifest_path}")
-
-    doc_versions_path = write_doc_versions(
-        Path("."),
-        None,
-        pending_version=new_version,
-        pending_targets=sorted_release_targets,
-    )
-    repo_relative_doc_versions_path = os.path.relpath(doc_versions_path, Path.cwd())
-    edited_files.append(repo_relative_doc_versions_path)
-    click.echo(f"Updated {repo_relative_doc_versions_path}")
-
-    commit_message = f"Bump version to {new_version} (#{pr_number})\n\n{release_string}"
-    commit_sha = _commit_files_via_git_data_api(
-        repo,
-        pr.head.ref,
-        pr.head.sha,
-        edited_files,
-        commit_message,
-    )
     click.echo(f"Created version bump commit {commit_sha} on {pr.head.ref}")
 
 
@@ -806,14 +853,14 @@ def verify_pr_requirements() -> None:
             continue
 
         commit = repo.get_commit(expected_head_sha)
-        check_results = _required_context_results_for_commit(commit)
-        failed_contexts = _failed_required_contexts(required_contexts, check_results)
+        check_results = _get_required_context_results_for_commit(commit)
+        failed_contexts = _get_failed_required_contexts(required_contexts, check_results)
         if failed_contexts:
             raise click.ClickException(
                 f"Required status checks failed for pull request #{pr_number}: {', '.join(failed_contexts)}"
             )
 
-        pending_contexts = _pending_required_contexts(required_contexts, check_results)
+        pending_contexts = _get_pending_required_contexts(required_contexts, check_results)
         if pending_contexts:
             print(f"Waiting for required status checks: {', '.join(pending_contexts)}")
             time.sleep(PR_REQUIREMENTS_POLL_INTERVAL_SECONDS)
