@@ -17,12 +17,13 @@
 import click
 import os
 import sys
+import time
 from lxml import etree as ET
 import json
 import toml
 from ruamel.yaml import YAML
 import subprocess
-from github import Github, GithubException
+from github import Github, GithubException, InputGitAuthor, InputGitTreeElement
 from pathlib import Path
 
 from .commands.consolidated_readme import consolidated_readme
@@ -37,11 +38,38 @@ from .release_plan import (
 
 yaml = YAML()
 LICENSE_HEADER_IGNORE_FILE = ".license-header-ignore"
+DEFAULT_BASE_BRANCH = "main"
+MERGE_ALLOWED_PERMISSION_LEVELS = {"admin", "maintain", "write"}
+PR_REQUIREMENTS_POLL_INTERVAL_SECONDS = 15
+PR_REQUIREMENTS_MAX_POLLS = 120
+PR_UPDATE_BRANCH_POLL_INTERVAL_SECONDS = 5
+PR_UPDATE_BRANCH_MAX_POLLS = 60
+BUMP_PROJECT_FILES = [
+    'lib/java/pom.xml',
+    'lib/py/pyproject.toml',
+    'lib/ts/package.json',
+    'bind/dart/pubspec.yaml',
+    'bind/dart/package.json',
+    'sdk/cli/pyproject.toml',
+    'sdk/prettier/package.json',
+    'sdk/console/package.json',
+]
+BUMP_COMMIT_AUTHOR = InputGitAuthor(
+    "telepact-notary[bot]",
+    "telepact-notary[bot]@users.noreply.github.com",
+)
 
 
 def _write_json(path: str, data: dict) -> None:
     with open(path, "w", encoding="utf-8") as f:
         f.write(json.dumps(data, indent=2) + "\n")
+
+
+def _require_env(name: str) -> str:
+    value = os.getenv(name)
+    if not value:
+        raise click.ClickException(f"{name} environment variable is not set.")
+    return value
 
 
 def _load_pyproject() -> dict:
@@ -90,6 +118,104 @@ def _license_header_ignored(file_path: str) -> bool:
             return True
 
     return False
+
+
+def _get_repo_and_pr() -> tuple[Github, object, object, int]:
+    github_token = _require_env('GITHUB_TOKEN')
+    github_repository = _require_env('GITHUB_REPOSITORY')
+    pr_number = int(_require_env('PR_NUMBER'))
+
+    github_client = Github(github_token)
+    repo = github_client.get_repo(github_repository)
+    pr = repo.get_pull(pr_number)
+    return github_client, repo, pr, pr_number
+
+
+def _refresh_pull_request(repo, pr_number: int):
+    return repo.get_pull(pr_number)
+
+
+def _validate_open_main_branch_pull_request(repo, pr, pr_number: int) -> None:
+    if pr.state != 'open':
+        raise click.ClickException(f"Pull request #{pr_number} is not open.")
+    if pr.base.ref != DEFAULT_BASE_BRANCH:
+        raise click.ClickException(
+            f"Pull request #{pr_number} must target '{DEFAULT_BASE_BRANCH}', found '{pr.base.ref}'."
+        )
+    if pr.head.repo is None or pr.head.repo.full_name != repo.full_name:
+        raise click.ClickException(
+            f"Pull request #{pr_number} must use a branch in '{repo.full_name}'."
+        )
+
+
+def _required_context_results_for_commit(commit) -> dict[str, str]:
+    results: dict[str, str] = {}
+
+    combined_status = commit.get_combined_status()
+    for status in combined_status.statuses:
+        state = (status.state or "").lower()
+        if state:
+            results[status.context] = state
+
+    for check_run in commit.get_check_runs():
+        status = (check_run.status or "").lower()
+        conclusion = (check_run.conclusion or "").lower()
+        if status == "completed":
+            results[check_run.name] = conclusion or "failure"
+        else:
+            results[check_run.name] = status or "queued"
+
+    return results
+
+
+def _pending_required_contexts(required_contexts: list[str], results: dict[str, str]) -> list[str]:
+    pending_states = {"queued", "in_progress", "pending", "requested", "waiting"}
+    pending = []
+    for context in required_contexts:
+        state = results.get(context)
+        if state is None or state in pending_states:
+            pending.append(context)
+    return pending
+
+
+def _failed_required_contexts(required_contexts: list[str], results: dict[str, str]) -> list[str]:
+    acceptable_states = {"success", "neutral", "skipped"}
+    pending_states = {"queued", "in_progress", "pending", "requested", "waiting"}
+    failed = []
+    for context in required_contexts:
+        state = results.get(context)
+        if state is None or state in pending_states or state in acceptable_states:
+            continue
+        failed.append(f"{context}={state}")
+    return failed
+
+
+def _commit_files_via_git_data_api(repo, branch_name: str, head_sha: str, edited_paths: list[str], commit_message: str) -> str:
+    head_commit = repo.get_git_commit(head_sha)
+    tree_elements: list[InputGitTreeElement] = []
+
+    for repo_relative_path in list(dict.fromkeys(edited_paths)):
+        file_content = Path(repo_relative_path).read_text(encoding="utf-8")
+        blob = repo.create_git_blob(file_content, "utf-8")
+        tree_elements.append(
+            InputGitTreeElement(
+                path=repo_relative_path,
+                mode="100644",
+                type="blob",
+                sha=blob.sha,
+            )
+        )
+
+    new_tree = repo.create_git_tree(tree_elements, base_tree=head_commit.tree)
+    new_commit = repo.create_git_commit(
+        commit_message,
+        new_tree,
+        [head_commit],
+        author=BUMP_COMMIT_AUTHOR,
+        committer=BUMP_COMMIT_AUTHOR,
+    )
+    repo.get_git_ref(f"heads/{branch_name}").edit(new_commit.sha, force=False)
+    return new_commit.sha
 
 
 @click.group()
@@ -167,56 +293,21 @@ def set_version(version: str) -> None:
 
 @click.command()
 def bump() -> None:
-    version_file = 'VERSION.txt'
+    _, repo, pr, pr_number = _get_repo_and_pr()
+    _validate_open_main_branch_pull_request(repo, pr, pr_number)
 
-    project_files = [
-        'lib/java/pom.xml',
-        'lib/py/pyproject.toml',
-        'lib/ts/package.json',
-        'bind/dart/pubspec.yaml',
-        'bind/dart/package.json',
-        'sdk/cli/pyproject.toml',
-        'sdk/prettier/package.json',
-        'sdk/console/package.json',
-    ]
+    version_file = Path('VERSION.txt')
+    if not version_file.exists():
+        raise click.ClickException(f"Version file {version_file} does not exist.")
 
-    pr_number_str = os.getenv('PR_NUMBER')
-    if not pr_number_str:
-        click.echo("PR_NUMBER environment variable not set.", err=True)
-        sys.exit(1)
-    pr_number = int(pr_number_str)
-
-    # Get the paths from the previous commit
-    prev_commit_paths = subprocess.run(
-        ['git', 'show', '--name-only', '--pretty=format:', 'HEAD'],
-        stdout=subprocess.PIPE, text=True
-    ).stdout.strip().split('\n')
-
-    print('prev_commit_paths:')
-    print(prev_commit_paths)
-
-    def bump_version2(version: str) -> str:
-        parts = version.split('.')
-        parts[-1] = str(int(parts[-1]) + 1)
-        return '.'.join(parts)
-
-    if not os.path.exists(version_file):
-        click.echo(f"Version file {version_file} does not exist.")
-        return
-
-    with open(version_file, 'r') as f:
-        version = f.read().strip()
-
-    new_version = bump_version2(version)
-
-    with open(version_file, 'w') as f:
-        f.write(new_version)
-
+    version = version_file.read_text(encoding='utf-8').strip()
+    new_version = bump_version(version)
+    version_file.write_text(new_version, encoding='utf-8')
     click.echo(f"Updated version file {version_file} to version {new_version}")
 
-    edited_files = [version_file]
+    edited_files = [str(version_file)]
 
-    for project_file in project_files:
+    for project_file in BUMP_PROJECT_FILES:
         if os.path.exists(project_file):
             if project_file.endswith("pom.xml"):
                 parser = ET.XMLParser(remove_blank_text=True)
@@ -224,56 +315,51 @@ def bump() -> None:
                 root = tree.getroot()
                 root.find("{http://maven.apache.org/POM/4.0.0}version").text = new_version
                 tree.write(project_file, xml_declaration=True, encoding='utf-8', pretty_print=True)
-                click.echo(f"Updated {project_file} to version {new_version}")
-                edited_files.append(project_file)
             elif project_file.endswith("package.json"):
-                with open(project_file, 'r') as f:
+                with open(project_file, 'r', encoding='utf-8') as f:
                     data = json.load(f)
                 data["version"] = new_version
                 _write_json(project_file, data)
-                click.echo(f"Updated {project_file} to version {new_version}")
-                edited_files.append(project_file)
             elif project_file.endswith("pyproject.toml"):
-                with open(project_file, 'r') as f:
+                with open(project_file, 'r', encoding='utf-8') as f:
                     data = toml.load(f)
                 data = _set_project_version(data, new_version)
-                with open(project_file, 'w') as f:
+                with open(project_file, 'w', encoding='utf-8') as f:
                     toml.dump(data, f)
-                click.echo(f"Updated {project_file} to version {new_version}")
-                edited_files.append(project_file)
             elif project_file.endswith("pubspec.yaml"):
-                with open(project_file, 'r') as f:
+                with open(project_file, 'r', encoding='utf-8') as f:
                     data = yaml.load(f)
                 data["version"] = new_version
-                with open(project_file, 'w') as f:
+                with open(project_file, 'w', encoding='utf-8') as f:
                     yaml.dump(data, f)
-                click.echo(f"Updated {project_file} to version {new_version}")
-                edited_files.append(project_file)
             else:
-                click.echo(f"Unsupported project file type: {project_file}")
+                raise click.ClickException(f"Unsupported project file type: {project_file}")
+            click.echo(f"Updated {project_file} to version {new_version}")
+            edited_files.append(project_file)
         else:
             click.echo(f"Project file {project_file} does not exist.")
 
-    # Update lock files
-    for project_file in project_files:
-        if project_file.endswith("package.json") and os.path.exists(os.path.join(os.path.dirname(project_file), "package-lock.json")):
-            subprocess.run(["npm", "install"], cwd=os.path.dirname(project_file), check=True)
-            edited_files.append(os.path.join(os.path.dirname(project_file), "package-lock.json"))
-            click.echo(f"Updated package-lock.json in {os.path.dirname(project_file)}")
+    for project_file in BUMP_PROJECT_FILES:
+        project_directory = os.path.dirname(project_file)
+        if project_file.endswith("package.json") and os.path.exists(os.path.join(project_directory, "package-lock.json")):
+            subprocess.run(["npm", "install"], cwd=project_directory, check=True)
+            edited_files.append(os.path.join(project_directory, "package-lock.json"))
+            click.echo(f"Updated package-lock.json in {project_directory}")
 
-        if project_file.endswith("pyproject.toml") and os.path.exists(os.path.join(os.path.dirname(project_file), "uv.lock")):
-            subprocess.run(["uv", "lock"], cwd=os.path.dirname(project_file), check=True)
-            edited_files.append(os.path.join(os.path.dirname(project_file), "uv.lock"))
-            click.echo(f"Updated uv.lock in {os.path.dirname(project_file)}")
+        if project_file.endswith("pyproject.toml") and os.path.exists(os.path.join(project_directory, "uv.lock")):
+            subprocess.run(["uv", "lock"], cwd=project_directory, check=True)
+            edited_files.append(os.path.join(project_directory, "uv.lock"))
+            click.echo(f"Updated uv.lock in {project_directory}")
 
-        if project_file.endswith("pubspec.yaml") and os.path.exists(os.path.join(os.path.dirname(project_file), "pubspec.lock")):
-            subprocess.run(["dart", "pub", "get"], cwd=os.path.dirname(project_file), check=True)
-            edited_files.append(os.path.join(os.path.dirname(project_file), "pubspec.lock"))
-            click.echo(f"Updated pubspec.lock in {os.path.dirname(project_file)}")
+        if project_file.endswith("pubspec.yaml") and os.path.exists(os.path.join(project_directory, "pubspec.lock")):
+            subprocess.run(["dart", "pub", "get"], cwd=project_directory, check=True)
+            edited_files.append(os.path.join(project_directory, "pubspec.lock"))
+            click.echo(f"Updated pubspec.lock in {project_directory}")
 
+    changed_paths = sorted({file.filename for file in pr.get_files()})
     release_manifest = compute_release_manifest(
         Path("."),
-        changed_paths=prev_commit_paths,
+        changed_paths=changed_paths,
         version=new_version,
         pr_number=pr_number,
     )
@@ -300,12 +386,15 @@ def bump() -> None:
     edited_files.append(repo_relative_doc_versions_path)
     click.echo(f"Updated {repo_relative_doc_versions_path}")
 
-    # Create the new commit message
-    new_commit_msg = f"Bump version to {new_version} (#{pr_number})\n\n" + release_string
-
-    # Add and commit the changes
-    subprocess.run(['git', 'add'] + list(dict.fromkeys(edited_files)))
-    subprocess.run(['git', 'commit', '-m', new_commit_msg])
+    commit_message = f"Bump version to {new_version} (#{pr_number})\n\n{release_string}"
+    commit_sha = _commit_files_via_git_data_api(
+        repo,
+        pr.head.ref,
+        pr.head.sha,
+        edited_files,
+        commit_message,
+    )
+    click.echo(f"Created version bump commit {commit_sha} on {pr.head.ref}")
 
 
 @click.command()
@@ -638,83 +727,126 @@ def publish_targets(release_tag: str | None, release_body: str | None, github_ou
         click.echo("\n".join(lines))
 
 @click.command()
-def automerge():
-    """
-    Approves and squashes a Pull Request if the author is on the hardcoded allow list.
-    All necessary information is retrieved from environment variables.
-    """
+def verify_automerge_conditions() -> None:
+    _, repo, pr, pr_number = _get_repo_and_pr()
+    commenter_login = _require_env('COMMENT_AUTHOR')
 
-    AUTOMERGE_ALLOWED_AUTHORS = ["dependabot[bot]"]
+    _validate_open_main_branch_pull_request(repo, pr, pr_number)
 
-    AUTOMERGE_ALLOWED_FILES = [
-        "bind/dart/package-lock.json",
-        "bind/dart/package.json",
-        "bind/dart/pubspec.lock",
-        "bind/dart/pubspec.yaml",
-        "lib/java/pom.xml",
-        "lib/py/uv.lock",
-        "lib/py/pyproject.toml",
-        "lib/ts/package-lock.json",
-        "lib/ts/package.json",
-        "package-lock.json",
-        "package.json",
-        "sdk/cli/uv.lock",
-        "sdk/cli/pyproject.toml",
-        "sdk/console/package-lock.json",
-        "sdk/console/package.json",
-        "sdk/prettier/package-lock.json",
-        "sdk/prettier/package.json",
-        "test/console-self-hosted/package.json",
-        "test/lib/java/pom.xml",
-        "test/lib/py/pyproject.toml",
-        "test/lib/ts/package.json",
-        "test/runner/uv.lock",
-        "test/runner/pyproject.toml",
-        "tool/telepact_project_cli/uv.lock",
-        "tool/telepact_project_cli/pyproject.toml"
-    ]
+    if not repo.has_in_collaborators(commenter_login):
+        raise click.ClickException(
+            f"@{commenter_login} is not a collaborator on {repo.full_name}."
+        )
 
-    pr_number_str = os.getenv('PR_NUMBER')
-    github_token = os.getenv('GITHUB_TOKEN')
-    github_repository = os.getenv('GITHUB_REPOSITORY')
+    permission = repo.get_collaborator_permission(commenter_login)
+    print(f"@{commenter_login} permission on {repo.full_name}: {permission}")
+    if permission not in MERGE_ALLOWED_PERMISSION_LEVELS:
+        raise click.ClickException(
+            f"@{commenter_login} does not have merge permission on {repo.full_name}."
+        )
 
-    if not pr_number_str:
-        raise Exception("PR_NUMBER environment variable is not set.")
+    print(f"Pull request #{pr_number} is eligible for auto-merge.")
 
-    pr_number = int(pr_number_str)
 
-    if not github_token:
-        raise Exception("GITHUB_TOKEN environment variable is not set.")
-    if not github_repository:
-        raise Exception("GITHUB_REPOSITORY environment variable is not set (e.g., 'owner/repo').")
+@click.command()
+def tidy_pr() -> None:
+    _, repo, pr, pr_number = _get_repo_and_pr()
+    _validate_open_main_branch_pull_request(repo, pr, pr_number)
 
-    print(f"Processing PR #{pr_number} in '{github_repository}'...")
-    print(f"Hardcoded allowed authors for automerge: {', '.join(AUTOMERGE_ALLOWED_AUTHORS)}")
+    if pr.draft:
+        pr.mark_ready_for_review()
+        print(f"Marked pull request #{pr_number} ready for review.")
+        pr = _refresh_pull_request(repo, pr_number)
 
-    g = Github(github_token)
-    repo_obj = g.get_repo(github_repository)
-    pr = repo_obj.get_pull(pr_number)
-
-    pr_author_login = pr.user.login
-    print(f"Pull Request #{pr_number} is authored by @{pr_author_login}")
-
-    if pr_author_login not in AUTOMERGE_ALLOWED_AUTHORS:
-        raise Exception(f"Author @{pr_author_login} is NOT on the hardcoded allow list. Aborting automerge.")
+    comparison = repo.compare(pr.base.sha, pr.head.sha)
+    if comparison.behind_by > 0:
+        previous_head_sha = pr.head.sha
+        pr.update_branch(expected_head_sha=previous_head_sha)
+        print(f"Updated pull request #{pr_number} with {pr.base.ref}.")
+        for _ in range(PR_UPDATE_BRANCH_MAX_POLLS):
+            pr = _refresh_pull_request(repo, pr_number)
+            if pr.head.sha != previous_head_sha:
+                print(f"Pull request #{pr_number} head advanced to {pr.head.sha}.")
+                break
+            time.sleep(PR_UPDATE_BRANCH_POLL_INTERVAL_SECONDS)
+        else:
+            raise click.ClickException(
+                f"Timed out waiting for pull request #{pr_number} branch update to complete."
+            )
     else:
-        print(f"Author @{pr_author_login} is on the allow list.")
-    
-    for f in pr.get_files():
-        if f.status == 'removed':
-            raise Exception(f"Pull Request #{pr_number} contains removed files. Aborting automerge.")
-        if f.filename not in AUTOMERGE_ALLOWED_FILES:
-            raise Exception(f"Pull Request #{pr_number} contains changes in the file '{f.filename}' which is not allowed for automerge.")
+        print(f"Pull request #{pr_number} is already up to date with {pr.base.ref}.")
 
-    print("Approving Pull Request...")
-    pr.create_review(event='APPROVE')
-    print("Pull Request approved.")
 
-    pr.enable_automerge(merge_method='SQUASH')
-    print("Pull Request will be automerged when build succeeds.")
+@click.command()
+def verify_pr_requirements() -> None:
+    _, repo, pr, pr_number = _get_repo_and_pr()
+    _validate_open_main_branch_pull_request(repo, pr, pr_number)
+    expected_head_sha = pr.head.sha
+
+    required_contexts = list(repo.get_branch(pr.base.ref).get_required_status_checks().contexts)
+    if required_contexts:
+        print(f"Required status checks: {', '.join(required_contexts)}")
+    else:
+        print("No required status checks configured; relying on mergeability checks.")
+
+    for attempt in range(1, PR_REQUIREMENTS_MAX_POLLS + 1):
+        pr = _refresh_pull_request(repo, pr_number)
+        _validate_open_main_branch_pull_request(repo, pr, pr_number)
+
+        if pr.head.sha != expected_head_sha:
+            raise click.ClickException(
+                f"Pull request #{pr_number} head changed from {expected_head_sha} to {pr.head.sha} while waiting."
+            )
+
+        mergeable_state = pr.mergeable_state or "unknown"
+        print(f"Attempt {attempt}: mergeable_state={mergeable_state}")
+
+        if mergeable_state == "unknown":
+            time.sleep(PR_REQUIREMENTS_POLL_INTERVAL_SECONDS)
+            continue
+
+        commit = repo.get_commit(expected_head_sha)
+        check_results = _required_context_results_for_commit(commit)
+        failed_contexts = _failed_required_contexts(required_contexts, check_results)
+        if failed_contexts:
+            raise click.ClickException(
+                f"Required status checks failed for pull request #{pr_number}: {', '.join(failed_contexts)}"
+            )
+
+        pending_contexts = _pending_required_contexts(required_contexts, check_results)
+        if pending_contexts:
+            print(f"Waiting for required status checks: {', '.join(pending_contexts)}")
+            time.sleep(PR_REQUIREMENTS_POLL_INTERVAL_SECONDS)
+            continue
+
+        if mergeable_state != "clean":
+            raise click.ClickException(
+                f"Pull request #{pr_number} does not satisfy merge requirements (mergeable_state={mergeable_state})."
+            )
+
+        print(f"Pull request #{pr_number} satisfies all merge requirements.")
+        return
+
+    raise click.ClickException(
+        f"Timed out waiting for pull request #{pr_number} requirements to pass."
+    )
+
+
+@click.command()
+def merge_pr() -> None:
+    _, repo, pr, pr_number = _get_repo_and_pr()
+    _validate_open_main_branch_pull_request(repo, pr, pr_number)
+
+    merge_status = pr.merge(
+        merge_method='squash',
+        sha=pr.head.sha,
+        delete_branch=False,
+    )
+    if not merge_status.merged:
+        raise click.ClickException(
+            f"Failed to merge pull request #{pr_number}: {merge_status.message}"
+        )
+    print(f"Pull request #{pr_number} merged with squash.")
 
 @click.command()
 @click.option('--add', 'add_name', help='Add a name to .gitignore')
@@ -753,7 +885,10 @@ main.add_command(license_header)
 main.add_command(github_labels)
 main.add_command(release)
 main.add_command(publish_targets)
-main.add_command(automerge)
+main.add_command(verify_automerge_conditions)
+main.add_command(tidy_pr)
+main.add_command(verify_pr_requirements)
+main.add_command(merge_pr)
 main.add_command(gitignore)
 main.add_command(consolidated_readme)
 main.add_command(doc_versions)
