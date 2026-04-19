@@ -206,8 +206,15 @@ def _get_failed_required_contexts(required_contexts: list[str], results: dict[st
 def _commit_files_via_git_data_api(repo, branch_name: str, head_sha: str, edited_paths: list[str], commit_message: str) -> str:
     head_commit = repo.get_git_commit(head_sha)
     tree_elements: list[InputGitTreeElement] = []
+    unique_edited_paths: list[str] = []
+    seen_paths: set[str] = set()
+    for repo_relative_path in edited_paths:
+        if repo_relative_path in seen_paths:
+            continue
+        seen_paths.add(repo_relative_path)
+        unique_edited_paths.append(repo_relative_path)
 
-    for repo_relative_path in list(dict.fromkeys(edited_paths)):
+    for repo_relative_path in unique_edited_paths:
         file_content = Path(repo_relative_path).read_text(encoding="utf-8")
         blob = repo.create_git_blob(file_content, "utf-8")
         tree_elements.append(
@@ -377,9 +384,17 @@ def bump() -> None:
                 else:
                     click.echo(f"Project file {project_file} does not exist.")
 
+            npm_lock_directories: set[str] = set()
+            uv_lock_directories: set[str] = set()
+            dart_lock_directories: set[str] = set()
             for project_file in BUMP_PROJECT_FILES:
                 project_directory = os.path.dirname(project_file)
-                if project_file.endswith("package.json") and os.path.exists(os.path.join(project_directory, "package-lock.json")):
+                if (
+                    project_file.endswith("package.json")
+                    and project_directory not in npm_lock_directories
+                    and os.path.exists(os.path.join(project_directory, "package-lock.json"))
+                ):
+                    npm_lock_directories.add(project_directory)
                     subprocess.run(
                         [
                             "npm",
@@ -395,12 +410,22 @@ def bump() -> None:
                     edited_files.append(os.path.join(project_directory, "package-lock.json"))
                     click.echo(f"Updated package-lock.json in {project_directory}")
 
-                if project_file.endswith("pyproject.toml") and os.path.exists(os.path.join(project_directory, "uv.lock")):
+                if (
+                    project_file.endswith("pyproject.toml")
+                    and project_directory not in uv_lock_directories
+                    and os.path.exists(os.path.join(project_directory, "uv.lock"))
+                ):
+                    uv_lock_directories.add(project_directory)
                     subprocess.run(["uv", "lock"], cwd=project_directory, check=True)
                     edited_files.append(os.path.join(project_directory, "uv.lock"))
                     click.echo(f"Updated uv.lock in {project_directory}")
 
-                if project_file.endswith("pubspec.yaml") and os.path.exists(os.path.join(project_directory, "pubspec.lock")):
+                if (
+                    project_file.endswith("pubspec.yaml")
+                    and project_directory not in dart_lock_directories
+                    and os.path.exists(os.path.join(project_directory, "pubspec.lock"))
+                ):
+                    dart_lock_directories.add(project_directory)
                     subprocess.run(["dart", "pub", "get"], cwd=project_directory, check=True)
                     edited_files.append(os.path.join(project_directory, "pubspec.lock"))
                     click.echo(f"Updated pubspec.lock in {project_directory}")
