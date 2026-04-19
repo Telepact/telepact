@@ -199,11 +199,13 @@ def write_doc_versions(
     output: Path | None,
     pending_version: str | None = None,
     pending_targets: Iterable[str] = (),
+    history_repo_root: Path | None = None,
 ) -> Path:
     repo_root = _find_repo_root(repo_root)
+    history_repo_root = _find_repo_root(history_repo_root) if history_repo_root is not None else repo_root
 
     version_by_target = _latest_released_versions(
-        repo_root,
+        history_repo_root,
         targets=["go", "java", "py", "ts", "cli", "console", "prettier"],
         pending_version=pending_version,
         pending_targets=pending_targets,

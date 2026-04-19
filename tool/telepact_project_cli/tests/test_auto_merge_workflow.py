@@ -174,8 +174,8 @@ class AutoMergeWorkflowTests(unittest.TestCase):
                 path.write_text('{"version":"1.2.4"}\n', encoding="utf-8")
                 return path
 
-            def _fake_write_doc_versions(*_args, **_kwargs) -> Path:
-                path = Path("doc-versions.json")
+            def _fake_write_doc_versions(_repo_root: Path, *_args, **_kwargs) -> Path:
+                path = _repo_root / "doc-versions.json"
                 path.write_text('{"version":"1.2.4"}\n', encoding="utf-8")
                 return path
 

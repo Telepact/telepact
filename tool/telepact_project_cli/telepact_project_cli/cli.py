@@ -18,7 +18,6 @@ import base64
 import contextlib
 import click
 import os
-import shutil
 import sys
 import tempfile
 import time
@@ -332,10 +331,7 @@ def bump() -> None:
     with tempfile.TemporaryDirectory() as tmp_dir:
         temp_repo_root = Path(tmp_dir)
         _materialize_pull_request_head(repo, pr.head.sha, temp_repo_root)
-
-        current_git_dir = Path.cwd() / ".git"
-        if current_git_dir.exists():
-            shutil.copytree(current_git_dir, temp_repo_root / ".git", symlinks=True)
+        history_repo_root = Path.cwd()
 
         with _pushd(temp_repo_root):
             version_file = Path('VERSION.txt')
@@ -385,7 +381,14 @@ def bump() -> None:
                 project_directory = os.path.dirname(project_file)
                 if project_file.endswith("package.json") and os.path.exists(os.path.join(project_directory, "package-lock.json")):
                     subprocess.run(
-                        ["npm", "install", "--package-lock-only", "--ignore-scripts"],
+                        [
+                            "npm",
+                            "install",
+                            "--package-lock-only",
+                            "--ignore-scripts",
+                            "--no-audit",
+                            "--no-fund",
+                        ],
                         cwd=project_directory,
                         check=True,
                     )
@@ -427,6 +430,7 @@ def bump() -> None:
                 None,
                 pending_version=new_version,
                 pending_targets=sorted_release_targets,
+                history_repo_root=history_repo_root,
             )
             repo_relative_doc_versions_path = os.path.relpath(doc_versions_path, Path.cwd())
             edited_files.append(repo_relative_doc_versions_path)
