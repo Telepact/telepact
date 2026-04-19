@@ -42,6 +42,29 @@ def _pushd(path: Path):
 
 
 class AutoMergeWorkflowTests(unittest.TestCase):
+    def test_verify_automerge_conditions_rejects_non_collaborator(self) -> None:
+        repo = Mock(full_name="Telepact/telepact")
+        repo.has_in_collaborators.return_value = False
+        pr = SimpleNamespace(
+            state="open",
+            base=SimpleNamespace(ref="main"),
+            head=SimpleNamespace(repo=SimpleNamespace(full_name="Telepact/telepact")),
+        )
+
+        runner = CliRunner()
+        with patch(
+            "telepact_project_cli.cli._get_repo_and_pr",
+            return_value=(None, repo, pr, 16),
+        ):
+            result = runner.invoke(
+                main,
+                ["verify-automerge-conditions"],
+                env={"COMMENT_AUTHOR": "octocat"},
+            )
+
+        self.assertNotEqual(result.exit_code, 0)
+        self.assertIn("is not a collaborator", result.output)
+
     def test_verify_automerge_conditions_rejects_insufficient_permission(self) -> None:
         repo = Mock(full_name="Telepact/telepact")
         repo.has_in_collaborators.return_value = True
@@ -65,6 +88,28 @@ class AutoMergeWorkflowTests(unittest.TestCase):
 
         self.assertNotEqual(result.exit_code, 0)
         self.assertIn("does not have merge permission", result.output)
+
+    def test_verify_automerge_conditions_rejects_fork_pull_request(self) -> None:
+        repo = Mock(full_name="Telepact/telepact")
+        pr = SimpleNamespace(
+            state="open",
+            base=SimpleNamespace(ref="main"),
+            head=SimpleNamespace(repo=SimpleNamespace(full_name="someone/fork")),
+        )
+
+        runner = CliRunner()
+        with patch(
+            "telepact_project_cli.cli._get_repo_and_pr",
+            return_value=(None, repo, pr, 17),
+        ):
+            result = runner.invoke(
+                main,
+                ["verify-automerge-conditions"],
+                env={"COMMENT_AUTHOR": "octocat"},
+            )
+
+        self.assertNotEqual(result.exit_code, 0)
+        self.assertIn("must use a branch", result.output)
 
     def test_tidy_pr_marks_ready_and_updates_branch_when_behind(self) -> None:
         repo = Mock(full_name="Telepact/telepact")
@@ -110,6 +155,30 @@ class AutoMergeWorkflowTests(unittest.TestCase):
         self.assertEqual(result.exit_code, 0, msg=result.output)
         initial_pr.mark_ready_for_review.assert_called_once_with()
         ready_pr.update_branch.assert_called_once_with(expected_head_sha="head-sha")
+
+    def test_tidy_pr_leaves_ready_up_to_date_pull_request_alone(self) -> None:
+        repo = Mock(full_name="Telepact/telepact")
+        repo.compare.return_value = SimpleNamespace(behind_by=0)
+
+        pr = Mock()
+        pr.state = "open"
+        pr.draft = False
+        pr.base = SimpleNamespace(ref="main", sha="base-sha")
+        pr.head = SimpleNamespace(
+            sha="head-sha",
+            repo=SimpleNamespace(full_name="Telepact/telepact"),
+        )
+
+        runner = CliRunner()
+        with patch(
+            "telepact_project_cli.cli._get_repo_and_pr",
+            return_value=(None, repo, pr, 18),
+        ):
+            result = runner.invoke(main, ["tidy-pr"])
+
+        self.assertEqual(result.exit_code, 0, msg=result.output)
+        pr.mark_ready_for_review.assert_not_called()
+        pr.update_branch.assert_not_called()
 
     def test_verify_pr_requirements_fails_when_head_changes_while_waiting(self) -> None:
         repo = Mock(full_name="Telepact/telepact")
@@ -212,6 +281,61 @@ class AutoMergeWorkflowTests(unittest.TestCase):
                 )
                 self.assertIn("Bump version to 1.2.4 (#20)", commit_message)
                 self.assertEqual(subprocess_run.call_count, 0)
+
+    def test_bump_fails_when_version_file_is_missing(self) -> None:
+        repo = Mock(full_name="Telepact/telepact")
+        pr = Mock()
+        pr.state = "open"
+        pr.base = SimpleNamespace(ref="main")
+        pr.head = SimpleNamespace(
+            ref="feature-branch",
+            sha="head-sha",
+            repo=SimpleNamespace(full_name="Telepact/telepact"),
+        )
+
+        runner = CliRunner()
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            repo_root = Path(tmp_dir)
+
+            def _fake_materialize_pull_request_head(_repo, _head_sha: str, destination: Path) -> None:
+                destination.mkdir(exist_ok=True)
+
+            with patch(
+                "telepact_project_cli.cli._get_repo_and_pr",
+                return_value=(None, repo, pr, 21),
+            ), patch(
+                "telepact_project_cli.cli._materialize_pull_request_head",
+                side_effect=_fake_materialize_pull_request_head,
+            ), _pushd(repo_root):
+                result = runner.invoke(main, ["bump"])
+
+        self.assertNotEqual(result.exit_code, 0)
+        self.assertIn("Version file VERSION.txt does not exist", result.output)
+
+    def test_merge_pr_squashes_pull_request(self) -> None:
+        repo = Mock(full_name="Telepact/telepact")
+        pr = Mock()
+        pr.state = "open"
+        pr.base = SimpleNamespace(ref="main")
+        pr.head = SimpleNamespace(
+            sha="head-sha",
+            repo=SimpleNamespace(full_name="Telepact/telepact"),
+        )
+        pr.merge.return_value = SimpleNamespace(merged=True, message="merged")
+
+        runner = CliRunner()
+        with patch(
+            "telepact_project_cli.cli._get_repo_and_pr",
+            return_value=(None, repo, pr, 22),
+        ):
+            result = runner.invoke(main, ["merge-pr"])
+
+        self.assertEqual(result.exit_code, 0, msg=result.output)
+        pr.merge.assert_called_once_with(
+            merge_method="squash",
+            sha="head-sha",
+            delete_branch=False,
+        )
 
 
 if __name__ == "__main__":
