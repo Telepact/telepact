@@ -92,6 +92,12 @@ def _set_project_version(data: dict, version: str) -> dict:
 
 
 def _set_version_in_project_file(project_file: str, version: str) -> bool:
+    """Update a supported project file in-place.
+
+    Returns True when the file exists and its version field is updated, False
+    when the file does not exist, and raises ClickException for unsupported
+    file types.
+    """
     if not os.path.exists(project_file):
         return False
 
@@ -278,6 +284,7 @@ def _materialize_pull_request_head(repo, head_sha: str, destination: Path) -> No
 
 
 def _sync_pull_request_head_to_worktree(repo, head_sha: str) -> None:
+    """Materialize the pull request head commit into the current worktree."""
     _materialize_pull_request_head(repo, head_sha, Path("."))
 
 
