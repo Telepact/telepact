@@ -232,11 +232,9 @@ class AutoMergeWorkflowTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp_dir:
             repo_root = Path(tmp_dir)
             manifest_path = Path(".release/release-manifest.json")
-            doc_versions_path = Path("doc-versions.json")
 
-            def _fake_materialize_pull_request_head(_repo, _head_sha: str, destination: Path) -> None:
-                (destination / "VERSION.txt").write_text("1.2.3", encoding="utf-8")
-                (destination / ".release").mkdir()
+            (repo_root / "VERSION.txt").write_text("1.2.3", encoding="utf-8")
+            (repo_root / ".release").mkdir()
 
             def _fake_write_release_manifest(_repo_root: Path, _manifest) -> Path:
                 path = _repo_root / manifest_path
@@ -252,8 +250,7 @@ class AutoMergeWorkflowTests(unittest.TestCase):
                 "telepact_project_cli.cli._get_repo_and_pr",
                 return_value=(None, repo, pr, 20),
             ), patch(
-                "telepact_project_cli.cli._materialize_pull_request_head",
-                side_effect=_fake_materialize_pull_request_head,
+                "telepact_project_cli.cli._sync_pull_request_head_to_worktree",
             ), patch(
                 "telepact_project_cli.cli.compute_release_manifest",
                 return_value=SimpleNamespace(targets=("py",)),
@@ -297,15 +294,11 @@ class AutoMergeWorkflowTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp_dir:
             repo_root = Path(tmp_dir)
 
-            def _fake_materialize_pull_request_head(_repo, _head_sha: str, destination: Path) -> None:
-                destination.mkdir(exist_ok=True)
-
             with patch(
                 "telepact_project_cli.cli._get_repo_and_pr",
                 return_value=(None, repo, pr, 21),
             ), patch(
-                "telepact_project_cli.cli._materialize_pull_request_head",
-                side_effect=_fake_materialize_pull_request_head,
+                "telepact_project_cli.cli._sync_pull_request_head_to_worktree",
             ), _pushd(repo_root):
                 result = runner.invoke(main, ["bump"])
 

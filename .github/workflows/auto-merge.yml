@@ -43,13 +43,6 @@ jobs:
           app-id: ${{ vars.TELEPACT_BOT_APP_ID }}
           private-key: ${{ secrets.TELEPACT_BOT_PRIVATE_KEY }}
 
-      - name: Export workflow environment
-        run: |
-          echo "PR_NUMBER=${{ github.event.issue.number }}" >> "$GITHUB_ENV"
-          echo "COMMENT_AUTHOR=${{ github.event.comment.user.login }}" >> "$GITHUB_ENV"
-          echo "GITHUB_REPOSITORY=${{ github.repository }}" >> "$GITHUB_ENV"
-          echo "GITHUB_TOKEN=${{ steps.generate-token.outputs.token }}" >> "$GITHUB_ENV"
-
       - name: Checkout workflow code
         uses: actions/checkout@v4
         with:
@@ -69,19 +62,44 @@ jobs:
           sdk: 3.6
 
       - name: Verify auto-merge conditions
+        env:
+          COMMENT_AUTHOR: ${{ github.event.comment.user.login }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
+          PR_NUMBER: ${{ github.event.issue.number }}
         run: ./tool/telepact-project verify-automerge-conditions
 
       - name: Tidy pull request
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
+          PR_NUMBER: ${{ github.event.issue.number }}
         run: ./tool/telepact-project tidy-pr
 
       - name: Verify pull request requirements before bump
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
+          PR_NUMBER: ${{ github.event.issue.number }}
         run: ./tool/telepact-project verify-pr-requirements
 
       - name: Bump version on pull request branch
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
+          PR_NUMBER: ${{ github.event.issue.number }}
         run: ./tool/telepact-project bump
 
       - name: Verify pull request requirements after bump
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
+          PR_NUMBER: ${{ github.event.issue.number }}
         run: ./tool/telepact-project verify-pr-requirements
 
       - name: Merge pull request
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
+          PR_NUMBER: ${{ github.event.issue.number }}
         run: ./tool/telepact-project merge-pr

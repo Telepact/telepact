@@ -15,18 +15,16 @@
 #|
 
 import base64
-import contextlib
 import click
 import os
 import sys
-import tempfile
 import time
 from lxml import etree as ET
 import json
 import toml
 from ruamel.yaml import YAML
 import subprocess
-from github import Github, GithubException, InputGitAuthor, InputGitTreeElement
+from github import Github, GithubException, InputGitTreeElement
 from pathlib import Path
 
 from .commands.consolidated_readme import consolidated_readme
@@ -57,10 +55,6 @@ BUMP_PROJECT_FILES = [
     'sdk/prettier/package.json',
     'sdk/console/package.json',
 ]
-BUMP_COMMIT_AUTHOR = InputGitAuthor(
-    "telepact-notary[bot]",
-    "telepact-notary[bot]@users.noreply.github.com",
-)
 
 
 def _write_json(path: str, data: dict) -> None:
@@ -95,6 +89,44 @@ def _set_project_version(data: dict, version: str) -> dict:
 
     data["tool"]["poetry"]["version"] = version
     return data
+
+
+def _set_version_in_project_file(project_file: str, version: str) -> bool:
+    if not os.path.exists(project_file):
+        return False
+
+    if project_file.endswith("pom.xml"):
+        parser = ET.XMLParser(remove_blank_text=True)
+        tree = ET.parse(project_file, parser)
+        root = tree.getroot()
+        root.find("{http://maven.apache.org/POM/4.0.0}version").text = version
+        tree.write(project_file, xml_declaration=True, encoding='utf-8', pretty_print=True)
+        return True
+
+    if project_file.endswith("package.json"):
+        with open(project_file, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        data["version"] = version
+        _write_json(project_file, data)
+        return True
+
+    if project_file.endswith("pyproject.toml"):
+        with open(project_file, "r", encoding="utf-8") as f:
+            data = toml.load(f)
+        data = _set_project_version(data, version)
+        with open(project_file, "w", encoding="utf-8") as f:
+            toml.dump(data, f)
+        return True
+
+    if project_file.endswith("pubspec.yaml"):
+        with open(project_file, "r", encoding="utf-8") as f:
+            data = yaml.load(f)
+        data["version"] = version
+        with open(project_file, "w", encoding="utf-8") as f:
+            yaml.dump(data, f)
+        return True
+
+    raise click.ClickException(f"Unsupported project file type: {project_file}")
 
 
 def bump_version(version: str) -> str:
@@ -149,16 +181,6 @@ def _validate_open_main_branch_pull_request(repo, pr, pr_number: int) -> None:
         raise click.ClickException(
             f"Pull request #{pr_number} must use a branch in '{repo.full_name}'."
         )
-
-
-@contextlib.contextmanager
-def _pushd(path: Path):
-    previous = Path.cwd()
-    os.chdir(path)
-    try:
-        yield
-    finally:
-        os.chdir(previous)
 
 
 def _get_required_context_results_for_commit(commit) -> dict[str, str]:
@@ -231,8 +253,6 @@ def _commit_files_via_git_data_api(repo, branch_name: str, head_sha: str, edited
         commit_message,
         new_tree,
         [head_commit],
-        author=BUMP_COMMIT_AUTHOR,
-        committer=BUMP_COMMIT_AUTHOR,
     )
     repo.get_git_ref(f"heads/{branch_name}").edit(new_commit.sha, force=False)
     return new_commit.sha
@@ -255,6 +275,10 @@ def _materialize_pull_request_head(repo, head_sha: str, destination: Path) -> No
                 f"Unsupported blob encoding '{blob.encoding}' for {entry.path}."
             )
         target_path.write_bytes(base64.b64decode(blob.content))
+
+
+def _sync_pull_request_head_to_worktree(repo, head_sha: str) -> None:
+    _materialize_pull_request_head(repo, head_sha, Path("."))
 
 
 @click.group()
@@ -293,38 +317,10 @@ def get() -> None:
 def set_version(version: str) -> None:
     updated = False
 
-    if os.path.exists("pom.xml"):
-        parser = ET.XMLParser(remove_blank_text=True)
-        tree = ET.parse("pom.xml", parser)
-        root = tree.getroot()
-        root.find("{http://maven.apache.org/POM/4.0.0}version").text = version
-        tree.write("pom.xml", xml_declaration=True, encoding='utf-8', pretty_print=True)
-        click.echo(f"Set pom.xml to version {version}")
-        updated = True
-
-    if os.path.exists("package.json"):
-        with open("package.json", "r") as f:
-            data = json.load(f)
-        data["version"] = version
-        _write_json("package.json", data)
-        click.echo(f"Set package.json to version {version}")
-        updated = True
-
-    if os.path.exists("pyproject.toml"):
-        data = _set_project_version(_load_pyproject(), version)
-        with open("pyproject.toml", "w") as f:
-            toml.dump(data, f)
-        click.echo(f"Set pyproject.toml to version {version}")
-        updated = True
-
-    if os.path.exists("pubspec.yaml"):
-        with open("pubspec.yaml", "r") as f:
-            data = yaml.load(f)
-        data["version"] = version
-        with open("pubspec.yaml", "w") as f:
-            yaml.dump(data, f)
-        click.echo(f"Set pubspec.yaml to version {version}")
-        updated = True
+    for project_file in ["pom.xml", "package.json", "pyproject.toml", "pubspec.yaml"]:
+        if _set_version_in_project_file(project_file, version):
+            click.echo(f"Set {project_file} to version {version}")
+            updated = True
 
     if not updated:
         click.echo("No supported project file found.")
@@ -334,141 +330,111 @@ def set_version(version: str) -> None:
 def bump() -> None:
     _, repo, pr, pr_number = _get_repo_and_pr()
     _validate_open_main_branch_pull_request(repo, pr, pr_number)
+    _sync_pull_request_head_to_worktree(repo, pr.head.sha)
 
-    with tempfile.TemporaryDirectory() as tmp_dir:
-        temp_repo_root = Path(tmp_dir)
-        _materialize_pull_request_head(repo, pr.head.sha, temp_repo_root)
-        history_repo_root = Path.cwd()
+    version_file = Path('VERSION.txt')
+    if not version_file.exists():
+        raise click.ClickException(f"Version file {version_file} does not exist.")
 
-        with _pushd(temp_repo_root):
-            version_file = Path('VERSION.txt')
-            if not version_file.exists():
-                raise click.ClickException(f"Version file {version_file} does not exist.")
+    version = version_file.read_text(encoding='utf-8').strip()
+    new_version = bump_version(version)
+    version_file.write_text(new_version, encoding='utf-8')
+    click.echo(f"Updated version file {version_file} to version {new_version}")
 
-            version = version_file.read_text(encoding='utf-8').strip()
-            new_version = bump_version(version)
-            version_file.write_text(new_version, encoding='utf-8')
-            click.echo(f"Updated version file {version_file} to version {new_version}")
+    edited_files = [str(version_file)]
 
-            edited_files = [str(version_file)]
+    for project_file in BUMP_PROJECT_FILES:
+        if _set_version_in_project_file(project_file, new_version):
+            click.echo(f"Updated {project_file} to version {new_version}")
+            edited_files.append(project_file)
+        else:
+            click.echo(f"Project file {project_file} does not exist.")
 
-            for project_file in BUMP_PROJECT_FILES:
-                if os.path.exists(project_file):
-                    if project_file.endswith("pom.xml"):
-                        parser = ET.XMLParser(remove_blank_text=True)
-                        tree = ET.parse(project_file, parser)
-                        root = tree.getroot()
-                        root.find("{http://maven.apache.org/POM/4.0.0}version").text = new_version
-                        tree.write(project_file, xml_declaration=True, encoding='utf-8', pretty_print=True)
-                    elif project_file.endswith("package.json"):
-                        with open(project_file, 'r', encoding='utf-8') as f:
-                            data = json.load(f)
-                        data["version"] = new_version
-                        _write_json(project_file, data)
-                    elif project_file.endswith("pyproject.toml"):
-                        with open(project_file, 'r', encoding='utf-8') as f:
-                            data = toml.load(f)
-                        data = _set_project_version(data, new_version)
-                        with open(project_file, 'w', encoding='utf-8') as f:
-                            toml.dump(data, f)
-                    elif project_file.endswith("pubspec.yaml"):
-                        with open(project_file, 'r', encoding='utf-8') as f:
-                            data = yaml.load(f)
-                        data["version"] = new_version
-                        with open(project_file, 'w', encoding='utf-8') as f:
-                            yaml.dump(data, f)
-                    else:
-                        raise click.ClickException(f"Unsupported project file type: {project_file}")
-                    click.echo(f"Updated {project_file} to version {new_version}")
-                    edited_files.append(project_file)
-                else:
-                    click.echo(f"Project file {project_file} does not exist.")
-
-            npm_lock_directories: set[str] = set()
-            uv_lock_directories: set[str] = set()
-            dart_lock_directories: set[str] = set()
-            for project_file in BUMP_PROJECT_FILES:
-                project_directory = os.path.dirname(project_file)
-                if (
-                    project_file.endswith("package.json")
-                    and project_directory not in npm_lock_directories
-                    and os.path.exists(os.path.join(project_directory, "package-lock.json"))
-                ):
-                    npm_lock_directories.add(project_directory)
-                    subprocess.run(
-                        [
-                            "npm",
-                            "install",
-                            "--package-lock-only",
-                            "--ignore-scripts",
-                            "--no-audit",
-                            "--no-fund",
-                        ],
-                        cwd=project_directory,
-                        check=True,
-                    )
-                    edited_files.append(os.path.join(project_directory, "package-lock.json"))
-                    click.echo(f"Updated package-lock.json in {project_directory}")
-
-                if (
-                    project_file.endswith("pyproject.toml")
-                    and project_directory not in uv_lock_directories
-                    and os.path.exists(os.path.join(project_directory, "uv.lock"))
-                ):
-                    uv_lock_directories.add(project_directory)
-                    subprocess.run(["uv", "lock"], cwd=project_directory, check=True)
-                    edited_files.append(os.path.join(project_directory, "uv.lock"))
-                    click.echo(f"Updated uv.lock in {project_directory}")
-
-                if (
-                    project_file.endswith("pubspec.yaml")
-                    and project_directory not in dart_lock_directories
-                    and os.path.exists(os.path.join(project_directory, "pubspec.lock"))
-                ):
-                    dart_lock_directories.add(project_directory)
-                    subprocess.run(["dart", "pub", "get"], cwd=project_directory, check=True)
-                    edited_files.append(os.path.join(project_directory, "pubspec.lock"))
-                    click.echo(f"Updated pubspec.lock in {project_directory}")
-
-            changed_paths = sorted({file.filename for file in pr.get_files()})
-            release_manifest = compute_release_manifest(
-                Path("."),
-                changed_paths=changed_paths,
-                version=new_version,
-                pr_number=pr_number,
+    npm_lock_directories: set[str] = set()
+    uv_lock_directories: set[str] = set()
+    dart_lock_directories: set[str] = set()
+    for project_file in BUMP_PROJECT_FILES:
+        project_directory = os.path.dirname(project_file)
+        if (
+            project_file.endswith("package.json")
+            and project_directory not in npm_lock_directories
+            and os.path.exists(os.path.join(project_directory, "package-lock.json"))
+        ):
+            npm_lock_directories.add(project_directory)
+            subprocess.run(
+                [
+                    "npm",
+                    "install",
+                    "--package-lock-only",
+                    "--ignore-scripts",
+                    "--no-audit",
+                    "--no-fund",
+                ],
+                cwd=project_directory,
+                check=True,
             )
-            sorted_release_targets = list(release_manifest.targets)
-            print(f'release_targets: {sorted_release_targets}')
+            edited_files.append(os.path.join(project_directory, "package-lock.json"))
+            click.echo(f"Updated package-lock.json in {project_directory}")
 
-            if sorted_release_targets:
-                release_string = "Release targets:\n" + "\n".join(sorted_release_targets)
-            else:
-                release_string = "No release targets"
+        if (
+            project_file.endswith("pyproject.toml")
+            and project_directory not in uv_lock_directories
+            and os.path.exists(os.path.join(project_directory, "uv.lock"))
+        ):
+            uv_lock_directories.add(project_directory)
+            subprocess.run(["uv", "lock"], cwd=project_directory, check=True)
+            edited_files.append(os.path.join(project_directory, "uv.lock"))
+            click.echo(f"Updated uv.lock in {project_directory}")
 
-            manifest_path = write_release_manifest(Path("."), release_manifest)
-            repo_relative_manifest_path = os.path.relpath(manifest_path, Path.cwd())
-            edited_files.append(repo_relative_manifest_path)
-            click.echo(f"Updated {repo_relative_manifest_path}")
+        if (
+            project_file.endswith("pubspec.yaml")
+            and project_directory not in dart_lock_directories
+            and os.path.exists(os.path.join(project_directory, "pubspec.lock"))
+        ):
+            dart_lock_directories.add(project_directory)
+            subprocess.run(["dart", "pub", "get"], cwd=project_directory, check=True)
+            edited_files.append(os.path.join(project_directory, "pubspec.lock"))
+            click.echo(f"Updated pubspec.lock in {project_directory}")
 
-            doc_versions_path = write_doc_versions(
-                Path("."),
-                None,
-                pending_version=new_version,
-                pending_targets=sorted_release_targets,
-                history_repo_root=history_repo_root,
-            )
-            repo_relative_doc_versions_path = os.path.relpath(doc_versions_path, Path.cwd())
-            edited_files.append(repo_relative_doc_versions_path)
-            click.echo(f"Updated {repo_relative_doc_versions_path}")
+    changed_paths = sorted({file.filename for file in pr.get_files()})
+    release_manifest = compute_release_manifest(
+        Path("."),
+        changed_paths=changed_paths,
+        version=new_version,
+        pr_number=pr_number,
+    )
+    sorted_release_targets = list(release_manifest.targets)
+    print(f'release_targets: {sorted_release_targets}')
 
-            commit_message = f"Bump version to {new_version} (#{pr_number})\n\n{release_string}"
-            commit_sha = _commit_files_via_git_data_api(
-                repo,
-                pr.head.ref,
-                pr.head.sha,
-                edited_files,
-                commit_message,
-            )
+    if sorted_release_targets:
+        release_string = "Release targets:\n" + "\n".join(sorted_release_targets)
+    else:
+        release_string = "No release targets"
+
+    manifest_path = write_release_manifest(Path("."), release_manifest)
+    repo_relative_manifest_path = os.path.relpath(manifest_path, Path.cwd())
+    edited_files.append(repo_relative_manifest_path)
+    click.echo(f"Updated {repo_relative_manifest_path}")
+
+    doc_versions_path = write_doc_versions(
+        Path("."),
+        None,
+        pending_version=new_version,
+        pending_targets=sorted_release_targets,
+        history_repo_root=Path("."),
+    )
+    repo_relative_doc_versions_path = os.path.relpath(doc_versions_path, Path.cwd())
+    edited_files.append(repo_relative_doc_versions_path)
+    click.echo(f"Updated {repo_relative_doc_versions_path}")
+
+    commit_message = f"Bump version to {new_version} (#{pr_number})\n\n{release_string}"
+    commit_sha = _commit_files_via_git_data_api(
+        repo,
+        pr.head.ref,
+        pr.head.sha,
+        edited_files,
+        commit_message,
+    )
 
     click.echo(f"Created version bump commit {commit_sha} on {pr.head.ref}")
 
