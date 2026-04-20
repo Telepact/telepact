@@ -276,7 +276,7 @@ class AutoMergeWorkflowTests(unittest.TestCase):
                     edited_files,
                     ["VERSION.txt", ".release/release-manifest.json", "doc-versions.json"],
                 )
-                self.assertIn("Bump version to 1.2.4 (#20)", commit_message)
+                self.assertEqual(commit_message, "Bump version to 1.2.4 (#20)")
                 self.assertEqual(subprocess_run.call_count, 0)
 
     def test_bump_fails_when_version_file_is_missing(self) -> None:

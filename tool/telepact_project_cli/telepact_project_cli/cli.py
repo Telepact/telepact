@@ -413,11 +413,6 @@ def bump() -> None:
     sorted_release_targets = list(release_manifest.targets)
     print(f'release_targets: {sorted_release_targets}')
 
-    if sorted_release_targets:
-        release_string = "Release targets:\n" + "\n".join(sorted_release_targets)
-    else:
-        release_string = "No release targets"
-
     manifest_path = write_release_manifest(Path("."), release_manifest)
     repo_relative_manifest_path = os.path.relpath(manifest_path, Path.cwd())
     edited_files.append(repo_relative_manifest_path)
@@ -434,7 +429,7 @@ def bump() -> None:
     edited_files.append(repo_relative_doc_versions_path)
     click.echo(f"Updated {repo_relative_doc_versions_path}")
 
-    commit_message = f"Bump version to {new_version} (#{pr_number})\n\n{release_string}"
+    commit_message = f"Bump version to {new_version} (#{pr_number})"
     commit_sha = _commit_files_via_git_data_api(
         repo,
         pr.head.ref,
