@@ -17,11 +17,13 @@
 import os
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 import click
 from github import Github, GithubException
 
+from .project_version import bump_version
 from ..release_plan import load_release_manifest, resolve_publish_targets
 
 PROJECT_LABEL_MAP = {
@@ -46,6 +48,12 @@ RELEASE_TARGET_ASSET_DIRECTORY_MAP = {
 }
 
 MAX_ASSETS = 10
+MAIN_BRANCH = "main"
+MERGE_ALLOWED_PERMISSIONS = {"admin", "maintain", "write"}
+SUCCESSFUL_CHECK_STATES = {"success", "neutral", "skipped"}
+PENDING_CHECK_STATES = {"pending", "queued", "in_progress", "requested", "waiting"}
+REQUIREMENT_POLL_INTERVAL_SECONDS = 10
+REQUIREMENT_POLL_ATTEMPTS = 90
 
 AUTOMERGE_ALLOWED_AUTHORS = ["dependabot[bot]"]
 
@@ -78,6 +86,23 @@ AUTOMERGE_ALLOWED_FILES = [
 ]
 
 
+def _require_env(name: str) -> str:
+    value = os.getenv(name)
+    if not value:
+        raise click.ClickException(f"{name} environment variable is not set.")
+    return value
+
+
+def _run_git(args: list[str], *, capture_output: bool = False) -> str:
+    completed = subprocess.run(
+        ["git"] + args,
+        check=True,
+        stdout=subprocess.PIPE if capture_output else None,
+        text=True,
+    )
+    return completed.stdout.strip() if capture_output else ""
+
+
 def _get_modified_files(base_branch, head_sha):
     try:
         subprocess.run(["git", "fetch", "origin", base_branch], check=True)
@@ -96,6 +121,182 @@ def _get_modified_project_labels(files):
             if file.startswith(directory):
                 tags.add(tag)
     return tags
+
+
+def _validate_commenter_can_merge(repo, commenter_login: str) -> None:
+    try:
+        permission = repo.get_collaborator_permission(commenter_login)
+    except GithubException as exc:
+        if exc.status == 404:
+            raise click.ClickException(f"Commenter @{commenter_login} is not eligible to merge pull requests.") from exc
+        raise
+
+    if permission not in MERGE_ALLOWED_PERMISSIONS:
+        raise click.ClickException(
+            f"Commenter @{commenter_login} does not have merge permission (found: {permission})."
+        )
+
+
+def _validate_merge_pr_state(pr, github_repository: str) -> None:
+    if pr.state != "open":
+        raise click.ClickException(f"Pull request #{pr.number} is not open.")
+    if pr.base.ref != MAIN_BRANCH:
+        raise click.ClickException(f"Pull request #{pr.number} must target {MAIN_BRANCH}.")
+    if pr.head.repo is None or pr.head.repo.full_name != github_repository:
+        raise click.ClickException("Pull request head branch must live in this repository.")
+
+
+def _wait_for_condition(description: str, predicate) -> object:
+    for _ in range(REQUIREMENT_POLL_ATTEMPTS):
+        value = predicate()
+        if value is not None:
+            return value
+        time.sleep(REQUIREMENT_POLL_INTERVAL_SECONDS)
+    raise click.ClickException(f"Timed out waiting for {description}.")
+
+
+def _checkout_pr_branch(pr) -> str:
+    branch_name = pr.head.ref
+    _run_git(["fetch", "origin", MAIN_BRANCH, branch_name])
+    _run_git(["checkout", "-B", branch_name, f"origin/{branch_name}"])
+    return branch_name
+
+
+def _branch_is_behind_main() -> bool:
+    counts = _run_git(["rev-list", "--left-right", "--count", f"HEAD...origin/{MAIN_BRANCH}"], capture_output=True)
+    _, behind_count = counts.split()
+    return int(behind_count) > 0
+
+
+def _wait_for_head_sha(repo, pr_number: int, expected_head_sha: str, *, allowed_previous_sha: str | None = None):
+    observed_expected_head = False
+
+    def _predicate():
+        nonlocal observed_expected_head
+        pr = repo.get_pull(pr_number)
+        current_head_sha = pr.head.sha
+        if current_head_sha == expected_head_sha:
+            observed_expected_head = True
+            return pr
+        if current_head_sha == allowed_previous_sha and not observed_expected_head:
+            return None
+        raise click.ClickException(
+            f"Pull request head changed unexpectedly while waiting for {expected_head_sha}: now {current_head_sha}."
+        )
+
+    return _wait_for_condition(f"pull request #{pr_number} head to become {expected_head_sha}", _predicate)
+
+
+def _tidy_up_pull_request(repo, pr, branch_name: str):
+    if pr.draft:
+        pr.mark_ready_for_review()
+
+        def _not_draft():
+            refreshed_pr = repo.get_pull(pr.number)
+            if refreshed_pr.draft:
+                return None
+            return refreshed_pr
+
+        pr = _wait_for_condition(f"pull request #{pr.number} to leave draft state", _not_draft)
+
+    if _branch_is_behind_main():
+        previous_head_sha = pr.head.sha
+        try:
+            pr.update_branch(expected_head_sha=previous_head_sha)
+        except GithubException as exc:
+            raise click.ClickException(f"Failed to update pull request #{pr.number} with {MAIN_BRANCH}: {exc}") from exc
+
+        def _head_changed():
+            refreshed_pr = repo.get_pull(pr.number)
+            if refreshed_pr.head.sha == previous_head_sha:
+                return None
+            return refreshed_pr
+
+        pr = _wait_for_condition(f"pull request #{pr.number} branch update", _head_changed)
+        _run_git(["fetch", "origin", MAIN_BRANCH, branch_name])
+        _run_git(["reset", "--hard", f"origin/{branch_name}"])
+
+    return pr
+
+
+def _required_status_contexts(branch) -> set[str]:
+    try:
+        required_checks = branch.get_required_status_checks()
+    except GithubException as exc:
+        if exc.status == 404:
+            return set()
+        raise
+    return set(required_checks.contexts)
+
+
+def _collect_check_states(commit) -> dict[str, str]:
+    states: dict[str, str] = {}
+
+    for status in commit.get_statuses():
+        states[status.context] = status.state
+
+    for check_run in commit.get_check_runs():
+        if check_run.status != "completed":
+            states[check_run.name] = check_run.status
+        else:
+            states[check_run.name] = check_run.conclusion or "pending"
+
+    return states
+
+
+def _evaluate_context_states(states: dict[str, str], tracked_contexts: set[str]) -> tuple[list[str], list[str]]:
+    pending: list[str] = []
+    failed: list[str] = []
+
+    for context in sorted(tracked_contexts):
+        state = states.get(context)
+        if state is None or state in PENDING_CHECK_STATES:
+            pending.append(context)
+        elif state not in SUCCESSFUL_CHECK_STATES:
+            failed.append(f"{context}={state}")
+
+    return pending, failed
+
+
+def _wait_for_pr_requirements(repo, pr_number: int, expected_head_sha: str):
+    branch = repo.get_branch(MAIN_BRANCH)
+    required_contexts = _required_status_contexts(branch)
+
+    def _predicate():
+        pr = repo.get_pull(pr_number)
+        _validate_merge_pr_state(pr, repo.full_name)
+        if pr.head.sha != expected_head_sha:
+            raise click.ClickException(
+                f"Pull request #{pr_number} received new commits while waiting for checks: {pr.head.sha}."
+            )
+        if pr.draft:
+            raise click.ClickException(f"Pull request #{pr_number} is still a draft.")
+
+        commit = repo.get_commit(expected_head_sha)
+        states = _collect_check_states(commit)
+        tracked_contexts = required_contexts or set(states)
+        pending_contexts, failed_contexts = _evaluate_context_states(states, tracked_contexts)
+
+        if failed_contexts:
+            raise click.ClickException(
+                "Pull request requirements failed: " + ", ".join(failed_contexts)
+            )
+        if pending_contexts:
+            return None
+        if pr.mergeable is None or pr.mergeable_state == "unknown":
+            return None
+        if not pr.mergeable or pr.mergeable_state != "clean":
+            raise click.ClickException(
+                f"Pull request requirements are not satisfied: mergeable_state={pr.mergeable_state}."
+            )
+        return pr
+
+    return _wait_for_condition(f"pull request #{pr_number} requirements", _predicate)
+
+
+def _list_changed_paths_against_main() -> list[str]:
+    output = _run_git(["diff", "--name-only", f"origin/{MAIN_BRANCH}...HEAD"], capture_output=True)
+    return [line for line in output.splitlines() if line]
 
 
 @click.command()
@@ -305,3 +506,36 @@ def automerge():
 
     pr.enable_automerge(merge_method="SQUASH")
     print("Pull Request will be automerged when build succeeds.")
+
+
+@click.command(name="merge-pr")
+def merge_pr() -> None:
+    pr_number = int(_require_env("PR_NUMBER"))
+    github_token = _require_env("GITHUB_TOKEN")
+    github_repository = _require_env("GITHUB_REPOSITORY")
+    commenter_login = _require_env("COMMENTER_LOGIN")
+
+    github_client = Github(github_token)
+    repo = github_client.get_repo(github_repository)
+    _validate_commenter_can_merge(repo, commenter_login)
+
+    pr = repo.get_pull(pr_number)
+    _validate_merge_pr_state(pr, github_repository)
+
+    branch_name = _checkout_pr_branch(pr)
+    pr = _tidy_up_pull_request(repo, pr, branch_name)
+    pr = _wait_for_pr_requirements(repo, pr_number, pr.head.sha)
+
+    changed_paths = _list_changed_paths_against_main()
+    bump_version(pr_number, changed_paths)
+    bumped_head_sha = _run_git(["rev-parse", "HEAD"], capture_output=True)
+    _run_git(["push", "origin", f"HEAD:{branch_name}"])
+
+    pr = _wait_for_head_sha(repo, pr_number, bumped_head_sha, allowed_previous_sha=pr.head.sha)
+    pr = _wait_for_pr_requirements(repo, pr_number, pr.head.sha)
+
+    merge_status = pr.merge(merge_method="squash", sha=pr.head.sha)
+    if not merge_status.merged:
+        raise click.ClickException(f"Failed to merge pull request #{pr_number}: {merge_status.message}")
+
+    click.echo(f"Pull request #{pr_number} merged.")
