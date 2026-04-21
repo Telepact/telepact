@@ -155,9 +155,6 @@ def create_version_bump_commit(pr_number: int) -> str:
         check=True,
     ).stdout.strip().split("\n")
 
-    print("prev_commit_paths:")
-    print(prev_commit_paths)
-
     if not os.path.exists(version_file):
         raise FileNotFoundError(f"Version file {version_file} does not exist.")
 
@@ -193,7 +190,6 @@ def create_version_bump_commit(pr_number: int) -> str:
         pr_number=pr_number,
     )
     sorted_release_targets = list(release_manifest.targets)
-    print(f"release_targets: {sorted_release_targets}")
 
     manifest_path = write_release_manifest(Path("."), release_manifest)
     repo_relative_manifest_path = os.path.relpath(manifest_path, Path.cwd())
