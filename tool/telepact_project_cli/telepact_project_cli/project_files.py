@@ -25,8 +25,7 @@ from ruamel.yaml import YAML
 
 yaml = YAML()
 
-# Ordered by lookup priority when multiple supported project files exist in one directory.
-SUPPORTED_VERSION_FILES = ("pom.xml", "package.json", "pyproject.toml", "pubspec.yaml")
+SUPPORTED_VERSION_FILE_PRIORITY_ORDER = ("pom.xml", "package.json", "pyproject.toml", "pubspec.yaml")
 _MAVEN_VERSION_XPATH = "{http://maven.apache.org/POM/4.0.0}version"
 
 
@@ -39,7 +38,7 @@ def load_pyproject(path: Path) -> dict:
         return toml.load(file)
 
 
-def project_version(data: dict) -> str:
+def _pyproject_version(data: dict) -> str:
     project = data.get("project", {})
     if isinstance(project, dict) and isinstance(project.get("version"), str):
         return project["version"]
@@ -51,7 +50,7 @@ def project_version(data: dict) -> str:
     raise click.ClickException("Missing project version in pyproject.toml")
 
 
-def set_pyproject_version_data(data: dict, version: str) -> dict:
+def _update_pyproject_version(data: dict, version: str) -> dict:
     project = data.get("project")
     if isinstance(project, dict) and "version" in project:
         project["version"] = version
@@ -67,7 +66,7 @@ def set_pyproject_version_data(data: dict, version: str) -> dict:
 
 
 def find_supported_project_file(base_dir: Path = Path(".")) -> Path | None:
-    for file_name in SUPPORTED_VERSION_FILES:
+    for file_name in SUPPORTED_VERSION_FILE_PRIORITY_ORDER:
         path = base_dir / file_name
         if path.exists():
             return path
@@ -75,7 +74,7 @@ def find_supported_project_file(base_dir: Path = Path(".")) -> Path | None:
 
 
 def list_supported_project_files(base_dir: Path = Path(".")) -> list[Path]:
-    return [base_dir / file_name for file_name in SUPPORTED_VERSION_FILES if (base_dir / file_name).exists()]
+    return [base_dir / file_name for file_name in SUPPORTED_VERSION_FILE_PRIORITY_ORDER if (base_dir / file_name).exists()]
 
 
 def _pom_version_element(path: Path):
@@ -97,7 +96,7 @@ def read_version(path: Path) -> str:
         data = json.loads(path.read_text(encoding="utf-8"))
         return data["version"]
     if path.name == "pyproject.toml":
-        return project_version(load_pyproject(path))
+        return _pyproject_version(load_pyproject(path))
     if path.name == "pubspec.yaml":
         with path.open("r", encoding="utf-8") as file:
             data = yaml.load(file)
@@ -119,7 +118,7 @@ def write_version(path: Path, version: str) -> None:
         return
 
     if path.name == "pyproject.toml":
-        data = set_pyproject_version_data(load_pyproject(path), version)
+        data = _update_pyproject_version(load_pyproject(path), version)
         with path.open("w", encoding="utf-8") as file:
             toml.dump(data, file)
         return

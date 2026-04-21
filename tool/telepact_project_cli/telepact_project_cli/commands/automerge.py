@@ -24,7 +24,7 @@ from ..git_helpers import require_env, require_int_env
 @click.command()
 def automerge() -> None:
     """
-    Approves and squashes a Pull Request if the author is on the hardcoded allow list.
+    Approves and squashes a Pull Request if the author is on the configured allow list.
     All necessary information is retrieved from environment variables.
     """
     pr_number = require_int_env("PR_NUMBER")
