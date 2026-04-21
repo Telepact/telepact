@@ -268,7 +268,7 @@ def _verify_required_checks(repo, pr_number: int, expected_head_sha: str):
         time.sleep(WAIT_INTERVAL_SECONDS)
 
 
-def _validate_merge_request(pr, commenter_login: str, commenter_permission: str, is_admin: bool) -> int:
+def _validate_merge_request(pr, commenter_login: str, is_admin: bool) -> int:
     if pr.state != "open":
         raise RuntimeError(f"Pull request #{pr.number} is not open.")
     if pr.base.ref != MAIN_BRANCH:
@@ -277,8 +277,6 @@ def _validate_merge_request(pr, commenter_login: str, commenter_permission: str,
         raise RuntimeError("Cross-repository pull requests are not supported by merge-pr.")
     if not pr.mergeable:
         raise RuntimeError(f"Pull request #{pr.number} is not mergeable (state={pr.mergeable_state}).")
-    if commenter_permission not in MERGE_ALLOWED_PERMISSIONS:
-        raise RuntimeError(f"User @{commenter_login} does not have permission to merge pull requests.")
 
     required_reviews = _required_review_count(pr.base.repo, pr.base.ref)
     approvals = _approval_count(pr)
@@ -465,12 +463,16 @@ def merge_pr() -> None:
         raise click.ClickException(f"User @{commenter_login} is not a repository collaborator.")
 
     commenter_permission = repo.get_collaborator_permission(commenter_login)
+
+    if commenter_permission not in MERGE_ALLOWED_PERMISSIONS:
+        raise RuntimeError(f"User @{commenter_login} does not have permission to merge pull requests.")
+
     is_admin = commenter_permission == "admin"
 
     pr = repo.get_pull(pr_number)
     expected_head_sha = pr.head.sha
     pr = _wait_for_pr_stable(repo, pr_number, expected_head_sha)
-    required_reviews = _validate_merge_request(pr, commenter_login, commenter_permission, is_admin)
+    required_reviews = _validate_merge_request(pr, commenter_login, is_admin)
 
     if pr.draft:
         click.echo(f"Marking pull request #{pr.number} ready for review.")
