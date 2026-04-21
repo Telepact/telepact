@@ -130,7 +130,7 @@ def _set_version_in_project_file(project_file: str, version: str) -> None:
 def _update_and_get_lock_file_path(project_file: str) -> str | None:
     project_dir = os.path.dirname(project_file)
     if project_file.endswith("package.json") and os.path.exists(os.path.join(project_dir, "package-lock.json")):
-        subprocess.run(["npm", "install"], cwd=project_dir, check=True)
+        subprocess.run(["npm", "install", "--ignore-scripts"], cwd=project_dir, check=True)
         click.echo(f"Updated package-lock.json in {project_dir}")
         return os.path.join(project_dir, "package-lock.json")
 
@@ -151,6 +151,10 @@ def _bump_version(version: str) -> str:
     parts = version.split(".")
     parts[-1] = str(int(parts[-1]) + 1)
     return ".".join(parts)
+
+
+def _deduplicate_preserving_order(values: list[str]) -> tuple[str, ...]:
+    return tuple(dict.fromkeys(values))
 
 
 def _require_env(name: str) -> str:
@@ -209,7 +213,7 @@ def _apply_version_bump(repo_root: Path, changed_paths: list[str], pr_number: in
     return BumpResult(
         new_version=new_version,
         commit_message=f"Bump version to {new_version} (#{pr_number})",
-        edited_files=tuple(dict.fromkeys(edited_files)),
+        edited_files=_deduplicate_preserving_order(edited_files),
     )
 
 

@@ -45,13 +45,13 @@ jobs:
           app-id: ${{ vars.TELEPACT_BOT_APP_ID }}
           private-key: ${{ secrets.TELEPACT_BOT_PRIVATE_KEY }}
 
-      - name: Checkout PR head
+      - name: Checkout trusted repository code
         env:
-          PR_NUMBER: ${{ github.event.issue.number }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: refs/pull/${{ github.event.issue.number }}/head
+          ref: ${{ github.event.repository.default_branch }}
           token: ${{ steps.generate-token.outputs.token }}
 
       - name: Set up Node.js

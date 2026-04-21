@@ -14,8 +14,11 @@
 #|  limitations under the License.
 #|
 
+import base64
 import os
+import shutil
 import time
+from pathlib import Path
 
 import click
 from github import Github, GithubException
@@ -57,7 +60,12 @@ def _validate_pr_state(pr) -> None:
 
 
 def _ensure_commenter_can_merge(repo, commenter: str) -> None:
-    permission = repo.get_collaborator_permission(commenter)
+    try:
+        permission = repo.get_collaborator_permission(commenter)
+    except GithubException as exc:
+        if exc.status == 404:
+            raise click.ClickException(f"User @{commenter} is not a repository member of {repo.full_name}.")
+        raise
     if permission.lower() not in ALLOWED_MERGE_PERMISSIONS:
         raise click.ClickException(
             f"User @{commenter} is not allowed to merge PRs in {repo.full_name} (permission={permission})."
@@ -118,8 +126,34 @@ def _validate_review_requirements(pr, required_reviews) -> None:
 def _latest_check_run_by_name(commit) -> dict[str, object]:
     latest_runs: dict[str, object] = {}
     for check_run in commit.get_check_runs():
-        latest_runs.setdefault(check_run.name, check_run)
+        current = latest_runs.get(check_run.name)
+        if current is None or check_run.id > current.id:
+            latest_runs[check_run.name] = check_run
     return latest_runs
+
+
+def _sync_pull_request_head_to_worktree(repo, head_sha: str, repo_root: Path | str) -> None:
+    repo_root = Path(repo_root).resolve()
+    git_commit = repo.get_git_commit(head_sha)
+    git_tree = repo.get_git_tree(git_commit.tree.sha, recursive=True)
+
+    for child in repo_root.iterdir():
+        if child.name == ".git":
+            continue
+        if child.is_dir():
+            shutil.rmtree(child)
+        else:
+            child.unlink()
+
+    for element in git_tree.tree:
+        if element.type != "blob":
+            continue
+        blob = repo.get_git_blob(element.sha)
+        content = blob.content
+        data = base64.b64decode(content) if blob.encoding == "base64" else content.encode("utf-8")
+        path = repo_root / element.path
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(data)
 
 
 def _evaluate_required_checks(commit, required_check_names: list[str]) -> tuple[list[str], list[str]]:
@@ -249,6 +283,7 @@ def merge_pr() -> None:
     _validate_pr_state(pr)
     pr = _tidy_pull_request(repo, pr)
     verify_pr_requirements(repo, pr.number, pr.head.sha)
+    _sync_pull_request_head_to_worktree(repo, pr.head.sha, ".")
 
     new_head_sha, new_version = bump_pull_request_version(repo, repo.get_pull(pr.number), ".")
     verify_pr_requirements(repo, pr.number, new_head_sha)
