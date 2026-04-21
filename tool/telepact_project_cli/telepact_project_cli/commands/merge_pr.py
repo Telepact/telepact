@@ -251,12 +251,21 @@ def _wait_for_branch_update(repo, pr_number: int, previous_head_sha: str):
     raise click.ClickException(f"Timed out waiting for PR #{pr_number} to update with main.")
 
 
+def _wait_for_ready_for_review(repo, pr_number: int):
+    for _ in range(MAX_MERGEABLE_POLLS):
+        pr = repo.get_pull(pr_number)
+        if not pr.draft:
+            return pr
+        time.sleep(POLL_INTERVAL_SECONDS)
+    raise click.ClickException(f"Timed out waiting for PR #{pr_number} to leave draft state.")
+
+
 def _tidy_pull_request(repo, pr):
     _validate_pr_state(pr)
 
     if pr.draft:
         pr.mark_ready_for_review()
-        pr = repo.get_pull(pr.number)
+        pr = _wait_for_ready_for_review(repo, pr.number)
 
     main_sha = repo.get_branch("main").commit.sha
     comparison = repo.compare(main_sha, pr.head.sha)
@@ -282,10 +291,10 @@ def merge_pr() -> None:
     pr = repo.get_pull(pr_number)
     _validate_pr_state(pr)
     pr = _tidy_pull_request(repo, pr)
-    verify_pr_requirements(repo, pr.number, pr.head.sha)
+    pr = verify_pr_requirements(repo, pr.number, pr.head.sha)
     _sync_pull_request_head_to_worktree(repo, pr.head.sha, ".")
 
-    new_head_sha, new_version = bump_pull_request_version(repo, repo.get_pull(pr.number), ".")
+    new_head_sha, new_version = bump_pull_request_version(repo, pr, ".")
     verify_pr_requirements(repo, pr.number, new_head_sha)
 
     merge_status = repo.get_pull(pr.number).merge(merge_method="squash", sha=new_head_sha)
