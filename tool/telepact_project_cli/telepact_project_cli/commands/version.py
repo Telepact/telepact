@@ -41,12 +41,9 @@ VERSIONED_PROJECT_FILES = (
 
 
 def bump_version(version: str) -> str:
-    try:
-        major, minor, patch = map(int, version.split("."))
-    except ValueError as exc:
-        raise click.ClickException(f"Expected version in major.minor.patch format, got: {version}") from exc
-    patch += 1
-    return f"{major}.{minor}.{patch}"
+    parts = version.split('.')
+    parts[-1] = str(int(parts[-1]) + 1)
+    return '.'.join(parts)
 
 
 @click.command()
