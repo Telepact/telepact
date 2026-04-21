@@ -33,7 +33,7 @@ jobs:
     steps:
       - name: Check head commit for release manifest changes
         id: check
-        run: echo "should_release=${{ contains(toJSON(github.event.head_commit.added), '.release/release-manifest.json') || contains(toJSON(github.event.head_commit.modified), '.release/release-manifest.json') || contains(toJSON(github.event.head_commit.removed), '.release/release-manifest.json') }}" >> "$GITHUB_OUTPUT"
+        run: echo "should_release=${{ contains(toJSON(github.event.head_commit.added), '.release/release-manifest.json') || contains(toJSON(github.event.head_commit.modified), '.release/release-manifest.json') }}" >> "$GITHUB_OUTPUT"
 
   build-release:
     name: Build release
