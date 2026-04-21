@@ -255,8 +255,8 @@ def publish_targets(release_tag: str | None, release_body: str | None, github_ou
 
 @click.command()
 def automerge() -> None:
-    allowed_authors = ["dependabot[bot]"]
-    allowed_files = [
+    automerge_allowed_authors = ["dependabot[bot]"]
+    automerge_allowed_files = [
         "bind/dart/package-lock.json",
         "bind/dart/package.json",
         "bind/dart/pubspec.lock",
@@ -292,7 +292,7 @@ def automerge() -> None:
     )
 
     print(f"Processing PR #{pr_number} in '{github_repository}'...")
-    print(f"Hardcoded allowed authors for automerge: {', '.join(allowed_authors)}")
+    print(f"Hardcoded allowed authors for automerge: {', '.join(automerge_allowed_authors)}")
 
     g = Github(github_token)
     repo_obj = g.get_repo(github_repository)
@@ -301,14 +301,14 @@ def automerge() -> None:
     pr_author_login = pr.user.login
     print(f"Pull Request #{pr_number} is authored by @{pr_author_login}")
 
-    if pr_author_login not in allowed_authors:
+    if pr_author_login not in automerge_allowed_authors:
         raise Exception(f"Author @{pr_author_login} is NOT on the hardcoded allow list. Aborting automerge.")
     print(f"Author @{pr_author_login} is on the allow list.")
 
     for f in pr.get_files():
         if f.status == "removed":
             raise Exception(f"Pull Request #{pr_number} contains removed files. Aborting automerge.")
-        if f.filename not in allowed_files:
+        if f.filename not in automerge_allowed_files:
             raise Exception(
                 f"Pull Request #{pr_number} contains changes in the file '{f.filename}' which is not allowed for automerge."
             )

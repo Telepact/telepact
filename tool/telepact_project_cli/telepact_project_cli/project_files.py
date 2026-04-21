@@ -39,7 +39,7 @@ def write_json(path: Path | str, data: dict) -> None:
     path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
 
 
-def load_pyproject(path: Path | str) -> dict:
+def read_pyproject(path: Path | str) -> dict:
     path = Path(path)
     with path.open("r", encoding="utf-8") as f:
         return toml.load(f)
@@ -99,7 +99,7 @@ def read_project_version(project_file: Path | str) -> str:
         return data["version"]
 
     if project_file.name == "pyproject.toml":
-        return project_version(load_pyproject(project_file))
+        return project_version(read_pyproject(project_file))
 
     if project_file.name == "pubspec.yaml":
         with project_file.open("r", encoding="utf-8") as f:
@@ -130,7 +130,7 @@ def write_project_version(project_file: Path | str, version: str) -> None:
         return
 
     if project_file.name == "pyproject.toml":
-        data = set_project_version(load_pyproject(project_file), version)
+        data = set_project_version(read_pyproject(project_file), version)
         with project_file.open("w", encoding="utf-8") as f:
             toml.dump(data, f)
         return

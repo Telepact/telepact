@@ -167,8 +167,8 @@ def bump() -> None:
     pr_number = _require_pr_number()
     prev_commit_paths = _head_changed_paths()
 
-    print("prev_commit_paths:")
-    print(prev_commit_paths)
+    click.echo("prev_commit_paths:")
+    click.echo(str(prev_commit_paths))
 
     version = _read_repo_version(VERSION_FILE)
     new_version = bump_version(version)
