@@ -81,8 +81,8 @@ def bump() -> None:
         check=True,
     ).stdout.splitlines()
 
-    print("prev_commit_paths:")
-    print(prev_commit_paths)
+    click.echo("prev_commit_paths:")
+    click.echo(str(prev_commit_paths))
 
     if not version_file.exists():
         click.echo(f"Version file {version_file} does not exist.")
@@ -112,7 +112,7 @@ def bump() -> None:
         pr_number=pr_number,
     )
     sorted_release_targets = list(release_manifest.targets)
-    print(f"release_targets: {sorted_release_targets}")
+    click.echo(f"release_targets: {sorted_release_targets}")
 
     if sorted_release_targets:
         release_string = "Release targets:\n" + "\n".join(sorted_release_targets)

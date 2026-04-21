@@ -138,7 +138,15 @@ def _set_project_version(data: dict, version: str) -> dict:
         project["version"] = version
         return data
 
-    data["tool"]["poetry"]["version"] = version
+    tool = data.get("tool")
+    if not isinstance(tool, dict):
+        raise click.ClickException("pyproject.toml is missing both project.version and tool.poetry.version")
+
+    poetry = tool.get("poetry")
+    if not isinstance(poetry, dict) or "version" not in poetry:
+        raise click.ClickException("pyproject.toml is missing both project.version and tool.poetry.version")
+
+    poetry["version"] = version
     return data
 
 
