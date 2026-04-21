@@ -110,7 +110,7 @@ def _get_modified_project_labels(files):
     return tags
 
 
-def _require_env(name: str) -> str:
+def _require_env_var(name: str) -> str:
     value = os.getenv(name)
     if not value:
         raise click.ClickException(f"{name} environment variable is not set.")
@@ -526,10 +526,10 @@ def publish_targets(release_tag: str | None, release_body: str | None, github_ou
 
 @click.command(name="merge-pr")
 def merge_pr() -> None:
-    pr_number = int(_require_env("PR_NUMBER"))
-    commenter_login = _require_env("MERGE_COMMENTER")
-    github_token = _require_env("GITHUB_TOKEN")
-    repository_full_name = _require_env("GITHUB_REPOSITORY")
+    pr_number = int(_require_env_var("PR_NUMBER"))
+    commenter_login = _require_env_var("MERGE_COMMENTER")
+    github_token = _require_env_var("GITHUB_TOKEN")
+    repository_full_name = _require_env_var("GITHUB_REPOSITORY")
 
     click.echo(f"Processing merge request for PR #{pr_number} in {repository_full_name}.")
 

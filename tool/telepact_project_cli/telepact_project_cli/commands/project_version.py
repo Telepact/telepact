@@ -172,9 +172,6 @@ def bump() -> None:
         text=True,
     ).stdout.strip().split("\n")
 
-    print("prev_commit_paths:")
-    print(prev_commit_paths)
-
     bump_version(prev_commit_paths, int(pr_number_str))
 
 

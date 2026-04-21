@@ -31,6 +31,8 @@ jobs:
     if: github.event.issue.pull_request != null && github.event.comment.body == '/merge'
     runs-on: ubuntu-latest
     environment: bot
+    permissions:
+      contents: read
     env:
       GITHUB_REPOSITORY: ${{ github.repository }}
       MERGE_COMMENTER: ${{ github.event.comment.user.login }}
