@@ -498,7 +498,7 @@ def merge_pr() -> None:
 
     pr = _wait_for_pr_stable(repo, pr_number, expected_head_sha)
 
-    if is_admin and _approval_count(pr) < required_reviews or _approval_count(pr) >= required_reviews:
+    if is_admin or _approval_count(pr) >= required_reviews:
         click.echo(f"Creating approval review for pull request #{pr.number}.")
         pr.create_review(event="APPROVE")
     
