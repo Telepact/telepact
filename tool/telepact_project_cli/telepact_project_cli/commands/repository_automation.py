@@ -484,10 +484,6 @@ def merge_pr() -> None:
         pr = _wait_for_pr_head_update(repo, pr_number, previous_head_sha)
         expected_head_sha = pr.head.sha
 
-    if is_admin and _approval_count(pr) < required_reviews:
-        click.echo(f"Creating approval review for pull request #{pr.number}.")
-        pr.create_review(event="APPROVE")
-
     _checkout_pr_branch(pr.head.ref)
     _verify_required_checks(repo, pr_number, expected_head_sha)
 
@@ -501,6 +497,11 @@ def merge_pr() -> None:
     _verify_required_checks(repo, pr_number, expected_head_sha)
 
     pr = _wait_for_pr_stable(repo, pr_number, expected_head_sha)
+
+    if is_admin and _approval_count(pr) < required_reviews or _approval_count(pr) >= required_reviews:
+        click.echo(f"Creating approval review for pull request #{pr.number}.")
+        pr.create_review(event="APPROVE")
+    
     merge_result = pr.merge(merge_method="squash", sha=expected_head_sha)
     if not merge_result.merged:
         raise RuntimeError(f"Failed to merge pull request #{pr.number}: {merge_result.message}")
