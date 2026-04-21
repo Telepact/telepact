@@ -22,6 +22,19 @@ from pathlib import Path
 import click
 
 LICENSE_HEADER_IGNORE_FILE = ".license-header-ignore"
+SUPPORTED_LICENSE_HEADER_SUFFIXES = {
+    ".py",
+    ".java",
+    ".ts",
+    ".dart",
+    ".sh",
+    ".js",
+    ".yaml",
+    ".yml",
+    ".html",
+    ".css",
+    ".svelte",
+}
 
 
 @click.command()
@@ -47,7 +60,7 @@ def license_header(license_header_path: str) -> None:
 def _license_header_supported(file_path: str) -> bool:
     path = Path(file_path)
     return (
-        (path.name != "pubspec.yaml" and path.suffix.lower() in [".py", ".java", ".ts", ".dart", ".sh", ".js", ".yaml", ".yml", ".html", ".css", ".svelte"])
+        (path.name != "pubspec.yaml" and path.suffix.lower() in SUPPORTED_LICENSE_HEADER_SUFFIXES)
         or path.name == "Dockerfile"
         or path.name == "Makefile"
     )

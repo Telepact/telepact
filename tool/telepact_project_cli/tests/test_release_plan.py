@@ -62,7 +62,8 @@ class ReleasePlanTests(unittest.TestCase):
                 result = runner.invoke(main, ["get"])
 
             self.assertEqual(result.exit_code, 0, msg=result.output)
-            self.assertEqual(result.output, "1.2.3")
+            self.assertEqual(result.output.rstrip("\n"), "1.2.3")
+            self.assertFalse(result.output.endswith("\n"))
 
     def test_set_version_preserves_aligned_package_json(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
