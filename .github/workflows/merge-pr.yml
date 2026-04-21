@@ -42,11 +42,10 @@ jobs:
           app-id: ${{ vars.TELEPACT_BOT_APP_ID }}
           private-key: ${{ secrets.TELEPACT_BOT_PRIVATE_KEY }}
 
-      - name: Checkout PR head
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
-          ref: refs/pull/${{ github.event.issue.number }}/head
           token: ${{ steps.generate-token.outputs.token }}
 
       - name: Set up Node.js
@@ -86,13 +85,6 @@ jobs:
           GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
           PR_NUMBER: ${{ github.event.issue.number }}
         run: ./tool/telepact-project verify-pr-requirements --expected-head-sha "${{ steps.tidy-pr.outputs.head_sha }}" --github-output "$GITHUB_OUTPUT"
-
-      - name: Refresh PR checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
-          ref: refs/pull/${{ github.event.issue.number }}/head
-          token: ${{ steps.generate-token.outputs.token }}
 
       - name: Bump version
         id: bump

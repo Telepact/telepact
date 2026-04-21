@@ -15,13 +15,12 @@
 #|
 
 import json
-import os
 import subprocess
 from pathlib import Path
 
 import click
 import toml
-from github import Github, InputGitTreeElement
+from github import Github, GithubException, InputGitTreeElement
 from lxml import etree as ET
 from ruamel.yaml import YAML
 
@@ -131,6 +130,24 @@ def _repo_relative_path(repo_root: Path, path: Path) -> str:
     return path.resolve().relative_to(repo_root.resolve()).as_posix()
 
 
+def _hydrate_workspace_file(repo_root: Path, repo, ref: str, relative_path: str) -> None:
+    try:
+        contents = repo.get_contents(relative_path, ref=ref)
+    except GithubException as exc:
+        if exc.status == 404:
+            return
+        raise
+
+    absolute_path = repo_root / relative_path
+    absolute_path.parent.mkdir(parents=True, exist_ok=True)
+    absolute_path.write_bytes(contents.decoded_content)
+
+
+def _hydrate_workspace_from_pull_request(repo_root: Path, repo, ref: str, relative_paths: list[str]) -> None:
+    for relative_path in list(dict.fromkeys(relative_paths)):
+        _hydrate_workspace_file(repo_root, repo, ref, relative_path)
+
+
 def _create_git_data_commit(
     repo_root: Path,
     repo,
@@ -217,6 +234,26 @@ def bump(expected_head_sha: str | None, github_output: Path | None) -> None:
 
     if expected_head_sha and head_sha != expected_head_sha:
         raise click.ClickException(f"Pull request head changed unexpectedly: expected {expected_head_sha}, found {head_sha}.")
+
+    _hydrate_workspace_from_pull_request(
+        repo_root,
+        repo,
+        head_sha,
+        [
+            "VERSION.txt",
+            ".release/release-targets.yaml",
+            "doc/04-operate/03-versions.md",
+            "bind/dart/package-lock.json",
+            "bind/dart/pubspec.lock",
+            "lib/go/go.mod",
+            "lib/py/uv.lock",
+            "lib/ts/package-lock.json",
+            "sdk/cli/uv.lock",
+            "sdk/console/package-lock.json",
+            "sdk/prettier/package-lock.json",
+            *[_repo_relative_path(repo_root, project_file) for project_file in project_files],
+        ],
+    )
 
     if not version_file.exists():
         raise click.ClickException(f"Version file {version_file} does not exist.")

@@ -25,6 +25,7 @@ from types import SimpleNamespace
 from unittest.mock import patch
 
 from click.testing import CliRunner
+from github import GithubException
 
 PACKAGE_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PACKAGE_ROOT))
@@ -61,10 +62,11 @@ class _FakeGitCommit:
 
 
 class _FakeRepo:
-    def __init__(self, head_sha: str, head_ref: str, changed_paths: list[str]):
+    def __init__(self, head_sha: str, head_ref: str, changed_paths: list[str], repo_root: Path | None = None):
         self._ref = _FakeGitRef(head_sha)
         self._base_commit = _FakeGitCommit(head_sha)
         self._new_commit = _FakeGitCommit("new-commit-sha")
+        self._repo_root = repo_root
         self._pull = SimpleNamespace(
             head=SimpleNamespace(sha=head_sha, ref=head_ref),
             get_files=lambda: [SimpleNamespace(filename=path) for path in changed_paths],
@@ -80,6 +82,15 @@ class _FakeRepo:
 
     def get_git_commit(self, _sha: str):
         return self._base_commit
+
+    def get_contents(self, path: str, ref: str):
+        del ref
+        if self._repo_root is None:
+            raise GithubException(404, {"message": "Not Found"}, None)
+        absolute_path = self._repo_root / path
+        if not absolute_path.exists():
+            raise GithubException(404, {"message": "Not Found"}, None)
+        return SimpleNamespace(decoded_content=absolute_path.read_bytes())
 
     def create_git_tree(self, tree, base_tree):
         self.created_tree = (tree, base_tree)
@@ -130,7 +141,7 @@ class RepositoryAutomationTests(unittest.TestCase):
             merged=False,
             draft=False,
             base_ref="main",
-            head_ref="copilot/test",
+            head_ref="feature/test",
             head_sha="locked-head",
             mergeable=True,
             mergeable_state="clean",
@@ -170,7 +181,7 @@ class RepositoryAutomationTests(unittest.TestCase):
                 output_path.read_text(encoding="utf-8").splitlines(),
                 [
                     "head_sha=locked-head",
-                    "head_ref=copilot/test",
+                    "head_ref=feature/test",
                     "base_ref=main",
                 ],
             )
@@ -181,11 +192,11 @@ class RepositoryAutomationTests(unittest.TestCase):
             updated_file = repo_root / "VERSION.txt"
             updated_file.write_text("1.2.4\n", encoding="utf-8")
 
-            fake_repo = _FakeRepo(head_sha="base-sha", head_ref="copilot/test", changed_paths=["lib/ts/package.json"])
+            fake_repo = _FakeRepo(head_sha="base-sha", head_ref="feature/test", changed_paths=["lib/ts/package.json"])
             new_sha = _create_git_data_commit(
                 repo_root,
                 fake_repo,
-                "copilot/test",
+                "feature/test",
                 "base-sha",
                 "Bump version to 1.2.4 (#12)",
                 ["VERSION.txt"],
@@ -266,7 +277,12 @@ class RepositoryAutomationTests(unittest.TestCase):
                 encoding="utf-8",
             )
 
-            fake_repo = _FakeRepo(head_sha="base-sha", head_ref="copilot/test", changed_paths=["lib/ts/src/index.ts"])
+            fake_repo = _FakeRepo(
+                head_sha="base-sha",
+                head_ref="feature/test",
+                changed_paths=["lib/ts/src/index.ts"],
+                repo_root=repo_root,
+            )
             output_path = repo_root / "github-output.txt"
             with patch.dict(
                 os.environ,

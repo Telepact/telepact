@@ -27,7 +27,7 @@ import toml
 from ..release_plan import load_release_manifest_at_commit, parse_legacy_release_info
 
 _PYPI_PRERELEASE_RE = re.compile(r"^(\d+\.\d+\.\d+)-(alpha|beta|rc)\.(\d+)$")
-_REPO_FROM_PYPI_PRERELEASE_RE = re.compile(r"^(\d+\.\d+\.\d+)(a|b|rc)(\d+)$")
+_PYPI_TO_REPO_PRERELEASE_RE = re.compile(r"^(\d+\.\d+\.\d+)(a|b|rc)(\d+)$")
 
 
 def _find_repo_root(start: Path) -> Path:
@@ -194,7 +194,7 @@ def _to_pypi_version(version: str) -> str:
 
 
 def _from_pypi_version(version: str) -> str:
-    match = _REPO_FROM_PYPI_PRERELEASE_RE.match(version)
+    match = _PYPI_TO_REPO_PRERELEASE_RE.match(version)
     if not match:
         return version
 
