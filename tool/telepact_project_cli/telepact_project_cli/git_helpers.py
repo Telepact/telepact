@@ -1,0 +1,47 @@
+#|
+#|  Copyright The Telepact Authors
+#|
+#|  Licensed under the Apache License, Version 2.0 (the "License");
+#|  you may not use this file except in compliance with the License.
+#|  You may obtain a copy of the License at
+#|
+#|  https://www.apache.org/licenses/LICENSE-2.0
+#|
+#|  Unless required by applicable law or agreed to in writing, software
+#|  distributed under the License is distributed on an "AS IS" BASIS,
+#|  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#|  See the License for the specific language governing permissions and
+#|  limitations under the License.
+#|
+
+import os
+import subprocess
+from pathlib import Path
+from typing import Sequence
+
+import click
+
+
+def require_env(name: str) -> str:
+    value = os.getenv(name)
+    if not value:
+        raise click.ClickException(f"{name} environment variable not set.")
+    return value
+
+
+def require_int_env(name: str) -> int:
+    return int(require_env(name))
+
+
+def git_stdout(args: Sequence[str], cwd: Path | str = ".") -> str:
+    return subprocess.run(
+        ["git", *args],
+        cwd=cwd,
+        stdout=subprocess.PIPE,
+        text=True,
+        check=True,
+    ).stdout
+
+
+def git_lines(args: Sequence[str], cwd: Path | str = ".") -> list[str]:
+    return [line for line in git_stdout(args, cwd=cwd).splitlines() if line]

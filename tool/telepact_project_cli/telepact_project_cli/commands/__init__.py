@@ -14,3 +14,23 @@
 #|  limitations under the License.
 #|
 
+from .automerge import automerge
+from .consolidated_readme import consolidated_readme
+from .doc_versions import doc_versions
+from .github_labels import github_labels
+from .license_header import license_header
+from .release import publish_targets, release
+from .versioning import bump, get, set_version
+
+COMMANDS = (
+    get,
+    set_version,
+    bump,
+    license_header,
+    github_labels,
+    release,
+    publish_targets,
+    automerge,
+    consolidated_readme,
+    doc_versions,
+)
