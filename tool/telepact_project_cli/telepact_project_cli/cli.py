@@ -66,12 +66,6 @@ def _set_project_version(data: dict, version: str) -> dict:
     return data
 
 
-def bump_version(version: str) -> str:
-    major, minor, patch = map(int, version.split('.'))
-    patch += 1
-    return f"{major}.{minor}.{patch}"
-
-
 def _license_header_supported(file_path: str) -> bool:
     file_extension = os.path.splitext(file_path)[1].lower()
     file_name = os.path.basename(file_path)
