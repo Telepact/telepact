@@ -1,17 +1,17 @@
 {
   "changed_paths": [
-    "lib/py/Makefile",
-    "sdk/cli/Makefile",
-    "tool/telepact_project_cli/telepact_project_cli/cli.py"
+    "sdk/cli/telepact_cli/cli.py",
+    "tool/telepact_project_cli/telepact_project_cli/cli.py",
+    "tool/telepact_project_cli/telepact_project_cli/commands/consolidated_readme.py",
+    "tool/telepact_project_cli/telepact_project_cli/commands/doc_versions.py",
+    "tool/telepact_project_cli/telepact_project_cli/release_plan.py"
   ],
   "direct_targets": [
-    "cli",
-    "py"
+    "cli"
   ],
-  "pr_number": 418,
+  "pr_number": 420,
   "targets": [
-    "cli",
-    "py"
+    "cli"
   ],
-  "version": "1.0.0-alpha.306"
+  "version": "1.0.0-alpha.307"
 }
