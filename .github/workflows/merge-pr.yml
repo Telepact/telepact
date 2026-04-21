@@ -21,10 +21,6 @@ on:
     types:
       - created
 
-permissions:
-  contents: write
-  pull-requests: write
-
 concurrency:
   group: merge-pr
   cancel-in-progress: false
