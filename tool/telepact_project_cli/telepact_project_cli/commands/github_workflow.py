@@ -66,7 +66,7 @@ def github_labels() -> None:
             )
             return result.stdout.decode("utf-8").strip()
         except subprocess.CalledProcessError as e:
-            print(f"Error fetching or diffing: {e}")
+            click.echo(f"Error fetching or diffing: {e}")
             return ""
 
     def get_modified_project_labels(files: str) -> set[str]:
@@ -84,7 +84,7 @@ def github_labels() -> None:
     head_sha = os.getenv("HEAD_SHA")
 
     files = get_modified_files(base_branch, head_sha)
-    print(f"Modified files: {files}")
+    click.echo(f"Modified files: {files}")
 
     g = Github(token)
     repo = g.get_repo(repository)
@@ -92,7 +92,7 @@ def github_labels() -> None:
     current_labels = {label.name for label in pr.get_labels()}
     new_labels = get_modified_project_labels(files)
 
-    print(f"Labels to be added: {new_labels}")
+    click.echo(f"Labels to be added: {new_labels}")
 
     added_labels = []
     removed_labels = []
@@ -106,7 +106,7 @@ def github_labels() -> None:
             pr.remove_from_labels(label)
             removed_labels.append(label)
 
-    print(
+    click.echo(
         f"Summary:\n  Added tags: {', '.join(added_labels) if added_labels else 'None'}\n"
         f"  Removed tags: {', '.join(removed_labels) if removed_labels else 'None'}"
     )
@@ -137,7 +137,7 @@ def release() -> None:
         text=True,
         check=True,
     ).stdout.strip()
-    print(f"head_commit: {head_commit}")
+    click.echo(f"head_commit: {head_commit}")
 
     manifest_file = Path(".release/release-manifest.json")
     if manifest_file.exists():
@@ -153,7 +153,7 @@ def release() -> None:
             text=True,
             check=True,
         ).stdout.strip()
-        print(f"commit_message: {commit_message}")
+        click.echo(f"commit_message: {commit_message}")
         lines = commit_message.splitlines()
         legacy_info = parse_legacy_release_info(lines[0] if lines else "", "\n".join(lines[1:]))
         if legacy_info is None:
@@ -164,9 +164,9 @@ def release() -> None:
         pr_number = int(pr_number_str)
         click.echo("Loaded release metadata from legacy bump commit message")
 
-    print(f"release_targets: {release_targets}")
-    print(f"version: {version}")
-    print(f"pr_number: {pr_number}")
+    click.echo(f"release_targets: {release_targets}")
+    click.echo(f"version: {version}")
+    click.echo(f"pr_number: {pr_number}")
 
     g = Github(token)
     repo = g.get_repo(repository)
@@ -291,19 +291,19 @@ def automerge() -> None:
         "GITHUB_REPOSITORY environment variable is not set (e.g., 'owner/repo').",
     )
 
-    print(f"Processing PR #{pr_number} in '{github_repository}'...")
-    print(f"Hardcoded allowed authors for automerge: {', '.join(automerge_allowed_authors)}")
+    click.echo(f"Processing PR #{pr_number} in '{github_repository}'...")
+    click.echo(f"Hardcoded allowed authors for automerge: {', '.join(automerge_allowed_authors)}")
 
     g = Github(github_token)
     repo_obj = g.get_repo(github_repository)
     pr = repo_obj.get_pull(pr_number)
 
     pr_author_login = pr.user.login
-    print(f"Pull Request #{pr_number} is authored by @{pr_author_login}")
+    click.echo(f"Pull Request #{pr_number} is authored by @{pr_author_login}")
 
     if pr_author_login not in automerge_allowed_authors:
         raise Exception(f"Author @{pr_author_login} is NOT on the hardcoded allow list. Aborting automerge.")
-    print(f"Author @{pr_author_login} is on the allow list.")
+    click.echo(f"Author @{pr_author_login} is on the allow list.")
 
     for f in pr.get_files():
         if f.status == "removed":
@@ -313,9 +313,9 @@ def automerge() -> None:
                 f"Pull Request #{pr_number} contains changes in the file '{f.filename}' which is not allowed for automerge."
             )
 
-    print("Approving Pull Request...")
+    click.echo("Approving Pull Request...")
     pr.create_review(event="APPROVE")
-    print("Pull Request approved.")
+    click.echo("Pull Request approved.")
 
     pr.enable_automerge(merge_method="SQUASH")
-    print("Pull Request will be automerged when build succeeds.")
+    click.echo("Pull Request will be automerged when build succeeds.")

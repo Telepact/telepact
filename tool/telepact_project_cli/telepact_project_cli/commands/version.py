@@ -107,7 +107,7 @@ def _write_release_outputs(new_version: str, pr_number: int, changed_paths: list
         pr_number=pr_number,
     )
     sorted_release_targets = list(release_manifest.targets)
-    print(f"release_targets: {sorted_release_targets}")
+    click.echo(f"release_targets: {sorted_release_targets}")
 
     manifest_path = write_release_manifest(Path("."), release_manifest)
     repo_relative_manifest_path = os.path.relpath(manifest_path, Path.cwd())
