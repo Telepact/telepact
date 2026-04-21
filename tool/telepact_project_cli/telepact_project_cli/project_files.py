@@ -45,7 +45,7 @@ def project_version(data: dict) -> str:
     return data["tool"]["poetry"]["version"]
 
 
-def set_project_version_data(data: dict, version: str) -> dict:
+def set_pyproject_version_data(data: dict, version: str) -> dict:
     project = data.get("project")
     if isinstance(project, dict) and "version" in project:
         project["version"] = version
@@ -72,15 +72,16 @@ def _pom_version_element(path: Path):
     tree = ET.parse(str(path), parser)
     root = tree.getroot()
     version_element = root.find(_MAVEN_VERSION_XPATH)
-    if version_element is None or version_element.text is None:
+    version_text = None if version_element is None else version_element.text
+    if version_element is None or version_text is None:
         raise click.ClickException(f"Missing Maven version in {path}")
-    return tree, version_element
+    return tree, version_element, version_text
 
 
 def read_version(path: Path) -> str:
     if path.name == "pom.xml":
-        _, version_element = _pom_version_element(path)
-        return version_element.text
+        _, _, version_text = _pom_version_element(path)
+        return version_text
     if path.name == "package.json":
         data = json.loads(path.read_text(encoding="utf-8"))
         return data["version"]
@@ -95,7 +96,7 @@ def read_version(path: Path) -> str:
 
 def write_version(path: Path, version: str) -> None:
     if path.name == "pom.xml":
-        tree, version_element = _pom_version_element(path)
+        tree, version_element, _ = _pom_version_element(path)
         version_element.text = version
         tree.write(str(path), xml_declaration=True, encoding="utf-8", pretty_print=True)
         return
@@ -107,7 +108,7 @@ def write_version(path: Path, version: str) -> None:
         return
 
     if path.name == "pyproject.toml":
-        data = set_project_version_data(load_pyproject(path), version)
+        data = set_pyproject_version_data(load_pyproject(path), version)
         with path.open("w", encoding="utf-8") as file:
             toml.dump(data, file)
         return
