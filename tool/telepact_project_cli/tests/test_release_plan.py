@@ -49,6 +49,21 @@ def _pushd(path: Path):
 
 
 class ReleasePlanTests(unittest.TestCase):
+    def test_get_reads_package_json_version(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            project_root = Path(tmp_dir)
+            (project_root / "package.json").write_text(
+                '{\n  "name": "example",\n  "version": "1.2.3"\n}\n',
+                encoding="utf-8",
+            )
+
+            runner = CliRunner()
+            with _pushd(project_root):
+                result = runner.invoke(main, ["get"])
+
+            self.assertEqual(result.exit_code, 0, msg=result.output)
+            self.assertEqual(result.output, "1.2.3")
+
     def test_set_version_preserves_aligned_package_json(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             project_root = Path(tmp_dir)

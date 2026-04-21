@@ -26,17 +26,9 @@ import click
 from lxml import etree as ET
 import toml
 
-from ..release_plan import load_release_manifest_at_commit, parse_legacy_release_info
+from ..release_plan import find_repo_root, load_release_manifest_at_commit, parse_legacy_release_info
 
 _PYPI_PRERELEASE_RE = re.compile(r"^(\d+\.\d+\.\d+)-(alpha|beta|rc)\.(\d+)$")
-
-
-def _find_repo_root(start: Path) -> Path:
-    start = start.resolve()
-    for candidate in [start, *start.parents]:
-        if (candidate / "VERSION.txt").exists():
-            return candidate
-    raise click.ClickException("Unable to locate repo root (VERSION.txt not found).")
 
 
 def _read_text(path: Path) -> str:
@@ -200,7 +192,7 @@ def write_doc_versions(
     pending_version: str | None = None,
     pending_targets: Iterable[str] = (),
 ) -> Path:
-    repo_root = _find_repo_root(repo_root)
+    repo_root = find_repo_root(repo_root)
 
     version_by_target = _latest_released_versions(
         repo_root,
