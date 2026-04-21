@@ -26,7 +26,7 @@ sys.path.insert(0, str(PACKAGE_ROOT))
 from click.testing import CliRunner
 
 from telepact_project_cli.cli import main
-from telepact_project_cli.commands.repository_automation import _approval_count, _require_merge_reviews, _summarize_failed_statuses
+from telepact_project_cli.commands.repository_automation import _approval_count, _should_create_approval_review, _summarize_failed_statuses
 
 
 class RepositoryAutomationTests(unittest.TestCase):
@@ -59,16 +59,16 @@ class RepositoryAutomationTests(unittest.TestCase):
 
         self.assertEqual(failed, ["unit=failure", "release=error"])
 
-    def test_require_merge_reviews_rejects_blocked_non_admin(self) -> None:
+    def test_should_create_approval_review_rejects_blocked_non_admin(self) -> None:
         pr = SimpleNamespace(number=7, mergeable_state="blocked")
 
         with self.assertRaisesRegex(RuntimeError, "waiting on required code review"):
-            _require_merge_reviews(pr, is_admin=False)
+            _should_create_approval_review(pr, is_admin=False)
 
-    def test_require_merge_reviews_allows_blocked_admin_without_approval(self) -> None:
+    def test_should_create_approval_review_allows_blocked_admin_without_approval(self) -> None:
         pr = SimpleNamespace(number=7, mergeable_state="blocked")
 
-        self.assertFalse(_require_merge_reviews(pr, is_admin=True))
+        self.assertFalse(_should_create_approval_review(pr, is_admin=True))
 
     def test_merge_pr_command_rejects_non_collaborator(self) -> None:
         repo = mock.Mock()
@@ -93,7 +93,7 @@ class RepositoryAutomationTests(unittest.TestCase):
         self.assertNotEqual(result.exit_code, 0)
         self.assertIn("not a repository collaborator", result.output)
 
-    def test_merge_pr_command_admin_flow_updates_and_merges_without_review_bypass_approval(self) -> None:
+    def test_merge_pr_command_admin_bypasses_blocked_state_without_approval(self) -> None:
         initial_pr = mock.Mock()
         initial_pr.number = 7
         initial_pr.head = SimpleNamespace(sha="head-1", ref="feature")

@@ -197,7 +197,7 @@ def _summarize_failed_statuses(commit: Commit) -> list[str]:
     combined_status = commit.get_combined_status()
     failures = []
     for status in combined_status.statuses:
-        if status.state not in SUCCESSFUL_COMBINED_STATUS_STATES and status.state not in PENDING_COMBINED_STATUS_STATES:
+        if status.state in FAILED_COMBINED_STATUS_STATES:
             failures.append(f"{status.context}={status.state}")
     return failures
 
@@ -233,7 +233,7 @@ def _validate_merge_request(pr) -> None:
         raise RuntimeError(f"Pull request #{pr.number} is not mergeable (state={pr.mergeable_state}).")
 
 
-def _require_merge_reviews(pr: PullRequest, is_admin: bool) -> bool:
+def _should_create_approval_review(pr: PullRequest, is_admin: bool) -> bool:
     if is_admin:
         return pr.mergeable_state != "blocked"
     if pr.mergeable_state == "blocked":
@@ -454,7 +454,7 @@ def merge_pr() -> None:
 
     pr = _wait_for_pr_stable(repo, pr_number, expected_head_sha)
 
-    if _require_merge_reviews(pr, is_admin):
+    if _should_create_approval_review(pr, is_admin):
         click.echo(f"Creating approval review for pull request #{pr.number}.")
         pr.create_review(event="APPROVE")
     
