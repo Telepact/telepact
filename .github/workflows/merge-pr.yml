@@ -52,21 +52,11 @@ jobs:
 
       - name: Install uv
         uses: astral-sh/setup-uv@v6
-        env:
-          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
-          PR_NUMBER: ${{ github.event.issue.number }}
-          COMMENTER_LOGIN: ${{ github.event.comment.user.login }}
 
       - name: Configure git identity
         run: |
           git config --global user.name "telepact-notary[bot]"
           git config --global user.email "telepact-notary[bot]@users.noreply.github.com"
-        env:
-          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
-          PR_NUMBER: ${{ github.event.issue.number }}
-          COMMENTER_LOGIN: ${{ github.event.comment.user.login }}
 
       - name: Merge PR
         run: ./tool/telepact-project merge-pr
