@@ -21,6 +21,10 @@ on:
     types: [completed]
     workflows: ["PR Report"]
 
+permissions:
+  actions: read
+  contents: read
+
 jobs:
   get-pr-info:
     name: Get PR Information
