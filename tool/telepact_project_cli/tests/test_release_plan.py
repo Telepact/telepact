@@ -23,6 +23,7 @@ import tempfile
 import textwrap
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
 from unittest import mock
 
 from click.testing import CliRunner
@@ -232,7 +233,7 @@ class ReleasePlanTests(unittest.TestCase):
             self.assertNotEqual(result.exit_code, 0)
             self.assertIn("Release manifest not found:", result.output)
 
-    def test_bump_command_uses_subject_only_commit_message_and_writes_manifest(self) -> None:
+    def test_bump_command_uses_git_data_api_commit_and_writes_manifest(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             repo_root = Path(tmp_dir)
             (repo_root / "VERSION.txt").write_text("1.0.0-alpha.214", encoding="utf-8")
@@ -253,24 +254,54 @@ class ReleasePlanTests(unittest.TestCase):
             )
 
             runner = CliRunner()
+            fake_pull = mock.Mock()
+            fake_pull.number = 7
+            fake_pull.head = SimpleNamespace(ref="feature/test", sha="abc123")
+            fake_pull.get_files.return_value = [SimpleNamespace(filename="lib/py/pyproject.toml")]
 
-            git_commands: list[list[str]] = []
+            fake_parent_commit = mock.Mock()
+            fake_parent_commit.tree = mock.Mock()
 
-            def subprocess_run_side_effect(args, **kwargs):
-                git_commands.append(args)
-                if args[:4] == ["git", "show", "--name-only", "--pretty=format:"]:
-                    return subprocess.CompletedProcess(args, 0, stdout="lib/py/pyproject.toml\n")
-                return subprocess.CompletedProcess(args, 0, stdout="")
+            fake_new_tree = mock.Mock()
+
+            fake_new_commit = mock.Mock()
+            fake_new_commit.sha = "def456"
+
+            fake_ref = mock.Mock()
+
+            fake_repo = mock.Mock()
+            fake_repo.get_pull.return_value = fake_pull
+            fake_repo.get_git_commit.return_value = fake_parent_commit
+            fake_repo.create_git_tree.return_value = fake_new_tree
+            fake_repo.create_git_commit.return_value = fake_new_commit
+            fake_repo.get_git_ref.return_value = fake_ref
+
+            fake_github = mock.Mock()
+            fake_github.get_repo.return_value = fake_repo
+
+            def write_doc_versions_side_effect(*args, **kwargs):
+                doc_path = repo_root / "doc" / "04-operate" / "03-versions.md"
+                doc_path.parent.mkdir(parents=True, exist_ok=True)
+                doc_path.write_text("# Versions\n", encoding="utf-8")
+                return doc_path
 
             with (
                 _pushd(repo_root),
-                mock.patch("telepact_project_cli.commands.project_version.subprocess.run", side_effect=subprocess_run_side_effect),
+                mock.patch("telepact_project_cli.commands.project_version.Github", return_value=fake_github),
                 mock.patch(
                     "telepact_project_cli.commands.project_version.write_doc_versions",
-                    return_value=repo_root / ".release" / "doc-versions.json",
+                    side_effect=write_doc_versions_side_effect,
                 ),
             ):
-                result = runner.invoke(main, ["bump"], env={"PR_NUMBER": "7"})
+                result = runner.invoke(
+                    main,
+                    ["bump"],
+                    env={
+                        "PR_NUMBER": "7",
+                        "GITHUB_TOKEN": "token",
+                        "GITHUB_REPOSITORY": "Telepact/telepact",
+                    },
+                )
 
             self.assertEqual(result.exit_code, 0, msg=result.output)
             self.assertEqual((repo_root / "VERSION.txt").read_text(encoding="utf-8"), "1.0.0-alpha.215")
@@ -284,10 +315,66 @@ class ReleasePlanTests(unittest.TestCase):
                     "targets": ["cli", "py"],
                 },
             )
-            self.assertIn(
-                ["git", "commit", "-m", "Bump version to 1.0.0-alpha.215 (#7)"],
-                git_commands,
+            self.assertEqual(
+                fake_repo.create_git_commit.call_args.kwargs["message"],
+                "Bump version to 1.0.0-alpha.215 (#7)",
             )
+            self.assertEqual(fake_ref.edit.call_args.args[0], "def456")
+
+    def test_merge_pr_command_requires_merge_permission(self) -> None:
+        runner = CliRunner()
+        fake_repo = mock.Mock()
+        fake_repo.full_name = "Telepact/telepact"
+        fake_repo.get_collaborator_permission.return_value = "read"
+
+        fake_github = mock.Mock()
+        fake_github.get_repo.return_value = fake_repo
+
+        with mock.patch("telepact_project_cli.commands.merge_pr.Github", return_value=fake_github):
+            result = runner.invoke(
+                main,
+                ["merge-pr"],
+                env={
+                    "COMMENT_AUTHOR": "alice",
+                    "PR_NUMBER": "7",
+                    "GITHUB_TOKEN": "token",
+                    "GITHUB_REPOSITORY": "Telepact/telepact",
+                },
+            )
+
+        self.assertNotEqual(result.exit_code, 0)
+        self.assertIn("not allowed to merge PRs", result.output)
+
+    def test_merge_pr_command_requires_main_base_branch(self) -> None:
+        runner = CliRunner()
+        fake_repo = mock.Mock()
+        fake_repo.full_name = "Telepact/telepact"
+        fake_repo.get_collaborator_permission.return_value = "write"
+
+        fake_pr = mock.Mock()
+        fake_pr.number = 7
+        fake_pr.state = "open"
+        fake_pr.base = SimpleNamespace(ref="release", repo=SimpleNamespace(full_name="Telepact/telepact"))
+        fake_pr.head = SimpleNamespace(sha="abc123", repo=SimpleNamespace(full_name="Telepact/telepact"))
+        fake_repo.get_pull.return_value = fake_pr
+
+        fake_github = mock.Mock()
+        fake_github.get_repo.return_value = fake_repo
+
+        with mock.patch("telepact_project_cli.commands.merge_pr.Github", return_value=fake_github):
+            result = runner.invoke(
+                main,
+                ["merge-pr"],
+                env={
+                    "COMMENT_AUTHOR": "alice",
+                    "PR_NUMBER": "7",
+                    "GITHUB_TOKEN": "token",
+                    "GITHUB_REPOSITORY": "Telepact/telepact",
+                },
+            )
+
+        self.assertNotEqual(result.exit_code, 0)
+        self.assertIn("must target main", result.output)
 
     def test_latest_released_versions_uses_manifest_history_only(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:

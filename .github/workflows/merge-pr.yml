@@ -1,0 +1,82 @@
+#|
+#|  Copyright The Telepact Authors
+#|
+#|  Licensed under the Apache License, Version 2.0 (the "License");
+#|  you may not use this file except in compliance with the License.
+#|  You may obtain a copy of the License at
+#|
+#|  https://www.apache.org/licenses/LICENSE-2.0
+#|
+#|  Unless required by applicable law or agreed to in writing, software
+#|  distributed under the License is distributed on an "AS IS" BASIS,
+#|  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#|  See the License for the specific language governing permissions and
+#|  limitations under the License.
+#|
+
+name: merge-pr
+
+on:
+  issue_comment:
+    types:
+      - created
+
+concurrency:
+  group: merge-pr
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  issues: read
+  pull-requests: read
+
+jobs:
+  merge-pr:
+    name: Merge PR
+    if: ${{ github.event.issue.pull_request && github.event.comment.body == '/merge' }}
+    runs-on: ubuntu-latest
+    environment: bot
+    timeout-minutes: 15
+    steps:
+      - name: Generate GitHub App token
+        id: generate-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ vars.TELEPACT_BOT_APP_ID }}
+          private-key: ${{ secrets.TELEPACT_BOT_PRIVATE_KEY }}
+
+      - name: Checkout PR head
+        env:
+          PR_NUMBER: ${{ github.event.issue.number }}
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: refs/pull/${{ github.event.issue.number }}/head
+          token: ${{ steps.generate-token.outputs.token }}
+
+      - name: Set up Node.js
+        env:
+          NODE_VERSION_FILE: .nvmrc
+        uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+
+      - name: Set up Dart
+        env:
+          DART_SDK_VERSION: "3.6"
+        uses: dart-lang/setup-dart@v1
+        with:
+          sdk: 3.6
+
+      - name: Install uv
+        env:
+          UV_NO_SYNC: "1"
+        uses: astral-sh/setup-uv@v6
+
+      - name: Merge PR
+        env:
+          COMMENT_AUTHOR: ${{ github.event.comment.user.login }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
+          PR_NUMBER: ${{ github.event.issue.number }}
+        run: ./tool/telepact-project merge-pr

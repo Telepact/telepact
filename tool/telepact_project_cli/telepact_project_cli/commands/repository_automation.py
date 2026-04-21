@@ -15,7 +15,6 @@
 #|
 
 import os
-import subprocess
 import sys
 from pathlib import Path
 
@@ -78,20 +77,9 @@ AUTOMERGE_ALLOWED_FILES = [
 ]
 
 
-def _get_modified_files(base_branch, head_sha):
-    try:
-        subprocess.run(["git", "fetch", "origin", base_branch], check=True)
-        result = subprocess.run(["git", "diff", "--name-only", f"origin/{base_branch}", head_sha], check=True, stdout=subprocess.PIPE)
-        files = result.stdout.decode("utf-8").strip()
-        return files
-    except subprocess.CalledProcessError as e:
-        print(f"Error fetching or diffing: {e}")
-        return ""
-
-
 def _get_modified_project_labels(files):
     tags = set()
-    for file in files.split():
+    for file in files:
         for directory, tag in PROJECT_LABEL_MAP.items():
             if file.startswith(directory):
                 tags.add(tag)
@@ -107,15 +95,12 @@ def github_labels() -> None:
         click.echo("PR_NUMBER environment variable not set.", err=True)
         sys.exit(1)
     pr_number = int(pr_number_str)
-    base_branch = os.getenv("BASE_BRANCH")
-    head_sha = os.getenv("HEAD_SHA")
-
-    files = _get_modified_files(base_branch, head_sha)
-    print(f"Modified files: {files}")
 
     g = Github(token)
     repo = g.get_repo(repository)
     pr = repo.get_pull(pr_number)
+    files = sorted(file.filename for file in pr.get_files())
+    print(f"Modified files: {files}")
 
     current_labels = {label.name for label in pr.get_labels()}
     new_labels = _get_modified_project_labels(files)
@@ -149,12 +134,10 @@ def release() -> None:
         click.echo("GITHUB_TOKEN and GITHUB_REPOSITORY environment variables must be set.")
         return
 
-    head_commit = subprocess.run(
-        ["git", "rev-parse", "HEAD"],
-        stdout=subprocess.PIPE,
-        text=True,
-        check=True,
-    ).stdout.strip()
+    head_commit = os.getenv("GITHUB_SHA")
+    if not head_commit:
+        click.echo("GITHUB_SHA environment variable must be set.")
+        return
 
     print(f"head_commit: {head_commit}")
 

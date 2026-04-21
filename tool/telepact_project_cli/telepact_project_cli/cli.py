@@ -17,6 +17,7 @@
 import click
 
 from .commands.license_header import license_header
+from .commands.merge_pr import merge_pr
 from .commands.project_version import bump, get, set_version
 from .commands.repository_automation import automerge, github_labels, publish_targets, release
 from .commands.consolidated_readme import consolidated_readme
@@ -32,6 +33,7 @@ def main() -> None:
 main.add_command(get)
 main.add_command(set_version)
 main.add_command(bump)
+main.add_command(merge_pr)
 main.add_command(license_header)
 main.add_command(github_labels)
 main.add_command(release)
