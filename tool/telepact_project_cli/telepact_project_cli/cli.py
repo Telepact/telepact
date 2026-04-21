@@ -15,6 +15,7 @@
 #|
 
 import click
+from pathlib import Path
 
 from .commands.consolidated_readme import consolidated_readme
 from .commands.doc_versions import doc_versions
@@ -51,12 +52,17 @@ def gitignore(add_name, remove_name):
 
     if add_name:
         if name not in lines:
-            with gitignore_path.open('a') as f:
-                f.write(f"\n{name}")
+            existing_text = gitignore_path.read_text(encoding="utf-8")
+            prefix = "" if not existing_text or existing_text.endswith("\n") else "\n"
+            with gitignore_path.open("a", encoding="utf-8") as f:
+                f.write(f"{prefix}{name}\n")
     elif remove_name:
         if name in lines:
             new_lines = [line for line in lines if line != name]
-            gitignore_path.write_text('\n'.join(new_lines))
+            if new_lines:
+                gitignore_path.write_text("\n".join(new_lines) + "\n", encoding="utf-8")
+            else:
+                gitignore_path.write_text("", encoding="utf-8")
 
 main.add_command(get)
 main.add_command(set_version)

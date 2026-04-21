@@ -30,7 +30,7 @@ from ..release_plan import load_release_manifest, parse_legacy_release_info, res
 def _require_env(name: str, message: str) -> str:
     value = os.getenv(name)
     if not value:
-        click.echo(message, err=name == "PR_NUMBER")
+        click.echo(message, err=True)
         raise click.Abort()
     return value
 
