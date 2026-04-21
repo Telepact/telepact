@@ -273,7 +273,7 @@ def _validate_merge_request(pr, commenter_login: str, commenter_permission: str,
         raise RuntimeError(f"Pull request #{pr.number} is not open.")
     if pr.base.ref != MAIN_BRANCH:
         raise RuntimeError(f"Pull request #{pr.number} must target {MAIN_BRANCH}.")
-    if pr.head.repo.full_name != pr.base.repo.full_name:
+    if pr.head.repo is None or pr.head.repo.full_name != pr.base.repo.full_name:
         raise RuntimeError("Cross-repository pull requests are not supported by merge-pr.")
     if not pr.mergeable:
         raise RuntimeError(f"Pull request #{pr.number} is not mergeable (state={pr.mergeable_state}).")

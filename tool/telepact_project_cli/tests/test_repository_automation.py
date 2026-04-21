@@ -20,10 +20,10 @@ from pathlib import Path
 from types import SimpleNamespace
 from unittest import mock
 
-from click.testing import CliRunner
-
 PACKAGE_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PACKAGE_ROOT))
+
+from click.testing import CliRunner
 
 from telepact_project_cli.cli import main
 from telepact_project_cli.commands.repository_automation import _approval_count, _classify_required_checks
