@@ -48,11 +48,11 @@ def _load_release_metadata(repo_root: Path) -> tuple[str, int, list[str]] | None
 
 
 def _release_body(pr_title: str, pr_number: int, pr_url: str, release_targets: list[str]) -> str:
-    released_projects = "".join(f"- {target}\n" for target in release_targets) if release_targets else "(None)"
+    released_projects_text = "".join(f"- {target}\n" for target in release_targets) if release_targets else "(None)"
     return (
         f"## {pr_title} [(#{pr_number})]({pr_url})\n\n"
         f"### Released Projects\n"
-        f"{released_projects}"
+        f"{released_projects_text}"
     ).strip()
 
 

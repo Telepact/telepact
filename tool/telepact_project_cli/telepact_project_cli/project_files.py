@@ -74,7 +74,7 @@ def _pom_version_element(path: Path):
     version_element = root.find(_MAVEN_VERSION_XPATH)
     version_text = None if version_element is None else version_element.text
     if version_element is None or version_text is None:
-        raise click.ClickException(f"Missing Maven version in {path}")
+        raise click.ClickException(f"Missing Maven version element at {_MAVEN_VERSION_XPATH} in {path}")
     return tree, version_element, version_text
 
 

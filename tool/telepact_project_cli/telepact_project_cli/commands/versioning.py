@@ -38,6 +38,10 @@ def _bump_patch_version(version: str) -> str:
     return ".".join(parts)
 
 
+def _deduplicate_preserving_order(items: list[str]) -> list[str]:
+    return list(dict.fromkeys(items))
+
+
 @click.command()
 def get() -> None:
     project_file = find_supported_project_file(Path("."))
@@ -117,6 +121,6 @@ def bump() -> None:
     click.echo(f"Updated {doc_versions_file_name}")
 
     commit_message = f"Bump version to {new_version} (#{pr_number})\n\n{release_string}"
-    unique_files = list(dict.fromkeys(edited_files))
+    unique_files = _deduplicate_preserving_order(edited_files)
     subprocess.run(["git", "add", *unique_files], cwd=repo_root, check=True)
     subprocess.run(["git", "commit", "-m", commit_message], cwd=repo_root, check=True)
