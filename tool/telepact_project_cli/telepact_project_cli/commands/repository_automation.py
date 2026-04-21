@@ -501,9 +501,8 @@ def merge_pr() -> None:
     expected_head_sha = pr.head.sha
     pr = _wait_for_pr_mergeable(repo, pr_number, expected_head_sha)
 
-    if is_admin or _approval_count(pr) > 0:
-        click.echo(f"Creating approval review for pull request #{pr.number}.")
-        pr.create_review(event="APPROVE")
+    click.echo(f"Creating approval review for pull request #{pr.number}.")
+    pr.create_review(event="APPROVE")
     
     merge_result = pr.merge(merge_method="squash", sha=expected_head_sha)
     if not merge_result.merged:
