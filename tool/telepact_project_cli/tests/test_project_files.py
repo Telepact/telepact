@@ -24,7 +24,7 @@ sys.path.insert(0, str(PACKAGE_ROOT))
 
 from telepact_project_cli.project_files import (
     find_supported_project_file,
-    iter_supported_project_files,
+    list_supported_project_files,
     read_version,
     write_version,
 )
@@ -38,7 +38,7 @@ class ProjectFilesTests(unittest.TestCase):
             (project_root / "pyproject.toml").write_text('[project]\nversion = "4.5.6"\n', encoding="utf-8")
 
             self.assertEqual(find_supported_project_file(project_root), project_root / "package.json")
-            self.assertEqual(list(iter_supported_project_files(project_root)), [
+            self.assertEqual(list_supported_project_files(project_root), [
                 project_root / "package.json",
                 project_root / "pyproject.toml",
             ])

@@ -23,7 +23,7 @@ from ..constants import PROJECT_FILES
 from ..git_helpers import git_lines, require_int_env
 from ..project_files import (
     find_supported_project_file,
-    iter_supported_project_files,
+    list_supported_project_files,
     read_version,
     update_lock_files,
     write_version,
@@ -34,6 +34,8 @@ from .doc_versions import write_doc_versions
 
 def _bump_patch_version(version: str) -> str:
     parts = version.split(".")
+    if len(parts) < 2 or not parts[-1].isdigit():
+        raise click.ClickException(f"Unsupported version format for bump: {version}")
     parts[-1] = str(int(parts[-1]) + 1)
     return ".".join(parts)
 
@@ -57,7 +59,7 @@ def get() -> None:
 def set_version(version: str) -> None:
     updated = False
 
-    for project_file in iter_supported_project_files(Path(".")):
+    for project_file in list_supported_project_files(Path(".")):
         write_version(project_file, version)
         click.echo(f"Set {project_file.name} to version {version}")
         updated = True

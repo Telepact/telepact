@@ -63,7 +63,7 @@ def find_supported_project_file(base_dir: Path = Path(".")) -> Path | None:
     return None
 
 
-def iter_supported_project_files(base_dir: Path = Path(".")) -> list[Path]:
+def list_supported_project_files(base_dir: Path = Path(".")) -> list[Path]:
     return [base_dir / file_name for file_name in SUPPORTED_VERSION_FILES if (base_dir / file_name).exists()]
 
 
