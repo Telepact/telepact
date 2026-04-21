@@ -168,6 +168,19 @@ def _wait_for_pr_head_update(repo, pr_number: int, previous_head_sha: str) -> Pu
         time.sleep(WAIT_INTERVAL_SECONDS)
 
 
+def _wait_for_pr_mergeable(repo, pr_number: int, expected_head_sha: str) -> PullRequest:
+    deadline = time.monotonic() + WAIT_TIMEOUT_SECONDS
+    while True:
+        pr = _wait_for_pr_stable(repo, pr_number, expected_head_sha)
+        if pr.mergeable:
+            return pr
+        if time.monotonic() >= deadline:
+            raise TimeoutError(
+                f"Timed out waiting for pull request #{pr.number} to become mergeable (state={pr.mergeable_state})."
+            )
+        time.sleep(WAIT_INTERVAL_SECONDS)
+
+
 def _wait_for_expected_head(repo, pr_number: int, previous_head_sha: str, expected_head_sha: str) -> PullRequest:
     deadline = time.monotonic() + WAIT_TIMEOUT_SECONDS
     while True:
@@ -268,23 +281,13 @@ def _verify_required_checks(repo, pr_number: int, expected_head_sha: str):
         time.sleep(WAIT_INTERVAL_SECONDS)
 
 
-def _validate_merge_request(pr, commenter_login: str, is_admin: bool) -> int:
+def _validate_merge_request(pr) -> None:
     if pr.state != "open":
         raise RuntimeError(f"Pull request #{pr.number} is not open.")
     if pr.base.ref != MAIN_BRANCH:
         raise RuntimeError(f"Pull request #{pr.number} must target {MAIN_BRANCH}.")
     if pr.head.repo is None or pr.head.repo.full_name != pr.base.repo.full_name:
         raise RuntimeError("Cross-repository pull requests are not supported by merge-pr.")
-    if not pr.mergeable:
-        raise RuntimeError(f"Pull request #{pr.number} is not mergeable (state={pr.mergeable_state}).")
-
-    required_reviews = _required_review_count(pr.base.repo, pr.base.ref)
-    approvals = _approval_count(pr)
-    if not is_admin and approvals < required_reviews:
-        raise RuntimeError(
-            f"Pull request #{pr.number} needs {required_reviews} approving review(s); found {approvals}."
-        )
-    return required_reviews
 
 
 @click.command()
@@ -472,7 +475,7 @@ def merge_pr() -> None:
     pr = repo.get_pull(pr_number)
     expected_head_sha = pr.head.sha
     pr = _wait_for_pr_stable(repo, pr_number, expected_head_sha)
-    required_reviews = _validate_merge_request(pr, commenter_login, is_admin)
+    _validate_merge_request(pr)
 
     if pr.draft:
         click.echo(f"Marking pull request #{pr.number} ready for review.")
@@ -486,8 +489,8 @@ def merge_pr() -> None:
         pr = _wait_for_pr_head_update(repo, pr_number, previous_head_sha)
         expected_head_sha = pr.head.sha
 
+    pr = _wait_for_pr_mergeable(repo, pr_number, expected_head_sha)
     _checkout_pr_branch(pr.head.ref)
-    _verify_required_checks(repo, pr_number, expected_head_sha)
 
     click.echo(f"Bumping version on branch {pr.head.ref}.")
     create_version_bump_commit(pr_number)
@@ -496,11 +499,9 @@ def merge_pr() -> None:
 
     pr = _wait_for_expected_head(repo, pr_number, expected_head_sha, bumped_head_sha)
     expected_head_sha = pr.head.sha
-    _verify_required_checks(repo, pr_number, expected_head_sha)
+    pr = _wait_for_pr_mergeable(repo, pr_number, expected_head_sha)
 
-    pr = _wait_for_pr_stable(repo, pr_number, expected_head_sha)
-
-    if is_admin or _approval_count(pr) >= required_reviews:
+    if is_admin or _approval_count(pr) > 0:
         click.echo(f"Creating approval review for pull request #{pr.number}.")
         pr.create_review(event="APPROVE")
     

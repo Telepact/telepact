@@ -26,7 +26,7 @@ sys.path.insert(0, str(PACKAGE_ROOT))
 from click.testing import CliRunner
 
 from telepact_project_cli.cli import main
-from telepact_project_cli.commands.repository_automation import _approval_count, _classify_required_checks
+from telepact_project_cli.commands.repository_automation import _approval_count, _classify_required_checks, _wait_for_pr_mergeable
 
 
 class RepositoryAutomationTests(unittest.TestCase):
@@ -64,6 +64,22 @@ class RepositoryAutomationTests(unittest.TestCase):
         self.assertEqual(pending, ["build"])
         self.assertEqual(failed, ["unit=failure"])
         self.assertEqual(missing, ["missing"])
+
+    def test_wait_for_pr_mergeable_retries_until_pr_is_mergeable(self) -> None:
+        blocked_pr = SimpleNamespace(number=7, mergeable=False, mergeable_state="blocked")
+        clean_pr = SimpleNamespace(number=7, mergeable=True, mergeable_state="clean")
+
+        with (
+            mock.patch(
+                "telepact_project_cli.commands.repository_automation._wait_for_pr_stable",
+                side_effect=[blocked_pr, clean_pr],
+            ),
+            mock.patch("telepact_project_cli.commands.repository_automation.time.monotonic", side_effect=[0, 0]),
+            mock.patch("telepact_project_cli.commands.repository_automation.time.sleep"),
+        ):
+            result = _wait_for_pr_mergeable(mock.Mock(), 7, "head-1")
+
+        self.assertIs(result, clean_pr)
 
     def test_merge_pr_command_rejects_non_collaborator(self) -> None:
         repo = mock.Mock()
@@ -131,12 +147,15 @@ class RepositoryAutomationTests(unittest.TestCase):
                 return_value=updated_pr,
             ),
             mock.patch(
+                "telepact_project_cli.commands.repository_automation._wait_for_pr_mergeable",
+                side_effect=[updated_pr, bumped_pr],
+            ),
+            mock.patch(
                 "telepact_project_cli.commands.repository_automation._wait_for_expected_head",
                 return_value=bumped_pr,
             ),
-            mock.patch("telepact_project_cli.commands.repository_automation._validate_merge_request", return_value=1),
+            mock.patch("telepact_project_cli.commands.repository_automation._validate_merge_request"),
             mock.patch("telepact_project_cli.commands.repository_automation._approval_count", return_value=0),
-            mock.patch("telepact_project_cli.commands.repository_automation._verify_required_checks"),
             mock.patch("telepact_project_cli.commands.repository_automation._checkout_pr_branch"),
             mock.patch("telepact_project_cli.commands.repository_automation._push_current_branch"),
             mock.patch("telepact_project_cli.commands.repository_automation._current_head_sha", return_value="head-3"),
@@ -156,7 +175,7 @@ class RepositoryAutomationTests(unittest.TestCase):
         self.assertEqual(result.exit_code, 0, msg=result.output)
         initial_pr.mark_ready_for_review.assert_called_once_with()
         ready_pr.update_branch.assert_called_once_with(expected_head_sha="head-1")
-        updated_pr.create_review.assert_called_once_with(event="APPROVE")
+        bumped_pr.create_review.assert_called_once_with(event="APPROVE")
         bumped_pr.merge.assert_called_once_with(merge_method="squash", sha="head-3")
 
 
