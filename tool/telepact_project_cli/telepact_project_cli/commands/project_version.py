@@ -145,15 +145,25 @@ def _bump_version(version: str) -> str:
     return ".".join(parts)
 
 
+def _changed_paths_since_main(main_ref: str = "origin/main") -> list[str]:
+    try:
+        result = subprocess.run(
+            ["git", "diff", "--name-only", f"{main_ref}...HEAD"],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            check=True,
+        )
+    except subprocess.CalledProcessError as exc:
+        raise click.ClickException(
+            f"Unable to compute changed paths against {main_ref}: {exc.stderr.strip()}"
+        )
+    return [path for path in result.stdout.strip().splitlines() if path]
+
+
 def create_version_bump_commit(pr_number: int) -> str:
     version_file = "VERSION.txt"
-
-    prev_commit_paths = subprocess.run(
-        ["git", "show", "--name-only", "--pretty=format:", "HEAD"],
-        stdout=subprocess.PIPE,
-        text=True,
-        check=True,
-    ).stdout.strip().split("\n")
+    changed_paths = _changed_paths_since_main()
 
     if not os.path.exists(version_file):
         raise click.ClickException(f"Version file {version_file} does not exist.")
@@ -185,7 +195,7 @@ def create_version_bump_commit(pr_number: int) -> str:
 
     release_manifest = compute_release_manifest(
         Path("."),
-        changed_paths=prev_commit_paths,
+        changed_paths=changed_paths,
         version=new_version,
         pr_number=pr_number,
     )

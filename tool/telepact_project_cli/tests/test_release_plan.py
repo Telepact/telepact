@@ -258,7 +258,7 @@ class ReleasePlanTests(unittest.TestCase):
 
             def subprocess_run_side_effect(args, **kwargs):
                 git_commands.append(args)
-                if args[:4] == ["git", "show", "--name-only", "--pretty=format:"]:
+                if args[:3] == ["git", "diff", "--name-only"]:
                     return subprocess.CompletedProcess(args, 0, stdout="lib/py/pyproject.toml\n")
                 return subprocess.CompletedProcess(args, 0, stdout="")
 
@@ -288,6 +288,35 @@ class ReleasePlanTests(unittest.TestCase):
                 ["git", "commit", "-m", "Bump version to 1.0.0-alpha.215 (#7)"],
                 git_commands,
             )
+            self.assertIn(
+                ["git", "diff", "--name-only", "origin/main...HEAD"],
+                git_commands,
+            )
+
+    def test_bump_command_fails_when_branch_diff_against_main_cannot_be_computed(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            repo_root = Path(tmp_dir)
+            (repo_root / "VERSION.txt").write_text("1.0.0-alpha.214", encoding="utf-8")
+
+            runner = CliRunner()
+
+            def subprocess_run_side_effect(args, **kwargs):
+                if args[:3] == ["git", "diff", "--name-only"]:
+                    raise subprocess.CalledProcessError(
+                        128,
+                        args,
+                        stderr="fatal: ambiguous argument 'origin/main...HEAD'",
+                    )
+                return subprocess.CompletedProcess(args, 0, stdout="")
+
+            with (
+                _pushd(repo_root),
+                mock.patch("telepact_project_cli.commands.project_version.subprocess.run", side_effect=subprocess_run_side_effect),
+            ):
+                result = runner.invoke(main, ["bump"], env={"PR_NUMBER": "7"})
+
+            self.assertNotEqual(result.exit_code, 0)
+            self.assertIn("Unable to compute changed paths against origin/main", result.output)
 
     def test_latest_released_versions_uses_manifest_history_only(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
