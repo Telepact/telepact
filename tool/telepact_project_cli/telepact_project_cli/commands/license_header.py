@@ -99,6 +99,9 @@ def _read_license_header(file_path: Path) -> list[str]:
     while header_lines and not header_lines[-1].strip():
         header_lines.pop()
 
+    if not header_lines:
+        raise click.ClickException(f"License header template is empty: {file_path}")
+
     return header_lines
 
 

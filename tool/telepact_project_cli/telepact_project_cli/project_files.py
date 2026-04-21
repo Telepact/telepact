@@ -32,7 +32,7 @@ _MAVEN_VERSION_PATH = "{http://maven.apache.org/POM/4.0.0}version"
 
 
 def find_supported_project_files(root: Path | str = ".") -> list[Path]:
-    """Return supported project files present in the given directory."""
+    """Return supported project files present directly in the given directory."""
     directory = Path(root)
     return [directory / name for name in SUPPORTED_PROJECT_FILE_NAMES if (directory / name).exists()]
 
