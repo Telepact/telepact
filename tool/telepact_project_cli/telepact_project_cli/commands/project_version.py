@@ -156,7 +156,7 @@ def create_version_bump_commit(pr_number: int) -> str:
     ).stdout.strip().split("\n")
 
     if not os.path.exists(version_file):
-        raise FileNotFoundError(f"Version file {version_file} does not exist.")
+        raise click.ClickException(f"Version file {version_file} does not exist.")
 
     with open(version_file, "r") as f:
         version = f.read().strip()

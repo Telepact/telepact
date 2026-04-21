@@ -48,6 +48,7 @@ RELEASE_TARGET_ASSET_DIRECTORY_MAP = {
 }
 
 MAX_ASSETS = 10
+MAIN_BRANCH = "main"
 WAIT_TIMEOUT_SECONDS = 20 * 60  # 20 minutes
 WAIT_INTERVAL_SECONDS = 10
 MERGE_ALLOWED_PERMISSIONS = {"write", "maintain", "admin"}
@@ -250,7 +251,7 @@ def _classify_required_checks(required_contexts: list[str], commit) -> tuple[lis
 
 def _verify_required_checks(repo, pr_number: int, expected_head_sha: str):
     deadline = time.monotonic() + WAIT_TIMEOUT_SECONDS
-    required_contexts = _required_check_contexts(repo, "main")
+    required_contexts = _required_check_contexts(repo, MAIN_BRANCH)
     while True:
         pr = _wait_for_pr_stable(repo, pr_number, expected_head_sha)
         commit = repo.get_commit(pr.head.sha)
@@ -268,8 +269,8 @@ def _verify_required_checks(repo, pr_number: int, expected_head_sha: str):
 def _validate_merge_request(pr, commenter_login: str, commenter_permission: str, is_admin: bool) -> int:
     if pr.state != "open":
         raise RuntimeError(f"Pull request #{pr.number} is not open.")
-    if pr.base.ref != "main":
-        raise RuntimeError(f"Pull request #{pr.number} must target main.")
+    if pr.base.ref != MAIN_BRANCH:
+        raise RuntimeError(f"Pull request #{pr.number} must target {MAIN_BRANCH}.")
     if pr.head.repo.full_name != pr.base.repo.full_name:
         raise RuntimeError("Cross-repository pull requests are not supported by merge-pr.")
     if not pr.mergeable:
