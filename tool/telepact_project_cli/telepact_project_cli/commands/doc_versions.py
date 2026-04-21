@@ -24,7 +24,7 @@ import click
 from lxml import etree as ET
 import toml
 
-from ..release_plan import load_release_manifest_at_commit, parse_legacy_release_info
+from ..release_plan import load_release_manifest_at_commit
 
 _PYPI_PRERELEASE_RE = re.compile(r"^(\d+\.\d+\.\d+)-(alpha|beta|rc)\.(\d+)$")
 
@@ -158,18 +158,15 @@ def _latest_released_versions(
             if target in needed:
                 found[target] = pending_version
 
-    for sha, subject, body in _iter_git_commits(repo_root):
+    for sha, _, _ in _iter_git_commits(repo_root):
         manifest_data = load_release_manifest_at_commit(repo_root, sha)
-        if manifest_data is not None:
-            version = manifest_data.get("version")
-            release_targets = manifest_data.get("targets", [])
-            if not isinstance(version, str) or not isinstance(release_targets, list):
-                raise click.ClickException(f"Invalid release manifest data at commit {sha}")
-        else:
-            legacy_info = parse_legacy_release_info(subject, body)
-            if legacy_info is None:
-                continue
-            version, release_targets = legacy_info
+        if manifest_data is None:
+            continue
+
+        version = manifest_data.get("version")
+        release_targets = manifest_data.get("targets", [])
+        if not isinstance(version, str) or not isinstance(release_targets, list):
+            raise click.ClickException(f"Invalid release manifest data at commit {sha}")
 
         if not release_targets:
             continue

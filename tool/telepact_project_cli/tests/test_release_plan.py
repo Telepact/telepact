@@ -213,6 +213,25 @@ class ReleasePlanTests(unittest.TestCase):
                 ],
             )
 
+    def test_publish_targets_command_requires_manifest(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            repo_root = Path(tmp_dir)
+            (repo_root / "VERSION.txt").write_text("1.0.0-alpha.214", encoding="utf-8")
+
+            runner = CliRunner()
+            with _pushd(repo_root):
+                result = runner.invoke(
+                    main,
+                    [
+                        "publish-targets",
+                        "--release-tag",
+                        "1.0.0-alpha.214",
+                    ],
+                )
+
+            self.assertNotEqual(result.exit_code, 0)
+            self.assertIn("Release manifest not found:", result.output)
+
     def test_bump_command_uses_subject_only_commit_message_and_writes_manifest(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             repo_root = Path(tmp_dir)
@@ -270,7 +289,7 @@ class ReleasePlanTests(unittest.TestCase):
                 git_commands,
             )
 
-    def test_latest_released_versions_prefers_manifest_history_and_falls_back_to_legacy_commits(self) -> None:
+    def test_latest_released_versions_uses_manifest_history_only(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             repo_root = Path(tmp_dir)
             subprocess.run(["git", "init"], cwd=repo_root, check=True, capture_output=True, text=True)
@@ -323,7 +342,6 @@ class ReleasePlanTests(unittest.TestCase):
                 {
                     "py": "1.0.0-alpha.202",
                     "cli": "1.0.0-alpha.202",
-                    "java": "1.0.0-alpha.201",
                 },
             )
 
