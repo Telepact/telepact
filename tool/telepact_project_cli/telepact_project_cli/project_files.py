@@ -26,16 +26,19 @@ import toml
 
 yaml = YAML()
 
+# Supported manifest files that carry package versions in this repository.
 SUPPORTED_PROJECT_FILE_NAMES = ("pom.xml", "package.json", "pyproject.toml", "pubspec.yaml")
 _MAVEN_VERSION_PATH = "{http://maven.apache.org/POM/4.0.0}version"
 
 
 def find_supported_project_files(root: Path | str = ".") -> list[Path]:
+    """Return supported project files present in the given directory."""
     directory = Path(root)
     return [directory / name for name in SUPPORTED_PROJECT_FILE_NAMES if (directory / name).exists()]
 
 
 def read_project_version(project_file: Path | str) -> str:
+    """Read the version from a supported project file."""
     path = Path(project_file)
 
     if path.name == "pom.xml":
@@ -68,6 +71,7 @@ def read_project_version(project_file: Path | str) -> str:
 
 
 def write_project_version(project_file: Path | str, version: str) -> None:
+    """Write the version to a supported project file."""
     path = Path(project_file)
 
     if path.name == "pom.xml":

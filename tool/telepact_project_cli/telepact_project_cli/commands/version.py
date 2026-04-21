@@ -27,6 +27,7 @@ from ..project_files import find_supported_project_files, read_project_version, 
 from ..release_plan import compute_release_manifest, write_release_manifest
 from .doc_versions import write_doc_versions
 
+# Repository project files whose versions are updated by the bump workflow.
 VERSIONED_PROJECT_FILES = (
     Path("lib/java/pom.xml"),
     Path("lib/py/pyproject.toml"),
@@ -47,6 +48,7 @@ def bump_version(version: str) -> str:
 
 @click.command()
 def get() -> None:
+    """Print the version from the first supported project file in the current directory."""
     project_files = find_supported_project_files()
     if not project_files:
         click.echo("No supported project file found.", nl=False)
@@ -58,6 +60,7 @@ def get() -> None:
 @click.command()
 @click.argument("version")
 def set_version(version: str) -> None:
+    """Set the version in each supported project file in the current directory."""
     updated = False
 
     for project_file in find_supported_project_files():
@@ -71,6 +74,7 @@ def set_version(version: str) -> None:
 
 @click.command()
 def bump() -> None:
+    """Bump the repo version, update project manifests, and create the release commit."""
     version_file = Path("VERSION.txt")
     pr_number = _required_int_env("PR_NUMBER")
 

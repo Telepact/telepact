@@ -27,6 +27,7 @@ LICENSE_HEADER_IGNORE_FILE = ".license-header-ignore"
 @click.command()
 @click.argument("license_header_path")
 def license_header(license_header_path: str) -> None:
+    """Apply the given license header template to supported tracked files."""
     license_header_lines = _read_license_header(Path(license_header_path))
     files = subprocess.run(["git", "ls-files"], stdout=subprocess.PIPE, text=True, check=True).stdout.splitlines()
 
