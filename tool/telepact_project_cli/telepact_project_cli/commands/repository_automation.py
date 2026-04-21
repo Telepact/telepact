@@ -17,11 +17,13 @@
 import os
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 import click
 from github import Github, GithubException
 
+from .project_version import create_version_bump_commit
 from ..release_plan import load_release_manifest, resolve_publish_targets
 
 PROJECT_LABEL_MAP = {
@@ -46,6 +48,12 @@ RELEASE_TARGET_ASSET_DIRECTORY_MAP = {
 }
 
 MAX_ASSETS = 10
+WAIT_TIMEOUT_SECONDS = 20 * 60
+WAIT_INTERVAL_SECONDS = 10
+MERGE_ALLOWED_PERMISSIONS = {"write", "maintain", "admin"}
+PENDING_MERGEABLE_STATES = {"unknown"}
+PENDING_CHECK_STATES = {"expected", "pending", "queued", "requested", "waiting", "in_progress"}
+SUCCESSFUL_CHECK_CONCLUSIONS = {"success", "neutral", "skipped"}
 
 AUTOMERGE_ALLOWED_AUTHORS = ["dependabot[bot]"]
 
@@ -78,6 +86,23 @@ AUTOMERGE_ALLOWED_FILES = [
 ]
 
 
+def _require_env(name: str) -> str:
+    value = os.getenv(name)
+    if not value:
+        raise click.ClickException(f"{name} environment variable is not set.")
+    return value
+
+
+def _git(*args: str, capture_output: bool = False) -> str:
+    result = subprocess.run(
+        ["git", *args],
+        check=True,
+        text=True,
+        stdout=subprocess.PIPE if capture_output else None,
+    )
+    return result.stdout.strip() if capture_output else ""
+
+
 def _get_modified_files(base_branch, head_sha):
     try:
         subprocess.run(["git", "fetch", "origin", base_branch], check=True)
@@ -96,6 +121,169 @@ def _get_modified_project_labels(files):
             if file.startswith(directory):
                 tags.add(tag)
     return tags
+
+
+def _current_head_sha() -> str:
+    return _git("rev-parse", "HEAD", capture_output=True)
+
+
+def _checkout_pr_branch(head_ref: str) -> None:
+    remote_ref = f"refs/remotes/origin/{head_ref}"
+    _git("fetch", "origin", f"refs/heads/{head_ref}:{remote_ref}")
+    _git("checkout", "-B", head_ref, remote_ref)
+
+
+def _push_current_branch(head_ref: str) -> None:
+    _git("push", "origin", f"HEAD:{head_ref}")
+
+
+def _wait_for_pr_stable(repo, pr_number: int, expected_head_sha: str):
+    deadline = time.monotonic() + WAIT_TIMEOUT_SECONDS
+    while True:
+        pr = repo.get_pull(pr_number)
+        if pr.head.sha != expected_head_sha:
+            raise RuntimeError(
+                f"Pull request head changed unexpectedly from {expected_head_sha} to {pr.head.sha}."
+            )
+        mergeable_state = pr.mergeable_state or ""
+        if pr.mergeable is not None and mergeable_state not in PENDING_MERGEABLE_STATES:
+            return pr
+        if time.monotonic() >= deadline:
+            raise TimeoutError("Timed out waiting for pull request mergeability to stabilize.")
+        time.sleep(WAIT_INTERVAL_SECONDS)
+
+
+def _wait_for_pr_head_update(repo, pr_number: int, previous_head_sha: str):
+    deadline = time.monotonic() + WAIT_TIMEOUT_SECONDS
+    while True:
+        pr = repo.get_pull(pr_number)
+        mergeable_state = pr.mergeable_state or ""
+        if pr.head.sha != previous_head_sha and pr.mergeable is not None and mergeable_state not in PENDING_MERGEABLE_STATES:
+            return pr
+        if time.monotonic() >= deadline:
+            raise TimeoutError("Timed out waiting for pull request branch update to complete.")
+        time.sleep(WAIT_INTERVAL_SECONDS)
+
+
+def _wait_for_expected_head(repo, pr_number: int, previous_head_sha: str, expected_head_sha: str):
+    deadline = time.monotonic() + WAIT_TIMEOUT_SECONDS
+    while True:
+        pr = repo.get_pull(pr_number)
+        if pr.head.sha == expected_head_sha:
+            return pr
+        if pr.head.sha != previous_head_sha:
+            raise RuntimeError(
+                f"Pull request head changed unexpectedly from {previous_head_sha} to {pr.head.sha}; expected {expected_head_sha}."
+            )
+        if time.monotonic() >= deadline:
+            raise TimeoutError(f"Timed out waiting for pull request head {expected_head_sha}.")
+        time.sleep(WAIT_INTERVAL_SECONDS)
+
+
+def _required_review_count(repo, base_ref: str) -> int:
+    protection = repo.get_branch(base_ref).get_protection()
+    required_reviews = protection.required_pull_request_reviews
+    if required_reviews is None:
+        return 0
+    return required_reviews.required_approving_review_count or 0
+
+
+def _approval_count(pr) -> int:
+    latest_states = {}
+    for review in pr.get_reviews():
+        if review.user is None:
+            continue
+        latest_states[review.user.login] = review.state
+    return sum(1 for state in latest_states.values() if state == "APPROVED")
+
+
+def _required_check_contexts(repo, base_ref: str) -> list[str]:
+    protection = repo.get_branch(base_ref).get_protection()
+    required_status_checks = protection.required_status_checks
+    if required_status_checks is None:
+        return []
+
+    contexts = set(required_status_checks.contexts or [])
+    for check in required_status_checks.checks or []:
+        context = check.get("context") if isinstance(check, dict) else getattr(check, "context", None)
+        if context:
+            contexts.add(context)
+    return sorted(contexts)
+
+
+def _classify_required_checks(required_contexts: list[str], commit) -> tuple[list[str], list[str], list[str]]:
+    statuses_by_context = {}
+    combined_status = commit.get_combined_status()
+    for status in combined_status.statuses:
+        statuses_by_context[status.context] = status.state
+
+    check_runs_by_name = {}
+    for check_run in commit.get_check_runs():
+        existing = check_runs_by_name.get(check_run.name)
+        if existing is None or check_run.id > existing.id:
+            check_runs_by_name[check_run.name] = check_run
+
+    pending = []
+    failed = []
+    missing = []
+
+    for context in required_contexts:
+        if context in check_runs_by_name:
+            check_run = check_runs_by_name[context]
+            if check_run.status != "completed":
+                pending.append(context)
+                continue
+            if check_run.conclusion not in SUCCESSFUL_CHECK_CONCLUSIONS:
+                failed.append(f"{context}={check_run.conclusion}")
+            continue
+
+        state = statuses_by_context.get(context)
+        if state is None:
+            missing.append(context)
+        elif state in PENDING_CHECK_STATES:
+            pending.append(context)
+        elif state != "success":
+            failed.append(f"{context}={state}")
+
+    return pending, failed, missing
+
+
+def _verify_required_checks(repo, pr_number: int, expected_head_sha: str):
+    deadline = time.monotonic() + WAIT_TIMEOUT_SECONDS
+    required_contexts = _required_check_contexts(repo, "main")
+    while True:
+        pr = _wait_for_pr_stable(repo, pr_number, expected_head_sha)
+        commit = repo.get_commit(pr.head.sha)
+        pending, failed, missing = _classify_required_checks(required_contexts, commit)
+        if not pending and not missing:
+            if failed:
+                raise RuntimeError(f"Required checks failed: {', '.join(failed)}")
+            return pr
+        if time.monotonic() >= deadline:
+            waiting_on = pending + missing
+            raise TimeoutError(f"Timed out waiting for required checks: {', '.join(waiting_on)}")
+        time.sleep(WAIT_INTERVAL_SECONDS)
+
+
+def _validate_merge_request(pr, commenter_login: str, commenter_permission: str, is_admin: bool) -> int:
+    if pr.state != "open":
+        raise RuntimeError(f"Pull request #{pr.number} is not open.")
+    if pr.base.ref != "main":
+        raise RuntimeError(f"Pull request #{pr.number} must target main.")
+    if pr.head.repo.full_name != pr.base.repo.full_name:
+        raise RuntimeError("Cross-repository pull requests are not supported by merge-pr.")
+    if not pr.mergeable:
+        raise RuntimeError(f"Pull request #{pr.number} is not mergeable (state={pr.mergeable_state}).")
+    if commenter_permission not in MERGE_ALLOWED_PERMISSIONS:
+        raise RuntimeError(f"User @{commenter_login} does not have permission to merge pull requests.")
+
+    required_reviews = _required_review_count(pr.base.repo, pr.base.ref)
+    approvals = _approval_count(pr)
+    if not is_admin and approvals < required_reviews:
+        raise RuntimeError(
+            f"Pull request #{pr.number} needs {required_reviews} approving review(s); found {approvals}."
+        )
+    return required_reviews
 
 
 @click.command()
@@ -260,6 +448,61 @@ def publish_targets(release_tag: str | None, release_body: str | None, github_ou
         github_output.write_text("\n".join(lines) + "\n", encoding="utf-8")
     else:
         click.echo("\n".join(lines))
+
+
+@click.command(name="merge-pr")
+def merge_pr() -> None:
+    github_token = _require_env("GITHUB_TOKEN")
+    github_repository = _require_env("GITHUB_REPOSITORY")
+    commenter_login = _require_env("COMMENTER_LOGIN")
+    pr_number = int(_require_env("PR_NUMBER"))
+
+    repo = Github(github_token).get_repo(github_repository)
+    if not repo.has_in_collaborators(commenter_login):
+        raise click.ClickException(f"User @{commenter_login} is not a repository collaborator.")
+
+    commenter_permission = repo.get_collaborator_permission(commenter_login)
+    is_admin = commenter_permission == "admin"
+
+    pr = repo.get_pull(pr_number)
+    expected_head_sha = pr.head.sha
+    pr = _wait_for_pr_stable(repo, pr_number, expected_head_sha)
+    required_reviews = _validate_merge_request(pr, commenter_login, commenter_permission, is_admin)
+
+    if pr.draft:
+        click.echo(f"Marking pull request #{pr.number} ready for review.")
+        pr.mark_ready_for_review()
+        pr = _wait_for_pr_stable(repo, pr_number, expected_head_sha)
+
+    if pr.mergeable_state == "behind":
+        click.echo(f"Updating pull request #{pr.number} with main.")
+        previous_head_sha = expected_head_sha
+        pr.update_branch(expected_head_sha=expected_head_sha)
+        pr = _wait_for_pr_head_update(repo, pr_number, previous_head_sha)
+        expected_head_sha = pr.head.sha
+
+    if is_admin and _approval_count(pr) < required_reviews:
+        click.echo(f"Creating approval review for pull request #{pr.number}.")
+        pr.create_review(event="APPROVE")
+
+    _checkout_pr_branch(pr.head.ref)
+    _verify_required_checks(repo, pr_number, expected_head_sha)
+
+    click.echo(f"Bumping version on branch {pr.head.ref}.")
+    create_version_bump_commit(pr_number)
+    bumped_head_sha = _current_head_sha()
+    _push_current_branch(pr.head.ref)
+
+    pr = _wait_for_expected_head(repo, pr_number, expected_head_sha, bumped_head_sha)
+    expected_head_sha = pr.head.sha
+    _verify_required_checks(repo, pr_number, expected_head_sha)
+
+    pr = _wait_for_pr_stable(repo, pr_number, expected_head_sha)
+    merge_result = pr.merge(merge_method="squash", sha=expected_head_sha)
+    if not merge_result.merged:
+        raise RuntimeError(f"Failed to merge pull request #{pr.number}: {merge_result.message}")
+
+    click.echo(f"Merged pull request #{pr.number} with squash.")
 
 
 @click.command()

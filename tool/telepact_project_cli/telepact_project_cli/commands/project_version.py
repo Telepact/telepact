@@ -30,6 +30,17 @@ from ..release_plan import compute_release_manifest, write_release_manifest
 
 yaml = YAML()
 
+PROJECT_FILES = [
+    "lib/java/pom.xml",
+    "lib/py/pyproject.toml",
+    "lib/ts/package.json",
+    "bind/dart/pubspec.yaml",
+    "bind/dart/package.json",
+    "sdk/cli/pyproject.toml",
+    "sdk/prettier/package.json",
+    "sdk/console/package.json",
+]
+
 
 def _write_json(path: str, data: dict) -> None:
     with open(path, "w", encoding="utf-8") as f:
@@ -134,64 +145,21 @@ def _bump_version(version: str) -> str:
     return ".".join(parts)
 
 
-@click.command()
-def get() -> None:
-    for project_file in ["pom.xml", "package.json", "pyproject.toml", "pubspec.yaml"]:
-        if os.path.exists(project_file):
-            click.echo(_get_version_from_project_file(project_file), nl=False)
-            return
-
-    click.echo("No supported project file found.", nl=False)
-
-
-@click.command()
-@click.argument("version")
-def set_version(version: str) -> None:
-    updated = False
-
-    for project_file in ["pom.xml", "package.json", "pyproject.toml", "pubspec.yaml"]:
-        if os.path.exists(project_file):
-            _set_version_in_project_file(project_file, version)
-            click.echo(f"Set {project_file} to version {version}")
-            updated = True
-
-    if not updated:
-        click.echo("No supported project file found.")
-
-
-@click.command()
-def bump() -> None:
+def create_version_bump_commit(pr_number: int) -> str:
     version_file = "VERSION.txt"
-
-    project_files = [
-        "lib/java/pom.xml",
-        "lib/py/pyproject.toml",
-        "lib/ts/package.json",
-        "bind/dart/pubspec.yaml",
-        "bind/dart/package.json",
-        "sdk/cli/pyproject.toml",
-        "sdk/prettier/package.json",
-        "sdk/console/package.json",
-    ]
-
-    pr_number_str = os.getenv("PR_NUMBER")
-    if not pr_number_str:
-        click.echo("PR_NUMBER environment variable not set.", err=True)
-        sys.exit(1)
-    pr_number = int(pr_number_str)
 
     prev_commit_paths = subprocess.run(
         ["git", "show", "--name-only", "--pretty=format:", "HEAD"],
         stdout=subprocess.PIPE,
         text=True,
+        check=True,
     ).stdout.strip().split("\n")
 
     print("prev_commit_paths:")
     print(prev_commit_paths)
 
     if not os.path.exists(version_file):
-        click.echo(f"Version file {version_file} does not exist.")
-        return
+        raise FileNotFoundError(f"Version file {version_file} does not exist.")
 
     with open(version_file, "r") as f:
         version = f.read().strip()
@@ -205,7 +173,7 @@ def bump() -> None:
 
     edited_files = [version_file]
 
-    for project_file in project_files:
+    for project_file in PROJECT_FILES:
         if os.path.exists(project_file):
             _set_version_in_project_file(project_file, new_version)
             click.echo(f"Updated {project_file} to version {new_version}")
@@ -213,7 +181,7 @@ def bump() -> None:
         else:
             click.echo(f"Project file {project_file} does not exist.")
 
-    for project_file in project_files:
+    for project_file in PROJECT_FILES:
         lock_file = _update_and_get_lock_file_path(project_file)
         if lock_file is not None:
             edited_files.append(lock_file)
@@ -244,5 +212,40 @@ def bump() -> None:
 
     new_commit_msg = f"Bump version to {new_version} (#{pr_number})"
 
-    subprocess.run(["git", "add"] + list(dict.fromkeys(edited_files)))
-    subprocess.run(["git", "commit", "-m", new_commit_msg])
+    subprocess.run(["git", "add"] + list(dict.fromkeys(edited_files)), check=True)
+    subprocess.run(["git", "commit", "-m", new_commit_msg], check=True)
+    return new_version
+
+
+@click.command()
+def get() -> None:
+    for project_file in ["pom.xml", "package.json", "pyproject.toml", "pubspec.yaml"]:
+        if os.path.exists(project_file):
+            click.echo(_get_version_from_project_file(project_file), nl=False)
+            return
+
+    click.echo("No supported project file found.", nl=False)
+
+
+@click.command()
+@click.argument("version")
+def set_version(version: str) -> None:
+    updated = False
+
+    for project_file in ["pom.xml", "package.json", "pyproject.toml", "pubspec.yaml"]:
+        if os.path.exists(project_file):
+            _set_version_in_project_file(project_file, version)
+            click.echo(f"Set {project_file} to version {version}")
+            updated = True
+
+    if not updated:
+        click.echo("No supported project file found.")
+
+
+@click.command()
+def bump() -> None:
+    pr_number_str = os.getenv("PR_NUMBER")
+    if not pr_number_str:
+        click.echo("PR_NUMBER environment variable not set.", err=True)
+        sys.exit(1)
+    create_version_bump_commit(int(pr_number_str))
