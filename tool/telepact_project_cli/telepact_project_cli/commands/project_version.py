@@ -108,7 +108,7 @@ def _set_version_in_project_file(project_file: str, version: str) -> None:
     raise ValueError(f"Unsupported project file type: {project_file}")
 
 
-def _update_lock_file(project_file: str) -> str | None:
+def _update_and_get_lock_file_path(project_file: str) -> str | None:
     project_dir = os.path.dirname(project_file)
     if project_file.endswith("package.json") and os.path.exists(os.path.join(project_dir, "package-lock.json")):
         subprocess.run(["npm", "install"], cwd=project_dir, check=True)
@@ -214,7 +214,7 @@ def bump() -> None:
             click.echo(f"Project file {project_file} does not exist.")
 
     for project_file in project_files:
-        lock_file = _update_lock_file(project_file)
+        lock_file = _update_and_get_lock_file_path(project_file)
         if lock_file is not None:
             edited_files.append(lock_file)
 
