@@ -771,6 +771,85 @@ def publish_targets(release_tag: str | None, release_body: str | None, github_ou
         click.echo("\n".join(lines))
 
 @click.command()
+def automerge():
+    """
+    Approves and squashes a Pull Request if the author is on the hardcoded allow list.
+    All necessary information is retrieved from environment variables.
+    """
+
+    AUTOMERGE_ALLOWED_AUTHORS = ["dependabot[bot]"]
+
+    AUTOMERGE_ALLOWED_FILES = [
+        "bind/dart/package-lock.json",
+        "bind/dart/package.json",
+        "bind/dart/pubspec.lock",
+        "bind/dart/pubspec.yaml",
+        "lib/java/pom.xml",
+        "lib/py/uv.lock",
+        "lib/py/pyproject.toml",
+        "lib/ts/package-lock.json",
+        "lib/ts/package.json",
+        "package-lock.json",
+        "package.json",
+        "sdk/cli/uv.lock",
+        "sdk/cli/pyproject.toml",
+        "sdk/console/package-lock.json",
+        "sdk/console/package.json",
+        "sdk/prettier/package-lock.json",
+        "sdk/prettier/package.json",
+        "test/console-self-hosted/package.json",
+        "test/lib/java/pom.xml",
+        "test/lib/py/pyproject.toml",
+        "test/lib/ts/package.json",
+        "test/runner/uv.lock",
+        "test/runner/pyproject.toml",
+        "tool/telepact_project_cli/uv.lock",
+        "tool/telepact_project_cli/pyproject.toml"
+    ]
+
+    pr_number_str = os.getenv('PR_NUMBER')
+    github_token = os.getenv('GITHUB_TOKEN')
+    github_repository = os.getenv('GITHUB_REPOSITORY')
+
+    if not pr_number_str:
+        raise Exception("PR_NUMBER environment variable is not set.")
+
+    pr_number = int(pr_number_str)
+
+    if not github_token:
+        raise Exception("GITHUB_TOKEN environment variable is not set.")
+    if not github_repository:
+        raise Exception("GITHUB_REPOSITORY environment variable is not set (e.g., 'owner/repo').")
+
+    print(f"Processing PR #{pr_number} in '{github_repository}'...")
+    print(f"Hardcoded allowed authors for automerge: {', '.join(AUTOMERGE_ALLOWED_AUTHORS)}")
+
+    g = Github(github_token)
+    repo_obj = g.get_repo(github_repository)
+    pr = repo_obj.get_pull(pr_number)
+
+    pr_author_login = pr.user.login
+    print(f"Pull Request #{pr_number} is authored by @{pr_author_login}")
+
+    if pr_author_login not in AUTOMERGE_ALLOWED_AUTHORS:
+        raise Exception(f"Author @{pr_author_login} is NOT on the hardcoded allow list. Aborting automerge.")
+    else:
+        print(f"Author @{pr_author_login} is on the allow list.")
+
+    for f in pr.get_files():
+        if f.status == 'removed':
+            raise Exception(f"Pull Request #{pr_number} contains removed files. Aborting automerge.")
+        if f.filename not in AUTOMERGE_ALLOWED_FILES:
+            raise Exception(f"Pull Request #{pr_number} contains changes in the file '{f.filename}' which is not allowed for automerge.")
+
+    print("Approving Pull Request...")
+    pr.create_review(event='APPROVE')
+    print("Pull Request approved.")
+
+    pr.enable_automerge(merge_method='SQUASH')
+    print("Pull Request will be automerged when build succeeds.")
+
+@click.command()
 def verify_automerge_conditions() -> None:
     _, repo, pr, pr_number = _get_repo_and_pr()
     commenter_login = _require_env('COMMENT_AUTHOR')
@@ -899,15 +978,12 @@ main.add_command(license_header)
 main.add_command(github_labels)
 main.add_command(release)
 main.add_command(publish_targets)
-<<<<<<< copilot/remove-merge-queue-workflow
 main.add_command(verify_automerge_conditions)
 main.add_command(tidy_pr)
 main.add_command(verify_pr_requirements)
 main.add_command(merge_pr)
 main.add_command(gitignore)
-=======
 main.add_command(automerge)
->>>>>>> main
 main.add_command(consolidated_readme)
 main.add_command(doc_versions)
 
