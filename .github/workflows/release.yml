@@ -19,11 +19,14 @@ name: Release
 on:
   push:
     branches:
-      - main  
+      - main
+    paths:
+      - .release/release-manifest.json
 
 jobs:
   build-release:
     name: Build release
+    if: ${{ contains(github.event.head_commit.added, '.release/release-manifest.json') || contains(github.event.head_commit.modified, '.release/release-manifest.json') || contains(github.event.head_commit.removed, '.release/release-manifest.json') }}
     uses: ./.github/workflows/build.yml
     
   create-release:
@@ -31,6 +34,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: bot
     needs: [build-release]
+    if: ${{ contains(github.event.head_commit.added, '.release/release-manifest.json') || contains(github.event.head_commit.modified, '.release/release-manifest.json') || contains(github.event.head_commit.removed, '.release/release-manifest.json') }}
     timeout-minutes: 2
     steps:
       - name: Generate GitHub App token
