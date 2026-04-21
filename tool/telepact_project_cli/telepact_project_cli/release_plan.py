@@ -240,26 +240,6 @@ def load_release_manifest_at_commit(repo_root: Path | str, sha: str) -> dict | N
     return data
 
 
-def parse_legacy_release_info(subject: str, body: str) -> tuple[str, list[str]] | None:
-    prefix = "Bump version to "
-    if not subject.startswith(prefix):
-        return None
-
-    version = subject[len(prefix):].split()[0]
-    lines = [line.strip() for line in body.splitlines()]
-    try:
-        header_index = lines.index("Release targets:")
-    except ValueError:
-        return version, []
-
-    targets: list[str] = []
-    for line in lines[header_index + 1 :]:
-        if not line:
-            break
-        targets.append(line)
-    return version, targets
-
-
 def resolve_publish_targets(
     repo_root: Path | str = ".",
     release_tag: str | None = None,
@@ -276,8 +256,7 @@ def resolve_publish_targets(
             )
         targets = set(data.get("targets", []))
     else:
-        release_body = release_body or ""
-        targets = {target for target in PUBLISH_TARGETS if f"- {target}" in release_body}
+        raise click.ClickException(f"Release manifest not found: {manifest_path}")
 
     return {
         f"publish_{target}": target in targets

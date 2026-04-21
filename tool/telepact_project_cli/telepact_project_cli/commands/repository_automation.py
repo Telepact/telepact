@@ -22,7 +22,7 @@ from pathlib import Path
 import click
 from github import Github, GithubException
 
-from ..release_plan import load_release_manifest, parse_legacy_release_info, resolve_publish_targets
+from ..release_plan import load_release_manifest, resolve_publish_targets
 
 PROJECT_LABEL_MAP = {
     "lib/java": "java",
@@ -166,22 +166,8 @@ def release() -> None:
         release_targets = list(release_manifest.get("targets", []))
         click.echo("Loaded release metadata from .release/release-manifest.json")
     else:
-        commit_message = subprocess.run(
-            ["git", "show", "-s", "--format=%s%n%b", "HEAD"],
-            stdout=subprocess.PIPE,
-            text=True,
-            check=True,
-        ).stdout.strip()
-        print(f"commit_message: {commit_message}")
-        lines = commit_message.splitlines()
-        legacy_info = parse_legacy_release_info(lines[0] if lines else "", "\n".join(lines[1:]))
-        if legacy_info is None:
-            click.echo("No release manifest found and the last commit message does not match the expected legacy format.")
-            return
-        version, release_targets = legacy_info
-        pr_number_str = lines[0].rsplit("(#", 1)[-1].rstrip(")") if lines else ""
-        pr_number = int(pr_number_str)
-        click.echo("Loaded release metadata from legacy bump commit message")
+        click.echo("No release manifest found.")
+        return
 
     print(f"release_targets: {release_targets}")
     print(f"version: {version}")
@@ -259,7 +245,7 @@ def release() -> None:
 
 @click.command(name="publish-targets")
 @click.option("--release-tag", default=None, help="Expected release tag/version for validation.")
-@click.option("--release-body", default=None, help="Legacy fallback release body when no manifest exists.")
+@click.option("--release-body", default=None, help="Unused compatibility option; release targets come from the manifest.")
 @click.option("--github-output", default=None, type=click.Path(dir_okay=False, path_type=Path), help="Write key=value lines for GitHub Actions outputs.")
 def publish_targets(release_tag: str | None, release_body: str | None, github_output: Path | None) -> None:
     outputs = resolve_publish_targets(
