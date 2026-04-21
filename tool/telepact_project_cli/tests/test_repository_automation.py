@@ -49,7 +49,10 @@ class RepositoryAutomationTests(unittest.TestCase):
                 number=9,
                 state="open",
                 base=SimpleNamespace(ref="main"),
-                head=SimpleNamespace(sha="abc123"),
+                head=SimpleNamespace(
+                    sha="abc123",
+                    repo=SimpleNamespace(full_name="Telepact/telepact"),
+                ),
                 draft=False,
                 mergeable=None,
                 mergeable_state="unknown",
@@ -58,7 +61,10 @@ class RepositoryAutomationTests(unittest.TestCase):
                 number=9,
                 state="open",
                 base=SimpleNamespace(ref="main"),
-                head=SimpleNamespace(sha="def456"),
+                head=SimpleNamespace(
+                    sha="def456",
+                    repo=SimpleNamespace(full_name="Telepact/telepact"),
+                ),
                 draft=False,
                 mergeable=None,
                 mergeable_state="unknown",
