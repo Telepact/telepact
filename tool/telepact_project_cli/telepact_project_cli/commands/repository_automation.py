@@ -55,8 +55,9 @@ WAIT_TIMEOUT_SECONDS = 20 * 60  # 20 minutes
 WAIT_INTERVAL_SECONDS = 10
 MERGE_ALLOWED_PERMISSIONS = {"write", "maintain", "admin"}
 PENDING_MERGEABLE_STATES = {"unknown"}
-PENDING_CHECK_STATES = {"expected", "pending", "queued", "requested", "waiting", "in_progress"}
-SUCCESSFUL_CHECK_CONCLUSIONS = {"success", "neutral", "skipped"}
+PENDING_COMBINED_STATUS_STATES = {"pending"}
+SUCCESSFUL_COMBINED_STATUS_STATES = {"success"}
+FAILED_COMBINED_STATUS_STATES = {"error", "failure"}
 
 AUTOMERGE_ALLOWED_AUTHORS = ["dependabot[bot]"]
 
@@ -183,14 +184,6 @@ def _wait_for_expected_head(repo, pr_number: int, previous_head_sha: str, expect
         time.sleep(WAIT_INTERVAL_SECONDS)
 
 
-def _required_review_count(repo, base_ref: str) -> int:
-    protection = repo.get_branch(base_ref).get_protection()
-    required_reviews = protection.required_pull_request_reviews
-    if required_reviews is None:
-        return 0
-    return required_reviews.required_approving_review_count or 0
-
-
 def _approval_count(pr: PullRequest) -> int:
     latest_states = {}
     for review in pr.get_reviews():
@@ -200,75 +193,36 @@ def _approval_count(pr: PullRequest) -> int:
     return sum(1 for state in latest_states.values() if state == "APPROVED")
 
 
-def _required_check_contexts(repo, base_ref: str) -> list[str]:
-    protection = repo.get_branch(base_ref).get_protection()
-    required_status_checks = protection.required_status_checks
-    if required_status_checks is None:
-        return []
-
-    contexts = set(required_status_checks.contexts or [])
-    for check in required_status_checks.checks or []:
-        context = check.get("context") if isinstance(check, dict) else getattr(check, "context", None)
-        if context:
-            contexts.add(context)
-    return sorted(contexts)
-
-
-def _classify_required_checks(required_contexts: list[str], commit: Commit) -> tuple[list[str], list[str], list[str]]:
-    statuses_by_context = {}
+def _summarize_failed_statuses(commit: Commit) -> list[str]:
     combined_status = commit.get_combined_status()
+    failures = []
     for status in combined_status.statuses:
-        statuses_by_context[status.context] = status.state
-
-    check_runs_by_name = {}
-    for check_run in commit.get_check_runs():
-        existing = check_runs_by_name.get(check_run.name)
-        if existing is None or check_run.id > existing.id:
-            check_runs_by_name[check_run.name] = check_run
-
-    pending = []
-    failed = []
-    missing = []
-
-    for context in required_contexts:
-        if context in check_runs_by_name:
-            check_run = check_runs_by_name[context]
-            if check_run.status != "completed":
-                pending.append(context)
-                continue
-            if check_run.conclusion not in SUCCESSFUL_CHECK_CONCLUSIONS:
-                failed.append(f"{context}={check_run.conclusion}")
-            continue
-
-        state = statuses_by_context.get(context)
-        if state is None:
-            missing.append(context)
-        elif state in PENDING_CHECK_STATES:
-            pending.append(context)
-        elif state != "success":
-            failed.append(f"{context}={state}")
-
-    return pending, failed, missing
+        if status.state not in SUCCESSFUL_COMBINED_STATUS_STATES and status.state not in PENDING_COMBINED_STATUS_STATES:
+            failures.append(f"{status.context}={status.state}")
+    return failures
 
 
-def _verify_required_checks(repo, pr_number: int, expected_head_sha: str):
+def _verify_pr_ci_status(repo, pr_number: int, expected_head_sha: str):
     deadline = time.monotonic() + WAIT_TIMEOUT_SECONDS
-    required_contexts = _required_check_contexts(repo, MAIN_BRANCH)
     while True:
         pr = _wait_for_pr_stable(repo, pr_number, expected_head_sha)
         commit = repo.get_commit(pr.head.sha)
-        pending, failed, missing = _classify_required_checks(required_contexts, commit)
-        if not pending and not missing:
-            if failed:
-                raise RuntimeError(f"Required checks failed: {', '.join(failed)}")
+        combined_status_state = (commit.get_combined_status().state or "").lower()
+        if combined_status_state in SUCCESSFUL_COMBINED_STATUS_STATES:
             return pr
+        if combined_status_state in FAILED_COMBINED_STATUS_STATES:
+            failed = _summarize_failed_statuses(commit)
+            if failed:
+                raise RuntimeError(f"CI failed: {', '.join(failed)}")
+            raise RuntimeError(f"CI failed with combined status state={combined_status_state}.")
+        if combined_status_state not in PENDING_COMBINED_STATUS_STATES:
+            raise RuntimeError(f"Unexpected combined status state={combined_status_state!r}.")
         if time.monotonic() >= deadline:
-            waiting_on = pending + missing
-            raise TimeoutError(f"Timed out waiting for required checks: {', '.join(waiting_on)}")
+            raise TimeoutError("Timed out waiting for CI to complete.")
         time.sleep(WAIT_INTERVAL_SECONDS)
 
 
-def _validate_merge_request(pr, commenter_login: str, is_admin: bool) -> int:
+def _validate_merge_request(pr) -> None:
     if pr.state != "open":
         raise RuntimeError(f"Pull request #{pr.number} is not open.")
     if pr.base.ref != MAIN_BRANCH:
@@ -278,13 +232,13 @@ def _validate_merge_request(pr, commenter_login: str, is_admin: bool) -> int:
     if not pr.mergeable:
         raise RuntimeError(f"Pull request #{pr.number} is not mergeable (state={pr.mergeable_state}).")
 
-    required_reviews = _required_review_count(pr.base.repo, pr.base.ref)
-    approvals = _approval_count(pr)
-    if not is_admin and approvals < required_reviews:
-        raise RuntimeError(
-            f"Pull request #{pr.number} needs {required_reviews} approving review(s); found {approvals}."
-        )
-    return required_reviews
+
+def _require_merge_reviews(pr: PullRequest, is_admin: bool) -> bool:
+    if is_admin:
+        return pr.mergeable_state != "blocked"
+    if pr.mergeable_state == "blocked":
+        raise RuntimeError(f"Pull request #{pr.number} is waiting on required code review before merge.")
+    return True
 
 
 @click.command()
@@ -472,7 +426,7 @@ def merge_pr() -> None:
     pr = repo.get_pull(pr_number)
     expected_head_sha = pr.head.sha
     pr = _wait_for_pr_stable(repo, pr_number, expected_head_sha)
-    required_reviews = _validate_merge_request(pr, commenter_login, is_admin)
+    _validate_merge_request(pr)
 
     if pr.draft:
         click.echo(f"Marking pull request #{pr.number} ready for review.")
@@ -487,7 +441,7 @@ def merge_pr() -> None:
         expected_head_sha = pr.head.sha
 
     _checkout_pr_branch(pr.head.ref)
-    _verify_required_checks(repo, pr_number, expected_head_sha)
+    _verify_pr_ci_status(repo, pr_number, expected_head_sha)
 
     click.echo(f"Bumping version on branch {pr.head.ref}.")
     create_version_bump_commit(pr_number)
@@ -496,11 +450,11 @@ def merge_pr() -> None:
 
     pr = _wait_for_expected_head(repo, pr_number, expected_head_sha, bumped_head_sha)
     expected_head_sha = pr.head.sha
-    _verify_required_checks(repo, pr_number, expected_head_sha)
+    _verify_pr_ci_status(repo, pr_number, expected_head_sha)
 
     pr = _wait_for_pr_stable(repo, pr_number, expected_head_sha)
 
-    if is_admin or _approval_count(pr) >= required_reviews:
+    if _require_merge_reviews(pr, is_admin):
         click.echo(f"Creating approval review for pull request #{pr.number}.")
         pr.create_review(event="APPROVE")
     
