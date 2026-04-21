@@ -161,6 +161,24 @@ def set_version(version: str) -> None:
 
 @click.command()
 def bump() -> None:
+    pr_number_str = os.getenv("PR_NUMBER")
+    if not pr_number_str:
+        click.echo("PR_NUMBER environment variable not set.", err=True)
+        sys.exit(1)
+
+    prev_commit_paths = subprocess.run(
+        ["git", "show", "--name-only", "--pretty=format:", "HEAD"],
+        stdout=subprocess.PIPE,
+        text=True,
+    ).stdout.strip().split("\n")
+
+    print("prev_commit_paths:")
+    print(prev_commit_paths)
+
+    bump_version(prev_commit_paths, int(pr_number_str))
+
+
+def bump_version(changed_paths: list[str], pr_number: int, commit_changes: bool = True) -> str:
     version_file = "VERSION.txt"
 
     project_files = [
@@ -174,24 +192,9 @@ def bump() -> None:
         "sdk/console/package.json",
     ]
 
-    pr_number_str = os.getenv("PR_NUMBER")
-    if not pr_number_str:
-        click.echo("PR_NUMBER environment variable not set.", err=True)
-        sys.exit(1)
-    pr_number = int(pr_number_str)
-
-    prev_commit_paths = subprocess.run(
-        ["git", "show", "--name-only", "--pretty=format:", "HEAD"],
-        stdout=subprocess.PIPE,
-        text=True,
-    ).stdout.strip().split("\n")
-
-    print("prev_commit_paths:")
-    print(prev_commit_paths)
-
     if not os.path.exists(version_file):
         click.echo(f"Version file {version_file} does not exist.")
-        return
+        raise click.ClickException(f"Version file {version_file} does not exist.")
 
     with open(version_file, "r") as f:
         version = f.read().strip()
@@ -220,7 +223,7 @@ def bump() -> None:
 
     release_manifest = compute_release_manifest(
         Path("."),
-        changed_paths=prev_commit_paths,
+        changed_paths=sorted({path for path in changed_paths if path}),
         version=new_version,
         pr_number=pr_number,
     )
@@ -244,5 +247,8 @@ def bump() -> None:
 
     new_commit_msg = f"Bump version to {new_version} (#{pr_number})"
 
-    subprocess.run(["git", "add"] + list(dict.fromkeys(edited_files)))
-    subprocess.run(["git", "commit", "-m", new_commit_msg])
+    if commit_changes:
+        subprocess.run(["git", "add"] + list(dict.fromkeys(edited_files)), check=True)
+        subprocess.run(["git", "commit", "-m", new_commit_msg], check=True)
+
+    return new_version
