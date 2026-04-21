@@ -21,6 +21,8 @@ import time
 from pathlib import Path
 
 import click
+from github.Commit import Commit
+from github.PullRequest import PullRequest
 from github import Github, GithubException
 
 from .project_version import create_version_bump_commit
@@ -138,7 +140,7 @@ def _push_current_branch(head_ref: str) -> None:
     _git("push", "origin", f"HEAD:{head_ref}")
 
 
-def _wait_for_pr_stable(repo, pr_number: int, expected_head_sha: str):
+def _wait_for_pr_stable(repo, pr_number: int, expected_head_sha: str) -> PullRequest:
     deadline = time.monotonic() + WAIT_TIMEOUT_SECONDS
     while True:
         pr = repo.get_pull(pr_number)
@@ -154,7 +156,7 @@ def _wait_for_pr_stable(repo, pr_number: int, expected_head_sha: str):
         time.sleep(WAIT_INTERVAL_SECONDS)
 
 
-def _wait_for_pr_head_update(repo, pr_number: int, previous_head_sha: str):
+def _wait_for_pr_head_update(repo, pr_number: int, previous_head_sha: str) -> PullRequest:
     deadline = time.monotonic() + WAIT_TIMEOUT_SECONDS
     while True:
         pr = repo.get_pull(pr_number)
@@ -166,7 +168,7 @@ def _wait_for_pr_head_update(repo, pr_number: int, previous_head_sha: str):
         time.sleep(WAIT_INTERVAL_SECONDS)
 
 
-def _wait_for_expected_head(repo, pr_number: int, previous_head_sha: str, expected_head_sha: str):
+def _wait_for_expected_head(repo, pr_number: int, previous_head_sha: str, expected_head_sha: str) -> PullRequest:
     deadline = time.monotonic() + WAIT_TIMEOUT_SECONDS
     while True:
         pr = repo.get_pull(pr_number)
@@ -189,7 +191,7 @@ def _required_review_count(repo, base_ref: str) -> int:
     return required_reviews.required_approving_review_count or 0
 
 
-def _approval_count(pr) -> int:
+def _approval_count(pr: PullRequest) -> int:
     latest_states = {}
     for review in pr.get_reviews():
         if review.user is None:
@@ -212,7 +214,7 @@ def _required_check_contexts(repo, base_ref: str) -> list[str]:
     return sorted(contexts)
 
 
-def _classify_required_checks(required_contexts: list[str], commit) -> tuple[list[str], list[str], list[str]]:
+def _classify_required_checks(required_contexts: list[str], commit: Commit) -> tuple[list[str], list[str], list[str]]:
     statuses_by_context = {}
     combined_status = commit.get_combined_status()
     for status in combined_status.statuses:
