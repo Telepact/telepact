@@ -176,10 +176,10 @@ def bump_version(pr_number: int, changed_paths: list[str]) -> str:
         if lock_file is not None:
             edited_files.append(lock_file)
 
-    filtered_changed_paths = sorted(path for path in changed_paths if path)
+    non_empty_changed_paths = sorted(path for path in changed_paths if path)
     release_manifest = compute_release_manifest(
         Path("."),
-        changed_paths=filtered_changed_paths,
+        changed_paths=non_empty_changed_paths,
         version=new_version,
         pr_number=pr_number,
     )
