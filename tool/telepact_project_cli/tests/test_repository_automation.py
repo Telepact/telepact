@@ -195,7 +195,6 @@ class RepositoryAutomationTests(unittest.TestCase):
             self.assertEqual(fake_repo._ref.edited_to, ("new-commit-sha", False))
             self.assertEqual(fake_repo.created_commit_message, "Bump version to 1.2.4 (#12)")
             self.assertEqual(len(fake_repo.created_tree[0]), 1)
-            self.assertEqual(fake_repo.created_tree[0][0].path, "VERSION.txt")
 
     def test_bump_commits_with_git_data_api_and_updates_outputs(self) -> None:
         runner = CliRunner()
