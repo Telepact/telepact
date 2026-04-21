@@ -164,7 +164,10 @@ def _checkout_pr_branch(pr) -> str:
 
 def _branch_is_behind_main() -> bool:
     counts = _run_git(["rev-list", "--left-right", "--count", f"HEAD...origin/{MAIN_BRANCH}"], capture_output=True)
-    _, behind_count = counts.split()
+    split_counts = counts.split()
+    if len(split_counts) != 2:
+        raise click.ClickException(f"Unexpected git rev-list output while checking branch freshness: {counts!r}")
+    _, behind_count = split_counts
     return int(behind_count) > 0
 
 
@@ -294,7 +297,7 @@ def _wait_for_pr_requirements(repo, pr_number: int, expected_head_sha: str):
     return _wait_for_condition(f"pull request #{pr_number} requirements", _predicate)
 
 
-def _list_changed_paths_against_main() -> list[str]:
+def _list_pr_changed_paths() -> list[str]:
     output = _run_git(["diff", "--name-only", f"origin/{MAIN_BRANCH}...HEAD"], capture_output=True)
     return [line for line in output.splitlines() if line]
 
@@ -526,7 +529,7 @@ def merge_pr() -> None:
     pr = _tidy_up_pull_request(repo, pr, branch_name)
     pr = _wait_for_pr_requirements(repo, pr_number, pr.head.sha)
 
-    changed_paths = _list_changed_paths_against_main()
+    changed_paths = _list_pr_changed_paths()
     bump_version(pr_number, changed_paths)
     bumped_head_sha = _run_git(["rev-parse", "HEAD"], capture_output=True)
     _run_git(["push", "origin", f"HEAD:{branch_name}"])

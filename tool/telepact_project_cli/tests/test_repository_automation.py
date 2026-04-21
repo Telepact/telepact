@@ -145,7 +145,7 @@ class RepositoryAutomationTests(unittest.TestCase):
                 return_value=final_pr,
             ),
             mock.patch(
-                "telepact_project_cli.commands.repository_automation._list_changed_paths_against_main",
+                "telepact_project_cli.commands.repository_automation._list_pr_changed_paths",
                 return_value=["sdk/cli/pyproject.toml"],
             ),
             mock.patch("telepact_project_cli.commands.repository_automation.bump_version"),
