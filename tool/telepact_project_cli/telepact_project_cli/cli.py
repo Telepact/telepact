@@ -892,36 +892,6 @@ def merge_pr() -> None:
         )
     print(f"Pull request #{pr_number} merged with squash.")
 
-@click.command()
-@click.option('--add', 'add_name', help='Add a name to .gitignore')
-@click.option('--remove', 'remove_name', help='Remove a name from .gitignore')
-def gitignore(add_name, remove_name):
-    """Add or remove entries in .gitignore"""
-    if add_name and remove_name:
-        raise click.UsageError("Cannot use --add and --remove at the same time.")
-    if not add_name and not remove_name:
-        raise click.UsageError("Must provide either --add or --remove.")
-
-    gitignore_path = Path('.gitignore')
-
-    if not gitignore_path.exists():
-        if remove_name:
-            return  # Nothing to remove
-        if add_name:
-            gitignore_path.touch()
-
-    lines = gitignore_path.read_text().splitlines()
-    name = add_name or remove_name
-
-    if add_name:
-        if name not in lines:
-            with gitignore_path.open('a') as f:
-                f.write(f"\n{name}")
-    elif remove_name:
-        if name in lines:
-            new_lines = [line for line in lines if line != name]
-            gitignore_path.write_text('\n'.join(new_lines))
-
 main.add_command(get)
 main.add_command(set_version)
 main.add_command(bump)
@@ -929,11 +899,15 @@ main.add_command(license_header)
 main.add_command(github_labels)
 main.add_command(release)
 main.add_command(publish_targets)
+<<<<<<< copilot/remove-merge-queue-workflow
 main.add_command(verify_automerge_conditions)
 main.add_command(tidy_pr)
 main.add_command(verify_pr_requirements)
 main.add_command(merge_pr)
 main.add_command(gitignore)
+=======
+main.add_command(automerge)
+>>>>>>> main
 main.add_command(consolidated_readme)
 main.add_command(doc_versions)
 

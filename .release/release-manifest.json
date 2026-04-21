@@ -1,9 +1,17 @@
 {
   "changed_paths": [
-    ".github/workflows/copilot-setup-steps.yml"
+    "lib/py/Makefile",
+    "sdk/cli/Makefile",
+    "tool/telepact_project_cli/telepact_project_cli/cli.py"
   ],
-  "direct_targets": [],
-  "pr_number": 414,
-  "targets": [],
-  "version": "1.0.0-alpha.305"
+  "direct_targets": [
+    "cli",
+    "py"
+  ],
+  "pr_number": 418,
+  "targets": [
+    "cli",
+    "py"
+  ],
+  "version": "1.0.0-alpha.306"
 }
