@@ -18,7 +18,16 @@ import click
 
 from .commands.license_header import license_header
 from .commands.project_version import bump, get, set_version
-from .commands.repository_automation import automerge, github_labels, publish_targets, release
+from .commands.repository_automation import (
+    automerge,
+    github_labels,
+    merge_pr,
+    publish_targets,
+    release,
+    tidy_pr,
+    verify_merge_conditions,
+    verify_pr_requirements,
+)
 from .commands.consolidated_readme import consolidated_readme
 from .commands.doc_versions import doc_versions
 
@@ -37,6 +46,10 @@ main.add_command(github_labels)
 main.add_command(release)
 main.add_command(publish_targets)
 main.add_command(automerge)
+main.add_command(verify_merge_conditions)
+main.add_command(tidy_pr)
+main.add_command(verify_pr_requirements)
+main.add_command(merge_pr)
 main.add_command(consolidated_readme)
 main.add_command(doc_versions)
 

@@ -27,6 +27,7 @@ import toml
 from ..release_plan import load_release_manifest_at_commit, parse_legacy_release_info
 
 _PYPI_PRERELEASE_RE = re.compile(r"^(\d+\.\d+\.\d+)-(alpha|beta|rc)\.(\d+)$")
+_REPO_FROM_PYPI_PRERELEASE_RE = re.compile(r"^(\d+\.\d+\.\d+)(a|b|rc)(\d+)$")
 
 
 def _find_repo_root(start: Path) -> Path:
@@ -192,20 +193,63 @@ def _to_pypi_version(version: str) -> str:
     return f"{base}{suffix_by_stage[stage]}{number}"
 
 
+def _from_pypi_version(version: str) -> str:
+    match = _REPO_FROM_PYPI_PRERELEASE_RE.match(version)
+    if not match:
+        return version
+
+    base, stage, number = match.groups()
+    suffix_by_stage = {"a": "alpha", "b": "beta", "rc": "rc"}
+    return f"{base}-{suffix_by_stage[stage]}.{number}"
+
+
+def _read_existing_doc_versions(doc_versions_path: Path) -> dict[str, str]:
+    if not doc_versions_path.exists():
+        return {}
+
+    target_by_kind = {
+        "Library (Go)": "go",
+        "Library (Java)": "java",
+        "Library (Python)": "py",
+        "Library (TypeScript)": "ts",
+        "SDK (CLI)": "cli",
+        "SDK (Console)": "console",
+        "SDK (Prettier)": "prettier",
+    }
+    versions: dict[str, str] = {}
+    for line in doc_versions_path.read_text(encoding="utf-8").splitlines():
+        if not line.startswith("| "):
+            continue
+        cells = [part.strip() for part in line.split("|")[1:-1]]
+        if len(cells) != 4:
+            continue
+        target = target_by_kind.get(cells[0])
+        version = cells[3].strip("`")
+        if target and version and version != "—":
+            versions[target] = _from_pypi_version(version) if target in {"py", "cli"} else version
+    return versions
+
+
 def write_doc_versions(
     repo_root: Path,
     output: Path | None,
     pending_version: str | None = None,
     pending_targets: Iterable[str] = (),
+    existing_version_by_target: dict[str, str] | None = None,
 ) -> Path:
     repo_root = _find_repo_root(repo_root)
 
-    version_by_target = _latest_released_versions(
-        repo_root,
-        targets=["go", "java", "py", "ts", "cli", "console", "prettier"],
-        pending_version=pending_version,
-        pending_targets=pending_targets,
-    )
+    version_by_target = dict(existing_version_by_target or {})
+    if not version_by_target:
+        version_by_target = _latest_released_versions(
+            repo_root,
+            targets=["go", "java", "py", "ts", "cli", "console", "prettier"],
+            pending_version=pending_version,
+            pending_targets=pending_targets,
+        )
+    elif pending_version:
+        for target in pending_targets:
+            version_by_target[target] = pending_version
 
     go_module = _read_go_module_path(repo_root / "lib/go/go.mod")
     java_package, _ = _read_maven_gav(repo_root / "lib/java/pom.xml")

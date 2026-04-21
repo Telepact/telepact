@@ -34,6 +34,7 @@ from telepact_project_cli.commands.doc_versions import _latest_released_versions
 from telepact_project_cli.release_plan import (
     compute_release_manifest,
     load_release_manifest,
+    resolve_publish_targets,
     write_release_manifest,
 )
 
@@ -211,6 +212,14 @@ class ReleasePlanTests(unittest.TestCase):
                     "publish_ts=false",
                 ],
             )
+
+    def test_resolve_publish_targets_requires_manifest(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            repo_root = Path(tmp_dir)
+            (repo_root / "VERSION.txt").write_text("1.0.0-alpha.214", encoding="utf-8")
+
+            with self.assertRaisesRegex(Exception, "Release manifest not found"):
+                resolve_publish_targets(repo_root, release_tag="1.0.0-alpha.214")
 
     def test_latest_released_versions_prefers_manifest_history_and_falls_back_to_legacy_commits(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
