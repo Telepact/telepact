@@ -32,7 +32,7 @@ from ..release_plan import compute_release_manifest, find_repo_root, write_relea
 from .doc_versions import write_doc_versions
 
 
-def _bump_patch_version(version: str) -> str:
+def _bump_last_numeric_component(version: str) -> str:
     parts = version.split(".")
     if len(parts) < 2 or not parts[-1].isdigit():
         raise click.ClickException(f"Unsupported version format for bump: {version}")
@@ -79,7 +79,7 @@ def bump() -> None:
         click.echo(f"Version file {version_file} does not exist.")
         return
 
-    new_version = _bump_patch_version(version_file.read_text(encoding="utf-8").strip())
+    new_version = _bump_last_numeric_component(version_file.read_text(encoding="utf-8").strip())
     version_file.write_text(new_version, encoding="utf-8")
     click.echo(f"Updated version file VERSION.txt to version {new_version}")
 

@@ -25,6 +25,7 @@ from ruamel.yaml import YAML
 
 yaml = YAML()
 
+# Ordered by lookup priority when multiple supported project files exist in one directory.
 SUPPORTED_VERSION_FILES = ("pom.xml", "package.json", "pyproject.toml", "pubspec.yaml")
 _MAVEN_VERSION_XPATH = "{http://maven.apache.org/POM/4.0.0}version"
 
@@ -40,9 +41,14 @@ def load_pyproject(path: Path) -> dict:
 
 def project_version(data: dict) -> str:
     project = data.get("project", {})
-    if "version" in project:
+    if isinstance(project, dict) and isinstance(project.get("version"), str):
         return project["version"]
-    return data["tool"]["poetry"]["version"]
+
+    poetry = data.get("tool", {}).get("poetry", {})
+    if isinstance(poetry, dict) and isinstance(poetry.get("version"), str):
+        return poetry["version"]
+
+    raise click.ClickException("Missing project version in pyproject.toml")
 
 
 def set_pyproject_version_data(data: dict, version: str) -> dict:
@@ -51,8 +57,13 @@ def set_pyproject_version_data(data: dict, version: str) -> dict:
         project["version"] = version
         return data
 
-    data["tool"]["poetry"]["version"] = version
-    return data
+    tool = data.get("tool")
+    poetry = tool.get("poetry") if isinstance(tool, dict) else None
+    if isinstance(poetry, dict) and "version" in poetry:
+        poetry["version"] = version
+        return data
+
+    raise click.ClickException("Missing version field in pyproject.toml")
 
 
 def find_supported_project_file(base_dir: Path = Path(".")) -> Path | None:

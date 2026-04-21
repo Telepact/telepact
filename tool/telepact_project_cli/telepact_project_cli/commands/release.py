@@ -74,7 +74,7 @@ def _upload_release_assets(release, release_targets: list[str]) -> None:
                     release.upload_asset(
                         path=file_path,
                         name=file_name,
-                        label=f" [{target}]: {file_name}",
+                        label=f"[{target}]: {file_name}",
                     )
                     asset_count += 1
                     click.echo(f"Uploaded asset: {file_name} for target: {target}")
