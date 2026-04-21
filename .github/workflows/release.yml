@@ -27,6 +27,7 @@ jobs:
   should-release:
     name: Check release trigger
     runs-on: ubuntu-latest
+    permissions: {}
     outputs:
       should_release: ${{ steps.check.outputs.should_release }}
     steps:
