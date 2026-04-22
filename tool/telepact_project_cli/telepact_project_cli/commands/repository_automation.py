@@ -216,16 +216,14 @@ def _validate_merge_request(pr, is_admin: bool) -> None:
     mergeable = pr.mergeable
 
     if mergeable_state == "blocked" and combined_status_state == "success" and not is_admin:
-        raise RuntimeError(f"Pull request #{pr.number} is blocked after CI succeeded; required approving reviews may still be missing.")
+        raise RuntimeError(f"Pull request #{pr.number} is blocked after CI succeeded because required approving reviews are missing.")
 
     if mergeable is None:
         raise RuntimeError(f"Pull request #{pr.number} mergeability is still being calculated.")
 
-    if mergeable is False and mergeable_state == "behind":
-        return
-    if mergeable is False and mergeable_state == "draft":
-        return
     if mergeable is False:
+        if mergeable_state in {"behind", "draft"}:
+            return
         raise RuntimeError(f"Pull request #{pr.number} is not mergeable (state={pr.mergeable_state}).")
 
 

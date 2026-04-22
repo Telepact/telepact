@@ -62,7 +62,7 @@ class RepositoryAutomationTests(unittest.TestCase):
             ),
         )
 
-        with self.assertRaisesRegex(RuntimeError, "required approving reviews may still be missing"):
+        with self.assertRaisesRegex(RuntimeError, "required approving reviews are missing"):
             _validate_merge_request(pr, is_admin=False)
 
     def test_validate_merge_request_allows_admin_when_only_reviews_are_missing(self) -> None:
