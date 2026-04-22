@@ -32,23 +32,3 @@ jobs:
   build:
     name: Build
     uses: ./.github/workflows/build.yml
-
-  update-labels:
-    name: Update Labels
-    runs-on: ubuntu-latest
-    timeout-minutes: 1
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v6
-
-      - name: Update PR labels
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-          BASE_BRANCH: ${{ github.event.pull_request.base.ref }}
-          HEAD_SHA: ${{ github.sha }}
-        run: ./tool/telepact-project github-labels
