@@ -63,7 +63,7 @@ class RepositoryAutomationTests(unittest.TestCase):
         )
 
         with self.assertRaisesRegex(RuntimeError, "waiting for required approving reviews"):
-            _validate_merge_request(pr, "maintainer", is_admin=False)
+            _validate_merge_request(pr, is_admin=False)
 
     def test_validate_merge_request_allows_admin_when_only_reviews_are_missing(self) -> None:
         pr = SimpleNamespace(
@@ -83,7 +83,7 @@ class RepositoryAutomationTests(unittest.TestCase):
             ),
         )
 
-        _validate_merge_request(pr, "admin-user", is_admin=True)
+        _validate_merge_request(pr, is_admin=True)
 
     def test_merge_pr_command_rejects_non_collaborator(self) -> None:
         repo = mock.Mock()

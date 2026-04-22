@@ -200,7 +200,7 @@ def _verify_pull_request_ci(repo, pr_number: int, expected_head_sha: str) -> Pul
         time.sleep(WAIT_INTERVAL_SECONDS)
 
 
-def _validate_merge_request(pr, _commenter_login: str, is_admin: bool) -> None:
+def _validate_merge_request(pr, is_admin: bool) -> None:
     if pr.state != "open":
         raise RuntimeError(f"Pull request #{pr.number} is not open.")
     if pr.base.ref != MAIN_BRANCH:
@@ -214,7 +214,7 @@ def _validate_merge_request(pr, _commenter_login: str, is_admin: bool) -> None:
     if mergeable_state == "blocked" and combined_status_state == "success" and not is_admin:
         raise RuntimeError(f"Pull request #{pr.number} is waiting for required approving reviews.")
 
-    if pr.mergeable is False and mergeable_state not in {"behind", "draft"}:
+    if pr.mergeable is not None and not pr.mergeable and mergeable_state not in {"behind", "draft"}:
         raise RuntimeError(f"Pull request #{pr.number} is not mergeable (state={pr.mergeable_state}).")
 
 
@@ -403,7 +403,7 @@ def merge_pr() -> None:
     pr = repo.get_pull(pr_number)
     expected_head_sha = pr.head.sha
     pr = _wait_for_pr_stable(repo, pr_number, expected_head_sha)
-    _validate_merge_request(pr, commenter_login, is_admin)
+    _validate_merge_request(pr, is_admin)
 
     if pr.draft:
         click.echo(f"Marking pull request #{pr.number} ready for review.")
@@ -430,7 +430,7 @@ def merge_pr() -> None:
     _verify_pull_request_ci(repo, pr_number, expected_head_sha)
 
     pr = _wait_for_pr_stable(repo, pr_number, expected_head_sha)
-    _validate_merge_request(pr, commenter_login, is_admin)
+    _validate_merge_request(pr, is_admin)
 
     merge_result = pr.merge(merge_method="squash", sha=expected_head_sha)
     if not merge_result.merged:
