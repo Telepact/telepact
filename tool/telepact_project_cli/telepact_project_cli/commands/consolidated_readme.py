@@ -182,28 +182,27 @@ def consolidate_readme_impl(readme_path: Path, output_path: Path, include_skill_
     
     # Extract and process GitHub raw links
     github_links = extract_github_raw_links(consolidated)
-    code_files: Dict[str, Tuple[str, str, str]] = {}  # local_path -> (anchor, filename, content)
-    
-    for full_match, link_text, url, local_path in github_links:
+    code_files: Dict[str, Tuple[str, str]] = {}  # local_path -> (anchor, content)
+
+    for _, _, _, local_path in github_links:
         if local_path in code_files:
             continue  # Already processed this file
         
         # Read the local file (will error if file not found)
         file_path = base_dir / local_path
         file_content = read_file(file_path)
-        
+
         # Generate a heading from the filename
         filename = Path(local_path).name
-        heading = filename.replace('.', ' ').replace('-', ' ').title()
         # Generate anchor from the filename (will error if duplicate)
         anchor = slug_tracker.slugify(filename, f"code file: {local_path}")
-        
-        code_files[local_path] = (anchor, filename, file_content)
-    
+
+        code_files[local_path] = (anchor, file_content)
+
     # Replace GitHub raw links with anchor links
-    for full_match, link_text, url, local_path in github_links:
+    for full_match, link_text, _, local_path in github_links:
         if local_path in code_files:
-            anchor, _, _ = code_files[local_path]
+            anchor, _ = code_files[local_path]
             new_link = f'[{link_text}](#{anchor})'
             consolidated = consolidated.replace(full_match, new_link)
     
@@ -211,7 +210,7 @@ def consolidate_readme_impl(readme_path: Path, output_path: Path, include_skill_
     if code_files:
         consolidated += "\n\n---\n\n# Appendix\n\n"
         
-        for local_path, (anchor, filename, file_content) in code_files.items():
+        for local_path, (anchor, file_content) in code_files.items():
             consolidated += f"## {anchor}\n\n"
             consolidated += f"```json\n{file_content}\n```\n\n"
     

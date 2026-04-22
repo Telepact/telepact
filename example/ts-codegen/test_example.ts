@@ -16,7 +16,7 @@
 
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { AddressInfo } from 'node:net';
+import type { AddressInfo } from 'node:net';
 import { Client, ClientOptions, Message, Serializer } from 'telepact';
 import { TypedClient, greet } from './gen/genTypes.js';
 import { createHttpServer } from './server.js';

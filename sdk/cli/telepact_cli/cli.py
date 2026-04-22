@@ -17,14 +17,10 @@
 import click
 import os
 import json
-import argparse
 import msgpack
-import shutil
-import yaml
-from typing import cast, Pattern
+from typing import Any, Set, cast
 import jinja2
-import click
-from importlib.metadata import PackageNotFoundError, version as package_version
+from importlib.metadata import version as package_version
 from pathlib import Path
 import re
 from starlette.applications import Starlette
@@ -41,11 +37,6 @@ from .telepact import Client, FunctionRouter, Server, Message, Serializer, Telep
 import asyncio
 import requests
 
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from .telepact.internal.types.TTypeDeclaration import TTypeDeclaration
-
 from .resources import load_calculator_telepact_json
 
 
@@ -57,12 +48,6 @@ def _demo_unavailable_response() -> Message | None:
     if random.random() < 0.01:
         return Message({}, {'ErrorUnavailable': {}})
     return None
-
-
-def bump_version(version: str) -> str:
-    major, minor, patch = map(int, version.split('.'))
-    patch += 1
-    return f"{major}.{minor}.{patch}"
 
 
 def _validate_package(ctx: click.Context, param: click.Parameter, value: str) -> str:
@@ -1035,7 +1020,7 @@ def trace_type(type_declaration: 'TTypeDeclaration') -> list[str]:
 
 from .telepact.internal.types.TStruct import TStruct
 from .telepact.internal.types.TUnion import TUnion
-from typing import cast, Dict, Any, Set
+
 
 def _get_original_schema_name(schema_original: list, type_name: str, field_name: str) -> str:
     """Helper to get the original type name from the schema's raw data."""
@@ -1157,7 +1142,6 @@ def compare(new_schema_dir: str, old_schema_dir: str) -> None:
     """
     Compare two Telepact API schemas for backwards compatibility.
     """
-    from .telepact.internal.types.TType import TType
     from .telepact.TelepactSchema import TelepactSchema
 
     new_telepact_schema = TelepactSchema.from_directory(new_schema_dir)

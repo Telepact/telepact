@@ -1,14 +1,11 @@
 {
   "changed_paths": [
-    "sdk/prettier/package-lock.json"
+    ".github/workflows/pr.yml",
+    "tool/telepact_project_cli/telepact_project_cli/cli.py",
+    "tool/telepact_project_cli/telepact_project_cli/commands/repository_automation.py"
   ],
-  "direct_targets": [
-    "prettier"
-  ],
-  "pr_number": 406,
-  "targets": [
-    "console",
-    "prettier"
-  ],
-  "version": "1.0.0-alpha.301"
+  "direct_targets": [],
+  "pr_number": 436,
+  "targets": [],
+  "version": "1.0.0-alpha.313"
 }
