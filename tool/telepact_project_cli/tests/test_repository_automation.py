@@ -26,44 +26,64 @@ sys.path.insert(0, str(PACKAGE_ROOT))
 from click.testing import CliRunner
 
 from telepact_project_cli.cli import main
-from telepact_project_cli.commands.repository_automation import _approval_count, _classify_required_checks
+from telepact_project_cli.commands.repository_automation import _combined_status_state, _validate_merge_request
 
 
 class RepositoryAutomationTests(unittest.TestCase):
-    def test_approval_count_uses_latest_state_per_reviewer(self) -> None:
+    def test_combined_status_state_reads_head_commit_status(self) -> None:
         pr = SimpleNamespace(
-            get_reviews=lambda: [
-                SimpleNamespace(user=SimpleNamespace(login="alice"), state="APPROVED"),
-                SimpleNamespace(user=SimpleNamespace(login="bob"), state="APPROVED"),
-                SimpleNamespace(user=SimpleNamespace(login="alice"), state="CHANGES_REQUESTED"),
-                SimpleNamespace(user=SimpleNamespace(login="carol"), state="COMMENTED"),
-            ]
-        )
-
-        self.assertEqual(_approval_count(pr), 1)
-
-    def test_classify_required_checks_distinguishes_pending_failed_and_missing(self) -> None:
-        commit = SimpleNamespace(
-            get_combined_status=lambda: SimpleNamespace(
-                statuses=[
-                    SimpleNamespace(context="lint", state="success"),
-                    SimpleNamespace(context="unit", state="failure"),
-                ]
+            head=SimpleNamespace(sha="head-sha"),
+            base=SimpleNamespace(
+                repo=SimpleNamespace(
+                    get_commit=lambda sha: SimpleNamespace(
+                        get_combined_status=lambda: SimpleNamespace(state="SUCCESS")
+                    )
+                )
             ),
-            get_check_runs=lambda: [
-                SimpleNamespace(name="build", status="in_progress", conclusion=None, id=1),
-                SimpleNamespace(name="docs", status="completed", conclusion="skipped", id=2),
-            ],
         )
 
-        pending, failed, missing = _classify_required_checks(
-            ["build", "docs", "lint", "unit", "missing"],
-            commit,
+        self.assertEqual(_combined_status_state(pr), "success")
+
+    def test_validate_merge_request_rejects_missing_reviews_for_non_admin(self) -> None:
+        pr = SimpleNamespace(
+            number=7,
+            state="open",
+            mergeable=True,
+            mergeable_state="blocked",
+            head=SimpleNamespace(sha="head-sha", repo=SimpleNamespace(full_name="Telepact/telepact")),
+            base=SimpleNamespace(
+                ref="main",
+                repo=SimpleNamespace(
+                    full_name="Telepact/telepact",
+                    get_commit=lambda sha: SimpleNamespace(
+                        get_combined_status=lambda: SimpleNamespace(state="success")
+                    ),
+                ),
+            ),
         )
 
-        self.assertEqual(pending, ["build"])
-        self.assertEqual(failed, ["unit=failure"])
-        self.assertEqual(missing, ["missing"])
+        with self.assertRaisesRegex(RuntimeError, "waiting for required approving reviews"):
+            _validate_merge_request(pr, "maintainer", is_admin=False)
+
+    def test_validate_merge_request_allows_admin_when_only_reviews_are_missing(self) -> None:
+        pr = SimpleNamespace(
+            number=7,
+            state="open",
+            mergeable=True,
+            mergeable_state="blocked",
+            head=SimpleNamespace(sha="head-sha", repo=SimpleNamespace(full_name="Telepact/telepact")),
+            base=SimpleNamespace(
+                ref="main",
+                repo=SimpleNamespace(
+                    full_name="Telepact/telepact",
+                    get_commit=lambda sha: SimpleNamespace(
+                        get_combined_status=lambda: SimpleNamespace(state="success")
+                    ),
+                ),
+            ),
+        )
+
+        _validate_merge_request(pr, "admin-user", is_admin=True)
 
     def test_merge_pr_command_rejects_non_collaborator(self) -> None:
         repo = mock.Mock()
@@ -104,7 +124,6 @@ class RepositoryAutomationTests(unittest.TestCase):
         updated_pr = mock.Mock()
         updated_pr.number = 7
         updated_pr.head = SimpleNamespace(sha="head-2", ref="feature")
-        updated_pr.create_review = mock.Mock()
 
         bumped_pr = mock.Mock()
         bumped_pr.number = 7
@@ -120,6 +139,7 @@ class RepositoryAutomationTests(unittest.TestCase):
         github_client.get_repo.return_value = repo
 
         runner = CliRunner()
+        validate_merge_request = mock.Mock()
         with (
             mock.patch("telepact_project_cli.commands.repository_automation.Github", return_value=github_client),
             mock.patch(
@@ -134,9 +154,11 @@ class RepositoryAutomationTests(unittest.TestCase):
                 "telepact_project_cli.commands.repository_automation._wait_for_expected_head",
                 return_value=bumped_pr,
             ),
-            mock.patch("telepact_project_cli.commands.repository_automation._validate_merge_request", return_value=1),
-            mock.patch("telepact_project_cli.commands.repository_automation._approval_count", return_value=0),
-            mock.patch("telepact_project_cli.commands.repository_automation._verify_required_checks"),
+            mock.patch(
+                "telepact_project_cli.commands.repository_automation._validate_merge_request",
+                validate_merge_request,
+            ),
+            mock.patch("telepact_project_cli.commands.repository_automation._verify_pull_request_ci"),
             mock.patch("telepact_project_cli.commands.repository_automation._checkout_pr_branch"),
             mock.patch("telepact_project_cli.commands.repository_automation._push_current_branch"),
             mock.patch("telepact_project_cli.commands.repository_automation._current_head_sha", return_value="head-3"),
@@ -156,7 +178,7 @@ class RepositoryAutomationTests(unittest.TestCase):
         self.assertEqual(result.exit_code, 0, msg=result.output)
         initial_pr.mark_ready_for_review.assert_called_once_with()
         ready_pr.update_branch.assert_called_once_with(expected_head_sha="head-1")
-        updated_pr.create_review.assert_called_once_with(event="APPROVE")
+        self.assertEqual(validate_merge_request.call_count, 2)
         bumped_pr.merge.assert_called_once_with(merge_method="squash", sha="head-3")
 
 
