@@ -1,9 +1,7 @@
 {
-  "changed_paths": [
-    "doc/02-design-apis/01-schema-guide.md"
-  ],
+  "changed_paths": [],
   "direct_targets": [],
-  "pr_number": 407,
+  "pr_number": 412,
   "targets": [],
-  "version": "1.0.0-alpha.302"
+  "version": "1.0.0-alpha.310"
 }
