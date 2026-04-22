@@ -263,6 +263,10 @@ def _validate_merge_request(pr, is_admin: bool) -> None:
         raise RuntimeError(f"Pull request #{pr.number} is not mergeable (state={pr.mergeable_state}).")
 
 
+def _pull_request_changed_paths(pr: PullRequest) -> list[str]:
+    return sorted({file.filename for file in pr.get_files() if getattr(file, "filename", "")})
+
+
 @click.command()
 def github_labels() -> None:
     token = os.getenv("GITHUB_TOKEN")
@@ -449,6 +453,7 @@ def merge_pr() -> None:
     expected_head_sha = pr.head.sha
     pr = _wait_for_pr_stable(repo, pr_number, expected_head_sha)
     _validate_merge_request(pr, is_admin)
+    changed_paths = _pull_request_changed_paths(pr)
 
     if pr.draft:
         click.echo(f"Marking pull request #{pr.number} ready for review.")
@@ -466,7 +471,7 @@ def merge_pr() -> None:
     _verify_pull_request_ci(repo, pr_number, expected_head_sha)
 
     click.echo(f"Bumping version on branch {pr.head.ref}.")
-    create_version_bump_commit(pr_number)
+    create_version_bump_commit(pr_number, changed_paths=changed_paths)
     bumped_head_sha = _current_head_sha()
     _push_current_branch(pr.head.ref)
 
