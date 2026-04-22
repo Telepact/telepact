@@ -20,9 +20,9 @@ import sys
 import time
 from pathlib import Path
 
+import click
 from github import Github, GithubException
 from github.PullRequest import PullRequest
-import click
 
 from .project_version import create_version_bump_commit
 from ..release_plan import load_release_manifest, resolve_publish_targets
@@ -210,11 +210,12 @@ def _validate_merge_request(pr, is_admin: bool) -> None:
 
     combined_status_state = _combined_status_state(pr)
     mergeable_state = pr.mergeable_state or ""
+    mergeable = pr.mergeable
 
     if mergeable_state == "blocked" and combined_status_state == "success" and not is_admin:
         raise RuntimeError(f"Pull request #{pr.number} is waiting for required approving reviews.")
 
-    if pr.mergeable is not None and not pr.mergeable and mergeable_state not in {"behind", "draft"}:
+    if mergeable is False and mergeable_state not in {"behind", "draft"}:
         raise RuntimeError(f"Pull request #{pr.number} is not mergeable (state={pr.mergeable_state}).")
 
 
