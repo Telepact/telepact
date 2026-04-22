@@ -476,6 +476,7 @@ def merge_pr() -> None:
     _push_current_branch(pr.head.ref)
 
     pr = _wait_for_expected_head(repo, pr_number, expected_head_sha, bumped_head_sha)
+    expected_head_sha = pr.head.sha
 
     merge_result = pr.merge(merge_method="squash", sha=expected_head_sha)
     if not merge_result.merged:
