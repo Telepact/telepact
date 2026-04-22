@@ -34,6 +34,45 @@ import json
 import nats
 import os
 
+
+NATS_TIMEOUT_RETRIES = 1
+NATS_TIMEOUT_RETRY_DELAY_SECONDS = 0.25
+NATS_TIMEOUT_RETRY_MAX_SECONDS = 5
+
+
+class RetryingNatsClient:
+    def __init__(self, client):
+        self._client = client
+
+    async def request(self, *args, **kwargs):
+        timeout = kwargs.get('timeout')
+        if timeout is None and len(args) >= 3:
+            timeout = args[2]
+
+        retries = NATS_TIMEOUT_RETRIES if timeout and timeout <= NATS_TIMEOUT_RETRY_MAX_SECONDS else 0
+        subject = kwargs.get('subject', args[0] if args else '<unknown>')
+
+        for attempt in range(retries + 1):
+            try:
+                return await self._client.request(*args, **kwargs)
+            except nats.errors.TimeoutError:
+                if attempt >= retries:
+                    raise
+
+                print(
+                    'NATS timeout for {}. Retrying {}/{}...'.format(
+                        subject,
+                        attempt + 1,
+                        retries,
+                    ),
+                    flush=True,
+                )
+                await asyncio.sleep(NATS_TIMEOUT_RETRY_DELAY_SECONDS)
+
+    def __getattr__(self, attr):
+        return getattr(self._client, attr)
+
+
 def pytest_runtest_makereport(item, call):
     if call.excinfo is not None and call.excinfo.typename not in ("AssertionError", "Skipped"):
         print(f"Error: {call.excinfo.value}")
@@ -92,7 +131,7 @@ def nats_client(loop, nats_server):
 
     print('NATS client connected!')
 
-    yield client
+    yield RetryingNatsClient(client)
 
 
 @pytest.fixture(scope='session', params=get_lib_modules())
