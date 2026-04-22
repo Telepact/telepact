@@ -55,6 +55,7 @@ WAIT_INTERVAL_SECONDS = 10
 MERGE_ALLOWED_PERMISSIONS = {"write", "maintain", "admin"}
 PENDING_MERGEABLE_STATES = {"unknown"}
 PENDING_CHECK_STATES = {"expected", "pending", "queued", "requested", "waiting", "in_progress"}
+FAILED_COMBINED_STATUS_STATES = {"error", "failure"}
 
 AUTOMERGE_ALLOWED_AUTHORS = ["dependabot[bot]"]
 
@@ -193,8 +194,10 @@ def _verify_pull_request_ci(repo, pr_number: int, expected_head_sha: str) -> Pul
         combined_status_state = _combined_status_state(pr)
         if combined_status_state == "success":
             return pr
-        if combined_status_state not in PENDING_CHECK_STATES:
+        if combined_status_state in FAILED_COMBINED_STATUS_STATES:
             raise RuntimeError(f"Pull request #{pr.number} CI failed with combined status {combined_status_state!r}.")
+        if combined_status_state not in PENDING_CHECK_STATES:
+            raise RuntimeError(f"Pull request #{pr.number} has unexpected combined status {combined_status_state!r}.")
         if time.monotonic() >= deadline:
             raise TimeoutError(f"Timed out waiting for pull request #{pr.number} CI to complete.")
         time.sleep(WAIT_INTERVAL_SECONDS)
@@ -218,7 +221,11 @@ def _validate_merge_request(pr, is_admin: bool) -> None:
     if mergeable is None:
         raise RuntimeError(f"Pull request #{pr.number} mergeability is still being calculated.")
 
-    if mergeable is False and mergeable_state not in {"behind", "draft"}:
+    if mergeable is False and mergeable_state == "behind":
+        return
+    if mergeable is False and mergeable_state == "draft":
+        return
+    if mergeable is False:
         raise RuntimeError(f"Pull request #{pr.number} is not mergeable (state={pr.mergeable_state}).")
 
 
