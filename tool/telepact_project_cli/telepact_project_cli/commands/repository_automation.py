@@ -205,11 +205,11 @@ def _check_runs_state(pr: PullRequest) -> str | None:
             pending = True
             continue
         if not conclusion:
-            return "completed_without_conclusion"
+            return "error_no_conclusion"
         if conclusion in FAILED_CHECK_RUN_CONCLUSIONS:
             return conclusion
         if conclusion not in SUCCESSFUL_CHECK_RUN_CONCLUSIONS:
-            return conclusion
+            return f"unknown_conclusion:{conclusion}"
 
     if pending:
         return "pending"
