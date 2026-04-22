@@ -1,13 +1,7 @@
 {
-  "changed_paths": [
-    "tool/telepact_project_cli/telepact_project_cli/commands/doc_versions.py",
-    "tool/telepact_project_cli/telepact_project_cli/commands/project_version.py",
-    "tool/telepact_project_cli/telepact_project_cli/commands/repository_automation.py",
-    "tool/telepact_project_cli/telepact_project_cli/release_plan.py",
-    "tool/telepact_project_cli/tests/test_release_plan.py"
-  ],
+  "changed_paths": [],
   "direct_targets": [],
-  "pr_number": 424,
+  "pr_number": 412,
   "targets": [],
-  "version": "1.0.0-alpha.309"
+  "version": "1.0.0-alpha.310"
 }
