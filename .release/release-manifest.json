@@ -1,9 +1,9 @@
 {
   "changed_paths": [
-    ".github/dependabot.yml"
+    ".github/workflows/pr.yml"
   ],
   "direct_targets": [],
-  "pr_number": 441,
+  "pr_number": 442,
   "targets": [],
-  "version": "1.0.0-alpha.314"
+  "version": "1.0.0-alpha.315"
 }
