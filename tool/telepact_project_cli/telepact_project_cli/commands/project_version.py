@@ -145,6 +145,7 @@ def _bump_version(version: str) -> str:
     return ".".join(parts)
 
 
+# TODO: Remove. This has been replaced by another method that gets changed files direct from the PR
 def _changed_paths_since_main(main_ref: str = "origin/main") -> list[str]:
     try:
         result = subprocess.run(
