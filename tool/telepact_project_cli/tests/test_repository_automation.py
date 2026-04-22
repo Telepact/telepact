@@ -161,6 +161,10 @@ class RepositoryAutomationTests(unittest.TestCase):
         initial_pr.head = SimpleNamespace(sha="head-1", ref="feature")
         initial_pr.mark_ready_for_review = mock.Mock()
         initial_pr.draft = True
+        initial_pr.get_files.return_value = [
+            SimpleNamespace(filename="lib/py/pyproject.toml"),
+            SimpleNamespace(filename="sdk/cli/pyproject.toml"),
+        ]
 
         ready_pr = mock.Mock()
         ready_pr.number = 7
@@ -209,7 +213,7 @@ class RepositoryAutomationTests(unittest.TestCase):
             mock.patch("telepact_project_cli.commands.repository_automation._checkout_pr_branch"),
             mock.patch("telepact_project_cli.commands.repository_automation._push_current_branch"),
             mock.patch("telepact_project_cli.commands.repository_automation._current_head_sha", return_value="head-3"),
-            mock.patch("telepact_project_cli.commands.repository_automation.create_version_bump_commit"),
+            mock.patch("telepact_project_cli.commands.repository_automation.create_version_bump_commit") as create_version_bump_commit,
         ):
             result = runner.invoke(
                 main,
@@ -227,6 +231,10 @@ class RepositoryAutomationTests(unittest.TestCase):
         ready_pr.update_branch.assert_called_once_with(expected_head_sha="head-1")
         # Validation runs before the branch update and again after the version bump settles.
         self.assertEqual(validate_merge_request.call_count, 2)
+        create_version_bump_commit.assert_called_once_with(
+            7,
+            changed_paths=["lib/py/pyproject.toml", "sdk/cli/pyproject.toml"],
+        )
         bumped_pr.merge.assert_called_once_with(merge_method="squash", sha="head-3")
 
 

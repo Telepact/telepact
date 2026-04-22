@@ -145,6 +145,7 @@ def _bump_version(version: str) -> str:
     return ".".join(parts)
 
 
+# TODO: Remove. This has been replaced by another method that gets changed files direct from the PR
 def _changed_paths_since_main(main_ref: str = "origin/main") -> list[str]:
     try:
         result = subprocess.run(
@@ -161,9 +162,10 @@ def _changed_paths_since_main(main_ref: str = "origin/main") -> list[str]:
     return [path for path in result.stdout.strip().splitlines() if path]
 
 
-def create_version_bump_commit(pr_number: int) -> str:
+def create_version_bump_commit(pr_number: int, changed_paths: list[str] | None = None) -> str:
     version_file = "VERSION.txt"
-    changed_paths = _changed_paths_since_main()
+    if changed_paths is None:
+        changed_paths = _changed_paths_since_main()
 
     if not os.path.exists(version_file):
         raise click.ClickException(f"Version file {version_file} does not exist.")
