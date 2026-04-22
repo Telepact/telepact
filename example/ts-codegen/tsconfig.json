@@ -10,6 +10,7 @@
     "rootDir": ".",
     "outDir": "dist",
     "strict": true,
+    "verbatimModuleSyntax": true,
     "esModuleInterop": true,
     "skipLibCheck": true
   },
