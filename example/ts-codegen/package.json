@@ -3,6 +3,7 @@
   "private": true,
   "scripts": {
     "build": "tsc",
+    "build:bundler": "tsc --noEmit --module ESNext --moduleResolution bundler",
     "test": "node --test dist/test_example.js"
   },
   "dependencies": {
