@@ -57,7 +57,8 @@ PENDING_MERGEABLE_STATES = {"unknown"}
 PENDING_CHECK_STATES = {"expected", "pending", "queued", "requested", "waiting", "in_progress"}
 FAILED_COMBINED_STATUS_STATES = {"error", "failure"}
 # GitHub check runs treat "neutral" and "skipped" as completed non-failures, while
-# "cancelled" and similar conclusions should stop merge-pr immediately.
+# interrupted or incomplete conclusions such as "cancelled", "timed_out",
+# "stale", and "action_required" should stop merge-pr immediately.
 FAILED_CHECK_RUN_CONCLUSIONS = {"action_required", "cancelled", "failure", "startup_failure", "stale", "timed_out"}
 SUCCESSFUL_CHECK_RUN_CONCLUSIONS = {"neutral", "skipped", "success"}
 
@@ -204,7 +205,7 @@ def _check_runs_state(pr: PullRequest) -> str | None:
             pending = True
             continue
         if not conclusion:
-            return "unknown"
+            return "completed_without_conclusion"
         if conclusion in FAILED_CHECK_RUN_CONCLUSIONS:
             return conclusion
         if conclusion not in SUCCESSFUL_CHECK_RUN_CONCLUSIONS:
