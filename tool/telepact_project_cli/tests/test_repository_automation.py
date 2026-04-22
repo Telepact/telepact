@@ -62,7 +62,7 @@ class RepositoryAutomationTests(unittest.TestCase):
             ),
         )
 
-        with self.assertRaisesRegex(RuntimeError, "waiting for required approving reviews"):
+        with self.assertRaisesRegex(RuntimeError, "required approving reviews may still be missing"):
             _validate_merge_request(pr, is_admin=False)
 
     def test_validate_merge_request_allows_admin_when_only_reviews_are_missing(self) -> None:
@@ -178,6 +178,7 @@ class RepositoryAutomationTests(unittest.TestCase):
         self.assertEqual(result.exit_code, 0, msg=result.output)
         initial_pr.mark_ready_for_review.assert_called_once_with()
         ready_pr.update_branch.assert_called_once_with(expected_head_sha="head-1")
+        # Validation runs before the branch update and again after the version bump settles.
         self.assertEqual(validate_merge_request.call_count, 2)
         bumped_pr.merge.assert_called_once_with(merge_method="squash", sha="head-3")
 
