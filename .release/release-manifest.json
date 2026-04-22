@@ -1,23 +1,11 @@
 {
   "changed_paths": [
-    "example/ts-codegen/README.md",
-    "example/ts-codegen/gen/genTypes.ts",
-    "example/ts-codegen/package.json",
-    "example/ts-codegen/server.ts",
-    "example/ts-codegen/test_example.ts",
-    "example/ts-codegen/tsconfig.json",
-    "sdk/cli/telepact_cli/templates/ts_all_2.j2",
-    "test/lib/ts-browser-safe/src/main.ts",
-    "test/lib/ts-browser-safe/tsconfig.json",
-    "test/lib/ts-nodenext/src/main.ts",
-    "test/lib/ts-nodenext/tsconfig.json"
+    ".github/workflows/pr.yml",
+    "tool/telepact_project_cli/telepact_project_cli/cli.py",
+    "tool/telepact_project_cli/telepact_project_cli/commands/repository_automation.py"
   ],
-  "direct_targets": [
-    "cli"
-  ],
-  "pr_number": 408,
-  "targets": [
-    "cli"
-  ],
-  "version": "1.0.0-alpha.311"
+  "direct_targets": [],
+  "pr_number": 436,
+  "targets": [],
+  "version": "1.0.0-alpha.312"
 }
