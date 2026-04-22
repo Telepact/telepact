@@ -23,6 +23,7 @@ import tempfile
 import textwrap
 import unittest
 from pathlib import Path
+from unittest import mock
 
 from click.testing import CliRunner
 
@@ -212,7 +213,112 @@ class ReleasePlanTests(unittest.TestCase):
                 ],
             )
 
-    def test_latest_released_versions_prefers_manifest_history_and_falls_back_to_legacy_commits(self) -> None:
+    def test_publish_targets_command_requires_manifest(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            repo_root = Path(tmp_dir)
+            (repo_root / "VERSION.txt").write_text("1.0.0-alpha.214", encoding="utf-8")
+
+            runner = CliRunner()
+            with _pushd(repo_root):
+                result = runner.invoke(
+                    main,
+                    [
+                        "publish-targets",
+                        "--release-tag",
+                        "1.0.0-alpha.214",
+                    ],
+                )
+
+            self.assertNotEqual(result.exit_code, 0)
+            self.assertIn("Release manifest not found:", result.output)
+
+    def test_bump_command_uses_subject_only_commit_message_and_writes_manifest(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            repo_root = Path(tmp_dir)
+            (repo_root / "VERSION.txt").write_text("1.0.0-alpha.214", encoding="utf-8")
+            (repo_root / ".release").mkdir()
+            (repo_root / ".release" / "release-targets.yaml").write_text(
+                textwrap.dedent(
+                    """
+                    projects:
+                      py:
+                        paths: [lib/py]
+                        is_dependency_for: [cli]
+                      cli:
+                        paths: [sdk/cli]
+                    """
+                ).strip()
+                + "\n",
+                encoding="utf-8",
+            )
+
+            runner = CliRunner()
+
+            git_commands: list[list[str]] = []
+
+            def subprocess_run_side_effect(args, **kwargs):
+                git_commands.append(args)
+                if args[:3] == ["git", "diff", "--name-only"]:
+                    return subprocess.CompletedProcess(args, 0, stdout="lib/py/pyproject.toml\n")
+                return subprocess.CompletedProcess(args, 0, stdout="")
+
+            with (
+                _pushd(repo_root),
+                mock.patch("telepact_project_cli.commands.project_version.subprocess.run", side_effect=subprocess_run_side_effect),
+                mock.patch(
+                    "telepact_project_cli.commands.project_version.write_doc_versions",
+                    return_value=repo_root / ".release" / "doc-versions.json",
+                ),
+            ):
+                result = runner.invoke(main, ["bump"], env={"PR_NUMBER": "7"})
+
+            self.assertEqual(result.exit_code, 0, msg=result.output)
+            self.assertEqual((repo_root / "VERSION.txt").read_text(encoding="utf-8"), "1.0.0-alpha.215")
+            self.assertEqual(
+                load_release_manifest(repo_root),
+                {
+                    "version": "1.0.0-alpha.215",
+                    "pr_number": 7,
+                    "changed_paths": ["lib/py/pyproject.toml"],
+                    "direct_targets": ["py"],
+                    "targets": ["cli", "py"],
+                },
+            )
+            self.assertIn(
+                ["git", "commit", "-m", "Bump version to 1.0.0-alpha.215 (#7)"],
+                git_commands,
+            )
+            self.assertIn(
+                ["git", "diff", "--name-only", "origin/main...HEAD"],
+                git_commands,
+            )
+
+    def test_bump_command_fails_when_branch_diff_against_main_cannot_be_computed(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            repo_root = Path(tmp_dir)
+            (repo_root / "VERSION.txt").write_text("1.0.0-alpha.214", encoding="utf-8")
+
+            runner = CliRunner()
+
+            def subprocess_run_side_effect(args, **kwargs):
+                if args[:3] == ["git", "diff", "--name-only"]:
+                    raise subprocess.CalledProcessError(
+                        128,
+                        args,
+                        stderr="fatal: ambiguous argument 'origin/main...HEAD'",
+                    )
+                return subprocess.CompletedProcess(args, 0, stdout="")
+
+            with (
+                _pushd(repo_root),
+                mock.patch("telepact_project_cli.commands.project_version.subprocess.run", side_effect=subprocess_run_side_effect),
+            ):
+                result = runner.invoke(main, ["bump"], env={"PR_NUMBER": "7"})
+
+            self.assertNotEqual(result.exit_code, 0)
+            self.assertIn("Unable to compute changed paths against origin/main", result.output)
+
+    def test_latest_released_versions_uses_manifest_history_only(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             repo_root = Path(tmp_dir)
             subprocess.run(["git", "init"], cwd=repo_root, check=True, capture_output=True, text=True)
@@ -265,7 +371,6 @@ class ReleasePlanTests(unittest.TestCase):
                 {
                     "py": "1.0.0-alpha.202",
                     "cli": "1.0.0-alpha.202",
-                    "java": "1.0.0-alpha.201",
                 },
             )
 
