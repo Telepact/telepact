@@ -26,7 +26,12 @@ sys.path.insert(0, str(PACKAGE_ROOT))
 from click.testing import CliRunner
 
 from telepact_project_cli.cli import main
-from telepact_project_cli.commands.repository_automation import _combined_status_state, _validate_merge_request
+from telepact_project_cli.commands.repository_automation import (
+    _combined_status_state,
+    _pull_request_ci_state,
+    _validate_merge_request,
+    _verify_pull_request_ci,
+)
 
 
 class RepositoryAutomationTests(unittest.TestCase):
@@ -44,6 +49,46 @@ class RepositoryAutomationTests(unittest.TestCase):
 
         self.assertEqual(_combined_status_state(pr), "success")
 
+    def test_pull_request_ci_state_prefers_failed_check_runs(self) -> None:
+        pr = SimpleNamespace(
+            head=SimpleNamespace(sha="head-sha"),
+            base=SimpleNamespace(
+                repo=SimpleNamespace(
+                    get_commit=lambda sha: SimpleNamespace(
+                        get_combined_status=lambda: SimpleNamespace(state="pending"),
+                        get_check_runs=lambda: [
+                            SimpleNamespace(status="completed", conclusion="cancelled"),
+                        ],
+                    )
+                )
+            ),
+        )
+
+        self.assertEqual(_pull_request_ci_state(pr), "cancelled")
+
+    def test_verify_pull_request_ci_fails_immediately_for_failed_check_run(self) -> None:
+        pr = SimpleNamespace(
+            number=7,
+            head=SimpleNamespace(sha="head-sha"),
+            base=SimpleNamespace(
+                repo=SimpleNamespace(
+                    get_commit=lambda sha: SimpleNamespace(
+                        get_combined_status=lambda: SimpleNamespace(state="pending"),
+                        get_check_runs=lambda: [
+                            SimpleNamespace(status="completed", conclusion="failure"),
+                        ],
+                    )
+                )
+            ),
+        )
+
+        with mock.patch(
+            "telepact_project_cli.commands.repository_automation._wait_for_pr_stable",
+            return_value=pr,
+        ):
+            with self.assertRaisesRegex(RuntimeError, "CI failed with state 'failure'"):
+                _verify_pull_request_ci(mock.Mock(), 7, "head-sha")
+
     def test_validate_merge_request_rejects_missing_reviews_for_non_admin(self) -> None:
         pr = SimpleNamespace(
             number=7,
@@ -56,7 +101,8 @@ class RepositoryAutomationTests(unittest.TestCase):
                 repo=SimpleNamespace(
                     full_name="Telepact/telepact",
                     get_commit=lambda sha: SimpleNamespace(
-                        get_combined_status=lambda: SimpleNamespace(state="success")
+                        get_combined_status=lambda: SimpleNamespace(state="success"),
+                        get_check_runs=lambda: [SimpleNamespace(status="completed", conclusion="success")],
                     ),
                 ),
             ),
@@ -77,7 +123,8 @@ class RepositoryAutomationTests(unittest.TestCase):
                 repo=SimpleNamespace(
                     full_name="Telepact/telepact",
                     get_commit=lambda sha: SimpleNamespace(
-                        get_combined_status=lambda: SimpleNamespace(state="success")
+                        get_combined_status=lambda: SimpleNamespace(state="success"),
+                        get_check_runs=lambda: [SimpleNamespace(status="completed", conclusion="success")],
                     ),
                 ),
             ),

@@ -56,6 +56,11 @@ MERGE_ALLOWED_PERMISSIONS = {"write", "maintain", "admin"}
 PENDING_MERGEABLE_STATES = {"unknown"}
 PENDING_CHECK_STATES = {"expected", "pending", "queued", "requested", "waiting", "in_progress"}
 FAILED_COMBINED_STATUS_STATES = {"error", "failure"}
+# GitHub check runs treat "neutral" and "skipped" as completed non-failures, while
+# interrupted or incomplete conclusions such as "cancelled", "timed_out",
+# "stale", and "action_required" should stop merge-pr immediately.
+FAILED_CHECK_RUN_CONCLUSIONS = {"action_required", "cancelled", "failure", "startup_failure", "stale", "timed_out"}
+SUCCESSFUL_CHECK_RUN_CONCLUSIONS = {"neutral", "skipped", "success"}
 
 AUTOMERGE_ALLOWED_AUTHORS = ["dependabot[bot]"]
 
@@ -187,17 +192,48 @@ def _combined_status_state(pr: PullRequest) -> str:
     return (combined_status.state or "").lower()
 
 
+def _check_runs_state(pr: PullRequest) -> str | None:
+    check_runs = list(pr.base.repo.get_commit(pr.head.sha).get_check_runs())
+    if not check_runs:
+        return None
+
+    pending = False
+    for check_run in check_runs:
+        status = (check_run.status or "").lower()
+        conclusion = (check_run.conclusion or "").lower()
+        if status != "completed":
+            pending = True
+            continue
+        if not conclusion:
+            return "error_no_conclusion"
+        if conclusion in FAILED_CHECK_RUN_CONCLUSIONS:
+            return conclusion
+        if conclusion not in SUCCESSFUL_CHECK_RUN_CONCLUSIONS:
+            return f"unknown_conclusion:{conclusion}"
+
+    if pending:
+        return "pending"
+    return "success"
+
+
+def _pull_request_ci_state(pr: PullRequest) -> str:
+    check_runs_state = _check_runs_state(pr)
+    if check_runs_state is not None:
+        return check_runs_state
+    return _combined_status_state(pr)
+
+
 def _verify_pull_request_ci(repo, pr_number: int, expected_head_sha: str) -> PullRequest:
     deadline = time.monotonic() + WAIT_TIMEOUT_SECONDS
     while True:
         pr = _wait_for_pr_stable(repo, pr_number, expected_head_sha)
-        combined_status_state = _combined_status_state(pr)
-        if combined_status_state == "success":
+        ci_state = _pull_request_ci_state(pr)
+        if ci_state == "success":
             return pr
-        if combined_status_state in FAILED_COMBINED_STATUS_STATES:
-            raise RuntimeError(f"Pull request #{pr.number} CI failed with combined status {combined_status_state!r}.")
-        if combined_status_state not in PENDING_CHECK_STATES:
-            raise RuntimeError(f"Pull request #{pr.number} has unexpected combined status {combined_status_state!r}.")
+        if ci_state in FAILED_COMBINED_STATUS_STATES or ci_state in FAILED_CHECK_RUN_CONCLUSIONS:
+            raise RuntimeError(f"Pull request #{pr.number} CI failed with state {ci_state!r}.")
+        if ci_state not in PENDING_CHECK_STATES:
+            raise RuntimeError(f"Pull request #{pr.number} has unexpected CI state {ci_state!r}.")
         if time.monotonic() >= deadline:
             raise TimeoutError(f"Timed out waiting for pull request #{pr.number} CI to complete.")
         time.sleep(WAIT_INTERVAL_SECONDS)
@@ -211,7 +247,7 @@ def _validate_merge_request(pr, is_admin: bool) -> None:
     if pr.head.repo is None or pr.head.repo.full_name != pr.base.repo.full_name:
         raise RuntimeError("Cross-repository pull requests are not supported by merge-pr.")
 
-    combined_status_state = _combined_status_state(pr)
+    combined_status_state = _pull_request_ci_state(pr)
     mergeable_state = pr.mergeable_state or ""
     mergeable = pr.mergeable
 
