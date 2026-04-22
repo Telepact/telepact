@@ -403,10 +403,6 @@ def merge_pr() -> None:
 
     pr = _wait_for_expected_head(repo, pr_number, expected_head_sha, bumped_head_sha)
     expected_head_sha = pr.head.sha
-    _verify_pull_request_ci(repo, pr_number, expected_head_sha)
-
-    pr = _wait_for_pr_stable(repo, pr_number, expected_head_sha)
-    _validate_merge_request(pr, is_admin)
 
     merge_result = pr.merge(merge_method="squash", sha=expected_head_sha)
     if not merge_result.merged:

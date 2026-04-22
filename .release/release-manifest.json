@@ -1,23 +1,13 @@
 {
   "changed_paths": [
-    "example/ts-codegen/README.md",
-    "example/ts-codegen/gen/genTypes.ts",
-    "example/ts-codegen/package.json",
-    "example/ts-codegen/server.ts",
-    "example/ts-codegen/test_example.ts",
-    "example/ts-codegen/tsconfig.json",
-    "sdk/cli/telepact_cli/templates/ts_all_2.j2",
-    "test/lib/ts-browser-safe/src/main.ts",
-    "test/lib/ts-browser-safe/tsconfig.json",
-    "test/lib/ts-nodenext/src/main.ts",
-    "test/lib/ts-nodenext/tsconfig.json"
+    "bind/dart/pubspec.lock"
   ],
   "direct_targets": [
-    "cli"
+    "dart"
   ],
-  "pr_number": 408,
+  "pr_number": 409,
   "targets": [
-    "cli"
+    "dart"
   ],
-  "version": "1.0.0-alpha.311"
+  "version": "1.0.0-alpha.312"
 }
