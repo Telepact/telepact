@@ -6,7 +6,7 @@ dependencies = [
     "build>=1.2,<2",
     "msgpack>=1.0,<2",
     "nats-py>=2.8,<3",
-    "prometheus-client>=0.20,<0.21",
+    "prometheus-client>=0.25.0,<0.26",
 ]
 
 [dependency-groups]
