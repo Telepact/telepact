@@ -49,6 +49,11 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v6
 
+      - name: Set up Dart
+        uses: dart-lang/setup-dart@v1
+        with:
+          sdk: 3.6
+
       - name: Configure git identity
         run: |
           git config --global user.name "telepact-notary[bot]"
