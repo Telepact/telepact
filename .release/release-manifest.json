@@ -1,13 +1,7 @@
 {
-  "changed_paths": [
-    "bind/dart/pubspec.lock"
-  ],
-  "direct_targets": [
-    "dart"
-  ],
-  "pr_number": 409,
-  "targets": [
-    "dart"
-  ],
-  "version": "1.0.0-alpha.311"
+  "changed_paths": [],
+  "direct_targets": [],
+  "pr_number": 412,
+  "targets": [],
+  "version": "1.0.0-alpha.310"
 }
