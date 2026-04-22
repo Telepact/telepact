@@ -1,11 +1,9 @@
 {
   "changed_paths": [
-    ".github/workflows/pr.yml",
-    "tool/telepact_project_cli/telepact_project_cli/cli.py",
-    "tool/telepact_project_cli/telepact_project_cli/commands/repository_automation.py"
+    ".github/dependabot.yml"
   ],
   "direct_targets": [],
-  "pr_number": 436,
+  "pr_number": 441,
   "targets": [],
-  "version": "1.0.0-alpha.313"
+  "version": "1.0.0-alpha.314"
 }
