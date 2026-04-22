@@ -165,8 +165,6 @@ def create_version_bump_commit(pr_number: int, changed_paths: list[str] | None =
     version_file = "VERSION.txt"
     if changed_paths is None:
         changed_paths = _changed_paths_since_main()
-    else:
-        changed_paths = [path for path in changed_paths if path]
 
     if not os.path.exists(version_file):
         raise click.ClickException(f"Version file {version_file} does not exist.")

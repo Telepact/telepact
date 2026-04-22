@@ -264,7 +264,7 @@ def _validate_merge_request(pr, is_admin: bool) -> None:
 
 
 def _pull_request_changed_paths(pr: PullRequest) -> list[str]:
-    return sorted({file.filename for file in pr.get_files() if getattr(file, "filename", "")})
+    return sorted({file.filename for file in pr.get_files() if file.filename})
 
 
 @click.command()
