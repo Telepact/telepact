@@ -33,11 +33,7 @@ $(TAR_GZ): $(DEP_TAR_GZ) $(SRC_FILES)
 
 	rm -rf dist
 	uv sync --all-groups
-
-	# TODO: Get "include" to work in pyproject.toml
-	../../tool/telepact-project gitignore --remove telepact_cli/telepact
 	uv build
-	../../tool/telepact-project gitignore --add telepact_cli/telepact
 
 	mkdir tmp
 	cp dist/telepact_cli-*.tar.gz tmp/telepact_cli.tar.gz
@@ -71,7 +67,4 @@ old-test:
 	uv run telepact codegen --schema-dir tests/data --lang ts --out tests/output/ts
 
 deploy: $(TAR_GZ)
-	# TODO: Get "include" to work in pyproject.toml
-	../../tool/telepact-project gitignore --remove telepact_cli/telepact
 	uv publish
-	../../tool/telepact-project gitignore --add telepact_cli/telepact

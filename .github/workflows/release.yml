@@ -19,43 +19,34 @@ name: Release
 on:
   push:
     branches:
-      - main  
+      - main
+    paths:
+      - .release/release-manifest.json
 
 jobs:
-
-  check-version-change:
-    name: Check version change
+  should-release:
+    name: Check release trigger
     runs-on: ubuntu-latest
+    permissions: {}
     outputs:
-      version-changed: ${{ steps.check-file.outputs.version_changed }}
+      should_release: ${{ steps.check.outputs.should_release }}
     steps:
-      - name: Checkout repository code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
-
-      - name: Determine if VERSION.txt was modified in the latest commit
-        id: check-file
-        run: |
-          if git show --name-only --pretty="" HEAD | grep -q "VERSION.txt"; then
-            echo "VERSION.txt was changed in the last commit."
-            echo "version_changed=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "VERSION.txt was NOT changed in the last commit. Subsequent jobs will be skipped."
-            echo "version_changed=false" >> "$GITHUB_OUTPUT"
-          fi
+      - name: Check head commit for release manifest changes
+        id: check
+        run: echo "should_release=${{ contains(toJSON(github.event.head_commit.modified), '.release/release-manifest.json') }}" >> "$GITHUB_OUTPUT"
 
   build-release:
     name: Build release
-    needs: [check-version-change]
-    if: needs.check-version-change.outputs.version-changed == 'true'
+    needs: [should-release]
+    if: ${{ needs.should-release.outputs.should_release == 'true' }}
     uses: ./.github/workflows/build.yml
     
   create-release:
     name: Create release
     runs-on: ubuntu-latest
     environment: bot
-    needs: [build-release]
+    needs: [should-release, build-release]
+    if: ${{ needs.should-release.outputs.should_release == 'true' }}
     timeout-minutes: 2
     steps:
       - name: Generate GitHub App token
