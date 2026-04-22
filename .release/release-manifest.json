@@ -1,13 +1,11 @@
 {
   "changed_paths": [
-    "bind/dart/pubspec.lock"
+    ".github/workflows/pr.yml",
+    "tool/telepact_project_cli/telepact_project_cli/cli.py",
+    "tool/telepact_project_cli/telepact_project_cli/commands/repository_automation.py"
   ],
-  "direct_targets": [
-    "dart"
-  ],
-  "pr_number": 409,
-  "targets": [
-    "dart"
-  ],
-  "version": "1.0.0-alpha.312"
+  "direct_targets": [],
+  "pr_number": 436,
+  "targets": [],
+  "version": "1.0.0-alpha.313"
 }

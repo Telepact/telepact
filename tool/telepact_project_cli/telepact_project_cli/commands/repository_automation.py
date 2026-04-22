@@ -16,7 +16,6 @@
 
 import os
 import subprocess
-import sys
 import time
 from pathlib import Path
 
@@ -26,17 +25,6 @@ from github.PullRequest import PullRequest
 
 from .project_version import create_version_bump_commit
 from ..release_plan import load_release_manifest, resolve_publish_targets
-
-PROJECT_LABEL_MAP = {
-    "lib/java": "java",
-    "lib/py": "py",
-    "lib/ts": "ts",
-    "lib/go": "go",
-    "bind/dart": "dart",
-    "sdk/cli": "cli",
-    "sdk/console": "console",
-    "sdk/prettier": "prettier",
-}
 
 RELEASE_TARGET_ASSET_DIRECTORY_MAP = {
     "java": ["lib/java/target/central-publishing"],
@@ -108,26 +96,6 @@ def _git(*args: str, capture_output: bool = False) -> str:
         stdout=subprocess.PIPE if capture_output else None,
     )
     return result.stdout.strip() if capture_output else ""
-
-
-def _get_modified_files(base_branch, head_sha):
-    try:
-        subprocess.run(["git", "fetch", "origin", base_branch], check=True)
-        result = subprocess.run(["git", "diff", "--name-only", f"origin/{base_branch}", head_sha], check=True, stdout=subprocess.PIPE)
-        files = result.stdout.decode("utf-8").strip()
-        return files
-    except subprocess.CalledProcessError as e:
-        print(f"Error fetching or diffing: {e}")
-        return ""
-
-
-def _get_modified_project_labels(files):
-    tags = set()
-    for file in files.split():
-        for directory, tag in PROJECT_LABEL_MAP.items():
-            if file.startswith(directory):
-                tags.add(tag)
-    return tags
 
 
 def _current_head_sha() -> str:
@@ -265,48 +233,6 @@ def _validate_merge_request(pr, is_admin: bool) -> None:
 
 def _pull_request_changed_paths(pr: PullRequest) -> list[str]:
     return sorted({file.filename for file in pr.get_files() if file.filename})
-
-
-@click.command()
-def github_labels() -> None:
-    token = os.getenv("GITHUB_TOKEN")
-    repository = os.getenv("GITHUB_REPOSITORY")
-    pr_number_str = os.getenv("PR_NUMBER")
-    if not pr_number_str:
-        click.echo("PR_NUMBER environment variable not set.", err=True)
-        sys.exit(1)
-    pr_number = int(pr_number_str)
-    base_branch = os.getenv("BASE_BRANCH")
-    head_sha = os.getenv("HEAD_SHA")
-
-    files = _get_modified_files(base_branch, head_sha)
-    print(f"Modified files: {files}")
-
-    g = Github(token)
-    repo = g.get_repo(repository)
-    pr = repo.get_pull(pr_number)
-
-    current_labels = {label.name for label in pr.get_labels()}
-    new_labels = _get_modified_project_labels(files)
-
-    print(f"Labels to be added: {new_labels}")
-
-    added_labels = []
-    removed_labels = []
-
-    for label in new_labels:
-        if label not in current_labels:
-            pr.add_to_labels(label)
-            added_labels.append(label)
-
-    for label in current_labels:
-        if label not in new_labels and label in PROJECT_LABEL_MAP.values():
-            pr.remove_from_labels(label)
-            removed_labels.append(label)
-
-    print(
-        f"Summary:\n  Added tags: {', '.join(added_labels) if added_labels else 'None'}\n  Removed tags: {', '.join(removed_labels) if removed_labels else 'None'}"
-    )
 
 
 @click.command()
