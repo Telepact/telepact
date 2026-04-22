@@ -35,7 +35,7 @@ import nats
 import os
 
 
-NATS_TIMEOUT_RETRIES = 1
+NATS_TIMEOUT_ADDITIONAL_RETRIES = 1
 NATS_TIMEOUT_RETRY_DELAY_SECONDS = 0.25
 NATS_TIMEOUT_RETRY_MAX_SECONDS = 5
 
@@ -44,12 +44,15 @@ class RetryingNatsClient:
     def __init__(self, client):
         self._client = client
 
+    def _should_retry_timeout(self, timeout):
+        return timeout is not None and timeout <= NATS_TIMEOUT_RETRY_MAX_SECONDS
+
     async def request(self, *args, **kwargs):
         timeout = kwargs.get('timeout')
         if timeout is None and len(args) >= 3:
             timeout = args[2]
 
-        retries = NATS_TIMEOUT_RETRIES if timeout and timeout <= NATS_TIMEOUT_RETRY_MAX_SECONDS else 0
+        retries = NATS_TIMEOUT_ADDITIONAL_RETRIES if self._should_retry_timeout(timeout) else 0
         subject = kwargs.get('subject', args[0] if args else '<unknown>')
 
         for attempt in range(retries + 1):
