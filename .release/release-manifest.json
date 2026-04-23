@@ -1,9 +1,13 @@
 {
   "changed_paths": [
-    ".github/dependabot.yml"
+    "sdk/console/package-lock.json"
   ],
-  "direct_targets": [],
-  "pr_number": 452,
-  "targets": [],
-  "version": "1.0.0-alpha.317"
+  "direct_targets": [
+    "console"
+  ],
+  "pr_number": 457,
+  "targets": [
+    "console"
+  ],
+  "version": "1.0.0-alpha.318"
 }
