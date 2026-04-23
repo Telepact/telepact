@@ -21,17 +21,58 @@ on:
     types:
       - created
 
-concurrency:
-  group: merge-pr
-  cancel-in-progress: false
+permissions:
+  contents: read
 
 jobs:
-  merge-pr:
-    name: merge-pr
+  mark-merge-ready:
+    name: mark-merge-ready
     if: ${{ github.event.issue.pull_request && github.event.comment.body == '/merge' }}
     runs-on: ubuntu-latest
     environment: bot
+    timeout-minutes: 10
+    concurrency:
+      group: mark-merge-ready
+      cancel-in-progress: false
+    outputs:
+      skip-merge-loop: ${{ steps.mark-merge-ready.outputs.skip_merge_loop }}
+    steps:
+      - name: Generate GitHub App token
+        id: generate-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ vars.TELEPACT_BOT_APP_ID }}
+          private-key: ${{ secrets.TELEPACT_BOT_PRIVATE_KEY }}
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ steps.generate-token.outputs.token }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Mark PR merge ready
+        id: mark-merge-ready
+        run: ./tool/telepact-project mark-merge-ready --github-output "$GITHUB_OUTPUT"
+        env:
+          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.issue.number }}
+          COMMENTER_LOGIN: ${{ github.event.comment.user.login }}
+
+  merge-pr:
+    name: merge-pr
+    needs:
+      - mark-merge-ready
+    if: ${{ needs.mark-merge-ready.result == 'success' && needs.mark-merge-ready.outputs.skip-merge-loop != 'true' }}
+    runs-on: ubuntu-latest
+    environment: bot
     timeout-minutes: 30
+    concurrency:
+      group: merge-pr
+      cancel-in-progress: false
     steps:
       - name: Generate GitHub App token
         id: generate-token
@@ -64,5 +105,3 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-          PR_NUMBER: ${{ github.event.issue.number }}
-          COMMENTER_LOGIN: ${{ github.event.comment.user.login }}
