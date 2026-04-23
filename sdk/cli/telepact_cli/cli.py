@@ -104,6 +104,9 @@ def codegen(schema_http_url: str, schema_dir: str, lang: str, out: str, package:
     possible_fn_selects = select.possible_selects
     possible_fn_selects.pop('fn.ping_', None)
     possible_fn_selects.pop('fn.api_', None)
+    possible_fn_selects.pop('fn.index_', None)
+    possible_fn_selects.pop('fn.def_', None)
+    possible_fn_selects.pop('fn.example_', None)
 
     # Call the generate function
     _generate_internal(schema_data, possible_fn_selects, target, output_directory, package)
