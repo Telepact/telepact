@@ -1,14 +1,10 @@
 {
   "changed_paths": [
-    "sdk/cli/pyproject.toml",
-    "sdk/cli/uv.lock"
+    "tool/telepact_project_cli/telepact_project_cli/commands/repository_automation.py",
+    "tool/telepact_project_cli/tests/test_repository_automation.py"
   ],
-  "direct_targets": [
-    "cli"
-  ],
-  "pr_number": 446,
-  "targets": [
-    "cli"
-  ],
+  "direct_targets": [],
+  "pr_number": 462,
+  "targets": [],
   "version": "1.0.0-alpha.322"
 }
