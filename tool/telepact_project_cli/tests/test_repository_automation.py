@@ -172,6 +172,7 @@ class RepositoryAutomationTests(unittest.TestCase):
     def test_mark_merge_ready_command_sets_skip_false_for_first_labeled_pr(self) -> None:
         issue = mock.Mock()
         issue.pull_request = object()
+        issue.state = "open"
         issue.labels = []
         issue.add_to_labels = mock.Mock()
 
@@ -215,6 +216,7 @@ class RepositoryAutomationTests(unittest.TestCase):
     def test_mark_merge_ready_command_sets_skip_true_when_multiple_prs_are_labeled(self) -> None:
         issue = mock.Mock()
         issue.pull_request = object()
+        issue.state = "open"
         issue.labels = []
         issue.add_to_labels = mock.Mock()
 

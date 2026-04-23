@@ -524,9 +524,11 @@ def mark_merge_ready(github_output: Path | None) -> None:
 
     repo = Github(github_token).get_repo(github_repository)
     _commenter_permission(repo, commenter_login)
+    issue = repo.get_issue(pr_number)
 
     merge_ready_pr_numbers = set(_open_merge_ready_pr_numbers(repo))
-    merge_ready_pr_numbers.add(pr_number)
+    if issue.state == "open":
+        merge_ready_pr_numbers.add(pr_number)
     merge_ready_count = len(merge_ready_pr_numbers)
     skip_merge_loop = any(number != pr_number for number in merge_ready_pr_numbers)
 
