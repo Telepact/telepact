@@ -232,7 +232,7 @@ class ReleasePlanTests(unittest.TestCase):
             self.assertNotEqual(result.exit_code, 0)
             self.assertIn("Release manifest not found:", result.output)
 
-    def test_bump_command_uses_subject_only_commit_message_and_writes_manifest(self) -> None:
+    def test_bump_command_updates_version_when_manifest_has_targets(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             repo_root = Path(tmp_dir)
             (repo_root / "VERSION.txt").write_text("1.0.0-alpha.214", encoding="utf-8")
@@ -285,11 +285,71 @@ class ReleasePlanTests(unittest.TestCase):
                 },
             )
             self.assertIn(
-                ["git", "commit", "-m", "Bump version to 1.0.0-alpha.215 (#7)"],
+                ["git", "commit", "-m", "Update release-manifest.json"],
                 git_commands,
             )
             self.assertIn(
                 ["git", "diff", "--name-only", "origin/main...HEAD"],
+                git_commands,
+            )
+
+    def test_bump_command_keeps_version_when_manifest_has_no_targets(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            repo_root = Path(tmp_dir)
+            (repo_root / "VERSION.txt").write_text("1.0.0-alpha.214", encoding="utf-8")
+            (repo_root / ".release").mkdir()
+            (repo_root / ".release" / "release-targets.yaml").write_text(
+                textwrap.dedent(
+                    """
+                    projects:
+                      py:
+                        paths: [lib/py]
+                    """
+                ).strip()
+                + "\n",
+                encoding="utf-8",
+            )
+
+            runner = CliRunner()
+
+            git_commands: list[list[str]] = []
+
+            def subprocess_run_side_effect(args, **kwargs):
+                git_commands.append(args)
+                if args[:3] == ["git", "diff", "--name-only"]:
+                    return subprocess.CompletedProcess(args, 0, stdout="README.md\n")
+                return subprocess.CompletedProcess(args, 0, stdout="")
+
+            with (
+                _pushd(repo_root),
+                mock.patch("telepact_project_cli.commands.project_version.subprocess.run", side_effect=subprocess_run_side_effect),
+                mock.patch(
+                    "telepact_project_cli.commands.project_version.write_doc_versions",
+                    return_value=repo_root / ".release" / "doc-versions.json",
+                ) as write_doc_versions,
+            ):
+                result = runner.invoke(main, ["bump"], env={"PR_NUMBER": "7"})
+
+            self.assertEqual(result.exit_code, 0, msg=result.output)
+            self.assertEqual((repo_root / "VERSION.txt").read_text(encoding="utf-8"), "1.0.0-alpha.214")
+            self.assertEqual(
+                load_release_manifest(repo_root),
+                {
+                    "version": "1.0.0-alpha.214",
+                    "pr_number": 7,
+                    "changed_paths": ["README.md"],
+                    "direct_targets": [],
+                    "targets": [],
+                },
+            )
+            write_doc_versions.assert_called_once_with(
+                Path("."),
+                None,
+                pending_version=None,
+                pending_targets=[],
+            )
+            self.assertIn(
+                ["git", "commit", "-m", "Update release-manifest.json"],
                 git_commands,
             )
 
