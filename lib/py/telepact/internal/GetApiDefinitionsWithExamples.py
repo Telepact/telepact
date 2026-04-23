@@ -46,6 +46,35 @@ def get_api_definitions_with_examples(
     ]
 
 
+def get_definition_example(
+    telepact_schema: 'TelepactSchema',
+    name: str,
+    include_internal: bool,
+) -> dict[str, object]:
+    if not include_internal and name.endswith('_'):
+        return {}
+
+    definitions = telepact_schema.full if include_internal else telepact_schema.original
+    definition = next((
+        cast(dict[str, object], definition)
+        for definition in definitions
+        if _get_schema_key(cast(dict[str, object], definition)) == name
+    ), None)
+    if definition is None:
+        return {}
+
+    example_definition = _add_examples_to_definition(
+        definition,
+        telepact_schema,
+        _get_default_fn_scope(telepact_schema.parsed),
+    )
+    return {
+        key: value
+        for key, value in example_definition.items()
+        if key in {'example', 'inputExample', 'outputExample'}
+    }
+
+
 def _add_examples_to_definition(
     definition: dict[str, object],
     telepact_schema: 'TelepactSchema',

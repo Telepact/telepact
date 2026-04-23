@@ -21,7 +21,9 @@ from ..internal.binary.ServerBase64Decode import server_base64_decode
 from ..Message import Message
 from ..TelepactError import TelepactError
 from ..internal.UnknownError import build_unknown_error_message
-from .GetApiDefinitionsWithExamples import get_api_definitions_with_examples
+from .GetApiDefinitionsWithExamples import get_definition_example
+from .SchemaIntrospection import get_definition_closure
+from .SchemaIntrospection import get_index_entries
 from .types.TTypeDeclaration import TTypeDeclaration
 
 if TYPE_CHECKING:
@@ -169,15 +171,28 @@ async def handle_message(
     result_message: Message
     if function_name == "fn.ping_":
         result_message = Message({}, {"Ok_": {}})
+    elif function_name == "fn.index_":
+        include_internal = isinstance(request_payload, dict) and request_payload.get("includeInternal!") is True
+        result_message = Message({}, {"Ok_": {"functions": get_index_entries(telepact_schema, include_internal)}})
+    elif function_name == "fn.def_":
+        include_internal = isinstance(request_payload, dict) and request_payload.get("includeInternal!") is True
+        name = cast(str, request_payload.get("name")) if isinstance(request_payload, dict) else ""
+        result_message = Message({}, {"Ok_": {"definitions": get_definition_closure(
+            telepact_schema,
+            name,
+            include_internal,
+        )}})
+    elif function_name == "fn.example_":
+        include_internal = isinstance(request_payload, dict) and request_payload.get("includeInternal!") is True
+        name = cast(str, request_payload.get("name")) if isinstance(request_payload, dict) else ""
+        result_message = Message({}, {"Ok_": get_definition_example(
+            telepact_schema,
+            name,
+            include_internal,
+        )})
     elif function_name == "fn.api_":
         include_internal = isinstance(request_payload, dict) and request_payload.get("includeInternal!") is True
-        include_examples = isinstance(request_payload, dict) and request_payload.get("includeExamples!") is True
-        api_definitions = get_api_definitions_with_examples(
-            telepact_schema,
-            include_internal,
-        ) if include_examples else (
-            telepact_schema.full if include_internal else telepact_schema.original
-        )
+        api_definitions = telepact_schema.full if include_internal else telepact_schema.original
         result_message = Message({}, {"Ok_": {"api": api_definitions}})
     else:
         try:

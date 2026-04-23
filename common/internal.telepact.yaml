@@ -21,14 +21,54 @@
   _errors: '^errors\.Validation_$'
 
 - ///: |
+    List the top-level functions exposed by this server.
+
+    This is intended as a compact entrypoint for tools and AI agents.
+    Set `includeInternal` to `true` to include internal functions.
+  fn.index_:
+    includeInternal!: "boolean"
+  ->:
+    - Ok_:
+        functions:
+          - name: "string"
+            comment!: "any"
+  _errors: '^errors\.Validation_$'
+
+- ///: |
+    Get a single schema definition and its transitive referenced definitions.
+
+    Set `includeInternal` to `true` to allow looking up internal definitions.
+  fn.def_:
+    name: "string"
+    includeInternal!: "boolean"
+  ->:
+    - Ok_:
+        definitions: [{"string": "any"}]
+  _errors: '^errors\.Validation_$'
+
+- ///: |
+    Get a deterministic mocked payload example for a single schema definition.
+
+    Functions and headers return `inputExample` and `outputExample`.
+    Other definitions return `example`.
+
+    Set `includeInternal` to `true` to allow looking up internal definitions.
+  fn.example_:
+    name: "string"
+    includeInternal!: "boolean"
+  ->:
+    - Ok_:
+        example!: "any"
+        inputExample!: "any"
+        outputExample!: "any"
+  _errors: '^errors\.Validation_$'
+
+- ///: |
     Get the telepact `schema` of this server.
 
     Set `includeInternal` to `true` to include Telepact internal definitions.
-    Set `includeExamples` to `true` to add deterministic example payloads to
-    each schema entry.
   fn.api_:
     includeInternal!: "boolean"
-    includeExamples!: "boolean"
   ->:
     - Ok_:
         api: [{"string": "any"}]

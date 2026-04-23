@@ -178,19 +178,40 @@ func HandleMessage(
 	switch functionName {
 	case "fn.ping_":
 		resultMessage = ServerMessage{Headers: make(map[string]any), Body: map[string]any{"Ok_": map[string]any{}}}
-	case "fn.api_":
+	case "fn.index_":
 		includeInternal := false
-		includeExamples := false
 		if requestMap, ok := requestPayload.(map[string]any); ok {
 			includeInternal = boolValue(requestMap["includeInternal!"])
-			includeExamples = boolValue(requestMap["includeExamples!"])
+		}
+		resultMessage = ServerMessage{Headers: make(map[string]any), Body: map[string]any{"Ok_": map[string]any{"functions": GetIndexEntries(schema, includeInternal)}}}
+	case "fn.def_":
+		includeInternal := false
+		name := ""
+		if requestMap, ok := requestPayload.(map[string]any); ok {
+			includeInternal = boolValue(requestMap["includeInternal!"])
+			if requestName, ok := requestMap["name"].(string); ok {
+				name = requestName
+			}
+		}
+		resultMessage = ServerMessage{Headers: make(map[string]any), Body: map[string]any{"Ok_": map[string]any{"definitions": GetDefinitionClosure(schema, name, includeInternal)}}}
+	case "fn.example_":
+		includeInternal := false
+		name := ""
+		if requestMap, ok := requestPayload.(map[string]any); ok {
+			includeInternal = boolValue(requestMap["includeInternal!"])
+			if requestName, ok := requestMap["name"].(string); ok {
+				name = requestName
+			}
+		}
+		resultMessage = ServerMessage{Headers: make(map[string]any), Body: map[string]any{"Ok_": GetDefinitionExample(schema, name, includeInternal)}}
+	case "fn.api_":
+		includeInternal := false
+		if requestMap, ok := requestPayload.(map[string]any); ok {
+			includeInternal = boolValue(requestMap["includeInternal!"])
 		}
 		apiDefinitions := schema.OriginalDefinitions()
 		if includeInternal {
 			apiDefinitions = schema.FullDefinitions()
-		}
-		if includeExamples {
-			apiDefinitions = GetAPIDefinitionsWithExamples(schema, includeInternal)
 		}
 		resultMessage = ServerMessage{Headers: make(map[string]any), Body: map[string]any{"Ok_": map[string]any{"api": apiDefinitions}}}
 	default:

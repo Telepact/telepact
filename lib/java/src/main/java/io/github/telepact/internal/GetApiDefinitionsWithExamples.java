@@ -42,6 +42,37 @@ public class GetApiDefinitionsWithExamples {
                 .collect(Collectors.toList());
     }
 
+    public static Map<String, Object> getDefinitionExample(
+            TelepactSchema telepactSchema,
+            String name,
+            boolean includeInternal) {
+        if (!includeInternal && name.endsWith("_")) {
+            return Map.of();
+        }
+
+        final var definitions = includeInternal ? telepactSchema.full : telepactSchema.original;
+        for (final var definition : definitions) {
+            final var definitionMap = (Map<String, Object>) definition;
+            if (!getSchemaKey(definitionMap).equals(name)) {
+                continue;
+            }
+
+            final var exampleDefinition = addExamplesToDefinition(
+                    definitionMap,
+                    telepactSchema,
+                    getDefaultFnScope(telepactSchema.parsed));
+            final var result = new LinkedHashMap<String, Object>();
+            for (final var key : List.of("example", "inputExample", "outputExample")) {
+                if (exampleDefinition.containsKey(key)) {
+                    result.put(key, exampleDefinition.get(key));
+                }
+            }
+            return result;
+        }
+
+        return Map.of();
+    }
+
     private static Map<String, Object> addExamplesToDefinition(
             Map<String, Object> definition,
             TelepactSchema telepactSchema,

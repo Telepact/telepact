@@ -32,6 +32,35 @@ export function getApiDefinitionsWithExamples(telepactSchema: TelepactSchema, in
     );
 }
 
+export function getDefinitionExample(
+    telepactSchema: TelepactSchema,
+    name: string,
+    includeInternal: boolean,
+): Record<string, any> {
+    if (!includeInternal && name.endsWith('_')) {
+        return {};
+    }
+
+    const definitions = includeInternal ? telepactSchema.full : telepactSchema.original;
+    const definition = definitions
+        .map((entry) => entry as Record<string, any>)
+        .find((entry) => getSchemaKey(entry) === name);
+    if (!definition) {
+        return {};
+    }
+
+    const exampleDefinition = addExamplesToDefinition(
+        definition,
+        telepactSchema,
+        getDefaultFnScope(telepactSchema.parsed),
+    );
+    return Object.fromEntries(
+        Object.entries(exampleDefinition).filter(([key]) =>
+            key === 'example' || key === 'inputExample' || key === 'outputExample'
+        ),
+    );
+}
+
 function addExamplesToDefinition(
     definition: Record<string, any>,
     telepactSchema: TelepactSchema,

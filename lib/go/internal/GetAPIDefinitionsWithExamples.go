@@ -123,6 +123,40 @@ func GetAPIDefinitionsWithExamples(schema SchemaAccessor, includeInternal bool) 
 	return result
 }
 
+// GetDefinitionExample returns example payload fields for a single schema definition.
+func GetDefinitionExample(schema SchemaAccessor, name string, includeInternal bool) map[string]any {
+	if !includeInternal && strings.HasSuffix(name, "_") {
+		return map[string]any{}
+	}
+
+	definitions := schema.OriginalDefinitions()
+	if includeInternal {
+		definitions = schema.FullDefinitions()
+	}
+
+	for _, definition := range definitions {
+		definitionMap := toStringAnyMap(definition)
+		if getSchemaKey(definitionMap) != name {
+			continue
+		}
+
+		exampleDefinition := addExamplesToDefinition(
+			definitionMap,
+			schema,
+			getDefaultFnScope(schema.ParsedDefinitions()),
+		)
+		result := map[string]any{}
+		for _, key := range []string{"example", "inputExample", "outputExample"} {
+			if value, ok := exampleDefinition[key]; ok {
+				result[key] = value
+			}
+		}
+		return result
+	}
+
+	return map[string]any{}
+}
+
 func addExamplesToDefinition(
 	definition map[string]any,
 	schema SchemaAccessor,

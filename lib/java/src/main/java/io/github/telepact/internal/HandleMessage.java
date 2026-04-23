@@ -161,15 +161,34 @@ import io.github.telepact.internal.validation.ValidationFailure;
         final Message resultMessage;
         if (functionName.equals("fn.ping_")) {
             resultMessage = new Message(Map.of(), Map.of("Ok_", Map.of()));
+        } else if (functionName.equals("fn.index_")) {
+            final var includeInternal = requestPayload instanceof Map<?, ?>
+                    && Objects.equals(true, ((Map<?, ?>) requestPayload).get("includeInternal!"));
+            resultMessage = new Message(Map.of(),
+                    Map.of("Ok_", Map.of("functions", SchemaIntrospection.getIndexEntries(telepactSchema, includeInternal))));
+        } else if (functionName.equals("fn.def_")) {
+            final var includeInternal = requestPayload instanceof Map<?, ?>
+                    && Objects.equals(true, ((Map<?, ?>) requestPayload).get("includeInternal!"));
+            final var name = requestPayload instanceof Map<?, ?>
+                    && ((Map<?, ?>) requestPayload).get("name") instanceof String
+                            ? (String) ((Map<?, ?>) requestPayload).get("name")
+                            : "";
+            resultMessage = new Message(Map.of(),
+                    Map.of("Ok_", Map.of("definitions", SchemaIntrospection.getDefinitionClosure(telepactSchema, name, includeInternal))));
+        } else if (functionName.equals("fn.example_")) {
+            final var includeInternal = requestPayload instanceof Map<?, ?>
+                    && Objects.equals(true, ((Map<?, ?>) requestPayload).get("includeInternal!"));
+            final var name = requestPayload instanceof Map<?, ?>
+                    && ((Map<?, ?>) requestPayload).get("name") instanceof String
+                            ? (String) ((Map<?, ?>) requestPayload).get("name")
+                            : "";
+            resultMessage = new Message(Map.of(),
+                    Map.of("Ok_", GetApiDefinitionsWithExamples.getDefinitionExample(telepactSchema, name, includeInternal)));
         } else if (functionName.equals("fn.api_")) {
             final var includeInternal = requestPayload instanceof Map<?, ?>
                     && Objects.equals(true, ((Map<?, ?>) requestPayload).get("includeInternal!"));
-            final var includeExamples = requestPayload instanceof Map<?, ?>
-                    && Objects.equals(true, ((Map<?, ?>) requestPayload).get("includeExamples!"));
             resultMessage = new Message(Map.of(),
-                    Map.of("Ok_", Map.of("api", includeExamples
-                            ? GetApiDefinitionsWithExamples.getApiDefinitionsWithExamples(telepactSchema, includeInternal)
-                            : includeInternal ? telepactSchema.full : telepactSchema.original)));
+                    Map.of("Ok_", Map.of("api", includeInternal ? telepactSchema.full : telepactSchema.original)));
         } else {
             try {
                 resultMessage = middleware.apply(callMessage, functionRouter);

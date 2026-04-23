@@ -27,7 +27,8 @@ import { validateResult } from '../internal/validation/ValidateResult.js';
 import { mapValidationFailuresToInvalidFieldCases } from './validation/MapValidationFailuresToInvalidFieldCases.js';
 import { ValidateContext } from './validation/ValidateContext.js';
 import { serverBase64Decode } from './binary/ServerBase64Decode.js';
-import { getApiDefinitionsWithExamples } from './GetApiDefinitionsWithExamples.js';
+import { getDefinitionExample } from './GetApiDefinitionsWithExamples.js';
+import { getDefinitionClosure, getIndexEntries } from './SchemaIntrospection.js';
 import { TelepactError } from '../TelepactError.js';
 import { UpdateHeaders } from '../Server.js';
 import { buildUnknownErrorMessage } from './UnknownError.js';
@@ -181,14 +182,22 @@ export async function handleMessage(
     let resultMessage: Message;
     if (functionName === 'fn.ping_') {
         resultMessage = new Message({}, { Ok_: {} });
+    } else if (functionName === 'fn.index_') {
+        const includeInternal = requestPayload['includeInternal!'] === true;
+        resultMessage = new Message({}, { Ok_: { functions: getIndexEntries(telepactSchema, includeInternal) } });
+    } else if (functionName === 'fn.def_') {
+        const includeInternal = requestPayload['includeInternal!'] === true;
+        const name = typeof requestPayload.name === 'string' ? requestPayload.name : '';
+        resultMessage = new Message({}, { Ok_: { definitions: getDefinitionClosure(telepactSchema, name, includeInternal) } });
+    } else if (functionName === 'fn.example_') {
+        const includeInternal = requestPayload['includeInternal!'] === true;
+        const name = typeof requestPayload.name === 'string' ? requestPayload.name : '';
+        resultMessage = new Message({}, { Ok_: getDefinitionExample(telepactSchema, name, includeInternal) });
     } else if (functionName === 'fn.api_') {
         const includeInternal = requestPayload['includeInternal!'] === true;
-        const includeExamples = requestPayload['includeExamples!'] === true;
-        const apiDefinitions = includeExamples
-            ? getApiDefinitionsWithExamples(telepactSchema, includeInternal)
-            : includeInternal
-                ? telepactSchema.full
-                : telepactSchema.original;
+        const apiDefinitions = includeInternal
+            ? telepactSchema.full
+            : telepactSchema.original;
         resultMessage = new Message({}, { Ok_: { api: apiDefinitions } });
     } else {
         try {
