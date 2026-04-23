@@ -51,7 +51,10 @@ export function getApiDefinitionExamples(
     return Object.fromEntries(
         Object.entries(definitionWithExamples).filter(([key]) =>
             key === 'example' || key === 'inputExample' || key === 'outputExample'
-        ),
+        ).map(([key, value]) => [
+            key === 'example' ? 'example!' : key === 'inputExample' ? 'inputExample!' : 'outputExample!',
+            value,
+        ]),
     );
 }
 

@@ -59,10 +59,12 @@ public class GetApiDefinitionsWithExamples {
                     getDefaultFnScope(telepactSchema.parsed));
             final var result = new LinkedHashMap<String, Object>();
             for (final var entry : definitionWithExamples.entrySet()) {
-                if (entry.getKey().equals("example")
-                        || entry.getKey().equals("inputExample")
-                        || entry.getKey().equals("outputExample")) {
-                    result.put(entry.getKey(), entry.getValue());
+                if (entry.getKey().equals("example")) {
+                    result.put("example!", entry.getValue());
+                } else if (entry.getKey().equals("inputExample")) {
+                    result.put("inputExample!", entry.getValue());
+                } else if (entry.getKey().equals("outputExample")) {
+                    result.put("outputExample!", entry.getValue());
                 }
             }
             return result;

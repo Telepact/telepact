@@ -143,8 +143,13 @@ func GetAPIDefinitionExamples(schema SchemaAccessor, schemaKey string, includeIn
 		)
 		result := make(map[string]any)
 		for key, value := range definitionWithExamples {
-			if key == "example" || key == "inputExample" || key == "outputExample" {
-				result[key] = value
+			switch key {
+			case "example":
+				result["example!"] = value
+			case "inputExample":
+				result["inputExample!"] = value
+			case "outputExample":
+				result["outputExample!"] = value
 			}
 		}
 		return result

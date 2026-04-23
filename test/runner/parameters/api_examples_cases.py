@@ -18,15 +18,15 @@ auth_cases = {
     'api_examples_auth': [
         [
             [{}, {'fn.example_': {'schemaKey': 'fn.test'}}],
-            [{}, {'Ok_': {'inputExample': {'fn.test': {}}, 'outputExample': {'Ok_': {}}}}],
+            [{}, {'Ok_': {'inputExample!': {'fn.test': {}}, 'outputExample!': {'Ok_': {}}}}],
         ],
         [
             [{}, {'fn.example_': {'schemaKey': 'headers.Auth_'}}],
-            [{}, {'Ok_': {'inputExample': {'@auth_': {'Token': {'token': 'sigma'}}}, 'outputExample': {}}}],
+            [{}, {'Ok_': {'inputExample!': {'@auth_': {'Token': {'token': 'sigma'}}}, 'outputExample!': {}}}],
         ],
         [
             [{}, {'fn.example_': {'schemaKey': 'errors.Auth_'}}],
-            [{}, {'Ok_': {'example': {'ErrorUnauthorized_': {'message!': 'sigma'}}}}],
+            [{}, {'Ok_': {'example!': {'ErrorUnauthorized_': {'message!': 'sigma'}}}}],
         ],
     ],
 }
@@ -37,13 +37,13 @@ mock_cases = {
         [
             [{}, {'fn.example_': {'schemaKey': 'fn.createStub_', 'includeInternal!': True}}],
             [{}, {'Ok_': {
-                'inputExample': {'fn.createStub_': {'count!': 3178529, 'strictMatch!': False, 'stub': {'fn.test': {}, '->': {'Ok_': {}}}}},
-                'outputExample': {'ErrorUnknown_': {'caseId': 'xi'}},
+                'inputExample!': {'fn.createStub_': {'count!': 3178529, 'strictMatch!': False, 'stub': {'fn.test': {}, '->': {'Ok_': {}}}}},
+                'outputExample!': {'ErrorUnknown_': {'caseId': 'xi'}},
             }}],
         ],
         [
             [{}, {'fn.example_': {'schemaKey': '_ext.Stub_', 'includeInternal!': True}}],
-            [{}, {'Ok_': {'example': {'fn.test': {'value': {'bytes!': 'AiHAMQ==', 'sel!': {'->': {'Ok_': ['value']}, 'struct.Payload': ['bytes!']}}}, '->': {'Ok_': {}}}}}],
+            [{}, {'Ok_': {'example!': {'fn.test': {'value': {'bytes!': 'AiHAMQ==', 'sel!': {'->': {'Ok_': ['value']}, 'struct.Payload': ['bytes!']}}}, '->': {'Ok_': {}}}}}],
         ],
     ],
 }
