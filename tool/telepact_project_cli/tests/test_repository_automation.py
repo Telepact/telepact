@@ -58,20 +58,21 @@ class RepositoryAutomationTests(unittest.TestCase):
 
     def test_should_release_command_writes_github_output_when_version_file_not_changed(self) -> None:
         runner = CliRunner()
-        github_output = Path("/tmp/github-output.txt")
-        with (
-            mock.patch(
-                "telepact_project_cli.commands.repository_automation.subprocess.run",
-                return_value=SimpleNamespace(stdout="README.md\n"),
-            ),
-            mock.patch(
-                "telepact_project_cli.commands.repository_automation._write_github_outputs",
-            ) as write_github_outputs,
-        ):
-            result = runner.invoke(
-                main,
-                ["should-release", "--github-output", str(github_output)],
-            )
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            github_output = Path(tmp_dir) / "github-output.txt"
+            with (
+                mock.patch(
+                    "telepact_project_cli.commands.repository_automation.subprocess.run",
+                    return_value=SimpleNamespace(stdout="README.md\n"),
+                ),
+                mock.patch(
+                    "telepact_project_cli.commands.repository_automation._write_github_outputs",
+                ) as write_github_outputs,
+            ):
+                result = runner.invoke(
+                    main,
+                    ["should-release", "--github-output", str(github_output)],
+                )
 
         self.assertEqual(result.exit_code, 0, msg=result.output)
         write_github_outputs.assert_called_once_with(github_output, {"should_release": False})
