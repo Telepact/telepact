@@ -1,9 +1,9 @@
 {
   "changed_paths": [
-    "test/runner/util.py"
+    ".github/workflows/release.yml"
   ],
   "direct_targets": [],
-  "pr_number": 466,
+  "pr_number": 467,
   "targets": [],
   "version": "1.0.0-alpha.321"
 }
