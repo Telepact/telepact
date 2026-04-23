@@ -26,7 +26,12 @@ from lxml import etree as ET
 from ruamel.yaml import YAML
 
 from .doc_versions import write_doc_versions
-from ..release_plan import compute_release_manifest, load_release_manifest, write_release_manifest
+from ..release_plan import (
+    RELEASE_MANIFEST_RELATIVE_PATH,
+    compute_release_manifest,
+    load_release_manifest,
+    write_release_manifest,
+)
 
 yaml = YAML()
 
@@ -170,7 +175,7 @@ def create_version_bump_commit(pr_number: int, changed_paths: list[str] | None =
     version = current_manifest.get("version")
     if not isinstance(version, str) or not version:
         raise click.ClickException(
-            "Release manifest at .release/release-manifest.json must define a non-empty string 'version'."
+            f"Release manifest at {RELEASE_MANIFEST_RELATIVE_PATH.as_posix()} must define a non-empty string 'version'."
         )
 
     release_manifest = compute_release_manifest(

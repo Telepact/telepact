@@ -66,7 +66,9 @@ def find_repo_root(start: Path | str = ".") -> Path:
     for candidate in [start_path, *start_path.parents]:
         if (candidate / RELEASE_MANIFEST_RELATIVE_PATH).exists() or (candidate / RELEASE_CONFIG_RELATIVE_PATH).exists():
             return candidate
-    raise click.ClickException("Unable to locate repo root (release metadata not found).")
+    raise click.ClickException(
+        "Unable to locate repo root (.release/release-manifest.json or .release/release-targets.yaml not found)."
+    )
 
 
 def release_manifest_path(repo_root: Path | str = ".") -> Path:
