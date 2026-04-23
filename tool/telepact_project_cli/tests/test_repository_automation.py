@@ -33,6 +33,7 @@ from telepact_project_cli.commands.repository_automation import (
     _pull_request_ci_state,
     _validate_merge_request,
     _verify_pull_request_ci,
+    _wait_for_pr_stable,
 )
 
 
@@ -90,6 +91,17 @@ class RepositoryAutomationTests(unittest.TestCase):
         ):
             with self.assertRaisesRegex(RuntimeError, "CI failed with state 'failure'"):
                 _verify_pull_request_ci(mock.Mock(), 7, "head-sha")
+
+    def test_wait_for_pr_stable_rejects_closed_pull_request(self) -> None:
+        repo = mock.Mock()
+        repo.get_pull.return_value = SimpleNamespace(
+            number=7,
+            state="closed",
+            head=SimpleNamespace(sha="head-sha"),
+        )
+
+        with self.assertRaisesRegex(RuntimeError, "Pull request #7 is not open."):
+            _wait_for_pr_stable(repo, 7, "head-sha")
 
     def test_validate_merge_request_rejects_missing_reviews_for_non_admin(self) -> None:
         pr = SimpleNamespace(

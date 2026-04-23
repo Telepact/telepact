@@ -223,6 +223,8 @@ def _wait_for_pr_stable(repo, pr_number: int, expected_head_sha: str) -> PullReq
     deadline = time.monotonic() + WAIT_TIMEOUT_SECONDS
     while True:
         pr = repo.get_pull(pr_number)
+        if pr.state != "open":
+            raise RuntimeError(f"Pull request #{pr.number} is not open.")
         if pr.head.sha != expected_head_sha:
             raise RuntimeError(
                 f"Pull request head changed unexpectedly from {expected_head_sha} to {pr.head.sha}."
