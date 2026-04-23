@@ -1,9 +1,10 @@
 {
   "changed_paths": [
-    ".github/workflows/release.yml"
+    "tool/telepact_project_cli/telepact_project_cli/commands/repository_automation.py",
+    "tool/telepact_project_cli/tests/test_repository_automation.py"
   ],
   "direct_targets": [],
-  "pr_number": 467,
+  "pr_number": 462,
   "targets": [],
-  "version": "1.0.0-alpha.321"
+  "version": "1.0.0-alpha.322"
 }

@@ -28,6 +28,7 @@ from click.testing import CliRunner
 
 from telepact_project_cli.cli import main
 from telepact_project_cli.commands.repository_automation import (
+    _build_release_body,
     _combined_status_state,
     _process_merge_ready_pull_request,
     _pull_request_ci_state,
@@ -38,6 +39,60 @@ from telepact_project_cli.commands.repository_automation import (
 
 
 class RepositoryAutomationTests(unittest.TestCase):
+    def test_build_release_body_separates_direct_and_dependency_triggered_targets(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            repo_root = Path(tmp_dir)
+            (repo_root / "VERSION.txt").write_text("1.0.0-alpha.318", encoding="utf-8")
+            (repo_root / ".release").mkdir()
+            (repo_root / ".release" / "release-targets.yaml").write_text(
+                """
+projects:
+  py:
+    paths: [lib/py]
+    is_dependency_for: [cli]
+  cli:
+    paths: [sdk/cli]
+""".strip()
+                + "\n",
+                encoding="utf-8",
+            )
+            (repo_root / "lib" / "py").mkdir(parents=True)
+            (repo_root / "lib" / "py" / "pyproject.toml").write_text(
+                """
+[project]
+name = "telepact"
+version = "1.0.0-alpha.318"
+""".strip()
+                + "\n",
+                encoding="utf-8",
+            )
+            (repo_root / "sdk" / "cli").mkdir(parents=True)
+            (repo_root / "sdk" / "cli" / "pyproject.toml").write_text(
+                """
+[project]
+name = "telepact-cli"
+version = "1.0.0-alpha.318"
+""".strip()
+                + "\n",
+                encoding="utf-8",
+            )
+
+            body = _build_release_body(
+                repo_root,
+                pr_title="Improve release notes",
+                pr_number=7,
+                pr_url="https://github.com/Telepact/telepact/pull/7",
+                direct_targets=["py"],
+                release_targets=["cli", "py"],
+            )
+
+            self.assertIn("### Direct package changes", body)
+            self.assertIn("- **Library (Python)** — `telepact` (PyPI)", body)
+            self.assertIn("### Dependency-triggered republishes", body)
+            self.assertIn("- **SDK (CLI)** — `telepact-cli` (PyPI) — dependency-triggered republish from Library (Python)", body)
+            self.assertIn("### Published package summary", body)
+            self.assertIn("direct change; review if you use this package directly.", body)
+
     def test_combined_status_state_reads_head_commit_status(self) -> None:
         pr = SimpleNamespace(
             head=SimpleNamespace(sha="head-sha"),
