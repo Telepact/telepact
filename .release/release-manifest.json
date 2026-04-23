@@ -1,15 +1,9 @@
 {
   "changed_paths": [
-    "lib/py/pyproject.toml",
-    "lib/py/uv.lock"
+    "test/runner/util.py"
   ],
-  "direct_targets": [
-    "py"
-  ],
-  "pr_number": 448,
-  "targets": [
-    "cli",
-    "py"
-  ],
+  "direct_targets": [],
+  "pr_number": 466,
+  "targets": [],
   "version": "1.0.0-alpha.321"
 }
