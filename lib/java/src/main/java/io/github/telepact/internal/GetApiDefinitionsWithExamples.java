@@ -42,6 +42,35 @@ public class GetApiDefinitionsWithExamples {
                 .collect(Collectors.toList());
     }
 
+    public static Map<String, Object> getApiDefinitionExamples(
+            TelepactSchema telepactSchema,
+            String schemaKey,
+            boolean includeInternal) {
+        final var definitions = includeInternal ? telepactSchema.full : telepactSchema.original;
+        for (final var definition : definitions) {
+            final var definitionMap = (Map<String, Object>) definition;
+            if (!getSchemaKey(definitionMap).equals(schemaKey)) {
+                continue;
+            }
+
+            final var definitionWithExamples = addExamplesToDefinition(
+                    definitionMap,
+                    telepactSchema,
+                    getDefaultFnScope(telepactSchema.parsed));
+            final var result = new LinkedHashMap<String, Object>();
+            for (final var entry : definitionWithExamples.entrySet()) {
+                if (entry.getKey().equals("example")
+                        || entry.getKey().equals("inputExample")
+                        || entry.getKey().equals("outputExample")) {
+                    result.put(entry.getKey(), entry.getValue());
+                }
+            }
+            return result;
+        }
+
+        return null;
+    }
+
     private static Map<String, Object> addExamplesToDefinition(
             Map<String, Object> definition,
             TelepactSchema telepactSchema,
@@ -258,7 +287,7 @@ public class GetApiDefinitionsWithExamples {
         return "fn.ping_";
     }
 
-    private static String getSchemaKey(Map<String, Object> definition) {
+    static String getSchemaKey(Map<String, Object> definition) {
         for (final var key : definition.keySet()) {
             if (!key.equals("///") && !key.equals("->") && !key.equals("_errors")) {
                 return key;

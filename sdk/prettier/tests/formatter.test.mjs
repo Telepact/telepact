@@ -34,7 +34,7 @@ async function formatTelepactSchema(input) {
 
 test("formats schema JSON into Telepact YAML", async () => {
     const input =
-        '[{"///":"Get the telepact `schema` of this server.\\n\\nSet `includeInternal` to `true` to include Telepact internal definitions.","fn.api_":{"includeInternal!":"boolean","includeExamples!":"boolean"},"->":[{"Ok_":{"api":[{"string":"any"}]}}]}]';
+        '[{"///":"Get the telepact `schema` of this server.\\n\\nSet `includeInternal` to `true` to include Telepact internal definitions.","fn.api_":{"includeInternal!":"boolean"},"->":[{"Ok_":{"api":[{"string":"any"}]}}]}]';
 
     const output = await formatTelepactSchema(input);
 
@@ -46,7 +46,6 @@ test("formats schema JSON into Telepact YAML", async () => {
     Set \`includeInternal\` to \`true\` to include Telepact internal definitions.
   fn.api_:
     includeInternal!: "boolean"
-    includeExamples!: "boolean"
   ->:
     - Ok_:
         api: [{"string": "any"}]

@@ -161,15 +161,56 @@ import io.github.telepact.internal.validation.ValidationFailure;
         final Message resultMessage;
         if (functionName.equals("fn.ping_")) {
             resultMessage = new Message(Map.of(), Map.of("Ok_", Map.of()));
+        } else if (functionName.equals("fn.index_")) {
+            final var includeInternal = requestPayload instanceof Map<?, ?>
+                    && Objects.equals(true, ((Map<?, ?>) requestPayload).get("includeInternal!"));
+            resultMessage = new Message(Map.of(),
+                    Map.of("Ok_", Map.of("api", GetIncrementalApiDefinitions.getApiEntrypointDefinitions(telepactSchema, includeInternal))));
+        } else if (functionName.equals("fn.def_")) {
+            final var includeInternal = requestPayload instanceof Map<?, ?>
+                    && Objects.equals(true, ((Map<?, ?>) requestPayload).get("includeInternal!"));
+            final var requestedSchemaKey = requestPayload.get("schemaKey");
+            final var apiDefinitions = requestedSchemaKey instanceof String
+                    ? GetIncrementalApiDefinitions.getApiDefinitionsBySchemaKey(telepactSchema, (String) requestedSchemaKey, includeInternal)
+                    : null;
+            if (apiDefinitions == null) {
+                final Map<String, Object> invalidSchemaKeyResult = Map.of(
+                        "ErrorInvalidRequestBody_",
+                        Map.of("cases", List.of(Map.of(
+                                "path", List.of(functionName, "schemaKey"),
+                                "reason", Map.of("ExtensionValidationFailed", Map.of(
+                                        "reason", "SchemaKeyUnknown",
+                                        "data!", Map.of("schemaKey", requestedSchemaKey)))))));
+                validateResult(resultUnionType, invalidSchemaKeyResult);
+                resultMessage = new Message(Map.of(), invalidSchemaKeyResult);
+            } else {
+                resultMessage = new Message(Map.of(), Map.of("Ok_", Map.of("api", apiDefinitions)));
+            }
+        } else if (functionName.equals("fn.example_")) {
+            final var includeInternal = requestPayload instanceof Map<?, ?>
+                    && Objects.equals(true, ((Map<?, ?>) requestPayload).get("includeInternal!"));
+            final var requestedSchemaKey = requestPayload.get("schemaKey");
+            final var definitionExamples = requestedSchemaKey instanceof String
+                    ? GetApiDefinitionsWithExamples.getApiDefinitionExamples(telepactSchema, (String) requestedSchemaKey, includeInternal)
+                    : null;
+            if (definitionExamples == null) {
+                final Map<String, Object> invalidSchemaKeyResult = Map.of(
+                        "ErrorInvalidRequestBody_",
+                        Map.of("cases", List.of(Map.of(
+                                "path", List.of(functionName, "schemaKey"),
+                                "reason", Map.of("ExtensionValidationFailed", Map.of(
+                                        "reason", "SchemaKeyUnknown",
+                                        "data!", Map.of("schemaKey", requestedSchemaKey)))))));
+                validateResult(resultUnionType, invalidSchemaKeyResult);
+                resultMessage = new Message(Map.of(), invalidSchemaKeyResult);
+            } else {
+                resultMessage = new Message(Map.of(), Map.of("Ok_", definitionExamples));
+            }
         } else if (functionName.equals("fn.api_")) {
             final var includeInternal = requestPayload instanceof Map<?, ?>
                     && Objects.equals(true, ((Map<?, ?>) requestPayload).get("includeInternal!"));
-            final var includeExamples = requestPayload instanceof Map<?, ?>
-                    && Objects.equals(true, ((Map<?, ?>) requestPayload).get("includeExamples!"));
             resultMessage = new Message(Map.of(),
-                    Map.of("Ok_", Map.of("api", includeExamples
-                            ? GetApiDefinitionsWithExamples.getApiDefinitionsWithExamples(telepactSchema, includeInternal)
-                            : includeInternal ? telepactSchema.full : telepactSchema.original)));
+                    Map.of("Ok_", Map.of("api", includeInternal ? telepactSchema.full : telepactSchema.original)));
         } else {
             try {
                 resultMessage = middleware.apply(callMessage, functionRouter);

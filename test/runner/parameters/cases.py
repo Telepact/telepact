@@ -17,6 +17,7 @@
 from typing import Any
 import base64
 from pathlib import Path
+import re
 
 from parameters.schema_loader import load_schema_definitions
 
@@ -80,6 +81,97 @@ _EXAMPLE_FULL_SCHEMA = _load_sorted_schema(
     'test/runner/schema/example/example.telepact.json',
     'common/internal.telepact.yaml',
 )
+_EXAMPLE_PUBLIC_SCHEMA = _load_sorted_schema(
+    'test/runner/schema/example/example.telepact.json',
+)
+_ENTRYPOINT_PREFIXES = ('info.', 'headers.', 'errors.', 'fn.')
+_CUSTOM_TYPE_PREFIXES = ('fn.', 'struct.', 'union.', 'headers.', 'errors.', 'info.', '_ext.')
+
+
+def _entrypoint_schema(definitions: list[dict[str, object]]) -> list[dict[str, object]]:
+    return [
+        definition
+        for definition in definitions
+        if _schema_key(definition).startswith(_ENTRYPOINT_PREFIXES)
+    ]
+
+
+def _transitive_schema(definitions: list[dict[str, object]], schema_key: str) -> list[dict[str, object]]:
+    definitions_by_key = {_schema_key(definition): definition for definition in definitions}
+    included_schema_keys: set[str] = set()
+    pending_schema_keys: list[str] = [schema_key]
+
+    while pending_schema_keys:
+        current_schema_key = pending_schema_keys.pop()
+        if current_schema_key in included_schema_keys:
+            continue
+        definition = definitions_by_key.get(current_schema_key)
+        if definition is None:
+            continue
+
+        included_schema_keys.add(current_schema_key)
+        pending_schema_keys.extend([
+            referenced_schema_key
+            for referenced_schema_key in _referenced_schema_keys(definition, definitions_by_key)
+            if referenced_schema_key not in included_schema_keys
+        ])
+
+    return [
+        definition
+        for definition in definitions
+        if _schema_key(definition) in included_schema_keys
+    ]
+
+
+def _referenced_schema_keys(
+    definition: dict[str, object],
+    definitions_by_key: dict[str, dict[str, object]],
+) -> list[str]:
+    references: set[str] = set()
+
+    for key, value in definition.items():
+        if key in {'///', '_errors'}:
+            continue
+        _collect_referenced_schema_keys(value, definitions_by_key, references)
+
+    errors_regex = definition.get('_errors')
+    if isinstance(errors_regex, str):
+        regex = re.compile(errors_regex)
+        references.update([
+            candidate_schema_key
+            for candidate_schema_key in definitions_by_key.keys()
+            if regex.match(candidate_schema_key)
+        ])
+
+    return sorted(references)
+
+
+def _collect_referenced_schema_keys(
+    value: object,
+    definitions_by_key: dict[str, dict[str, object]],
+    references: set[str],
+) -> None:
+    if isinstance(value, str):
+        schema_key = value[:-1] if value.endswith('?') else value
+        if schema_key.startswith(_CUSTOM_TYPE_PREFIXES) and schema_key in definitions_by_key:
+            references.add(schema_key)
+        return
+
+    if isinstance(value, list):
+        for entry in value:
+            _collect_referenced_schema_keys(entry, definitions_by_key, references)
+        return
+
+    if isinstance(value, dict):
+        for key, entry in value.items():
+            if key == '///':
+                continue
+            _collect_referenced_schema_keys(entry, definitions_by_key, references)
+
+
+_EXAMPLE_PUBLIC_ENTRYPOINT_SCHEMA = _entrypoint_schema(_EXAMPLE_PUBLIC_SCHEMA)
+_EXAMPLE_FULL_ENTRYPOINT_SCHEMA = _entrypoint_schema(_EXAMPLE_FULL_SCHEMA)
+_EXAMPLE_FN_TEST_SCHEMA = _transitive_schema(_EXAMPLE_PUBLIC_SCHEMA, 'fn.test')
 
 def get_values(given_field: str, the_type, given_correct_values, additional_incorrect_values):
     default_incorrect_values = list(filter(lambda n: type(n) not in (int, float) if the_type == float else type(n) not in (Base64String, str) if the_type == Base64String else False if the_type == Any else type(n) != the_type, default_values))
@@ -359,6 +451,10 @@ cases = {
     'api': [
         [[{}, {'fn.api_': {}}], [{}, {'Ok_': {'api': [{'///': [' This is the example schema. It is focussed on outlining type edge cases for     ', ' use in tests.                                                                   ', '                                                                                 ', ' As a reminder:                                                                  ', '                                                                                 ', ' - ! means optional field                                                        ', ' - ? means nullable type                                                         '], 'info.Example': {}}, {'errors.ExampleErrors': [{'ErrorExample2': {'field1': 'string'}}]}, {'fn.circularLink1': {'field1': 'boolean'}, '->': [{'Ok_': {'follow': 'fn.circularLink2'}}]}, {'fn.circularLink2': {'field2': 'boolean'}, '->': [{'Ok_': {'follow': 'fn.circularLink1'}}]}, {'///': ' An example function. ', 'fn.example': {'required': 'boolean', 'optional!': 'boolean'}, '->': [{'Ok_': {'required': 'boolean', 'optional!': 'boolean'}}]}, {'fn.getBigList': {}, '->': [{'Ok_': {'items': ['struct.Big']}}]}, {'fn.selfLink': {'required': 'boolean', 'optional!': 'boolean'}, '->': [{'Ok_': {'followSelf': 'fn.selfLink'}}]}, {'fn.test': {'value!': 'struct.Value'}, '->': [{'Ok_': {'value!': 'struct.Value'}}, {'ErrorExample': {'property': 'string'}}]}, {'headers.ExampleHeaders': {'@in': 'boolean'}, '->': {'@out': 'boolean'}}, {'struct.Big': {'aF': 'boolean', 'cF': 'boolean', 'bF': 'boolean', 'dF': 'boolean'}}, {'///': [' The main struct example.                                                        ', '                                                                                 ', ' The [required] field must be supplied. The optional field does not need to be   ', ' supplied.                                                                       '], 'struct.ExStruct': {'required': 'boolean', 'optional!': 'boolean', 'optional2!': 'integer'}}, {'///': ' A struct value demonstrating all common type permutations. ', 'struct.Value': {'bool!': 'boolean', 'nullBool!': 'boolean?', 'arrBool!': ['boolean'], 'arrNullBool!': ['boolean?'], 'objBool!': {'string': 'boolean'}, 'objNullBool!': {'string': 'boolean?'}, 'int!': 'integer', 'nullInt!': 'integer?', 'arrInt!': ['integer'], 'arrNullInt!': ['integer?'], 'objInt!': {'string': 'integer'}, 'objNullInt!': {'string': 'integer?'}, 'num!': 'number', 'nullNum!': 'number?', 'arrNum!': ['number'], 'arrNullNum!': ['number?'], 'objNum!': {'string': 'number'}, 'objNullNum!': {'string': 'number?'}, 'str!': 'string', 'nullStr!': 'string?', 'arrStr!': ['string'], 'arrNullStr!': ['string?'], 'objStr!': {'string': 'string'}, 'objNullStr!': {'string': 'string?'}, 'any!': 'any', 'nullAny!': 'any?', 'arrAny!': ['any'], 'arrNullAny!': ['any?'], 'objAny!': {'string': 'any'}, 'objNullAny!': {'string': 'any?'}, 'bytes!': 'bytes', 'nullBytes!': 'bytes?', 'arrBytes!': ['bytes'], 'arrNullBytes!': ['bytes?'], 'objBytes!': {'string': 'bytes'}, 'objNullBytes!': {'string': 'bytes?'}, 'arr!': ['any'], 'arrArr!': [['any']], 'objArr!': {'string': ['any']}, 'obj!': {'string': 'any'}, 'arrObj!': [{'string': 'any'}], 'objObj!': {'string': {'string': 'any'}}, 'struct!': 'struct.ExStruct', 'nullStruct!': 'struct.ExStruct?', 'arrStruct!': ['struct.ExStruct'], 'arrNullStruct!': ['struct.ExStruct?'], 'objStruct!': {'string': 'struct.ExStruct'}, 'objNullStruct!': {'string': 'struct.ExStruct?'}, 'union!': 'union.ExUnion', 'nullUnion!': 'union.ExUnion?', 'arrUnion!': ['union.ExUnion'], 'arrNullUnion!': ['union.ExUnion?'], 'objUnion!': {'string': 'union.ExUnion'}, 'objNullUnion!': {'string': 'union.ExUnion?'}, 'fn!': 'fn.example', 'nullFn!': 'fn.example?', 'arrFn!': ['fn.example'], 'arrNullFn!': ['fn.example?'], 'objFn!': {'string': 'fn.example'}, 'objNullFn!': {'string': 'fn.example?'}, 'sel!': '_ext.Select_', 'nullSel!': '_ext.Select_?', 'arrSel!': ['_ext.Select_'], 'arrNullSel!': ['_ext.Select_?'], 'objSel!': {'string': '_ext.Select_'}, 'objNullSel!': {'string': '_ext.Select_?'}}}, {'union.ExUnion': [{'One': {}}, {'Two': {'required': 'boolean', 'optional!': 'boolean'}}]}]}}]],
         [[{}, {'fn.api_': {'includeInternal!': True}}], [{}, {'Ok_': {'api': _EXAMPLE_FULL_SCHEMA}}]],
+        [[{}, {'fn.index_': {}}], [{}, {'Ok_': {'api': _EXAMPLE_PUBLIC_ENTRYPOINT_SCHEMA}}]],
+        [[{}, {'fn.index_': {'includeInternal!': True}}], [{}, {'Ok_': {'api': _EXAMPLE_FULL_ENTRYPOINT_SCHEMA}}]],
+        [[{}, {'fn.def_': {'schemaKey': 'fn.test'}}], [{}, {'Ok_': {'api': _EXAMPLE_FN_TEST_SCHEMA}}]],
+        [[{}, {'fn.def_': {'schemaKey': 'missing'}}], [{}, {'ErrorInvalidRequestBody_': {'cases': [{'path': ['fn.def_', 'schemaKey'], 'reason': {'ExtensionValidationFailed': {'reason': 'SchemaKeyUnknown', 'data!': {'schemaKey': 'missing'}}}}]}}]],
     ],
     'serverHooks': [
         [[{'@ok_': {}, '@onRequestError_': True}, {'fn.test': {}}], [{}, {'Ok_': {}}]],

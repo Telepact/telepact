@@ -32,6 +32,29 @@ export function getApiDefinitionsWithExamples(telepactSchema: TelepactSchema, in
     );
 }
 
+export function getApiDefinitionExamples(
+    telepactSchema: TelepactSchema,
+    schemaKey: string,
+    includeInternal: boolean,
+): Record<string, any> | null {
+    const definitions = includeInternal ? telepactSchema.full : telepactSchema.original;
+    const definition = definitions.find((candidate) => getSchemaKey(candidate as Record<string, any>) === schemaKey) as Record<string, any> | undefined;
+    if (definition === undefined) {
+        return null;
+    }
+
+    const definitionWithExamples = addExamplesToDefinition(
+        definition,
+        telepactSchema,
+        getDefaultFnScope(telepactSchema.parsed),
+    );
+    return Object.fromEntries(
+        Object.entries(definitionWithExamples).filter(([key]) =>
+            key === 'example' || key === 'inputExample' || key === 'outputExample'
+        ),
+    );
+}
+
 function addExamplesToDefinition(
     definition: Record<string, any>,
     telepactSchema: TelepactSchema,
@@ -238,7 +261,7 @@ function getDefaultFnScope(parsedTypes: Record<string, TType>): string {
     return 'fn.ping_';
 }
 
-function getSchemaKey(definition: Record<string, any>): string {
+export function getSchemaKey(definition: Record<string, any>): string {
     for (const key of Object.keys(definition)) {
         if (key !== '///' && key !== '->' && key !== '_errors') {
             return key;

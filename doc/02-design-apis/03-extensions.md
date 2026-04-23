@@ -41,8 +41,8 @@ If you need ordinary API data modeling, use `struct.*`, `union.*`, `fn.*`,
 ## Discovering Them
 
 Call `fn.api_` with `{"includeInternal!": true}` to include internal schemas,
-including `_ext.*_` definitions. Add `{"includeExamples!": true}` to get
-deterministic example payloads for those types.
+including `_ext.*_` definitions. Use `fn.example_` to get deterministic example
+payloads for a single definition.
 
 The examples below are illustrative request and response messages. They use the
 normal Telepact two-object message format:

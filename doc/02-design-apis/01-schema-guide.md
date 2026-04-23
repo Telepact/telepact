@@ -317,9 +317,10 @@ included and cannot be turned off.
 
 The `fn.api_` helper returns the user-facing schema by default. Pass
 `{"includeInternal!": true}` to include these standard Telepact definitions in
-the response. Pass `{"includeExamples!": true}` to attach deterministic example
-payloads to each returned schema entry. For mock servers, the expanded response
-also includes the bundled mock schema definitions.
+the response. Use `fn.index_`, `fn.def_`, and `fn.example_` when you want to
+consume the schema incrementally or fetch deterministic example payloads for a
+single definition. For mock servers, the expanded response also includes the
+bundled mock schema definitions.
 
 You can find all standard definitions
 [here](../../common/internal.telepact.yaml).

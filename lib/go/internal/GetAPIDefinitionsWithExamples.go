@@ -123,6 +123,36 @@ func GetAPIDefinitionsWithExamples(schema SchemaAccessor, includeInternal bool) 
 	return result
 }
 
+// GetAPIDefinitionExamples returns deterministic example payloads for a single schema definition.
+func GetAPIDefinitionExamples(schema SchemaAccessor, schemaKey string, includeInternal bool) map[string]any {
+	definitions := schema.OriginalDefinitions()
+	if includeInternal {
+		definitions = schema.FullDefinitions()
+	}
+
+	for _, definition := range definitions {
+		definitionMap := toStringAnyMap(definition)
+		if definitionMap == nil || getSchemaKey(definitionMap) != schemaKey {
+			continue
+		}
+
+		definitionWithExamples := addExamplesToDefinition(
+			definitionMap,
+			schema,
+			getDefaultFnScope(schema.ParsedDefinitions()),
+		)
+		result := make(map[string]any)
+		for key, value := range definitionWithExamples {
+			if key == "example" || key == "inputExample" || key == "outputExample" {
+				result[key] = value
+			}
+		}
+		return result
+	}
+
+	return nil
+}
+
 func addExamplesToDefinition(
 	definition map[string]any,
 	schema SchemaAccessor,

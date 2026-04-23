@@ -178,19 +178,88 @@ func HandleMessage(
 	switch functionName {
 	case "fn.ping_":
 		resultMessage = ServerMessage{Headers: make(map[string]any), Body: map[string]any{"Ok_": map[string]any{}}}
-	case "fn.api_":
+	case "fn.index_":
 		includeInternal := false
-		includeExamples := false
 		if requestMap, ok := requestPayload.(map[string]any); ok {
 			includeInternal = boolValue(requestMap["includeInternal!"])
-			includeExamples = boolValue(requestMap["includeExamples!"])
+		}
+		resultMessage = ServerMessage{Headers: make(map[string]any), Body: map[string]any{"Ok_": map[string]any{"api": GetAPIEntrypointDefinitions(schema, includeInternal)}}}
+	case "fn.def_":
+		includeInternal := false
+		requestedSchemaKey := ""
+		if requestMap, ok := requestPayload.(map[string]any); ok {
+			includeInternal = boolValue(requestMap["includeInternal!"])
+			if schemaKey, ok := requestMap["schemaKey"].(string); ok {
+				requestedSchemaKey = schemaKey
+			}
+		}
+		apiDefinitions := GetAPIDefinitionsBySchemaKey(schema, requestedSchemaKey, includeInternal)
+		if apiDefinitions == nil {
+			invalidSchemaKeyResult := map[string]any{
+				"ErrorInvalidRequestBody_": map[string]any{
+					"cases": []any{
+						map[string]any{
+							"path": []any{functionName, "schemaKey"},
+							"reason": map[string]any{
+								"ExtensionValidationFailed": map[string]any{
+									"reason": "SchemaKeyUnknown",
+									"data!": map[string]any{"schemaKey": requestPayload.(map[string]any)["schemaKey"]},
+								},
+							},
+						},
+					},
+				},
+			}
+			if err := validateResult(resultUnionType, invalidSchemaKeyResult); err != nil {
+				return ServerMessage{}, err
+			}
+			resultMessage = ServerMessage{Headers: make(map[string]any), Body: invalidSchemaKeyResult}
+		} else {
+			resultMessage = ServerMessage{Headers: make(map[string]any), Body: map[string]any{"Ok_": map[string]any{"api": apiDefinitions}}}
+		}
+	case "fn.example_":
+		includeInternal := false
+		requestedSchemaKey := ""
+		var requestedSchemaKeyValue any
+		if requestMap, ok := requestPayload.(map[string]any); ok {
+			includeInternal = boolValue(requestMap["includeInternal!"])
+			requestedSchemaKeyValue = requestMap["schemaKey"]
+			if schemaKey, ok := requestedSchemaKeyValue.(string); ok {
+				requestedSchemaKey = schemaKey
+			}
+		}
+		definitionExamples := GetAPIDefinitionExamples(schema, requestedSchemaKey, includeInternal)
+		if definitionExamples == nil {
+			invalidSchemaKeyResult := map[string]any{
+				"ErrorInvalidRequestBody_": map[string]any{
+					"cases": []any{
+						map[string]any{
+							"path": []any{functionName, "schemaKey"},
+							"reason": map[string]any{
+								"ExtensionValidationFailed": map[string]any{
+									"reason": "SchemaKeyUnknown",
+									"data!": map[string]any{"schemaKey": requestedSchemaKeyValue},
+								},
+							},
+						},
+					},
+				},
+			}
+			if err := validateResult(resultUnionType, invalidSchemaKeyResult); err != nil {
+				return ServerMessage{}, err
+			}
+			resultMessage = ServerMessage{Headers: make(map[string]any), Body: invalidSchemaKeyResult}
+		} else {
+			resultMessage = ServerMessage{Headers: make(map[string]any), Body: map[string]any{"Ok_": definitionExamples}}
+		}
+	case "fn.api_":
+		includeInternal := false
+		if requestMap, ok := requestPayload.(map[string]any); ok {
+			includeInternal = boolValue(requestMap["includeInternal!"])
 		}
 		apiDefinitions := schema.OriginalDefinitions()
 		if includeInternal {
 			apiDefinitions = schema.FullDefinitions()
-		}
-		if includeExamples {
-			apiDefinitions = GetAPIDefinitionsWithExamples(schema, includeInternal)
 		}
 		resultMessage = ServerMessage{Headers: make(map[string]any), Body: map[string]any{"Ok_": map[string]any{"api": apiDefinitions}}}
 	default:

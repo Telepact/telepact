@@ -21,14 +21,48 @@
   _errors: '^errors\.Validation_$'
 
 - ///: |
+    Get the Telepact schema entrypoints of this server.
+
+    Set `includeInternal` to `true` to include Telepact internal entrypoints.
+  fn.index_:
+    includeInternal!: "boolean"
+  ->:
+    - Ok_:
+        api: [{"string": "any"}]
+  _errors: '^errors\.Validation_$'
+
+- ///: |
+    Get a single Telepact schema definition and its transitive dependencies.
+
+    Set `includeInternal` to `true` to allow Telepact internal definitions.
+  fn.def_:
+    schemaKey: "string"
+    includeInternal!: "boolean"
+  ->:
+    - Ok_:
+        api: [{"string": "any"}]
+  _errors: '^errors\.Validation_$'
+
+- ///: |
+    Get deterministic example payloads for a single Telepact schema definition.
+
+    Set `includeInternal` to `true` to allow Telepact internal definitions.
+  fn.example_:
+    schemaKey: "string"
+    includeInternal!: "boolean"
+  ->:
+    - Ok_:
+        example!: "any"
+        inputExample!: "any"
+        outputExample!: "any"
+  _errors: '^errors\.Validation_$'
+
+- ///: |
     Get the telepact `schema` of this server.
 
     Set `includeInternal` to `true` to include Telepact internal definitions.
-    Set `includeExamples` to `true` to add deterministic example payloads to
-    each schema entry.
   fn.api_:
     includeInternal!: "boolean"
-    includeExamples!: "boolean"
   ->:
     - Ok_:
         api: [{"string": "any"}]

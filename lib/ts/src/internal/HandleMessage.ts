@@ -27,7 +27,8 @@ import { validateResult } from '../internal/validation/ValidateResult.js';
 import { mapValidationFailuresToInvalidFieldCases } from './validation/MapValidationFailuresToInvalidFieldCases.js';
 import { ValidateContext } from './validation/ValidateContext.js';
 import { serverBase64Decode } from './binary/ServerBase64Decode.js';
-import { getApiDefinitionsWithExamples } from './GetApiDefinitionsWithExamples.js';
+import { getApiDefinitionExamples } from './GetApiDefinitionsWithExamples.js';
+import { getApiDefinitionsBySchemaKey, getApiEntrypointDefinitions } from './GetIncrementalApiDefinitions.js';
 import { TelepactError } from '../TelepactError.js';
 import { UpdateHeaders } from '../Server.js';
 import { buildUnknownErrorMessage } from './UnknownError.js';
@@ -181,14 +182,64 @@ export async function handleMessage(
     let resultMessage: Message;
     if (functionName === 'fn.ping_') {
         resultMessage = new Message({}, { Ok_: {} });
+    } else if (functionName === 'fn.index_') {
+        const includeInternal = requestPayload['includeInternal!'] === true;
+        resultMessage = new Message({}, { Ok_: { api: getApiEntrypointDefinitions(telepactSchema, includeInternal) } });
+    } else if (functionName === 'fn.def_') {
+        const includeInternal = requestPayload['includeInternal!'] === true;
+        const requestedSchemaKey = requestPayload['schemaKey'];
+        const apiDefinitions = typeof requestedSchemaKey === 'string'
+            ? getApiDefinitionsBySchemaKey(telepactSchema, requestedSchemaKey, includeInternal)
+            : null;
+        if (apiDefinitions === null) {
+            const invalidSchemaKeyResult: Record<string, any> = {
+                ErrorInvalidRequestBody_: {
+                    cases: [{
+                        path: [functionName, 'schemaKey'],
+                        reason: {
+                            ExtensionValidationFailed: {
+                                reason: 'SchemaKeyUnknown',
+                                'data!': { schemaKey: requestedSchemaKey },
+                            },
+                        },
+                    }],
+                },
+            };
+            validateResult(resultUnionType, invalidSchemaKeyResult);
+            resultMessage = new Message({}, invalidSchemaKeyResult);
+        } else {
+            resultMessage = new Message({}, { Ok_: { api: apiDefinitions } });
+        }
+    } else if (functionName === 'fn.example_') {
+        const includeInternal = requestPayload['includeInternal!'] === true;
+        const requestedSchemaKey = requestPayload['schemaKey'];
+        const definitionExamples = typeof requestedSchemaKey === 'string'
+            ? getApiDefinitionExamples(telepactSchema, requestedSchemaKey, includeInternal)
+            : null;
+        if (definitionExamples === null) {
+            const invalidSchemaKeyResult: Record<string, any> = {
+                ErrorInvalidRequestBody_: {
+                    cases: [{
+                        path: [functionName, 'schemaKey'],
+                        reason: {
+                            ExtensionValidationFailed: {
+                                reason: 'SchemaKeyUnknown',
+                                'data!': { schemaKey: requestedSchemaKey },
+                            },
+                        },
+                    }],
+                },
+            };
+            validateResult(resultUnionType, invalidSchemaKeyResult);
+            resultMessage = new Message({}, invalidSchemaKeyResult);
+        } else {
+            resultMessage = new Message({}, { Ok_: definitionExamples });
+        }
     } else if (functionName === 'fn.api_') {
         const includeInternal = requestPayload['includeInternal!'] === true;
-        const includeExamples = requestPayload['includeExamples!'] === true;
-        const apiDefinitions = includeExamples
-            ? getApiDefinitionsWithExamples(telepactSchema, includeInternal)
-            : includeInternal
-                ? telepactSchema.full
-                : telepactSchema.original;
+        const apiDefinitions = includeInternal
+            ? telepactSchema.full
+            : telepactSchema.original;
         resultMessage = new Message({}, { Ok_: { api: apiDefinitions } });
     } else {
         try {

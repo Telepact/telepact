@@ -21,7 +21,9 @@ from ..internal.binary.ServerBase64Decode import server_base64_decode
 from ..Message import Message
 from ..TelepactError import TelepactError
 from ..internal.UnknownError import build_unknown_error_message
-from .GetApiDefinitionsWithExamples import get_api_definitions_with_examples
+from .GetApiDefinitionsWithExamples import get_api_definition_examples
+from .GetIncrementalApiDefinitions import get_api_definitions_by_schema_key
+from .GetIncrementalApiDefinitions import get_api_entrypoint_definitions
 from .types.TTypeDeclaration import TTypeDeclaration
 
 if TYPE_CHECKING:
@@ -169,15 +171,68 @@ async def handle_message(
     result_message: Message
     if function_name == "fn.ping_":
         result_message = Message({}, {"Ok_": {}})
+    elif function_name == "fn.index_":
+        include_internal = isinstance(request_payload, dict) and request_payload.get("includeInternal!") is True
+        result_message = Message({}, {"Ok_": {"api": get_api_entrypoint_definitions(telepact_schema, include_internal)}})
+    elif function_name == "fn.def_":
+        include_internal = isinstance(request_payload, dict) and request_payload.get("includeInternal!") is True
+        requested_schema_key = request_payload.get("schemaKey") if isinstance(request_payload, dict) else None
+        api_definitions = get_api_definitions_by_schema_key(
+            telepact_schema,
+            cast(str, requested_schema_key),
+            include_internal,
+        ) if isinstance(requested_schema_key, str) else None
+        if api_definitions is None:
+            invalid_schema_key_result = {
+                "ErrorInvalidRequestBody_": {
+                    "cases": [
+                        {
+                            "path": [function_name, "schemaKey"],
+                            "reason": {
+                                "ExtensionValidationFailed": {
+                                    "reason": "SchemaKeyUnknown",
+                                    "data!": {"schemaKey": requested_schema_key},
+                                }
+                            },
+                        }
+                    ]
+                }
+            }
+            validate_result(result_union_type, invalid_schema_key_result)
+            result_message = Message({}, invalid_schema_key_result)
+        else:
+            result_message = Message({}, {"Ok_": {"api": api_definitions}})
+    elif function_name == "fn.example_":
+        include_internal = isinstance(request_payload, dict) and request_payload.get("includeInternal!") is True
+        requested_schema_key = request_payload.get("schemaKey") if isinstance(request_payload, dict) else None
+        definition_examples = get_api_definition_examples(
+            telepact_schema,
+            cast(str, requested_schema_key),
+            include_internal,
+        ) if isinstance(requested_schema_key, str) else None
+        if definition_examples is None:
+            invalid_schema_key_result = {
+                "ErrorInvalidRequestBody_": {
+                    "cases": [
+                        {
+                            "path": [function_name, "schemaKey"],
+                            "reason": {
+                                "ExtensionValidationFailed": {
+                                    "reason": "SchemaKeyUnknown",
+                                    "data!": {"schemaKey": requested_schema_key},
+                                }
+                            },
+                        }
+                    ]
+                }
+            }
+            validate_result(result_union_type, invalid_schema_key_result)
+            result_message = Message({}, invalid_schema_key_result)
+        else:
+            result_message = Message({}, {"Ok_": definition_examples})
     elif function_name == "fn.api_":
         include_internal = isinstance(request_payload, dict) and request_payload.get("includeInternal!") is True
-        include_examples = isinstance(request_payload, dict) and request_payload.get("includeExamples!") is True
-        api_definitions = get_api_definitions_with_examples(
-            telepact_schema,
-            include_internal,
-        ) if include_examples else (
-            telepact_schema.full if include_internal else telepact_schema.original
-        )
+        api_definitions = telepact_schema.full if include_internal else telepact_schema.original
         result_message = Message({}, {"Ok_": {"api": api_definitions}})
     else:
         try:
