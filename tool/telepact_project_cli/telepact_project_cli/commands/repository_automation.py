@@ -533,11 +533,11 @@ def publish_targets(release_tag: str | None, release_body: str | None, github_ou
 @click.command(name="should-release")
 @click.option("--github-output", default=None, type=click.Path(dir_okay=False, path_type=Path), help="Write key=value lines for GitHub Actions outputs.")
 def should_release(github_output: Path | None) -> None:
-    result = "VERSION.txt" in _head_commit_changed_paths()
+    should_release_result = "VERSION.txt" in _head_commit_changed_paths()
     if github_output is not None:
-        _write_github_outputs(github_output, {"should_release": result})
+        _write_github_outputs(github_output, {"should_release": should_release_result})
     else:
-        click.echo("true" if result else "false")
+        click.echo("true" if should_release_result else "false")
 
 
 @click.command(name="mark-merge-ready")

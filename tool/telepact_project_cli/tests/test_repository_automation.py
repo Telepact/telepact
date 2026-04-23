@@ -88,6 +88,27 @@ class RepositoryAutomationTests(unittest.TestCase):
         self.assertEqual(result.exit_code, 0, msg=result.output)
         write_github_outputs.assert_called_once_with(github_output, {"should_release": False})
 
+    def test_should_release_command_calls_write_github_outputs_when_version_file_changed(self) -> None:
+        runner = CliRunner()
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            github_output = Path(tmp_dir) / "github-output.txt"
+            with (
+                mock.patch(
+                    "telepact_project_cli.commands.repository_automation.subprocess.run",
+                    return_value=SimpleNamespace(stdout="VERSION.txt\n"),
+                ),
+                mock.patch(
+                    "telepact_project_cli.commands.repository_automation._write_github_outputs",
+                ) as write_github_outputs,
+            ):
+                result = runner.invoke(
+                    main,
+                    ["should-release", "--github-output", str(github_output)],
+                )
+
+        self.assertEqual(result.exit_code, 0, msg=result.output)
+        write_github_outputs.assert_called_once_with(github_output, {"should_release": True})
+
     def test_combined_status_state_reads_head_commit_status(self) -> None:
         pr = SimpleNamespace(
             head=SimpleNamespace(sha="head-sha"),
