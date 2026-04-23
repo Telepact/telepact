@@ -31,6 +31,9 @@ jobs:
     runs-on: ubuntu-latest
     environment: bot
     timeout-minutes: 10
+    concurrency:
+      group: mark-merge-ready
+      cancel-in-progress: false
     outputs:
       skip-merge-loop: ${{ steps.mark-merge-ready.outputs.skip_merge_loop }}
     steps:
