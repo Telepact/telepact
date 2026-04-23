@@ -16,10 +16,9 @@
 
 import prettier from 'prettier/standalone';
 import markdownPlugin from 'prettier/plugins/markdown';
-import estreePlugin from 'prettier/plugins/estree';
-import babelPlugin from 'prettier/plugins/babel';
 
 import telepactPlugin from './prettier-plugin-telepact/index.esm.js';
+import { minifySchemaDraft } from './console';
 
 import {
 	Client,
@@ -46,6 +45,18 @@ export type LoadedConsoleData = {
 	schemaDraft?: string;
 	authManaged: boolean;
 };
+
+async function formatSchemaDraft(schemaDraft: string): Promise<string> {
+	return (
+		await prettier.format(schemaDraft, {
+			filepath: 'telepact-draft.telepact.yaml',
+			parser: 'telepact-parse',
+			printWidth: 78,
+			proseWrap: 'always',
+			plugins: [markdownPlugin, telepactPlugin]
+		})
+	).trimEnd();
+}
 
 type ConsoleProxyConfig = {
 	httpPath: string;
@@ -140,7 +151,7 @@ export async function loadConsoleData(url: URL): Promise<LoadedConsoleData> {
 
 		const schemaDraft = url.searchParams.get('sd') ?? defaultSchema;
 
-		const telepactSchema = MockTelepactSchema.fromJson(schemaDraft);
+		const telepactSchema = MockTelepactSchema.fromJson(minifySchemaDraft(schemaDraft));
 
 		const mockServerOptions = new MockServerOptions();
 		mockServerOptions.generatedCollectionLengthMin = 2;
@@ -407,14 +418,7 @@ export async function loadConsoleData(url: URL): Promise<LoadedConsoleData> {
 	});
 
 	const filteredJson = JSON.stringify(filteredSchemaPseudoJson, null, 2);
-	const schemaDraft = (
-		await prettier.format(filteredJson, {
-			parser: 'telepact-parse',
-			printWidth: 78,
-			proseWrap: 'always',
-			plugins: [babelPlugin, estreePlugin, markdownPlugin, telepactPlugin]
-		})
-	).trimEnd();
+	const schemaDraft = await formatSchemaDraft(filteredJson);
 
 	return {
 		client,

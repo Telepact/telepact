@@ -145,6 +145,56 @@ for (const transport of transports) {
 	});
 }
 
+test.describe('Live schema YAML rendering', () => {
+	test('Live-loaded schemas are displayed as YAML in the schema pane', async ({ page }) => {
+		await page.goto('/');
+		await expect(page.getByRole('heading', { name: 'Telepact' })).toBeVisible();
+
+		const liveUrlInput = page.getByRole('textbox', { name: 'Live URL' });
+		await liveUrlInput.fill('http://localhost:8085/api');
+		await page.getByRole('button', { name: 'Load' }).click();
+
+		await expect(page.getByRole('heading', { name: 'Schema' })).toBeVisible();
+
+		const schemaButton = page.getByRole('button', { name: 'Toggle Schema', pressed: false });
+		await schemaButton.click();
+		await expect(
+			page.getByRole('button', { name: 'Toggle Schema', pressed: true })
+		).toBeVisible();
+
+		const schemaEditor = page.locator('[data-language="yaml"]').filter({
+			has: page.getByRole('textbox', { name: 'schema' })
+		});
+		await expect(schemaEditor).toHaveCount(1);
+
+		const schemaText = await selectAllCopyAndGet(page, schemaEditor);
+
+		expect(schemaText.trimStart().startsWith('- info.DevConsole: {}')).toBeTruthy();
+		expect(schemaText).toContain('fn.fn1:');
+		expect(schemaText).toContain('input1: "string"');
+		expect(schemaText).toContain('output1: ["struct.Struct1"]');
+		expect(schemaText).toContain('fn.fnA: {}');
+		expect(schemaText).toContain('linkA: "fn.fn1"');
+		expect(schemaText).toContain('struct.Struct1:');
+		expect(schemaText).not.toContain('[{"Ok_"');
+
+		const tokenColors = await schemaEditor.evaluate((editor) => {
+			return [
+				...new Set(
+					[...editor.querySelectorAll('.view-line span')]
+						.map((span) => ({
+							text: span.textContent?.trim() ?? '',
+							color: getComputedStyle(span).color
+						}))
+						.filter(({ text }) => text.length > 0)
+						.map(({ color }) => color)
+				)
+			];
+		});
+		expect(tokenColors.length).toBeGreaterThan(1);
+	});
+});
+
 function defineConsoleTests() {
 	test.describe('Live URL validation', () => {
 		test('accepts blank and relative targets without error', async ({ page }) => {

@@ -17,6 +17,8 @@
 NPM_INSTALL ?= install --ignore-scripts
 TAR_GZ := dist-tgz/*.tgz
 
+.PHONY: clean test deploy
+
 $(TAR_GZ):
 	rm -rf dist
 	mkdir -p dist
@@ -32,6 +34,9 @@ clean:
 	rm -rf dist
 	rm -rf dist-tgz
 	rm -rf node_modules
+
+test:
+	npm test
 
 deploy: $(TAR_GZ)
 	npm publish

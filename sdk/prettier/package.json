@@ -1,6 +1,6 @@
 {
   "name": "prettier-plugin-telepact",
-  "version": "1.0.0-alpha.319",
+  "version": "1.0.0-alpha.320",
   "description": "Prettier plugin to format Telepact API schemas.",
   "type": "module",
   "license": "Apache-2.0",
@@ -32,8 +32,8 @@
     "telepact"
   ],
   "dependencies": {
-    "@prettier/sync": "^0.6.1",
-    "prettier": "^3.6.2"
+    "prettier": "^3.6.2",
+    "yaml": "^2.8.3"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^29.0.0",
@@ -44,7 +44,8 @@
     "typescript": "^5.9.3"
   },
   "scripts": {
-    "build": "tsc && rollup -c"
+    "build": "tsc && rollup -c",
+    "test": "npm run build && node --test"
   },
   "files": [
     "dist",
