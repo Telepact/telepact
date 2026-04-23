@@ -122,22 +122,6 @@ def _current_head_sha() -> str:
     return _git("rev-parse", "HEAD", capture_output=True)
 
 
-def _head_commit_changed_paths() -> list[str]:
-    try:
-        result = subprocess.run(
-            ["git", "diff-tree", "--no-commit-id", "--name-only", "-r", "--root", "HEAD"],
-            check=True,
-            text=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
-    except subprocess.CalledProcessError as exc:
-        raise click.ClickException(
-            f"Unable to compute changed paths for HEAD: {exc.stderr.strip()}"
-        )
-    return [path for path in result.stdout.strip().splitlines() if path]
-
-
 def _checkout_pr_branch(head_ref: str) -> None:
     remote_ref = f"refs/remotes/origin/{head_ref}"
     _git("fetch", "origin", f"refs/heads/{head_ref}:{remote_ref}")
@@ -528,16 +512,6 @@ def publish_targets(release_tag: str | None, release_body: str | None, github_ou
         github_output.write_text("\n".join(lines) + "\n", encoding="utf-8")
     else:
         click.echo("\n".join(lines))
-
-
-@click.command(name="should-release")
-@click.option("--github-output", default=None, type=click.Path(dir_okay=False, path_type=Path), help="Write key=value lines for GitHub Actions outputs.")
-def should_release(github_output: Path | None) -> None:
-    version_changed = "VERSION.txt" in _head_commit_changed_paths()
-    if github_output is not None:
-        _write_github_outputs(github_output, {"should_release": version_changed})
-    else:
-        click.echo("true" if version_changed else "false")
 
 
 @click.command(name="mark-merge-ready")

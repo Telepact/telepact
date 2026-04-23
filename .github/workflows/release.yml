@@ -34,12 +34,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install uv
-        uses: astral-sh/setup-uv@v6
-
       - name: Check head commit for version changes
         id: check
-        run: ./tool/telepact-project should-release --github-output "$GITHUB_OUTPUT"
+        run: |
+          if git diff-tree --no-commit-id --name-only -r --root HEAD | grep -Fxq 'VERSION.txt'; then
+            echo "should_release=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "should_release=false" >> "$GITHUB_OUTPUT"
+          fi
 
   build-release:
     name: Build release
