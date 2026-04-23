@@ -65,12 +65,13 @@ def get_api_definition_examples(
         telepact_schema,
         _get_default_fn_scope(telepact_schema.parsed),
     )
+    example_field_names = {
+        'example': 'example!',
+        'inputExample': 'inputExample!',
+        'outputExample': 'outputExample!',
+    }
     return {
-        {
-            'example': 'example!',
-            'inputExample': 'inputExample!',
-            'outputExample': 'outputExample!',
-        }[key]: value
+        example_field_names[key]: value
         for key, value in definition_with_examples.items()
         if key in {'example', 'inputExample', 'outputExample'}
     }
