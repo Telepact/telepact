@@ -180,7 +180,6 @@ def create_version_bump_commit(pr_number: int, changed_paths: list[str] | None =
         pr_number=pr_number,
     )
     edited_files: list[str] = []
-    new_version = version
 
     if release_manifest.targets:
         new_version = _bump_version(version)
@@ -206,6 +205,7 @@ def create_version_bump_commit(pr_number: int, changed_paths: list[str] | None =
         )
         sorted_release_targets = list(release_manifest.targets)
     else:
+        new_version = version
         click.echo("Release manifest targets are empty; leaving version unchanged.")
         sorted_release_targets = []
 
