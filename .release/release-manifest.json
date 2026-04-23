@@ -1,31 +1,9 @@
 {
   "changed_paths": [
-    ".prettierrc",
-    "sdk/console/package-lock.json",
-    "sdk/console/package.json",
-    "sdk/console/playwright.config.ts",
-    "sdk/console/src/App.tsx",
-    "sdk/console/src/components/MonacoEditor.tsx",
-    "sdk/console/src/lib/console.ts",
-    "sdk/console/src/lib/loadConsoleData.ts",
-    "sdk/console/tests/constants.ts",
-    "sdk/console/tests/test.ts",
-    "sdk/prettier/Makefile",
-    "sdk/prettier/README.md",
-    "sdk/prettier/package-lock.json",
-    "sdk/prettier/package.json",
-    "sdk/prettier/src/index.ts",
-    "sdk/prettier/tests/formatter.test.mjs",
-    "sdk/prettier/tsconfig.json"
+    ".github/workflows/release.yml"
   ],
-  "direct_targets": [
-    "console",
-    "prettier"
-  ],
-  "pr_number": 403,
-  "targets": [
-    "console",
-    "prettier"
-  ],
-  "version": "1.0.0-alpha.320"
+  "direct_targets": [],
+  "pr_number": 467,
+  "targets": [],
+  "version": "1.0.0-alpha.321"
 }
