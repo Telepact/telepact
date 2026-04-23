@@ -4,12 +4,6 @@
     "plugins": ["prettier-plugin-telepact"],
     "overrides": [
         {
-            "files": "*.telepact.json",
-            "options": {
-                "parser": "telepact-parse"
-            }
-        },
-        {
             "files": [".ts"],
             "options": {
                 "singleQuote": true

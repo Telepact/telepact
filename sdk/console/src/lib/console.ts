@@ -16,6 +16,7 @@
 
 import { parse } from 'marked';
 import DOMPurify from 'dompurify';
+import { parseDocument } from 'yaml';
 
 import * as telepact from './telepact/index.esm.js';
 import { _internal } from './telepact/index.esm.js';
@@ -52,6 +53,16 @@ export function minifyJson(json: string, redactAuthHeader = false) {
 	}
 
 	return JSON.stringify(pseudoJson);
+}
+
+export function minifySchemaDraft(schemaDraft: string) {
+	const document = parseDocument(schemaDraft);
+
+	if (document.errors.length > 0) {
+		throw document.errors[0];
+	}
+
+	return JSON.stringify(document.toJS());
 }
 
 export function unMinifyJson(json: string | null, authManaged = false) {

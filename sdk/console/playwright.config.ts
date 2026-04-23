@@ -29,10 +29,11 @@ const config: PlaywrightTestConfig = {
 	webServer: [
 		{
 			command: `npx . -p 8084`,
-			port: 8084,
+			port: 8084
 		},
 		{
-			command: 'telepact mock --port 8085 --dir tests/schema --generated-collection-length-min 2 --generated-collection-length-max 2',
+			command:
+				'telepact mock --port 8085 --dir tests/schema --generated-collection-length-min 2 --generated-collection-length-max 2',
 			port: 8085,
 			stdout: 'pipe'
 		}
