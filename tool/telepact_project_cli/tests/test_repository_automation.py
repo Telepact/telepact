@@ -170,7 +170,7 @@ class RepositoryAutomationTests(unittest.TestCase):
         self.assertNotEqual(result.exit_code, 0)
         self.assertIn("not a repository collaborator", result.output)
 
-    def test_mark_pr_merge_ready_command_labels_pull_request_and_sets_skip_output(self) -> None:
+    def test_mark_pr_merge_ready_command_labels_pr_and_writes_outputs(self) -> None:
         pr = mock.Mock()
         pr.number = 7
         pr.state = "open"
@@ -309,6 +309,7 @@ class RepositoryAutomationTests(unittest.TestCase):
             changed_paths=["lib/py/pyproject.toml", "sdk/cli/pyproject.toml"],
         )
         bumped_pr.merge.assert_called_once_with(merge_method="squash", sha="head-3")
+        bumped_pr.remove_from_labels.assert_called_once_with(MERGE_READY_LABEL)
 
 
 if __name__ == "__main__":

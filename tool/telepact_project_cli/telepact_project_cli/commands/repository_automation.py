@@ -302,6 +302,7 @@ def _process_merge_pull_request(repo, pr_number: int, is_admin: bool) -> None:
     if not merge_result.merged:
         raise RuntimeError(f"Failed to merge pull request #{pr.number}: {merge_result.message}")
 
+    pr.remove_from_labels(MERGE_READY_LABEL)
     click.echo(f"Merged pull request #{pr.number} with squash.")
 
 
