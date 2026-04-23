@@ -169,7 +169,9 @@ def create_version_bump_commit(pr_number: int, changed_paths: list[str] | None =
     current_manifest = load_release_manifest(Path("."))
     version = current_manifest.get("version")
     if not isinstance(version, str) or not version:
-        raise click.ClickException("Release manifest must define a non-empty string 'version'.")
+        raise click.ClickException(
+            "Release manifest at .release/release-manifest.json must define a non-empty string 'version'."
+        )
 
     release_manifest = compute_release_manifest(
         Path("."),
