@@ -16,7 +16,7 @@
 
 SHELL := /bin/bash
 
-VERSION := $(shell cat ../../VERSION.txt)
+VERSION := $(shell python3 -c "import json, pathlib; print(json.loads(pathlib.Path('../../.release/release-manifest.json').read_text())['version'])")
 MODULE_PATH := github.com/telepact/telepact/lib/go
 
 GO_SOURCES := $(shell find . -type f -name '*.go' -not -path './target/*')

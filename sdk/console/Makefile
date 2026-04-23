@@ -15,7 +15,7 @@
 #|
 
 NPM_INSTALL ?= install --ignore-scripts
-VERSION := $(shell cat ../../VERSION.txt)
+VERSION := $(shell python3 -c "import json, pathlib; print(json.loads(pathlib.Path('../../.release/release-manifest.json').read_text())['version'])")
 TAR_GZ := dist-tgz/*.tgz
 DEP_LIB_FILE := ../../lib/ts/dist/index.esm.js
 DEP_PRETTIER_FILE := ../../sdk/prettier/dist/index.esm.js

@@ -19,7 +19,7 @@ SHELL := /bin/bash
 MVN_BUILD ?= install
 SRC_FILES := $(shell find src -type f)
 COMMON_SCHEMA_FILES := $(shell find ../../common -type f \( -name '*.json' -o -name '*.yaml' \))
-JAR_FILE := target/telepact-$(shell cat ../../VERSION.txt).jar
+JAR_FILE := target/telepact-$(shell python3 -c "import json, pathlib; print(json.loads(pathlib.Path('../../.release/release-manifest.json').read_text())['version'])").jar
 
 $(JAR_FILE): $(SRC_FILES) $(COMMON_SCHEMA_FILES)
 	mkdir -p src/main/resources

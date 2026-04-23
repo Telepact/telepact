@@ -64,9 +64,9 @@ class ReleaseManifest:
 def find_repo_root(start: Path | str = ".") -> Path:
     start_path = Path(start).resolve()
     for candidate in [start_path, *start_path.parents]:
-        if (candidate / "VERSION.txt").exists():
+        if (candidate / RELEASE_MANIFEST_RELATIVE_PATH).exists() or (candidate / RELEASE_CONFIG_RELATIVE_PATH).exists():
             return candidate
-    raise click.ClickException("Unable to locate repo root (VERSION.txt not found).")
+    raise click.ClickException("Unable to locate repo root (release metadata not found).")
 
 
 def release_manifest_path(repo_root: Path | str = ".") -> Path:

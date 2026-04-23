@@ -23,7 +23,9 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const VERSION = fs.readFileSync(path.resolve(__dirname, '../../VERSION.txt'), 'utf-8').trim();
+const { version: VERSION } = JSON.parse(
+  fs.readFileSync(path.resolve(__dirname, '../../.release/release-manifest.json'), 'utf-8'),
+) as { version: string };
 
 export default defineConfig({
   testDir: './tests',

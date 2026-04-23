@@ -14,7 +14,7 @@
 #|  limitations under the License.
 #|
 
-VERSION := $(shell cat ../../VERSION.txt)
+VERSION := $(shell python3 -c "import json, pathlib; print(json.loads(pathlib.Path('../../.release/release-manifest.json').read_text())['version'])")
 
 LIB_TAR_GZ := ../../sdk/console/dist-docker/*.tar.gz
 TAR_GZ := telepact-console.tar.gz

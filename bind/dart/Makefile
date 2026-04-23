@@ -14,7 +14,7 @@
 #|  limitations under the License.
 #|
 
-VERSION := $(shell cat ../../VERSION.txt)
+VERSION := $(shell python3 -c "import json, pathlib; print(json.loads(pathlib.Path('../../.release/release-manifest.json').read_text())['version'])")
 JS_ASSETS := lib/js/telepact.js lib/js/crc32.js lib/js/msgpackr.js
 
 .PHONY: all prepare-js-assets test

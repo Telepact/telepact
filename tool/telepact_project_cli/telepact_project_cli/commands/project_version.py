@@ -26,7 +26,7 @@ from lxml import etree as ET
 from ruamel.yaml import YAML
 
 from .doc_versions import write_doc_versions
-from ..release_plan import compute_release_manifest, write_release_manifest
+from ..release_plan import compute_release_manifest, load_release_manifest, write_release_manifest
 
 yaml = YAML()
 
@@ -163,24 +163,27 @@ def _changed_paths_since_main(main_ref: str = "origin/main") -> list[str]:
 
 
 def create_version_bump_commit(pr_number: int, changed_paths: list[str] | None = None) -> str:
-    version_file = "VERSION.txt"
     if changed_paths is None:
         changed_paths = _changed_paths_since_main()
 
-    if not os.path.exists(version_file):
-        raise click.ClickException(f"Version file {version_file} does not exist.")
+    current_manifest = load_release_manifest(Path("."))
+    version = current_manifest.get("version")
+    if not isinstance(version, str) or not version:
+        raise click.ClickException("Release manifest must define a non-empty string 'version'.")
 
-    with open(version_file, "r") as f:
-        version = f.read().strip()
+    release_manifest = compute_release_manifest(
+        Path("."),
+        changed_paths=changed_paths,
+        version=version,
+        pr_number=pr_number,
+    )
+    if not release_manifest.targets:
+        click.echo("Skipping version bump because release manifest targets are empty.")
+        return version
 
     new_version = _bump_version(version)
 
-    with open(version_file, "w") as f:
-        f.write(new_version)
-
-    click.echo(f"Updated version file {version_file} to version {new_version}")
-
-    edited_files = [version_file]
+    edited_files: list[str] = []
 
     for project_file in PROJECT_FILES:
         if os.path.exists(project_file):

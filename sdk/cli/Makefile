@@ -16,7 +16,7 @@
 
 .PHONY: all dep clean
 
-VERSION := $(shell cat ../../VERSION.txt)
+VERSION := $(shell python3 -c "import json, pathlib; print(json.loads(pathlib.Path('../../.release/release-manifest.json').read_text())['version'])")
 
 SRC_FILES := $(shell find telepact_cli -type f)
 TAR_GZ := dist/*.tar.gz
