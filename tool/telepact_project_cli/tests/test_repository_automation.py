@@ -56,7 +56,18 @@ class RepositoryAutomationTests(unittest.TestCase):
             stderr=mock.ANY,
         )
 
-    def test_should_release_command_writes_github_output_when_version_file_not_changed(self) -> None:
+    def test_should_release_command_returns_false_when_head_commit_does_not_change_version_file(self) -> None:
+        runner = CliRunner()
+        with mock.patch(
+            "telepact_project_cli.commands.repository_automation.subprocess.run",
+            return_value=SimpleNamespace(stdout="README.md\n"),
+        ):
+            result = runner.invoke(main, ["should-release"])
+
+        self.assertEqual(result.exit_code, 0, msg=result.output)
+        self.assertEqual(result.output, "false\n")
+
+    def test_should_release_command_calls_write_github_outputs_when_version_file_not_changed(self) -> None:
         runner = CliRunner()
         with tempfile.TemporaryDirectory() as tmp_dir:
             github_output = Path(tmp_dir) / "github-output.txt"
