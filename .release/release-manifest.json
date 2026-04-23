@@ -1,9 +1,14 @@
 {
   "changed_paths": [
-    ".github/workflows/release.yml"
+    "sdk/cli/pyproject.toml",
+    "sdk/cli/uv.lock"
   ],
-  "direct_targets": [],
-  "pr_number": 467,
-  "targets": [],
-  "version": "1.0.0-alpha.321"
+  "direct_targets": [
+    "cli"
+  ],
+  "pr_number": 446,
+  "targets": [
+    "cli"
+  ],
+  "version": "1.0.0-alpha.322"
 }
