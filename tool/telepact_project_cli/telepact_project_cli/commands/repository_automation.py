@@ -20,11 +20,13 @@ import time
 from pathlib import Path
 
 import click
+import yaml
 from github import Github, GithubException
 from github.PullRequest import PullRequest
 
+from .doc_versions import _read_go_module_path, _read_maven_gav, _read_package_json_name, _read_pyproject_name
 from .project_version import create_version_bump_commit
-from ..release_plan import load_release_manifest, resolve_publish_targets
+from ..release_plan import find_repo_root, load_release_manifest, load_release_target_rules, resolve_publish_targets
 
 RELEASE_TARGET_ASSET_DIRECTORY_MAP = {
     "java": ["lib/java/target/central-publishing"],
@@ -82,6 +84,100 @@ AUTOMERGE_ALLOWED_FILES = [
     "tool/telepact_project_cli/uv.lock",
     "tool/telepact_project_cli/pyproject.toml",
 ]
+
+
+def _read_pubspec_name(pubspec_path: Path) -> str:
+    try:
+        data = yaml.safe_load(pubspec_path.read_text(encoding="utf-8"))
+    except FileNotFoundError as exc:
+        raise click.ClickException(f"File not found: {pubspec_path}") from exc
+
+    if not isinstance(data, dict):
+        raise click.ClickException(f"Invalid YAML object in {pubspec_path}")
+
+    name = data.get("name")
+    if not isinstance(name, str) or not name:
+        raise click.ClickException(f"Missing/invalid package name in {pubspec_path}")
+    return name
+
+
+def _release_target_details(repo_root: Path, target: str) -> tuple[str, str, str]:
+    match target:
+        case "go":
+            return ("Library (Go)", _read_go_module_path(repo_root / "lib/go/go.mod"), "Go module")
+        case "java":
+            package_name, _ = _read_maven_gav(repo_root / "lib/java/pom.xml")
+            return ("Library (Java)", package_name, "Maven Central")
+        case "py":
+            return ("Library (Python)", _read_pyproject_name(repo_root / "lib/py/pyproject.toml"), "PyPI")
+        case "ts":
+            return ("Library (TypeScript)", _read_package_json_name(repo_root / "lib/ts/package.json"), "npm")
+        case "dart":
+            return ("Binding (Dart)", _read_pubspec_name(repo_root / "bind/dart/pubspec.yaml"), "Release assets")
+        case "cli":
+            return ("SDK (CLI)", _read_pyproject_name(repo_root / "sdk/cli/pyproject.toml"), "PyPI")
+        case "console":
+            return ("SDK (Console)", _read_package_json_name(repo_root / "sdk/console/package.json"), "npm")
+        case "prettier":
+            return ("SDK (Prettier)", _read_package_json_name(repo_root / "sdk/prettier/package.json"), "npm")
+        case _:
+            return (target, target, "Release assets")
+
+
+def _format_release_target(repo_root: Path, target: str) -> str:
+    label, package_name, registry = _release_target_details(repo_root, target)
+    return f"- **{label}** — `{package_name}` ({registry})"
+
+
+def _build_release_body(
+    repo_root: Path,
+    *,
+    pr_title: str,
+    pr_number: int,
+    pr_url: str,
+    direct_targets: list[str],
+    release_targets: list[str],
+) -> str:
+    rules = load_release_target_rules(repo_root).projects
+    direct_target_set = set(direct_targets)
+    dependency_targets = [target for target in release_targets if target not in direct_target_set]
+
+    direct_lines = [_format_release_target(repo_root, target) for target in direct_targets] or ["(None)"]
+
+    def _dependency_reason(target: str) -> str:
+        upstream_targets = sorted(source for source in direct_targets if target in rules[source].is_dependency_for)
+        if not upstream_targets:
+            return "dependency-triggered republish; usually no extra review beyond the underlying dependency update."
+        upstream_labels = ", ".join(_release_target_details(repo_root, source)[0] for source in upstream_targets)
+        return (
+            f"dependency-triggered republish from {upstream_labels}; "
+            "usually no extra review beyond the underlying dependency update."
+        )
+
+    republish_lines = [
+        f"{_format_release_target(repo_root, target)} — {_dependency_reason(target)}"
+        for target in dependency_targets
+    ] or ["(None)"]
+
+    summary_lines = [
+        (
+            f"{_format_release_target(repo_root, target)} — "
+            "direct change; review if you use this package directly."
+        )
+        if target in direct_target_set
+        else f"{_format_release_target(repo_root, target)} — {_dependency_reason(target)}"
+        for target in release_targets
+    ] or ["(None)"]
+
+    return (
+        f"## {pr_title} [(#{pr_number})]({pr_url})\n\n"
+        "### Direct package changes\n"
+        f"{chr(10).join(direct_lines)}\n\n"
+        "### Dependency-triggered republishes\n"
+        f"{chr(10).join(republish_lines)}\n\n"
+        "### Published package summary\n"
+        f"{chr(10).join(summary_lines)}"
+    ).strip()
 
 
 def _require_env(name: str) -> str:
@@ -408,6 +504,7 @@ def release() -> None:
         release_manifest = load_release_manifest(Path("."))
         version = release_manifest["version"]
         pr_number = int(release_manifest["pr_number"])
+        direct_targets = list(release_manifest.get("direct_targets", []))
         release_targets = list(release_manifest.get("targets", []))
         click.echo("Loaded release metadata from .release/release-manifest.json")
     else:
@@ -444,12 +541,14 @@ def release() -> None:
 
     pr_title = pr.title
     pr_url = pr.html_url
-    released_projects = "".join(f"- {target}\n" for target in release_targets) if release_targets else "(None)"
-    final_release_body = (
-        f"## {pr_title} [(#{pr_number})]({pr_url})\n\n"
-        f"### Released Projects\n"
-        f"{released_projects}"
-    ).strip()
+    final_release_body = _build_release_body(
+        find_repo_root(Path(".")),
+        pr_title=pr_title,
+        pr_number=pr_number,
+        pr_url=pr_url,
+        direct_targets=direct_targets,
+        release_targets=release_targets,
+    )
 
     try:
         release = repo.create_git_release(
