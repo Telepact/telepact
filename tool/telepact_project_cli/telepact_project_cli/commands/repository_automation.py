@@ -352,6 +352,10 @@ def _process_merge_ready_pull_request(repo, pr_number: int) -> None:
     click.echo(f"Processing merge-ready pull request #{pr_number} requested by @{commenter_login}.")
 
     pr = repo.get_pull(pr_number)
+    if pr.state != "open":
+        click.echo(f"Removing {MERGE_READY_LABEL!r} from pull request #{pr.number} because it is not open.")
+        _remove_merge_ready_label(repo, pr.number)
+        return
     expected_head_sha = pr.head.sha
     pr = _wait_for_pr_stable(repo, pr_number, expected_head_sha)
     _validate_merge_request(pr, is_admin)
@@ -384,6 +388,7 @@ def _process_merge_ready_pull_request(repo, pr_number: int) -> None:
     if not merge_result.merged:
         raise RuntimeError(f"Failed to merge pull request #{pr.number}: {merge_result.message}")
 
+    _remove_merge_ready_label(repo, pr.number)
     click.echo(f"Merged pull request #{pr.number} with squash.")
 
 
@@ -520,8 +525,10 @@ def mark_merge_ready(github_output: Path | None) -> None:
     repo = Github(github_token).get_repo(github_repository)
     _commenter_permission(repo, commenter_login)
 
-    merge_ready_count = len(_open_merge_ready_pr_numbers(repo))
-    skip_merge_loop = merge_ready_count > 0
+    merge_ready_pr_numbers = set(_open_merge_ready_pr_numbers(repo))
+    merge_ready_pr_numbers.add(pr_number)
+    merge_ready_count = len(merge_ready_pr_numbers)
+    skip_merge_loop = any(number != pr_number for number in merge_ready_pr_numbers)
 
     _add_merge_ready_label(repo, pr_number)
 
