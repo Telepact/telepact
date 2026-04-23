@@ -1,10 +1,9 @@
 {
   "changed_paths": [
-    "site/src/build.py",
-    "site/src/index.template.html"
+    ".github/dependabot.yml"
   ],
   "direct_targets": [],
-  "pr_number": 440,
+  "pr_number": 452,
   "targets": [],
-  "version": "1.0.0-alpha.316"
+  "version": "1.0.0-alpha.317"
 }

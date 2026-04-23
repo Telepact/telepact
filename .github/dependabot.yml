@@ -27,6 +27,10 @@ updates:
     labels:
       - "dependabot"
     open-pull-requests-limit: 1
+    groups:
+      all-dependencies:
+        patterns:
+          - "*"
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
@@ -41,6 +45,10 @@ updates:
     labels:
       - "dependabot"
     open-pull-requests-limit: 1
+    groups:
+      all-dependencies:
+        patterns:
+          - "*"
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
@@ -55,6 +63,10 @@ updates:
     labels:
       - "dependabot"
     open-pull-requests-limit: 1
+    groups:
+      all-dependencies:
+        patterns:
+          - "*"
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
@@ -69,6 +81,10 @@ updates:
     labels:
       - "dependabot"
     open-pull-requests-limit: 1
+    groups:
+      all-dependencies:
+        patterns:
+          - "*"
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
@@ -83,6 +99,10 @@ updates:
     labels:
       - "dependabot"
     open-pull-requests-limit: 1
+    groups:
+      all-dependencies:
+        patterns:
+          - "*"
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
@@ -97,6 +117,10 @@ updates:
     labels:
       - "dependabot"
     open-pull-requests-limit: 1
+    groups:
+      all-dependencies:
+        patterns:
+          - "*"
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
@@ -111,6 +135,10 @@ updates:
     labels:
       - "dependabot"
     open-pull-requests-limit: 1
+    groups:
+      all-dependencies:
+        patterns:
+          - "*"
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
@@ -125,6 +153,10 @@ updates:
     labels:
       - "dependabot"
     open-pull-requests-limit: 1
+    groups:
+      all-dependencies:
+        patterns:
+          - "*"
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
@@ -139,6 +171,10 @@ updates:
     labels:
       - "dependabot"
     open-pull-requests-limit: 1
+    groups:
+      all-dependencies:
+        patterns:
+          - "*"
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
@@ -155,6 +191,10 @@ updates:
     labels:
       - "dependabot"
     open-pull-requests-limit: 1
+    groups:
+      all-dependencies:
+        patterns:
+          - "*"
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
@@ -169,6 +209,10 @@ updates:
     labels:
       - "dependabot"
     open-pull-requests-limit: 1
+    groups:
+      all-dependencies:
+        patterns:
+          - "*"
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
@@ -183,6 +227,10 @@ updates:
     labels:
       - "dependabot"
     open-pull-requests-limit: 1
+    groups:
+      all-dependencies:
+        patterns:
+          - "*"
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
@@ -197,6 +245,10 @@ updates:
     labels:
       - "dependabot"
     open-pull-requests-limit: 1
+    groups:
+      all-dependencies:
+        patterns:
+          - "*"
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
@@ -211,6 +263,10 @@ updates:
     labels:
       - "dependabot"
     open-pull-requests-limit: 1
+    groups:
+      all-dependencies:
+        patterns:
+          - "*"
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
@@ -225,6 +281,10 @@ updates:
     labels:
       - "dependabot"
     open-pull-requests-limit: 1
+    groups:
+      all-dependencies:
+        patterns:
+          - "*"
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
@@ -239,6 +299,10 @@ updates:
     labels:
       - "dependabot"
     open-pull-requests-limit: 1
+    groups:
+      all-dependencies:
+        patterns:
+          - "*"
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
