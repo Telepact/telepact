@@ -21,6 +21,9 @@ on:
     types:
       - created
 
+permissions:
+  contents: read
+
 jobs:
   mark-merge-ready:
     name: mark-merge-ready

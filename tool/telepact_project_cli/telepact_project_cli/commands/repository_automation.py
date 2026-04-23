@@ -91,7 +91,7 @@ def _require_env(name: str) -> str:
     return value
 
 
-def _write_github_outputs(github_output: Path | None, outputs: dict[str, str | int | bool]) -> None:
+def _write_github_outputs(github_output_path: Path | None, outputs: dict[str, str | int | bool]) -> None:
     lines = []
     for key, value in outputs.items():
         if isinstance(value, bool):
@@ -101,9 +101,9 @@ def _write_github_outputs(github_output: Path | None, outputs: dict[str, str | i
         lines.append(f"{key}={rendered_value}")
 
     rendered_outputs = "\n".join(lines)
-    if github_output is not None:
-        github_output.parent.mkdir(parents=True, exist_ok=True)
-        github_output.write_text(rendered_outputs + "\n", encoding="utf-8")
+    if github_output_path is not None:
+        github_output_path.parent.mkdir(parents=True, exist_ok=True)
+        github_output_path.write_text(rendered_outputs + "\n", encoding="utf-8")
     else:
         click.echo(rendered_outputs)
 
@@ -160,6 +160,15 @@ def _ensure_merge_ready_label(repo) -> None:
         )
 
 
+def _merge_ready_label(repo):
+    try:
+        return repo.get_label(MERGE_READY_LABEL)
+    except GithubException as exc:
+        if exc.status != 404:
+            raise
+        return None
+
+
 def _add_merge_ready_label(repo, pr_number: int) -> None:
     issue = repo.get_issue(pr_number)
     if issue.pull_request is None:
@@ -177,8 +186,12 @@ def _remove_merge_ready_label(repo, pr_number: int) -> None:
 
 
 def _open_merge_ready_pr_numbers(repo) -> list[int]:
+    merge_ready_label = _merge_ready_label(repo)
+    if merge_ready_label is None:
+        return []
+
     merge_ready_numbers = []
-    for issue in repo.get_issues(state="open"):
+    for issue in repo.get_issues(state="open", labels=[merge_ready_label]):
         if issue.pull_request is None:
             continue
         if MERGE_READY_LABEL in _label_names(issue):
@@ -535,7 +548,7 @@ def merge_pr() -> None:
         except Exception as exc:
             click.echo(f"Failed to merge pull request #{pr_number}: {exc}")
             _remove_merge_ready_label(repo, pr_number)
-            failures.append((pr_number, str(exc)))
+            failures.append((pr_number, repr(exc)))
 
     if failures:
         failure_summary = "; ".join(f"#{pr_number}: {message}" for pr_number, message in failures)

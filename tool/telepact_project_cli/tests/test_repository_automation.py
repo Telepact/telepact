@@ -134,7 +134,7 @@ class RepositoryAutomationTests(unittest.TestCase):
 
         _validate_merge_request(pr, is_admin=True)
 
-    def test_merge_pr_command_rejects_non_collaborator(self) -> None:
+    def test_mark_merge_ready_command_rejects_non_collaborator(self) -> None:
         repo = mock.Mock()
         repo.has_in_collaborators.return_value = False
 
@@ -145,7 +145,7 @@ class RepositoryAutomationTests(unittest.TestCase):
         with mock.patch("telepact_project_cli.commands.repository_automation.Github", return_value=github_client):
             result = runner.invoke(
                 main,
-                ["merge-pr"],
+                ["mark-merge-ready"],
                 env={
                     "GITHUB_TOKEN": "token",
                     "GITHUB_REPOSITORY": "Telepact/telepact",
@@ -343,9 +343,9 @@ class RepositoryAutomationTests(unittest.TestCase):
             )
 
         self.assertNotEqual(result.exit_code, 0)
-        self.assertEqual(process_merge_ready_pull_request.call_count, 2)
+        process_merge_ready_pull_request.assert_has_calls([mock.call(repo, 7), mock.call(repo, 8)])
         remove_merge_ready_label.assert_called_once_with(repo, 7)
-        self.assertIn("Merge loop completed with failures: #7: boom", result.output)
+        self.assertEqual(str(result.exception), "Merge loop completed with failures: #7: RuntimeError('boom')")
 
     def test_merge_pr_command_exits_cleanly_when_no_merge_ready_prs_exist(self) -> None:
         repo = mock.Mock()
