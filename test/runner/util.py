@@ -76,7 +76,7 @@ def handler(request):
         return [response_header, {'Ok_': {}}]
 
 
-async def backdoor_handler(nats_client: nats.aio.client.Client, backdoor_topic):
+async def backdoor_handler(nats_client: nats.aio.client.Client, backdoor_topic, ready=None):
     done = asyncio.get_running_loop().create_future()
     try:
         async def nats_handler(msg: Msg):
@@ -97,12 +97,19 @@ async def backdoor_handler(nats_client: nats.aio.client.Client, backdoor_topic):
             done.set_result(True)
 
         sub = await nats_client.subscribe(backdoor_topic, cb=nats_handler)
+        await nats_client.flush()
+        if ready and not ready.done():
+            ready.set_result(True)
 
         await sub.unsubscribe(limit=1)
         await done
     except asyncio.exceptions.CancelledError:
         if sub:
             await sub.unsubscribe()
+    except Exception as e:
+        if ready and not ready.done():
+            ready.set_exception(e)
+        raise
 
 
 def count_int_keys(m: dict):
@@ -124,7 +131,7 @@ class NotEnoughIntegerKeys(Exception):
     pass
 
 
-async def client_backdoor_handler(nats_client, client_backdoor_topic, frontdoor_topic, times=1):
+async def client_backdoor_handler(nats_client, client_backdoor_topic, frontdoor_topic, times=1, ready=None):
     try:
         request_was_binary = False
         request_binary_had_enough_integer_keys = False
@@ -199,6 +206,9 @@ async def client_backdoor_handler(nats_client, client_backdoor_topic, frontdoor_
                 done.set_result(True)
 
         sub = await nats_client.subscribe(client_backdoor_topic, cb=nats_handler)
+        await nats_client.flush()
+        if ready and not ready.done():
+            ready.set_result(True)
 
         # TODO: This does not block until the subscription ends. Need to find another way to get the binary assertion results
         await sub.unsubscribe(limit=times)
@@ -208,6 +218,10 @@ async def client_backdoor_handler(nats_client, client_backdoor_topic, frontdoor_
     except asyncio.exceptions.CancelledError:
         if sub:
             await sub.unsubscribe()
+    except Exception as e:
+        if ready and not ready.done():
+            ready.set_exception(e)
+        raise
 
 
 def signal_handler(signum, frame):
@@ -243,8 +257,10 @@ async def verify_server_case(nats_client, request, expected_response, frontdoor_
     assert_rules = {} if not expected_response or type(
         expected_response) == bytes else expected_response[0].pop('@assert_', {})
 
+    backdoor_ready = asyncio.get_running_loop().create_future()
     backdoor_handling_task = asyncio.create_task(
-        backdoor_handler(nats_client, backdoor_topic))
+        backdoor_handler(nats_client, backdoor_topic, ready=backdoor_ready))
+    await backdoor_ready
 
     try:
         response = await send_case(nats_client, request, expected_response, frontdoor_topic, just_send=just_send)
@@ -288,11 +304,18 @@ async def verify_client_case(nats_client, request, expected_response, client_fro
     if assert_rules.get('expectTwoRequests', False):
         client_times = 2
 
+    client_ready = None if not client_backdoor_topic else asyncio.get_running_loop().create_future()
     client_handling_task = None if not client_backdoor_topic else asyncio.create_task(
-        client_backdoor_handler(nats_client, client_backdoor_topic, frontdoor_topic, times=client_times))
+        client_backdoor_handler(nats_client, client_backdoor_topic, frontdoor_topic, times=client_times, ready=client_ready))
 
+    backdoor_ready = None if not backdoor_topic else asyncio.get_running_loop().create_future()
     backdoor_handling_task = None if not backdoor_topic else asyncio.create_task(
-        backdoor_handler(nats_client, backdoor_topic))
+        backdoor_handler(nats_client, backdoor_topic, ready=backdoor_ready))
+
+    if backdoor_ready:
+        await backdoor_ready
+    if client_ready:
+        await client_ready
 
     try:
         response = await send_case(nats_client, request, expected_response, client_frontdoor_topic)
