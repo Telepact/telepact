@@ -18,6 +18,7 @@ import json
 import os
 import subprocess
 import sys
+from dataclasses import replace
 from pathlib import Path
 
 import click
@@ -207,12 +208,7 @@ def create_version_bump_commit(pr_number: int, changed_paths: list[str] | None =
             if lock_file is not None:
                 edited_files.append(lock_file)
 
-        release_manifest = compute_release_manifest(
-            Path("."),
-            changed_paths=changed_paths,
-            version=new_version,
-            pr_number=pr_number,
-        )
+        release_manifest = replace(release_manifest, version=new_version)
 
     manifest_path = write_release_manifest(Path("."), release_manifest)
     repo_relative_manifest_path = os.path.relpath(manifest_path, Path.cwd())
