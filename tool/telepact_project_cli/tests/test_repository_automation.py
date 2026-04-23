@@ -34,6 +34,7 @@ from telepact_project_cli.commands.repository_automation import (
     _pull_request_ci_state,
     _validate_merge_request,
     _verify_pull_request_ci,
+    _wait_for_pr_stable,
 )
 
 
@@ -146,6 +147,17 @@ version = "1.0.0-alpha.318"
             with self.assertRaisesRegex(RuntimeError, "CI failed with state 'failure'"):
                 _verify_pull_request_ci(mock.Mock(), 7, "head-sha")
 
+    def test_wait_for_pr_stable_rejects_closed_pull_request(self) -> None:
+        repo = mock.Mock()
+        repo.get_pull.return_value = SimpleNamespace(
+            number=7,
+            state="closed",
+            head=SimpleNamespace(sha="head-sha"),
+        )
+
+        with self.assertRaisesRegex(RuntimeError, "Pull request #7 is not open."):
+            _wait_for_pr_stable(repo, 7, "head-sha")
+
     def test_validate_merge_request_rejects_missing_reviews_for_non_admin(self) -> None:
         pr = SimpleNamespace(
             number=7,
@@ -215,6 +227,7 @@ version = "1.0.0-alpha.318"
     def test_mark_merge_ready_command_sets_skip_false_for_first_labeled_pr(self) -> None:
         issue = mock.Mock()
         issue.pull_request = object()
+        issue.state = "open"
         issue.labels = []
         issue.add_to_labels = mock.Mock()
 
@@ -258,6 +271,7 @@ version = "1.0.0-alpha.318"
     def test_mark_merge_ready_command_sets_skip_true_when_multiple_prs_are_labeled(self) -> None:
         issue = mock.Mock()
         issue.pull_request = object()
+        issue.state = "open"
         issue.labels = []
         issue.add_to_labels = mock.Mock()
 
@@ -300,6 +314,7 @@ version = "1.0.0-alpha.318"
     def test_process_merge_ready_pull_request_admin_flow_updates_and_merges(self) -> None:
         initial_pr = mock.Mock()
         initial_pr.number = 7
+        initial_pr.state = "open"
         initial_pr.head = SimpleNamespace(sha="head-1", ref="feature")
         initial_pr.mark_ready_for_review = mock.Mock()
         initial_pr.draft = True
@@ -310,16 +325,19 @@ version = "1.0.0-alpha.318"
 
         ready_pr = mock.Mock()
         ready_pr.number = 7
+        ready_pr.state = "open"
         ready_pr.head = SimpleNamespace(sha="head-1", ref="feature")
         ready_pr.mergeable_state = "behind"
         ready_pr.update_branch = mock.Mock()
 
         updated_pr = mock.Mock()
         updated_pr.number = 7
+        updated_pr.state = "open"
         updated_pr.head = SimpleNamespace(sha="head-2", ref="feature")
 
         bumped_pr = mock.Mock()
         bumped_pr.number = 7
+        bumped_pr.state = "open"
         bumped_pr.head = SimpleNamespace(sha="head-3", ref="feature")
         bumped_pr.merge.return_value = SimpleNamespace(merged=True, message="")
 
@@ -353,6 +371,7 @@ version = "1.0.0-alpha.318"
                 "telepact_project_cli.commands.repository_automation._validate_merge_request",
                 validate_merge_request,
             ),
+            mock.patch("telepact_project_cli.commands.repository_automation._remove_merge_ready_label") as remove_merge_ready_label,
             mock.patch("telepact_project_cli.commands.repository_automation._verify_pull_request_ci"),
             mock.patch("telepact_project_cli.commands.repository_automation._checkout_pr_branch"),
             mock.patch("telepact_project_cli.commands.repository_automation._push_current_branch"),
@@ -369,6 +388,34 @@ version = "1.0.0-alpha.318"
             changed_paths=["lib/py/pyproject.toml", "sdk/cli/pyproject.toml"],
         )
         bumped_pr.merge.assert_called_once_with(merge_method="squash", sha="head-3")
+        remove_merge_ready_label.assert_called_once_with(repo, 7)
+
+    def test_process_merge_ready_pull_request_removes_label_from_closed_pr_without_waiting(self) -> None:
+        closed_pr = mock.Mock()
+        closed_pr.number = 7
+        closed_pr.state = "closed"
+
+        issue = mock.Mock()
+        issue.get_comments.return_value = [
+            SimpleNamespace(body="/merge", user=SimpleNamespace(login="admin-user")),
+        ]
+
+        repo = mock.Mock()
+        repo.has_in_collaborators.return_value = True
+        repo.get_collaborator_permission.return_value = "admin"
+        repo.get_issue.return_value = issue
+        repo.get_pull.return_value = closed_pr
+
+        with (
+            mock.patch("telepact_project_cli.commands.repository_automation._remove_merge_ready_label") as remove_merge_ready_label,
+            mock.patch("telepact_project_cli.commands.repository_automation._wait_for_pr_stable") as wait_for_pr_stable,
+            mock.patch("telepact_project_cli.commands.repository_automation._validate_merge_request") as validate_merge_request,
+        ):
+            _process_merge_ready_pull_request(repo, 7)
+
+        remove_merge_ready_label.assert_called_once_with(repo, 7)
+        wait_for_pr_stable.assert_not_called()
+        validate_merge_request.assert_not_called()
 
     def test_merge_pr_command_removes_label_and_continues_after_failure(self) -> None:
         repo = mock.Mock()
