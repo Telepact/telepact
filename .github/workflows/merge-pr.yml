@@ -21,17 +21,50 @@ on:
     types:
       - created
 
-concurrency:
-  group: merge-pr
-  cancel-in-progress: false
-
 jobs:
-  merge-pr:
-    name: merge-pr
+  mark-pr-merge-ready:
+    name: mark-pr-merge-ready
     if: ${{ github.event.issue.pull_request && github.event.comment.body == '/merge' }}
     runs-on: ubuntu-latest
     environment: bot
-    timeout-minutes: 30
+    timeout-minutes: 5
+    outputs:
+      skip_merge_loop: ${{ steps.mark-pr.outputs.skip_merge_loop }}
+    steps:
+      - name: Generate GitHub App token
+        id: generate-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ vars.TELEPACT_BOT_APP_ID }}
+          private-key: ${{ secrets.TELEPACT_BOT_PRIVATE_KEY }}
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ steps.generate-token.outputs.token }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Mark PR merge ready
+        id: mark-pr
+        run: ./tool/telepact-project mark-pr-merge-ready
+        env:
+          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.issue.number }}
+          COMMENTER_LOGIN: ${{ github.event.comment.user.login }}
+
+  merge-pr:
+    name: merge-pr
+    needs: [mark-pr-merge-ready]
+    if: ${{ needs.mark-pr-merge-ready.result == 'success' && needs.mark-pr-merge-ready.outputs.skip_merge_loop != 'true' }}
+    runs-on: ubuntu-latest
+    environment: bot
+    timeout-minutes: 180
+    concurrency:
+      group: merge-pr
+      cancel-in-progress: false
     steps:
       - name: Generate GitHub App token
         id: generate-token
@@ -64,5 +97,3 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-          PR_NUMBER: ${{ github.event.issue.number }}
-          COMMENTER_LOGIN: ${{ github.event.comment.user.login }}

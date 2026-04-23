@@ -27,7 +27,9 @@ from click.testing import CliRunner
 
 from telepact_project_cli.cli import main
 from telepact_project_cli.commands.repository_automation import (
+    MERGE_READY_LABEL,
     _combined_status_state,
+    _list_open_merge_ready_pull_requests,
     _pull_request_ci_state,
     _validate_merge_request,
     _verify_pull_request_ci,
@@ -132,7 +134,20 @@ class RepositoryAutomationTests(unittest.TestCase):
 
         _validate_merge_request(pr, is_admin=True)
 
-    def test_merge_pr_command_rejects_non_collaborator(self) -> None:
+    def test_list_open_merge_ready_pull_requests_filters_and_orders(self) -> None:
+        repo = mock.Mock()
+        repo.get_pulls.return_value = [
+            SimpleNamespace(number=3, get_labels=lambda: [SimpleNamespace(name=MERGE_READY_LABEL)]),
+            SimpleNamespace(number=4, get_labels=lambda: [SimpleNamespace(name="bug")]),
+            SimpleNamespace(number=5, get_labels=lambda: [SimpleNamespace(name=MERGE_READY_LABEL)]),
+        ]
+
+        pull_requests = _list_open_merge_ready_pull_requests(repo)
+
+        self.assertEqual([pr.number for pr in pull_requests], [3, 5])
+        repo.get_pulls.assert_called_once_with(state="open", sort="created", direction="asc", base="main")
+
+    def test_mark_pr_merge_ready_command_rejects_non_collaborator(self) -> None:
         repo = mock.Mock()
         repo.has_in_collaborators.return_value = False
 
@@ -143,7 +158,7 @@ class RepositoryAutomationTests(unittest.TestCase):
         with mock.patch("telepact_project_cli.commands.repository_automation.Github", return_value=github_client):
             result = runner.invoke(
                 main,
-                ["merge-pr"],
+                ["mark-pr-merge-ready"],
                 env={
                     "GITHUB_TOKEN": "token",
                     "GITHUB_REPOSITORY": "Telepact/telepact",
@@ -155,7 +170,77 @@ class RepositoryAutomationTests(unittest.TestCase):
         self.assertNotEqual(result.exit_code, 0)
         self.assertIn("not a repository collaborator", result.output)
 
-    def test_merge_pr_command_admin_flow_updates_approves_and_merges(self) -> None:
+    def test_mark_pr_merge_ready_command_labels_pull_request_and_sets_skip_output(self) -> None:
+        pr = mock.Mock()
+        pr.number = 7
+        pr.state = "open"
+        pr.get_labels.return_value = []
+
+        queued_pr = SimpleNamespace(number=7, get_labels=lambda: [SimpleNamespace(name=MERGE_READY_LABEL)])
+        other_pr = SimpleNamespace(number=8, get_labels=lambda: [SimpleNamespace(name=MERGE_READY_LABEL)])
+
+        repo = mock.Mock()
+        repo.has_in_collaborators.return_value = True
+        repo.get_collaborator_permission.return_value = "write"
+        repo.get_pull.return_value = pr
+        repo.get_pulls.return_value = [queued_pr, other_pr]
+
+        github_client = mock.Mock()
+        github_client.get_repo.return_value = repo
+
+        runner = CliRunner()
+        with runner.isolated_filesystem():
+            output_path = Path("github-output.txt")
+            with mock.patch("telepact_project_cli.commands.repository_automation.Github", return_value=github_client):
+                result = runner.invoke(
+                    main,
+                    ["mark-pr-merge-ready"],
+                    env={
+                        "GITHUB_TOKEN": "token",
+                        "GITHUB_REPOSITORY": "Telepact/telepact",
+                        "COMMENTER_LOGIN": "maintainer",
+                        "PR_NUMBER": "7",
+                        "GITHUB_OUTPUT": str(output_path),
+                    },
+                )
+
+            self.assertEqual(result.exit_code, 0, msg=result.output)
+            pr.add_to_labels.assert_called_once_with(MERGE_READY_LABEL)
+            self.assertIn(f"skip_merge_loop=true\n", output_path.read_text())
+            self.assertIn(f"merge_ready_count=2\n", output_path.read_text())
+
+    def test_merge_pr_command_processes_all_merge_ready_pull_requests(self) -> None:
+        first_pr = SimpleNamespace(number=7, get_labels=lambda: [SimpleNamespace(name=MERGE_READY_LABEL)])
+        second_pr = SimpleNamespace(number=8, get_labels=lambda: [SimpleNamespace(name=MERGE_READY_LABEL)])
+
+        repo = mock.Mock()
+        repo.get_pulls.side_effect = [
+            [first_pr, second_pr],
+            [second_pr],
+            [],
+        ]
+
+        github_client = mock.Mock()
+        github_client.get_repo.return_value = repo
+
+        runner = CliRunner()
+        with (
+            mock.patch("telepact_project_cli.commands.repository_automation.Github", return_value=github_client),
+            mock.patch("telepact_project_cli.commands.repository_automation._process_merge_pull_request") as process_merge_pull_request,
+        ):
+            result = runner.invoke(
+                main,
+                ["merge-pr"],
+                env={
+                    "GITHUB_TOKEN": "token",
+                    "GITHUB_REPOSITORY": "Telepact/telepact",
+                },
+            )
+
+        self.assertEqual(result.exit_code, 0, msg=result.output)
+        self.assertEqual(process_merge_pull_request.call_args_list, [mock.call(repo, 7, is_admin=False), mock.call(repo, 8, is_admin=False)])
+
+    def test_merge_pr_processing_flow_updates_approves_and_merges(self) -> None:
         initial_pr = mock.Mock()
         initial_pr.number = 7
         initial_pr.head = SimpleNamespace(sha="head-1", ref="feature")
@@ -186,13 +271,8 @@ class RepositoryAutomationTests(unittest.TestCase):
         repo.get_collaborator_permission.return_value = "admin"
         repo.get_pull.return_value = initial_pr
 
-        github_client = mock.Mock()
-        github_client.get_repo.return_value = repo
-
-        runner = CliRunner()
         validate_merge_request = mock.Mock()
         with (
-            mock.patch("telepact_project_cli.commands.repository_automation.Github", return_value=github_client),
             mock.patch(
                 "telepact_project_cli.commands.repository_automation._wait_for_pr_stable",
                 side_effect=[initial_pr, ready_pr, bumped_pr],
@@ -215,21 +295,12 @@ class RepositoryAutomationTests(unittest.TestCase):
             mock.patch("telepact_project_cli.commands.repository_automation._current_head_sha", return_value="head-3"),
             mock.patch("telepact_project_cli.commands.repository_automation.create_version_bump_commit") as create_version_bump_commit,
         ):
-            result = runner.invoke(
-                main,
-                ["merge-pr"],
-                env={
-                    "GITHUB_TOKEN": "token",
-                    "GITHUB_REPOSITORY": "Telepact/telepact",
-                    "COMMENTER_LOGIN": "admin-user",
-                    "PR_NUMBER": "7",
-                },
-            )
+            from telepact_project_cli.commands.repository_automation import _process_merge_pull_request
 
-        self.assertEqual(result.exit_code, 0, msg=result.output)
+            _process_merge_pull_request(repo, 7, is_admin=True)
+
         initial_pr.mark_ready_for_review.assert_called_once_with()
         ready_pr.update_branch.assert_called_once_with(expected_head_sha="head-1")
-        # Validation runs before the branch update and again after the version bump settles.
         self.assertEqual(validate_merge_request.call_count, 2)
         create_version_bump_commit.assert_called_once_with(
             7,

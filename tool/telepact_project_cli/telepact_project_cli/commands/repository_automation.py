@@ -38,6 +38,7 @@ RELEASE_TARGET_ASSET_DIRECTORY_MAP = {
 
 MAX_ASSETS = 10
 MAIN_BRANCH = "main"
+MERGE_READY_LABEL = "Merge Ready"
 WAIT_TIMEOUT_SECONDS = 20 * 60  # 20 minutes
 WAIT_INTERVAL_SECONDS = 10
 MERGE_ALLOWED_PERMISSIONS = {"write", "maintain", "admin"}
@@ -100,6 +101,14 @@ def _git(*args: str, capture_output: bool = False) -> str:
 
 def _current_head_sha() -> str:
     return _git("rev-parse", "HEAD", capture_output=True)
+
+
+def _write_github_output(name: str, value: str) -> None:
+    github_output = os.getenv("GITHUB_OUTPUT")
+    if not github_output:
+        return
+    with open(github_output, "a", encoding="utf-8") as output_file:
+        output_file.write(f"{name}={value}\n")
 
 
 def _checkout_pr_branch(head_ref: str) -> None:
@@ -235,6 +244,67 @@ def _pull_request_changed_paths(pr: PullRequest) -> list[str]:
     return sorted({file.filename for file in pr.get_files() if file.filename})
 
 
+def _require_merge_permission(repo, commenter_login: str) -> str:
+    if not repo.has_in_collaborators(commenter_login):
+        raise click.ClickException(f"User @{commenter_login} is not a repository collaborator.")
+
+    commenter_permission = repo.get_collaborator_permission(commenter_login)
+    if commenter_permission not in MERGE_ALLOWED_PERMISSIONS:
+        raise RuntimeError(f"User @{commenter_login} does not have permission to merge pull requests.")
+
+    return commenter_permission
+
+
+def _is_merge_ready_pull_request(pr: PullRequest) -> bool:
+    return any((label.name or "") == MERGE_READY_LABEL for label in pr.get_labels())
+
+
+def _list_open_merge_ready_pull_requests(repo) -> list[PullRequest]:
+    return [
+        pr
+        for pr in repo.get_pulls(state="open", sort="created", direction="asc", base=MAIN_BRANCH)
+        if _is_merge_ready_pull_request(pr)
+    ]
+
+
+def _process_merge_pull_request(repo, pr_number: int, is_admin: bool) -> None:
+    pr = repo.get_pull(pr_number)
+    expected_head_sha = pr.head.sha
+    pr = _wait_for_pr_stable(repo, pr_number, expected_head_sha)
+    _validate_merge_request(pr, is_admin)
+    changed_paths = _pull_request_changed_paths(pr)
+
+    if pr.draft:
+        click.echo(f"Marking pull request #{pr.number} ready for review.")
+        pr.mark_ready_for_review()
+        pr = _wait_for_pr_stable(repo, pr_number, expected_head_sha)
+
+    if pr.mergeable_state == "behind":
+        click.echo(f"Updating pull request #{pr.number} with main.")
+        previous_head_sha = expected_head_sha
+        pr.update_branch(expected_head_sha=expected_head_sha)
+        pr = _wait_for_pr_head_update(repo, pr_number, previous_head_sha)
+        expected_head_sha = pr.head.sha
+
+    _checkout_pr_branch(pr.head.ref)
+    _verify_pull_request_ci(repo, pr_number, expected_head_sha)
+
+    click.echo(f"Bumping version on branch {pr.head.ref}.")
+    create_version_bump_commit(pr_number, changed_paths=changed_paths)
+    bumped_head_sha = _current_head_sha()
+    _push_current_branch(pr.head.ref)
+
+    pr = _wait_for_expected_head(repo, pr_number, expected_head_sha, bumped_head_sha)
+    expected_head_sha = pr.head.sha
+    _validate_merge_request(pr, is_admin)
+
+    merge_result = pr.merge(merge_method="squash", sha=expected_head_sha)
+    if not merge_result.merged:
+        raise RuntimeError(f"Failed to merge pull request #{pr.number}: {merge_result.message}")
+
+    click.echo(f"Merged pull request #{pr.number} with squash.")
+
+
 @click.command()
 def release() -> None:
     token = os.getenv("GITHUB_TOKEN")
@@ -361,54 +431,47 @@ def publish_targets(release_tag: str | None, release_body: str | None, github_ou
 def merge_pr() -> None:
     github_token = _require_env("GITHUB_TOKEN")
     github_repository = _require_env("GITHUB_REPOSITORY")
+
+    repo = Github(github_token).get_repo(github_repository)
+    while True:
+        merge_ready_pull_requests = _list_open_merge_ready_pull_requests(repo)
+        if not merge_ready_pull_requests:
+            click.echo(f"No open pull requests labeled '{MERGE_READY_LABEL}'.")
+            return
+
+        pr = merge_ready_pull_requests[0]
+        click.echo(f"Processing pull request #{pr.number}.")
+        _process_merge_pull_request(repo, pr.number, is_admin=False)
+
+
+@click.command(name="mark-pr-merge-ready")
+def mark_pr_merge_ready() -> None:
+    github_token = _require_env("GITHUB_TOKEN")
+    github_repository = _require_env("GITHUB_REPOSITORY")
     commenter_login = _require_env("COMMENTER_LOGIN")
     pr_number = int(_require_env("PR_NUMBER"))
 
     repo = Github(github_token).get_repo(github_repository)
-    if not repo.has_in_collaborators(commenter_login):
-        raise click.ClickException(f"User @{commenter_login} is not a repository collaborator.")
-
-    commenter_permission = repo.get_collaborator_permission(commenter_login)
-
-    if commenter_permission not in MERGE_ALLOWED_PERMISSIONS:
-        raise RuntimeError(f"User @{commenter_login} does not have permission to merge pull requests.")
-
-    is_admin = commenter_permission == "admin"
+    commenter_permission = _require_merge_permission(repo, commenter_login)
 
     pr = repo.get_pull(pr_number)
-    expected_head_sha = pr.head.sha
-    pr = _wait_for_pr_stable(repo, pr_number, expected_head_sha)
-    _validate_merge_request(pr, is_admin)
-    changed_paths = _pull_request_changed_paths(pr)
+    if pr.state != "open":
+        raise RuntimeError(f"Pull request #{pr.number} is not open.")
 
-    if pr.draft:
-        click.echo(f"Marking pull request #{pr.number} ready for review.")
-        pr.mark_ready_for_review()
-        pr = _wait_for_pr_stable(repo, pr_number, expected_head_sha)
+    if not _is_merge_ready_pull_request(pr):
+        pr.add_to_labels(MERGE_READY_LABEL)
+        click.echo(f"Added '{MERGE_READY_LABEL}' label to pull request #{pr.number}.")
+    else:
+        click.echo(f"Pull request #{pr.number} already has the '{MERGE_READY_LABEL}' label.")
 
-    if pr.mergeable_state == "behind":
-        click.echo(f"Updating pull request #{pr.number} with main.")
-        previous_head_sha = expected_head_sha
-        pr.update_branch(expected_head_sha=expected_head_sha)
-        pr = _wait_for_pr_head_update(repo, pr_number, previous_head_sha)
-        expected_head_sha = pr.head.sha
-
-    _checkout_pr_branch(pr.head.ref)
-    _verify_pull_request_ci(repo, pr_number, expected_head_sha)
-
-    click.echo(f"Bumping version on branch {pr.head.ref}.")
-    create_version_bump_commit(pr_number, changed_paths=changed_paths)
-    bumped_head_sha = _current_head_sha()
-    _push_current_branch(pr.head.ref)
-
-    pr = _wait_for_expected_head(repo, pr_number, expected_head_sha, bumped_head_sha)
-    expected_head_sha = pr.head.sha
-
-    merge_result = pr.merge(merge_method="squash", sha=expected_head_sha)
-    if not merge_result.merged:
-        raise RuntimeError(f"Failed to merge pull request #{pr.number}: {merge_result.message}")
-
-    click.echo(f"Merged pull request #{pr.number} with squash.")
+    merge_ready_count = len(_list_open_merge_ready_pull_requests(repo))
+    skip_merge_loop = merge_ready_count > 1
+    _write_github_output("skip_merge_loop", "true" if skip_merge_loop else "false")
+    _write_github_output("merge_ready_count", str(merge_ready_count))
+    _write_github_output("commenter_permission", commenter_permission)
+    click.echo(f"Open pull requests labeled '{MERGE_READY_LABEL}': {merge_ready_count}.")
+    if skip_merge_loop:
+        click.echo("Skipping merge loop start because another merge-ready pull request is already queued.")
 
 
 @click.command()
