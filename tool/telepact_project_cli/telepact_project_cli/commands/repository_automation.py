@@ -113,7 +113,7 @@ def _release_target_details(repo_root: Path, target: str) -> tuple[str, str, str
         case "ts":
             return ("Library (TypeScript)", _read_package_json_name(repo_root / "lib/ts/package.json"), "npm")
         case "dart":
-            return ("Binding (Dart)", _read_pubspec_name(repo_root / "bind/dart/pubspec.yaml"), "Release assets")
+            return ("Binding (Dart)", _read_pubspec_name(repo_root / "bind/dart/pubspec.yaml"), "GitHub release assets")
         case "cli":
             return ("SDK (CLI)", _read_pyproject_name(repo_root / "sdk/cli/pyproject.toml"), "PyPI")
         case "console":
