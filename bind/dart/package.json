@@ -1,16 +1,16 @@
 {
   "name": "telepact-wrapped",
-  "version": "1.0.0-alpha.313",
+  "version": "1.0.0-alpha.321",
   "description": "A Dart library for wrapping an npm package.",
   "main": "index.js",
   "private": true,
   "type": "module",
   "dependencies": {
     "crc-32": "^1.2.2",
-    "msgpackr": "^1.11.9"
+    "msgpackr": "^1.11.10"
   },
   "devDependencies": {
-    "rollup": "4.60.1",
+    "rollup": "4.60.2",
     "@rollup/plugin-commonjs": "^29.0.2"
   }
 }

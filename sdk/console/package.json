@@ -1,6 +1,6 @@
 {
   "name": "telepact-console",
-  "version": "1.0.0-alpha.313",
+  "version": "1.0.0-alpha.321",
   "description": "A web-based interface for inspecting and testing Telepact APIs.",
   "license": "Apache-2.0",
   "repository": {
@@ -65,7 +65,8 @@
     "msgpackr": "^1.11.5",
     "prettier": "^3.6.2",
     "react": "^19.1.1",
-    "react-dom": "^19.1.1"
+    "react-dom": "^19.1.1",
+    "yaml": "^2.8.3"
   },
   "overrides": {
     "follow-redirects": "^1.16.0",

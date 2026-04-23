@@ -1,11 +1,15 @@
 {
   "changed_paths": [
-    ".github/workflows/pr.yml",
-    "tool/telepact_project_cli/telepact_project_cli/cli.py",
-    "tool/telepact_project_cli/telepact_project_cli/commands/repository_automation.py"
+    "lib/py/pyproject.toml",
+    "lib/py/uv.lock"
   ],
-  "direct_targets": [],
-  "pr_number": 436,
-  "targets": [],
-  "version": "1.0.0-alpha.313"
+  "direct_targets": [
+    "py"
+  ],
+  "pr_number": 448,
+  "targets": [
+    "cli",
+    "py"
+  ],
+  "version": "1.0.0-alpha.321"
 }
