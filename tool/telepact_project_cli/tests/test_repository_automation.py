@@ -38,6 +38,44 @@ from telepact_project_cli.commands.repository_automation import (
 
 
 class RepositoryAutomationTests(unittest.TestCase):
+    def test_should_release_command_returns_true_when_head_commit_changes_version_file(self) -> None:
+        runner = CliRunner()
+        with mock.patch(
+            "telepact_project_cli.commands.repository_automation.subprocess.run",
+            return_value=SimpleNamespace(stdout="VERSION.txt\nsdk/cli/pyproject.toml\n"),
+        ) as subprocess_run:
+            result = runner.invoke(main, ["should-release"])
+
+        self.assertEqual(result.exit_code, 0, msg=result.output)
+        self.assertEqual(result.output, "true\n")
+        subprocess_run.assert_called_once_with(
+            ["git", "diff-tree", "--no-commit-id", "--name-only", "-r", "--root", "HEAD"],
+            check=True,
+            text=True,
+            stdout=mock.ANY,
+            stderr=mock.ANY,
+        )
+
+    def test_should_release_command_writes_github_output_when_version_file_not_changed(self) -> None:
+        runner = CliRunner()
+        github_output = Path("/tmp/github-output.txt")
+        with (
+            mock.patch(
+                "telepact_project_cli.commands.repository_automation.subprocess.run",
+                return_value=SimpleNamespace(stdout="README.md\n"),
+            ),
+            mock.patch(
+                "telepact_project_cli.commands.repository_automation._write_github_outputs",
+            ) as write_github_outputs,
+        ):
+            result = runner.invoke(
+                main,
+                ["should-release", "--github-output", str(github_output)],
+            )
+
+        self.assertEqual(result.exit_code, 0, msg=result.output)
+        write_github_outputs.assert_called_once_with(github_output, {"should_release": False})
+
     def test_combined_status_state_reads_head_commit_status(self) -> None:
         pr = SimpleNamespace(
             head=SimpleNamespace(sha="head-sha"),
