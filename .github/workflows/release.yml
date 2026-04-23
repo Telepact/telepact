@@ -31,9 +31,17 @@ jobs:
     outputs:
       should_release: ${{ steps.check.outputs.should_release }}
     steps:
-      - name: Check head commit for release manifest changes
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check head commit for version changes
         id: check
-        run: echo "should_release=${{ contains(toJSON(github.event.head_commit.modified), '.release/release-manifest.json') }}" >> "$GITHUB_OUTPUT"
+        run: |
+          if git diff-tree --no-commit-id --name-only -r HEAD | grep -Fxq 'VERSION.txt'; then
+            echo "should_release=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "should_release=false" >> "$GITHUB_OUTPUT"
+          fi
 
   build-release:
     name: Build release
