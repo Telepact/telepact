@@ -37,7 +37,7 @@ jobs:
       - name: Check head commit for version changes
         id: check
         run: |
-          if git diff-tree --no-commit-id --name-only -r --root HEAD | grep -Fxq 'VERSION.txt'; then
+          if git diff-tree --no-commit-id --name-only -r HEAD | grep -Fxq 'VERSION.txt'; then
             echo "should_release=true" >> "$GITHUB_OUTPUT"
           else
             echo "should_release=false" >> "$GITHUB_OUTPUT"
