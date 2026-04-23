@@ -49,6 +49,33 @@ def _pushd(path: Path):
         os.chdir(old_cwd)
 
 
+def _write_release_manifest(repo_root: Path, version: str) -> None:
+    (repo_root / ".release").mkdir(exist_ok=True)
+    (repo_root / ".release" / "release-manifest.json").write_text(
+        json.dumps(
+            {
+                "version": version,
+                "pr_number": 0,
+                "changed_paths": [],
+                "direct_targets": [],
+                "targets": [],
+            },
+            indent=2,
+            sort_keys=True,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+
+def _write_release_targets(repo_root: Path, body: str) -> None:
+    (repo_root / ".release").mkdir(exist_ok=True)
+    (repo_root / ".release" / "release-targets.yaml").write_text(
+        textwrap.dedent(body).strip() + "\n",
+        encoding="utf-8",
+    )
+
+
 class ReleasePlanTests(unittest.TestCase):
     def test_set_version_preserves_aligned_package_json(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
@@ -67,31 +94,26 @@ class ReleasePlanTests(unittest.TestCase):
     def test_compute_release_manifest_uses_declarative_rules_and_dependency_expansion(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             repo_root = Path(tmp_dir)
-            (repo_root / "VERSION.txt").write_text("1.0.0-alpha.214", encoding="utf-8")
-            (repo_root / ".release").mkdir()
-            (repo_root / ".release" / "release-targets.yaml").write_text(
-                textwrap.dedent(
-                    """
-                    projects:
-                      py:
-                        paths: [lib/py]
-                        is_dependency_for: [cli]
-                      ts:
-                        paths: [lib/ts]
-                        is_dependency_for: [dart, console]
-                      cli:
-                        paths: [sdk/cli]
-                      console:
-                        paths: [sdk/console]
-                      dart:
-                        paths: [bind/dart]
-                      prettier:
-                        paths: [sdk/prettier]
-                        is_dependency_for: [console]
-                    """
-                ).strip()
-                + "\n",
-                encoding="utf-8",
+            _write_release_targets(
+                repo_root,
+                """
+                projects:
+                  py:
+                    paths: [lib/py]
+                    is_dependency_for: [cli]
+                  ts:
+                    paths: [lib/ts]
+                    is_dependency_for: [dart, console]
+                  cli:
+                    paths: [sdk/cli]
+                  console:
+                    paths: [sdk/console]
+                  dart:
+                    paths: [bind/dart]
+                  prettier:
+                    paths: [sdk/prettier]
+                    is_dependency_for: [console]
+                """,
             )
 
             manifest = compute_release_manifest(
@@ -119,37 +141,32 @@ class ReleasePlanTests(unittest.TestCase):
     def test_compute_release_manifest_marks_all_targets_when_force_all_file_changes(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             repo_root = Path(tmp_dir)
-            (repo_root / "VERSION.txt").write_text("1.0.0-alpha.214", encoding="utf-8")
-            (repo_root / ".release").mkdir()
-            (repo_root / ".release" / "release-targets.yaml").write_text(
-                textwrap.dedent(
-                    """
-                    projects:
-                      java:
-                        paths: [lib/java]
-                      py:
-                        paths: [lib/py]
-                        is_dependency_for: [cli]
-                      ts:
-                        paths: [lib/ts]
-                        is_dependency_for: [dart, console]
-                      go:
-                        paths: [lib/go]
-                      dart:
-                        paths: [bind/dart]
-                      cli:
-                        paths: [sdk/cli]
-                      console:
-                        paths: [sdk/console]
-                      prettier:
-                        paths: [sdk/prettier]
-                        is_dependency_for: [console]
-                    force_all_if_changed:
-                      - .release/force-all.md
-                    """
-                ).strip()
-                + "\n",
-                encoding="utf-8",
+            _write_release_targets(
+                repo_root,
+                """
+                projects:
+                  java:
+                    paths: [lib/java]
+                  py:
+                    paths: [lib/py]
+                    is_dependency_for: [cli]
+                  ts:
+                    paths: [lib/ts]
+                    is_dependency_for: [dart, console]
+                  go:
+                    paths: [lib/go]
+                  dart:
+                    paths: [bind/dart]
+                  cli:
+                    paths: [sdk/cli]
+                  console:
+                    paths: [sdk/console]
+                  prettier:
+                    paths: [sdk/prettier]
+                    is_dependency_for: [console]
+                force_all_if_changed:
+                  - .release/force-all.md
+                """,
             )
 
             manifest = compute_release_manifest(
@@ -168,21 +185,26 @@ class ReleasePlanTests(unittest.TestCase):
     def test_publish_targets_command_writes_github_outputs(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             repo_root = Path(tmp_dir)
-            (repo_root / "VERSION.txt").write_text("1.0.0-alpha.214", encoding="utf-8")
-            (repo_root / ".release").mkdir()
-            (repo_root / ".release" / "release-manifest.json").write_text(
-                json.dumps(
-                    {
-                        "version": "1.0.0-alpha.214",
-                        "pr_number": 7,
-                        "changed_paths": ["lib/py/pyproject.toml"],
-                        "direct_targets": ["py"],
-                        "targets": ["cli", "py"],
-                    },
-                    indent=2,
-                    sort_keys=True,
-                ) + "\n",
-                encoding="utf-8",
+            _write_release_targets(
+                repo_root,
+                """
+                projects:
+                  py:
+                    paths: [lib/py]
+                    is_dependency_for: [cli]
+                  cli:
+                    paths: [sdk/cli]
+                """,
+            )
+            _write_release_manifest(repo_root, "1.0.0-alpha.214")
+            write_release_manifest(
+                repo_root,
+                compute_release_manifest(
+                    repo_root,
+                    changed_paths=["lib/py/pyproject.toml"],
+                    version="1.0.0-alpha.214",
+                    pr_number=7,
+                ),
             )
 
             output_path = repo_root / "github-output.txt"
@@ -216,7 +238,14 @@ class ReleasePlanTests(unittest.TestCase):
     def test_publish_targets_command_requires_manifest(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             repo_root = Path(tmp_dir)
-            (repo_root / "VERSION.txt").write_text("1.0.0-alpha.214", encoding="utf-8")
+            _write_release_targets(
+                repo_root,
+                """
+                projects:
+                  py:
+                    paths: [lib/py]
+                """,
+            )
 
             runner = CliRunner()
             with _pushd(repo_root):
@@ -235,21 +264,17 @@ class ReleasePlanTests(unittest.TestCase):
     def test_bump_command_uses_subject_only_commit_message_and_writes_manifest(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             repo_root = Path(tmp_dir)
-            (repo_root / "VERSION.txt").write_text("1.0.0-alpha.214", encoding="utf-8")
-            (repo_root / ".release").mkdir()
-            (repo_root / ".release" / "release-targets.yaml").write_text(
-                textwrap.dedent(
-                    """
-                    projects:
-                      py:
-                        paths: [lib/py]
-                        is_dependency_for: [cli]
-                      cli:
-                        paths: [sdk/cli]
-                    """
-                ).strip()
-                + "\n",
-                encoding="utf-8",
+            _write_release_manifest(repo_root, "1.0.0-alpha.214")
+            _write_release_targets(
+                repo_root,
+                """
+                projects:
+                  py:
+                    paths: [lib/py]
+                    is_dependency_for: [cli]
+                  cli:
+                    paths: [sdk/cli]
+                """,
             )
 
             runner = CliRunner()
@@ -273,7 +298,6 @@ class ReleasePlanTests(unittest.TestCase):
                 result = runner.invoke(main, ["bump"], env={"PR_NUMBER": "7"})
 
             self.assertEqual(result.exit_code, 0, msg=result.output)
-            self.assertEqual((repo_root / "VERSION.txt").read_text(encoding="utf-8"), "1.0.0-alpha.215")
             self.assertEqual(
                 load_release_manifest(repo_root),
                 {
@@ -293,10 +317,43 @@ class ReleasePlanTests(unittest.TestCase):
                 git_commands,
             )
 
+    def test_bump_command_skips_commit_when_release_targets_are_empty(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            repo_root = Path(tmp_dir)
+            _write_release_manifest(repo_root, "1.0.0-alpha.214")
+            _write_release_targets(
+                repo_root,
+                """
+                projects:
+                  py:
+                    paths: [lib/py]
+                """,
+            )
+
+            runner = CliRunner()
+            git_commands: list[list[str]] = []
+
+            def subprocess_run_side_effect(args, **kwargs):
+                git_commands.append(args)
+                if args[:3] == ["git", "diff", "--name-only"]:
+                    return subprocess.CompletedProcess(args, 0, stdout="README.md\n")
+                return subprocess.CompletedProcess(args, 0, stdout="")
+
+            with (
+                _pushd(repo_root),
+                mock.patch("telepact_project_cli.commands.project_version.subprocess.run", side_effect=subprocess_run_side_effect),
+            ):
+                result = runner.invoke(main, ["bump"], env={"PR_NUMBER": "7"})
+
+            self.assertEqual(result.exit_code, 0, msg=result.output)
+            self.assertIn("Skipping version bump because release manifest targets are empty.", result.output)
+            self.assertEqual(load_release_manifest(repo_root)["version"], "1.0.0-alpha.214")
+            self.assertNotIn(["git", "commit", "-m", "Bump version to 1.0.0-alpha.215 (#7)"], git_commands)
+
     def test_bump_command_fails_when_branch_diff_against_main_cannot_be_computed(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             repo_root = Path(tmp_dir)
-            (repo_root / "VERSION.txt").write_text("1.0.0-alpha.214", encoding="utf-8")
+            _write_release_manifest(repo_root, "1.0.0-alpha.214")
 
             runner = CliRunner()
 
@@ -325,8 +382,15 @@ class ReleasePlanTests(unittest.TestCase):
             subprocess.run(["git", "config", "user.name", "Test User"], cwd=repo_root, check=True)
             subprocess.run(["git", "config", "user.email", "test@example.com"], cwd=repo_root, check=True)
 
-            (repo_root / "VERSION.txt").write_text("1.0.0-alpha.200", encoding="utf-8")
-            subprocess.run(["git", "add", "VERSION.txt"], cwd=repo_root, check=True)
+            _write_release_targets(
+                repo_root,
+                """
+                projects:
+                  py:
+                    paths: [lib/py]
+                """,
+            )
+            subprocess.run(["git", "add", ".release/release-targets.yaml"], cwd=repo_root, check=True)
             subprocess.run(["git", "commit", "-m", "Initial commit"], cwd=repo_root, check=True)
 
             subprocess.run(
@@ -341,7 +405,7 @@ class ReleasePlanTests(unittest.TestCase):
                 check=True,
             )
 
-            (repo_root / ".release").mkdir()
+            (repo_root / ".release").mkdir(exist_ok=True)
             (repo_root / ".release" / "release-manifest.json").write_text(
                 json.dumps(
                     {
