@@ -20,8 +20,6 @@ on:
   push:
     branches:
       - main
-    paths:
-      - .release/release-manifest.json
 
 jobs:
   should-release:
@@ -46,7 +44,6 @@ jobs:
   build-release:
     name: Build release
     needs: [should-release]
-    if: ${{ needs.should-release.outputs.should_release == 'true' }}
     uses: ./.github/workflows/build.yml
     
   create-release:
