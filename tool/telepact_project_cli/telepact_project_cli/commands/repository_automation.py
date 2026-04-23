@@ -518,9 +518,11 @@ def mark_merge_ready(github_output: Path | None) -> None:
     repo = Github(github_token).get_repo(github_repository)
     _commenter_permission(repo, commenter_login)
 
-    _add_merge_ready_label(repo, pr_number)
     merge_ready_count = len(_open_merge_ready_pr_numbers(repo))
-    skip_merge_loop = merge_ready_count > 1
+    skip_merge_loop = merge_ready_count > 0
+
+    _add_merge_ready_label(repo, pr_number)
+
     click.echo(f"Pull request #{pr_number} is labeled {MERGE_READY_LABEL!r}. Open merge-ready pull requests: {merge_ready_count}.")
     _write_github_outputs(
         github_output,
