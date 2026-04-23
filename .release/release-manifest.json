@@ -1,9 +1,9 @@
 {
   "changed_paths": [
-    ".github/workflows/release.yml"
+    ".github/workflows/copilot-setup-steps.yml"
   ],
   "direct_targets": [],
-  "pr_number": 468,
+  "pr_number": 469,
   "targets": [],
   "version": "1.0.0-alpha.322"
 }
