@@ -261,7 +261,7 @@ class ReleasePlanTests(unittest.TestCase):
             self.assertNotEqual(result.exit_code, 0)
             self.assertIn("Release manifest not found:", result.output)
 
-    def test_bump_command_uses_subject_only_commit_message_and_writes_manifest(self) -> None:
+    def test_bump_command_updates_manifest_and_uses_generic_commit_message(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             repo_root = Path(tmp_dir)
             _write_release_manifest(repo_root, "1.0.0-alpha.214")
@@ -309,7 +309,7 @@ class ReleasePlanTests(unittest.TestCase):
                 },
             )
             self.assertIn(
-                ["git", "commit", "-m", "Bump version to 1.0.0-alpha.215 (#7)"],
+                ["git", "commit", "-m", "Update release-manifest.json"],
                 git_commands,
             )
             self.assertIn(
@@ -317,7 +317,7 @@ class ReleasePlanTests(unittest.TestCase):
                 git_commands,
             )
 
-    def test_bump_command_skips_commit_when_release_targets_are_empty(self) -> None:
+    def test_bump_command_commits_manifest_when_release_targets_are_empty(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             repo_root = Path(tmp_dir)
             _write_release_manifest(repo_root, "1.0.0-alpha.214")
@@ -346,9 +346,18 @@ class ReleasePlanTests(unittest.TestCase):
                 result = runner.invoke(main, ["bump"], env={"PR_NUMBER": "7"})
 
             self.assertEqual(result.exit_code, 0, msg=result.output)
-            self.assertIn("Skipping version bump because release manifest targets are empty.", result.output)
-            self.assertEqual(load_release_manifest(repo_root)["version"], "1.0.0-alpha.214")
-            self.assertNotIn(["git", "commit", "-m", "Bump version to 1.0.0-alpha.215 (#7)"], git_commands)
+            self.assertIn("Release manifest targets are empty; leaving version unchanged.", result.output)
+            self.assertEqual(
+                load_release_manifest(repo_root),
+                {
+                    "version": "1.0.0-alpha.214",
+                    "pr_number": 7,
+                    "changed_paths": ["README.md"],
+                    "direct_targets": [],
+                    "targets": [],
+                },
+            )
+            self.assertIn(["git", "commit", "-m", "Update release-manifest.json"], git_commands)
 
     def test_bump_command_fails_when_branch_diff_against_main_cannot_be_computed(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:

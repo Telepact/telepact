@@ -179,51 +179,53 @@ def create_version_bump_commit(pr_number: int, changed_paths: list[str] | None =
         version=version,
         pr_number=pr_number,
     )
-    if not release_manifest.targets:
-        click.echo("Skipping version bump because release manifest targets are empty.")
-        return version
-
-    new_version = _bump_version(version)
-
     edited_files: list[str] = []
+    new_version = version
 
-    for project_file in PROJECT_FILES:
-        if os.path.exists(project_file):
-            _set_version_in_project_file(project_file, new_version)
-            click.echo(f"Updated {project_file} to version {new_version}")
-            edited_files.append(project_file)
-        else:
-            click.echo(f"Project file {project_file} does not exist.")
+    if release_manifest.targets:
+        new_version = _bump_version(version)
 
-    for project_file in PROJECT_FILES:
-        lock_file = _update_and_get_lock_file_path(project_file)
-        if lock_file is not None:
-            edited_files.append(lock_file)
+        for project_file in PROJECT_FILES:
+            if os.path.exists(project_file):
+                _set_version_in_project_file(project_file, new_version)
+                click.echo(f"Updated {project_file} to version {new_version}")
+                edited_files.append(project_file)
+            else:
+                click.echo(f"Project file {project_file} does not exist.")
 
-    release_manifest = compute_release_manifest(
-        Path("."),
-        changed_paths=changed_paths,
-        version=new_version,
-        pr_number=pr_number,
-    )
-    sorted_release_targets = list(release_manifest.targets)
+        for project_file in PROJECT_FILES:
+            lock_file = _update_and_get_lock_file_path(project_file)
+            if lock_file is not None:
+                edited_files.append(lock_file)
+
+        release_manifest = compute_release_manifest(
+            Path("."),
+            changed_paths=changed_paths,
+            version=new_version,
+            pr_number=pr_number,
+        )
+        sorted_release_targets = list(release_manifest.targets)
+    else:
+        click.echo("Release manifest targets are empty; leaving version unchanged.")
+        sorted_release_targets = []
 
     manifest_path = write_release_manifest(Path("."), release_manifest)
     repo_relative_manifest_path = os.path.relpath(manifest_path, Path.cwd())
     edited_files.append(repo_relative_manifest_path)
     click.echo(f"Updated {repo_relative_manifest_path}")
 
-    doc_versions_path = write_doc_versions(
-        Path("."),
-        None,
-        pending_version=new_version,
-        pending_targets=sorted_release_targets,
-    )
-    repo_relative_doc_versions_path = os.path.relpath(doc_versions_path, Path.cwd())
-    edited_files.append(repo_relative_doc_versions_path)
-    click.echo(f"Updated {repo_relative_doc_versions_path}")
+    if sorted_release_targets:
+        doc_versions_path = write_doc_versions(
+            Path("."),
+            None,
+            pending_version=new_version,
+            pending_targets=sorted_release_targets,
+        )
+        repo_relative_doc_versions_path = os.path.relpath(doc_versions_path, Path.cwd())
+        edited_files.append(repo_relative_doc_versions_path)
+        click.echo(f"Updated {repo_relative_doc_versions_path}")
 
-    new_commit_msg = f"Bump version to {new_version} (#{pr_number})"
+    new_commit_msg = "Update release-manifest.json"
 
     subprocess.run(["git", "add"] + list(dict.fromkeys(edited_files)), check=True)
     subprocess.run(["git", "commit", "-m", new_commit_msg], check=True)
