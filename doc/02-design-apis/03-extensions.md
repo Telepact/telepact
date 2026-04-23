@@ -41,8 +41,8 @@ If you need ordinary API data modeling, use `struct.*`, `union.*`, `fn.*`,
 ## Discovering Them
 
 Call `fn.api_` with `{"includeInternal!": true}` to include internal schemas,
-including `_ext.*_` definitions. Add `{"includeExamples!": true}` to get
-deterministic example payloads for those types.
+including `_ext.*_` definitions. Call `fn.example_` with the definition `name`
+to get a deterministic example payload for a specific internal type.
 
 The examples below are illustrative request and response messages. They use the
 normal Telepact two-object message format:
@@ -580,5 +580,6 @@ calls.
 - Prefer ordinary Telepact definitions unless you are intentionally integrating
   with Telepact internal or mock schemas.
 - Treat `_ext.*_` types as reserved names with runtime-defined behavior.
-- When in doubt, inspect `fn.api_` with internal definitions and examples
+- When in doubt, inspect `fn.api_` with internal definitions and use
+  `fn.example_` for concrete payloads
   enabled to see the exact shape the current schema exposes.

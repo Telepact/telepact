@@ -185,11 +185,11 @@ async def handle_message(
     elif function_name == "fn.example_":
         include_internal = isinstance(request_payload, dict) and request_payload.get("includeInternal!") is True
         name = cast(str, request_payload.get("name")) if isinstance(request_payload, dict) else ""
-        result_message = Message({}, {"Ok_": get_definition_example(
+        result_message = Message({}, {"Ok_": {"examples": get_definition_example(
             telepact_schema,
             name,
             include_internal,
-        )})
+        )}})
     elif function_name == "fn.api_":
         include_internal = isinstance(request_payload, dict) and request_payload.get("includeInternal!") is True
         api_definitions = telepact_schema.full if include_internal else telepact_schema.original

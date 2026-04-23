@@ -398,7 +398,7 @@ cases = {
         [[{}, {'fn.def_': {'name': 'fn.ping_'}}], [{}, {'Ok_': {'definitions': []}}]],
         [[{}, {'fn.def_': {'name': 'fn.ping_', 'includeInternal!': True}}], [{}, {'Ok_': {'definitions': _definition_closure(
             _EXAMPLE_FULL_SCHEMA,
-            {'fn.ping_'},
+            {'errors.Validation_', 'fn.ping_', 'struct.ValidationFailure_', 'union.ParseFailure_', 'union.Type_', 'union.ValidationFailureReason_'},
         )}}]],
     ],
     'serverHooks': [

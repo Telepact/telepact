@@ -19,23 +19,29 @@ from msgpack import ExtType
 _BINARY_ENCODING = {
     'Ok_': 0,
     'api': 1,
-    'data': 2,
-    'fn.api_': 3,
-    'fn.example': 4,
-    'fn.ping_': 5,
-    'id': 6,
-    'includeExamples!': 7,
-    'includeInternal!': 8,
-    'name': 9,
+    'comment!': 2,
+    'data': 3,
+    'definitions': 4,
+    'examples': 5,
+    'fn.api_': 6,
+    'fn.def_': 7,
+    'fn.example': 8,
+    'fn.example_': 9,
+    'fn.index_': 10,
+    'fn.ping_': 11,
+    'functions': 12,
+    'id': 13,
+    'includeInternal!': 14,
+    'name': 15,
 }
-_BINARY_CHECKSUM = 1059755324
+_BINARY_CHECKSUM = -1973795655
 
 cases = {
     'binary': [
         [[{'@bin_': []}, {'fn.ping_': {}}], [{'@enc_': _BINARY_ENCODING, '@bin_': [_BINARY_CHECKSUM]}, {0: {}}]],
         [[{'@msgpack': True, '@bin_': [0]}, {0: {}}], [{}, {'ErrorParseFailure_': {'reasons': [{'IncompatibleBinaryEncoding': {}}]}}]],
-        [[{'@msgpack': True, '@bin_': [_BINARY_CHECKSUM]}, {5: {}}], [{'@bin_': [_BINARY_CHECKSUM]}, {0: {}}]],
-        [[{'@msgpack': True, '@bin_': [_BINARY_CHECKSUM], '@pac_': True, '@ok_': {'data': [{'id': 1, 'name': 'one'}, {'id': 2, 'name': 'two'}]}}, {4: {}}], [{'@bin_': [_BINARY_CHECKSUM], '@pac_': True}, {0: {2: [ExtType(17, b''), [None, 6, 9], [1, 'one'], [2, 'two']]}}]],
+        [[{'@msgpack': True, '@bin_': [_BINARY_CHECKSUM]}, {11: {}}], [{'@bin_': [_BINARY_CHECKSUM]}, {0: {}}]],
+        [[{'@msgpack': True, '@bin_': [_BINARY_CHECKSUM], '@pac_': True, '@ok_': {'data': [{'id': 1, 'name': 'one'}, {'id': 2, 'name': 'two'}]}}, {8: {}}], [{'@bin_': [_BINARY_CHECKSUM], '@pac_': True}, {0: {3: [ExtType(17, b''), [None, 13, 15], [1, 'one'], [2, 'two']]}}]],
         [[{'@msgpack': True, '@bin_': [_BINARY_CHECKSUM]}, {255: {}}], [{}, {'ErrorParseFailure_': {'reasons': [{'BinaryDecodeFailure': {}}]}}]],
         [[{'@bin_': None}, {'fn.ping_': {}}], [{}, {'ErrorInvalidRequestHeaders_': {'cases': [{'path': ['@bin_'], 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Array': {}}}}}]}}]],
         [[{'@bin_': False}, {'fn.ping_': {}}], [{}, {'ErrorInvalidRequestHeaders_': {'cases': [{'path': ['@bin_'], 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Array': {}}}}}]}}]],

@@ -86,8 +86,7 @@ On one run, the response looked like this:
 
 ```text
 527
-���@enc_�·,�Add·�Constant·�Div·�Mul·�Ok_·�Sub·�Variable·�api·�blob·�expression�fn.add
-�fn.api_·�fn.deleteVariable·�fn.deleteVariables·�fn.evaluate·�fn.export·�fn.getPaperTape·�fn.getVariable·�fn.getVariables·�fn.import·�fn.login·�fn.logout·�fn.ping_·�fn.saveVariable·�fn.saveVariables·�includeExamples!·�includeInternal!·�left·�limit!·�name·�names·�result·�right �saveResult!�successful"�tape#�timestamp$�token%�username&�value'�variable!(�variables)�x*�y+�@bin_��5����·�#���·�·�x·�········$�i���"·�·�·�·�'· �·�'···$�i���"�
+���@enc_�...�fn.api_�...�fn.ping_�...�includeInternal!�...�@bin_�...
 ```
 
 That noisy `@enc_` section is the one-time negotiation payload.

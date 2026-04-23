@@ -29,9 +29,7 @@
     includeInternal!: "boolean"
   ->:
     - Ok_:
-        functions:
-          - name: "string"
-            comment!: "any"
+        functions: ["struct.IndexFunction_"]
   _errors: '^errors\.Validation_$'
 
 - ///: |
@@ -58,9 +56,7 @@
     includeInternal!: "boolean"
   ->:
     - Ok_:
-        example!: "any"
-        inputExample!: "any"
-        outputExample!: "any"
+        examples: {"string": "any"}
   _errors: '^errors\.Validation_$'
 
 - ///: |
@@ -73,6 +69,11 @@
     - Ok_:
         api: [{"string": "any"}]
   _errors: '^errors\.Validation_$'
+
+- ///: A compact function index entry.
+  struct.IndexFunction_:
+    name: "string"
+    comment!: "any"
 
 - ///: |
     `_ext.Select_` is the selection object used by the `@select_` header. Use

@@ -183,7 +183,7 @@ import io.github.telepact.internal.validation.ValidationFailure;
                             ? (String) ((Map<?, ?>) requestPayload).get("name")
                             : "";
             resultMessage = new Message(Map.of(),
-                    Map.of("Ok_", GetApiDefinitionsWithExamples.getDefinitionExample(telepactSchema, name, includeInternal)));
+                    Map.of("Ok_", Map.of("examples", GetApiDefinitionsWithExamples.getDefinitionExample(telepactSchema, name, includeInternal))));
         } else if (functionName.equals("fn.api_")) {
             final var includeInternal = requestPayload instanceof Map<?, ?>
                     && Objects.equals(true, ((Map<?, ?>) requestPayload).get("includeInternal!"));

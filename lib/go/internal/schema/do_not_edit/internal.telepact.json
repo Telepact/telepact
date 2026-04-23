@@ -12,10 +12,61 @@
     "_errors": "^errors\\.Validation_$"
   },
   {
-    "///": "Get the telepact `schema` of this server.\n\nSet `includeInternal` to `true` to include Telepact internal definitions.\nSet `includeExamples` to `true` to add deterministic example payloads to\neach schema entry.\n",
+    "///": "List the top-level functions exposed by this server.\n\nThis is intended as a compact entrypoint for tools and AI agents.\nSet `includeInternal` to `true` to include internal functions.\n",
+    "fn.index_": {
+      "includeInternal!": "boolean"
+    },
+    "->": [
+      {
+        "Ok_": {
+          "functions": [
+            "struct.IndexFunction_"
+          ]
+        }
+      }
+    ],
+    "_errors": "^errors\\.Validation_$"
+  },
+  {
+    "///": "Get a single schema definition and its transitive referenced definitions.\n\nSet `includeInternal` to `true` to allow looking up internal definitions.\n",
+    "fn.def_": {
+      "name": "string",
+      "includeInternal!": "boolean"
+    },
+    "->": [
+      {
+        "Ok_": {
+          "definitions": [
+            {
+              "string": "any"
+            }
+          ]
+        }
+      }
+    ],
+    "_errors": "^errors\\.Validation_$"
+  },
+  {
+    "///": "Get a deterministic mocked payload example for a single schema definition.\n\nFunctions and headers return `inputExample` and `outputExample`.\nOther definitions return `example`.\n\nSet `includeInternal` to `true` to allow looking up internal definitions.\n",
+    "fn.example_": {
+      "name": "string",
+      "includeInternal!": "boolean"
+    },
+    "->": [
+      {
+        "Ok_": {
+          "examples": {
+            "string": "any"
+          }
+        }
+      }
+    ],
+    "_errors": "^errors\\.Validation_$"
+  },
+  {
+    "///": "Get the telepact `schema` of this server.\n\nSet `includeInternal` to `true` to include Telepact internal definitions.\n",
     "fn.api_": {
-      "includeInternal!": "boolean",
-      "includeExamples!": "boolean"
+      "includeInternal!": "boolean"
     },
     "->": [
       {
@@ -29,6 +80,13 @@
       }
     ],
     "_errors": "^errors\\.Validation_$"
+  },
+  {
+    "///": "A compact function index entry.",
+    "struct.IndexFunction_": {
+      "name": "string",
+      "comment!": "any"
+    }
   },
   {
     "///": "`_ext.Select_` is the selection object used by the `@select_` header. Use\n`->` to narrow fields on the active result union, `struct.*` keys to narrow\nstruct fields, and `union.*` keys to narrow fields for specific union tags.\n\nSee https://raw.githubusercontent.com/Telepact/telepact/main/doc/\nextensions.md for full `_ext.Select_` rules and end-to-end examples.\n",

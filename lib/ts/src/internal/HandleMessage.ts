@@ -192,7 +192,7 @@ export async function handleMessage(
     } else if (functionName === 'fn.example_') {
         const includeInternal = requestPayload['includeInternal!'] === true;
         const name = typeof requestPayload.name === 'string' ? requestPayload.name : '';
-        resultMessage = new Message({}, { Ok_: getDefinitionExample(telepactSchema, name, includeInternal) });
+        resultMessage = new Message({}, { Ok_: { examples: getDefinitionExample(telepactSchema, name, includeInternal) } });
     } else if (functionName === 'fn.api_') {
         const includeInternal = requestPayload['includeInternal!'] === true;
         const apiDefinitions = includeInternal

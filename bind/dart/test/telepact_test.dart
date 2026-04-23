@@ -91,7 +91,7 @@ void main() {
       final exampleLocalStorageData = {
         "-1337": {"lol": 1, "notreal": 2}
       };
-      //final exampleLocalStorageData = {"-1443216067":{"Ok_":0,"api":1,"fn.add":2,"fn.api_":3,"fn.ping_":4,"includeInternal!":5,"result":6,"x":7,"y":8}};
+      //final exampleLocalStorageData = {"-1774020243":{"Ok_":0,"api":1,"comment!":2,"definitions":3,"examples":4,"fn.add":5,"fn.api_":6,"fn.def_":7,"fn.example_":8,"fn.index_":9,"fn.ping_":10,"functions":11,"includeInternal!":12,"name":13,"result":14,"x":15,"y":16}};
       web.window.localStorage.setItem(
           'telepact-api-encoding:test', jsonEncode(exampleLocalStorageData));
 
@@ -110,16 +110,23 @@ void main() {
           '@enc_': {
             'Ok_': 0,
             'api': 1,
-            'fn.add': 2,
-            'fn.api_': 3,
-            'fn.ping_': 4,
-            'includeExamples!': 5,
-            'includeInternal!': 6,
-            'result': 7,
-            'x': 8,
-            'y': 9
+            'comment!': 2,
+            'definitions': 3,
+            'examples': 4,
+            'fn.add': 5,
+            'fn.api_': 6,
+            'fn.def_': 7,
+            'fn.example_': 8,
+            'fn.index_': 9,
+            'fn.ping_': 10,
+            'functions': 11,
+            'includeInternal!': 12,
+            'name': 13,
+            'result': 14,
+            'x': 15,
+            'y': 16
           },
-          '@bin_': [-260261837]
+          '@bin_': [-1774020243]
         }, {
           "Ok_": {}
         });

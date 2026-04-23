@@ -203,7 +203,7 @@ func HandleMessage(
 				name = requestName
 			}
 		}
-		resultMessage = ServerMessage{Headers: make(map[string]any), Body: map[string]any{"Ok_": GetDefinitionExample(schema, name, includeInternal)}}
+		resultMessage = ServerMessage{Headers: make(map[string]any), Body: map[string]any{"Ok_": map[string]any{"examples": GetDefinitionExample(schema, name, includeInternal)}}}
 	case "fn.api_":
 		includeInternal := false
 		if requestMap, ok := requestPayload.(map[string]any); ok {
