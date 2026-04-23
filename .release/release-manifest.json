@@ -1,12 +1,9 @@
 {
   "changed_paths": [
-    ".github/workflows/merge-pr.yml",
-    "tool/telepact_project_cli/telepact_project_cli/cli.py",
-    "tool/telepact_project_cli/telepact_project_cli/commands/repository_automation.py",
-    "tool/telepact_project_cli/tests/test_repository_automation.py"
+    "test/lib/java/src/main/java/telepacttest/Main.java"
   ],
   "direct_targets": [],
-  "pr_number": 459,
+  "pr_number": 461,
   "targets": [],
-  "version": "1.0.0-alpha.318"
+  "version": "1.0.0-alpha.319"
 }

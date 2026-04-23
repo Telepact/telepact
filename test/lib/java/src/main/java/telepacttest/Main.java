@@ -61,6 +61,10 @@ import io.nats.client.Nats;
 import io.nats.client.Options;
 
 public class Main {
+    private static final Duration NATS_REQUEST_TIMEOUT = Duration.ofSeconds(10);
+    private static final int NATS_REQUEST_ADDITIONAL_RETRIES = 2;
+    private static final Duration NATS_REQUEST_RETRY_DELAY = Duration.ofMillis(250);
+
     public static class CustomByteArraySerializer extends JsonSerializer<byte[]> {
         @Override
         public void serialize(byte[] value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
@@ -126,6 +130,27 @@ public class Main {
         return false;
     }
 
+    private static io.nats.client.Message requestWithRetry(io.nats.client.Connection connection, String topic,
+            byte[] requestBytes) throws InterruptedException {
+        io.nats.client.Message response = null;
+        for (int attempt = 0; attempt <= NATS_REQUEST_ADDITIONAL_RETRIES; attempt++) {
+            response = connection.request(topic, requestBytes, NATS_REQUEST_TIMEOUT);
+            if (response != null) {
+                return response;
+            }
+
+            if (attempt < NATS_REQUEST_ADDITIONAL_RETRIES) {
+                System.out.println("NATS request to %s returned no response. Retrying %d/%d..."
+                        .formatted(topic, attempt + 1, NATS_REQUEST_ADDITIONAL_RETRIES));
+                System.out.flush();
+                Thread.sleep(NATS_REQUEST_RETRY_DELAY.toMillis());
+            }
+        }
+
+        throw new IllegalStateException("NATS request to %s returned no response after %d attempts with timeout %s"
+                .formatted(topic, NATS_REQUEST_ADDITIONAL_RETRIES + 1, NATS_REQUEST_TIMEOUT));
+    }
+
     private static boolean isFunctionRouteName(String typeName) {
         return typeName.startsWith("fn.") && !typeName.endsWith(".->") && !typeName.endsWith("_");
     }
@@ -172,9 +197,9 @@ public class Main {
 
                     io.nats.client.Message natsResponseMessage;
                     try {
-                        natsResponseMessage = connection.request(clientBackdoorTopic, requestBytes,
-                                Duration.ofSeconds(5));
+                        natsResponseMessage = requestWithRetry(connection, clientBackdoorTopic, requestBytes);
                     } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
                         throw new RuntimeException(e);
                     }
                     var responseBytes = natsResponseMessage.getData();
@@ -482,8 +507,9 @@ public class Main {
 
                 io.nats.client.Message natsResponseMessage;
                 try {
-                    natsResponseMessage = connection.request(backdoorTopic, requestBytes, Duration.ofSeconds(5));
+                    natsResponseMessage = requestWithRetry(connection, backdoorTopic, requestBytes);
                 } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
                     throw new RuntimeException(e);
                 }
                 var responseBytes = natsResponseMessage.getData();
