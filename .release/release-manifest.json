@@ -1,9 +1,12 @@
 {
   "changed_paths": [
-    ".github/dependabot.yml"
+    ".github/workflows/merge-pr.yml",
+    "tool/telepact_project_cli/telepact_project_cli/cli.py",
+    "tool/telepact_project_cli/telepact_project_cli/commands/repository_automation.py",
+    "tool/telepact_project_cli/tests/test_repository_automation.py"
   ],
   "direct_targets": [],
-  "pr_number": 452,
+  "pr_number": 459,
   "targets": [],
-  "version": "1.0.0-alpha.317"
+  "version": "1.0.0-alpha.318"
 }
