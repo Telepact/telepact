@@ -256,7 +256,7 @@ def _require_merge_permission(repo, commenter_login: str) -> str:
 
 
 def _is_merge_ready_pull_request(pr: PullRequest) -> bool:
-    return any((label.name or "") == MERGE_READY_LABEL for label in pr.get_labels())
+    return any(label.name == MERGE_READY_LABEL for label in pr.get_labels())
 
 
 def _list_open_merge_ready_pull_requests(repo) -> list[PullRequest]:

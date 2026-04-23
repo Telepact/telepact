@@ -238,7 +238,9 @@ class RepositoryAutomationTests(unittest.TestCase):
             )
 
         self.assertEqual(result.exit_code, 0, msg=result.output)
-        self.assertEqual(process_merge_pull_request.call_args_list, [mock.call(repo, 7, is_admin=False), mock.call(repo, 8, is_admin=False)])
+        self.assertEqual(process_merge_pull_request.call_count, 2)
+        self.assertEqual(process_merge_pull_request.call_args_list[0], mock.call(repo, 7, is_admin=False))
+        self.assertEqual(process_merge_pull_request.call_args_list[1], mock.call(repo, 8, is_admin=False))
 
     def test_merge_pr_processing_flow_updates_approves_and_merges(self) -> None:
         initial_pr = mock.Mock()
