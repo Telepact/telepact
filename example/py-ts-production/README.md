@@ -19,9 +19,10 @@ Browse the files:
 - [`api/app.telepact.yaml`](./api/app.telepact.yaml) - public Telepact schema
 - [`schema-baseline/app.telepact.yaml`](./schema-baseline/app.telepact.yaml) - schema baseline used by `telepact compare`
 - [`server.py`](./server.py) - Python transport adapter, Telepact server, middleware, auth, logging, metrics, and static asset serving
+- [`playwright.config.ts`](./playwright.config.ts) - Playwright configuration that starts the Python server for browser e2e coverage
+- [`tests/example.spec.ts`](./tests/example.spec.ts) - browser end-to-end verification
 - [`web/index.html`](./web/index.html) - browser page
 - [`web/app.ts`](./web/app.ts) - TypeScript browser client
-- [`test_example.py`](./test_example.py) - end-to-end verification
 - [`Makefile`](./Makefile) - local build, compare, run, and serve targets
 
 Run the verification flow:

@@ -17,15 +17,15 @@
 SHELL := /bin/bash
 PYTHON := .venv/bin/python
 
-.PHONY: run build-frontend compare serve clean
+.PHONY: run build-frontend setup-backend compare playwright serve clean
 
 run: compare build-frontend
 	@set -euo pipefail; \
-	$(MAKE) -C ../../lib/py; \
 	rm -rf .venv; \
 	uv venv --python python3.11 .venv; \
-	uv pip install --python $(PYTHON) pytest ../../lib/py/dist/*.tar.gz; \
-	$(PYTHON) -m pytest -q
+	uv pip install --python $(PYTHON) ../../lib/py/dist/*.tar.gz; \
+	npx playwright install --with-deps chromium; \
+	npm test
 
 build-frontend:
 	@set -euo pipefail; \
@@ -33,16 +33,28 @@ build-frontend:
 	npm install --ignore-scripts --no-package-lock; \
 	npm run build
 
-compare:
-	@uv run --project ../../sdk/cli telepact compare --old-schema-dir schema-baseline --new-schema-dir api
-
-serve: build-frontend
+setup-backend:
 	@set -euo pipefail; \
 	$(MAKE) -C ../../lib/py; \
 	rm -rf .venv; \
 	uv venv --python python3.11 .venv; \
-	uv pip install --python $(PYTHON) ../../lib/py/dist/*.tar.gz; \
-	$(PYTHON) server.py
+	uv pip install --python $(PYTHON) ../../lib/py/dist/*.tar.gz
+
+compare:
+	@set -euo pipefail; \
+	$(MAKE) -C ../../lib/py; \
+	rm -rf ../../sdk/cli/telepact_cli/telepact; \
+	cp -r ../../lib/py/telepact ../../sdk/cli/telepact_cli/telepact; \
+	trap 'rm -rf ../../sdk/cli/telepact_cli/telepact' EXIT; \
+	uv run --project ../../sdk/cli telepact compare --old-schema-dir schema-baseline --new-schema-dir api
+
+playwright: build-frontend setup-backend
+	@set -euo pipefail; \
+	npx playwright install --with-deps chromium; \
+	npm test
+
+serve: build-frontend setup-backend
+	@set -euo pipefail; $(PYTHON) server.py
 
 clean:
-	@rm -rf .venv dist-web node_modules
+	@rm -rf .venv dist-web node_modules playwright-report test-results

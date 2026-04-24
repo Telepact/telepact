@@ -1,3 +1,5 @@
 .venv/
 dist-web/
 node_modules/
+playwright-report/
+test-results/
