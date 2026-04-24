@@ -119,13 +119,9 @@ The Telepact-specific guidance is:
 - stage breaking changes so callers are not forced across incompatible message
   shapes all at once
 
-Example:
-
-```bash
-telepact compare \
-  --old-schema-dir path/to/schema-baseline \
-  --new-schema-dir path/to/current-schema
-```
+For the practical Git-based workflow to compare the checked-in schema on your
+branch with `origin/main` or a release tag, see
+[Tooling Workflow: Compare schema versions](../03-build-clients-and-servers/04-tooling-workflow.md#compare-schema-versions).
 
 Telepact does not prescribe the surrounding rollout procedure. Whether your
 organization uses canaries, blue/green, staged regional rollout, or something
