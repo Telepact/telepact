@@ -1,6 +1,10 @@
 # ts-select
 
-Minimal TypeScript Telepact example that selects just the `id` field from a list of users.
+Minimal TypeScript Telepact example that shows all three select targets in one request:
+
+- `->` keeps only the `package` and `latestEvent` result fields
+- `struct.Package` keeps only the `trackingId` field
+- `union.DeliveryEvent` keeps only the `location` field on the `Dropoff` tag
 
 Browse the files:
 
@@ -22,11 +26,17 @@ The request uses the runtime-supported `@select_` shape:
 [
   {
     "@select_": {
-      "struct.User": ["id"]
+      "->": {
+        "Ok_": ["package", "latestEvent"]
+      },
+      "struct.Package": ["trackingId"],
+      "union.DeliveryEvent": {
+        "Dropoff": ["location"]
+      }
     }
   },
   {
-    "fn.listUsers": {}
+    "fn.trackPackage": {}
   }
 ]
 ```

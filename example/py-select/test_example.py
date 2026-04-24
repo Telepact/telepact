@@ -18,9 +18,6 @@ from server import create_http_server
 from test_support import post_json, run_server, stop_server
 
 
-INDEX_MESSAGE_BODY = 1
-
-
 def test_select_example_runs_end_to_end() -> None:
     server = create_http_server()
     thread = run_server(server)
@@ -29,11 +26,17 @@ def test_select_example_runs_end_to_end() -> None:
         payload = post_json(url, [
             {
                 '@select_': {
-                    'struct.User': ['id'],
+                    '->': {
+                        'Ok_': ['package', 'latestEvent'],
+                    },
+                    'struct.Package': ['trackingId'],
+                    'union.DeliveryEvent': {
+                        'Dropoff': ['location'],
+                    },
                 },
             },
             {
-                'fn.listUsers': {},
+                'fn.trackPackage': {},
             },
         ])
 
@@ -41,16 +44,16 @@ def test_select_example_runs_end_to_end() -> None:
             {},
             {
                 'Ok_': {
-                    'users': [
-                        {'id': 'user-1'},
-                        {'id': 'user-2'},
-                    ],
+                    'package': {
+                        'trackingId': 'PKG-42',
+                    },
+                    'latestEvent': {
+                        'Dropoff': {
+                            'location': 'Front desk',
+                        },
+                    },
                 },
             },
-        ]
-        assert payload[INDEX_MESSAGE_BODY]['Ok_']['users'] == [
-            {'id': 'user-1'},
-            {'id': 'user-2'},
         ]
     finally:
         stop_server(server, thread)

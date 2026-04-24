@@ -25,27 +25,27 @@ options = Server.Options()
 options.auth_required = False
 
 
-async def list_users(function_name: str, request_message: Message) -> Message:
-    argument = request_message.body[function_name]
+async def track_package(function_name: str, request_message: Message) -> Message:
+    request_message.body[function_name]
     return Message({}, {
         'Ok_': {
-            'users': [
-                {
-                    'id': 'user-1',
-                    'email': 'ada@example.com',
-                    'name': 'Ada',
+            'package': {
+                'trackingId': 'PKG-42',
+                'recipient': 'Ada Lovelace',
+                'city': 'London',
+            },
+            'latestEvent': {
+                'Dropoff': {
+                    'location': 'Front desk',
+                    'signedBy': 'M. Singh',
                 },
-                {
-                    'id': 'user-2',
-                    'email': 'grace@example.com',
-                    'name': 'Grace',
-                },
-            ],
+            },
+            'note': 'Left with building reception.',
         },
     })
 
 
-function_router = FunctionRouter({'fn.listUsers': list_users})
+function_router = FunctionRouter({'fn.trackPackage': track_package})
 telepact_server = Server(schema, function_router, options)
 
 

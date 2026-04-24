@@ -20,8 +20,6 @@ import { AddressInfo } from 'node:net';
 import { createHttpServer } from './server.js';
 import { postJson, runServer, stopServer } from './test_support.js';
 
-const INDEX_MESSAGE_BODY = 1;
-
 test('select example runs end to end', async () => {
     const server = createHttpServer();
     await runServer(server);
@@ -31,11 +29,17 @@ test('select example runs end to end', async () => {
         const payload = await postJson(url, [
             {
                 '@select_': {
-                    'struct.User': ['id'],
+                    '->': {
+                        'Ok_': ['package', 'latestEvent'],
+                    },
+                    'struct.Package': ['trackingId'],
+                    'union.DeliveryEvent': {
+                        'Dropoff': ['location'],
+                    },
                 },
             },
             {
-                'fn.listUsers': {},
+                'fn.trackPackage': {},
             },
         ]);
 
@@ -43,17 +47,16 @@ test('select example runs end to end', async () => {
             {},
             {
                 'Ok_': {
-                    'users': [
-                        { 'id': 'user-1' },
-                        { 'id': 'user-2' },
-                    ],
+                    'package': {
+                        'trackingId': 'PKG-42',
+                    },
+                    'latestEvent': {
+                        'Dropoff': {
+                            'location': 'Front desk',
+                        },
+                    },
                 },
             },
-        ]);
-        const responseBody = payload[INDEX_MESSAGE_BODY] as Record<string, any>;
-        assert.deepEqual(responseBody['Ok_']['users'], [
-            { 'id': 'user-1' },
-            { 'id': 'user-2' },
         ]);
     } finally {
         await stopServer(server);

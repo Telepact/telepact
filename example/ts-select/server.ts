@@ -24,26 +24,26 @@ const schema = TelepactSchema.fromFileJsonMap(files.filenamesToJson);
 const options = new ServerOptions();
 options.authRequired = false;
 
-async function listUsers(_functionName: string, _requestMessage: Message): Promise<Message> {
+async function trackPackage(_functionName: string, _requestMessage: Message): Promise<Message> {
     return new Message({}, {
         'Ok_': {
-            'users': [
-                {
-                    'id': 'user-1',
-                    'email': 'ada@example.com',
-                    'name': 'Ada',
+            'package': {
+                'trackingId': 'PKG-42',
+                'recipient': 'Ada Lovelace',
+                'city': 'London',
+            },
+            'latestEvent': {
+                'Dropoff': {
+                    'location': 'Front desk',
+                    'signedBy': 'M. Singh',
                 },
-                {
-                    'id': 'user-2',
-                    'email': 'grace@example.com',
-                    'name': 'Grace',
-                },
-            ],
+            },
+            'note': 'Left with building reception.',
         },
     });
 }
 
-const functionRouter = new FunctionRouter({ 'fn.listUsers': listUsers });
+const functionRouter = new FunctionRouter({ 'fn.trackPackage': trackPackage });
 const telepactServer = new Server(schema, functionRouter, options);
 
 function readRequestBytes(request: IncomingMessage): Promise<Uint8Array> {
