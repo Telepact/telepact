@@ -1,7 +1,6 @@
 # Introduction
 
-Telepact is an API ecosystem for bridging programs across inter-process
-communication boundaries.
+Telepact is a thin but powerful RPC framework built on JSON.
 
 What makes Telepact different? It takes the differentiating features of the
 industry's most popular API technologies, and combines them together through 3
