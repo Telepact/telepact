@@ -1,3 +1,4 @@
+"use strict";
 //|
 //|  Copyright The Telepact Authors
 //|
@@ -13,36 +14,20 @@
 //|  See the License for the specific language governing permissions and
 //|  limitations under the License.
 //|
-
-type TelepactHeaders = Record<string, unknown>;
-type TelepactBody = Record<string, unknown>;
-
-type TelepactResponse = {
-    requestId: string;
-    status: number;
-    httpRequestId: string | null;
-    headers: TelepactHeaders;
-    body: TelepactBody;
-};
-
 const resultNode = document.getElementById('result');
 const observabilityNode = document.getElementById('observability');
-
 if (!(resultNode instanceof HTMLElement) || !(observabilityNode instanceof HTMLElement)) {
     throw new Error('expected output elements');
 }
-
-const resultElement: HTMLElement = resultNode;
-const observabilityElement: HTMLElement = observabilityNode;
-
-function nextRequestId(): string {
+const resultElement = resultNode;
+const observabilityElement = observabilityNode;
+function nextRequestId() {
     if ('randomUUID' in crypto) {
         return crypto.randomUUID();
     }
     return `req-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
-
-async function postTelepact(functionName: string, payload: Record<string, unknown>): Promise<TelepactResponse> {
+async function postTelepact(functionName, payload) {
     const requestId = nextRequestId();
     const response = await fetch('/api/telepact', {
         method: 'POST',
@@ -56,8 +41,7 @@ async function postTelepact(functionName: string, payload: Record<string, unknow
             { [functionName]: payload },
         ]),
     });
-
-    const [headers, body] = await response.json() as [TelepactHeaders, TelepactBody];
+    const [headers, body] = await response.json();
     return {
         requestId,
         status: response.status,
@@ -66,8 +50,7 @@ async function postTelepact(functionName: string, payload: Record<string, unknow
         body,
     };
 }
-
-async function postSession(path: string): Promise<void> {
+async function postSession(path) {
     const response = await fetch(path, {
         method: 'POST',
         credentials: 'same-origin',
@@ -76,20 +59,17 @@ async function postSession(path: string): Promise<void> {
         throw new Error(`session request failed with ${response.status}`);
     }
 }
-
-async function loadObservability(): Promise<void> {
+async function loadObservability() {
     const response = await fetch('/ops/observability', {
         credentials: 'same-origin',
     });
     const payload = await response.json();
     observabilityElement.textContent = JSON.stringify(payload, null, 2);
 }
-
-function renderResult(label: string, value: unknown): void {
+function renderResult(label, value) {
     resultElement.textContent = `${label}\n\n${JSON.stringify(value, null, 2)}`;
 }
-
-function wireButton(id: string, handler: () => Promise<void>): void {
+function wireButton(id, handler) {
     const button = document.getElementById(id);
     if (!(button instanceof HTMLButtonElement)) {
         throw new Error(`expected button ${id}`);
@@ -98,7 +78,8 @@ function wireButton(id: string, handler: () => Promise<void>): void {
         void (async () => {
             try {
                 await handler();
-            } catch (error: unknown) {
+            }
+            catch (error) {
                 renderResult('error', {
                     message: error instanceof Error ? error.message : String(error),
                 });
@@ -106,41 +87,34 @@ function wireButton(id: string, handler: () => Promise<void>): void {
         })();
     });
 }
-
 wireButton('login-viewer', async () => {
     await postSession('/login?role=viewer');
     renderResult('signed in', { role: 'viewer' });
     await loadObservability();
 });
-
 wireButton('login-admin', async () => {
     await postSession('/login?role=admin');
     renderResult('signed in', { role: 'admin' });
     await loadObservability();
 });
-
 wireButton('logout', async () => {
     await postSession('/logout');
     renderResult('signed out', {});
     await loadObservability();
 });
-
 wireButton('load-dashboard', async () => {
     const response = await postTelepact('fn.viewerDashboard', {});
     renderResult('dashboard response', response);
     await loadObservability();
 });
-
 wireButton('load-admin-audit', async () => {
     const response = await postTelepact('fn.adminAudit', {});
     renderResult('admin audit response', response);
     await loadObservability();
 });
-
 wireButton('trigger-crash', async () => {
     const response = await postTelepact('fn.debugCrash', {});
     renderResult('crash response', response);
     await loadObservability();
 });
-
 wireButton('refresh-observability', loadObservability);
