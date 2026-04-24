@@ -29,6 +29,23 @@ This is useful when you want to:
 - gate schema changes in CI
 - make compatibility an explicit release check
 
+In practice, that often means comparing the checked-in schema directory on your
+branch with the version from `origin/main` or the last release tag:
+
+```sh
+old_dir="$(mktemp -d)"
+new_dir="$(mktemp -d)"
+
+git archive origin/main api | tar -x -C "$old_dir"
+git archive HEAD api | tar -x -C "$new_dir"
+
+telepact compare \
+  --old-schema-dir "$old_dir/api" \
+  --new-schema-dir "$new_dir/api"
+```
+
+Replace `api` with the schema directory your service checks in.
+
 See:
 
 - [Operating Boundary Guide](../04-operate/01-production-guide.md)

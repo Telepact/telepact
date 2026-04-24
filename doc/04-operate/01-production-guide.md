@@ -119,13 +119,23 @@ The Telepact-specific guidance is:
 - stage breaking changes so callers are not forced across incompatible message
   shapes all at once
 
-Example:
+Example, comparing the checked-in schema on your branch with `origin/main`:
 
 ```bash
+old_dir="$(mktemp -d)"
+new_dir="$(mktemp -d)"
+
+git archive origin/main api | tar -x -C "$old_dir"
+git archive HEAD api | tar -x -C "$new_dir"
+
 telepact compare \
-  --old-schema-dir path/to/schema-baseline \
-  --new-schema-dir path/to/current-schema
+  --old-schema-dir "$old_dir/api" \
+  --new-schema-dir "$new_dir/api"
 ```
+
+Replace `api` with the schema directory your service checks in. If you compare
+against a release tag instead of `origin/main`, substitute that ref in the
+`git archive` command.
 
 Telepact does not prescribe the surrounding rollout procedure. Whether your
 organization uses canaries, blue/green, staged regional rollout, or something
