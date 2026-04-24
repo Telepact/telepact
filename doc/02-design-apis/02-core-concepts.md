@@ -91,7 +91,7 @@ language.
 See:
 
 - [Learn by Example: Select](../01-learn-by-example/03-opt-in-features/12-select.md)
-- [Extensions](./03-extensions.md)
+- [`_ext.Select_`](./04-select-extension.md)
 
 ## Binary
 
