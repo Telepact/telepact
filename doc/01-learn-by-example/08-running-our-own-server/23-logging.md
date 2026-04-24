@@ -41,8 +41,11 @@ async def middleware(request_message: Message, function_router) -> Message:
 options.middleware = middleware
 
 
-def on_error(error: TelepactError) -> None:
-    log.exception('telepact error case_id=%s', error.case_id, exc_info=error)
+def on_error(error: Exception) -> None:
+    if isinstance(error, TelepactError):
+        log.exception('telepact error case_id=%s', error.case_id, exc_info=error)
+    else:
+        log.exception('telepact error', exc_info=error)
 
 
 options.on_error = on_error
