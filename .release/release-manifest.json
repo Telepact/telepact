@@ -1,46 +1,9 @@
 {
   "changed_paths": [
-    "bind/dart/lib/interfaces.dart",
-    "bind/dart/lib/src/bindings.dart",
-    "lib/go/FunctionRouter.go",
-    "lib/go/InternalFunctionRoutes.go",
-    "lib/go/MockServer.go",
-    "lib/go/Server.go",
-    "lib/go/internal/HandleMessage.go",
-    "lib/go/internal/mock/MockHandle.go",
-    "lib/java/src/main/java/io/github/telepact/FunctionRouter.java",
-    "lib/java/src/main/java/io/github/telepact/MockServer.java",
-    "lib/java/src/main/java/io/github/telepact/Server.java",
-    "lib/java/src/main/java/io/github/telepact/internal/CreateInternalFunctionRoutes.java",
-    "lib/java/src/main/java/io/github/telepact/internal/HandleMessage.java",
-    "lib/java/src/main/java/io/github/telepact/internal/mock/MockHandle.java",
-    "lib/py/telepact/MockServer.py",
-    "lib/py/telepact/Server.py",
-    "lib/py/telepact/internal/CreateInternalFunctionRoutes.py",
-    "lib/py/telepact/internal/HandleMessage.py",
-    "lib/py/telepact/internal/mock/MockHandle.py",
-    "lib/ts/src/MockServer.ts",
-    "lib/ts/src/Server.ts",
-    "lib/ts/src/internal/CreateInternalFunctionRoutes.ts",
-    "lib/ts/src/internal/HandleMessage.ts",
-    "lib/ts/src/internal/mock/MockHandle.ts"
+    "README.md"
   ],
-  "direct_targets": [
-    "dart",
-    "go",
-    "java",
-    "py",
-    "ts"
-  ],
-  "pr_number": 483,
-  "targets": [
-    "cli",
-    "console",
-    "dart",
-    "go",
-    "java",
-    "py",
-    "ts"
-  ],
+  "direct_targets": [],
+  "pr_number": 486,
+  "targets": [],
   "version": "1.0.0-alpha.325"
 }
