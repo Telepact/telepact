@@ -179,8 +179,7 @@ class Server {
       Future<Message> Function(Message im) handler, ServerOptions options) {
     JSPromise outerMiddleware(b.Message om, b.FunctionRouter functionRouter) {
       final m = Message.fromJS(om);
-      final functionName = m.body.keys.isEmpty ? null : m.body.keys.first;
-      if (functionName == 'fn.ping_' || functionName == 'fn.api_') {
+      if (m.body.containsKey('fn.ping_') || m.body.containsKey('fn.api_')) {
         return functionRouter.route(om);
       }
       return handler(m).then((response) => response._message).toJS;
