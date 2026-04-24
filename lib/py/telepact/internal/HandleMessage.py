@@ -21,7 +21,6 @@ from ..internal.binary.ServerBase64Decode import server_base64_decode
 from ..Message import Message
 from ..TelepactError import TelepactError
 from ..internal.UnknownError import build_unknown_error_message
-from .GetApiDefinitionsWithExamples import get_api_definitions_with_examples
 from .types.TTypeDeclaration import TTypeDeclaration
 
 if TYPE_CHECKING:
@@ -167,32 +166,19 @@ async def handle_message(
         request_headers, {request_target: request_payload})
 
     result_message: Message
-    if function_name == "fn.ping_":
-        result_message = Message({}, {"Ok_": {}})
-    elif function_name == "fn.api_":
-        include_internal = isinstance(request_payload, dict) and request_payload.get("includeInternal!") is True
-        include_examples = isinstance(request_payload, dict) and request_payload.get("includeExamples!") is True
-        api_definitions = get_api_definitions_with_examples(
-            telepact_schema,
-            include_internal,
-        ) if include_examples else (
-            telepact_schema.full if include_internal else telepact_schema.original
+    try:
+        result_message = await middleware(call_message, function_router)
+    except Exception as e:
+        wrapped = TelepactError(
+            f"telepact handler failed while handling {function_name}",
+            kind="handler",
+            cause=e,
         )
-        result_message = Message({}, {"Ok_": {"api": api_definitions}})
-    else:
         try:
-            result_message = await middleware(call_message, function_router)
-        except Exception as e:
-            wrapped = TelepactError(
-                f"telepact handler failed while handling {function_name}",
-                kind="handler",
-                cause=e,
-            )
-            try:
-                on_error(wrapped)
-            except Exception:
-                pass
-            return build_unknown_error_message(wrapped, response_headers)
+            on_error(wrapped)
+        except Exception:
+            pass
+        return build_unknown_error_message(wrapped, response_headers)
 
     result_union: dict[str, object] = result_message.body
 

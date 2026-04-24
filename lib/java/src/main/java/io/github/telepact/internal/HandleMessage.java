@@ -159,32 +159,19 @@ import io.github.telepact.internal.validation.ValidationFailure;
         final var callMessage = new Message(requestHeaders, Map.of(requestTarget, requestPayload));
 
         final Message resultMessage;
-        if (functionName.equals("fn.ping_")) {
-            resultMessage = new Message(Map.of(), Map.of("Ok_", Map.of()));
-        } else if (functionName.equals("fn.api_")) {
-            final var includeInternal = requestPayload instanceof Map<?, ?>
-                    && Objects.equals(true, ((Map<?, ?>) requestPayload).get("includeInternal!"));
-            final var includeExamples = requestPayload instanceof Map<?, ?>
-                    && Objects.equals(true, ((Map<?, ?>) requestPayload).get("includeExamples!"));
-            resultMessage = new Message(Map.of(),
-                    Map.of("Ok_", Map.of("api", includeExamples
-                            ? GetApiDefinitionsWithExamples.getApiDefinitionsWithExamples(telepactSchema, includeInternal)
-                            : includeInternal ? telepactSchema.full : telepactSchema.original)));
-        } else {
+        try {
+            resultMessage = middleware.apply(callMessage, functionRouter);
+        } catch (Throwable e) {
+            final var wrapped = new TelepactError(
+                    "telepact handler failed while handling %s".formatted(functionName),
+                    "handler",
+                    e);
             try {
-                resultMessage = middleware.apply(callMessage, functionRouter);
-            } catch (Throwable e) {
-                final var wrapped = new TelepactError(
-                        "telepact handler failed while handling %s".formatted(functionName),
-                        "handler",
-                        e);
-                try {
-                    onError.accept(wrapped);
-                } catch (Throwable ignored) {
+                onError.accept(wrapped);
+            } catch (Throwable ignored) {
 
-                }
-                return buildUnknownErrorMessage(wrapped, responseHeaders);
             }
+            return buildUnknownErrorMessage(wrapped, responseHeaders);
         }
 
         final Map<String, Object> resultUnion = resultMessage.body;

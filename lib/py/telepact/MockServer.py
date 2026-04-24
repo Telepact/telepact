@@ -59,11 +59,10 @@ class MockServer:
         server_options = Server.Options()
         server_options.on_error = options.on_error
         server_options.auth_required = False
-        server_options.middleware = lambda request_message, function_router: self._handle(request_message)
 
         telepact_schema = TelepactSchema(mock_telepact_schema.original, mock_telepact_schema.full, mock_telepact_schema.parsed,
-                                        mock_telepact_schema.parsed_request_headers, mock_telepact_schema.parsed_response_headers)
-        function_router = FunctionRouter({})
+                                         mock_telepact_schema.parsed_request_headers, mock_telepact_schema.parsed_response_headers)
+        function_router = FunctionRouter(self._create_function_routes(telepact_schema))
 
         self.server = Server(
             telepact_schema, function_router, server_options)
@@ -77,8 +76,58 @@ class MockServer:
         """
         return await self.server.process(message)
 
-    async def _handle(self, request_message: 'Message') -> 'Message':
-        from .internal.mock.MockHandle import mock_handle
-        return await mock_handle(request_message, self.stubs, self.invocations, self.random,
-                                 self.server.telepact_schema, self.enableGeneratedDefaultStub,
-                                 self.enable_optional_field_generation, self.randomize_optional_field_generation)
+    def _create_function_routes(self, telepact_schema: 'TelepactSchema') -> dict[str, object]:
+        from .internal.mock.MockHandle import (
+            handle_auto_mock_function,
+            handle_clear_calls,
+            handle_clear_stubs,
+            handle_create_stub,
+            handle_set_random_seed,
+            handle_verify,
+            handle_verify_no_more_interactions,
+        )
+
+        function_routes = {
+            function_name: (
+                lambda _function_name, request_message, self=self, telepact_schema=telepact_schema:
+                    handle_auto_mock_function(
+                        request_message,
+                        self.stubs,
+                        self.invocations,
+                        self.random,
+                        telepact_schema,
+                        self.enableGeneratedDefaultStub,
+                        self.enable_optional_field_generation,
+                        self.randomize_optional_field_generation,
+                    )
+            )
+            for function_name in telepact_schema.parsed.keys()
+            if _is_auto_mock_function_name(function_name)
+        }
+
+        function_routes["fn.createStub_"] = lambda _function_name, request_message, self=self: handle_create_stub(
+            request_message,
+            self.stubs,
+        )
+        function_routes["fn.verify_"] = lambda _function_name, request_message, self=self: handle_verify(
+            request_message,
+            self.invocations,
+        )
+        function_routes["fn.verifyNoMoreInteractions_"] = lambda _function_name, _request_message, self=self: handle_verify_no_more_interactions(
+            self.invocations,
+        )
+        function_routes["fn.clearCalls_"] = lambda _function_name, _request_message, self=self: handle_clear_calls(
+            self.invocations,
+        )
+        function_routes["fn.clearStubs_"] = lambda _function_name, _request_message, self=self: handle_clear_stubs(
+            self.stubs,
+        )
+        function_routes["fn.setRandomSeed_"] = lambda _function_name, request_message, self=self: handle_set_random_seed(
+            request_message,
+            self.random,
+        )
+        return function_routes
+
+
+def _is_auto_mock_function_name(function_name: str) -> bool:
+    return function_name.startswith("fn.") and not function_name.endswith(".->") and not function_name.endswith("_")

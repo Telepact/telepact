@@ -72,6 +72,7 @@ func NewServer(telepactSchema *TelepactSchema, functionRouter *FunctionRouter, o
 	if functionRouter == nil {
 		return nil, NewTelepactError("telepact: function router must not be nil")
 	}
+	functionRouter.RegisterRoutes(createInternalFunctionRoutes(telepactSchema))
 
 	if options == nil {
 		options = NewServerOptions()

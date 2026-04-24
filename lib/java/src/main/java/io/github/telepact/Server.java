@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import io.github.telepact.internal.CreateInternalFunctionRoutes;
 import io.github.telepact.internal.binary.ServerBase64Encoder;
 import io.github.telepact.internal.binary.ServerBinaryEncoder;
 
@@ -106,6 +107,7 @@ public class Server {
      * @param options The options for configuring the server.
      */
     public Server(TelepactSchema telepactSchema, FunctionRouter functionRouter, Options options) {
+        functionRouter.registerRoutes(CreateInternalFunctionRoutes.createInternalFunctionRoutes(telepactSchema));
         this.functionRouter = functionRouter;
         this.middleware = options.middleware;
         this.onError = options.onError;

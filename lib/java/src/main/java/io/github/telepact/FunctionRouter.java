@@ -30,6 +30,10 @@ public class FunctionRouter {
         this.functionRoutes = new HashMap<>(functionRoutes);
     }
 
+    public void registerRoutes(Map<String, FunctionRoute> functionRoutes) {
+        this.functionRoutes.putAll(functionRoutes);
+    }
+
     public Message route(Message requestMessage) {
         final var functionName = requestMessage.getBodyTarget();
         final var functionRoute = this.functionRoutes.get(functionName);

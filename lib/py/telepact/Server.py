@@ -21,6 +21,7 @@ from .FunctionRouter import FunctionRoute, FunctionRouter
 from .Serializer import Serializer
 from .internal.binary.ServerBinaryEncoder import ServerBinaryEncoder
 from .internal.binary.ServerBase64Encoder import ServerBase64Encoder
+from .internal.CreateInternalFunctionRoutes import create_internal_function_routes
 
 if TYPE_CHECKING:
     from .Message import Message
@@ -58,6 +59,10 @@ class Server:
         """
         from .internal.binary.ConstructBinaryEncoding import construct_binary_encoding
 
+        function_router.function_routes = {
+            **function_router.function_routes,
+            **create_internal_function_routes(telepact_schema),
+        }
         self.function_router = function_router
         self.middleware = options.middleware
         self.on_error = options.on_error

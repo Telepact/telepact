@@ -29,8 +29,8 @@ type seedableRandomGenerator interface {
 	SetSeed(int32)
 }
 
-// MockHandle processes a Telepact mock request and produces response headers and body content.
-func MockHandle(
+// HandleAutoMockFunction processes a schema function route for the mock server.
+func HandleAutoMockFunction(
 	headers map[string]any,
 	functionName string,
 	argument map[string]any,
@@ -47,31 +47,6 @@ func MockHandle(
 	}
 
 	enableGenerationStub := boolValue(headers["@gen_"])
-
-	switch functionName {
-	case "fn.createStub_":
-		return handleCreateStub(argument, stubs)
-	case "fn.verify_":
-		return map[string]any{}, handleVerify(argument, *invocations), nil
-	case "fn.verifyNoMoreInteractions_":
-		return map[string]any{}, VerifyNoMoreInteractions(*invocations), nil
-	case "fn.clearCalls_":
-		*invocations = (*invocations)[:0]
-		return map[string]any{}, map[string]any{"Ok_": map[string]any{}}, nil
-	case "fn.clearStubs_":
-		*stubs = (*stubs)[:0]
-		return map[string]any{}, map[string]any{"Ok_": map[string]any{}}, nil
-	case "fn.setRandomSeed_":
-		if random == nil {
-			return nil, nil, fmt.Errorf("telepact: random generator unavailable")
-		}
-		seedValue, ok := argument["seed"]
-		if !ok {
-			return nil, nil, fmt.Errorf("telepact: setRandomSeed request missing seed")
-		}
-		random.SetSeed(int32(toInt(seedValue)))
-		return map[string]any{}, map[string]any{"Ok_": map[string]any{}}, nil
-	}
 
 	*invocations = append(*invocations, NewMockInvocation(functionName, cloneStringAnyMap(argument)))
 
@@ -116,11 +91,7 @@ func MockHandle(
 		return nil, nil, fmt.Errorf("telepact: union type missing Ok_ tag")
 	}
 
-	// The Python implementation always enables optional field generation for the
-	// auto-generated Ok_ stub response, regardless of the server option. We
-	// mirror that behavior here to keep the port faithful.
-	includeOptionalFields := true
-	_ = enableOptionalFieldGeneration
+	includeOptionalFields := enableOptionalFieldGeneration
 
 	ctx := types.NewGenerateContext(
 		includeOptionalFields,
@@ -139,7 +110,8 @@ func MockHandle(
 	return map[string]any{}, map[string]any{"Ok_": okBody}, nil
 }
 
-func handleCreateStub(argument map[string]any, stubs *[]*MockStub) (map[string]any, map[string]any, error) {
+// HandleCreateStub registers a mock stub route.
+func HandleCreateStub(argument map[string]any, stubs *[]*MockStub) (map[string]any, map[string]any, error) {
 	if argument == nil {
 		return nil, nil, fmt.Errorf("telepact: createStub request missing stub argument")
 	}
@@ -189,7 +161,8 @@ func handleCreateStub(argument map[string]any, stubs *[]*MockStub) (map[string]a
 	return map[string]any{}, map[string]any{"Ok_": map[string]any{}}, nil
 }
 
-func handleVerify(argument map[string]any, invocations []*MockInvocation) map[string]any {
+// HandleVerify verifies recorded mock invocations.
+func HandleVerify(argument map[string]any, invocations []*MockInvocation) map[string]any {
 	if argument == nil {
 		return map[string]any{"ErrorVerificationFailure": map[string]any{"reason": "missing call argument"}}
 	}
@@ -230,6 +203,36 @@ func handleVerify(argument map[string]any, invocations []*MockInvocation) map[st
 	strictMatch := boolValue(argument["strictMatch!"])
 
 	return Verify(callFunctionName, callArgument, strictMatch, verifyTimes, invocations)
+}
+
+// HandleVerifyNoMoreInteractions verifies that no unverified mock interactions remain.
+func HandleVerifyNoMoreInteractions(invocations []*MockInvocation) map[string]any {
+	return VerifyNoMoreInteractions(invocations)
+}
+
+// HandleClearCalls clears recorded mock invocations.
+func HandleClearCalls(invocations *[]*MockInvocation) (map[string]any, map[string]any, error) {
+	*invocations = (*invocations)[:0]
+	return map[string]any{}, map[string]any{"Ok_": map[string]any{}}, nil
+}
+
+// HandleClearStubs clears registered mock stubs.
+func HandleClearStubs(stubs *[]*MockStub) (map[string]any, map[string]any, error) {
+	*stubs = (*stubs)[:0]
+	return map[string]any{}, map[string]any{"Ok_": map[string]any{}}, nil
+}
+
+// HandleSetRandomSeed updates the mock random seed.
+func HandleSetRandomSeed(argument map[string]any, random seedableRandomGenerator) (map[string]any, map[string]any, error) {
+	if random == nil {
+		return nil, nil, fmt.Errorf("telepact: random generator unavailable")
+	}
+	seedValue, ok := argument["seed"]
+	if !ok {
+		return nil, nil, fmt.Errorf("telepact: setRandomSeed request missing seed")
+	}
+	random.SetSeed(int32(toInt(seedValue)))
+	return map[string]any{}, map[string]any{"Ok_": map[string]any{}}, nil
 }
 
 func lookupUnionDefinition(parsed map[string]types.TType, functionName string) *types.TUnion {
