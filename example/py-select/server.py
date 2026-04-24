@@ -25,8 +25,7 @@ options = Server.Options()
 options.auth_required = False
 
 
-async def track_package(function_name: str, request_message: Message) -> Message:
-    request_message.body[function_name]
+async def track_package(_function_name: str, _request_message: Message) -> Message:
     return Message({}, {
         'Ok_': {
             'package': {
