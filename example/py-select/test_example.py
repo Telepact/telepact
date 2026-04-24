@@ -23,7 +23,13 @@ def test_select_example_runs_end_to_end() -> None:
     thread = run_server(server)
     try:
         url = f'http://127.0.0.1:{server.server_address[1]}/api/telepact'
-        payload = post_json(url, [
+        full_payload = post_json(url, [
+            {},
+            {
+                'fn.trackPackage': {},
+            },
+        ])
+        selected_payload = post_json(url, [
             {
                 '@select_': {
                     '->': {
@@ -40,7 +46,26 @@ def test_select_example_runs_end_to_end() -> None:
             },
         ])
 
-        assert payload == [
+        assert full_payload == [
+            {},
+            {
+                'Ok_': {
+                    'package': {
+                        'trackingId': 'PKG-42',
+                        'recipient': 'Ada Lovelace',
+                        'city': 'London',
+                    },
+                    'latestEvent': {
+                        'Dropoff': {
+                            'location': 'Front desk',
+                            'signedBy': 'M. Singh',
+                        },
+                    },
+                    'note': 'Left with building reception.',
+                },
+            },
+        ]
+        assert selected_payload == [
             {},
             {
                 'Ok_': {
@@ -55,5 +80,6 @@ def test_select_example_runs_end_to_end() -> None:
                 },
             },
         ]
+        assert selected_payload != full_payload
     finally:
         stop_server(server, thread)

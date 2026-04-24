@@ -26,7 +26,13 @@ test('select example runs end to end', async () => {
     try {
         const address = server.address() as AddressInfo;
         const url = `http://127.0.0.1:${address.port}/api/telepact`;
-        const payload = await postJson(url, [
+        const fullPayload = await postJson(url, [
+            {},
+            {
+                'fn.trackPackage': {},
+            },
+        ]);
+        const selectedPayload = await postJson(url, [
             {
                 '@select_': {
                     '->': {
@@ -43,7 +49,26 @@ test('select example runs end to end', async () => {
             },
         ]);
 
-        assert.deepEqual(payload, [
+        assert.deepEqual(fullPayload, [
+            {},
+            {
+                'Ok_': {
+                    'package': {
+                        'trackingId': 'PKG-42',
+                        'recipient': 'Ada Lovelace',
+                        'city': 'London',
+                    },
+                    'latestEvent': {
+                        'Dropoff': {
+                            'location': 'Front desk',
+                            'signedBy': 'M. Singh',
+                        },
+                    },
+                    'note': 'Left with building reception.',
+                },
+            },
+        ]);
+        assert.deepEqual(selectedPayload, [
             {},
             {
                 'Ok_': {
@@ -58,6 +83,7 @@ test('select example runs end to end', async () => {
                 },
             },
         ]);
+        assert.notDeepEqual(selectedPayload, fullPayload);
     } finally {
         await stopServer(server);
     }
