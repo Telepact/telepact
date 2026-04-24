@@ -88,19 +88,7 @@ class MockServer:
         )
 
         function_routes = {
-            function_name: (
-                lambda _function_name, request_message, self=self, telepact_schema=telepact_schema:
-                    handle_auto_mock_function(
-                        request_message,
-                        self.stubs,
-                        self.invocations,
-                        self.random,
-                        telepact_schema,
-                        self.enableGeneratedDefaultStub,
-                        self.enable_optional_field_generation,
-                        self.randomize_optional_field_generation,
-                    )
-            )
+            function_name: self._create_auto_mock_route(telepact_schema)
             for function_name in telepact_schema.parsed.keys()
             if _is_auto_mock_function_name(function_name)
         }
@@ -127,6 +115,23 @@ class MockServer:
             self.random,
         )
         return function_routes
+
+    def _create_auto_mock_route(self, telepact_schema: 'TelepactSchema'):
+        from .internal.mock.MockHandle import handle_auto_mock_function
+
+        async def route(_function_name: str, request_message: 'Message') -> 'Message':
+            return await handle_auto_mock_function(
+                request_message,
+                self.stubs,
+                self.invocations,
+                self.random,
+                telepact_schema,
+                self.enableGeneratedDefaultStub,
+                self.enable_optional_field_generation,
+                self.randomize_optional_field_generation,
+            )
+
+        return route
 
 
 def _is_auto_mock_function_name(function_name: str) -> bool:

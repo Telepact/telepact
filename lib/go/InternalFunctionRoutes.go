@@ -29,8 +29,8 @@ func createInternalFunctionRoutes(telepactSchema *TelepactSchema) map[string]Fun
 				return Message{}, err
 			}
 
-			includeInternal := boolValue(requestPayload["includeInternal!"])
-			includeExamples := boolValue(requestPayload["includeExamples!"])
+			includeInternal, _ := requestPayload["includeInternal!"].(bool)
+			includeExamples, _ := requestPayload["includeExamples!"].(bool)
 
 			apiDefinitions := telepactSchema.Original
 			if includeInternal {
@@ -43,9 +43,4 @@ func createInternalFunctionRoutes(telepactSchema *TelepactSchema) map[string]Fun
 			return NewMessage(map[string]any{}, map[string]any{"Ok_": map[string]any{"api": apiDefinitions}}), nil
 		},
 	}
-}
-
-func boolValue(value any) bool {
-	flag, ok := value.(bool)
-	return ok && flag
 }

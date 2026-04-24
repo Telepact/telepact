@@ -163,13 +163,16 @@ func (ms *MockServer) createFunctionRoutes(telepactSchema *TelepactSchema) map[s
 		if !isAutoMockFunctionName(functionName) {
 			continue
 		}
-		routeFunctionName := functionName
-		functionRoutes[routeFunctionName] = func(_ string, requestMessage Message) (Message, error) {
-			return ms.handleAutoMockFunction(routeFunctionName, requestMessage)
-		}
+		functionRoutes[functionName] = ms.createAutoMockRoute(functionName)
 	}
 
 	return functionRoutes
+}
+
+func (ms *MockServer) createAutoMockRoute(functionName string) FunctionRoute {
+	return func(_ string, requestMessage Message) (Message, error) {
+		return ms.handleAutoMockFunction(functionName, requestMessage)
+	}
 }
 
 func (ms *MockServer) handleAutoMockFunction(functionName string, request Message) (Message, error) {
