@@ -2,8 +2,6 @@
 
 Telepact is a thin but powerful RPC framework built on JSON.
 
-Why choose Telepact:
-
 - ✨ **Plain JSON is the default** - Clients never need to worry about
   Telepact libraries or generated code. Tool optionality is real, not theoretical.
 - 🎯 **JSON as a Query Language** - No need to invent a second query language.
