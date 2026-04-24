@@ -1,9 +1,17 @@
 {
   "changed_paths": [
-    "README.md"
+    "example/README.md",
+    "example/py-select/README.md",
+    "example/py-select/api/select.telepact.yaml",
+    "example/py-select/server.py",
+    "example/py-select/test_example.py",
+    "example/ts-select/README.md",
+    "example/ts-select/api/select.telepact.yaml",
+    "example/ts-select/server.ts",
+    "example/ts-select/test_example.ts"
   ],
   "direct_targets": [],
-  "pr_number": 486,
+  "pr_number": 488,
   "targets": [],
   "version": "1.0.0-alpha.325"
 }
