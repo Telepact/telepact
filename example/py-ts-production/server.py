@@ -26,7 +26,6 @@ from http import HTTPStatus
 from http.cookies import SimpleCookie
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from typing import Any
 from urllib.parse import parse_qs, urlparse
 
 from telepact import FunctionRouter, Message, Response, Server, TelepactSchema, TelepactSchemaFiles
@@ -278,19 +277,7 @@ def read_session_cookie(cookie_header: str | None) -> str | None:
     return session.value if session is not None else None
 
 
-def sanitize_http_header_value(value: object) -> str | None:
-    if not isinstance(value, str):
-        return None
-    allowed = ''.join(character for character in value if character.isalnum() or character in '-._:')
-    if not allowed:
-        return None
-    return allowed[:128]
-
-
-def build_request_id(headers: Any) -> str:
-    request_id = sanitize_http_header_value(headers.get('X-Request-Id'))
-    if request_id is not None:
-        return request_id
+def build_request_id() -> str:
     return f'req-{uuid.uuid4()}'
 
 
@@ -338,7 +325,7 @@ def create_http_server(host: str = '127.0.0.1', port: int = 0) -> ThreadingHTTPS
 
         def do_POST(self) -> None:
             parsed = urlparse(self.path)
-            request_id = build_request_id(self.headers)
+            request_id = build_request_id()
             if parsed.path == '/login':
                 role = parse_qs(parsed.query).get('role', ['viewer'])[0]
                 token = 'admin-session' if role == 'admin' else 'viewer-session'

@@ -47,19 +47,18 @@ def request(opener: urllib.request.OpenerDirector, url: str, *, method: str = 'G
         return dict(response.headers.items()), response.read()
 
 
-def telepact_request(opener: urllib.request.OpenerDirector, base_url: str, request_id: str,
+def telepact_request(opener: urllib.request.OpenerDirector, base_url: str,
                      body: dict[str, object]) -> tuple[dict[str, object], dict[str, object], dict[str, str]]:
     response_headers, response_bytes = request(
         opener,
         f'{base_url}/api/telepact',
         method='POST',
         body=json.dumps([
-            {'@id_': request_id},
+            {},
             body,
         ]).encode(),
         headers={
             'Content-Type': 'application/json',
-            'X-Request-Id': request_id,
         },
     )
     telepact_headers, telepact_body = json.loads(response_bytes.decode())
@@ -85,11 +84,9 @@ def test_production_example_runs_end_to_end() -> None:
         telepact_headers, telepact_body, http_headers = telepact_request(
             opener,
             base_url,
-            'req-guest',
             {'fn.viewerDashboard': {}},
         )
-        assert telepact_headers['@id_'] == 'req-guest'
-        assert http_headers['X-Request-Id'] == 'req-guest'
+        assert telepact_headers['@id_'] == http_headers['X-Request-Id']
         assert telepact_body['ErrorUnauthenticated_']['message!'] == 'missing or invalid session cookie'
 
         request(opener, f'{base_url}/login?role=viewer', method='POST', body=b'')
@@ -97,11 +94,9 @@ def test_production_example_runs_end_to_end() -> None:
         telepact_headers, telepact_body, http_headers = telepact_request(
             opener,
             base_url,
-            'req-viewer',
             {'fn.viewerDashboard': {}},
         )
-        assert telepact_headers['@id_'] == 'req-viewer'
-        assert http_headers['X-Request-Id'] == 'req-viewer'
+        assert telepact_headers['@id_'] == http_headers['X-Request-Id']
         assert telepact_body['Ok_']['viewerId'] == 'user-123'
         assert telepact_body['Ok_']['displayName'] == 'Casey Viewer'
         assert len(telepact_body['Ok_']['notices']) == 2
@@ -109,7 +104,6 @@ def test_production_example_runs_end_to_end() -> None:
         _, telepact_body, _ = telepact_request(
             opener,
             base_url,
-            'req-admin-denied',
             {'fn.adminAudit': {}},
         )
         assert telepact_body['ErrorUnauthorized_']['message!'] == 'viewer is authenticated but lacks the admin role'
@@ -118,18 +112,17 @@ def test_production_example_runs_end_to_end() -> None:
         _, telepact_body, _ = telepact_request(
             opener,
             base_url,
-            'req-admin-ok',
             {'fn.adminAudit': {}},
         )
         assert telepact_body['Ok_']['entries'][0] == 'role-change review queue is empty'
 
-        _, telepact_body, _ = telepact_request(
+        telepact_headers, telepact_body, _ = telepact_request(
             opener,
             base_url,
-            'req-crash',
             {'fn.debugCrash': {}},
         )
         assert 'ErrorUnknown_' in telepact_body
+        crash_request_id = telepact_headers['@id_']
 
         _, observability_bytes = request(opener, f'{base_url}/ops/observability')
         observability = json.loads(observability_bytes.decode())
@@ -137,10 +130,13 @@ def test_production_example_runs_end_to_end() -> None:
         assert observability['metrics']['outcomesByFunction']['fn.adminAudit']['ErrorUnauthorized_'] == 1
         assert observability['metrics']['outcomesByFunction']['fn.debugCrash']['exception'] == 1
         assert any(
-            event['requestId'] == 'req-crash'
+            event['requestId'] == crash_request_id
             for event in observability['telepactEvents']
             if event['function'] == 'fn.debugCrash'
         )
-        assert any('demo crash for request req-crash' in event['message'] for event in observability['errorEvents'])
+        assert any(
+            f'demo crash for request {crash_request_id}' in event.get('message', '')
+            for event in observability['errorEvents']
+        )
     finally:
         stop_server(server, thread)

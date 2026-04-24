@@ -49,6 +49,6 @@ Production-guide mapping:
 - **Transport concerns**: `server.py` owns HTTP paths, cookie handling, request ids, static files, and a request size limit
 - **Auth**: `union.Auth_` models the public credential shape, the HTTP boundary populates `@auth_`, and `on_auth` normalizes internal headers
 - **Logging and metrics**: Telepact middleware emits per-function events and updates in-memory metrics
-- **Request ids and tracing**: `X-Request-Id` is copied into `@id_` and reflected back on both the HTTP and Telepact boundaries
+- **Request ids and tracing**: the transport layer creates a request id, writes it to `X-Request-Id`, and mirrors it into `@id_`
 - **Compatibility and upgrades**: `make compare` runs `telepact compare` against the checked-in schema baseline
 - **Error boundary**: the demo crash logs local details but still returns a stable `ErrorUnknown_` on the wire

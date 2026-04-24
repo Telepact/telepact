@@ -18,9 +18,8 @@ type TelepactHeaders = Record<string, unknown>;
 type TelepactBody = Record<string, unknown>;
 
 type TelepactResponse = {
-    requestId: string;
     status: number;
-    httpRequestId: string | null;
+    requestId: string | null;
     headers: TelepactHeaders;
     body: TelepactBody;
 };
@@ -35,33 +34,23 @@ if (!(resultNode instanceof HTMLElement) || !(observabilityNode instanceof HTMLE
 const resultElement: HTMLElement = resultNode;
 const observabilityElement: HTMLElement = observabilityNode;
 
-function nextRequestId(): string {
-    if ('randomUUID' in crypto) {
-        return crypto.randomUUID();
-    }
-    return `req-${Date.now()}-${Math.random().toString(16).slice(2)}`;
-}
-
 async function postTelepact(functionName: string, payload: Record<string, unknown>): Promise<TelepactResponse> {
-    const requestId = nextRequestId();
     const response = await fetch('/api/telepact', {
         method: 'POST',
         credentials: 'same-origin',
         headers: {
             'Content-Type': 'application/json',
-            'X-Request-Id': requestId,
         },
         body: JSON.stringify([
-            { '@id_': requestId },
+            {},
             { [functionName]: payload },
         ]),
     });
 
     const [headers, body] = await response.json() as [TelepactHeaders, TelepactBody];
     return {
-        requestId,
         status: response.status,
-        httpRequestId: response.headers.get('X-Request-Id'),
+        requestId: response.headers.get('X-Request-Id'),
         headers,
         body,
     };
