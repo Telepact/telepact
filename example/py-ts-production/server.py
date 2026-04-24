@@ -26,6 +26,7 @@ from http import HTTPStatus
 from http.cookies import SimpleCookie
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+from typing import Any
 from urllib.parse import parse_qs, urlparse
 
 from telepact import FunctionRouter, Message, Response, Server, TelepactSchema, TelepactSchemaFiles
