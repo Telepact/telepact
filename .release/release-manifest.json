@@ -1,10 +1,25 @@
 {
   "changed_paths": [
-    "site/src/build.py",
-    "site/src/index.template.html"
+    "common/internal.telepact.yaml",
+    "common/mock-internal.telepact.yaml",
+    "doc/01-learn-by-example/03-opt-in-features/12-select.md",
+    "doc/01-learn-by-example/04-mocking-an-integration/16-stubs.md",
+    "doc/01-learn-by-example/04-mocking-an-integration/17-verify.md",
+    "doc/02-design-apis/01-schema-guide.md",
+    "doc/02-design-apis/02-core-concepts.md",
+    "doc/02-design-apis/03-extensions.md",
+    "doc/02-design-apis/04-select-extension.md",
+    "doc/02-design-apis/05-mock-extensions.md",
+    "doc/index.md",
+    "lib/go/internal/schema/do_not_edit/internal.telepact.json",
+    "lib/go/internal/schema/do_not_edit/mock-internal.telepact.json"
   ],
-  "direct_targets": [],
-  "pr_number": 474,
-  "targets": [],
-  "version": "1.0.0-alpha.323"
+  "direct_targets": [
+    "go"
+  ],
+  "pr_number": 475,
+  "targets": [
+    "go"
+  ],
+  "version": "1.0.0-alpha.324"
 }
