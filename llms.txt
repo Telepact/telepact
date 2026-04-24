@@ -1,0 +1,36 @@
+# Telepact
+
+> Telepact is a JSON-first RPC framework with Markdown documentation, examples,
+> and developer references in this repository.
+
+Use these Markdown files as the primary source material for repository context.
+
+## Core
+
+- [Overview](README.md): Project introduction and top-level docs entry point.
+- [Contributing](CONTRIBUTING.md): Monorepo workflow, build, and test guidance.
+- [Documentation Home](doc/index.md): Main documentation map.
+- [Full-Stack Example](doc/example.md): End-to-end walkthrough.
+
+## Development
+
+- [Libraries](lib/README.md): Cross-language library coordination guidance.
+- [Runner Tests](test/runner/README.md): How the integration test runner is organized.
+- [Project CLI](tool/telepact_project_cli/README.md): Internal tooling used in the repo.
+
+## Libraries
+
+- [TypeScript Library](lib/ts/README.md): TypeScript runtime usage.
+- [Python Library](lib/py/README.md): Python runtime usage.
+- [Java Library](lib/java/README.md): Java runtime usage.
+- [Go Library](lib/go/README.md): Go runtime usage.
+
+## SDKs
+
+- [CLI](sdk/cli/README.md): Telepact command-line interface.
+- [Console](sdk/console/README.md): Browser-based Telepact console.
+- [Prettier Plugin](sdk/prettier/README.md): Telepact formatting support.
+
+## Examples
+
+- [Demos](example/README.md): Runnable end-to-end examples.
