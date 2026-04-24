@@ -124,6 +124,6 @@ export class MockServerOptions {
     generatedCollectionLengthMax = 3;
 }
 
-function isAutoMockFunctionName(typeName: string): boolean {
-    return typeName.startsWith('fn.') && !typeName.endsWith('.->') && !typeName.endsWith('_');
+function isAutoMockFunctionName(functionName: string): boolean {
+    return functionName.startsWith('fn.') && !functionName.endsWith('.->') && !functionName.endsWith('_');
 }
