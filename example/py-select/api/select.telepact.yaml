@@ -14,11 +14,20 @@
 #|  limitations under the License.
 #|
 
-- struct.User:
-    id: "string"
-    email: "string"
-    name: "string"
-- fn.listUsers: {}
+- struct.Package:
+    trackingId: "string"
+    recipient: "string"
+    city: "string"
+- union.DeliveryEvent:
+    - Dropoff:
+        location: "string"
+        signedBy: "string"
+    - Locker:
+        lockerCode: "string"
+        pickupBy: "string"
+- fn.trackPackage: {}
   ->:
     - Ok_:
-        users: ["struct.User"]
+        package: "struct.Package"
+        latestEvent: "union.DeliveryEvent"
+        note: "string"
