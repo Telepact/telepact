@@ -1,32 +1,25 @@
 # Introduction
 
-Telepact is what happens when JSON, GraphQL, gRPC, and hypermedia keep their
-best ideas and drop the baggage. 🚀
+Telepact is a thin but powerful RPC framework built on JSON.
 
-Build an API once, serve it over the transport that fits, and let every client
-choose its own comfort level: raw JSON when that's enough, schema-backed
-libraries when guardrails help, generated code when ergonomics matter, and
-binary when performance starts to count. Telepact starts featherweight and
-levels up without forcing every consumer into the same toolchain.
+Why choose Telepact:
 
-Why it lands:
+- ✨ **Plain JSON is the default** - Clients never need to worry about
+  Telepact libraries or generated code. Tool optionality is real, not theoretical.
+- 🎯 **JSON as a Query Language** - No need to invent a second query language.
+  Telepact has simple built-in options to trim responses according to client needs.
+- ⚡ **Binary without the toolchain tax** - Have you ever seen a binary protocol
+  that didn't require code generation? Now you have, with Telepact.
+    - (This innovation was made possible with MessagePack ❤️)
+- 🔗 **Hypermedia without HTTP** - API calls can return functions with pre-filled arguments.
+  Who said links had to be urls?
+- 🧪 **Schemas pull real weight** - The JSON-written Telepact schema holds the ecosystem
+  together. API introspection super-charges your develpoment, with type validation,
+  docs, mocks, and even generate your own code bindings.
 
-- ✨ **Plain JSON is the default** - clients can integrate with standard JSON
-  and networking tools, no mandatory codegen pipeline required
-- 🎯 **Response shaping is built in** - clients can ask for less data without
-  inventing a second query language
-- ⚡ **Binary is optional, not a tax** - efficient serialization is negotiated
-  at runtime instead of demanded up front
-- 🔗 **Hypermedia-style flows travel anywhere** - APIs can return prefilled
-  follow-up calls as data, not just URLs pinned to HTTP
-- 🧪 **Schemas pull real weight** - the same definition drives validation,
-  docs, mocks, version comparison, and optional code generation
+Modern innovations, without the ceremony 🚀
 
-If your team wants APIs that are easy to consume, hard to drift, and ready to
-scale from "just send JSON" to "ship the optimized path," Telepact makes a very
-convincing case. 🔥
-
-# It's just JSON
+# It's just JSON at the core
 No query params. No binary field ids. No required client libraries.
 
 It's just JSON in, and JSON out.
