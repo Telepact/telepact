@@ -278,9 +278,18 @@ def read_session_cookie(cookie_header: str | None) -> str | None:
     return session.value if session is not None else None
 
 
+def sanitize_http_header_value(value: object) -> str | None:
+    if not isinstance(value, str):
+        return None
+    allowed = ''.join(character for character in value if character.isalnum() or character in '-._:')
+    if not allowed:
+        return None
+    return allowed[:128]
+
+
 def build_request_id(headers: Any) -> str:
-    request_id = headers.get('X-Request-Id')
-    if isinstance(request_id, str) and request_id:
+    request_id = sanitize_http_header_value(headers.get('X-Request-Id'))
+    if request_id is not None:
         return request_id
     return f'req-{uuid.uuid4()}'
 
