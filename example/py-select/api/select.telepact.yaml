@@ -18,7 +18,20 @@
     id: "string"
     email: "string"
     name: "string"
+- struct.Team:
+    id: "string"
+    name: "string"
+    memberCount: "integer"
+- union.Highlight:
+    - User:
+        user: "struct.User"
+        note: "string"
+    - Team:
+        team: "struct.Team"
+        note: "string"
 - fn.listUsers: {}
   ->:
     - Ok_:
         users: ["struct.User"]
+        usersById: {"struct.User"}
+        featured: "union.Highlight"

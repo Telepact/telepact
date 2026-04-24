@@ -41,6 +41,28 @@ async def list_users(function_name: str, request_message: Message) -> Message:
                     'name': 'Grace',
                 },
             ],
+            'usersById': {
+                'user-1': {
+                    'id': 'user-1',
+                    'email': 'ada@example.com',
+                    'name': 'Ada',
+                },
+                'user-2': {
+                    'id': 'user-2',
+                    'email': 'grace@example.com',
+                    'name': 'Grace',
+                },
+            },
+            'featured': {
+                'Team': {
+                    'team': {
+                        'id': 'team-core',
+                        'name': 'Core Platform',
+                        'memberCount': 2,
+                    },
+                    'note': 'Maintains the shared Telepact APIs',
+                },
+            },
         },
     })
 

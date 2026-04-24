@@ -28,7 +28,7 @@ test('select example runs end to end', async () => {
     try {
         const address = server.address() as AddressInfo;
         const url = `http://127.0.0.1:${address.port}/api/telepact`;
-        const payload = await postJson(url, [
+        const structPayload = await postJson(url, [
             {
                 '@select_': {
                     'struct.User': ['id'],
@@ -39,7 +39,7 @@ test('select example runs end to end', async () => {
             },
         ]);
 
-        assert.deepEqual(payload, [
+        assert.deepEqual(structPayload, [
             {},
             {
                 'Ok_': {
@@ -47,13 +47,90 @@ test('select example runs end to end', async () => {
                         { 'id': 'user-1' },
                         { 'id': 'user-2' },
                     ],
+                    'usersById': {
+                        'user-1': { 'id': 'user-1' },
+                        'user-2': { 'id': 'user-2' },
+                    },
+                    'featured': {
+                        'Team': {
+                            'team': {
+                                'id': 'team-core',
+                                'name': 'Core Platform',
+                                'memberCount': 2,
+                            },
+                            'note': 'Maintains the shared Telepact APIs',
+                        },
+                    },
                 },
             },
         ]);
-        const responseBody = payload[INDEX_MESSAGE_BODY] as Record<string, any>;
+        const responseBody = structPayload[INDEX_MESSAGE_BODY] as Record<string, any>;
         assert.deepEqual(responseBody['Ok_']['users'], [
             { 'id': 'user-1' },
             { 'id': 'user-2' },
+        ]);
+
+        const unionPayload = await postJson(url, [
+            {
+                '@select_': {
+                    '->': {
+                        'Ok_': ['featured'],
+                    },
+                },
+            },
+            {
+                'fn.listUsers': {},
+            },
+        ]);
+
+        assert.deepEqual(unionPayload, [
+            {},
+            {
+                'Ok_': {
+                    'featured': {
+                        'Team': {
+                            'team': {
+                                'id': 'team-core',
+                                'name': 'Core Platform',
+                                'memberCount': 2,
+                            },
+                            'note': 'Maintains the shared Telepact APIs',
+                        },
+                    },
+                },
+            },
+        ]);
+
+        const nestedUnionPayload = await postJson(url, [
+            {
+                '@select_': {
+                    '->': {
+                        'Ok_': ['featured'],
+                    },
+                    'union.Highlight': {
+                        'Team': ['team'],
+                    },
+                    'struct.Team': ['name'],
+                },
+            },
+            {
+                'fn.listUsers': {},
+            },
+        ]);
+
+        assert.deepEqual(nestedUnionPayload, [
+            {},
+            {
+                'Ok_': {
+                    'featured': {
+                        'Team': {
+                            'team': {
+                                'name': 'Core Platform',
+                            },
+                        },
+                    },
+                },
+            },
         ]);
     } finally {
         await stopServer(server);

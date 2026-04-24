@@ -1,6 +1,7 @@
 # ts-select
 
-Minimal TypeScript Telepact example that selects just the `id` field from a list of users.
+Minimal TypeScript Telepact example that shows `@select_` across result-union,
+array, object, and union-payload edges.
 
 Browse the files:
 
@@ -16,7 +17,7 @@ Run it:
 make run
 ```
 
-The request uses the runtime-supported `@select_` shape:
+The example test covers three request shapes:
 
 ```json
 [
@@ -30,3 +31,44 @@ The request uses the runtime-supported `@select_` shape:
   }
 ]
 ```
+
+That trims `struct.User` fields everywhere they appear in the response, including
+the `users` array and the `usersById` object map.
+
+```json
+[
+  {
+    "@select_": {
+      "->": {
+        "Ok_": ["featured"]
+      }
+    }
+  },
+  {
+    "fn.listUsers": {}
+  }
+]
+```
+
+That narrows the active result union to just the `featured` field.
+
+```json
+[
+  {
+    "@select_": {
+      "->": {
+        "Ok_": ["featured"]
+      },
+      "union.Highlight": {
+        "Team": ["team"]
+      },
+      "struct.Team": ["name"]
+    }
+  },
+  {
+    "fn.listUsers": {}
+  }
+]
+```
+
+That trims the reachable union payload and then trims the nested `struct.Team`.

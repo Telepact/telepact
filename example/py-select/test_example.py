@@ -26,7 +26,7 @@ def test_select_example_runs_end_to_end() -> None:
     thread = run_server(server)
     try:
         url = f'http://127.0.0.1:{server.server_address[1]}/api/telepact'
-        payload = post_json(url, [
+        struct_payload = post_json(url, [
             {
                 '@select_': {
                     'struct.User': ['id'],
@@ -37,7 +37,7 @@ def test_select_example_runs_end_to_end() -> None:
             },
         ])
 
-        assert payload == [
+        assert struct_payload == [
             {},
             {
                 'Ok_': {
@@ -45,12 +45,89 @@ def test_select_example_runs_end_to_end() -> None:
                         {'id': 'user-1'},
                         {'id': 'user-2'},
                     ],
+                    'usersById': {
+                        'user-1': {'id': 'user-1'},
+                        'user-2': {'id': 'user-2'},
+                    },
+                    'featured': {
+                        'Team': {
+                            'team': {
+                                'id': 'team-core',
+                                'name': 'Core Platform',
+                                'memberCount': 2,
+                            },
+                            'note': 'Maintains the shared Telepact APIs',
+                        },
+                    },
                 },
             },
         ]
-        assert payload[INDEX_MESSAGE_BODY]['Ok_']['users'] == [
+        assert struct_payload[INDEX_MESSAGE_BODY]['Ok_']['users'] == [
             {'id': 'user-1'},
             {'id': 'user-2'},
+        ]
+
+        union_payload = post_json(url, [
+            {
+                '@select_': {
+                    '->': {
+                        'Ok_': ['featured'],
+                    },
+                },
+            },
+            {
+                'fn.listUsers': {},
+            },
+        ])
+
+        assert union_payload == [
+            {},
+            {
+                'Ok_': {
+                    'featured': {
+                        'Team': {
+                            'team': {
+                                'id': 'team-core',
+                                'name': 'Core Platform',
+                                'memberCount': 2,
+                            },
+                            'note': 'Maintains the shared Telepact APIs',
+                        },
+                    },
+                },
+            },
+        ]
+
+        nested_union_payload = post_json(url, [
+            {
+                '@select_': {
+                    '->': {
+                        'Ok_': ['featured'],
+                    },
+                    'union.Highlight': {
+                        'Team': ['team'],
+                    },
+                    'struct.Team': ['name'],
+                },
+            },
+            {
+                'fn.listUsers': {},
+            },
+        ])
+
+        assert nested_union_payload == [
+            {},
+            {
+                'Ok_': {
+                    'featured': {
+                        'Team': {
+                            'team': {
+                                'name': 'Core Platform',
+                            },
+                        },
+                    },
+                },
+            },
         ]
     finally:
         stop_server(server, thread)

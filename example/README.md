@@ -7,12 +7,12 @@ and the Telepact libraries keep their API surfaces closely aligned across langua
 - [py-codegen](./py-codegen/README.md) - Minimal Python demo that shows generated client and server bindings wired into the runtime
 - [py-http-cookie-auth](./py-http-cookie-auth/README.md) - Minimal Python demo that shows how to pull a session cookie into `@auth_` at the HTTP boundary
 - [py-links](./py-links/README.md) - Minimal Python demo that shows how to return a prepopulated function-type link
-- [py-select](./py-select/README.md) - Minimal Python demo that shows how to select just the `id` field from a list of users
+- [py-select](./py-select/README.md) - Minimal Python demo that shows how `@select_` trims result-union, array, object, and union-payload edges
 - [py-websocket](./py-websocket/README.md) - Minimal Python demo that shows how to use WebSocket request/reply
 
 - [ts-binary](./ts-binary/README.md) - Minimal TypeScript demo that shows how to verify binary negotiation
 - [ts-codegen](./ts-codegen/README.md) - Minimal TypeScript demo that shows generated client and server bindings wired into the runtime
 - [ts-http-cookie-auth](./ts-http-cookie-auth/README.md) - Minimal TypeScript demo that shows how to pull a session cookie into `@auth_` at the HTTP boundary
 - [ts-links](./ts-links/README.md) - Minimal TypeScript demo that shows how to return a prepopulated function-type link
-- [ts-select](./ts-select/README.md) - Minimal TypeScript demo that shows how to select just the `id` field from a list of users
+- [ts-select](./ts-select/README.md) - Minimal TypeScript demo that shows how `@select_` trims result-union, array, object, and union-payload edges
 - [ts-websocket](./ts-websocket/README.md) - Minimal TypeScript demo that shows how to use WebSocket request/reply
