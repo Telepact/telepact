@@ -42,7 +42,9 @@ servers, or place Telepact inside a larger service.
 - [Schema Writing Guide](./02-design-apis/01-schema-guide.md) for the full schema language
 - [Core Concepts](./02-design-apis/02-core-concepts.md) for Telepact's message model, schema
   role, headers, links, select, and binary at a high level
-- [Extensions](./02-design-apis/03-extensions.md) for Telepact's reserved `_ext.*_` types
+- [Extensions overview](./02-design-apis/03-extensions.md) for Telepact's reserved `_ext.*_` types
+- [`_ext.Select_`](./02-design-apis/04-select-extension.md) for response selection
+- [Mock extensions](./02-design-apis/05-mock-extensions.md) for `_ext.Call_` and `_ext.Stub_`
 - [JSON Schema](../common/json-schema.json) for schema-file validation
 
 ## Build clients and servers

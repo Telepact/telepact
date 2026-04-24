@@ -355,8 +355,8 @@ rules come from Telepact runtime behavior and surrounding schema context.
 
 You can find all mock definitions
 [here](../../common/mock-internal.telepact.yaml).
-There is also a guide to Telepact extension types, including mock extensions,
-[here](./03-extensions.md).
+There is also an overview of Telepact extension types [here](./03-extensions.md)
+and a mock-specific extension guide [here](./05-mock-extensions.md).
 
 ## Full Example
 
