@@ -134,6 +134,19 @@ unpreferred in Telepact in favor of precise data types. Where necessary, all
 `Ok_` tag. API designers are encouraged to prefer data abstractions over errors
 wherever possible, such as preferring empty optionals over "Not Found" errors.
 
+## Isn't `ErrorUnknown_` too opaque to be useful?
+
+Telepact intentionally keeps unexpected server failures opaque on the wire.
+Exposing server-side implementation details to clients is usually the wrong
+default, much like how HTTP `500` communicates that the server failed without
+dumping local internals into the response.
+
+`ErrorUnknown_` follows that model on purpose, but it still improves on a plain
+`500`: the response includes a `caseId`. That gives clients an always-on handle
+they can report to server operators, who can then match that `caseId` against
+local logs and recover the real stack trace or diagnostic context without
+turning those internal details into part of the public API contract.
+
 ## Why do functions in Telepact not support positional arguments?
 
 Telepact functions are automatically associated with an argument struct and a

@@ -1,9 +1,9 @@
 {
   "changed_paths": [
-    ".github/workflows/release.yml"
+    "doc/05-background-and-reference/01-faq.md"
   ],
   "direct_targets": [],
-  "pr_number": 477,
+  "pr_number": 479,
   "targets": [],
   "version": "1.0.0-alpha.324"
 }
