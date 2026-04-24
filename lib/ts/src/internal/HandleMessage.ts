@@ -27,7 +27,6 @@ import { validateResult } from '../internal/validation/ValidateResult.js';
 import { mapValidationFailuresToInvalidFieldCases } from './validation/MapValidationFailuresToInvalidFieldCases.js';
 import { ValidateContext } from './validation/ValidateContext.js';
 import { serverBase64Decode } from './binary/ServerBase64Decode.js';
-import { getApiDefinitionsWithExamples } from './GetApiDefinitionsWithExamples.js';
 import { TelepactError } from '../TelepactError.js';
 import { UpdateHeaders } from '../Server.js';
 import { buildUnknownErrorMessage } from './UnknownError.js';
@@ -179,29 +178,16 @@ export async function handleMessage(
     const callMessage: Message = new Message(requestHeaders, { [functionName]: requestPayload });
 
     let resultMessage: Message;
-    if (functionName === 'fn.ping_') {
-        resultMessage = new Message({}, { Ok_: {} });
-    } else if (functionName === 'fn.api_') {
-        const includeInternal = requestPayload['includeInternal!'] === true;
-        const includeExamples = requestPayload['includeExamples!'] === true;
-        const apiDefinitions = includeExamples
-            ? getApiDefinitionsWithExamples(telepactSchema, includeInternal)
-            : includeInternal
-                ? telepactSchema.full
-                : telepactSchema.original;
-        resultMessage = new Message({}, { Ok_: { api: apiDefinitions } });
-    } else {
+    try {
+        resultMessage = await middleware(callMessage, functionRouter);
+    } catch (e) {
+        const wrapped = new TelepactError(`telepact handler failed while handling ${functionName}`, 'handler', e);
         try {
-            resultMessage = await middleware(callMessage, functionRouter);
-        } catch (e) {
-            const wrapped = new TelepactError(`telepact handler failed while handling ${functionName}`, 'handler', e);
-            try {
-                onError(wrapped);
-            } catch (error) {
-                // Ignore error
-            }
-            return buildUnknownErrorMessage(wrapped, responseHeaders);
+            onError(wrapped);
+        } catch (error) {
+            // Ignore error
         }
+        return buildUnknownErrorMessage(wrapped, responseHeaders);
     }
 
     const resultUnion: Record<string, any> = resultMessage.body;

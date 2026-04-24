@@ -17,12 +17,19 @@
 import { TelepactSchema } from './TelepactSchema.js';
 import { MockInvocation } from './internal/mock/MockInvocation.js';
 import { MockStub } from './internal/mock/MockStub.js';
-import { FunctionRouter, Server, ServerOptions as ServerOptions } from './Server.js';
+import { FunctionRouter, FunctionRoutes, Server, ServerOptions as ServerOptions } from './Server.js';
 import { RandomGenerator } from './RandomGenerator.js';
-import { mockHandle } from './internal/mock/MockHandle.js';
+import {
+    handleAutoMockFunction,
+    handleClearCalls,
+    handleClearStubs,
+    handleCreateStub,
+    handleSetRandomSeed,
+    handleVerify,
+    handleVerifyNoMoreInteractions,
+} from './internal/mock/MockHandle.js';
 import { MockTelepactSchema } from './MockTelepactSchema.js';
 import { Response } from './Response.js';
-import { Message } from './Message.js';
 
 export class MockServer {
     /**
@@ -41,7 +48,6 @@ export class MockServer {
         const serverOptions = new ServerOptions();
         serverOptions.onError = options.onError;
         serverOptions.authRequired = false;
-        serverOptions.middleware = async (requestMessage: Message): Promise<Message> => await this.handle(requestMessage);
 
         const telepactSchema = new TelepactSchema(
             mockTelepactSchema.original,
@@ -51,7 +57,7 @@ export class MockServer {
             mockTelepactSchema.parsedResponseHeaders,
         );
 
-        const functionRouter = new FunctionRouter({});
+        const functionRouter = new FunctionRouter(this.createFunctionRoutes(telepactSchema));
         this.server = new Server(telepactSchema, functionRouter, serverOptions);
     }
 
@@ -73,18 +79,36 @@ export class MockServer {
         return await this.server.process(message);
     }
 
-    private handle = async (requestMessage: any): Promise<any> => {
-        return await mockHandle(
-            requestMessage,
-            this.stubs,
-            this.invocations,
-            this.random,
-            this.server.telepactSchema,
-            this.enableGeneratedDefaultStub,
-            this.enableOptionalFieldGeneration,
-            this.randomizeOptionalFieldGeneration,
-        );
-    };
+    private createFunctionRoutes(telepactSchema: TelepactSchema): FunctionRoutes {
+        const functionRoutes = Object.fromEntries(
+            Object.keys(telepactSchema.parsed)
+                .filter(isAutoMockFunctionName)
+                .map((functionName) => [
+                    functionName,
+                    async (_functionName: string, requestMessage: any): Promise<any> =>
+                        await handleAutoMockFunction(
+                            requestMessage,
+                            this.stubs,
+                            this.invocations,
+                            this.random,
+                            telepactSchema,
+                            this.enableGeneratedDefaultStub,
+                            this.enableOptionalFieldGeneration,
+                            this.randomizeOptionalFieldGeneration,
+                        ),
+                ]),
+        ) as FunctionRoutes;
+
+        return {
+            ...functionRoutes,
+            'fn.createStub_': async (_functionName, requestMessage) => await handleCreateStub(requestMessage, this.stubs),
+            'fn.verify_': async (_functionName, requestMessage) => await handleVerify(requestMessage, this.invocations),
+            'fn.verifyNoMoreInteractions_': async () => await handleVerifyNoMoreInteractions(this.invocations),
+            'fn.clearCalls_': async () => await handleClearCalls(this.invocations),
+            'fn.clearStubs_': async () => await handleClearStubs(this.stubs),
+            'fn.setRandomSeed_': async (_functionName, requestMessage) => await handleSetRandomSeed(requestMessage, this.random),
+        };
+    }
 }
 
 export class MockServerOptions {
@@ -98,4 +122,8 @@ export class MockServerOptions {
     randomizeOptionalFieldGeneration = true;
     generatedCollectionLengthMin = 0;
     generatedCollectionLengthMax = 3;
+}
+
+function isAutoMockFunctionName(typeName: string): boolean {
+    return typeName.startsWith('fn.') && !typeName.endsWith('.->') && !typeName.endsWith('_');
 }
