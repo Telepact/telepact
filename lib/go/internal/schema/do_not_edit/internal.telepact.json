@@ -31,7 +31,7 @@
     "_errors": "^errors\\.Validation_$"
   },
   {
-    "///": "`_ext.Select_` is the selection object used by the `@select_` header. Use\n`->` to narrow fields on the active result union, `struct.*` keys to narrow\nstruct fields, and `union.*` keys to narrow fields for specific union tags.\n\nSee https://raw.githubusercontent.com/Telepact/telepact/main/doc/\nextensions.md for full `_ext.Select_` rules and end-to-end examples.\n",
+    "///": "`_ext.Select_` is the selection object used by the `@select_` header. Use\n`->` to narrow fields on the active result union, `struct.*` keys to narrow\nstruct fields, and `union.*` keys to narrow fields for specific union tags.\n\nSee https://raw.githubusercontent.com/Telepact/telepact/main/doc/02-design-apis/04-select-extension.md\nfor full `_ext.Select_` rules and end-to-end examples.\n",
     "_ext.Select_": {
     }
   },
