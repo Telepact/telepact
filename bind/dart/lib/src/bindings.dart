@@ -90,6 +90,10 @@ extension type Server._(JSObject _) implements JSObject {
   external JSPromise<Response> process(JSUint8Array requestMessageBytes);
 }
 
+extension type FunctionRouter._(JSObject _) implements JSObject {
+  external JSPromise<Message> route(Message requestMessage);
+}
+
 extension type ServerOptions._(JSObject _) implements JSObject {
   external JSFunction get onError;
   external JSFunction get onRequest;

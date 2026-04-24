@@ -33,6 +33,19 @@ func NewFunctionRouter(functionRoutes map[string]FunctionRoute) *FunctionRouter 
 	return &FunctionRouter{functionRoutes: clonedRoutes}
 }
 
+// RegisterRoutes merges the supplied routes into the router, replacing any existing routes with the same name.
+func (r *FunctionRouter) RegisterRoutes(functionRoutes map[string]FunctionRoute) {
+	if r == nil || functionRoutes == nil {
+		return
+	}
+	if r.functionRoutes == nil {
+		r.functionRoutes = make(map[string]FunctionRoute, len(functionRoutes))
+	}
+	for functionName, functionRoute := range functionRoutes {
+		r.functionRoutes[functionName] = functionRoute
+	}
+}
+
 // Route dispatches a request message to the configured function route for its target.
 func (r *FunctionRouter) Route(requestMessage Message) (Message, error) {
 	if r == nil {

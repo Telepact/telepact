@@ -16,14 +16,14 @@
 
 package io.github.telepact;
 
-import static io.github.telepact.internal.mock.MockHandle.mockHandle;
-
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
 import io.github.telepact.internal.mock.MockInvocation;
+import io.github.telepact.internal.mock.MockHandle;
 import io.github.telepact.internal.mock.MockStub;
 
 /**
@@ -101,12 +101,11 @@ public class MockServer {
         final var serverOptions = new Server.Options();
         serverOptions.onError = options.onError;
         serverOptions.authRequired = false;
-        serverOptions.middleware = (requestMessage, functionRouter) -> this.handle(requestMessage);
 
         final var telepactSchema = new TelepactSchema(mockTelepactSchema.original, mockTelepactSchema.full, mockTelepactSchema.parsed,
                 mockTelepactSchema.parsedRequestHeaders, mockTelepactSchema.parsedResponseHeaders);
 
-        var functionRouter = new FunctionRouter(Map.of());
+        var functionRouter = new FunctionRouter(this.createFunctionRoutes(telepactSchema));
         this.server = new Server(telepactSchema, functionRouter, serverOptions);
     }
 
@@ -120,9 +119,33 @@ public class MockServer {
         return this.server.process(message);
     }
 
-    private Message handle(Message requestMessage) {
-        return mockHandle(requestMessage, this.stubs, this.invocations, this.random,
+    private Map<String, FunctionRoute> createFunctionRoutes(TelepactSchema telepactSchema) {
+        final var functionRoutes = new HashMap<String, FunctionRoute>();
+        functionRoutes.put("fn.createStub_", (_functionName, requestMessage) -> MockHandle.handleCreateStub(requestMessage, this.stubs));
+        functionRoutes.put("fn.verify_", (_functionName, requestMessage) -> MockHandle.handleVerify(requestMessage, this.invocations));
+        functionRoutes.put("fn.verifyNoMoreInteractions_", (_functionName, _requestMessage) -> MockHandle.handleVerifyNoMoreInteractions(this.invocations));
+        functionRoutes.put("fn.clearCalls_", (_functionName, _requestMessage) -> MockHandle.handleClearCalls(this.invocations));
+        functionRoutes.put("fn.clearStubs_", (_functionName, _requestMessage) -> MockHandle.handleClearStubs(this.stubs));
+        functionRoutes.put("fn.setRandomSeed_", (_functionName, requestMessage) -> MockHandle.handleSetRandomSeed(requestMessage, this.random));
+
+        for (final var functionName : telepactSchema.parsed.keySet()) {
+            if (!isAutoMockFunctionName(functionName)) {
+                continue;
+            }
+            functionRoutes.put(functionName,
+                    (_functionName, requestMessage) -> this.handleAutoMockFunction(requestMessage));
+        }
+
+        return functionRoutes;
+    }
+
+    private Message handleAutoMockFunction(Message requestMessage) {
+        return MockHandle.handleAutoMockFunction(requestMessage, this.stubs, this.invocations, this.random,
                 this.server.telepactSchema, this.enableGeneratedDefaultStub, this.enableOptionalFieldGeneration,
                 this.randomizeOptionalFieldGeneration);
+    }
+
+    private static boolean isAutoMockFunctionName(String functionName) {
+        return functionName.startsWith("fn.") && !functionName.endsWith(".->") && !functionName.endsWith("_");
     }
 }

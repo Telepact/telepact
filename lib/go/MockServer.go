@@ -17,6 +17,8 @@
 package telepact
 
 import (
+	"strings"
+
 	"github.com/telepact/telepact/lib/go/internal/mock"
 )
 
@@ -79,9 +81,6 @@ func NewMockServer(mockSchema *MockTelepactSchema, options *MockServerOptions) (
 	serverOptions := NewServerOptions()
 	serverOptions.OnError = options.OnError
 	serverOptions.AuthRequired = false
-	serverOptions.Middleware = func(requestMessage Message, functionRouter *FunctionRouter) (Message, error) {
-		return ms.handle(requestMessage)
-	}
 
 	telepactSchema := NewTelepactSchema(
 		mockSchema.Original,
@@ -91,7 +90,7 @@ func NewMockServer(mockSchema *MockTelepactSchema, options *MockServerOptions) (
 		mockSchema.ParsedResponseHeaders,
 	)
 
-	functionRouter := NewFunctionRouter(map[string]FunctionRoute{})
+	functionRouter := NewFunctionRouter(ms.createFunctionRoutes(telepactSchema))
 	server, err := NewServer(telepactSchema, functionRouter, serverOptions)
 	if err != nil {
 		return nil, err
@@ -110,14 +109,75 @@ func (ms *MockServer) Process(message []byte) (Response, error) {
 	return ms.server.Process(message)
 }
 
-func (ms *MockServer) handle(request Message) (Message, error) {
-	if ms == nil {
-		return Message{}, NewTelepactError("telepact: mock server is nil")
+func (ms *MockServer) createFunctionRoutes(telepactSchema *TelepactSchema) map[string]FunctionRoute {
+	functionRoutes := map[string]FunctionRoute{
+		"fn.createStub_": func(_ string, requestMessage Message) (Message, error) {
+			argument, err := requestMessage.BodyPayload()
+			if err != nil {
+				return Message{}, err
+			}
+			responseHeaders, responseBody, handleErr := mock.HandleCreateStub(argument, &ms.stubs)
+			if handleErr != nil {
+				return Message{}, NewTelepactError(handleErr.Error())
+			}
+			return NewMessage(responseHeaders, responseBody), nil
+		},
+		"fn.verify_": func(_ string, requestMessage Message) (Message, error) {
+			argument, err := requestMessage.BodyPayload()
+			if err != nil {
+				return Message{}, err
+			}
+			return NewMessage(map[string]any{}, mock.HandleVerify(argument, ms.invocations)), nil
+		},
+		"fn.verifyNoMoreInteractions_": func(_ string, _ Message) (Message, error) {
+			return NewMessage(map[string]any{}, mock.HandleVerifyNoMoreInteractions(ms.invocations)), nil
+		},
+		"fn.clearCalls_": func(_ string, _ Message) (Message, error) {
+			responseHeaders, responseBody, err := mock.HandleClearCalls(&ms.invocations)
+			if err != nil {
+				return Message{}, NewTelepactError(err.Error())
+			}
+			return NewMessage(responseHeaders, responseBody), nil
+		},
+		"fn.clearStubs_": func(_ string, _ Message) (Message, error) {
+			responseHeaders, responseBody, err := mock.HandleClearStubs(&ms.stubs)
+			if err != nil {
+				return Message{}, NewTelepactError(err.Error())
+			}
+			return NewMessage(responseHeaders, responseBody), nil
+		},
+		"fn.setRandomSeed_": func(_ string, requestMessage Message) (Message, error) {
+			argument, err := requestMessage.BodyPayload()
+			if err != nil {
+				return Message{}, err
+			}
+			responseHeaders, responseBody, handleErr := mock.HandleSetRandomSeed(argument, ms.random)
+			if handleErr != nil {
+				return Message{}, NewTelepactError(handleErr.Error())
+			}
+			return NewMessage(responseHeaders, responseBody), nil
+		},
 	}
 
-	functionName, err := request.BodyTarget()
-	if err != nil {
-		return Message{}, err
+	for functionName := range telepactSchema.Parsed {
+		if !isAutoMockFunctionName(functionName) {
+			continue
+		}
+		functionRoutes[functionName] = ms.createAutoMockRoute(functionName)
+	}
+
+	return functionRoutes
+}
+
+func (ms *MockServer) createAutoMockRoute(functionName string) FunctionRoute {
+	return func(_ string, requestMessage Message) (Message, error) {
+		return ms.handleAutoMockFunction(functionName, requestMessage)
+	}
+}
+
+func (ms *MockServer) handleAutoMockFunction(functionName string, request Message) (Message, error) {
+	if ms == nil {
+		return Message{}, NewTelepactError("telepact: mock server is nil")
 	}
 
 	argument, err := request.BodyPayload()
@@ -125,7 +185,7 @@ func (ms *MockServer) handle(request Message) (Message, error) {
 		return Message{}, err
 	}
 
-	responseHeaders, responseBody, handleErr := mock.MockHandle(
+	responseHeaders, responseBody, handleErr := mock.HandleAutoMockFunction(
 		request.Headers,
 		functionName,
 		argument,
@@ -142,4 +202,11 @@ func (ms *MockServer) handle(request Message) (Message, error) {
 	}
 
 	return NewMessage(responseHeaders, responseBody), nil
+}
+
+func isAutoMockFunctionName(functionName string) bool {
+	return len(functionName) > 3 &&
+		functionName[:3] == "fn." &&
+		!strings.HasSuffix(functionName, ".->") &&
+		!strings.HasSuffix(functionName, "_")
 }

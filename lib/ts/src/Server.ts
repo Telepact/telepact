@@ -24,7 +24,8 @@ import { processBytes } from './internal/ProcessBytes.js';
 import { Serialization } from './Serialization.js';
 import { ServerBase64Encoder } from './internal/binary/ServerBase64Encoder.js';
 import { Response } from './Response.js';
-import { FunctionRouter } from './FunctionRouter.js';
+import { FunctionRouter, FunctionRoutes } from './FunctionRouter.js';
+import { createInternalFunctionRoutes } from './internal/CreateInternalFunctionRoutes.js';
 
 export type Middleware = (requestMessage: Message, functionRouter: FunctionRouter) => Promise<Message>;
 export type UpdateHeaders = (headers: Record<string, any>) => void;
@@ -41,8 +42,15 @@ export class Server {
     telepactSchema: TelepactSchema;
     serializer: Serializer;
 
-    constructor(telepactSchema: TelepactSchema, functionRouter: FunctionRouter, options: ServerOptions) {
-        this.functionRouter = functionRouter;
+    constructor(telepactSchema: TelepactSchema, functionRouter: FunctionRouter | FunctionRoutes, options: ServerOptions) {
+        const normalizedFunctionRouter =
+            functionRouter instanceof FunctionRouter ? functionRouter : new FunctionRouter(functionRouter);
+
+        normalizedFunctionRouter.functionRoutes = {
+            ...normalizedFunctionRouter.functionRoutes,
+            ...createInternalFunctionRoutes(telepactSchema),
+        };
+        this.functionRouter = normalizedFunctionRouter;
         this.middleware = options.middleware;
         this.onError = options.onError;
         this.onRequest = options.onRequest;
