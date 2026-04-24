@@ -1,24 +1,28 @@
 # Introduction
 
-Telepact is a thin but powerful RPC framework built on JSON, enabling accessible
-API designs wherever JSON can be sent and received.
+Telepact is an RPC framework for people who want modern API power without the
+usual ceremony ✨
 
-What makes Telepact different? It takes the differentiating features of the
-industry's most popular API technologies, and combines them together through 3
-key innovations:
+It starts with plain JSON, then quietly layers in the kind of capabilities that
+normally drag along bespoke clients, code generation pipelines, or heavyweight
+protocols. The result is an API model that feels refreshingly simple on day one
+and surprisingly high-performance as you scale 🚀
 
-1. **JSON as a Query Language** - API calls and `SELECT`-style queries are all
-   achieved with JSON abstractions, giving first-class status to clients
-   wielding only a JSON library
-2. **Binary without code generation** - Binary protocols are established through
-   runtime handshakes, rather than build-time code generation, offering binary
-   efficiency to clients that want to avoid code generation toolchains
+What makes Telepact feel different is that it fuses some of the best ideas from
+today's most compelling API styles into 3 sharp innovations:
+
+1. **JSON as a Query Language** - API calls and `SELECT`-style queries happen
+   through JSON abstractions, so a client armed with nothing more than a JSON
+   library still gets first-class capabilities
+2. **Binary without code generation** - Binary protocols are negotiated at
+   runtime instead of locked behind build-time code generation, giving you a
+   path to efficiency without inheriting a toolchain
 3. **Hypermedia without HTTP** - API calls can return functions with pre-filled
-   arguments, approximating a link that can be followed, all achieved with pure
-   JSON abstractions
+   arguments, approximating links you can follow, all through pure JSON
+   abstractions
 
-These innovations allow Telepact to design for the minimalist consumer while
-giving clients the option to enrich the consumer experience by:
+That means Telepact can stay friendly to the most minimalist consumer while
+still unlocking serious upgrades when you want them:
 - Selecting less fields to reduce response sizes
 - Using schema-backed mocks to validate integrations before switching to live servers
 - Generating code when stronger static ergonomics are worth the extra tooling
