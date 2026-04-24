@@ -1,0 +1,13 @@
+{
+  "name": "telepact-example-py-ts-production",
+  "private": true,
+  "scripts": {
+    "build": "tsc --project tsconfig.json",
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.39.0",
+    "typescript": "^5.9.2"
+  },
+  "type": "module"
+}

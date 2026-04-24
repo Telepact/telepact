@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Telepact production example</title>
+    <style>
+        :root {
+            color-scheme: light dark;
+            font-family: sans-serif;
+        }
+        body {
+            margin: 2rem auto;
+            max-width: 60rem;
+            padding: 0 1rem 2rem;
+        }
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin: 1rem 0;
+        }
+        button {
+            padding: 0.65rem 0.9rem;
+        }
+        pre {
+            border: 1px solid #8884;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            padding: 1rem;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>Telepact production example</h1>
+    <p>
+        This page drives a Python Telepact backend through plain browser fetch
+        calls. Use it to inspect auth, request ids, middleware logs, metrics,
+        schema comparison, and error-boundary behavior.
+    </p>
+
+    <div class="controls">
+        <button id="login-viewer" type="button">Sign in as viewer</button>
+        <button id="login-admin" type="button">Sign in as admin</button>
+        <button id="logout" type="button">Clear session</button>
+        <button id="load-dashboard" type="button">Load dashboard</button>
+        <button id="load-admin-audit" type="button">Load admin audit</button>
+        <button id="trigger-crash" type="button">Trigger crash</button>
+        <button id="refresh-observability" type="button">Refresh observability</button>
+    </div>
+
+    <h2>Last result</h2>
+    <pre id="result">Click one of the actions above.</pre>
+
+    <h2>Observability snapshot</h2>
+    <pre id="observability">Not loaded yet.</pre>
+
+    <script type="module" src="/static/app.js"></script>
+</body>
+</html>
