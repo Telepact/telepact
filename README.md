@@ -1,6 +1,7 @@
 # Introduction
 
-Telepact is a thin but powerful RPC framework built on JSON.
+Telepact is a thin but powerful RPC framework built on JSON, enabling accessible
+API designs wherever JSON can be sent and received.
 
 What makes Telepact different? It takes the differentiating features of the
 industry's most popular API technologies, and combines them together through 3
