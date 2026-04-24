@@ -1,9 +1,11 @@
 {
   "changed_paths": [
-    "doc/05-background-and-reference/01-faq.md"
+    "doc/01-learn-by-example/08-running-our-own-server/26-schema-evolution.md",
+    "doc/03-build-clients-and-servers/04-tooling-workflow.md",
+    "doc/04-operate/01-production-guide.md"
   ],
   "direct_targets": [],
-  "pr_number": 479,
+  "pr_number": 480,
   "targets": [],
   "version": "1.0.0-alpha.324"
 }
