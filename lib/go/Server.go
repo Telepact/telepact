@@ -77,6 +77,8 @@ func NewServer(telepactSchema *TelepactSchema, functionRouter *FunctionRouter, o
 		options = NewServerOptions()
 	}
 
+	functionRouter = injectBuiltInFunctionRoutes(telepactSchema, functionRouter)
+
 	if options.OnError == nil {
 		options.OnError = func(error) {}
 	}
@@ -123,6 +125,38 @@ func NewServer(telepactSchema *TelepactSchema, functionRouter *FunctionRouter, o
 		telepactSchema: telepactSchema,
 		serializer:     serializer,
 	}, nil
+}
+
+func injectBuiltInFunctionRoutes(telepactSchema *TelepactSchema, functionRouter *FunctionRouter) *FunctionRouter {
+	functionRoutes := make(map[string]FunctionRoute, len(functionRouter.functionRoutes)+2)
+	for functionName, functionRoute := range functionRouter.functionRoutes {
+		functionRoutes[functionName] = functionRoute
+	}
+
+	functionRoutes["fn.ping_"] = func(functionName string, requestMessage Message) (Message, error) {
+		return NewMessage(map[string]any{}, map[string]any{"Ok_": map[string]any{}}), nil
+	}
+	functionRoutes["fn.api_"] = func(functionName string, requestMessage Message) (Message, error) {
+		requestPayload, _ := requestMessage.Body[functionName].(map[string]any)
+		includeInternal := false
+		includeExamples := false
+		if requestPayload != nil {
+			includeInternal, _ = requestPayload["includeInternal!"].(bool)
+			includeExamples, _ = requestPayload["includeExamples!"].(bool)
+		}
+
+		apiDefinitions := telepactSchema.Original
+		if includeInternal {
+			apiDefinitions = telepactSchema.Full
+		}
+		if includeExamples {
+			apiDefinitions = telepactinternal.GetAPIDefinitionsWithExamples(telepactSchema, includeInternal)
+		}
+
+		return NewMessage(map[string]any{}, map[string]any{"Ok_": map[string]any{"api": apiDefinitions}}), nil
+	}
+
+	return NewFunctionRouter(functionRoutes)
 }
 
 // ProcessWithHeaders processes a request message with optional header updates.

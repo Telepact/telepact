@@ -25,11 +25,38 @@ import { Serialization } from './Serialization.js';
 import { ServerBase64Encoder } from './internal/binary/ServerBase64Encoder.js';
 import { Response } from './Response.js';
 import { FunctionRouter } from './FunctionRouter.js';
+import { getApiDefinitionsWithExamples } from './internal/GetApiDefinitionsWithExamples.js';
 
 export type Middleware = (requestMessage: Message, functionRouter: FunctionRouter) => Promise<Message>;
 export type UpdateHeaders = (headers: Record<string, any>) => void;
 export { FunctionRouter } from './FunctionRouter.js';
 export type { FunctionRoute, FunctionRoutes } from './FunctionRouter.js';
+
+async function pingFunctionRoute(): Promise<Message> {
+    return new Message({}, { Ok_: {} });
+}
+
+function createApiFunctionRoute(telepactSchema: TelepactSchema) {
+    return async (functionName: string, requestMessage: Message): Promise<Message> => {
+        const requestPayload = requestMessage.body[functionName] as Record<string, any> | undefined;
+        const includeInternal = requestPayload?.['includeInternal!'] === true;
+        const includeExamples = requestPayload?.['includeExamples!'] === true;
+        const apiDefinitions = includeExamples
+            ? getApiDefinitionsWithExamples(telepactSchema, includeInternal)
+            : includeInternal
+                ? telepactSchema.full
+                : telepactSchema.original;
+        return new Message({}, { Ok_: { api: apiDefinitions } });
+    };
+}
+
+function injectBuiltInFunctionRoutes(telepactSchema: TelepactSchema, functionRouter: FunctionRouter): FunctionRouter {
+    return new FunctionRouter({
+        ...functionRouter.functionRoutes,
+        'fn.ping_': pingFunctionRoute,
+        'fn.api_': createApiFunctionRoute(telepactSchema),
+    });
+}
 
 export class Server {
     functionRouter: FunctionRouter;
@@ -42,7 +69,7 @@ export class Server {
     serializer: Serializer;
 
     constructor(telepactSchema: TelepactSchema, functionRouter: FunctionRouter, options: ServerOptions) {
-        this.functionRouter = functionRouter;
+        this.functionRouter = injectBuiltInFunctionRoutes(telepactSchema, functionRouter);
         this.middleware = options.middleware;
         this.onError = options.onError;
         this.onRequest = options.onRequest;

@@ -364,6 +364,8 @@ cases = {
         [[{'@ok_': {}, '@onRequestError_': True}, {'fn.test': {}}], [{}, {'Ok_': {}}]],
         [[{'@ok_': {}, '@onResponseError_': True}, {'fn.test': {}}], [{'@onResponseError_': True}, {'Ok_': {}}]],
         [[{'@ok_': {}, '@throwError_': True}, {'fn.test': {}}], [{'@assert_': {'assertCaseId': True}}, {'ErrorUnknown_': {'caseId': '<caseId>'}}]],
+        [[{'@throwError_': True}, {'fn.ping_': {}}], [{'@assert_': {'assertCaseId': True}}, {'ErrorUnknown_': {'caseId': '<caseId>'}}]],
+        [[{'@throwError_': True}, {'fn.api_': {}}], [{'@assert_': {'assertCaseId': True}}, {'ErrorUnknown_': {'caseId': '<caseId>'}}]],
     ],
     'clientHeaders': [
         [[{'@time_': 6000}, {'fn.ping_': {}}], [{}, {'Ok_': {}}]],

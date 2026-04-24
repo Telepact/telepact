@@ -174,38 +174,17 @@ func HandleMessage(
 		Body:    map[string]any{requestTarget: requestPayload},
 	}
 
-	var resultMessage ServerMessage
-	switch functionName {
-	case "fn.ping_":
-		resultMessage = ServerMessage{Headers: make(map[string]any), Body: map[string]any{"Ok_": map[string]any{}}}
-	case "fn.api_":
-		includeInternal := false
-		includeExamples := false
-		if requestMap, ok := requestPayload.(map[string]any); ok {
-			includeInternal = boolValue(requestMap["includeInternal!"])
-			includeExamples = boolValue(requestMap["includeExamples!"])
-		}
-		apiDefinitions := schema.OriginalDefinitions()
-		if includeInternal {
-			apiDefinitions = schema.FullDefinitions()
-		}
-		if includeExamples {
-			apiDefinitions = GetAPIDefinitionsWithExamples(schema, includeInternal)
-		}
-		resultMessage = ServerMessage{Headers: make(map[string]any), Body: map[string]any{"Ok_": map[string]any{"api": apiDefinitions}}}
-	default:
-		resp, err := middleware(callMessage, functionRouter)
-		if err != nil {
-			wrapped := newTelepactError(
-				fmt.Sprintf("telepact handler failed while handling %s", functionName),
-				"handler",
-				err,
-			)
-			invokeOnError(onError, wrapped)
-			return newUnknownErrorResponse(responseHeaders, wrapped.CaseID()), nil
-		}
-		resultMessage = resp
+	resp, err := middleware(callMessage, functionRouter)
+	if err != nil {
+		wrapped := newTelepactError(
+			fmt.Sprintf("telepact handler failed while handling %s", functionName),
+			"handler",
+			err,
+		)
+		invokeOnError(onError, wrapped)
+		return newUnknownErrorResponse(responseHeaders, wrapped.CaseID()), nil
 	}
+	resultMessage := resp
 
 	if resultMessage.Headers == nil {
 		resultMessage.Headers = make(map[string]any)

@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import io.github.telepact.internal.GetApiDefinitionsWithExamples;
 import io.github.telepact.internal.binary.ServerBase64Encoder;
 import io.github.telepact.internal.binary.ServerBinaryEncoder;
 
@@ -106,7 +107,7 @@ public class Server {
      * @param options The options for configuring the server.
      */
     public Server(TelepactSchema telepactSchema, FunctionRouter functionRouter, Options options) {
-        this.functionRouter = functionRouter;
+        this.functionRouter = injectBuiltInFunctionRoutes(telepactSchema, functionRouter);
         this.middleware = options.middleware;
         this.onError = options.onError;
         this.onRequest = options.onRequest;
@@ -124,6 +125,21 @@ public class Server {
             throw new RuntimeException(
                     "Unauthenticated server. Either define a `union.Auth_` in your schema or set `options.authRequired` to `false`.");
         }
+    }
+
+    private static FunctionRouter injectBuiltInFunctionRoutes(TelepactSchema telepactSchema, FunctionRouter functionRouter) {
+        final var functionRoutes = functionRouter.functionRoutes();
+        functionRoutes.put("fn.ping_", (functionName, requestMessage) -> new Message(Map.of(), Map.of("Ok_", Map.of())));
+        functionRoutes.put("fn.api_", (functionName, requestMessage) -> {
+            final var requestPayload = (Map<String, Object>) requestMessage.body.get(functionName);
+            final var includeInternal = requestPayload != null && Boolean.TRUE.equals(requestPayload.get("includeInternal!"));
+            final var includeExamples = requestPayload != null && Boolean.TRUE.equals(requestPayload.get("includeExamples!"));
+            final var apiDefinitions = includeExamples
+                    ? GetApiDefinitionsWithExamples.getApiDefinitionsWithExamples(telepactSchema, includeInternal)
+                    : includeInternal ? telepactSchema.full : telepactSchema.original;
+            return new Message(Map.of(), Map.of("Ok_", Map.of("api", apiDefinitions)));
+        });
+        return new FunctionRouter(functionRoutes);
     }
 
     /**

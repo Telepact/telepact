@@ -38,4 +38,8 @@ public class FunctionRouter {
         }
         return functionRoute.apply(functionName, requestMessage);
     }
+
+    Map<String, FunctionRoute> functionRoutes() {
+        return new HashMap<>(this.functionRoutes);
+    }
 }
