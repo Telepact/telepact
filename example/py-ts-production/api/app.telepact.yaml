@@ -14,19 +14,28 @@
 #|  limitations under the License.
 #|
 
-EXAMPLES := py-binary py-codegen py-http-cookie-auth py-links py-select py-ts-production py-websocket ts-binary ts-codegen ts-http-cookie-auth ts-links ts-select ts-websocket
+- union.Auth_:
+    - Session:
+        token: string
 
-.PHONY: list check run
+- struct.Notice:
+    id: string
+    summary: string
+    severity: string
 
-list:
-	@printf '%s\n' $(EXAMPLES)
+- fn.viewerDashboard: {}
+  ->:
+    - Ok_:
+        viewerId: string
+        displayName: string
+        notices: [struct.Notice]
 
-check:
-	@for example in $(EXAMPLES); do \
-		echo "==> $$example"; \
-		$(MAKE) -C $$example run || exit $$?; \
-	done
+- fn.adminAudit: {}
+  ->:
+    - Ok_:
+        entries: [string]
 
-run:
-	@test -n "$(EXAMPLE)" || (echo "Usage: make run EXAMPLE=<name>" && exit 1)
-	@$(MAKE) -C $(EXAMPLE) run
+- fn.debugCrash: {}
+  ->:
+    - Ok_:
+        status: string

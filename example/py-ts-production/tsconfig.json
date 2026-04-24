@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ES2022",
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "rootDir": "web",
+    "outDir": "dist-web",
+    "strict": true,
+    "skipLibCheck": true
+  },
+  "include": [
+    "web/**/*.ts"
+  ]
+}
