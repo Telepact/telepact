@@ -177,11 +177,13 @@ class Server {
   /// Initializes the server with the schema, handler function, and options.
   static b.Server initServer(b.TelepactSchema schema,
       Future<Message> Function(Message im) handler, ServerOptions options) {
-    JSPromise outerMiddleware(b.Message om, JSAny _) {
+    JSPromise outerMiddleware(b.Message om, b.FunctionRouter functionRouter) {
       final m = Message.fromJS(om);
-      return handler(m).then((response) {
-        return response._message;
-      }).toJS;
+      final functionName = m.body.keys.first;
+      if (functionName == 'fn.ping_' || functionName == 'fn.api_') {
+        return functionRouter.route(om);
+      }
+      return handler(m).then((response) => response._message).toJS;
     }
 
     options._options.middleware = outerMiddleware.toJS;
