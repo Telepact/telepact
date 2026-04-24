@@ -10,14 +10,14 @@ Why choose Telepact:
   Telepact has simple built-in options to trim responses according to client needs.
 - ⚡ **Binary without the toolchain tax** - Have you ever seen a binary protocol
   that didn't require code generation? Now you have, with Telepact.
-    - (This innovation was made possible with MessagePack ❤️)
+    - (Made possible with MessagePack ❤️)
 - 🔗 **Hypermedia without HTTP** - API calls can return functions with pre-filled arguments.
   Who said links had to be urls?
-- 🧪 **Schemas pull real weight** - The JSON-written Telepact schema holds the ecosystem
-  together. API introspection super-charges your develpoment, with type validation,
-  docs, mocks, and even generate your own code bindings.
-
-Modern innovations, without the ceremony 🚀
+- ⚖️ **An API schema you can trust** - No more out-of-band documentation. No more API schemas
+  that get buried. Telepact puts the API schema front and center, powering doc introspection,
+  integration simulations, and generating code bindings.
+  
+Modern innovations, without the tradeoffs 🚀
 
 # It's just JSON at the core
 No query params. No binary field ids. No required client libraries.
