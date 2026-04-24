@@ -80,6 +80,13 @@ func NewMockServer(mockSchema *MockTelepactSchema, options *MockServerOptions) (
 	serverOptions.OnError = options.OnError
 	serverOptions.AuthRequired = false
 	serverOptions.Middleware = func(requestMessage Message, functionRouter *FunctionRouter) (Message, error) {
+		functionName, err := requestMessage.BodyTarget()
+		if err != nil {
+			return Message{}, err
+		}
+		if functionName == "fn.ping_" || functionName == "fn.api_" {
+			return functionRouter.Route(requestMessage)
+		}
 		return ms.handle(requestMessage)
 	}
 

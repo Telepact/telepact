@@ -101,7 +101,13 @@ public class MockServer {
         final var serverOptions = new Server.Options();
         serverOptions.onError = options.onError;
         serverOptions.authRequired = false;
-        serverOptions.middleware = (requestMessage, functionRouter) -> this.handle(requestMessage);
+        serverOptions.middleware = (requestMessage, functionRouter) -> {
+            final var functionName = requestMessage.getBodyTarget();
+            if (functionName.equals("fn.ping_") || functionName.equals("fn.api_")) {
+                return functionRouter.route(requestMessage);
+            }
+            return this.handle(requestMessage);
+        };
 
         final var telepactSchema = new TelepactSchema(mockTelepactSchema.original, mockTelepactSchema.full, mockTelepactSchema.parsed,
                 mockTelepactSchema.parsedRequestHeaders, mockTelepactSchema.parsedResponseHeaders);

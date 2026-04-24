@@ -59,7 +59,13 @@ class MockServer:
         server_options = Server.Options()
         server_options.on_error = options.on_error
         server_options.auth_required = False
-        server_options.middleware = lambda request_message, function_router: self._handle(request_message)
+        async def middleware(request_message: 'Message', function_router: FunctionRouter) -> 'Message':
+            function_name = request_message.get_body_target()
+            if function_name in {"fn.ping_", "fn.api_"}:
+                return await function_router.route(request_message)
+            return await self._handle(request_message)
+
+        server_options.middleware = middleware
 
         telepact_schema = TelepactSchema(mock_telepact_schema.original, mock_telepact_schema.full, mock_telepact_schema.parsed,
                                         mock_telepact_schema.parsed_request_headers, mock_telepact_schema.parsed_response_headers)

@@ -41,7 +41,13 @@ export class MockServer {
         const serverOptions = new ServerOptions();
         serverOptions.onError = options.onError;
         serverOptions.authRequired = false;
-        serverOptions.middleware = async (requestMessage: Message): Promise<Message> => await this.handle(requestMessage);
+        serverOptions.middleware = async (requestMessage: Message, functionRouter: FunctionRouter): Promise<Message> => {
+            const functionName = requestMessage.getBodyTarget();
+            if (functionName === 'fn.ping_' || functionName === 'fn.api_') {
+                return await functionRouter.route(requestMessage);
+            }
+            return await this.handle(requestMessage);
+        };
 
         const telepactSchema = new TelepactSchema(
             mockTelepactSchema.original,
