@@ -33,5 +33,5 @@
   ->:
     - Ok_:
         users: ["struct.User"]
-        usersById: {"struct.User"}
+        usersById: {"string": "struct.User"}
         featured: "union.Highlight"
