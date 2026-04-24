@@ -1,27 +1,10 @@
 {
   "changed_paths": [
-    ".release/force-all.md"
+    "site/src/build.py",
+    "site/src/index.template.html"
   ],
-  "direct_targets": [
-    "cli",
-    "console",
-    "dart",
-    "go",
-    "java",
-    "prettier",
-    "py",
-    "ts"
-  ],
-  "pr_number": 472,
-  "targets": [
-    "cli",
-    "console",
-    "dart",
-    "go",
-    "java",
-    "prettier",
-    "py",
-    "ts"
-  ],
+  "direct_targets": [],
+  "pr_number": 474,
+  "targets": [],
   "version": "1.0.0-alpha.323"
 }
