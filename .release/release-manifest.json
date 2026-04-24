@@ -1,9 +1,27 @@
 {
   "changed_paths": [
-    ".github/workflows/copilot-setup-steps.yml"
+    ".release/force-all.md"
   ],
-  "direct_targets": [],
-  "pr_number": 469,
-  "targets": [],
-  "version": "1.0.0-alpha.322"
+  "direct_targets": [
+    "cli",
+    "console",
+    "dart",
+    "go",
+    "java",
+    "prettier",
+    "py",
+    "ts"
+  ],
+  "pr_number": 472,
+  "targets": [
+    "cli",
+    "console",
+    "dart",
+    "go",
+    "java",
+    "prettier",
+    "py",
+    "ts"
+  ],
+  "version": "1.0.0-alpha.323"
 }
