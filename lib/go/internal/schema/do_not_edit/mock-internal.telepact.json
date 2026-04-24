@@ -1,11 +1,11 @@
 [
   {
-    "///": "`_ext.Stub_` is the mock stub object consumed by `fn.createStub_`. It\ncontains exactly one non-internal `fn.*` matcher plus a matching `->`\nresult payload that the mock should return.\n\nSee https://raw.githubusercontent.com/Telepact/telepact/main/doc/02-design-apis/03-extensions.md\nfor full `_ext.Stub_` rules and end-to-end examples.\n",
+    "///": "`_ext.Stub_` is the mock stub object consumed by `fn.createStub_`. It\ncontains exactly one non-internal `fn.*` matcher plus a matching `->`\nresult payload that the mock should return.\n\nSee https://raw.githubusercontent.com/Telepact/telepact/main/doc/02-design-apis/05-mock-extensions.md\nfor full `_ext.Stub_` rules and end-to-end examples.\n",
     "_ext.Stub_": {
     }
   },
   {
-    "///": "`_ext.Call_` is the mock call object used by `fn.verify_` and verification\nfailures. It contains exactly one non-internal `fn.*` key whose value is\nthat function's argument object.\n\nSee https://raw.githubusercontent.com/Telepact/telepact/main/doc/02-design-apis/03-extensions.md\nfor full `_ext.Call_` rules and end-to-end examples.\n",
+    "///": "`_ext.Call_` is the mock call object used by `fn.verify_` and verification\nfailures. It contains exactly one non-internal `fn.*` key whose value is\nthat function's argument object.\n\nSee https://raw.githubusercontent.com/Telepact/telepact/main/doc/02-design-apis/05-mock-extensions.md\nfor full `_ext.Call_` rules and end-to-end examples.\n",
     "_ext.Call_": {
     }
   },
