@@ -31,6 +31,16 @@ When that happens, treat the `caseId` in `ErrorUnknown_` as a correlation ID:
 log it on the server next to the real exception details, then use it to match a
 client-side error report back to the corresponding server-side log entry.
 
+For example, a Python server can log the correlation ID in `on_error`:
+
+```py
+def on_error(error: TelepactError) -> None:
+    log.exception('telepact error case_id=%s', error.case_id, exc_info=error)
+```
+
+For a fuller walkthrough, see
+[Learn by example: Logging](../01-learn-by-example/08-running-our-own-server/23-logging.md).
+
 The main change is the local callback surface:
 
 - `options.onError` receives contextual errors instead of raw implementation
