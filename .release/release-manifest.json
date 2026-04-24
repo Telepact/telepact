@@ -1,10 +1,9 @@
 {
   "changed_paths": [
-    "site/src/build.py",
-    "site/src/index.template.html"
+    ".github/workflows/release.yml"
   ],
   "direct_targets": [],
-  "pr_number": 478,
+  "pr_number": 477,
   "targets": [],
   "version": "1.0.0-alpha.324"
 }
