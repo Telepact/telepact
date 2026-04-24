@@ -34,8 +34,10 @@ SITE_ROOT = REPO_ROOT / "site"
 SOURCE_DIR = SITE_ROOT / "src"
 SITE_DIR = SITE_ROOT / "dist"
 DOCS_DIR = SITE_DIR / "docs"
+MARKDOWN_DOCS_DIR = SITE_DIR / "markdown-docs"
 INDEX_TEMPLATE = SOURCE_DIR / "index.template.html"
 INDEX_OUTPUT = SITE_DIR / "index.html"
+LLMS_OUTPUT = SITE_DIR / "llms.txt"
 SNIPPETS_DIR = SOURCE_DIR / "snippets"
 STATIC_FILES = (".nojekyll", "404.html", "favicon.ico")
 DEFAULT_BASE_URL = "https://telepact.github.io/telepact/"
@@ -153,6 +155,10 @@ def output_resource_path(source: Path) -> Path:
     return DOCS_DIR / repo_rel(source)
 
 
+def output_markdown_doc_path(source: Path) -> Path:
+    return MARKDOWN_DOCS_DIR / source.relative_to(REPO_ROOT / "doc")
+
+
 def url_from_output(output_file: Path) -> str:
     rel = output_file.relative_to(SITE_DIR).as_posix()
     if rel.endswith("/index.html"):
@@ -253,6 +259,10 @@ def write_cname() -> None:
     if not CUSTOM_DOMAIN:
         return
     (SITE_DIR / "CNAME").write_text(CUSTOM_DOMAIN + "\n", encoding="utf-8")
+
+
+def site_url(path: str) -> str:
+    return posixpath.join(BASE_URL.rstrip("/"), path.lstrip("/"))
 
 
 @dataclass
@@ -1392,6 +1402,39 @@ def write_pages(pages: dict[Path, Page], resources: set[Path]) -> None:
         shutil.copy2(resource, target)
 
 
+def copy_markdown_docs() -> None:
+    for source in sorted((REPO_ROOT / "doc").rglob("*.md")):
+        target = output_markdown_doc_path(source)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source, target)
+
+
+def write_llms(pages: dict[Path, Page]) -> None:
+    markdown_directory_url = site_url("markdown-docs/")
+    lines = [
+        "# Telepact",
+        "",
+        "> Telepact is a thin but powerful RPC framework built on JSON.",
+        "",
+        "This site publishes the original documentation markdown files for AI agents.",
+        "",
+        f"- [HTML documentation]({site_url('docs/')})",
+        f"- [Markdown documentation directory]({markdown_directory_url})",
+        f"- [Markdown docs entrypoint]({site_url('markdown-docs/index.md')})",
+        "",
+        "## Original documentation markdown",
+        "",
+    ]
+
+    for source in sorted((REPO_ROOT / "doc").rglob("*.md")):
+        rel_path = source.relative_to(REPO_ROOT / "doc").as_posix()
+        page = pages.get(source)
+        title = page.title if page is not None and page.title else display_name(source)
+        lines.append(f"- [{title}]({site_url(f'markdown-docs/{rel_path}')})")
+
+    LLMS_OUTPUT.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
 def write_sitemap(pages: dict[Path, Page]) -> None:
     urls: dict[str, str] = {
         "": datetime.now(timezone.utc).date().isoformat(),
@@ -1423,10 +1466,13 @@ def main() -> None:
     snippet_count = write_home_page()
     pages, resources = discover_pages()
     DOCS_DIR.mkdir(parents=True, exist_ok=True)
+    MARKDOWN_DOCS_DIR.mkdir(parents=True, exist_ok=True)
     write_css()
     write_pages(pages, resources)
+    copy_markdown_docs()
     write_cname()
     write_robots()
+    write_llms(pages)
     write_sitemap(pages)
     print(
         f"Generated home page from {snippet_count} snippets, "
