@@ -11,9 +11,9 @@ Telepact is a thin but powerful RPC framework built on JSON.
     - (Made possible with MessagePack ❤️)
 - 🔗 **Hypermedia without HTTP** - API calls can return functions with pre-filled arguments.
   Who said links had to be urls?
-- ⚖️ **An API schema you can trust** - No more out-of-band documentation. No more API schemas
-  that get buried. Telepact puts the API schema front and center, powering doc introspection,
-  integration simulations, and generating code bindings.
+- ⚖️ **An API schema you can trust** - No more out-of-band documentation. No more API
+  schemas hidden from clients. Telepact puts the API schema front and center, powering
+  doc introspection, integration simulations, and code generation.
   
 Modern innovations, without the tradeoffs 🚀
 
