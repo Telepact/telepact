@@ -24,6 +24,7 @@ import {
     Message,
     SerializationError,
     Serializer,
+    TelepactError,
     MockServer,
     MockServerOptions,
     TelepactSchema,
@@ -431,6 +432,7 @@ function startTestServer(
     const serveAlternateServer = { value: false };
 
     const codeGenHandler = new CodeGenHandler();
+    const onErrorExpectation = { mode: null as null | 'nested' | 'standalone', failed: false, observed: false };
 
     class ThisError extends Error {}
 
@@ -487,18 +489,37 @@ function startTestServer(
     };
 
     const options: ServerOptions = new ServerOptions();
-    options.onError = (e: Error) => {
+    options.onError = (e: TelepactError) => {
         console.error(e);
-        if (e instanceof ThisError) {
-            throw new Error();
+        if (onErrorExpectation.mode !== null) {
+            onErrorExpectation.observed = true;
+            const hasExpectedCause = onErrorExpectation.mode === 'nested'
+                ? e.cause instanceof ThisError
+                : e.cause === undefined;
+            if (!(e instanceof TelepactError) || !hasExpectedCause) {
+                onErrorExpectation.failed = true;
+            }
         }
     };
     options.onRequest = (m: Message) => {
+        onErrorExpectation.mode = m.headers["@assertOnErrorNested_"] === true
+            ? 'nested'
+            : m.headers["@assertOnErrorStandalone_"] === true
+                ? 'standalone'
+                : null;
+        onErrorExpectation.failed = false;
+        onErrorExpectation.observed = false;
         if (m.headers["@onRequestError_"] === true) {
             throw new Error();
         }
     };
     options.onResponse = (m: Message) => {
+        if (onErrorExpectation.mode !== null && (onErrorExpectation.failed || !onErrorExpectation.observed)) {
+            m.headers["@assertionError"] = true;
+        }
+        onErrorExpectation.mode = null;
+        onErrorExpectation.failed = false;
+        onErrorExpectation.observed = false;
         if (m.headers["@onResponseError_"] === true) {
             throw new Error();
         }

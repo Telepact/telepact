@@ -30,7 +30,7 @@ if TYPE_CHECKING:
 
 async def process_bytes(request_message_bytes: bytes, update_headers: 'UpdateHeaders | None',
                          serializer: 'Serializer', telepact_schema: 'TelepactSchema',
-                         on_error: Callable[[Exception], None], on_request: Callable[['Message'], None],
+                         on_error: Callable[[TelepactError], None], on_request: Callable[['Message'], None],
                          on_response: Callable[['Message'], None], on_auth: Callable[[dict[str, object]], dict[str, object]],
                          middleware: 'Middleware', function_router: 'FunctionRouter') -> 'Response':
     from ..internal.HandleMessage import handle_message

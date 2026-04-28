@@ -28,6 +28,7 @@ import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -464,6 +465,9 @@ public class Main {
         var timers = metrics.timer(frontdoorTopic);
 
         var serveAlternateServer = new AtomicBoolean();
+        var onErrorExpectation = new AtomicReference<String>(null);
+        var onErrorFailed = new AtomicBoolean();
+        var onErrorObserved = new AtomicBoolean();
 
         CodeGenHandler codeGenHandler = new CodeGenHandler();
 
@@ -555,16 +559,37 @@ public class Main {
         options.onError = (e) -> {
             e.printStackTrace();
             System.err.flush();
-            if (e.getCause() instanceof ThisError) {
-                throw new RuntimeException();
+            if (onErrorExpectation.get() != null) {
+                onErrorObserved.set(true);
+                var hasExpectedCause = Objects.equals("nested", onErrorExpectation.get())
+                        ? e.getCause() instanceof ThisError
+                        : e.getCause() == null;
+                if (!hasExpectedCause) {
+                    onErrorFailed.set(true);
+                }
             }
         };
         options.onRequest = m -> {
+            if (Objects.equals(true, m.headers.get("@assertOnErrorNested_"))) {
+                onErrorExpectation.set("nested");
+            } else if (Objects.equals(true, m.headers.get("@assertOnErrorStandalone_"))) {
+                onErrorExpectation.set("standalone");
+            } else {
+                onErrorExpectation.set(null);
+            }
+            onErrorFailed.set(false);
+            onErrorObserved.set(false);
             if ((Boolean) m.headers.getOrDefault("@onRequestError_", false)) {
                 throw new RuntimeException();
             }
         };
         options.onResponse = m -> {
+            if (onErrorExpectation.get() != null && (onErrorFailed.get() || !onErrorObserved.get())) {
+                m.headers.put("@assertionError", true);
+            }
+            onErrorExpectation.set(null);
+            onErrorFailed.set(false);
+            onErrorObserved.set(false);
             if ((Boolean) m.headers.getOrDefault("@onResponseError_", false)) {
                 throw new RuntimeException();
             }

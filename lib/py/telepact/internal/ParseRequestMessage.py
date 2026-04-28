@@ -29,7 +29,7 @@ if TYPE_CHECKING:
 
 
 def parse_request_message(request_message_bytes: bytes, serializer: 'Serializer', telepact_schema: 'TelepactSchema',
-                          on_error: Callable[[Exception], None]) -> 'Message':
+                           on_error: Callable[[TelepactError], None]) -> 'Message':
     try:
         return serializer.deserialize(request_message_bytes)
     except Exception as e:

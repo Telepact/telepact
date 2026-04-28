@@ -25,7 +25,7 @@ import { TelepactError } from '../TelepactError.js';
 import { UpdateHeaders } from '../Server.js';
 import { buildUnknownErrorMessage } from './UnknownError.js';
 
-export type ErrorHandler = (error: any) => void;
+export type ErrorHandler = (error: TelepactError) => void;
 export type RequestHandler = (message: Message) => void;
 export type ResponseHandler = (message: Message) => void;
 export type AuthHandler = (headers: Record<string, any>) => Record<string, any>;

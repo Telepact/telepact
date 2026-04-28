@@ -30,6 +30,7 @@ import {
 } from './internal/mock/MockHandle.js';
 import { MockTelepactSchema } from './MockTelepactSchema.js';
 import { Response } from './Response.js';
+import { TelepactError } from './TelepactError.js';
 
 export class MockServer {
     /**
@@ -116,7 +117,7 @@ export class MockServerOptions {
      * Options for the MockServer.
      */
 
-    onError: (error: Error) => void = (e) => {};
+    onError: (error: TelepactError) => void = (_error) => {};
     enableMessageResponseGeneration = true;
     enableOptionalFieldGeneration = true;
     randomizeOptionalFieldGeneration = true;

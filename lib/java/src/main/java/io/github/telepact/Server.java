@@ -52,7 +52,7 @@ public class Server {
         /**
          * Handler for errors thrown during message processing.
          */
-        public Consumer<Throwable> onError = (e) -> {
+        public Consumer<TelepactError> onError = (e) -> {
         };
 
         /**
@@ -93,7 +93,7 @@ public class Server {
     final TelepactSchema telepactSchema;
     private final FunctionRouter functionRouter;
     private final Middleware middleware;
-    private final Consumer<Throwable> onError;
+    private final Consumer<TelepactError> onError;
     private final Consumer<Message> onRequest;
     private final Consumer<Message> onResponse;
     private final Function<Map<String, Object>, Map<String, Object>> onAuth;

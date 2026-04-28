@@ -28,6 +28,12 @@ const backwardsCompatibleChangeSchema = `
 ]
 `
 
+type thisError struct{}
+
+func (thisError) Error() string {
+	return "telepact: requested server error"
+}
+
 func main() {
 	logger := log.New(os.Stdout, "[telepact-go] ", log.LstdFlags|log.Lmicroseconds)
 
@@ -579,7 +585,7 @@ func startMockTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscripti
 	}
 
 	options := telepact.NewMockServerOptions()
-	options.OnError = func(err error) {
+	options.OnError = func(err *telepact.TelepactError) {
 		if err != nil {
 			d.logger.Printf("mock server error: %v", err)
 		}
@@ -690,7 +696,7 @@ func startSchemaTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscrip
 	}
 
 	options := telepact.NewServerOptions()
-	options.OnError = func(err error) {
+	options.OnError = func(err *telepact.TelepactError) {
 		if err != nil {
 			d.logger.Printf("schema server error: %v", err)
 		}
@@ -795,6 +801,9 @@ func startTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscription, 
 	}
 
 	type handlerError struct{}
+	onErrorExpectation := ""
+	onErrorFailed := false
+	onErrorObserved := false
 
 	onAuth := func(requestHeaders map[string]any) map[string]any {
 		authRaw, ok := requestHeaders["@auth_"]
@@ -845,7 +854,7 @@ func startTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscription, 
 		}
 
 		if boolValue(reqHeaders["@throwError_"]) {
-			return telepact.Message{}, fmt.Errorf("telepact: requested server error")
+			return telepact.Message{}, thisError{}
 		}
 
 		return msg, nil
@@ -853,17 +862,50 @@ func startTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscription, 
 
 	options := telepact.NewServerOptions()
 	options.AuthRequired = cfg.AuthRequired
-	options.OnError = func(err error) {
+	options.OnError = func(err *telepact.TelepactError) {
 		if err != nil {
 			d.logger.Printf("server error: %v", err)
 		}
+		if onErrorExpectation == "" {
+			return
+		}
+		onErrorObserved = true
+		if onErrorExpectation == "nested" {
+			var nested thisError
+			if err == nil || !errors.As(err.Unwrap(), &nested) {
+				onErrorFailed = true
+			}
+			return
+		}
+		if err == nil || err.Unwrap() != nil {
+			onErrorFailed = true
+		}
 	}
 	options.OnRequest = func(msg telepact.Message) {
+		switch {
+		case boolValue(msg.Headers["@assertOnErrorNested_"]):
+			onErrorExpectation = "nested"
+		case boolValue(msg.Headers["@assertOnErrorStandalone_"]):
+			onErrorExpectation = "standalone"
+		default:
+			onErrorExpectation = ""
+		}
+		onErrorFailed = false
+		onErrorObserved = false
 		if boolValue(msg.Headers["@onRequestError_"]) {
 			panic(handlerError{})
 		}
 	}
 	options.OnResponse = func(msg telepact.Message) {
+		if onErrorExpectation != "" && (onErrorFailed || !onErrorObserved) {
+			if msg.Headers == nil {
+				msg.Headers = map[string]any{}
+			}
+			msg.Headers["@assertionError"] = true
+		}
+		onErrorExpectation = ""
+		onErrorFailed = false
+		onErrorObserved = false
 		if boolValue(msg.Headers["@onResponseError_"]) {
 			panic(handlerError{})
 		}
@@ -885,7 +927,7 @@ func startTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscription, 
 
 	alternateOptions := telepact.NewServerOptions()
 	alternateOptions.AuthRequired = cfg.AuthRequired
-	alternateOptions.OnError = func(err error) {
+	alternateOptions.OnError = func(err *telepact.TelepactError) {
 		if err != nil {
 			d.logger.Printf("alternate server error: %v", err)
 		}

@@ -31,7 +31,7 @@ import io.github.telepact.internal.validation.InvalidMessageBody;
 
 public class ParseRequestMessage {
     static Message parseRequestMessage(byte[] requestMessageBytes, Serializer serializer, TelepactSchema telepactSchema,
-            Consumer<Throwable> onError) {
+            Consumer<TelepactError> onError) {
 
         try {
             return serializer.deserialize(requestMessageBytes);
