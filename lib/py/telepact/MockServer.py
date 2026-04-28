@@ -19,6 +19,7 @@ from typing import Callable, TYPE_CHECKING
 if TYPE_CHECKING:
     from .Message import Message
     from .MockTelepactSchema import MockTelepactSchema
+    from .TelepactError import TelepactError
     from .internal.mock.MockInvocation import MockInvocation
     from .internal.mock.MockStub import MockStub
 
@@ -34,7 +35,7 @@ class MockServer:
         """
 
         def __init__(self) -> None:
-            self.on_error: Callable[[Exception], None] = lambda e: None
+            self.on_error: Callable[['TelepactError'], None] = lambda e: None
             self.enable_message_response_generation: bool = True
             self.enable_optional_field_generation: bool = True
             self.randomize_optional_field_generation: bool = True

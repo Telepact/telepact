@@ -35,7 +35,7 @@ import json
 from nats.aio.client import Client as NATSClient, Subscription
 import asyncio
 import nats
-from telepact import FunctionRouter, SerializationError, Message, Serializer, Client, Server, TelepactSchema, MockTelepactSchema, MockServer, TelepactSchemaFiles, TelepactSchemaParseError, TestClient
+from telepact import FunctionRouter, SerializationError, Message, Serializer, Client, Server, TelepactSchema, MockTelepactSchema, MockServer, TelepactSchemaFiles, TelepactSchemaParseError, TelepactError, TestClient
 import traceback
 import sys
 from concurrent.futures import ThreadPoolExecutor
@@ -341,6 +341,9 @@ async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, 
     serve_alternate_server = False
 
     code_gen_handler = CodeGenHandler()
+    on_error_expectation: str | None = None
+    on_error_failed = False
+    on_error_observed = False
 
     class ThisError(RuntimeError):
         pass
@@ -391,10 +394,50 @@ async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, 
         return message
 
     options = Server.Options()
+    def server_on_error(error: TelepactError) -> None:
+        nonlocal on_error_failed
+        nonlocal on_error_observed
 
-    options.on_error = on_err
-    options.on_request = on_request_err
-    options.on_response = on_response_err
+        on_err(error)
+        if on_error_expectation is None:
+            return
+
+        on_error_observed = True
+        has_expected_cause = isinstance(error.cause, ThisError) if on_error_expectation == "nested" else error.cause is None
+        if not isinstance(error, TelepactError) or not has_expected_cause:
+            on_error_failed = True
+
+    def server_on_request(message: Message) -> None:
+        nonlocal on_error_expectation
+        nonlocal on_error_failed
+        nonlocal on_error_observed
+
+        on_error_expectation = (
+            "nested"
+            if message.headers.get("@assertOnErrorNested_") is True
+            else "standalone"
+            if message.headers.get("@assertOnErrorStandalone_") is True
+            else None
+        )
+        on_error_failed = False
+        on_error_observed = False
+        on_request_err(message)
+
+    def server_on_response(message: Message) -> None:
+        nonlocal on_error_expectation
+        nonlocal on_error_failed
+        nonlocal on_error_observed
+
+        if on_error_expectation is not None and (on_error_failed or not on_error_observed):
+            message.headers["@assertionError"] = True
+        on_error_expectation = None
+        on_error_failed = False
+        on_error_observed = False
+        on_response_err(message)
+
+    options.on_error = server_on_error
+    options.on_request = server_on_request
+    options.on_response = server_on_response
     options.on_auth = on_auth
     options.middleware = middleware
     options.auth_required = auth_required

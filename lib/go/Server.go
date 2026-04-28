@@ -28,7 +28,7 @@ type Middleware func(Message, *FunctionRouter) (Message, error)
 
 // ServerOptions configures server behaviour.
 type ServerOptions struct {
-	OnError       func(error)
+	OnError       func(*TelepactError)
 	OnRequest     func(Message)
 	OnResponse    func(Message)
 	OnAuth        func(map[string]any) map[string]any
@@ -40,7 +40,7 @@ type ServerOptions struct {
 // NewServerOptions constructs ServerOptions populated with defaults.
 func NewServerOptions() *ServerOptions {
 	return &ServerOptions{
-		OnError:    func(error) {},
+		OnError:    func(*TelepactError) {},
 		OnRequest:  func(Message) {},
 		OnResponse: func(Message) {},
 		OnAuth:     func(map[string]any) map[string]any { return map[string]any{} },
@@ -56,7 +56,7 @@ func NewServerOptions() *ServerOptions {
 type Server struct {
 	functionRouter *FunctionRouter
 	middleware     Middleware
-	onError        func(error)
+	onError        func(*TelepactError)
 	onRequest      func(Message)
 	onResponse     func(Message)
 	onAuth         func(map[string]any) map[string]any
@@ -79,7 +79,7 @@ func NewServer(telepactSchema *TelepactSchema, functionRouter *FunctionRouter, o
 	}
 
 	if options.OnError == nil {
-		options.OnError = func(error) {}
+		options.OnError = func(*TelepactError) {}
 	}
 	if options.OnRequest == nil {
 		options.OnRequest = func(Message) {}
@@ -154,28 +154,7 @@ func (s *Server) ProcessWithHeaders(requestMessageBytes []byte, updateHeaders fu
 	}
 
 	internalOnError := func(err error) {
-		if err == nil {
-			return
-		}
-
-		var telepactErr *TelepactError
-		if errors.As(err, &telepactErr) {
-			s.onError(telepactErr)
-			return
-		}
-
-		var detailedErr interface {
-			error
-			Kind() string
-			CaseID() string
-		}
-		if errors.As(err, &detailedErr) {
-			wrapped := NewTelepactErrorWithCaseID(err.Error(), detailedErr.Kind(), errors.Unwrap(err), detailedErr.CaseID())
-			s.onError(wrapped)
-			return
-		}
-
-		s.onError(err)
+		s.onError(normalizeOnErrorArgument(err))
 	}
 
 	internalFunctionRouter := &serverFunctionRouterAdapter{
@@ -208,6 +187,28 @@ func (s *Server) ProcessWithHeaders(requestMessageBytes []byte, updateHeaders fu
 	}
 
 	return NewResponse(responseBytes, responseMessage.Headers), nil
+}
+
+func normalizeOnErrorArgument(err error) *TelepactError {
+	if err == nil {
+		return nil
+	}
+
+	var telepactErr *TelepactError
+	if errors.As(err, &telepactErr) {
+		return telepactErr
+	}
+
+	var detailedErr interface {
+		error
+		Kind() string
+		CaseID() string
+	}
+	if errors.As(err, &detailedErr) {
+		return NewTelepactErrorWithCaseID(err.Error(), detailedErr.Kind(), errors.Unwrap(err), detailedErr.CaseID())
+	}
+
+	return NewTelepactErrorWithCause(err.Error(), "", err)
 }
 
 // Process processes a request message without any header updates.

@@ -27,6 +27,7 @@ export * from './Serializer.js';
 export * from './internal/binary/ClientBinaryStrategy.js';
 export * from './SerializationError.js';
 export * from './Serialization.js';
+export * from './TelepactError.js';
 export * from './TelepactSchema.js';
 export * from './MockTelepactSchema.js';
 export * from './TelepactSchemaParseError.js';

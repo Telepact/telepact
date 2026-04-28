@@ -45,7 +45,7 @@ public class MockServer {
         /**
          * Handler for errors thrown during message processing.
          */
-        public Consumer<Throwable> onError = (e) -> {
+        public Consumer<TelepactError> onError = (e) -> {
         };
 
         /**

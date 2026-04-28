@@ -36,7 +36,7 @@ import io.github.telepact.Server.Middleware;
 
 public class ProcessBytes {
     public static Response processBytes(byte[] requestMessageBytes, Consumer<Map<String, Object>> updateHeaders, Serializer serializer, TelepactSchema telepactSchema,
-            Consumer<Throwable> onError, Consumer<Message> onRequest, Consumer<Message> onResponse,
+            Consumer<TelepactError> onError, Consumer<Message> onRequest, Consumer<Message> onResponse,
             Function<Map<String, Object>, Map<String, Object>> onAuth,
             Middleware middleware, FunctionRouter functionRouter) {
         try {

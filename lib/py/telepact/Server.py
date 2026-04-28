@@ -25,6 +25,7 @@ from .internal.CreateInternalFunctionRoutes import create_internal_function_rout
 
 if TYPE_CHECKING:
     from .Message import Message
+    from .TelepactError import TelepactError
     from .TelepactSchema import TelepactSchema
     from .Response import Response
 
@@ -45,7 +46,7 @@ class Server:
         """
 
         def __init__(self) -> None:
-            self.on_error = lambda e: None
+            self.on_error: Callable[['TelepactError'], None] = lambda e: None
             self.on_request = lambda m: None
             self.on_response = lambda m: None
             self.on_auth = lambda headers: {}

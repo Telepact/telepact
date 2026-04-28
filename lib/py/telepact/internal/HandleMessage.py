@@ -36,7 +36,7 @@ async def handle_message(
     telepact_schema: 'TelepactSchema',
     middleware: 'Middleware',
     function_router: 'FunctionRouter',
-    on_error: Callable[[Exception], None],
+    on_error: Callable[[TelepactError], None],
     on_auth: Callable[[dict[str, object]], dict[str, object]],
 ) -> 'Message':
     from ..internal.SelectStructFields import select_struct_fields

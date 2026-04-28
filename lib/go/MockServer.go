@@ -24,7 +24,7 @@ import (
 
 // MockServerOptions configures behaviour of the mock server.
 type MockServerOptions struct {
-	OnError                          func(error)
+	OnError                          func(*TelepactError)
 	EnableMessageResponseGeneration  bool
 	EnableOptionalFieldGeneration    bool
 	RandomizeOptionalFieldGeneration bool
@@ -35,7 +35,7 @@ type MockServerOptions struct {
 // NewMockServerOptions constructs MockServerOptions populated with defaults.
 func NewMockServerOptions() *MockServerOptions {
 	return &MockServerOptions{
-		OnError:                          func(error) {},
+		OnError:                          func(*TelepactError) {},
 		EnableMessageResponseGeneration:  true,
 		EnableOptionalFieldGeneration:    true,
 		RandomizeOptionalFieldGeneration: true,
@@ -66,7 +66,7 @@ func NewMockServer(mockSchema *MockTelepactSchema, options *MockServerOptions) (
 	}
 
 	if options.OnError == nil {
-		options.OnError = func(error) {}
+		options.OnError = func(*TelepactError) {}
 	}
 
 	ms := &MockServer{

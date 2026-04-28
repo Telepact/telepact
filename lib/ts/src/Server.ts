@@ -26,6 +26,7 @@ import { ServerBase64Encoder } from './internal/binary/ServerBase64Encoder.js';
 import { Response } from './Response.js';
 import { FunctionRouter, FunctionRoutes } from './FunctionRouter.js';
 import { createInternalFunctionRoutes } from './internal/CreateInternalFunctionRoutes.js';
+import { TelepactError } from './TelepactError.js';
 
 export type Middleware = (requestMessage: Message, functionRouter: FunctionRouter) => Promise<Message>;
 export type UpdateHeaders = (headers: Record<string, any>) => void;
@@ -35,7 +36,7 @@ export type { FunctionRoute, FunctionRoutes } from './FunctionRouter.js';
 export class Server {
     functionRouter: FunctionRouter;
     middleware: Middleware;
-    onError: (error: any) => void;
+    onError: (error: TelepactError) => void;
     onRequest: (message: Message) => void;
     onResponse: (message: Message) => void;
     onAuth: (headers: Record<string, any>) => Record<string, any>;
@@ -89,7 +90,7 @@ export class Server {
 }
 
 export class ServerOptions {
-    onError: (error: any) => void;
+    onError: (error: TelepactError) => void;
     onRequest: (message: Message) => void;
     onResponse: (message: Message) => void;
     onAuth: (headers: Record<string, any>) => Record<string, any>;
@@ -98,7 +99,7 @@ export class ServerOptions {
     serialization: Serialization;
 
     constructor() {
-        this.onError = (e: any) => {};
+        this.onError = (_error: TelepactError) => {};
         this.onRequest = (m: Message) => {};
         this.onResponse = (m: Message) => {};
         this.onAuth = (headers: Record<string, any>) => ({});
