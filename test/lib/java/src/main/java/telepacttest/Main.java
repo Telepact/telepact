@@ -562,7 +562,7 @@ public class Main {
             if (onErrorExpectation.get() != null) {
                 onErrorObserved.set(true);
                 var hasExpectedCause = Objects.equals("nested", onErrorExpectation.get())
-                        ? e.getCause() instanceof ThisError
+                        ? hasCause(e, ThisError.class)
                         : e.getCause() == null;
                 if (!hasExpectedCause) {
                     onErrorFailed.set(true);
@@ -644,6 +644,17 @@ public class Main {
         System.out.println("Test server listening on " + frontdoorTopic);
 
         return dispatcher;
+    }
+
+    private static boolean hasCause(Throwable error, Class<? extends Throwable> causeType) {
+        var current = error;
+        while (current != null) {
+            if (causeType.isInstance(current)) {
+                return true;
+            }
+            current = current.getCause();
+        }
+        return false;
     }
 
     private static void runDispatcherServer() throws InterruptedException, IOException {
