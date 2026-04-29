@@ -1,10 +1,9 @@
 {
   "changed_paths": [
-    "doc/02-design-apis/01-schema-guide.md",
-    "doc/04-operate/02-runtime-errors.md"
+    "README.md"
   ],
   "direct_targets": [],
-  "pr_number": 487,
+  "pr_number": 494,
   "targets": [],
   "version": "1.0.0-alpha.326"
 }
