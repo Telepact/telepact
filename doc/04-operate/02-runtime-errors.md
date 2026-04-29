@@ -34,15 +34,9 @@ client-side error report back to the corresponding server-side log entry.
 For example, a Python server can log the correlation ID in `on_error`:
 
 ```py
-def on_error(error: Exception) -> None:
-    if isinstance(error, TelepactError):
-        log.exception('telepact error case_id=%s', error.case_id, exc_info=error)
-    else:
-        log.exception('telepact error', exc_info=error)
+def on_error(error: TelepactError) -> None:
+    log.exception('telepact error case_id=%s', error.case_id, exc_info=error)
 ```
-
-The callback itself accepts a generic `Exception`. Telepact server-processing
-failures are wrapped as `TelepactError`, so guard before reading `case_id`.
 
 For a fuller walkthrough, see
 [Learn by example: Logging](../01-learn-by-example/08-running-our-own-server/23-logging.md).
