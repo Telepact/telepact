@@ -315,6 +315,11 @@ Standard definitions include utility functions, like `fn.ping_`, and common
 errors, like `ErrorInvalidRequest` and `ErrorUnknown_`. These are always
 included and cannot be turned off.
 
+`ErrorUnknown_` stays intentionally generic on the wire, but it includes a
+`caseId`. Server implementations should log that `caseId` alongside the real
+error so operators can match a client-reported `caseId` back to the
+corresponding server-side stack trace or log entry.
+
 The `fn.api_` helper returns the user-facing schema by default. Pass
 `{"includeInternal!": true}` to include these standard Telepact definitions in
 the response. Pass `{"includeExamples!": true}` to attach deterministic example

@@ -27,6 +27,20 @@ For server code:
   `ErrorInvalidResponseBody_` or `ErrorInvalidResponseHeaders_`
 - unexpected handler or serialization failures still return `ErrorUnknown_`
 
+When that happens, treat the `caseId` in `ErrorUnknown_` as a correlation ID:
+log it on the server next to the real exception details, then use it to match a
+client-side error report back to the corresponding server-side log entry.
+
+For example, a Python server can log the correlation ID in `on_error`:
+
+```py
+def on_error(error: TelepactError) -> None:
+    log.exception('telepact error case_id=%s', error.case_id, exc_info=error)
+```
+
+For a fuller walkthrough, see
+[Learn by example: Logging](../01-learn-by-example/08-running-our-own-server/23-logging.md).
+
 The main change is the local callback surface:
 
 - `options.onError` receives contextual errors instead of raw implementation
@@ -58,8 +72,9 @@ For client code:
 ## Debugging Rule Of Thumb
 
 1. If the wire response is `ErrorInvalid*`, fix the schema mismatch first.
-2. If the wire response is `ErrorUnknown_`, check the local Telepact error:
-   it should usually tell you whether the root cause was middleware / function-route code or
-   serialization.
+2. If the wire response is `ErrorUnknown_`, capture the client-visible `caseId`
+   and match it against the same `caseId` in server logs; the local Telepact
+   error should usually tell you whether the root cause was middleware /
+   function-route code or serialization.
 3. If the client raised before any response arrived, check whether the local
    error is `transport` or `serialization`.
