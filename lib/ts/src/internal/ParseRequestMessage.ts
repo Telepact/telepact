@@ -27,7 +27,7 @@ export function parseRequestMessage(
     requestMessageBytes: Uint8Array,
     serializer: Serializer,
     telepactSchema: TelepactSchema,
-    onError: (error: Error) => void,
+    onError: (error: TelepactError) => void,
 ): Message {
     try {
         return serializer.deserialize(requestMessageBytes);

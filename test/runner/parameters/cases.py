@@ -364,6 +364,8 @@ cases = {
         [[{'@ok_': {}, '@onRequestError_': True}, {'fn.test': {}}], [{}, {'Ok_': {}}]],
         [[{'@ok_': {}, '@onResponseError_': True}, {'fn.test': {}}], [{'@onResponseError_': True}, {'Ok_': {}}]],
         [[{'@ok_': {}, '@throwError_': True}, {'fn.test': {}}], [{'@assert_': {'assertCaseId': True}}, {'ErrorUnknown_': {'caseId': '<caseId>'}}]],
+        [[{'@ok_': {}, '@throwError_': True, '@assertOnErrorNested_': True}, {'fn.test': {}}], [{'@assert_': {'assertCaseId': True}}, {'ErrorUnknown_': {'caseId': '<caseId>'}}]],
+        [[{'@ok_': {}, '@responseHeader': {'@out': 0}, '@assertOnErrorStandalone_': True}, {'fn.test': {}}], [{'@assert_': {'skipBinaryCheck': True, 'skipFieldIdCheck': True}}, {'ErrorInvalidResponseHeaders_': {'cases': [{'path': ['@out'], 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]],
     ],
     'clientHeaders': [
         [[{'@time_': 6000}, {'fn.ping_': {}}], [{}, {'Ok_': {}}]],

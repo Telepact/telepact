@@ -20,41 +20,70 @@ import { AddressInfo } from 'node:net';
 import { createHttpServer } from './server.js';
 import { postJson, runServer, stopServer } from './test_support.js';
 
-const INDEX_MESSAGE_BODY = 1;
-
 test('select example runs end to end', async () => {
     const server = createHttpServer();
     await runServer(server);
     try {
         const address = server.address() as AddressInfo;
         const url = `http://127.0.0.1:${address.port}/api/telepact`;
-        const payload = await postJson(url, [
+        const fullPayload = await postJson(url, [
+            {},
+            {
+                'fn.trackPackage': {},
+            },
+        ]);
+        const selectedPayload = await postJson(url, [
             {
                 '@select_': {
-                    'struct.User': ['id'],
+                    '->': {
+                        'Ok_': ['package', 'latestEvent'],
+                    },
+                    'struct.Package': ['trackingId'],
+                    'union.DeliveryEvent': {
+                        'Dropoff': ['location'],
+                    },
                 },
             },
             {
-                'fn.listUsers': {},
+                'fn.trackPackage': {},
             },
         ]);
 
-        assert.deepEqual(payload, [
+        assert.deepEqual(fullPayload, [
             {},
             {
                 'Ok_': {
-                    'users': [
-                        { 'id': 'user-1' },
-                        { 'id': 'user-2' },
-                    ],
+                    'package': {
+                        'trackingId': 'PKG-42',
+                        'recipient': 'Ada Lovelace',
+                        'city': 'London',
+                    },
+                    'latestEvent': {
+                        'Dropoff': {
+                            'location': 'Front desk',
+                            'signedBy': 'M. Singh',
+                        },
+                    },
+                    'note': 'Left with building reception.',
                 },
             },
         ]);
-        const responseBody = payload[INDEX_MESSAGE_BODY] as Record<string, any>;
-        assert.deepEqual(responseBody['Ok_']['users'], [
-            { 'id': 'user-1' },
-            { 'id': 'user-2' },
+        assert.deepEqual(selectedPayload, [
+            {},
+            {
+                'Ok_': {
+                    'package': {
+                        'trackingId': 'PKG-42',
+                    },
+                    'latestEvent': {
+                        'Dropoff': {
+                            'location': 'Front desk',
+                        },
+                    },
+                },
+            },
         ]);
+        assert.notDeepEqual(selectedPayload, fullPayload);
     } finally {
         await stopServer(server);
     }

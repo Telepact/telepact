@@ -46,7 +46,7 @@ import io.github.telepact.internal.validation.ValidationFailure;
     public class HandleMessage {
     static Message handleMessage(Message requestMessage, Consumer<Map<String, Object>> updateHeaders, TelepactSchema telepactSchema, Middleware middleware,
             FunctionRouter functionRouter,
-            Consumer<Throwable> onError, Function<Map<String, Object>, Map<String, Object>> onAuth) {
+            Consumer<TelepactError> onError, Function<Map<String, Object>, Map<String, Object>> onAuth) {
         final var responseHeaders = (Map<String, Object>) new HashMap<String, Object>();
         final Map<String, Object> requestHeaders = requestMessage.headers;
         final Map<String, Object> requestBody = requestMessage.body;

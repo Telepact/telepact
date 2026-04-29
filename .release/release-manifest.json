@@ -1,38 +1,36 @@
 {
   "changed_paths": [
-    "bind/dart/lib/interfaces.dart",
-    "bind/dart/lib/src/bindings.dart",
-    "lib/go/FunctionRouter.go",
-    "lib/go/InternalFunctionRoutes.go",
     "lib/go/MockServer.go",
     "lib/go/Server.go",
-    "lib/go/internal/HandleMessage.go",
-    "lib/go/internal/mock/MockHandle.go",
-    "lib/java/src/main/java/io/github/telepact/FunctionRouter.java",
     "lib/java/src/main/java/io/github/telepact/MockServer.java",
     "lib/java/src/main/java/io/github/telepact/Server.java",
-    "lib/java/src/main/java/io/github/telepact/internal/CreateInternalFunctionRoutes.java",
     "lib/java/src/main/java/io/github/telepact/internal/HandleMessage.java",
-    "lib/java/src/main/java/io/github/telepact/internal/mock/MockHandle.java",
+    "lib/java/src/main/java/io/github/telepact/internal/ParseRequestMessage.java",
+    "lib/java/src/main/java/io/github/telepact/internal/ProcessBytes.java",
     "lib/py/telepact/MockServer.py",
     "lib/py/telepact/Server.py",
-    "lib/py/telepact/internal/CreateInternalFunctionRoutes.py",
     "lib/py/telepact/internal/HandleMessage.py",
-    "lib/py/telepact/internal/mock/MockHandle.py",
+    "lib/py/telepact/internal/ParseRequestMessage.py",
+    "lib/py/telepact/internal/ProcessBytes.py",
     "lib/ts/src/MockServer.ts",
     "lib/ts/src/Server.ts",
-    "lib/ts/src/internal/CreateInternalFunctionRoutes.ts",
+    "lib/ts/src/index.ts",
     "lib/ts/src/internal/HandleMessage.ts",
-    "lib/ts/src/internal/mock/MockHandle.ts"
+    "lib/ts/src/internal/ParseRequestMessage.ts",
+    "lib/ts/src/internal/ProcessBytes.ts",
+    "test/lib/go/cmd/dispatcher/main.go",
+    "test/lib/java/src/main/java/telepacttest/Main.java",
+    "test/lib/py/telepact_test/test_server.py",
+    "test/lib/ts/src/main.ts",
+    "test/runner/parameters/cases.py"
   ],
   "direct_targets": [
-    "dart",
     "go",
     "java",
     "py",
     "ts"
   ],
-  "pr_number": 483,
+  "pr_number": 493,
   "targets": [
     "cli",
     "console",
@@ -42,5 +40,5 @@
     "py",
     "ts"
   ],
-  "version": "1.0.0-alpha.325"
+  "version": "1.0.0-alpha.326"
 }

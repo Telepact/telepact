@@ -1,30 +1,23 @@
 # Introduction
 
-Telepact is a thin but powerful RPC framework built on JSON, enabling accessible
-API designs wherever JSON can be sent and received.
+Telepact is a thin but powerful RPC framework built on JSON.
 
-What makes Telepact different? It takes the differentiating features of the
-industry's most popular API technologies, and combines them together through 3
-key innovations:
+- ✨ **Plain JSON is the default** - Clients never need to worry about
+  Telepact libraries or generated code. Tool optionality is real, not theoretical.
+- 🎯 **JSON as a Query Language** - No need to invent a second query language.
+  Telepact has simple built-in options to trim responses according to client needs.
+- ⚡ **Binary without the toolchain tax** - Have you ever seen a binary protocol
+  that didn't require code generation? Now you have, with Telepact.
+    - (Made possible with MessagePack ❤️)
+- 🔗 **Hypermedia without HTTP** - API calls can return functions with pre-filled arguments.
+  Who said links had to be urls?
+- ⚖️ **An API schema you can trust** - No more out-of-band documentation. No more API
+  schemas hidden from clients. Telepact puts the API schema front and center, powering
+  doc introspection, integration simulations, and code generation.
+  
+Modern innovations, without the tradeoffs 🚀
 
-1. **JSON as a Query Language** - API calls and `SELECT`-style queries are all
-   achieved with JSON abstractions, giving first-class status to clients
-   wielding only a JSON library
-2. **Binary without code generation** - Binary protocols are established through
-   runtime handshakes, rather than build-time code generation, offering binary
-   efficiency to clients that want to avoid code generation toolchains
-3. **Hypermedia without HTTP** - API calls can return functions with pre-filled
-   arguments, approximating a link that can be followed, all achieved with pure
-   JSON abstractions
-
-These innovations allow Telepact to design for the minimalist consumer while
-giving clients the option to enrich the consumer experience by:
-- Selecting less fields to reduce response sizes
-- Using schema-backed mocks to validate integrations before switching to live servers
-- Generating code when stronger static ergonomics are worth the extra tooling
-- Using binary serialization to reduce request/response sizes
-
-# It's just JSON
+# It's just JSON at the core
 No query params. No binary field ids. No required client libraries.
 
 It's just JSON in, and JSON out.

@@ -37,7 +37,7 @@ export async function handleMessage(
     telepactSchema: TelepactSchema,
     middleware: (requestMessage: Message, functionRouter: { route: (message: Message) => Promise<Message> }) => Promise<Message>,
     functionRouter: { route: (message: Message) => Promise<Message> },
-    onError: (error: Error) => void,
+    onError: (error: TelepactError) => void,
     onAuth: (headers: Record<string, any>) => Record<string, any>,
 ): Promise<Message> {
     const responseHeaders: Record<string, any> = {};
