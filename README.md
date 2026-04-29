@@ -7,8 +7,9 @@ Telepact is a thin but powerful RPC framework built on JSON.
 - 🎯 **JSON as a Query Language** - No need to invent a second query language.
   Telepact has simple built-in options to trim responses according to client needs.
 - ⚡ **Binary without the toolchain tax** - Have you ever seen an efficient binary protocol
-  that didn't require code generation? With Telepact, binary encodings are negotiated opaquely
-  at runtime, so any client that wants binary can have it from any Teleapct sever.
+  that didn't require code generation? With Telepact, binary encodings are negotiated
+  opaquely at runtime, so any client that wants binary can have it from any Telepact server
+  with a simple flag.
     - (Made possible with [MessagePack](https://msgpack.org/index.html) ❤️)
 - 🔗 **Hypermedia without HTTP** - API calls can return functions with pre-filled arguments.
   Who said links had to be urls?
