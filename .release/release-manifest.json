@@ -1,9 +1,14 @@
 {
   "changed_paths": [
-    "README.md"
+    "sdk/cli/pyproject.toml",
+    "sdk/cli/uv.lock"
   ],
-  "direct_targets": [],
-  "pr_number": 494,
-  "targets": [],
-  "version": "1.0.0-alpha.326"
+  "direct_targets": [
+    "cli"
+  ],
+  "pr_number": 491,
+  "targets": [
+    "cli"
+  ],
+  "version": "1.0.0-alpha.327"
 }
