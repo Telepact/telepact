@@ -20,7 +20,7 @@ import argparse
 import asyncio
 import json
 import logging
-import mimetypes
+import re
 import threading
 from collections import deque
 from contextvars import ContextVar
@@ -28,8 +28,9 @@ from copy import deepcopy
 from dataclasses import dataclass
 from http.cookies import SimpleCookie
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from time import perf_counter
+from urllib.parse import unquote, urlsplit
 from uuid import uuid4
 
 from telepact import FunctionRouter, Message, Server, TelepactError, TelepactSchema, TelepactSchemaFiles
@@ -54,6 +55,15 @@ VALID_SESSIONS = {
     'demo-user-session': SessionIdentity('user-123', 'reader', 'Demo Reader'),
     'demo-admin-session': SessionIdentity('admin-007', 'admin', 'Demo Admin'),
 }
+STATIC_CONTENT_TYPES = {
+    '.css': 'text/css; charset=utf-8',
+    '.html': 'text/html; charset=utf-8',
+    '.ico': 'image/x-icon',
+    '.js': 'application/javascript; charset=utf-8',
+    '.json': 'application/json; charset=utf-8',
+    '.svg': 'image/svg+xml',
+}
+REQUEST_ID_PATTERN = re.compile(r'^[A-Za-z0-9._-]{1,128}$')
 
 _METRICS_LOCK = threading.Lock()
 _METRICS: dict[str, object] = {
@@ -301,17 +311,25 @@ def _write_json(handler: BaseHTTPRequestHandler, payload: dict[str, object], sta
     handler.wfile.write(encoded)
 
 
+def _sanitize_request_id(value: str | None) -> str:
+    if value is None:
+        return str(uuid4())
+    return value if REQUEST_ID_PATTERN.fullmatch(value) else str(uuid4())
+
+
 def _safe_static_path(url_path: str) -> Path | None:
     client_root = CLIENT_DIST_DIR.resolve()
-    requested = 'index.html' if url_path in ('', '/') else url_path.lstrip('/')
-    candidate = (client_root / requested).resolve()
-    if candidate.is_dir():
-        candidate = candidate / 'index.html'
-    if candidate.exists() and (candidate == client_root or client_root in candidate.parents):
+    requested_path = unquote(urlsplit(url_path).path)
+    requested = PurePosixPath('index.html' if requested_path in ('', '/') else requested_path.lstrip('/'))
+    if requested.is_absolute() or '..' in requested.parts:
+        return None
+
+    candidate = (client_root / Path(*requested.parts)).resolve()
+    if candidate.exists() and candidate.is_file() and client_root in candidate.parents:
         return candidate
 
     fallback = (client_root / 'index.html').resolve()
-    if fallback.exists() and (fallback == client_root or client_root in fallback.parents):
+    if requested.suffix == '' and fallback.exists() and client_root in fallback.parents:
         return fallback
     return None
 
@@ -324,7 +342,7 @@ def _serve_static(handler: BaseHTTPRequestHandler, url_path: str) -> None:
         return
 
     data = file_path.read_bytes()
-    content_type, _ = mimetypes.guess_type(file_path.name)
+    content_type = STATIC_CONTENT_TYPES.get(file_path.suffix, 'application/octet-stream')
     handler.send_response(200)
     handler.send_header('Content-Type', content_type or 'application/octet-stream')
     handler.send_header('Content-Length', str(len(data)))
@@ -395,7 +413,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             return
 
         request_bytes = self.rfile.read(content_length)
-        request_id = self.headers.get('X-Request-ID') or str(uuid4())
+        request_id = _sanitize_request_id(self.headers.get('X-Request-ID'))
         session_token = read_session_cookie(self.headers.get('Cookie'))
         context_token = _REQUEST_CONTEXT.set({'requestId': request_id, 'transport': 'http'})
         try:

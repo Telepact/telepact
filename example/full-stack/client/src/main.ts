@@ -132,6 +132,8 @@ async function requestTelepact(body: JsonObject): Promise<void> {
     let echoedRequestId = 'missing';
     const client = new Client(async (message: Message, serializer: Serializer): Promise<Message> => {
       const requestBytes = serializer.serialize(message);
+      const requestBody = new Uint8Array(requestBytes.byteLength);
+      requestBody.set(requestBytes);
       const response = await fetch('/api/telepact', {
         method: 'POST',
         credentials: 'include',
@@ -139,7 +141,7 @@ async function requestTelepact(body: JsonObject): Promise<void> {
           'Content-Type': 'application/json',
           'X-Request-ID': requestId,
         },
-        body: requestBytes,
+        body: requestBody.buffer,
       });
       echoedRequestId = response.headers.get('X-Request-ID') ?? 'missing';
       const responseBytes = new Uint8Array(await response.arrayBuffer());
