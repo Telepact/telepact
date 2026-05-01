@@ -1,0 +1,236 @@
+//|
+//|  Copyright The Telepact Authors
+//|
+//|  Licensed under the Apache License, Version 2.0 (the "License");
+//|  you may not use this file except in compliance with the License.
+//|  You may obtain a copy of the License at
+//|
+//|  https://www.apache.org/licenses/LICENSE-2.0
+//|
+//|  Unless required by applicable law or agreed to in writing, software
+//|  distributed under the License is distributed on an "AS IS" BASIS,
+//|  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//|  See the License for the specific language governing permissions and
+//|  limitations under the License.
+//|
+
+import './style.css';
+import { Client, ClientOptions, Message, type Serializer } from 'telepact';
+
+type JsonObject = Record<string, unknown>;
+
+type SnapshotResponse = {
+  metrics: JsonObject;
+  recentEvents: Array<JsonObject>;
+};
+
+const app = document.querySelector<HTMLDivElement>('#app');
+if (app === null) {
+  throw new Error('missing #app root');
+}
+
+app.innerHTML = `
+  <section class="hero">
+    <span class="pill">Python backend + TypeScript browser frontend</span>
+    <h1>Telepact full-stack production-boundary demo</h1>
+    <p>
+      This browser app talks to a Python Telepact server over HTTP. The server extracts
+      a session cookie into <code>@auth_</code>, normalizes identity with
+      <code>on_auth</code>, emits Telepact-aware metrics and logs, attaches request IDs,
+      keeps auth decisions near the handlers, and surfaces unexpected failures as
+      <code>ErrorUnknown_</code> with a <code>caseId</code>.
+    </p>
+  </section>
+  <section class="grid">
+    <div class="stack">
+      <div class="card">
+        <h2>Session controls</h2>
+        <div class="actions">
+          <button id="sign-in-user">Sign in as reader</button>
+          <button id="sign-in-admin">Sign in as admin</button>
+          <button id="logout" class="secondary">Sign out</button>
+        </div>
+        <div class="status-line">
+          <span class="pill" id="session-pill">session: anonymous</span>
+          <span class="pill" id="health-pill">server: loading</span>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Telepact functions</h2>
+        <div class="actions">
+          <button id="call-me">Who am I?</button>
+          <button id="call-admin">Load admin report</button>
+          <button id="call-failure" class="secondary">Trigger server bug</button>
+        </div>
+        <div class="status-line">
+          <span class="pill" id="request-pill">request id: pending</span>
+          <span class="pill" id="outcome-pill">outcome: none</span>
+        </div>
+      </div>
+      <div class="card">
+        <h2>What this example demonstrates</h2>
+        <ul class="note-list">
+          <li>transport-specific cookie extraction stays at the HTTP edge</li>
+          <li><code>on_auth</code> normalizes identity into internal Telepact headers</li>
+          <li>request IDs, per-function metrics, and structured events come from Telepact hooks</li>
+          <li><code>ErrorUnauthorized_</code> stays close to the admin-only business rule</li>
+          <li><code>ErrorUnknown_</code> still keeps the wire response generic while exposing a <code>caseId</code></li>
+          <li>schema compatibility is tracked with the checked-in <code>schema-baseline/</code> snapshot</li>
+        </ul>
+      </div>
+    </div>
+    <div class="stack">
+      <div class="card">
+        <h2>Latest Telepact response</h2>
+        <div class="output"><pre id="response-output">Waiting for a browser action…</pre></div>
+      </div>
+      <div class="card">
+        <div class="actions" style="justify-content: space-between; align-items: center;">
+          <h2 style="margin-bottom: 0;">Operational snapshot</h2>
+          <button id="refresh-ops" class="secondary">Refresh ops snapshot</button>
+        </div>
+        <div class="output"><pre id="ops-output">Loading…</pre></div>
+      </div>
+    </div>
+  </section>
+`;
+
+const sessionPill = must<HTMLSpanElement>('#session-pill');
+const healthPill = must<HTMLSpanElement>('#health-pill');
+const requestPill = must<HTMLSpanElement>('#request-pill');
+const outcomePill = must<HTMLSpanElement>('#outcome-pill');
+const responseOutput = must<HTMLPreElement>('#response-output');
+const opsOutput = must<HTMLPreElement>('#ops-output');
+const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>('button'));
+
+let currentSession = 'anonymous';
+
+function must<T extends Element>(selector: string): T {
+  const element = document.querySelector<T>(selector);
+  if (element === null) {
+    throw new Error(`missing element: ${selector}`);
+  }
+  return element;
+}
+
+function pretty(value: unknown): string {
+  return JSON.stringify(value, null, 2);
+}
+
+function setBusy(isBusy: boolean): void {
+  for (const button of buttons) {
+    button.disabled = isBusy;
+  }
+}
+
+async function requestTelepact(body: JsonObject): Promise<void> {
+  setBusy(true);
+  const requestId = crypto.randomUUID();
+  requestPill.textContent = `request id: ${requestId}`;
+
+  try {
+    let echoedRequestId = 'missing';
+    const client = new Client(async (message: Message, serializer: Serializer): Promise<Message> => {
+      const requestBytes = serializer.serialize(message);
+      const response = await fetch('/api/telepact', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Request-ID': requestId,
+        },
+        body: requestBytes,
+      });
+      echoedRequestId = response.headers.get('X-Request-ID') ?? 'missing';
+      const responseBytes = new Uint8Array(await response.arrayBuffer());
+      return serializer.deserialize(responseBytes);
+    }, new ClientOptions());
+
+    const response = await client.request(new Message({}, body));
+    const outcome = response.getBodyTarget();
+    outcomePill.textContent = `outcome: ${outcome}`;
+    responseOutput.textContent = pretty({
+      requestId,
+      echoedRequestId,
+      session: currentSession,
+      body: response.body,
+    });
+  } catch (error: unknown) {
+    outcomePill.textContent = 'outcome: transport failure';
+    responseOutput.textContent = pretty({
+      requestId,
+      error: String(error),
+    });
+  } finally {
+    await refreshOpsSnapshot();
+    setBusy(false);
+  }
+}
+
+async function setSession(path: '/session/user' | '/session/admin' | '/session/logout', label: string): Promise<void> {
+  setBusy(true);
+  try {
+    const response = await fetch(path, {
+      method: 'POST',
+      credentials: 'include',
+    });
+    const payload = await response.json();
+    currentSession = label;
+    sessionPill.textContent = `session: ${label}`;
+    responseOutput.textContent = pretty(payload);
+    outcomePill.textContent = 'outcome: session updated';
+    await refreshOpsSnapshot();
+  } finally {
+    setBusy(false);
+  }
+}
+
+async function refreshOpsSnapshot(): Promise<void> {
+  const response = await fetch('/ops/snapshot', { cache: 'no-store' });
+  const snapshot = (await response.json()) as SnapshotResponse;
+  opsOutput.textContent = pretty(snapshot);
+}
+
+async function refreshHealth(): Promise<void> {
+  const response = await fetch('/healthz', { cache: 'no-store' });
+  const payload = (await response.json()) as { ok?: boolean };
+  healthPill.textContent = payload.ok ? 'server: healthy' : 'server: unavailable';
+}
+
+must<HTMLButtonElement>('#sign-in-user').addEventListener('click', async () => {
+  await setSession('/session/user', 'reader');
+});
+
+must<HTMLButtonElement>('#sign-in-admin').addEventListener('click', async () => {
+  await setSession('/session/admin', 'admin');
+});
+
+must<HTMLButtonElement>('#logout').addEventListener('click', async () => {
+  await setSession('/session/logout', 'anonymous');
+});
+
+must<HTMLButtonElement>('#call-me').addEventListener('click', async () => {
+  await requestTelepact({ 'fn.me': {} });
+});
+
+must<HTMLButtonElement>('#call-admin').addEventListener('click', async () => {
+  await requestTelepact({ 'fn.adminReport': {} });
+});
+
+must<HTMLButtonElement>('#call-failure').addEventListener('click', async () => {
+  await requestTelepact({ 'fn.triggerFailure': {} });
+});
+
+must<HTMLButtonElement>('#refresh-ops').addEventListener('click', async () => {
+  setBusy(true);
+  try {
+    await refreshOpsSnapshot();
+  } finally {
+    setBusy(false);
+  }
+});
+
+void (async () => {
+  await refreshHealth();
+  await refreshOpsSnapshot();
+})();

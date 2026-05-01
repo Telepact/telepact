@@ -1,0 +1,146 @@
+/*|
+ *|  Copyright The Telepact Authors
+ *|
+ *|  Licensed under the Apache License, Version 2.0 (the "License");
+ *|  you may not use this file except in compliance with the License.
+ *|  You may obtain a copy of the License at
+ *|
+ *|  https://www.apache.org/licenses/LICENSE-2.0
+ *|
+ *|  Unless required by applicable law or agreed to in writing, software
+ *|  distributed under the License is distributed on an "AS IS" BASIS,
+ *|  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *|  See the License for the specific language governing permissions and
+ *|  limitations under the License.
+ *|
+ */
+
+:root {
+  color-scheme: light;
+  font-family: Inter, system-ui, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  background: #f5f7fb;
+  color: #172033;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+button {
+  cursor: pointer;
+  border: 1px solid #2247d5;
+  background: #2247d5;
+  color: white;
+  border-radius: 0.6rem;
+  padding: 0.7rem 1rem;
+  font: inherit;
+}
+
+button.secondary {
+  background: white;
+  color: #2247d5;
+}
+
+button:disabled {
+  opacity: 0.65;
+  cursor: progress;
+}
+
+code,
+pre {
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+}
+
+pre {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+#app {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem 3rem;
+}
+
+.hero {
+  display: grid;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.hero p {
+  margin: 0;
+  max-width: 62rem;
+}
+
+.grid {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 960px) {
+  .grid {
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  }
+}
+
+.card {
+  background: white;
+  border-radius: 1rem;
+  padding: 1rem;
+  border: 1px solid #dbe2f0;
+  box-shadow: 0 18px 45px rgba(23, 32, 51, 0.06);
+}
+
+.card h2,
+.card h3 {
+  margin-top: 0;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.status-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+
+.pill {
+  display: inline-flex;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  background: #eef3ff;
+  color: #2247d5;
+  font-weight: 600;
+}
+
+.stack {
+  display: grid;
+  gap: 1rem;
+}
+
+.note-list {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+.output {
+  min-height: 14rem;
+  border-radius: 0.8rem;
+  padding: 1rem;
+  background: #0f1728;
+  color: #d9e2ff;
+  overflow: auto;
+}
