@@ -20,7 +20,6 @@ import argparse
 import asyncio
 import json
 import logging
-import re
 import threading
 from collections import deque
 from contextvars import ContextVar
@@ -63,7 +62,6 @@ STATIC_CONTENT_TYPES = {
     '.json': 'application/json; charset=utf-8',
     '.svg': 'image/svg+xml',
 }
-REQUEST_ID_PATTERN = re.compile(r'^[A-Za-z0-9._-]{1,128}$')
 
 _METRICS_LOCK = threading.Lock()
 _METRICS: dict[str, object] = {
@@ -311,12 +309,6 @@ def _write_json(handler: BaseHTTPRequestHandler, payload: dict[str, object], sta
     handler.wfile.write(encoded)
 
 
-def _sanitize_request_id(value: str | None) -> str:
-    if value is None:
-        return str(uuid4())
-    return value if REQUEST_ID_PATTERN.fullmatch(value) else str(uuid4())
-
-
 def _safe_static_path(url_path: str) -> Path | None:
     client_root = CLIENT_DIST_DIR.resolve()
     requested_path = unquote(urlsplit(url_path).path)
@@ -413,7 +405,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             return
 
         request_bytes = self.rfile.read(content_length)
-        request_id = _sanitize_request_id(self.headers.get('X-Request-ID'))
+        request_id = str(uuid4())
         session_token = read_session_cookie(self.headers.get('Cookie'))
         context_token = _REQUEST_CONTEXT.set({'requestId': request_id, 'transport': 'http'})
         try:

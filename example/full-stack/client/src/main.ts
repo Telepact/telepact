@@ -125,8 +125,7 @@ function setBusy(isBusy: boolean): void {
 
 async function requestTelepact(body: JsonObject): Promise<void> {
   setBusy(true);
-  const requestId = crypto.randomUUID();
-  requestPill.textContent = `request id: ${requestId}`;
+  requestPill.textContent = 'request id: waiting for server';
 
   try {
     let echoedRequestId = 'missing';
@@ -139,7 +138,6 @@ async function requestTelepact(body: JsonObject): Promise<void> {
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          'X-Request-ID': requestId,
         },
         body: requestBody.buffer,
       });
@@ -150,17 +148,16 @@ async function requestTelepact(body: JsonObject): Promise<void> {
 
     const response = await client.request(new Message({}, body));
     const outcome = response.getBodyTarget();
+    requestPill.textContent = `request id: ${echoedRequestId}`;
     outcomePill.textContent = `outcome: ${outcome}`;
     responseOutput.textContent = pretty({
-      requestId,
-      echoedRequestId,
+      requestId: echoedRequestId,
       session: currentSession,
       body: response.body,
     });
   } catch (error: unknown) {
     outcomePill.textContent = 'outcome: transport failure';
     responseOutput.textContent = pretty({
-      requestId,
       error: String(error),
     });
   } finally {
