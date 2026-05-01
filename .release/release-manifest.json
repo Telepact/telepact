@@ -1,14 +1,14 @@
 {
   "changed_paths": [
-    "sdk/cli/pyproject.toml",
-    "sdk/cli/uv.lock"
+    "bind/dart/package-lock.json",
+    "bind/dart/package.json"
   ],
   "direct_targets": [
-    "cli"
+    "dart"
   ],
-  "pr_number": 491,
+  "pr_number": 495,
   "targets": [
-    "cli"
+    "dart"
   ],
-  "version": "1.0.0-alpha.327"
+  "version": "1.0.0-alpha.328"
 }
