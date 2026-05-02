@@ -1,9 +1,14 @@
 {
   "changed_paths": [
-    "README.md"
+    "bind/dart/package-lock.json",
+    "bind/dart/package.json"
   ],
-  "direct_targets": [],
-  "pr_number": 494,
-  "targets": [],
-  "version": "1.0.0-alpha.326"
+  "direct_targets": [
+    "dart"
+  ],
+  "pr_number": 495,
+  "targets": [
+    "dart"
+  ],
+  "version": "1.0.0-alpha.328"
 }
