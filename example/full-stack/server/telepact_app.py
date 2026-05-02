@@ -46,7 +46,7 @@ class SessionIdentity:
 
 @dataclass(frozen=True)
 class TelepactHttpResponse:
-    bytes: bytes
+    response_bytes: bytes
     content_type: str
 
 
@@ -299,7 +299,7 @@ def process_telepact_request(request_bytes: bytes, request_id: str, session_toke
         asyncio.set_event_loop(loop)
         response = loop.run_until_complete(telepact_server.process(request_bytes, update_headers))
         content_type = 'application/octet-stream' if '@bin_' in response.headers else 'application/json'
-        return TelepactHttpResponse(bytes=response.bytes, content_type=content_type)
+        return TelepactHttpResponse(response_bytes=response.bytes, content_type=content_type)
     finally:
         asyncio.set_event_loop(None)
         loop.close()

@@ -158,7 +158,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         self.send_header('Cache-Control', 'no-store')
         self.send_header('X-Request-ID', request_id)
         self.end_headers()
-        self.wfile.write(response.bytes)
+        self.wfile.write(response.response_bytes)
 
     def log_message(self, format_string: str, *args: object) -> None:
         return
