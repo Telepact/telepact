@@ -296,11 +296,9 @@ def process_telepact_request(request_bytes: bytes, request_id: str, session_toke
             if session_token is not None:
                 headers['@auth_'] = {'Session': {'token': session_token}}
 
-        asyncio.set_event_loop(loop)
         response = loop.run_until_complete(telepact_server.process(request_bytes, update_headers))
         content_type = 'application/octet-stream' if '@bin_' in response.headers else 'application/json'
         return TelepactHttpResponse(response_bytes=response.bytes, content_type=content_type)
     finally:
-        asyncio.set_event_loop(None)
         loop.close()
         _REQUEST_CONTEXT.reset(context_token)
