@@ -15,6 +15,7 @@
 //|
 
 import './style.css';
+import appHtml from './app.html?raw';
 import { Client, ClientOptions, Message, type Serializer } from 'telepact';
 
 type JsonObject = Record<string, unknown>;
@@ -29,71 +30,7 @@ if (app === null) {
   throw new Error('missing #app root');
 }
 
-app.innerHTML = `
-  <section class="hero">
-    <span class="pill">Python backend + TypeScript browser frontend</span>
-    <h1>Telepact full-stack production-boundary demo</h1>
-    <p>
-      This browser app talks to a Python Telepact server over HTTP. The server extracts
-      a session cookie into <code>@auth_</code>, normalizes identity with
-      <code>on_auth</code>, emits Telepact-aware metrics and logs, attaches request IDs,
-      keeps auth decisions near the handlers, and surfaces unexpected failures as
-      <code>ErrorUnknown_</code> with a <code>caseId</code>.
-    </p>
-  </section>
-  <section class="grid">
-    <div class="stack">
-      <div class="card">
-        <h2>Session controls</h2>
-        <div class="actions">
-          <button id="sign-in-user">Sign in as reader</button>
-          <button id="sign-in-admin">Sign in as admin</button>
-          <button id="logout" class="secondary">Sign out</button>
-        </div>
-        <div class="status-line">
-          <span class="pill" id="session-pill">session: anonymous</span>
-          <span class="pill" id="health-pill">server: loading</span>
-        </div>
-      </div>
-      <div class="card">
-        <h2>Telepact functions</h2>
-        <div class="actions">
-          <button id="call-me">Who am I?</button>
-          <button id="call-admin">Load admin report</button>
-          <button id="call-failure" class="secondary">Trigger server bug</button>
-        </div>
-        <div class="status-line">
-          <span class="pill" id="request-pill">request id: pending</span>
-          <span class="pill" id="outcome-pill">outcome: none</span>
-        </div>
-      </div>
-      <div class="card">
-        <h2>What this example demonstrates</h2>
-        <ul class="note-list">
-          <li>transport-specific cookie extraction stays at the HTTP edge</li>
-          <li><code>on_auth</code> normalizes identity into internal Telepact headers</li>
-          <li>request IDs, per-function metrics, and structured events come from Telepact hooks</li>
-          <li><code>ErrorUnauthorized_</code> stays close to the admin-only business rule</li>
-          <li><code>ErrorUnknown_</code> still keeps the wire response generic while exposing a <code>caseId</code></li>
-          <li>schema compatibility is tracked with the checked-in <code>schema-baseline/</code> snapshot</li>
-        </ul>
-      </div>
-    </div>
-    <div class="stack">
-      <div class="card">
-        <h2>Latest Telepact response</h2>
-        <div class="output"><pre id="response-output">Waiting for a browser action…</pre></div>
-      </div>
-      <div class="card">
-        <div class="actions" style="justify-content: space-between; align-items: center;">
-          <h2 style="margin-bottom: 0;">Operational snapshot</h2>
-          <button id="refresh-ops" class="secondary">Refresh ops snapshot</button>
-        </div>
-        <div class="output"><pre id="ops-output">Loading…</pre></div>
-      </div>
-    </div>
-  </section>
-`;
+app.innerHTML = appHtml;
 
 const sessionPill = must<HTMLSpanElement>('#session-pill');
 const healthPill = must<HTMLSpanElement>('#health-pill');
