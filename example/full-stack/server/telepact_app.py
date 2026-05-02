@@ -289,14 +289,18 @@ telepact_server = Server(schema, function_router, options)
 
 def process_telepact_request(request_bytes: bytes, request_id: str, session_token: str | None) -> TelepactHttpResponse:
     context_token = _REQUEST_CONTEXT.set({'requestId': request_id, 'transport': 'http'})
+    loop = asyncio.new_event_loop()
     try:
         def update_headers(headers: dict[str, object]) -> None:
             headers['@requestId'] = request_id
             if session_token is not None:
                 headers['@auth_'] = {'Session': {'token': session_token}}
 
-        response = asyncio.run(telepact_server.process(request_bytes, update_headers))
+        asyncio.set_event_loop(loop)
+        response = loop.run_until_complete(telepact_server.process(request_bytes, update_headers))
         content_type = 'application/octet-stream' if '@bin_' in response.headers else 'application/json'
         return TelepactHttpResponse(bytes=response.bytes, content_type=content_type)
     finally:
+        asyncio.set_event_loop(None)
+        loop.close()
         _REQUEST_CONTEXT.reset(context_token)
