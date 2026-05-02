@@ -1,14 +1,25 @@
 {
   "changed_paths": [
-    "bind/dart/package-lock.json",
-    "bind/dart/package.json"
+    "example/Makefile",
+    "example/README.md",
+    "example/full-stack/Makefile",
+    "example/full-stack/README.md",
+    "example/full-stack/api/dashboard.telepact.yaml",
+    "example/full-stack/client/.gitignore",
+    "example/full-stack/client/index.html",
+    "example/full-stack/client/package.json",
+    "example/full-stack/client/playwright.config.ts",
+    "example/full-stack/client/src/app.html",
+    "example/full-stack/client/src/main.ts",
+    "example/full-stack/client/src/style.css",
+    "example/full-stack/client/tests/e2e.spec.ts",
+    "example/full-stack/client/tsconfig.json",
+    "example/full-stack/schema-baseline/dashboard.telepact.yaml",
+    "example/full-stack/server/app.py",
+    "example/full-stack/server/telepact_app.py"
   ],
-  "direct_targets": [
-    "dart"
-  ],
-  "pr_number": 495,
-  "targets": [
-    "dart"
-  ],
+  "direct_targets": [],
+  "pr_number": 496,
+  "targets": [],
   "version": "1.0.0-alpha.328"
 }
