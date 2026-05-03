@@ -1,15 +1,13 @@
 {
   "changed_paths": [
-    "sdk/prettier/package-lock.json",
-    "sdk/prettier/package.json"
+    "sdk/cli/uv.lock"
   ],
   "direct_targets": [
-    "prettier"
+    "cli"
   ],
-  "pr_number": 497,
+  "pr_number": 500,
   "targets": [
-    "console",
-    "prettier"
+    "cli"
   ],
-  "version": "1.0.0-alpha.329"
+  "version": "1.0.0-alpha.332"
 }
