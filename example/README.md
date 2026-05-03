@@ -10,6 +10,8 @@ and the Telepact libraries keep their API surfaces closely aligned across langua
 - [py-select](./py-select/README.md) - Minimal Python demo that shows `->`, `struct.*`, and `union.*` field selection together
 - [py-websocket](./py-websocket/README.md) - Minimal Python demo that shows how to use WebSocket request/reply
 
+- [full-stack](./full-stack/README.md) - Python backend + browser TypeScript frontend that demonstrates Telepact auth, request IDs, logs, metrics, and Playwright e2e coverage
+
 - [ts-binary](./ts-binary/README.md) - Minimal TypeScript demo that shows how to verify binary negotiation
 - [ts-codegen](./ts-codegen/README.md) - Minimal TypeScript demo that shows generated client and server bindings wired into the runtime
 - [ts-http-cookie-auth](./ts-http-cookie-auth/README.md) - Minimal TypeScript demo that shows how to pull a session cookie into `@auth_` at the HTTP boundary
