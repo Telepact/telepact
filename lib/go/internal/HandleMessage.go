@@ -18,6 +18,7 @@ package internal
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/telepact/telepact/lib/go/internal/binary"
 	"github.com/telepact/telepact/lib/go/internal/types"
@@ -273,7 +274,7 @@ func extractSelectStructFields(value any) map[string]any {
 }
 
 func isInternalFunctionName(functionName string) bool {
-	return len(functionName) > len("fn.") && functionName[:len("fn.")] == "fn." && functionName[len(functionName)-1] == '_'
+	return strings.HasPrefix(functionName, "fn.") && strings.HasSuffix(functionName, "_")
 }
 
 func invokeOnAuth(callback func(map[string]any) map[string]any, headers map[string]any) (result map[string]any, err error) {
