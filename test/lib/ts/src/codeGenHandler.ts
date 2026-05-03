@@ -14,16 +14,16 @@
 //|  limitations under the License.
 //|
 
-import { ExUnion, ExStruct, TypedServerHandler, example, test, Value } from './gen/genTypes.js';
+import { ExampleInput, ExampleOutput, ExUnion, ExStruct, TestInput, TestOutput, TypedServerHandler, example, test, Value } from './gen/genTypes.js';
 import { TypedMessage } from 'telepact';
 
 export class CodeGenHandler extends TypedServerHandler {
 
-    async example(headers: { [key: string]: any }, input: example.Input): Promise<TypedMessage<example.Output>> {
+    async example(headers: { [key: string]: any }, input: ExampleInput): Promise<TypedMessage<ExampleOutput>> {
         throw new Error("Unimplemented method 'example'");
     }
 
-    async test(headers: { [key: string]: any }, input: test.Input): Promise<TypedMessage<test.Output>> {
+    async test(headers: { [key: string]: any }, input: TestInput): Promise<TypedMessage<TestOutput>> {
         try {
             console.log("input: " + JSON.stringify(input.pseudoJson));
         } catch (e) {
@@ -297,7 +297,7 @@ function map_union(u: ExUnion): ExUnion {
     }
 }
 
-function map_fn(f: example.Input): example.Input {
+function map_fn(f: ExampleInput): ExampleInput {
     const args: { required: boolean, optional?: boolean} = {
         required: f.required()
     }

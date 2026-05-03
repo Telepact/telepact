@@ -7,7 +7,10 @@
     "strict": true,
     "verbatimModuleSyntax": true,
     "noImplicitAny": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "noUncheckedIndexedAccess": true,
+    "erasableSyntaxOnly": true,
     "skipLibCheck": false,
     "noEmit": true
   },
