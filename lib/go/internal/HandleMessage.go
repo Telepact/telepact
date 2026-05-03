@@ -23,6 +23,11 @@ import (
 	"github.com/telepact/telepact/lib/go/internal/types"
 )
 
+var internalFunctionsBypassingAuth = map[string]struct{}{
+	"fn.ping_": {},
+	"fn.api_":  {},
+}
+
 // HandleMessage mirrors the Python server handler orchestration using primitive maps.
 func HandleMessage(
 	requestMessage ServerMessage,
@@ -68,10 +73,12 @@ func HandleMessage(
 	if parsed == nil {
 		return ServerMessage{}, fmt.Errorf("telepact: schema missing parsed definitions")
 	}
+	_, hasRequestedTarget := parsed[requestTargetInit]
+	_, bypassAuthForFunction := internalFunctionsBypassingAuth[requestTargetInit]
 
 	requestTarget := requestTargetInit
 	unknownTarget := ""
-	if _, ok := parsed[requestTargetInit]; !ok {
+	if !hasRequestedTarget {
 		unknownTarget = requestTargetInit
 		requestTarget = "fn.ping_"
 	}
@@ -128,7 +135,7 @@ func HandleMessage(
 		return invalidMessage, err
 	}
 
-	if _, ok := requestHeaders["@auth_"]; ok {
+	if _, ok := requestHeaders["@auth_"]; ok && !bypassAuthForFunction {
 		authHeaders, err := invokeOnAuth(onAuth, requestHeaders)
 		if err != nil {
 			wrapped := newTelepactError(

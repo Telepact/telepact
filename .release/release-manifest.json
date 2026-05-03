@@ -1,14 +1,26 @@
 {
   "changed_paths": [
-    "sdk/console/package-lock.json",
-    "sdk/console/package.json"
+    "lib/go/internal/HandleMessage.go",
+    "lib/java/src/main/java/io/github/telepact/internal/HandleMessage.java",
+    "lib/py/telepact/internal/HandleMessage.py",
+    "lib/ts/src/internal/HandleMessage.ts",
+    "test/runner/parameters/auth_cases.py"
   ],
   "direct_targets": [
-    "console"
+    "go",
+    "java",
+    "py",
+    "ts"
   ],
-  "pr_number": 498,
+  "pr_number": 499,
   "targets": [
-    "console"
+    "cli",
+    "console",
+    "dart",
+    "go",
+    "java",
+    "py",
+    "ts"
   ],
-  "version": "1.0.0-alpha.330"
+  "version": "1.0.0-alpha.331"
 }

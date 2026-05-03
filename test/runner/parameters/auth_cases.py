@@ -57,5 +57,7 @@ cases = {
         [[{'@auth_': {'Token': {'token': 'unauthorized'}}}, {'fn.test': {}}], [{}, {'ErrorUnauthorized_': {'message!': 'a'}}]],
         [[{}, {'fn.api_': {}}], [{}, {'Ok_': {'api': _AUTH_PUBLIC_SCHEMA}}]],
         [[{}, {'fn.api_': {'includeInternal!': True}}], [{}, {'Ok_': {'api': _AUTH_FULL_SCHEMA}}]],
+        [[{'@auth_': {'Token': {'token': 'unauthenticated'}}}, {'fn.api_': {}}], [{}, {'Ok_': {'api': _AUTH_PUBLIC_SCHEMA}}]],
+        [[{'@auth_': {'Token': {'token': 'unauthorized'}}}, {'fn.api_': {'includeInternal!': True}}], [{}, {'Ok_': {'api': _AUTH_FULL_SCHEMA}}]],
    ]
 }
