@@ -59,6 +59,9 @@ import io.github.telepact.internal.validation.ValidationFailure;
 
         final String requestTargetInit = requestEntry.getKey();
         final Map<String, Object> requestPayload = (Map<String, Object>) requestEntry.getValue();
+        final var isInternalFunctionCall = parsedTelepactSchema.containsKey(requestTargetInit)
+                && requestTargetInit.startsWith("fn.")
+                && requestTargetInit.endsWith("_");
 
         final String unknownTarget;
         final String requestTarget;
@@ -97,7 +100,7 @@ import io.github.telepact.internal.validation.ValidationFailure;
                     responseHeaders);
         }
 
-        if (requestHeaders.containsKey("@auth_")) {
+        if (requestHeaders.containsKey("@auth_") && !isInternalFunctionCall) {
             try {
                 final var authHeaders = onAuth.apply(requestHeaders);
                 if (authHeaders != null) {

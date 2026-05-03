@@ -68,10 +68,12 @@ func HandleMessage(
 	if parsed == nil {
 		return ServerMessage{}, fmt.Errorf("telepact: schema missing parsed definitions")
 	}
+	_, hasRequestedTarget := parsed[requestTargetInit]
+	isInternalFunctionCall := hasRequestedTarget && isInternalFunctionName(requestTargetInit)
 
 	requestTarget := requestTargetInit
 	unknownTarget := ""
-	if _, ok := parsed[requestTargetInit]; !ok {
+	if !hasRequestedTarget {
 		unknownTarget = requestTargetInit
 		requestTarget = "fn.ping_"
 	}
@@ -128,7 +130,7 @@ func HandleMessage(
 		return invalidMessage, err
 	}
 
-	if _, ok := requestHeaders["@auth_"]; ok {
+	if _, ok := requestHeaders["@auth_"]; ok && !isInternalFunctionCall {
 		authHeaders, err := invokeOnAuth(onAuth, requestHeaders)
 		if err != nil {
 			wrapped := newTelepactError(
@@ -268,6 +270,10 @@ func extractSelectStructFields(value any) map[string]any {
 	default:
 		return nil
 	}
+}
+
+func isInternalFunctionName(functionName string) bool {
+	return len(functionName) > len("fn.") && functionName[:len("fn.")] == "fn." && functionName[len(functionName)-1] == '_'
 }
 
 func invokeOnAuth(callback func(map[string]any) map[string]any, headers map[string]any) (result map[string]any, err error) {

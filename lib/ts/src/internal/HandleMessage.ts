@@ -50,6 +50,10 @@ export async function handleMessage(
 
     const requestTargetInit = requestEntry[0];
     const requestPayload = requestEntry[1] as Record<string, any>;
+    const isInternalFunctionCall =
+        requestTargetInit in parsedTelepactSchema
+        && requestTargetInit.startsWith('fn.')
+        && requestTargetInit.endsWith('_');
 
     let unknownTarget: string | null;
     let requestTarget: string;
@@ -95,7 +99,7 @@ export async function handleMessage(
         );
     }
 
-    if ('@auth_' in requestHeaders) {
+    if ('@auth_' in requestHeaders && !isInternalFunctionCall) {
         try {
             const authHeaders = onAuth(requestHeaders) ?? {};
             Object.assign(requestHeaders, authHeaders);
