@@ -18,11 +18,15 @@ package internal
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/telepact/telepact/lib/go/internal/binary"
 	"github.com/telepact/telepact/lib/go/internal/types"
 )
+
+var internalFunctionsBypassingAuth = map[string]struct{}{
+	"fn.ping_": {},
+	"fn.api_":  {},
+}
 
 // HandleMessage mirrors the Python server handler orchestration using primitive maps.
 func HandleMessage(
@@ -70,7 +74,7 @@ func HandleMessage(
 		return ServerMessage{}, fmt.Errorf("telepact: schema missing parsed definitions")
 	}
 	_, hasRequestedTarget := parsed[requestTargetInit]
-	isInternalFunctionCall := hasRequestedTarget && isInternalFunctionName(requestTargetInit)
+	_, bypassAuthForFunction := internalFunctionsBypassingAuth[requestTargetInit]
 
 	requestTarget := requestTargetInit
 	unknownTarget := ""
@@ -131,7 +135,7 @@ func HandleMessage(
 		return invalidMessage, err
 	}
 
-	if _, ok := requestHeaders["@auth_"]; ok && !isInternalFunctionCall {
+	if _, ok := requestHeaders["@auth_"]; ok && !bypassAuthForFunction {
 		authHeaders, err := invokeOnAuth(onAuth, requestHeaders)
 		if err != nil {
 			wrapped := newTelepactError(
@@ -271,10 +275,6 @@ func extractSelectStructFields(value any) map[string]any {
 	default:
 		return nil
 	}
-}
-
-func isInternalFunctionName(functionName string) bool {
-	return strings.HasPrefix(functionName, "fn.") && strings.HasSuffix(functionName, "_")
 }
 
 func invokeOnAuth(callback func(map[string]any) map[string]any, headers map[string]any) (result map[string]any, err error) {

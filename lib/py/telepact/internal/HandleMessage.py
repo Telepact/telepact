@@ -29,6 +29,8 @@ if TYPE_CHECKING:
     from .types.TType import TType
     from ..TelepactSchema import TelepactSchema
 
+_INTERNAL_FUNCTIONS_BYPASSING_AUTH = {"fn.ping_", "fn.api_"}
+
 
 async def handle_message(
     request_message: 'Message',
@@ -59,11 +61,7 @@ async def handle_message(
     request_target_init = request_entry[0]
     request_payload = cast(
         dict[str, object], request_entry[1])
-    is_internal_function_call = (
-        request_target_init in parsed_telepact_schema
-        and request_target_init.startswith("fn.")
-        and request_target_init.endswith("_")
-    )
+    bypass_auth_for_function = request_target_init in _INTERNAL_FUNCTIONS_BYPASSING_AUTH
 
     unknown_target: str | None
     request_target: str
@@ -103,7 +101,7 @@ async def handle_message(
             response_headers,
         )
 
-    if "@auth_" in request_headers and not is_internal_function_call:
+    if "@auth_" in request_headers and not bypass_auth_for_function:
         try:
             auth_headers = on_auth(request_headers) or {}
             request_headers.update(auth_headers)

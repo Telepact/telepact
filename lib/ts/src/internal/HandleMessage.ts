@@ -31,6 +31,8 @@ import { TelepactError } from '../TelepactError.js';
 import { UpdateHeaders } from '../Server.js';
 import { buildUnknownErrorMessage } from './UnknownError.js';
 
+const INTERNAL_FUNCTIONS_BYPASSING_AUTH = new Set(['fn.ping_', 'fn.api_']);
+
 export async function handleMessage(
     requestMessage: Message,
     updateHeaders: UpdateHeaders | undefined,
@@ -50,10 +52,7 @@ export async function handleMessage(
 
     const requestTargetInit = requestEntry[0];
     const requestPayload = requestEntry[1] as Record<string, any>;
-    const isInternalFunctionCall =
-        requestTargetInit in parsedTelepactSchema
-        && requestTargetInit.startsWith('fn.')
-        && requestTargetInit.endsWith('_');
+    const bypassAuthForFunction = INTERNAL_FUNCTIONS_BYPASSING_AUTH.has(requestTargetInit);
 
     let unknownTarget: string | null;
     let requestTarget: string;
@@ -99,7 +98,7 @@ export async function handleMessage(
         );
     }
 
-    if ('@auth_' in requestHeaders && !isInternalFunctionCall) {
+    if ('@auth_' in requestHeaders && !bypassAuthForFunction) {
         try {
             const authHeaders = onAuth(requestHeaders) ?? {};
             Object.assign(requestHeaders, authHeaders);
