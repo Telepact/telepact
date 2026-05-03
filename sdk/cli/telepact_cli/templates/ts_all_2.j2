@@ -150,7 +150,12 @@ export class {{ class_name }} {
 
     {%- for field_name, field_type in fields.items() %}
     {{ sanitize_field_name(field_name) }}(): {{ to_maybe_opt_ts_type(field_type, field_name) }} {
-        return {% if '!' in field_name %}!("{{ field_name }}" in this.pseudoJson{% if fn %}["{{ fn }}"]{% endif %}) ? undefined : {% endif %}{% call marshall_ts_type(field_type, 0) %}this.pseudoJson{% if fn %}["{{ fn }}"]{% endif %}["{{ field_name }}"]{% endcall %};
+        {%- if '!' in field_name %}
+        if (!("{{ field_name }}" in this.pseudoJson{% if fn %}["{{ fn }}"]{% endif %})) {
+            return undefined;
+        }
+        {%- endif %}
+        return {% call marshall_ts_type(field_type, 0) %}this.pseudoJson{% if fn %}["{{ fn }}"]{% endif %}["{{ field_name }}"]{% endcall %};
     }
     {%- endfor %}
 }
