@@ -70,9 +70,10 @@ export class UntypedTaggedValue_ {
 
 {%- macro unmarshall_ts_type(t, depth) -%}
     {%- if t is string -%}
+        {%- set nullable = '?' in t %}
         {%- set typ = t | replace('?', '') -%}
         {%- if typ.startswith('struct') or typ.startswith('fn') or typ.startswith('union') or typ == '_ext.Select_' -%}
-            ((d{{ depth }}) => d{{ depth }}.pseudoJson)({{ caller() }})
+            ((d{{ depth }}) => {% if nullable %}d{{ depth }} === null ? null : {% endif %}d{{ depth }}.pseudoJson)({{ caller() }})
         {%- else -%}
             {{ caller() }}
         {%- endif -%}
