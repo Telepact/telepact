@@ -1,6 +1,6 @@
 {
   "name": "telepact-console",
-  "version": "1.0.0-alpha.329",
+  "version": "1.0.0-alpha.330",
   "description": "A web-based interface for inspecting and testing Telepact APIs.",
   "license": "Apache-2.0",
   "repository": {
@@ -72,6 +72,9 @@
     "follow-redirects": "^1.16.0",
     "micromatch": {
       "picomatch": "^2.3.2"
+    },
+    "monaco-editor": {
+      "dompurify": "^3.4.0"
     },
     "qs": "^6.15.1",
     "router": {
