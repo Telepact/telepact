@@ -15,7 +15,7 @@
 //|
 
 import { Client, ClientOptions, Message, Serializer } from 'telepact';
-import { TypedClient, greet } from '../../../../example/ts-codegen/gen/genTypes.js';
+import { TypedClient, greet } from './gen/genTypes.js';
 
 const adapter = async (message: Message, serializer: Serializer): Promise<Message> => {
   return serializer.deserialize(serializer.serialize(message));

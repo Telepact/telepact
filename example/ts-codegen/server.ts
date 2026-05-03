@@ -19,7 +19,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { FunctionRouter, Server, ServerOptions, TelepactSchema, TelepactSchemaFiles } from 'telepact';
 import type { Response, TypedMessage } from 'telepact';
-import { TypedServerHandler, greet } from './gen/genTypes.js';
+import { GreetInput, GreetOutput, TypedServerHandler, greet } from './gen/genTypes.js';
 
 const files = new TelepactSchemaFiles('api', fs, path);
 const schema = TelepactSchema.fromFileJsonMap(files.filenamesToJson);
@@ -27,7 +27,7 @@ const options = new ServerOptions();
 options.authRequired = false;
 
 class GreetingHandler extends TypedServerHandler {
-    async greet(_headers: Record<string, any>, input: greet.Input): Promise<TypedMessage<greet.Output>> {
+    async greet(_headers: Record<string, any>, input: GreetInput): Promise<TypedMessage<GreetOutput>> {
         return {
             headers: {},
             body: greet.Output.from_Ok_({

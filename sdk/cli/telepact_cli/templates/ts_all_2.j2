@@ -38,9 +38,9 @@ export class UntypedTaggedValue_ {
         {%- elif typ == 'bytes' -%}
             Uint8Array
         {%- elif typ.startswith('fn.') -%}
-            {{ typ | regex_replace('^.*\\.', '') }}.Input
+            {{ typ | regex_replace('^.*\.', '') | to_pascal_case }}Input
         {%- else -%}
-            {{ typ | regex_replace('^.*\\.', '') }}
+            {{ typ | regex_replace('^.*\.', '') }}
         {%- endif -%}
         {%- if append_nullable and nullable %} | null{%- endif -%}
     {%- elif t is mapping -%}
@@ -62,9 +62,9 @@ export class UntypedTaggedValue_ {
             {{ caller() }}
         {%- endif -%}
     {%- elif t is mapping -%}
-        ((d{{ depth }}: {{ to_ts_type(t) }}) => {% if nullable %}d{{ depth }} === null ? null : {% endif %}Object.fromEntries(Object.entries(d{{ depth }}).map(([k{{ depth }}, v{{ depth }}]) => [k{{ depth }}, {% call marshall_ts_type(t.values() | first, depth + 1) %}v{{ depth }}{% endcall %}])))({{ caller() }})
+        ((d{{ depth }}: {{ to_ts_type(t) }}) => Object.fromEntries(Object.entries(d{{ depth }}).map(([k{{ depth }}, v{{ depth }}]) => [k{{ depth }}, {% call marshall_ts_type(t.values() | first, depth + 1) %}v{{ depth }}{% endcall %}])))({{ caller() }})
     {%- elif t is sequence -%}
-        ((d{{ depth }}: {{ to_ts_type(t) }}) => {% if nullable %}d{{ depth }} === null ? null : {% endif %}d{{ depth }}.map((e{{ depth }}) => {% call marshall_ts_type(t[0], depth + 1) %}e{{ depth }}{% endcall %}))({{ caller() }})
+        ((d{{ depth }}: {{ to_ts_type(t) }}) => d{{ depth }}.map((e{{ depth }}) => {% call marshall_ts_type(t[0], depth + 1) %}e{{ depth }}{% endcall %}))({{ caller() }})
     {%- endif %}
 {%- endmacro -%}
 
@@ -78,9 +78,9 @@ export class UntypedTaggedValue_ {
             {{ caller() }}
         {%- endif -%}
     {%- elif t is mapping -%}
-        ((d{{ depth }}) => {% if nullable %}d{{ depth }} === null ? null : {% endif %}Object.fromEntries(Object.entries(d{{ depth }}).map(([k{{ depth }}, v{{ depth }}]) => [k{{ depth }}, {% call unmarshall_ts_type(t.values() | first, depth + 1) %}v{{ depth }}{% endcall %}])))({{ caller() }})
+        ((d{{ depth }}) => Object.fromEntries(Object.entries(d{{ depth }}).map(([k{{ depth }}, v{{ depth }}]) => [k{{ depth }}, {% call unmarshall_ts_type(t.values() | first, depth + 1) %}v{{ depth }}{% endcall %}])))({{ caller() }})
     {%- elif t is sequence -%}
-        ((d{{ depth }}) => {% if nullable %}d{{ depth }} === null ? null : {% endif %}d{{ depth }}.map((e{{ depth }}) => {% call unmarshall_ts_type(t[0], depth + 1) %}e{{ depth }}{% endcall %}))({{ caller() }})
+        ((d{{ depth }}) => d{{ depth }}.map((e{{ depth }}) => {% call unmarshall_ts_type(t[0], depth + 1) %}e{{ depth }}{% endcall %}))({{ caller() }})
     {%- endif -%}
 {%- endmacro -%}
 
@@ -90,10 +90,6 @@ export class UntypedTaggedValue_ {
     {%- else %}
         {{- to_ts_type(type) }}
     {%- endif %}
-{%- endmacro -%}
-
-{%- macro setter_maybe_opt(field_name) -%}
-    {{ caller() }}
 {%- endmacro -%}
 
 {%- macro docstring(doc) -%}
@@ -120,8 +116,8 @@ export class UntypedTaggedValue_ {
     {%- endif -%}
 {%- endmacro -%}
 
-{%- macro struct(type_display, doc, fields, type_prefix, fn) %}
-export class {{ type_display }} {
+{%- macro struct(class_name, doc, fields, fn=None) %}
+export class {{ class_name }} {
     {{ docstring(doc) | indent }}
     pseudoJson: Record<string, any>;
 
@@ -132,12 +128,12 @@ export class {{ type_display }} {
     static from({
         {%- for field_name, field_type in fields.items() %}
         {{ sanitize_field_name(field_name) }},
-        {%- endfor %}        
+        {%- endfor %}
     }: {
         {%- for field_name, field_type in fields.items() %}
         {{ sanitize_field_name(field_name) }}{% if '!' in field_name %}?{% endif %}: {{ to_maybe_opt_ts_type(field_type, field_name) }},
-        {%- endfor %}        
-    }): {{ type_prefix + type_display }} {
+        {%- endfor %}
+    }): {{ class_name }} {
         const input: Record<string, any> = {};
         {%- for field_name, field_type in fields.items() %}
         {%- if '!' in field_name %}
@@ -149,21 +145,24 @@ export class {{ type_display }} {
         {%- endif %}
         {%- endfor %}
 
-        return new {{ type_prefix + type_display }}({% if fn %}{"{{ fn }}": input}{% else %}input{% endif %});
+        return new {{ class_name }}({% if fn %}{"{{ fn }}": input}{% else %}input{% endif %});
     }
 
     {%- for field_name, field_type in fields.items() %}
     {{ sanitize_field_name(field_name) }}(): {{ to_maybe_opt_ts_type(field_type, field_name) }} {
-        return {% if '!' in field_name %}!("{{ field_name }}" in this.pseudoJson{% if fn %}["{{ fn }}"]{% endif %}) ? undefined :{% endif %}
-        {%- call marshall_ts_type(field_type, 0) %}this.pseudoJson{% if fn %}["{{ fn }}"]{% endif %}["{{ field_name }}"]{% endcall %};
+        {%- if '!' in field_name %}
+        if (!("{{ field_name }}" in this.pseudoJson{% if fn %}["{{ fn }}"]{% endif %})) {
+            return undefined;
+        }
+        {%- endif %}
+        return {% call marshall_ts_type(field_type, 0) %}this.pseudoJson{% if fn %}["{{ fn }}"]{% endif %}["{{ field_name }}"]{% endcall %};
     }
     {%- endfor %}
 }
 {%- endmacro -%}
 
-{%- macro union(type_display, doc, tags, type_prefix) %}
-    {%- set tag_prefix = type_prefix + type_display + '.' %}
-export class {{ type_display }} {
+{%- macro union(class_name, doc, tags, tag_class_prefix) %}
+export class {{ class_name }} {
     {{ docstring(doc) | indent }}
     pseudoJson: Record<string, any>;
 
@@ -173,120 +172,129 @@ export class {{ type_display }} {
 
     {%- for tag_entry in tags %}
         {%- set tag_key = tag_entry | find_tag_key %}
-        {%- set tag_data = tag_entry[tag_key] %}
         {%- set fields = tag_entry[tag_key] %}
+        {%- set tag_class_name = tag_class_prefix + (tag_key | to_pascal_case) %}
+    static {{ tag_key }}: typeof {{ tag_class_name }};
     static from_{{ tag_key }}(payload: {
         {%- for field_name, field_type in fields.items() %}
         {{ sanitize_field_name(field_name) }}{% if '!' in field_name %}?{% endif %}: {{ to_maybe_opt_ts_type(field_type, field_name) }},
-        {%- endfor %}        
-    }): {{ type_prefix + type_display }} {
-        return new {{ type_prefix + type_display }}({
-            "{{ tag_key }}": {{ tag_prefix + tag_key }}.from(payload).pseudoJson
+        {%- endfor %}
+    }): {{ class_name }} {
+        return new {{ class_name }}({
+            "{{ tag_key }}": {{ tag_class_name }}.from(payload).pseudoJson
         });
     }
     {%- endfor %}
 
-    getTaggedValue(): 
-        {%- for tag_entry in tags %}
-            {%- set tag_key = tag_entry | find_tag_key %}
-            {%- set tag_data = tag_entry[tag_key] %}
-        TaggedValue_<"{{ tag_key }}", {{ tag_prefix + tag_key }}> |
-        {%- endfor %} TaggedValue_<"NoMatch_", UntypedTaggedValue_> {
+    getTaggedValue():
+    {%- for tag_entry in tags %}
+        {%- set tag_key = tag_entry | find_tag_key %}
+        {%- set tag_class_name = tag_class_prefix + (tag_key | to_pascal_case) %}
+        TaggedValue_<"{{ tag_key }}", {{ tag_class_name }}> |
+    {%- endfor %} TaggedValue_<"NoMatch_", UntypedTaggedValue_> {
         const tag = Object.keys(this.pseudoJson)[0]!;
         {%- for tag_entry in tags %}
             {%- set tag_key = tag_entry | find_tag_key %}
+            {%- set tag_class_name = tag_class_prefix + (tag_key | to_pascal_case) %}
         if (tag === "{{ tag_key }}") {
-            return new TaggedValue_("{{ tag_key }}", new {{ tag_prefix + tag_key }}(this.pseudoJson["{{ tag_key }}"]));
+            return new TaggedValue_("{{ tag_key }}", new {{ tag_class_name }}(this.pseudoJson["{{ tag_key }}"]));
         }
         {%- endfor %}
         return new TaggedValue_("NoMatch_", new UntypedTaggedValue_(tag, this.pseudoJson[tag]));
     }
 }
 
-export namespace {{ type_display }} {
 {%- for tag_entry in tags %}
     {%- set tag_key = tag_entry | find_tag_key %}
-    {{ struct(tag_key, tag_entry['///'], tag_entry[tag_key], tag_prefix) | indent }}
+    {%- set tag_class_name = tag_class_prefix + (tag_key | to_pascal_case) %}
+{{ struct(tag_class_name, tag_entry['///'], tag_entry[tag_key]) }}
+{{ class_name }}.{{ tag_key }} = {{ tag_class_name }};
 {%- endfor %}
-}
 {%- endmacro -%}
 
 {%- macro function(type_display, data, schema_key, fn_selects) %}
-export namespace {{ type_display }} {
-    {{ struct('Input', data['///'], data[schema_key], type_display + '.', schema_key) | indent }}
-    {{ union('Output', data['///'], data['->'], type_display + '.') | indent }}
+    {%- set class_prefix = type_display | to_pascal_case %}
+    {%- set input_class_name = class_prefix + 'Input' %}
+    {%- set output_class_name = class_prefix + 'Output' %}
+    {%- set select_class_name = class_prefix + 'Select_' %}
+{{ struct(input_class_name, data['///'], data[schema_key], schema_key) }}
+{{ union(output_class_name, data['///'], data['->'], output_class_name) }}
 
-    export class Select_ {
+export class {{ select_class_name }} {
 
-        pseudoJson: Record<string, any> = {};
+    pseudoJson: Record<string, any> = {};
 
-        {%- for key in fn_selects %}
-            {%- if key.startswith('struct') %}
-                {%- set name = key | regex_replace('^.*\\.', '') %}
-                {%- set fields = fn_selects[key] %}
+    {%- for key in fn_selects %}
+        {%- if key.startswith('struct') %}
+            {%- set name = key | regex_replace('^.*\.', '') %}
+            {%- set fields = fn_selects[key] %}
+
+            {%- for field in fields %}
+
+    {{ name }}{{ field | replace('!', '') }}(): {{ select_class_name }} {
+        const theseFields = this.pseudoJson["{{ key }}"] ?? [];
+        if (!theseFields.includes('{{field}}')) {
+            theseFields.push('{{field}}');
+        }
+        this.pseudoJson["{{ key }}"] = theseFields;
+
+        return this;
+    }
+            {%- endfor %}
+
+        {%- elif key.startswith('union') %}
+            {%- set name = key | regex_replace('^.*\.', '') %}
+            {%- set tags = fn_selects[key] %}
+
+            {%- for tag in tags %}
+                {%- set fields = tags[tag] %}
 
                 {%- for field in fields %}
-        
-        {{ name }}{{ field | replace('!', '') }}(): Select_ {
-            const theseFields = this.pseudoJson["{{ key }}"] ?? [];
-            if (!theseFields.includes('{{field}}')) {
-                theseFields.push('{{field}}');
-            }
-            this.pseudoJson["{{ key }}"] = theseFields;
 
-            return this;
+    {{ name }}{{ tag }}{{ field | replace('!', '') }}(): {{ select_class_name }} {
+        const theseTags = this.pseudoJson["{{ key }}"] ?? {};
+        const theseFields = theseTags["{{ tag }}"] ?? [];
+        if (!theseFields.includes('{{field}}')) {
+            theseFields.push('{{field}}');
         }
-                {%- endfor %}
+        theseTags["{{ tag }}"] = theseFields;
+        this.pseudoJson["{{ key }}"] = theseTags;
 
-            {%- elif key.startswith('union') %}
-                {%- set name = key | regex_replace('^.*\\.', '') %}
-                {%- set tags = fn_selects[key] %}
-
-                {%- for tag in tags %}
-                    {%- set fields = tags[tag] %}
-
-                    {%- for field in fields %}
-        
-        {{ name }}{{ tag }}{{ field | replace('!', '') }}(): Select_ {
-            const theseTags = this.pseudoJson["{{ key }}"] ?? {};
-            const theseFields = theseTags["{{ tag }}"] ?? [];
-            if (!theseFields.includes('{{field}}')) {
-                theseFields.push('{{field}}');
-            }
-            theseTags["{{ tag }}"] = theseFields;
-            this.pseudoJson["{{ key }}"] = theseTags;
-
-            return this;
-        }
-
-                    {%- endfor %}
-                {%- endfor %}
-            
-            {%- elif key == '->' %}
-                {%- set okFields = fn_selects['->']['Ok_'] %}
-                {%- for okField in okFields %}
-            
-        ok{{ okField | replace('!', '') }}(): Select_ {
-            const resultUnion = this.pseudoJson["->"] ?? {};
-            const theseFields = resultUnion["Ok_"] ?? [];
-            if (!theseFields.includes('{{okField}}')) {
-                theseFields.push('{{okField}}');
-            }
-            resultUnion["Ok_"] = theseFields;
-            this.pseudoJson["->"] = resultUnion;
-            return this;
-        }
-
-                {%- endfor %}
-            {%- endif %}
-
-        {%- endfor %}
+        return this;
     }
 
+                {%- endfor %}
+            {%- endfor %}
+
+        {%- elif key == '->' %}
+            {%- set okFields = fn_selects['->']['Ok_'] %}
+            {%- for okField in okFields %}
+
+    ok{{ okField | replace('!', '') }}(): {{ select_class_name }} {
+        const resultUnion = this.pseudoJson["->"] ?? {};
+        const theseFields = resultUnion["Ok_"] ?? [];
+        if (!theseFields.includes('{{okField}}')) {
+            theseFields.push('{{okField}}');
+        }
+        resultUnion["Ok_"] = theseFields;
+        this.pseudoJson["->"] = resultUnion;
+        return this;
+    }
+
+            {%- endfor %}
+        {%- endif %}
+
+    {%- endfor %}
 }
+
+export const {{ type_display }} = {
+    Input: {{ input_class_name }},
+    Output: {{ output_class_name }},
+    Select_: {{ select_class_name }},
+} as const;
 {%- endmacro -%}
 
-{%- macro select(possible_fn_selects) %} 
+{%- macro select(possible_fn_selects) %}
 
 export class Select_ {
     pseudoJson: Record<string, any> = {};
@@ -296,9 +304,10 @@ export class Select_ {
     }
 
     {%- for fn in possible_fn_selects %}
-        {%- set fn_name = fn | regex_replace('^.*\\.', '') %}
+        {%- set fn_name = fn | regex_replace('^.*\.', '') %}
+        {%- set select_class_name = (fn_name | to_pascal_case) + 'Select_' %}
 
-    static for_{{fn_name}}(select: {{fn_name}}.Select_): Select_ {
+    static for_{{fn_name}}(select: {{ select_class_name }}): Select_ {
         return new Select_(select.pseudoJson);
     }
 
@@ -309,11 +318,11 @@ export class Select_ {
 
 {%- for schema_entry in input %}
     {%- set schema_key = schema_entry | find_schema_key %}
-    {%- set ts_name = schema_key | regex_replace('^.*\\.', '') %}
+    {%- set ts_name = schema_key | regex_replace('^.*\.', '') %}
     {%- if schema_key.startswith('struct') %}
-        {{ struct(ts_name, schema_entry['///'], schema_entry[schema_key], '') }}
+        {{ struct(ts_name, schema_entry['///'], schema_entry[schema_key]) }}
     {%- elif schema_key.startswith('union') %}
-        {{ union(ts_name, schema_entry['///'], schema_entry[schema_key], '') }}
+        {{ union(ts_name, schema_entry['///'], schema_entry[schema_key], ts_name) }}
     {%- elif schema_key.startswith('fn') %}
         {%- set fn_selects = possible_fn_selects[schema_key] %}
         {{ function(ts_name, schema_entry, schema_key, fn_selects) }}
@@ -331,9 +340,10 @@ export class TypedClient {
 
     {% for fn in functions %}
     {%- set function_name = fn | replace('fn.', '') %}
-    async {{ function_name }}(headers: Record<string, any>, input: {{ function_name }}.Input): Promise<TypedMessage<{{ function_name }}.Output>> {
+    {%- set class_prefix = function_name | to_pascal_case %}
+    async {{ function_name }}(headers: Record<string, any>, input: {{ class_prefix }}Input): Promise<TypedMessage<{{ class_prefix }}Output>> {
         const message = await this.client.request(new Message(headers, input.pseudoJson));
-        return { headers: message.headers, body: new {{ function_name }}.Output(message.body)};
+        return { headers: message.headers, body: new {{ class_prefix }}Output(message.body)};
     }
     {%- endfor %}
 }
@@ -341,7 +351,8 @@ export class TypedClient {
 export class TypedServerHandler {
     {% for fn in functions %}
     {%- set function_name = fn | replace('fn.', '') %}
-    async {{ function_name }}(headers: Record<string, any>, input: {{ function_name }}.Input): Promise<TypedMessage<{{ function_name }}.Output>> {
+    {%- set class_prefix = function_name | to_pascal_case %}
+    async {{ function_name }}(_headers: Record<string, any>, _input: {{ class_prefix }}Input): Promise<TypedMessage<{{ class_prefix }}Output>> {
         throw new Error('Not implemented');
     }
     {%- endfor %}
@@ -350,11 +361,12 @@ export class TypedServerHandler {
         return {
             {% for fn in functions %}
             {%- set function_name = fn | replace('fn.', '') %}
-            "{{ fn }}": async (functionName: string, requestMessage: Message): Promise<Message> => {
-                const argument = requestMessage.body[functionName];
+            {%- set class_prefix = function_name | to_pascal_case %}
+            "{{ fn }}": async (_functionName: string, requestMessage: Message): Promise<Message> => {
+                const argument = requestMessage.body["{{ fn }}"];
                 const { headers: responseHeaders, body } = await this.{{ function_name }}(
                     requestMessage.headers,
-                    new {{ function_name }}.Input({ "{{ fn }}": argument }),
+                    new {{ class_prefix }}Input({ "{{ fn }}": argument }),
                 );
                 return new Message(responseHeaders, body.pseudoJson);
             },
