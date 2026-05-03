@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -44,6 +45,8 @@ import io.github.telepact.internal.validation.ValidateContext;
 import io.github.telepact.internal.validation.ValidationFailure;
 
     public class HandleMessage {
+    private static final Set<String> INTERNAL_FUNCTIONS_BYPASSING_AUTH = Set.of("fn.ping_", "fn.api_");
+
     static Message handleMessage(Message requestMessage, Consumer<Map<String, Object>> updateHeaders, TelepactSchema telepactSchema, Middleware middleware,
             FunctionRouter functionRouter,
             Consumer<TelepactError> onError, Function<Map<String, Object>, Map<String, Object>> onAuth) {
@@ -59,6 +62,7 @@ import io.github.telepact.internal.validation.ValidationFailure;
 
         final String requestTargetInit = requestEntry.getKey();
         final Map<String, Object> requestPayload = (Map<String, Object>) requestEntry.getValue();
+        final var bypassAuthForFunction = INTERNAL_FUNCTIONS_BYPASSING_AUTH.contains(requestTargetInit);
 
         final String unknownTarget;
         final String requestTarget;
@@ -97,7 +101,7 @@ import io.github.telepact.internal.validation.ValidationFailure;
                     responseHeaders);
         }
 
-        if (requestHeaders.containsKey("@auth_")) {
+        if (requestHeaders.containsKey("@auth_") && !bypassAuthForFunction) {
             try {
                 final var authHeaders = onAuth.apply(requestHeaders);
                 if (authHeaders != null) {
