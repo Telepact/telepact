@@ -15,7 +15,7 @@
 //|
 
 import { Client, ClientOptions, Message, Serializer, TelepactSchema, type FsModule, type PathModule } from 'telepact';
-import { TypedClient, greet } from '../../../../example/ts-codegen/gen/genTypes.js';
+import { TypedClient, greet } from './gen/genTypes.js';
 
 const schema = TelepactSchema.fromJson('[]');
 

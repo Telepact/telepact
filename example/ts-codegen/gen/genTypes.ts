@@ -23,101 +23,103 @@ export class UntypedTaggedValue_ {
     }
 }
         
-export namespace greet {
+
+export class GreetInput {
     
-    export class Input {
-        
-        pseudoJson: Record<string, any>;
+    pseudoJson: Record<string, any>;
 
-        constructor(pseudoJson: Record<string, any>) {
-            this.pseudoJson = pseudoJson;
-        }
-
-        static from({
-            subject,        
-        }: {
-            subject: string,        
-        }): greet.Input {
-            const input: Record<string, any> = {};
-            input["subject"] = subject;
-
-            return new greet.Input({"fn.greet": input});
-        }
-        subject(): string {
-            return this.pseudoJson["fn.greet"]["subject"];
-        }
-    }
-    
-    export class Output {
-        
-        pseudoJson: Record<string, any>;
-
-        constructor(pseudoJson: Record<string, any>) {
-            this.pseudoJson = pseudoJson;
-        }
-        static from_Ok_(payload: {
-            message: string,        
-        }): greet.Output {
-            return new greet.Output({
-                "Ok_": greet.Output.Ok_.from(payload).pseudoJson
-            });
-        }
-
-        getTaggedValue():
-            TaggedValue_<"Ok_", greet.Output.Ok_> | TaggedValue_<"NoMatch_", UntypedTaggedValue_> {
-            const tag = Object.keys(this.pseudoJson)[0]!;
-            if (tag === "Ok_") {
-                return new TaggedValue_("Ok_", new greet.Output.Ok_(this.pseudoJson["Ok_"]));
-            }
-            return new TaggedValue_("NoMatch_", new UntypedTaggedValue_(tag, this.pseudoJson[tag]));
-        }
+    constructor(pseudoJson: Record<string, any>) {
+        this.pseudoJson = pseudoJson;
     }
 
-    export namespace Output {
-        
-        export class Ok_ {
-            
-            pseudoJson: Record<string, any>;
+    static from({
+        subject,
+    }: {
+        subject: string,
+    }): GreetInput {
+        const input: Record<string, any> = {};
+        input["subject"] = subject;
 
-            constructor(pseudoJson: Record<string, any>) {
-                this.pseudoJson = pseudoJson;
-            }
-
-            static from({
-                message,        
-            }: {
-                message: string,        
-            }): greet.Output.Ok_ {
-                const input: Record<string, any> = {};
-                input["message"] = message;
-
-                return new greet.Output.Ok_(input);
-            }
-            message(): string {
-                return this.pseudoJson["message"];
-            }
-        }
+        return new GreetInput({"fn.greet": input});
     }
-
-    export class Select_ {
-
-        pseudoJson: Record<string, any> = {};
-            
-        okmessage(): Select_ {
-            const resultUnion = this.pseudoJson["->"] ?? {};
-            const theseFields = resultUnion["Ok_"] ?? [];
-            if (!theseFields.includes('message')) {
-                theseFields.push('message');
-            }
-            resultUnion["Ok_"] = theseFields;
-            this.pseudoJson["->"] = resultUnion;
-            return this;
-        }
+    subject(): string {
+        return this.pseudoJson["fn.greet"]["subject"];
     }
-
 }
 
- 
+export class GreetOutput {
+    
+    pseudoJson: Record<string, any>;
+
+    constructor(pseudoJson: Record<string, any>) {
+        this.pseudoJson = pseudoJson;
+    }
+    static Ok_: typeof GreetOutputOk;
+    static from_Ok_(payload: {
+        message: string,
+    }): GreetOutput {
+        return new GreetOutput({
+            "Ok_": GreetOutputOk.from(payload).pseudoJson
+        });
+    }
+
+    getTaggedValue():
+        TaggedValue_<"Ok_", GreetOutputOk> | TaggedValue_<"NoMatch_", UntypedTaggedValue_> {
+        const tag = Object.keys(this.pseudoJson)[0]!;
+        if (tag === "Ok_") {
+            return new TaggedValue_("Ok_", new GreetOutputOk(this.pseudoJson["Ok_"]));
+        }
+        return new TaggedValue_("NoMatch_", new UntypedTaggedValue_(tag, this.pseudoJson[tag]));
+    }
+}
+
+export class GreetOutputOk {
+    
+    pseudoJson: Record<string, any>;
+
+    constructor(pseudoJson: Record<string, any>) {
+        this.pseudoJson = pseudoJson;
+    }
+
+    static from({
+        message,
+    }: {
+        message: string,
+    }): GreetOutputOk {
+        const input: Record<string, any> = {};
+        input["message"] = message;
+
+        return new GreetOutputOk(input);
+    }
+    message(): string {
+        return this.pseudoJson["message"];
+    }
+}
+GreetOutput.Ok_ = GreetOutputOk;
+
+export class GreetSelect_ {
+
+    pseudoJson: Record<string, any> = {};
+
+    okmessage(): GreetSelect_ {
+        const resultUnion = this.pseudoJson["->"] ?? {};
+        const theseFields = resultUnion["Ok_"] ?? [];
+        if (!theseFields.includes('message')) {
+            theseFields.push('message');
+        }
+        resultUnion["Ok_"] = theseFields;
+        this.pseudoJson["->"] = resultUnion;
+        return this;
+    }
+}
+
+export const greet = {
+    Input: GreetInput,
+    Output: GreetOutput,
+    Select_: GreetSelect_,
+} as const;
+
+
 
 export class Select_ {
     pseudoJson: Record<string, any> = {};
@@ -126,7 +128,7 @@ export class Select_ {
         this.pseudoJson = pseudoJson;
     }
 
-    static for_greet(select: greet.Select_): Select_ {
+    static for_greet(select: GreetSelect_): Select_ {
         return new Select_(select.pseudoJson);
     }
 }
@@ -139,26 +141,26 @@ export class TypedClient {
     }
 
     
-    async greet(headers: Record<string, any>, input: greet.Input): Promise<TypedMessage<greet.Output>> {
+    async greet(headers: Record<string, any>, input: GreetInput): Promise<TypedMessage<GreetOutput>> {
         const message = await this.client.request(new Message(headers, input.pseudoJson));
-        return { headers: message.headers, body: new greet.Output(message.body)};
+        return { headers: message.headers, body: new GreetOutput(message.body)};
     }
 }
 
 export class TypedServerHandler {
     
-    async greet(headers: Record<string, any>, input: greet.Input): Promise<TypedMessage<greet.Output>> {
+    async greet(_headers: Record<string, any>, _input: GreetInput): Promise<TypedMessage<GreetOutput>> {
         throw new Error('Not implemented');
     }
 
     functionRoutes(): Record<string, (functionName: string, requestMessage: Message) => Promise<Message>> {
         return {
             
-            "fn.greet": async (functionName: string, requestMessage: Message): Promise<Message> => {
-                const argument = requestMessage.body[functionName];
+            "fn.greet": async (_functionName: string, requestMessage: Message): Promise<Message> => {
+                const argument = requestMessage.body["fn.greet"];
                 const { headers: responseHeaders, body } = await this.greet(
                     requestMessage.headers,
-                    new greet.Input({ "fn.greet": argument }),
+                    new GreetInput({ "fn.greet": argument }),
                 );
                 return new Message(responseHeaders, body.pseudoJson);
             },
