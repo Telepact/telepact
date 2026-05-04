@@ -1,21 +1,13 @@
-# full-stack
+# full-stack-proxy
 
-A runnable Telepact example with a Python backend and a TypeScript browser
-frontend.
+A runnable Telepact example with a Python backend, a TypeScript browser frontend,
+and a websocket-to-NATS proxy.
 
-This example is intentionally broader than the minimal demos. It demonstrates the
-production-boundary concerns from
-[`doc/04-operate/01-production-guide.md`](../../doc/04-operate/01-production-guide.md):
-
-- HTTP-only session cookies stay at the transport boundary and are translated into
-  `@auth_`
-- `on_auth` normalizes identity into internal headers such as `@userId` and `@role`
-- Telepact hooks emit request IDs, per-function metrics, and structured events
-  without logging whole request payloads
-- authorization stays in the handler that owns the admin-only business rule
-- unexpected bugs still return `ErrorUnknown_` with a client-visible `caseId`
-- `schema-baseline/` gives you a checked-in schema snapshot to compare during
-  contract changes
+This example keeps the same API, auth flow, metrics, and Playwright coverage as
+[`full-stack`](../full-stack/README.md), but moves the browser Telepact traffic to
+an intermediate websocket proxy. The proxy has no Telepact code. It forwards raw
+message bytes to the NATS topic named in the websocket URL, and the real Telepact
+server handles the request behind that transport boundary.
 
 ## Layout
 
@@ -23,12 +15,16 @@ production-boundary concerns from
   checked-in Telepact schema
 - [`schema-baseline/dashboard.telepact.yaml`](./schema-baseline/dashboard.telepact.yaml)
   - baseline schema snapshot for compatibility checks
-- [`server/app.py`](./server/app.py) - Python HTTP adapter that serves the app
-  and Telepact endpoint
+- [`server/app.py`](./server/app.py) - Python HTTP adapter that serves the app,
+  session endpoints, ops snapshot, and starts the NATS-backed Telepact server
 - [`server/telepact_app.py`](./server/telepact_app.py) - Telepact server hooks,
-  auth normalization, metrics, and handlers
+  auth normalization, metrics, handlers, and NATS bridge
+- [`server/run_demo.py`](./server/run_demo.py) - local supervisor that starts
+  NATS, the HTTP server, and the websocket proxy for Playwright
+- [`proxy/app.py`](./proxy/app.py) - websocket-to-NATS byte proxy with no
+  Telepact code
 - [`client/src/main.ts`](./client/src/main.ts) - Vite-powered TypeScript browser
-  UI entry point
+  UI entry point that talks to the proxy over WebSocket
 - [`client/src/app.html`](./client/src/app.html) - browser UI markup
 - [`client/tests/e2e.spec.ts`](./client/tests/e2e.spec.ts) - Playwright end-to-end
   coverage
@@ -40,8 +36,8 @@ make run
 ```
 
 That target rebuilds the local Telepact Python and TypeScript packages, installs
-browser dependencies, builds the browser app, and runs the Playwright end-to-end
-suite against the Python server.
+browser and proxy dependencies, builds the browser app, starts a local NATS
+server, and runs the Playwright end-to-end suite.
 
 ## Inspect schema compatibility
 

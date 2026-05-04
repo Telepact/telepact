@@ -11,6 +11,7 @@ and the Telepact libraries keep their API surfaces closely aligned across langua
 - [py-websocket](./py-websocket/README.md) - Minimal Python demo that shows how to use WebSocket request/reply
 
 - [full-stack](./full-stack/README.md) - Python backend + browser TypeScript frontend that demonstrates Telepact auth, request IDs, logs, metrics, and Playwright e2e coverage
+- [full-stack-proxy](./full-stack-proxy/README.md) - Python backend + browser TypeScript frontend with a websocket proxy that forwards Telepact bytes to a NATS-backed server
 
 - [ts-binary](./ts-binary/README.md) - Minimal TypeScript demo that shows how to verify binary negotiation
 - [ts-codegen](./ts-codegen/README.md) - Minimal TypeScript demo that shows generated client and server bindings wired into the runtime

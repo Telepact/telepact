@@ -14,7 +14,7 @@
 #|  limitations under the License.
 #|
 
-EXAMPLES := full-stack py-binary py-codegen py-http-cookie-auth py-links py-select py-websocket ts-binary ts-codegen ts-http-cookie-auth ts-links ts-select ts-websocket
+EXAMPLES := full-stack full-stack-proxy py-binary py-codegen py-http-cookie-auth py-links py-select py-websocket ts-binary ts-codegen ts-http-cookie-auth ts-links ts-select ts-websocket
 
 .PHONY: list check run
 

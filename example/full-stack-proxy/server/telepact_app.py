@@ -27,14 +27,20 @@ from dataclasses import dataclass
 from http.cookies import SimpleCookie
 from pathlib import Path
 from time import perf_counter
+from uuid import uuid4
+
+import nats
+from nats.aio.msg import Msg
 
 from telepact import FunctionRouter, Message, Server, TelepactError, TelepactSchema, TelepactSchemaFiles
 
 EXAMPLE_DIR = Path(__file__).resolve().parent.parent
 RECENT_EVENT_LIMIT = 20
+REQUEST_ID_HEADER = 'x-telepact-request-id'
+SESSION_HEADER = 'x-telepact-session'
 
 logging.basicConfig(level=logging.INFO, format='%(message)s')
-log = logging.getLogger('telepact.example.full_stack')
+log = logging.getLogger('telepact.example.full_stack_proxy')
 
 
 @dataclass(frozen=True)
@@ -45,7 +51,7 @@ class SessionIdentity:
 
 
 @dataclass(frozen=True)
-class TelepactHttpResponse:
+class TelepactTransportResponse:
     response_bytes: bytes
     content_type: str
 
@@ -197,6 +203,7 @@ def on_response(message: Message) -> None:
         outcome=outcome,
         durationMs=duration_ms,
         caseId=case_id,
+        transport=context.get('transport'),
     )
 
 
@@ -212,6 +219,7 @@ def on_error(error: TelepactError) -> None:
         caseId=error.case_id,
         kind=error.kind,
         message=str(error),
+        transport=context.get('transport'),
     )
     log.exception('telepact error case_id=%s', error.case_id, exc_info=error)
 
@@ -221,7 +229,11 @@ options.on_error = on_error
 
 async def middleware(request_message: Message, function_router: FunctionRouter) -> Message:
     _merge_context(functionName=request_message.get_body_target())
-    return await function_router.route(request_message)
+    message = await function_router.route(request_message)
+    request_id = _REQUEST_CONTEXT.get().get('requestId')
+    if isinstance(request_id, str):
+        message.headers['@requestId'] = request_id
+    return message
 
 
 options.middleware = middleware
@@ -287,18 +299,96 @@ function_router = FunctionRouter({
 telepact_server = Server(schema, function_router, options)
 
 
-def process_telepact_request(request_bytes: bytes, request_id: str, session_token: str | None) -> TelepactHttpResponse:
-    context_token = _REQUEST_CONTEXT.set({'requestId': request_id, 'transport': 'http'})
-    loop = asyncio.new_event_loop()
+async def process_telepact_request_async(
+    request_bytes: bytes,
+    request_id: str,
+    session_token: str | None,
+    transport: str,
+) -> TelepactTransportResponse:
+    context_token = _REQUEST_CONTEXT.set({'requestId': request_id, 'transport': transport})
     try:
         def update_headers(headers: dict[str, object]) -> None:
             headers['@requestId'] = request_id
             if session_token is not None:
                 headers['@auth_'] = {'Session': {'token': session_token}}
 
-        response = loop.run_until_complete(telepact_server.process(request_bytes, update_headers))
+        response = await telepact_server.process(request_bytes, update_headers)
         content_type = 'application/octet-stream' if '@bin_' in response.headers else 'application/json'
-        return TelepactHttpResponse(response_bytes=response.bytes, content_type=content_type)
+        return TelepactTransportResponse(response_bytes=response.bytes, content_type=content_type)
     finally:
-        loop.close()
         _REQUEST_CONTEXT.reset(context_token)
+
+
+class TelepactNatsBridge:
+    def __init__(self, nats_url: str, topic: str):
+        self._nats_url = nats_url
+        self._topic = topic
+        self._loop = asyncio.new_event_loop()
+        self._thread = threading.Thread(target=self._run_loop, name='telepact-nats-bridge', daemon=True)
+        self._startup_complete = threading.Event()
+        self._startup_error: Exception | None = None
+        self._connection = None
+        self._subscription = None
+
+    def start(self) -> None:
+        self._thread.start()
+        self._startup_complete.wait(timeout=10)
+        if self._startup_error is not None:
+            raise self._startup_error
+        if not self._startup_complete.is_set():
+            raise TimeoutError('timed out starting NATS bridge')
+
+    def close(self) -> None:
+        if not self._thread.is_alive():
+            return
+        future = asyncio.run_coroutine_threadsafe(self._shutdown(), self._loop)
+        future.result(timeout=10)
+        self._loop.call_soon_threadsafe(self._loop.stop)
+        self._thread.join(timeout=10)
+
+    def _run_loop(self) -> None:
+        asyncio.set_event_loop(self._loop)
+        try:
+            self._loop.run_until_complete(self._startup())
+        except Exception as error:  # pragma: no cover - surfaced synchronously via start()
+            self._startup_error = error
+        finally:
+            self._startup_complete.set()
+
+        if self._startup_error is not None:
+            return
+
+        self._loop.run_forever()
+        self._loop.close()
+
+    async def _startup(self) -> None:
+        self._connection = await nats.connect(self._nats_url)
+        self._subscription = await self._connection.subscribe(self._topic, cb=self._handle_message)
+        await self._connection.flush()
+
+    async def _shutdown(self) -> None:
+        if self._subscription is not None:
+            await self._subscription.unsubscribe()
+            self._subscription = None
+        if self._connection is not None:
+            await self._connection.drain()
+            self._connection = None
+
+    async def _handle_message(self, msg: Msg) -> None:
+        request_id = _read_transport_header(msg, REQUEST_ID_HEADER) or str(uuid4())
+        session_token = _read_transport_header(msg, SESSION_HEADER)
+        response = await process_telepact_request_async(msg.data, request_id, session_token, transport='nats')
+        if msg.reply is not None and self._connection is not None:
+            await self._connection.publish(msg.reply, response.response_bytes)
+
+
+def _read_transport_header(msg: Msg, header_name: str) -> str | None:
+    headers = msg.headers
+    if headers is None:
+        return None
+    value = headers.get(header_name)
+    if isinstance(value, list):
+        if not value:
+            return None
+        value = value[0]
+    return value if isinstance(value, str) and value != '' else None

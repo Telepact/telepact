@@ -21,8 +21,10 @@ import { fileURLToPath } from 'node:url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const serverPython = path.resolve(__dirname, '../server/.venv/bin/python');
-const serverEntrypoint = path.resolve(__dirname, '../server/app.py');
+const demoEntrypoint = path.resolve(__dirname, '../server/run_demo.py');
 const port = 4173;
+const proxyPort = 4174;
+const natsPort = 42223;
 const TEST_TIMEOUT_MS = 60 * 1000;
 
 export default defineConfig({
@@ -32,7 +34,7 @@ export default defineConfig({
     baseURL: `http://127.0.0.1:${port}`,
   },
   webServer: {
-    command: `${serverPython} ${serverEntrypoint} --host 127.0.0.1 --port ${port}`,
+    command: `${serverPython} ${demoEntrypoint} --host 127.0.0.1 --port ${port} --proxy-port ${proxyPort} --nats-port ${natsPort} --topic example.full-stack-proxy.telepact`,
     port,
     reuseExistingServer: !process.env.CI,
   },

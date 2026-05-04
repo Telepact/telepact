@@ -1,5 +1,5 @@
 {
-  "name": "telepact-example-full-stack-client",
+  "name": "telepact-example-full-stack-proxy-client",
   "private": true,
   "version": "0.0.0",
   "type": "module",

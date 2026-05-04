@@ -22,13 +22,11 @@ from http.cookies import SimpleCookie
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path, PurePosixPath
 from urllib.parse import unquote, urlsplit
-from uuid import uuid4
 
-from telepact_app import log, process_telepact_request, read_session_cookie, snapshot_ops_state
+from telepact_app import TelepactNatsBridge, log, snapshot_ops_state
 
 EXAMPLE_DIR = Path(__file__).resolve().parent.parent
 CLIENT_DIST_DIR = EXAMPLE_DIR / 'client' / 'dist'
-BODY_LIMIT_BYTES = 64 * 1024
 STATIC_CONTENT_TYPES = {
     '.css': 'text/css; charset=utf-8',
     '.html': 'text/html; charset=utf-8',
@@ -138,27 +136,8 @@ class RequestHandler(BaseHTTPRequestHandler):
             self.wfile.write(body)
             return
 
-        if self.path != '/api/telepact':
-            self.send_response(404)
-            self.end_headers()
-            return
-
-        content_length = int(self.headers.get('Content-Length', '0'))
-        if content_length > BODY_LIMIT_BYTES:
-            _write_json(self, {'error': 'request body too large'}, status_code=413)
-            return
-
-        request_bytes = self.rfile.read(content_length)
-        request_id = str(uuid4())
-        session_token = read_session_cookie(self.headers.get('Cookie'))
-        response = process_telepact_request(request_bytes, request_id, session_token)
-
-        self.send_response(200)
-        self.send_header('Content-Type', response.content_type)
-        self.send_header('Cache-Control', 'no-store')
-        self.send_header('X-Request-ID', request_id)
+        self.send_response(404)
         self.end_headers()
-        self.wfile.write(response.response_bytes)
 
     def log_message(self, format_string: str, *args: object) -> None:
         return
@@ -169,19 +148,25 @@ def create_http_server(host: str = '127.0.0.1', port: int = 8000) -> ThreadingHT
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description='Run the Telepact full-stack example server.')
+    parser = argparse.ArgumentParser(description='Run the Telepact full-stack proxy example server.')
     parser.add_argument('--host', default='127.0.0.1')
     parser.add_argument('--port', type=int, default=8000)
+    parser.add_argument('--nats-url', default='nats://127.0.0.1:4222')
+    parser.add_argument('--topic', default='example.full-stack-proxy.telepact')
     args = parser.parse_args()
 
+    bridge = TelepactNatsBridge(args.nats_url, args.topic)
+    bridge.start()
     server = create_http_server(args.host, args.port)
-    log.info('serving full-stack example on http://%s:%s', args.host, args.port)
+    log.info('serving full-stack proxy example on http://%s:%s', args.host, args.port)
+    log.info('listening for Telepact requests on %s via %s', args.nats_url, args.topic)
     try:
         server.serve_forever()
     except KeyboardInterrupt:
         pass
     finally:
         server.server_close()
+        bridge.close()
 
 
 if __name__ == '__main__':

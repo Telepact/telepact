@@ -25,6 +25,9 @@ type SnapshotResponse = {
   recentEvents: Array<JsonObject>;
 };
 
+const TELEPACT_TOPIC = 'example.full-stack-proxy.telepact';
+const REQUEST_TIMEOUT_MS = 10_000;
+
 const app = document.querySelector<HTMLDivElement>('#app');
 if (app === null) {
   throw new Error('missing #app root');
@@ -60,31 +63,105 @@ function setBusy(isBusy: boolean): void {
   }
 }
 
+function getProxyUrl(): string {
+  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+  const locationPort = window.location.port === ''
+    ? (window.location.protocol === 'https:' ? 443 : 80)
+    : Number(window.location.port);
+  return `${protocol}//${window.location.hostname}:${locationPort + 1}/ws/telepact?topic=${encodeURIComponent(TELEPACT_TOPIC)}`;
+}
+
+async function messageEventDataToBytes(data: Blob | ArrayBuffer | string): Promise<Uint8Array> {
+  if (typeof data === 'string') {
+    return new TextEncoder().encode(data);
+  }
+  if (data instanceof ArrayBuffer) {
+    return new Uint8Array(data);
+  }
+  return new Uint8Array(await data.arrayBuffer());
+}
+
+async function requestProxy(requestBytes: Uint8Array): Promise<Uint8Array> {
+  return await new Promise<Uint8Array>((resolve, reject) => {
+    const websocket = new WebSocket(getProxyUrl());
+    websocket.binaryType = 'arraybuffer';
+
+    let settled = false;
+    const timeoutId = window.setTimeout(() => {
+      settleError(new Error('websocket proxy request timed out'));
+    }, REQUEST_TIMEOUT_MS);
+
+    function clearTimeoutIfNeeded(): void {
+      window.clearTimeout(timeoutId);
+    }
+
+    function settleResult(value: Uint8Array): void {
+      if (settled) {
+        return;
+      }
+      settled = true;
+      clearTimeoutIfNeeded();
+      resolve(value);
+    }
+
+    function settleError(error: Error): void {
+      if (settled) {
+        return;
+      }
+      settled = true;
+      clearTimeoutIfNeeded();
+      try {
+        websocket.close();
+      } catch {
+        // ignore close failures while rejecting the request
+      }
+      reject(error);
+    }
+
+    websocket.addEventListener('open', () => {
+      websocket.send(requestBytes);
+    }, { once: true });
+
+    websocket.addEventListener('message', (event: MessageEvent<Blob | ArrayBuffer | string>) => {
+      void (async () => {
+        const responseBytes = await messageEventDataToBytes(event.data);
+        settleResult(responseBytes);
+        websocket.close(1000, 'request complete');
+      })().catch((error: unknown) => {
+        settleError(error instanceof Error ? error : new Error(String(error)));
+      });
+    }, { once: true });
+
+    websocket.addEventListener('error', () => {
+      settleError(new Error('websocket proxy request failed'));
+    }, { once: true });
+
+    websocket.addEventListener('close', (event) => {
+      if (settled) {
+        return;
+      }
+      const reason = event.reason === '' ? 'no reason provided' : event.reason;
+      settleError(new Error(`websocket closed ${event.code}: ${reason}`));
+    }, { once: true });
+  });
+}
+
 async function requestTelepact(body: JsonObject): Promise<void> {
   setBusy(true);
   requestPill.textContent = 'request id: waiting for server';
 
   try {
-    let echoedRequestId = 'missing';
     const client = new Client(async (message: Message, serializer: Serializer): Promise<Message> => {
-      const requestBytes = serializer.serialize(message);
-      const requestBody = new Uint8Array(requestBytes.byteLength);
-      requestBody.set(requestBytes);
-      const response = await fetch('/api/telepact', {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: requestBody.buffer,
-      });
-      echoedRequestId = response.headers.get('X-Request-ID') ?? 'missing';
-      const responseBytes = new Uint8Array(await response.arrayBuffer());
+      const requestBytes = new Uint8Array(serializer.serialize(message));
+      const responseBytes = await requestProxy(requestBytes);
       return serializer.deserialize(responseBytes);
     }, new ClientOptions());
 
     const response = await client.request(new Message({}, body));
     const outcome = response.getBodyTarget();
+    const echoedRequestId = typeof response.headers['@requestId'] === 'string'
+      ? response.headers['@requestId']
+      : 'missing';
     requestPill.textContent = `request id: ${echoedRequestId}`;
     outcomePill.textContent = `outcome: ${outcome}`;
     responseOutput.textContent = pretty({
