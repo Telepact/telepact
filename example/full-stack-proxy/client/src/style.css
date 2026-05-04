@@ -15,6 +15,7 @@
 /*|                                                                            |*/
 
 :root {
+  --radius-full: 999px;
   color-scheme: light;
   font-family: Inter, system-ui, sans-serif;
   line-height: 1.5;
@@ -119,7 +120,7 @@ pre {
 .pill {
   display: inline-flex;
   padding: 0.35rem 0.7rem;
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   background: #eef3ff;
   color: #2247d5;
   font-weight: 600;

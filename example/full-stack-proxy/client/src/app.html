@@ -1,55 +1,65 @@
-<section class="shell">
-  <header>
-    <p class="eyebrow">Telepact example</p>
-    <h1>Telepact full-stack websocket proxy demo</h1>
-    <p>
-      The browser keeps using the same dashboard schema, but sends Telepact request
-      bytes to a websocket proxy that forwards them to the real server over NATS.
-    </p>
-  </header>
-
-  <section class="status-grid">
-    <div class="status-card">
-      <h2>Current session</h2>
-      <p id="session-pill">session: anonymous</p>
-      <div class="button-row">
+<section class="hero">
+  <span class="pill">Python backend + websocket proxy + TypeScript browser frontend</span>
+  <h1>Telepact full-stack websocket proxy demo</h1>
+  <p>
+    This browser app still uses the dashboard schema and browser UI from the full-stack example,
+    but sends Telepact request bytes to a websocket proxy. The proxy forwards the raw bytes to
+    NATS, and the real Telepact server handles auth normalization, metrics, request IDs, and
+    generic unknown-error responses behind that transport boundary.
+  </p>
+</section>
+<section class="grid">
+  <div class="stack">
+    <div class="card">
+      <h2>Session controls</h2>
+      <div class="actions">
         <button id="sign-in-user">Sign in as reader</button>
         <button id="sign-in-admin">Sign in as admin</button>
-        <button id="logout">Clear session</button>
+        <button id="logout" class="secondary">Sign out</button>
+      </div>
+      <div class="status-line">
+        <span class="pill" id="session-pill">session: anonymous</span>
+        <span class="pill" id="health-pill">server: loading</span>
       </div>
     </div>
-
-    <div class="status-card">
-      <h2>Transport health</h2>
-      <p id="health-pill">server: checking…</p>
-      <p id="request-pill">request id: waiting</p>
-      <p id="outcome-pill">outcome: idle</p>
-    </div>
-  </section>
-
-  <section class="status-card">
-    <h2>Try the API</h2>
-    <div class="button-row">
-      <button id="call-me">Who am I?</button>
-      <button id="call-admin">Load admin report</button>
-      <button id="call-failure">Trigger server bug</button>
-    </div>
-  </section>
-
-  <section class="output-grid">
-    <article class="status-card">
-      <div class="card-header">
-        <h2>Latest response</h2>
+    <div class="card">
+      <h2>Telepact functions</h2>
+      <div class="actions">
+        <button id="call-me">Who am I?</button>
+        <button id="call-admin">Load admin report</button>
+        <button id="call-failure" class="secondary">Trigger server bug</button>
       </div>
-      <pre id="response-output">No requests yet.</pre>
-    </article>
-
-    <article class="status-card">
-      <div class="card-header">
-        <h2>Ops snapshot</h2>
-        <button id="refresh-ops">Refresh</button>
+      <div class="status-line">
+        <span class="pill" id="request-pill">request id: pending</span>
+        <span class="pill" id="outcome-pill">outcome: none</span>
       </div>
-      <pre id="ops-output">Loading…</pre>
-    </article>
-  </section>
+    </div>
+    <div class="card">
+      <h2>What this example demonstrates</h2>
+      <ul class="note-list">
+        <li>the browser talks to a websocket proxy instead of directly to the Telepact server</li>
+        <li>the proxy forwards raw request bytes to a NATS topic without any Telepact code</li>
+        <li><code>on_auth</code> still normalizes identity into internal Telepact headers</li>
+        <li>request IDs, per-function metrics, and structured events still come from Telepact hooks</li>
+        <li><code>ErrorUnauthorized_</code> stays close to the admin-only business rule</li>
+        <li>
+          <code>ErrorUnknown_</code> still keeps the wire response generic while exposing a
+          <code>caseId</code>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="stack">
+    <div class="card">
+      <h2>Latest Telepact response</h2>
+      <div class="output"><pre id="response-output">Waiting for a browser action…</pre></div>
+    </div>
+    <div class="card">
+      <div class="actions" style="justify-content: space-between; align-items: center;">
+        <h2 style="margin-bottom: 0;">Operational snapshot</h2>
+        <button id="refresh-ops" class="secondary">Refresh ops snapshot</button>
+      </div>
+      <div class="output"><pre id="ops-output">Loading…</pre></div>
+    </div>
+  </div>
 </section>
