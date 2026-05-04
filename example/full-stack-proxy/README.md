@@ -5,8 +5,9 @@ proxy, and a Go Telepact server.
 
 This example shows how to expose an internal NATS RPC subject through a more common
 HTTP transport without putting any Telepact logic in the proxy itself. The browser
-still sends Telepact request bytes and receives Telepact response bytes, while the
-Python proxy only forwards those bytes between HTTP and NATS.
+still sends Telepact request bytes and receives Telepact response bytes over fixed
+HTTP routes, while the Python proxy is the only generalized component that forwards
+those bytes between HTTP and the NATS subject encoded in the URL.
 
 ## Layout
 

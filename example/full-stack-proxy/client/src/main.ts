@@ -23,6 +23,9 @@ type HealthResponse = {
   natsUrl?: string;
 };
 
+const GREET_SUBJECT = 'rpc.demo.greet';
+const MISSING_SUBJECT = 'rpc.demo.missing';
+
 const app = document.querySelector<HTMLDivElement>('#app');
 if (app === null) {
   throw new Error('missing #app root');
@@ -30,7 +33,6 @@ if (app === null) {
 
 app.innerHTML = appHtml;
 
-const subjectInput = must<HTMLInputElement>('#subject-input');
 const nameInput = must<HTMLInputElement>('#name-input');
 const healthPill = must<HTMLSpanElement>('#health-pill');
 const pathPill = must<HTMLSpanElement>('#path-pill');
@@ -67,15 +69,14 @@ function requestPath(subject: string): string {
   return `/rpc/${encodeURIComponent(subject)}`;
 }
 
-function syncSubjectUi(): string {
-  const subject = subjectInput.value.trim();
+function syncSubjectUi(subject: string): string {
   pathPill.textContent = `POST ${requestPath(subject)}`;
   return subject;
 }
 
 async function sendGreeting(subject: string): Promise<void> {
   setBusy(true);
-  syncSubjectUi();
+  syncSubjectUi(subject);
 
   try {
     const client = new Client(async (message: Message, serializer: Serializer): Promise<Message> => {
@@ -128,17 +129,12 @@ async function refreshHealth(): Promise<void> {
     : 'proxy: disconnected';
 }
 
-subjectInput.addEventListener('input', () => {
-  syncSubjectUi();
-});
-
 must<HTMLButtonElement>('#send-request').addEventListener('click', async () => {
-  await sendGreeting(syncSubjectUi());
+  await sendGreeting(syncSubjectUi(GREET_SUBJECT));
 });
 
 must<HTMLButtonElement>('#send-missing').addEventListener('click', async () => {
-  subjectInput.value = 'rpc.demo.missing';
-  await sendGreeting(syncSubjectUi());
+  await sendGreeting(syncSubjectUi(MISSING_SUBJECT));
 });
 
 must<HTMLButtonElement>('#refresh-health').addEventListener('click', async () => {
@@ -151,6 +147,6 @@ must<HTMLButtonElement>('#refresh-health').addEventListener('click', async () =>
 });
 
 void (async () => {
-  syncSubjectUi();
+  syncSubjectUi(GREET_SUBJECT);
   await refreshHealth();
 })();

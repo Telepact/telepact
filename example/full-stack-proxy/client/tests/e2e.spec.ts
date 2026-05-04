@@ -28,7 +28,7 @@ test('browser request reaches the Go Telepact server through the Python proxy', 
   await expect(page.locator('#path-pill')).toContainText('POST /rpc/rpc.demo.greet');
 });
 
-test('changing the subject changes the proxy route and surfaces transport failures', async ({ page }) => {
+test('browser uses a fixed missing-subject route and surfaces proxy transport failures', async ({ page }) => {
   await page.goto('/');
 
   await page.getByRole('button', { name: 'Use missing subject' }).click();

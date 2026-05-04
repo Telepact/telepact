@@ -28,10 +28,6 @@
     <div class="card">
       <h2>Route over HTTP</h2>
       <label class="field">
-        <span>NATS subject</span>
-        <input id="subject-input" type="text" value="rpc.demo.greet" spellcheck="false" />
-      </label>
-      <label class="field">
         <span>Name</span>
         <input id="name-input" type="text" value="Telepact" spellcheck="false" />
       </label>
@@ -51,7 +47,7 @@
       <ul class="note-list">
         <li>the browser can use plain HTTP while the internal RPC transport stays on NATS</li>
         <li>the proxy forwards raw request and response bytes without importing Telepact</li>
-        <li>the NATS subject is chosen from the HTTP URL instead of hard-coded proxy logic</li>
+        <li>the browser uses fixed routes, while the proxy stays generic and routes by URL subject</li>
         <li>the Go server still speaks normal Telepact once the bytes arrive on its topic</li>
       </ul>
     </div>
