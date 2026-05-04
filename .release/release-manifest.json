@@ -1,9 +1,9 @@
 {
   "changed_paths": [
-    "doc/04-operate/01-production-guide.md"
+    "tool/telepact_project_cli/uv.lock"
   ],
   "direct_targets": [],
-  "pr_number": 514,
+  "pr_number": 516,
   "targets": [],
   "version": "1.0.0-alpha.334"
 }
