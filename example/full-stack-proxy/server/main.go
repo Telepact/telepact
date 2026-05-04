@@ -120,8 +120,7 @@ func buildTelepactServer(apiDir string, subject string) (*telepact.Server, error
 				map[string]any{},
 				map[string]any{
 					"Ok_": map[string]any{
-						"message":   fmt.Sprintf("Hello %s from the Go Telepact server!", name),
-						"subject":   subject,
+						"message": fmt.Sprintf("Hello %s from the Go Telepact server!", name),
 					},
 				},
 			), nil
