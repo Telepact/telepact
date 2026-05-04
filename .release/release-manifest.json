@@ -1,10 +1,9 @@
 {
   "changed_paths": [
-    "tool/telepact_project_cli/pyproject.toml",
-    "tool/telepact_project_cli/uv.lock"
+    "example/full-stack/README.md"
   ],
   "direct_targets": [],
-  "pr_number": 505,
+  "pr_number": 509,
   "targets": [],
   "version": "1.0.0-alpha.333"
 }
