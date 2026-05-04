@@ -19,11 +19,18 @@ production-boundary concerns from
 
 ## Layout
 
-- [`api/`](./api/) - current checked-in Telepact schema
-- [`schema-baseline/`](./schema-baseline/) - baseline schema snapshot for
-  compatibility checks
-- [`server/`](./server/) - Python HTTP adapter and Telepact server hooks
-- [`client/`](./client/) - Vite-powered TypeScript browser UI and Playwright e2e
+- [`api/dashboard.telepact.yaml`](./api/dashboard.telepact.yaml) - current
+  checked-in Telepact schema
+- [`schema-baseline/dashboard.telepact.yaml`](./schema-baseline/dashboard.telepact.yaml)
+  - baseline schema snapshot for compatibility checks
+- [`server/app.py`](./server/app.py) - Python HTTP adapter that serves the app
+  and Telepact endpoint
+- [`server/telepact_app.py`](./server/telepact_app.py) - Telepact server hooks,
+  auth normalization, metrics, and handlers
+- [`client/src/main.ts`](./client/src/main.ts) - Vite-powered TypeScript browser
+  UI entry point
+- [`client/src/app.html`](./client/src/app.html) - browser UI markup
+- [`client/tests/e2e.spec.ts`](./client/tests/e2e.spec.ts) - Playwright end-to-end
   coverage
 
 ## Run it
