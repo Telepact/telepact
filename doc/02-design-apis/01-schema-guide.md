@@ -287,7 +287,7 @@ Telepact console.
 - ///: A struct that contains a `field`.
   struct.ExampleStruct:
     field: "boolean"
-- struct.ExampleUnion:
+- union.ExampleUnion:
     - ///: The default `Tag` that contains a `field`.
       Tag:
         field: "integer"
