@@ -28,7 +28,7 @@ import { mapValidationFailuresToInvalidFieldCases } from './validation/MapValida
 import { ValidateContext } from './validation/ValidateContext.js';
 import { serverBase64Decode } from './binary/ServerBase64Decode.js';
 import { TelepactError } from '../TelepactError.js';
-import { UpdateHeaders } from '../Server.js';
+import type { AuthHandler, UpdateHeaders } from '../Server.js';
 import { buildUnknownErrorMessage } from './UnknownError.js';
 
 const INTERNAL_FUNCTIONS_BYPASSING_AUTH = new Set(['fn.ping_', 'fn.api_']);
@@ -40,7 +40,7 @@ export async function handleMessage(
     middleware: (requestMessage: Message, functionRouter: { route: (message: Message) => Promise<Message> }) => Promise<Message>,
     functionRouter: { route: (message: Message) => Promise<Message> },
     onError: (error: TelepactError) => void,
-    onAuth: (headers: Record<string, any>) => Record<string, any>,
+    onAuth: AuthHandler,
 ): Promise<Message> {
     const responseHeaders: Record<string, any> = {};
     const requestHeaders: Record<string, any> = requestMessage.headers;
@@ -100,7 +100,7 @@ export async function handleMessage(
 
     if ('@auth_' in requestHeaders && !bypassAuthForFunction) {
         try {
-            const authHeaders = onAuth(requestHeaders) ?? {};
+            const authHeaders = (await onAuth(requestHeaders)) ?? {};
             Object.assign(requestHeaders, authHeaders);
         } catch (error) {
             const wrapped = new TelepactError(`telepact auth handler failed while handling ${functionName}`, 'handler', error);
