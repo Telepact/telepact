@@ -1,30 +1,9 @@
 {
   "changed_paths": [
-    ".github/workflows/build.yml",
-    ".gitignore",
-    "example/Makefile",
-    "example/README.md",
-    "example/full-stack-proxy/Makefile",
-    "example/full-stack-proxy/README.md",
-    "example/full-stack-proxy/api/greet.telepact.yaml",
-    "example/full-stack-proxy/client/.gitignore",
-    "example/full-stack-proxy/client/index.html",
-    "example/full-stack-proxy/client/package.json",
-    "example/full-stack-proxy/client/playwright.config.ts",
-    "example/full-stack-proxy/client/src/app.html",
-    "example/full-stack-proxy/client/src/main.ts",
-    "example/full-stack-proxy/client/src/style.css",
-    "example/full-stack-proxy/client/tests/e2e.spec.ts",
-    "example/full-stack-proxy/client/tsconfig.json",
-    "example/full-stack-proxy/proxy/app.py",
-    "example/full-stack-proxy/proxy/requirements.txt",
-    "example/full-stack-proxy/server/.gitignore",
-    "example/full-stack-proxy/server/go.mod",
-    "example/full-stack-proxy/server/go.sum",
-    "example/full-stack-proxy/server/main.go"
+    "doc/04-operate/01-production-guide.md"
   ],
   "direct_targets": [],
-  "pr_number": 513,
+  "pr_number": 514,
   "targets": [],
   "version": "1.0.0-alpha.334"
 }
