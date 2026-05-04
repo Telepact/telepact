@@ -31,10 +31,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import io.github.telepact.FunctionRouter;
 import io.github.telepact.Message;
+import io.github.telepact.Server.AuthHandler;
 import io.github.telepact.Server.Middleware;
 import io.github.telepact.TelepactError;
 import io.github.telepact.TelepactSchema;
@@ -49,7 +49,7 @@ import io.github.telepact.internal.validation.ValidationFailure;
 
     static Message handleMessage(Message requestMessage, Consumer<Map<String, Object>> updateHeaders, TelepactSchema telepactSchema, Middleware middleware,
             FunctionRouter functionRouter,
-            Consumer<TelepactError> onError, Function<Map<String, Object>, Map<String, Object>> onAuth) {
+            Consumer<TelepactError> onError, AuthHandler onAuth) {
         final var responseHeaders = (Map<String, Object>) new HashMap<String, Object>();
         final Map<String, Object> requestHeaders = requestMessage.headers;
         final Map<String, Object> requestBody = requestMessage.body;
@@ -103,11 +103,15 @@ import io.github.telepact.internal.validation.ValidationFailure;
 
         if (requestHeaders.containsKey("@auth_") && !bypassAuthForFunction) {
             try {
-                final var authHeaders = onAuth.apply(requestHeaders);
+                final var authFuture = onAuth.apply(requestHeaders);
+                final var authHeaders = authFuture == null ? Map.<String, Object>of() : authFuture.get();
                 if (authHeaders != null) {
                     requestHeaders.putAll(authHeaders);
                 }
             } catch (Throwable e) {
+                if (e instanceof InterruptedException) {
+                    Thread.currentThread().interrupt();
+                }
                 final var wrapped = new TelepactError(
                         "telepact auth handler failed while handling %s".formatted(functionName),
                         "handler",

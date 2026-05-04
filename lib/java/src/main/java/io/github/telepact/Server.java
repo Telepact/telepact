@@ -20,8 +20,9 @@ import static io.github.telepact.internal.ProcessBytes.processBytes;
 import static io.github.telepact.internal.binary.ConstructBinaryEncoding.constructBinaryEncoding;
 
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import io.github.telepact.internal.CreateInternalFunctionRoutes;
 import io.github.telepact.internal.binary.ServerBase64Encoder;
@@ -35,6 +36,11 @@ public class Server {
     @FunctionalInterface
     public interface Middleware {
         Message apply(Message requestMessage, FunctionRouter functionRouter);
+    }
+
+    @FunctionalInterface
+    public interface AuthHandler {
+        Future<Map<String, Object>> apply(Map<String, Object> headers);
     }
 
     /**
@@ -71,7 +77,7 @@ public class Server {
          * Execution hook that runs when auth headers are present and can add derived
          * request headers.
          */
-        public Function<Map<String, Object>, Map<String, Object>> onAuth = (headers) -> Map.of();
+        public AuthHandler onAuth = (headers) -> CompletableFuture.completedFuture(Map.of());
 
         /**
          * Middleware that can wrap function routing.
@@ -96,7 +102,7 @@ public class Server {
     private final Consumer<TelepactError> onError;
     private final Consumer<Message> onRequest;
     private final Consumer<Message> onResponse;
-    private final Function<Map<String, Object>, Map<String, Object>> onAuth;
+    private final AuthHandler onAuth;
     private final Serializer serializer;
 
     /**

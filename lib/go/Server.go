@@ -26,12 +26,23 @@ import (
 // Middleware wraps server-side request handling and can delegate to the supplied function router.
 type Middleware func(Message, *FunctionRouter) (Message, error)
 
+// AuthHandler asynchronously resolves derived request headers.
+type AuthHandler func(map[string]any) <-chan map[string]any
+
+// ImmediateAuthHeaders wraps immediate auth headers in an async result channel.
+func ImmediateAuthHeaders(headers map[string]any) <-chan map[string]any {
+	result := make(chan map[string]any, 1)
+	result <- headers
+	close(result)
+	return result
+}
+
 // ServerOptions configures server behaviour.
 type ServerOptions struct {
 	OnError       func(*TelepactError)
 	OnRequest     func(Message)
 	OnResponse    func(Message)
-	OnAuth        func(map[string]any) map[string]any
+	OnAuth        AuthHandler
 	Middleware    Middleware
 	AuthRequired  bool
 	Serialization Serialization
@@ -43,7 +54,7 @@ func NewServerOptions() *ServerOptions {
 		OnError:    func(*TelepactError) {},
 		OnRequest:  func(Message) {},
 		OnResponse: func(Message) {},
-		OnAuth:     func(map[string]any) map[string]any { return map[string]any{} },
+		OnAuth:     func(map[string]any) <-chan map[string]any { return ImmediateAuthHeaders(map[string]any{}) },
 		Middleware: func(requestMessage Message, functionRouter *FunctionRouter) (Message, error) {
 			return functionRouter.Route(requestMessage)
 		},
@@ -59,7 +70,7 @@ type Server struct {
 	onError        func(*TelepactError)
 	onRequest      func(Message)
 	onResponse     func(Message)
-	onAuth         func(map[string]any) map[string]any
+	onAuth         AuthHandler
 	telepactSchema *TelepactSchema
 	serializer     *Serializer
 }
@@ -88,7 +99,7 @@ func NewServer(telepactSchema *TelepactSchema, functionRouter *FunctionRouter, o
 		options.OnResponse = func(Message) {}
 	}
 	if options.OnAuth == nil {
-		options.OnAuth = func(map[string]any) map[string]any { return map[string]any{} }
+		options.OnAuth = func(map[string]any) <-chan map[string]any { return ImmediateAuthHeaders(map[string]any{}) }
 	}
 	if options.Middleware == nil {
 		options.Middleware = func(requestMessage Message, functionRouter *FunctionRouter) (Message, error) {

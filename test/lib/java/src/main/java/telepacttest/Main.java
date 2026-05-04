@@ -474,7 +474,7 @@ public class Main {
         class ThisError extends RuntimeException {
         }
 
-        Function<Map<String, Object>, Map<String, Object>> onAuth = (requestHeaders) -> {
+        Server.AuthHandler onAuth = (requestHeaders) -> CompletableFuture.supplyAsync(() -> {
             Object authObject = requestHeaders.get("@auth_");
             if (!(authObject instanceof Map<?, ?> authMap)) {
                 return Map.of();
@@ -496,7 +496,7 @@ public class Main {
                 return Map.of("@result", Map.of("ErrorUnauthenticated_", Map.of("message!", "a")));
             }
             return Map.of();
-        };
+        });
 
         FunctionRoute backdoorRoute = (functionName, requestMessage) -> {
             try {

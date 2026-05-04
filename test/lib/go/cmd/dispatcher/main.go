@@ -805,34 +805,43 @@ func startTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscription, 
 	onErrorFailed := false
 	onErrorObserved := false
 
-	onAuth := func(requestHeaders map[string]any) map[string]any {
-		authRaw, ok := requestHeaders["@auth_"]
-		if !ok {
-			return map[string]any{}
-		}
-		authMap, ok := authRaw.(map[string]any)
-		if !ok {
-			return map[string]any{}
-		}
-		tokenRaw, ok := authMap["Token"]
-		if !ok {
-			return map[string]any{}
-		}
-		tokenMap, ok := tokenRaw.(map[string]any)
-		if !ok {
-			return map[string]any{}
-		}
-		token, _ := tokenMap["token"].(string)
-		switch token {
-		case "ok":
-			return map[string]any{"@ok_": map[string]any{}}
-		case "unauthorized":
-			return map[string]any{"@result": map[string]any{"ErrorUnauthorized_": map[string]any{"message!": "a"}}}
-		case "":
-			return map[string]any{}
-		default:
-			return map[string]any{"@result": map[string]any{"ErrorUnauthenticated_": map[string]any{"message!": "a"}}}
-		}
+	onAuth := func(requestHeaders map[string]any) <-chan map[string]any {
+		result := make(chan map[string]any, 1)
+		go func() {
+			defer close(result)
+			authRaw, ok := requestHeaders["@auth_"]
+			if !ok {
+				result <- map[string]any{}
+				return
+			}
+			authMap, ok := authRaw.(map[string]any)
+			if !ok {
+				result <- map[string]any{}
+				return
+			}
+			tokenRaw, ok := authMap["Token"]
+			if !ok {
+				result <- map[string]any{}
+				return
+			}
+			tokenMap, ok := tokenRaw.(map[string]any)
+			if !ok {
+				result <- map[string]any{}
+				return
+			}
+			token, _ := tokenMap["token"].(string)
+			switch token {
+			case "ok":
+				result <- map[string]any{"@ok_": map[string]any{}}
+			case "unauthorized":
+				result <- map[string]any{"@result": map[string]any{"ErrorUnauthorized_": map[string]any{"message!": "a"}}}
+			case "":
+				result <- map[string]any{}
+			default:
+				result <- map[string]any{"@result": map[string]any{"ErrorUnauthenticated_": map[string]any{"message!": "a"}}}
+			}
+		}()
+		return result
 	}
 
 	middleware := func(message telepact.Message, functionRouter *telepact.FunctionRouter) (telepact.Message, error) {

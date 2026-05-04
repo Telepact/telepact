@@ -31,6 +31,7 @@ if TYPE_CHECKING:
 
 Middleware = Callable[['Message', 'FunctionRouter'], Awaitable['Message']]
 UpdateHeaders = Callable[[dict[str, object]], None]
+AuthHandler = Callable[[dict[str, object]], dict[str, object] | Awaitable[dict[str, object]]]
 
 
 async def _default_middleware(request_message: 'Message', function_router: FunctionRouter) -> 'Message':
@@ -49,7 +50,7 @@ class Server:
             self.on_error: Callable[['TelepactError'], None] = lambda e: None
             self.on_request = lambda m: None
             self.on_response = lambda m: None
-            self.on_auth = lambda headers: {}
+            self.on_auth: AuthHandler = lambda headers: {}
             self.middleware = _default_middleware
             self.auth_required = True
             self.serialization = DefaultSerialization()

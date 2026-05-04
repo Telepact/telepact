@@ -29,6 +29,7 @@ import { createInternalFunctionRoutes } from './internal/CreateInternalFunctionR
 import { TelepactError } from './TelepactError.js';
 
 export type Middleware = (requestMessage: Message, functionRouter: FunctionRouter) => Promise<Message>;
+export type AuthHandler = (headers: Record<string, any>) => Record<string, any> | Promise<Record<string, any>>;
 export type UpdateHeaders = (headers: Record<string, any>) => void;
 export { FunctionRouter } from './FunctionRouter.js';
 export type { FunctionRoute, FunctionRoutes } from './FunctionRouter.js';
@@ -39,7 +40,7 @@ export class Server {
     onError: (error: TelepactError) => void;
     onRequest: (message: Message) => void;
     onResponse: (message: Message) => void;
-    onAuth: (headers: Record<string, any>) => Record<string, any>;
+    onAuth: AuthHandler;
     telepactSchema: TelepactSchema;
     serializer: Serializer;
 
@@ -93,7 +94,7 @@ export class ServerOptions {
     onError: (error: TelepactError) => void;
     onRequest: (message: Message) => void;
     onResponse: (message: Message) => void;
-    onAuth: (headers: Record<string, any>) => Record<string, any>;
+    onAuth: AuthHandler;
     middleware: Middleware;
     authRequired: boolean;
     serialization: Serialization;

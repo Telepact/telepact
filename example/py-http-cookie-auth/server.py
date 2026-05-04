@@ -28,7 +28,7 @@ options = Server.Options()
 options.auth_required = False
 
 
-def on_auth(headers: dict[str, object]) -> dict[str, object]:
+async def on_auth(headers: dict[str, object]) -> dict[str, object]:
     auth = headers.get('@auth_')
     session = auth.get('Session') if isinstance(auth, dict) else None
     if isinstance(session, dict) and session.get('token') == VALID_SESSION:
