@@ -1,9 +1,40 @@
 {
   "changed_paths": [
-    "example/full-stack/README.md"
+    "example/full-stack/server/telepact_app.py",
+    "example/py-http-cookie-auth/server.py",
+    "example/ts-http-cookie-auth/server.ts",
+    "lib/go/Server.go",
+    "lib/go/internal/HandleMessage.go",
+    "lib/go/internal/ProcessBytes.go",
+    "lib/java/src/main/java/io/github/telepact/Server.java",
+    "lib/java/src/main/java/io/github/telepact/internal/HandleMessage.java",
+    "lib/java/src/main/java/io/github/telepact/internal/ProcessBytes.java",
+    "lib/py/telepact/Server.py",
+    "lib/py/telepact/internal/HandleMessage.py",
+    "lib/py/telepact/internal/ProcessBytes.py",
+    "lib/ts/src/Server.ts",
+    "lib/ts/src/internal/HandleMessage.ts",
+    "lib/ts/src/internal/ProcessBytes.ts",
+    "test/lib/go/cmd/dispatcher/main.go",
+    "test/lib/java/src/main/java/telepacttest/Main.java",
+    "test/lib/py/telepact_test/test_server.py",
+    "test/lib/ts/src/main.ts"
   ],
-  "direct_targets": [],
-  "pr_number": 509,
-  "targets": [],
-  "version": "1.0.0-alpha.333"
+  "direct_targets": [
+    "go",
+    "java",
+    "py",
+    "ts"
+  ],
+  "pr_number": 510,
+  "targets": [
+    "cli",
+    "console",
+    "dart",
+    "go",
+    "java",
+    "py",
+    "ts"
+  ],
+  "version": "1.0.0-alpha.334"
 }

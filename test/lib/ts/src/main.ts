@@ -436,7 +436,7 @@ function startTestServer(
 
     class ThisError extends Error {}
 
-    const onAuth = (requestHeaders: Record<string, any>): Record<string, any> => {
+    const onAuth = async (requestHeaders: Record<string, any>): Promise<Record<string, any>> => {
         const token = requestHeaders["@auth_"]?.Token?.token;
         if (token === "ok") {
             return { "@ok_": {} };

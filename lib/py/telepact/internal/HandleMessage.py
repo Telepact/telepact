@@ -14,6 +14,7 @@
 #|  limitations under the License.
 #|
 
+from inspect import isawaitable
 from typing import Callable, TYPE_CHECKING, cast, Awaitable
 
 from ..internal.binary.ServerBase64Decode import server_base64_decode
@@ -24,7 +25,7 @@ from ..internal.UnknownError import build_unknown_error_message
 from .types.TTypeDeclaration import TTypeDeclaration
 
 if TYPE_CHECKING:
-    from ..Server import FunctionRouter, Middleware, UpdateHeaders
+    from ..Server import AuthHandler, FunctionRouter, Middleware, UpdateHeaders
     from ..internal.validation.ValidationFailure import ValidationFailure
     from .types.TType import TType
     from ..TelepactSchema import TelepactSchema
@@ -39,7 +40,7 @@ async def handle_message(
     middleware: 'Middleware',
     function_router: 'FunctionRouter',
     on_error: Callable[[TelepactError], None],
-    on_auth: Callable[[dict[str, object]], dict[str, object]],
+    on_auth: 'AuthHandler',
 ) -> 'Message':
     from ..internal.SelectStructFields import select_struct_fields
     from ..internal.validation.GetInvalidErrorMessage import get_invalid_error_message
@@ -103,7 +104,10 @@ async def handle_message(
 
     if "@auth_" in request_headers and not bypass_auth_for_function:
         try:
-            auth_headers = on_auth(request_headers) or {}
+            auth_headers = on_auth(request_headers)
+            if isawaitable(auth_headers):
+                auth_headers = await auth_headers
+            auth_headers = auth_headers or {}
             request_headers.update(auth_headers)
         except Exception as e:
             wrapped = TelepactError(
