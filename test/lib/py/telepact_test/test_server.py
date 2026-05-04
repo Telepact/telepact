@@ -58,7 +58,7 @@ def on_response_err(m):
         raise RuntimeError()
 
 
-def on_auth(request_headers: dict[str, object]) -> dict[str, object]:
+async def on_auth(request_headers: dict[str, object]) -> dict[str, object]:
     auth = request_headers.get("@auth_")
     if not isinstance(auth, dict):
         return {}

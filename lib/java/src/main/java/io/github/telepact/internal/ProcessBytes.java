@@ -23,7 +23,6 @@ import static io.github.telepact.internal.UnknownError.buildUnknownErrorMessage;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import io.github.telepact.FunctionRouter;
 import io.github.telepact.Message;
@@ -32,12 +31,13 @@ import io.github.telepact.SerializationError;
 import io.github.telepact.TelepactError;
 import io.github.telepact.TelepactSchema;
 import io.github.telepact.Serializer;
+import io.github.telepact.Server.AuthHandler;
 import io.github.telepact.Server.Middleware;
 
 public class ProcessBytes {
     public static Response processBytes(byte[] requestMessageBytes, Consumer<Map<String, Object>> updateHeaders, Serializer serializer, TelepactSchema telepactSchema,
             Consumer<TelepactError> onError, Consumer<Message> onRequest, Consumer<Message> onResponse,
-            Function<Map<String, Object>, Map<String, Object>> onAuth,
+            AuthHandler onAuth,
             Middleware middleware, FunctionRouter functionRouter) {
         try {
             final var requestMessage = parseRequestMessage(requestMessageBytes, serializer,

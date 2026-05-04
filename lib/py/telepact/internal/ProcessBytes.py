@@ -23,7 +23,7 @@ from ..internal.UnknownError import build_unknown_error_message
 
 if TYPE_CHECKING:
     from ..Serializer import Serializer
-    from ..Server import Middleware, FunctionRouter, UpdateHeaders
+    from ..Server import AuthHandler, Middleware, FunctionRouter, UpdateHeaders
     from ..TelepactSchema import TelepactSchema
     from ..Response import Response
 
@@ -31,7 +31,7 @@ if TYPE_CHECKING:
 async def process_bytes(request_message_bytes: bytes, update_headers: 'UpdateHeaders | None',
                          serializer: 'Serializer', telepact_schema: 'TelepactSchema',
                          on_error: Callable[[TelepactError], None], on_request: Callable[['Message'], None],
-                         on_response: Callable[['Message'], None], on_auth: Callable[[dict[str, object]], dict[str, object]],
+                         on_response: Callable[['Message'], None], on_auth: 'AuthHandler',
                          middleware: 'Middleware', function_router: 'FunctionRouter') -> 'Response':
     from ..internal.HandleMessage import handle_message
     from ..internal.ParseRequestMessage import parse_request_message

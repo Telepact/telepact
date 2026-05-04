@@ -33,7 +33,7 @@ func ProcessBytes(
 	onError func(error),
 	onRequest func(ServerMessage),
 	onResponse func(ServerMessage),
-	onAuth func(map[string]any) map[string]any,
+	onAuth func(map[string]any) <-chan map[string]any,
 	middleware Middleware,
 	functionRouter FunctionRouter,
 ) (ServerMessage, []byte, error) {

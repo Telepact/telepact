@@ -36,7 +36,7 @@ func HandleMessage(
 	middleware Middleware,
 	functionRouter FunctionRouter,
 	onError func(error),
-	onAuth func(map[string]any) map[string]any,
+	onAuth func(map[string]any) <-chan map[string]any,
 ) (ServerMessage, error) {
 	if schema == nil {
 		return ServerMessage{}, fmt.Errorf("telepact: schema must not be nil")
@@ -277,7 +277,7 @@ func extractSelectStructFields(value any) map[string]any {
 	}
 }
 
-func invokeOnAuth(callback func(map[string]any) map[string]any, headers map[string]any) (result map[string]any, err error) {
+func invokeOnAuth(callback func(map[string]any) <-chan map[string]any, headers map[string]any) (result map[string]any, err error) {
 	if callback == nil {
 		return map[string]any{}, nil
 	}
@@ -290,7 +290,11 @@ func invokeOnAuth(callback func(map[string]any) map[string]any, headers map[stri
 			}
 		}
 	}()
-	result = callback(headers)
+	resultChan := callback(headers)
+	if resultChan == nil {
+		return map[string]any{}, nil
+	}
+	result = <-resultChan
 	if result == nil {
 		return map[string]any{}, nil
 	}
