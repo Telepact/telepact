@@ -21,4 +21,3 @@
     - Ok_:
         message: "string"
         subject: "string"
-        proxyHint: "string"
