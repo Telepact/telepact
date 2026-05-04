@@ -106,7 +106,32 @@ policy. The important Telepact point is simply to keep the ids consistent across
 the transport boundary and the Telepact middleware boundary so the same request
 can be correlated in both places.
 
-## 4. Compatibility and upgrades
+## 4. Expose unique transports to CLI tooling through a proxy
+
+If your production service speaks Telepact over a transport such as NATS, stdio,
+queues, or another internal RPC boundary, the CLI tooling still works best when
+it can reach a normal HTTP Telepact endpoint.
+
+In that setup, expose a small proxy specifically for tooling and operational
+access:
+
+- keep the real Telepact server on its native transport
+- expose fixed HTTP routes that map to the internal transport destinations your
+  tooling needs
+- forward raw Telepact request and response bytes through the proxy instead of
+  re-implementing Telepact semantics there
+- let `telepact fetch`, `telepact mock --http-url`, and related tooling talk to
+  the proxy's HTTP surface
+
+That keeps the transport-specific production boundary explicit while still
+making Telepact tooling usable from standard developer environments.
+
+For a runnable example, see
+[`example/full-stack-proxy`](../../example/full-stack-proxy/README.md), which
+shows a browser and HTTP-facing proxy forwarding Telepact bytes to an internal
+NATS subject.
+
+## 5. Compatibility and upgrades
 
 Telepact provides `telepact compare` because schema compatibility is part of the
 Telepact contract surface.
@@ -127,7 +152,7 @@ Telepact does not prescribe the surrounding rollout procedure. Whether your
 organization uses canaries, blue/green, staged regional rollout, or something
 else is outside this library's scope.
 
-## 5. Error boundary notes
+## 6. Error boundary notes
 
 Telepact keeps wire behavior and local diagnostics separate:
 
