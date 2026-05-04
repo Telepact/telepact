@@ -122,7 +122,6 @@ func buildTelepactServer(apiDir string, subject string) (*telepact.Server, error
 					"Ok_": map[string]any{
 						"message":   fmt.Sprintf("Hello %s from the Go Telepact server!", name),
 						"subject":   subject,
-						"proxyHint": "The Python proxy forwarded these bytes unchanged over NATS.",
 					},
 				},
 			), nil
