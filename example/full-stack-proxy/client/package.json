@@ -1,0 +1,18 @@
+{
+  "name": "telepact-example-full-stack-proxy-client",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc && vite build",
+    "test": "playwright test"
+  },
+  "dependencies": {
+    "telepact": "file:telepact.tgz"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.55.1",
+    "typescript": "^5.9.3",
+    "vite": "^8.0.8"
+  }
+}
