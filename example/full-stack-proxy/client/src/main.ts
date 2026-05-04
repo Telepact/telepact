@@ -50,6 +50,13 @@ function pretty(value: unknown): string {
   return JSON.stringify(value, null, 2);
 }
 
+function formatError(error: unknown): string {
+  if (error instanceof Error && error.cause instanceof Error) {
+    return error.cause.message;
+  }
+  return String(error);
+}
+
 function setBusy(isBusy: boolean): void {
   for (const button of buttons) {
     button.disabled = isBusy;
@@ -106,7 +113,7 @@ async function sendGreeting(subject: string): Promise<void> {
     outcomePill.textContent = 'outcome: transport failure';
     responseOutput.textContent = pretty({
       subject,
-      error: String(error),
+      error: formatError(error),
     });
   } finally {
     setBusy(false);

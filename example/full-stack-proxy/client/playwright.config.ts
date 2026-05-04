@@ -25,7 +25,7 @@ const apiDir = path.resolve(__dirname, '../api');
 const proxyPython = path.resolve(__dirname, '../proxy/.venv/bin/python');
 const proxyEntrypoint = path.resolve(__dirname, '../proxy/app.py');
 const port = 4173;
-const natsPort = 4222;
+const natsPort = 4322;
 const healthPort = 8413;
 const TEST_TIMEOUT_MS = 60 * 1000;
 
@@ -37,7 +37,7 @@ export default defineConfig({
   },
   webServer: [
     {
-      command: 'nats-server -D',
+      command: `nats-server -D -p ${natsPort}`,
       port: natsPort,
       reuseExistingServer: !process.env.CI,
     },
