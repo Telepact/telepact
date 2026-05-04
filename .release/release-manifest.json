@@ -1,26 +1,10 @@
 {
   "changed_paths": [
-    "example/ts-codegen/gen/genTypes.ts",
-    "example/ts-codegen/server.ts",
-    "sdk/cli/telepact_cli/templates/ts_all_2.j2",
-    "sdk/cli/tests/test_main.py",
-    "test/lib/ts-browser-safe/.gitignore",
-    "test/lib/ts-browser-safe/Makefile",
-    "test/lib/ts-browser-safe/package-lock.json",
-    "test/lib/ts-browser-safe/src/main.ts",
-    "test/lib/ts-browser-safe/tsconfig.json",
-    "test/lib/ts-nodenext/.gitignore",
-    "test/lib/ts-nodenext/Makefile",
-    "test/lib/ts-nodenext/src/main.ts",
-    "test/lib/ts-nodenext/tsconfig.json",
-    "test/lib/ts/src/codeGenHandler.ts"
+    "tool/telepact_project_cli/pyproject.toml",
+    "tool/telepact_project_cli/uv.lock"
   ],
-  "direct_targets": [
-    "cli"
-  ],
-  "pr_number": 501,
-  "targets": [
-    "cli"
-  ],
+  "direct_targets": [],
+  "pr_number": 505,
+  "targets": [],
   "version": "1.0.0-alpha.333"
 }
