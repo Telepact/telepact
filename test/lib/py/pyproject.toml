@@ -3,7 +3,7 @@ name = "telepacttest"
 version = "0.1.0"
 requires-python = ">=3.11,<4"
 dependencies = [
-    "build>=1.4.4,<2",
+    "build>=1.5.0,<2",
     "msgpack>=1.1.2,<2",
     "nats-py>=2.14.0,<3",
     "prometheus-client>=0.25.0,<0.26",
