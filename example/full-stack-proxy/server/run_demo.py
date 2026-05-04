@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import argparse
+import asyncio
 import signal
 import socket
 import subprocess
@@ -24,6 +25,8 @@ import sys
 import time
 import urllib.request
 from pathlib import Path
+
+import websockets
 
 ROOT = Path(__file__).resolve().parent.parent
 SERVER_APP = ROOT / 'server' / 'app.py'
@@ -48,6 +51,21 @@ def wait_for_http(url: str, timeout_seconds: float = 10.0) -> None:
             with urllib.request.urlopen(url, timeout=0.5) as response:
                 if response.status == 200:
                     return
+        except Exception:
+            time.sleep(0.1)
+    raise TimeoutError(f'timed out waiting for {url}')
+
+
+def wait_for_websocket(url: str, timeout_seconds: float = 10.0) -> None:
+    async def connect_once() -> None:
+        async with websockets.connect(url):
+            return
+
+    deadline = time.monotonic() + timeout_seconds
+    while time.monotonic() < deadline:
+        try:
+            asyncio.run(connect_once())
+            return
         except Exception:
             time.sleep(0.1)
     raise TimeoutError(f'timed out waiting for {url}')
@@ -100,7 +118,7 @@ def main() -> None:
         '--nats-url', nats_url,
     ])
     processes.append(proxy_process)
-    wait_for_tcp(args.host, args.proxy_port)
+    wait_for_websocket(f'ws://{args.host}:{args.proxy_port}/ws/telepact?topic=healthcheck')
 
     server_process = subprocess.Popen([
         sys.executable,
