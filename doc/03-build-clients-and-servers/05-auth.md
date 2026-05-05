@@ -7,7 +7,7 @@ The canonical model is:
 1. define every client-visible credential shape in `union.Auth_`
 2. carry those credentials in `+auth_`
 3. use the transport adapter to extract transport-specific credentials into `+auth_` when needed
-4. use `onAuth` to validate `+auth_` and normalize it into internal request headers such as `+userId`, `+tenantId`, or `@scopes`
+4. use `onAuth` to validate `+auth_` and normalize it into internal request headers such as `+userId`, `+tenantId`, or `+scopes`
 5. enforce authorization in middleware and function routes
 6. return `ErrorUnauthenticated_` or `ErrorUnauthorized_` for auth failures
 
@@ -132,7 +132,7 @@ Typical normalized headers are internal values like:
 - `+userId`
 - `+tenantId`
 - `+role`
-- `@scopes`
+- `+scopes`
 
 Keep these normalized headers service-specific. They are usually internal
 server-to-handler data, not public client contract.

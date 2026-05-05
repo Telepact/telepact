@@ -161,7 +161,7 @@ async def on_auth(headers: dict[str, object]) -> dict[str, object]:
     return {
         '+userId': identity.user_id,
         '+role': identity.role,
-        '@displayName': identity.display_name,
+        '+displayName': identity.display_name,
     }
 
 
@@ -229,7 +229,7 @@ options.middleware = middleware
 async def me(_function_name: str, request_message: Message) -> Message:
     user_id = request_message.headers.get('+userId')
     role = request_message.headers.get('+role')
-    display_name = request_message.headers.get('@displayName')
+    display_name = request_message.headers.get('+displayName')
     if not isinstance(user_id, str) or not isinstance(role, str) or not isinstance(display_name, str):
         return Message({}, {
             'ErrorUnauthenticated_': {
@@ -274,7 +274,7 @@ async def admin_report(_function_name: str, request_message: Message) -> Message
 
 
 async def trigger_failure(_function_name: str, request_message: Message) -> Message:
-    actor = request_message.headers.get('@displayName', 'anonymous caller')
+    actor = request_message.headers.get('+displayName', 'anonymous caller')
     raise RuntimeError(f'demo bug for {actor}')
 
 
