@@ -64,7 +64,7 @@ dev:
 	npm run dev
 
 playwright: $(NPM_STAMP)
-	npx playwright install --with-deps --force
+	npx playwright install --with-deps --force chromium
 
 clean:
 	rm -rf build
