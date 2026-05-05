@@ -50,7 +50,7 @@ def create_http_server(host: str = '127.0.0.1', port: int = 0) -> ThreadingHTTPS
             content_length = int(self.headers.get('Content-Length', '0'))
             request_bytes = self.rfile.read(content_length)
             response = asyncio.run(telepact_server.process(request_bytes))
-            content_type = 'application/octet-stream' if '@bin_' in response.headers else 'application/json'
+            content_type = 'application/octet-stream' if '+bin_' in response.headers else 'application/json'
 
             self.send_response(200)
             self.send_header('Content-Type', content_type)

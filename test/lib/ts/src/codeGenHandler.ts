@@ -30,7 +30,7 @@ export class CodeGenHandler extends TypedServerHandler {
             console.error(e);
         }
 
-        if (headers["@error"] === true) {
+        if (headers["+error"] === true) {
             let output = test.Output.from_ErrorExample2({ field1: "Boom!" });
             return { headers: {}, body: output };
         }

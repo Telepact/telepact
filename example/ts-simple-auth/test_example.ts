@@ -31,7 +31,7 @@ test('simple auth example runs end to end against the python server', async () =
         const client = new Client(adapter, new ClientOptions());
 
         const shiftResponse = await client.request(new Message({
-            '@auth_': {
+            '+auth_': {
                 'Password': {
                     'username': 'lead-baker',
                     'password': 'opensesame',
@@ -48,7 +48,7 @@ test('simple auth example runs end to end against the python server', async () =
         });
 
         const specialResponse = await client.request(new Message({
-            '@auth_': {
+            '+auth_': {
                 'Password': {
                     'username': 'cashier',
                     'password': 'knockknock',
@@ -63,7 +63,7 @@ test('simple auth example runs end to end against the python server', async () =
         });
 
         const authFailureResponse = await client.request(new Message({
-            '@auth_': {
+            '+auth_': {
                 'Password': {
                     'username': 'explode',
                     'password': 'boom',

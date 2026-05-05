@@ -5,7 +5,7 @@ flow:
 
 - define a session credential in `union.Auth_`
 - read the browser cookie at the HTTP boundary
-- translate it into `@auth_`
+- translate it into `+auth_`
 - normalize it in `on_auth`
 
 Browse the files:

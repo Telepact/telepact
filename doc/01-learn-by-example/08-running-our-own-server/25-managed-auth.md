@@ -1,6 +1,6 @@
 # 25. Managed auth
 
-Sometimes the client is not going to handcraft `@auth_` at all. Cookies are the
+Sometimes the client is not going to handcraft `+auth_` at all. Cookies are the
 common example.
 
 This page shows one browser/session-cookie branch of Telepact's auth
@@ -21,7 +21,7 @@ pip install --pre telepact
         token: string
 ```
 
-## Inject `@auth_` from the transport layer
+## Inject `+auth_` from the transport layer
 
 Here is the key pattern:
 
@@ -49,7 +49,7 @@ class RequestHandler(BaseHTTPRequestHandler):
 
         def update_headers(headers: dict[str, object]) -> None:
             if session_token is not None:
-                headers['@auth_'] = {'Session': {'token': session_token}}
+                headers['+auth_'] = {'Session': {'token': session_token}}
 
         response = asyncio.run(telepact_server.process(request_bytes, update_headers))
 ```
@@ -61,7 +61,7 @@ Now the rest of our auth story can stay the same:
 - handlers still work with normalized identity headers
 
 From the client's perspective, auth can be "managed" by the transport. That is a
-nice fit for browser cookies, while still converging on the canonical `@auth_`
+nice fit for browser cookies, while still converging on the canonical `+auth_`
 shape inside the Telepact server.
 
 Next: [26. Schema evolution](./26-schema-evolution.md)

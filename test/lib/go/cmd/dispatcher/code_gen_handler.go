@@ -33,7 +33,7 @@ func (c *codeGenHandler) Handle(message telepact.Message) (telepact.Message, err
 	if headers == nil {
 		headers = map[string]any{}
 	}
-	headers["@codegens_"] = true
+	headers["+codegens_"] = true
 
 	return telepact.NewMessage(headers, response.Body), nil
 }
@@ -69,7 +69,7 @@ func (s *typedCodeGenServer) SelfLink(headers map[string]any, input gen.SelfLink
 }
 
 func (s *typedCodeGenServer) Test(headers map[string]any, input gen.TestInput) (telepact.TypedMessage[gen.TestOutput], error) {
-	if boolValue(headers["@error"]) {
+	if boolValue(headers["+error"]) {
 		body := gen.NewTestOutputFromErrorExample2(gen.NewTestOutputErrorExample2("Boom!"))
 		return telepact.NewTypedMessage(map[string]any{}, body), nil
 	}
@@ -686,7 +686,7 @@ func (g *generatedTypedClient) Handle(message telepact.Message) (telepact.Messag
 		if body == nil {
 			body = map[string]any{}
 		}
-		headers["@codegenc_"] = true
+		headers["+codegenc_"] = true
 		return telepact.NewMessage(headers, body), nil
 	}
 
@@ -698,7 +698,7 @@ func (g *generatedTypedClient) Handle(message telepact.Message) (telepact.Messag
 	if response.Headers == nil {
 		response.Headers = map[string]any{}
 	}
-	response.Headers["@codegenc_"] = true
+	response.Headers["+codegenc_"] = true
 
 	return response, nil
 }

@@ -37,7 +37,7 @@ func ServerBase64Encode(message []any) error {
 		return err
 	}
 
-	base64Paths := headers["@base64_"]
+	base64Paths := headers["+base64_"]
 	if base64Paths == nil {
 		return nil
 	}

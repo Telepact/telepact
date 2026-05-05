@@ -15,19 +15,19 @@
 #|
 
 - ///: |
-    The `@auth_` header is the conventional location for sending credentials to
+    The `+auth_` header is the conventional location for sending credentials to
     the server for the purpose of authentication and authorization.
   headers.Auth_:
-    "@auth_": "union.Auth_"
+    "+auth_": "union.Auth_"
   ->: {}
 
 - ///: A standard error.
   errors.Auth_:
-    - ///: The credentials in the `@auth_` header were missing or invalid.
+    - ///: The credentials in the `+auth_` header were missing or invalid.
       ErrorUnauthenticated_:
         message!: "string"
     - ///: |
-        The credentials in the `@auth_` header were insufficient to run the
+        The credentials in the `+auth_` header were insufficient to run the
         function.
       ErrorUnauthorized_:
         message!: "string"

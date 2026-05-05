@@ -30,9 +30,9 @@ func ClientBase64Decode(message []any) error {
 	var base64Paths any
 	switch headers := message[0].(type) {
 	case map[string]any:
-		base64Paths = headers["@base64_"]
+		base64Paths = headers["+base64_"]
 	case map[any]any:
-		base64Paths = headers["@base64_"]
+		base64Paths = headers["+base64_"]
 	default:
 		return fmt.Errorf("invalid message headers for base64 decode: %T", message[0])
 	}

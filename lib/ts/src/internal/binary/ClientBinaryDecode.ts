@@ -27,11 +27,11 @@ export function clientBinaryDecode(
 ): any[] {
     const headers = message[0] as Map<string, any>;
     const encodedMessageBody = message[1] as Map<any, any>;
-    const binaryChecksums = headers.get("@bin_") as number[];
+    const binaryChecksums = headers.get("+bin_") as number[];
     const binaryChecksum = binaryChecksums[0]!;
 
-    if (headers.has("@enc_")) {
-        const binaryEncoding = headers.get("@enc_") as Map<string, number>;
+    if (headers.has("+enc_")) {
+        const binaryEncoding = headers.get("+enc_") as Map<string, number>;
         binaryEncodingCache.add(binaryChecksum, binaryEncoding);
     }
 
@@ -41,7 +41,7 @@ export function clientBinaryDecode(
     const binaryEncoder = binaryEncodingCache.get(newCurrentChecksumStrategy[0]);
 
     let finalEncodedMessageBody: Map<any, any>;
-    if (headers.get("@pac_") === true) {
+    if (headers.get("+pac_") === true) {
         finalEncodedMessageBody = unpackBody(encodedMessageBody);
     } else {
         finalEncodedMessageBody = encodedMessageBody;

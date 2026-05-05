@@ -29,8 +29,8 @@ export function validateHeaders(
         const headerValue = headers[header];
         const field = parsedRequestHeaders[header];
 
-        if (!header.startsWith("@")) {
-            validationFailures.push(new ValidationFailure([header], "RequiredObjectKeyPrefixMissing", {"prefix": "@"}));
+        if (!header.startsWith("+")) {
+            validationFailures.push(new ValidationFailure([header], "RequiredObjectKeyPrefixMissing", {"prefix": "+"}));
         }
 
         if (field) {

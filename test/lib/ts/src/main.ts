@@ -236,7 +236,7 @@ function startClientTestServer(
                 }
                 else if (useCodegen && functionName === "fn.test") {
                     const { headers: responseHeaders, body: outputBody } = await genClient.test(requestHeaders, new test.Input(requestBody));
-                    responseHeaders["@codegenc_"] = true;
+                    responseHeaders["+codegenc_"] = true;
                     response = new Message(responseHeaders, outputBody.pseudoJson);
                 } else {
                     response = await client.request(request);
@@ -253,7 +253,7 @@ function startClientTestServer(
             }
 
             if (findUint8Array(response.body)) {
-                response.headers['@clientReturnedBinary'] = true;
+                response.headers['+clientReturnedBinary'] = true;
             }
 
             const responsePseudoJson = [response.headers, response.body];
@@ -437,12 +437,12 @@ function startTestServer(
     class ThisError extends Error {}
 
     const onAuth = async (requestHeaders: Record<string, any>): Promise<Record<string, any>> => {
-        const token = requestHeaders["@auth_"]?.Token?.token;
+        const token = requestHeaders["+auth_"]?.Token?.token;
         if (token === "ok") {
-            return { "@ok_": {} };
+            return { "+ok_": {} };
         }
         if (token === "unauthorized") {
-            return { "@result": { ErrorUnauthorized_: { "message!": "a" } } };
+            return { "+result": { ErrorUnauthorized_: { "message!": "a" } } };
         }
         if (token !== undefined) {
             throw new Error("invalid auth");
@@ -474,14 +474,14 @@ function startTestServer(
         const message = await functionRouter.route(requestMessage);
 
         if (useCodegen) {
-            message.headers["@codegens_"] = true;
+            message.headers["+codegens_"] = true;
         }
 
-        if (requestMessage.headers["@toggleAlternateServer_"] === true) {
+        if (requestMessage.headers["+toggleAlternateServer_"] === true) {
             serveAlternateServer.value = !serveAlternateServer.value;
         }
 
-        if (requestMessage.headers["@throwError_"] === true) {
+        if (requestMessage.headers["+throwError_"] === true) {
             throw new ThisError();
         }
 
@@ -502,14 +502,14 @@ function startTestServer(
         }
     };
     options.onRequest = (m: Message) => {
-        onErrorExpectation.mode = m.headers["@assertOnErrorNested_"] === true
+        onErrorExpectation.mode = m.headers["+assertOnErrorNested_"] === true
             ? 'nested'
-            : m.headers["@assertOnErrorStandalone_"] === true
+            : m.headers["+assertOnErrorStandalone_"] === true
                 ? 'standalone'
                 : null;
         onErrorExpectation.failed = false;
         onErrorExpectation.observed = false;
-        if (m.headers["@onRequestError_"] === true) {
+        if (m.headers["+onRequestError_"] === true) {
             throw new Error();
         }
     };
@@ -520,7 +520,7 @@ function startTestServer(
         onErrorExpectation.mode = null;
         onErrorExpectation.failed = false;
         onErrorExpectation.observed = false;
-        if (m.headers["@onResponseError_"] === true) {
+        if (m.headers["+onResponseError_"] === true) {
             throw new Error();
         }
     };
@@ -567,7 +567,7 @@ function startTestServer(
                     responseBytes = response.bytes;
                 } else {
                     let response = await server.process(requestBytes, (headers) => {
-                        headers['@override'] = 'new';
+                        headers['+override'] = 'new';
                     });
                     responseBytes = response.bytes;
                 }

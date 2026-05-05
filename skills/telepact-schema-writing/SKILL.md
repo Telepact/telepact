@@ -270,15 +270,15 @@ Pattern:
 
 ```yaml
 headers.Auth:
-  "@requestId": string
-  "@traceId": string
+  "+requestId": string
+  "+traceId": string
 ->:
-  "@ratelimitRemaining": integer
+  "+ratelimitRemaining": integer
 ```
 
 Rules:
 
-- Every header field name must start with `@`.
+- Every header field name must start with `+`.
 - All header fields are implicitly optional.
 - Do not add `!` to header field names.
 - Extra unspecified header fields are allowed.
@@ -331,7 +331,7 @@ union.Auth_:
       token: string
 ```
 
-This enables Telepact auth definitions such as the `@auth_` header and auth-related errors. Put auth-related credential variants inside `union.Auth_`.
+This enables Telepact auth definitions such as the `+auth_` header and auth-related errors. Put auth-related credential variants inside `union.Auth_`.
 
 ### Mock Definitions
 
@@ -394,7 +394,7 @@ Before returning the schema, verify:
 - Every `fn.*` has a `"->"` result union.
 - Every function result union contains `Ok_`.
 - Every union has at least one tag.
-- Every header field begins with `@`.
+- Every header field begins with `+`.
 - `errors.*` is used only for cross-cutting failures.
 - DO NOT define your own "404 Not Found" or "400 Bad Request." Telepact handles those types of errors for you.
 - No built-in Telepact definitions were redundantly re-declared.

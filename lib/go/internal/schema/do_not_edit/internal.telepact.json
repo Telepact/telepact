@@ -31,70 +31,70 @@
     "_errors": "^errors\\.Validation_$"
   },
   {
-    "///": "`_ext.Select_` is the selection object used by the `@select_` header. Use\n`->` to narrow fields on the active result union, `struct.*` keys to narrow\nstruct fields, and `union.*` keys to narrow fields for specific union tags.\n\nSee https://raw.githubusercontent.com/Telepact/telepact/main/doc/02-design-apis/04-select-extension.md\nfor full `_ext.Select_` rules and end-to-end examples.\n",
+    "///": "`_ext.Select_` is the selection object used by the `+select_` header. Use\n`->` to narrow fields on the active result union, `struct.*` keys to narrow\nstruct fields, and `union.*` keys to narrow fields for specific union tags.\n\nSee https://raw.githubusercontent.com/Telepact/telepact/main/doc/02-design-apis/04-select-extension.md\nfor full `_ext.Select_` rules and end-to-end examples.\n",
     "_ext.Select_": {
     }
   },
   {
-    "///": "The `@time_` header indicates the request timeout honored by the client.",
+    "///": "The `+time_` header indicates the request timeout honored by the client.",
     "headers.Time_": {
-      "@time_": "integer"
+      "+time_": "integer"
     },
     "->": {
     }
   },
   {
-    "///": "If `@unsafe_` is set to `true`, response validation by the server will be\ndisabled. The server will reflect the client-provided value of the\n`@unsafe_` header in the response.\n",
+    "///": "If `+unsafe_` is set to `true`, response validation by the server will be\ndisabled. The server will reflect the client-provided value of the\n`+unsafe_` header in the response.\n",
     "headers.Unsafe_": {
-      "@unsafe_": "boolean"
+      "+unsafe_": "boolean"
     },
     "->": {
-      "@unsafe_": "boolean"
+      "+unsafe_": "boolean"
     }
   },
   {
-    "///": "The `@select_` header applies an `_ext.Select_` selection to the response\nresult graph, removing omitted struct fields and union payload fields.\n",
+    "///": "The `+select_` header applies an `_ext.Select_` selection to the response\nresult graph, removing omitted struct fields and union payload fields.\n",
     "headers.Select_": {
-      "@select_": "_ext.Select_"
+      "+select_": "_ext.Select_"
     },
     "->": {
     }
   },
   {
-    "///": "The `@bin_` header indicates the valid checksums of binary encodings\nnegotiated between the client and server. If the client sends a `@bin_`\nheader with any value, the server will respond with a `@bin_` header with an\narray containing the currently supported binary encoding checksum. If the\nclient's provided checksum does not match the server's checksum, the server\nwill also send an `@enc_` header containing the binary encoding, which is a\nmap of field names to field ids. The response body may also be encoded in\nbinary.\n\nThe `@pac_` header can also be used to indicate usage of 'packed' binary\nencoding strategy. If the client submits a `@pac_` header with a `true`\nvalue, the server will respond with a `@pac_` header with a `true` value.\n",
+    "///": "The `+bin_` header indicates the valid checksums of binary encodings\nnegotiated between the client and server. If the client sends a `+bin_`\nheader with any value, the server will respond with a `+bin_` header with an\narray containing the currently supported binary encoding checksum. If the\nclient's provided checksum does not match the server's checksum, the server\nwill also send an `+enc_` header containing the binary encoding, which is a\nmap of field names to field ids. The response body may also be encoded in\nbinary.\n\nThe `+pac_` header can also be used to indicate usage of 'packed' binary\nencoding strategy. If the client submits a `+pac_` header with a `true`\nvalue, the server will respond with a `+pac_` header with a `true` value.\n",
     "headers.Binary_": {
-      "@bin_": [
+      "+bin_": [
         "integer"
       ],
-      "@pac_": "boolean"
+      "+pac_": "boolean"
     },
     "->": {
-      "@bin_": [
+      "+bin_": [
         "integer"
       ],
-      "@enc_": {
+      "+enc_": {
         "string": "integer"
       },
-      "@pac_": "boolean"
+      "+pac_": "boolean"
     }
   },
   {
-    "///": "The `@warn_` header is used to send warnings to the client.",
+    "///": "The `+warn_` header is used to send warnings to the client.",
     "headers.Warning_": {
     },
     "->": {
-      "@warn_": [
+      "+warn_": [
         "any"
       ]
     }
   },
   {
-    "///": "The `@id_` header is used to correlate requests and responses. The server\nwill reflect the client-provided `@id_` header as-is.\n",
+    "///": "The `+id_` header is used to correlate requests and responses. The server\nwill reflect the client-provided `+id_` header as-is.\n",
     "headers.Id_": {
-      "@id_": "any"
+      "+id_": "any"
     },
     "->": {
-      "@id_": "any"
+      "+id_": "any"
     }
   },
   {

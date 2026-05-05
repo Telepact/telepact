@@ -33,8 +33,8 @@ public class SerializeInternal {
         final var headers = message.headers;
 
         final boolean serializeAsBinary;
-        if (headers.containsKey("@binary_")) {
-            serializeAsBinary = Objects.equals(true, headers.remove("@binary_"));
+        if (headers.containsKey("+binary_")) {
+            serializeAsBinary = Objects.equals(true, headers.remove("+binary_"));
         } else {
             serializeAsBinary = false;
         }

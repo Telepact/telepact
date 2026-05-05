@@ -32,9 +32,9 @@ options = Server.Options()
 
 
 def on_auth(headers: dict[str, object]) -> dict[str, object]:
-    auth = headers.get('@auth_')
+    auth = headers.get('+auth_')
     if auth == {'Password': {'password': 'swordfish'}}:
-        return {'@role': 'admin'}
+        return {'+role': 'admin'}
     raise ValueError('missing or invalid credentials')
 
 
@@ -47,7 +47,7 @@ async def secret(function_name: str, request_message: Message) -> Message:
 
 The important shape here is:
 
-1. read credentials from `@auth_`
+1. read credentials from `+auth_`
 2. validate them in `on_auth`
 3. return normalized identity or authorization headers for later handlers
 4. register protected handlers in the authenticated route map so missing
@@ -68,7 +68,7 @@ curl -s localhost:8002/api/telepact -d '[{}, {"fn.secret": {}}]'
 With auth:
 
 ```sh
-curl -s localhost:8002/api/telepact -d '[{"@auth_": {"Password": {"password": "swordfish"}}}, {"fn.secret": {}}]'
+curl -s localhost:8002/api/telepact -d '[{"+auth_": {"Password": {"password": "swordfish"}}}, {"fn.secret": {}}]'
 ```
 
 This keeps the public credential shape in the schema and the auth normalization

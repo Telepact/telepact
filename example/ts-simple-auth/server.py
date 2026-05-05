@@ -37,7 +37,7 @@ class Unauthorized(Exception):
 
 
 async def on_auth(headers: dict[str, object]) -> dict[str, object]:
-    auth = headers.get('@auth_')
+    auth = headers.get('+auth_')
     password = auth.get('Password') if isinstance(auth, dict) else None
     if not isinstance(password, dict):
         raise ValueError('missing or invalid bakery credentials')
@@ -46,10 +46,10 @@ async def on_auth(headers: dict[str, object]) -> dict[str, object]:
         raise RuntimeError('bakery auth backend unavailable')
 
     if password == LEAD_BAKER_CREDENTIALS:
-        return {'@employeeId': 'baker-001', '@station': 'oven'}
+        return {'+employeeId': 'baker-001', '+station': 'oven'}
 
     if password == CASHIER_CREDENTIALS:
-        return {'@employeeId': 'cashier-002', '@station': 'counter'}
+        return {'+employeeId': 'cashier-002', '+station': 'counter'}
 
     raise ValueError('missing or invalid bakery credentials')
 
@@ -61,8 +61,8 @@ def _log_identity(request_message: Message) -> None:
     event = {
         'event': 'middleware.identity',
         'function': request_message.get_body_target(),
-        'employeeId': request_message.headers.get('@employeeId'),
-        'station': request_message.headers.get('@station'),
+        'employeeId': request_message.headers.get('+employeeId'),
+        'station': request_message.headers.get('+station'),
     }
     MIDDLEWARE_EVENTS.append(event)
     print(json.dumps(event, sort_keys=True), flush=True)
@@ -85,18 +85,18 @@ options.middleware = middleware
 
 
 async def my_shift(_function_name: str, request_message: Message) -> Message:
-    pastry = 'sesame loaf' if request_message.headers['@station'] == 'oven' else 'almond croissant'
+    pastry = 'sesame loaf' if request_message.headers['+station'] == 'oven' else 'almond croissant'
     return Message({}, {
         'Ok_': {
-            'employeeId': request_message.headers['@employeeId'],
-            'station': request_message.headers['@station'],
+            'employeeId': request_message.headers['+employeeId'],
+            'station': request_message.headers['+station'],
             'pastry': pastry,
         },
     })
 
 
 async def approve_special(_function_name: str, request_message: Message) -> Message:
-    if request_message.headers.get('@station') != 'oven':
+    if request_message.headers.get('+station') != 'oven':
         raise Unauthorized('oven station required to approve the special')
 
     return Message({}, {
@@ -125,7 +125,7 @@ def create_http_server(host: str = '127.0.0.1', port: int = 0) -> ThreadingHTTPS
             content_length = int(self.headers.get('Content-Length', '0'))
             request_bytes = self.rfile.read(content_length)
             response = asyncio.run(telepact_server.process(request_bytes))
-            content_type = 'application/octet-stream' if '@bin_' in response.headers else 'application/json'
+            content_type = 'application/octet-stream' if '+bin_' in response.headers else 'application/json'
 
             self.send_response(200)
             self.send_header('Content-Type', content_type)

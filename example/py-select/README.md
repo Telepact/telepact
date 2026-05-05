@@ -20,12 +20,12 @@ Run it:
 make run
 ```
 
-The request uses the runtime-supported `@select_` shape:
+The request uses the runtime-supported `+select_` shape:
 
 ```json
 [
   {
-    "@select_": {
+    "+select_": {
       "->": {
         "Ok_": ["package", "latestEvent"]
       },

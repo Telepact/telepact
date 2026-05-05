@@ -49,17 +49,17 @@ def on_err(e):
 
 
 def on_request_err(m):
-    if m.headers.get("@onRequestError_", False):
+    if m.headers.get("+onRequestError_", False):
         raise RuntimeError()
 
 
 def on_response_err(m):
-    if m.headers.get("@onResponseError_", False):
+    if m.headers.get("+onResponseError_", False):
         raise RuntimeError()
 
 
 async def on_auth(request_headers: dict[str, object]) -> dict[str, object]:
-    auth = request_headers.get("@auth_")
+    auth = request_headers.get("+auth_")
     if not isinstance(auth, dict):
         return {}
 
@@ -69,9 +69,9 @@ async def on_auth(request_headers: dict[str, object]) -> dict[str, object]:
 
     token = token_value.get("token")
     if token == "ok":
-        return {"@ok_": {}}
+        return {"+ok_": {}}
     if token == "unauthorized":
-        return {"@result": {"ErrorUnauthorized_": {"message!": "a"}}}
+        return {"+result": {"ErrorUnauthorized_": {"message!": "a"}}}
     raise RuntimeError("invalid auth")
 
 
@@ -182,7 +182,7 @@ async def start_client_test_server(connection: NatsClient, metrics: CollectorReg
                     return Message(response_headers, {"ErrorUnknown_": {}})
             elif use_codegen and function_name == "fn.test":
                 headers, output = await generated_client.test(request_headers, fntest.Input(request_body))
-                headers['@codegenc_'] = True
+                headers['+codegenc_'] = True
                 return Message(headers, output.pseudo_json)
             else:
                 return await client.request(Message(request_headers, request_body))
@@ -197,7 +197,7 @@ async def start_client_test_server(connection: NatsClient, metrics: CollectorReg
             response = Message(response_headers, {"ErrorUnknown_": {}})
 
         if find_bytes(response.body):
-            response.headers['@clientReturnedBinary'] = True
+            response.headers['+clientReturnedBinary'] = True
 
         response_pseudo_json = [response.headers, response.body]
 
@@ -381,13 +381,13 @@ async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, 
         message = await function_router.route(request_message)
 
         if use_codegen:
-            message.headers["@codegens_"] = True
+            message.headers["+codegens_"] = True
 
-        toggle_alternate_server = request_message.headers.get("@toggleAlternateServer_")
+        toggle_alternate_server = request_message.headers.get("+toggleAlternateServer_")
         if toggle_alternate_server == True:
             serve_alternate_server = not serve_alternate_server
 
-        throw_error = request_message.headers.get("@throwError_")
+        throw_error = request_message.headers.get("+throwError_")
         if throw_error == True:
             raise ThisError()
 
@@ -414,9 +414,9 @@ async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, 
 
         on_error_expectation = (
             "nested"
-            if message.headers.get("@assertOnErrorNested_") is True
+            if message.headers.get("+assertOnErrorNested_") is True
             else "standalone"
-            if message.headers.get("@assertOnErrorStandalone_") is True
+            if message.headers.get("+assertOnErrorStandalone_") is True
             else None
         )
         on_error_failed = False
@@ -482,7 +482,7 @@ async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, 
             else:
                 response = await server.process(
                     request_bytes,
-                    lambda headers: headers.update({'@override': 'new'}),
+                    lambda headers: headers.update({'+override': 'new'}),
                 )
                 return response.bytes
 
