@@ -247,33 +247,33 @@ to the request/response semantics, but only with respect to the headers object
 on the Telepact message. Both the request and response definitions resemble
 struct definitions, with a few exceptions:
 
--   all header fields must be prepended with `+`
+-   all header fields must be prepended with `@`
 -   all header fields are implicitly optional
 -   header fields must not use the `!` suffix because optionality is already
     implied for all headers
 -   additional header fields not specified in the definition will be allowed
     during validation
 
-Header names therefore follow the pattern `^\+[a-z][a-zA-Z0-9_]*$`.
+Header names therefore follow the pattern `^@[a-z][a-zA-Z0-9_]*$`.
 
 Headers definitions cannot be used in type expressions.
 
 ```yaml
 - headers.Example:
-    "+requestHeader": "boolean"
-    "+anotherRequestHeader": "integer"
+    "@requestHeader": "boolean"
+    "@anotherRequestHeader": "integer"
   ->:
-    "+responseHeader": "string"
+    "@responseHeader": "string"
 ```
 
 | Example Request                                       | Example Response                              |
 | ----------------------------------------------------- | --------------------------------------------- |
-| `[{"+requestHeader": true}, {"fn.ping_": {}}]`        | `[{"+responseHeader": "text"}, {"Ok_": {}}]`  |
-| `[{"+anotherRequestHeader": true}, {"fn.ping_": {}}]` | `[{"+unspecifiedHeader": true}, {"Ok_": {}}]` |
+| `[{"@requestHeader": true}, {"fn.ping_": {}}]`        | `[{"@responseHeader": "text"}, {"Ok_": {}}]`  |
+| `[{"@anotherRequestHeader": true}, {"fn.ping_": {}}]` | `[{"@unspecifiedHeader": true}, {"Ok_": {}}]` |
 
 | Example Invalid Request                     | Example Invalid Response                |
 | ------------------------------------------- | --------------------------------------- |
-| `[{"+requestHeader": 1}, {"fn.ping_": {}}]` | `[{"+responseHeader": 1}, {"Ok_": {}}]` |
+| `[{"@requestHeader": 1}, {"fn.ping_": {}}]` | `[{"@responseHeader": 1}, {"Ok_": {}}]` |
 
 ### Docstrings
 
@@ -331,15 +331,15 @@ You can find all standard definitions
 
 ### Auth Definitions
 
-Auth definitions include the `+auth_` header and the `ErrorUnauthenticated_` and
+Auth definitions include the `@auth_` header and the `ErrorUnauthenticated_` and
 `ErrorUnauthorized_` errors. These are included conditionally if the API writer
 defines a `union.Auth_` definition in their schema, because the auth header
-definition data type references it, as in `"+auth_": "union.Auth_"`.
+definition data type references it, as in `"@auth_": "union.Auth_"`.
 
 The canonical Telepact auth contract is to place client-visible credential
-variants in `union.Auth_` and carry them in `+auth_`. API writers are strongly
+variants in `union.Auth_` and carry them in `@auth_`. API writers are strongly
 encouraged to reuse that shape rather than inventing a separate public auth
-header, because `+auth_` is treated with greater sensitivity throughout the
+header, because `@auth_` is treated with greater sensitivity throughout the
 Telepact ecosystem.
 
 You can find details about auth definitions
@@ -505,24 +505,24 @@ and a mock-specific extension guide [here](./05-mock-extensions.md).
 -> [{}, {"fn.login": {"username": "bob"}}]
 <- [{}, {"Ok_": {"token": "token-bob"}}]
 
--> [{"+auth_": {"Ephemeral": {"username": "bob"}}}, {"fn.saveVariables": {"variables": {"a": 1, "b": 2}}}]
+-> [{"@auth_": {"Ephemeral": {"username": "bob"}}}, {"fn.saveVariables": {"variables": {"a": 1, "b": 2}}}]
 <- [{}, {"Ok_": {}}]
 
--> [{"+auth_": {"Session": {"token": "token-bob"}}}, {"fn.evaluate": {"expression": {"Mul": {"left": {"Constant": {"value": 5}}, "right": {"Variable": {"name": "b"}}}}}}]
+-> [{"@auth_": {"Session": {"token": "token-bob"}}}, {"fn.evaluate": {"expression": {"Mul": {"left": {"Constant": {"value": 5}}, "right": {"Variable": {"name": "b"}}}}}}]
 <- [{}, {"Ok_": {"result": 10, "saveResult": {"fn.saveVariable": {"name": "result", "value": 10}}}}]
 
--> [{"+auth_": {"Session": {"token": "token-bob"}}}, {"fn.evaluate": {"expression": {"Div": {"left": {"Variable": {"name": "a"}}, "right": {"Constant": {"value": 0}}}}}}]
+-> [{"@auth_": {"Session": {"token": "token-bob"}}}, {"fn.evaluate": {"expression": {"Div": {"left": {"Variable": {"name": "a"}}, "right": {"Constant": {"value": 0}}}}}}]
 <- [{}, {"ErrorCannotDivideByZero": {}}]
 
--> [{"+auth_": {"Ephemeral": {"username": "bob"}}}, {"fn.evaluate": {"expression": {"Add": {"left": {"Variable": {"name": "a"}}, "right": {"Variable": {"name": "missing"}}}}}}]
+-> [{"@auth_": {"Ephemeral": {"username": "bob"}}}, {"fn.evaluate": {"expression": {"Add": {"left": {"Variable": {"name": "a"}}, "right": {"Variable": {"name": "missing"}}}}}}]
 <- [{}, {"ErrorUnknownVariables": {"unknownVariables": ["missing"]}}]
 
--> [{"+auth_": {"Ephemeral": {"username": "bob"}}}, {"fn.getPaperTape": {"limit!": 2}}]
+-> [{"@auth_": {"Ephemeral": {"username": "bob"}}}, {"fn.getPaperTape": {"limit!": 2}}]
 <- [{}, {"Ok_": {"tape": [{"expression": {"Add": {"left": {"Variable": {"name": "a"}}, "right": {"Variable": {"name": "missing"}}}}, "result": 0, "timestamp": 1710000001, "successful": false}, {"expression": {"Mul": {"left": {"Constant": {"value": 5}}, "right": {"Variable": {"name": "b"}}}}, "result": 10, "timestamp": 1710000000, "successful": true}]}}]
 
--> [{"+auth_": {"Ephemeral": {"username": "bob"}}}, {"fn.getVariables": {}}]
+-> [{"@auth_": {"Ephemeral": {"username": "bob"}}}, {"fn.getVariables": {}}]
 <- [{}, {"Ok_": {"variables": [{"name": "a", "value": 1}, {"name": "b", "value": 2}]}}]
 
--> [{"+auth_": {"Session": {"token": "token-bob"}}}, {"fn.logout": {"username": "bob"}}]
+-> [{"@auth_": {"Session": {"token": "token-bob"}}}, {"fn.logout": {"username": "bob"}}]
 <- [{}, {"Ok_": {}}]
 ```

@@ -39,19 +39,19 @@ export async function clientHandleMessage(
     const header: Record<string, any> = requestMessage.headers;
 
     try {
-        if (!header.hasOwnProperty('+time_')) {
-            header['+time_'] = timeoutMsDefault;
+        if (!header.hasOwnProperty('@time_')) {
+            header['@time_'] = timeoutMsDefault;
         }
 
         if (useBinaryDefault) {
-            header['+binary_'] = true;
+            header['@binary_'] = true;
         }
 
-        if (header['+binary_'] && alwaysSendJson) {
+        if (header['@binary_'] && alwaysSendJson) {
             header['_forceSendJson'] = true;
         }
 
-        const timeoutMs = header['+time_'] as number;
+        const timeoutMs = header['@time_'] as number;
 
         const responseMessage = await Promise.race([adapter(requestMessage, serializer), timeoutPromise(timeoutMs)]);
 
@@ -60,7 +60,7 @@ export async function clientHandleMessage(
                 ErrorParseFailure_: { reasons: [{ IncompatibleBinaryEncoding: {} }] },
             })
         ) {
-            header['+binary_'] = true;
+            header['@binary_'] = true;
             header['_forceSendJson'] = true;
 
             return await Promise.race([adapter(requestMessage, serializer), timeoutPromise(timeoutMs)]);
@@ -80,7 +80,7 @@ export async function clientHandleMessage(
         }
         if (e instanceof Error && e.message === 'Promise timed out') {
             throw new TelepactError(
-                `telepact client transport timed out after ${header['+time_']}ms`,
+                `telepact client transport timed out after ${header['@time_']}ms`,
                 'transport',
                 e,
             );

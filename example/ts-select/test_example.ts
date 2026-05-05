@@ -34,7 +34,7 @@ test('select example runs end to end', async () => {
         ]);
         const selectedPayload = await postJson(url, [
             {
-                '+select_': {
+                '@select_': {
                     '->': {
                         'Ok_': ['package', 'latestEvent'],
                     },

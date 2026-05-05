@@ -46,8 +46,8 @@ func SerializeInternal(
 	}
 
 	serializeAsBinary := false
-	if raw, ok := headers["+binary_"]; ok {
-		delete(headers, "+binary_")
+	if raw, ok := headers["@binary_"]; ok {
+		delete(headers, "@binary_")
 		if flag, ok := raw.(bool); ok && flag {
 			serializeAsBinary = true
 		}

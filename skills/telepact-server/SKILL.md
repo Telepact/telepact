@@ -80,7 +80,7 @@ The library handles:
 - automatically serving built-in functions such as `fn.ping_` and `fn.api_`
 - validating your handler's response body against the function result union
 - validating response headers
-- applying client-driven response field selection via `+select_`
+- applying client-driven response field selection via `@select_`
 - negotiating opt-in binary response behavior via Telepact headers
 - distributing the loaded API schema through the always-on `fn.api_` endpoint
 
@@ -88,24 +88,24 @@ Do not manually re-implement those behaviors in your transport or business logic
 
 ## Auth
 
-If the API uses credentials, always model them as `union.Auth_` and flow them through the `+auth_` header.
+If the API uses credentials, always model them as `union.Auth_` and flow them through the `@auth_` header.
 
 Do not invent alternate credential channels such as:
 
-- custom headers like `+token`, `+session`, or `Authorization`
+- custom headers like `@token`, `@session`, or `Authorization`
 - request body fields on ordinary functions
 - transport-specific side channels that bypass the Telepact message
 
-The Telepact ecosystem expects credentials to move through `union.Auth_` and `+auth_`. That path is treated with greater sensitivity. Outside it, Telepact has no equivalent guardrails, and credentials are easier to leak accidentally through logs, copied payloads, examples, or tooling.
+The Telepact ecosystem expects credentials to move through `union.Auth_` and `@auth_`. That path is treated with greater sensitivity. Outside it, Telepact has no equivalent guardrails, and credentials are easier to leak accidentally through logs, copied payloads, examples, or tooling.
 
 Server rule:
 
 - define `union.Auth_` in the schema when the API is authenticated
-- declare `+auth_` as `union.Auth_` in the schema's headers definition
+- declare `@auth_` as `union.Auth_` in the schema's headers definition
 - read credentials from the request headers, not from ordinary function arguments
 - keep auth handling inside the Telepact message flow rather than transport-specific side channels
 
-If the API does not need authentication, omit `union.Auth_` and `+auth_` entirely. Do not create custom credential placeholders.
+If the API does not need authentication, omit `union.Auth_` and `@auth_` entirely. Do not create custom credential placeholders.
 
 ## Language Quick Reference
 
@@ -322,7 +322,7 @@ Do not manually:
 - parse the request envelope
 - validate request payload shapes
 - perform `fn.api_` dispatch
-- implement `+select_`
+- implement `@select_`
 - negotiate binary encoding
 
 Those are library responsibilities.
@@ -371,7 +371,7 @@ const app = express();
 app.post('/api/telepact', express.raw({ type: '*/*' }), async (req, res) => {
     const requestBytes = new Uint8Array(req.body as Buffer);
     const response = await telepactServer.process(requestBytes);
-    const mediaType = '+bin_' in response.headers
+    const mediaType = '@bin_' in response.headers
         ? 'application/octet-stream'
         : 'application/json';
 
@@ -474,7 +474,7 @@ A Telepact client can opt into ecosystem features using headers. The server libr
 
 ### Response Field Selection
 
-Clients may request struct field selection using `+select_`.
+Clients may request struct field selection using `@select_`.
 
 For the full `_ext.Select_` shape and worked examples of how selection changes
 response payloads, see:

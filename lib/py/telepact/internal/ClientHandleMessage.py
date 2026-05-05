@@ -34,22 +34,22 @@ async def client_handle_message(request_message: 'Message',
     header: dict[str, object] = request_message.headers
 
     try:
-        if "+time_" not in header:
-            header["+time_"] = timeout_ms_default
+        if "@time_" not in header:
+            header["@time_"] = timeout_ms_default
 
         if use_binary_default:
-            header["+binary_"] = True
+            header["@binary_"] = True
 
-        if header.get('+binary_', False) and always_send_json:
+        if header.get('@binary_', False) and always_send_json:
             header["_forceSendJson"] = True
 
-        timeout_ms = cast(int, header.get("+time_"))
+        timeout_ms = cast(int, header.get("@time_"))
 
         async with asyncio.timeout(timeout_ms / 1000):
             response_message = await adapter(request_message, serializer)
 
         if response_message.body == {"ErrorParseFailure_": {"reasons": [{"IncompatibleBinaryEncoding": {}}]}}:
-            header["+binary_"] = True
+            header["@binary_"] = True
             header["_forceSendJson"] = True
 
             async with asyncio.timeout(timeout_ms / 1000):

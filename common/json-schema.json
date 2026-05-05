@@ -154,7 +154,7 @@
                         "type": "object",
                         "additionalProperties": false,
                         "patternProperties": {
-                            "^\\+[a-z]\\w*!?$": {
+                            "^@[a-z]\\w*!?$": {
                                 "$ref": "#/$defs/typeDeclaration"
                             }
                         }
@@ -166,7 +166,7 @@
                         "type": "object",
                         "additionalProperties": false,
                         "patternProperties": {
-                            "^\\+[a-z]\\w*!?$": {
+                            "^@[a-z]\\w*!?$": {
                                 "$ref": "#/$defs/typeDeclaration"
                             }
                         }

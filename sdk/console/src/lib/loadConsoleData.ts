@@ -174,7 +174,7 @@ export async function loadConsoleData(url: URL): Promise<LoadedConsoleData> {
 				next: () => Promise<Message>
 			) => {
 				if (newAuthHeader !== undefined) {
-					m.headers['+auth_'] = newAuthHeader;
+					m.headers['@auth_'] = newAuthHeader;
 				}
 
 				return next();
@@ -364,7 +364,7 @@ export async function loadConsoleData(url: URL): Promise<LoadedConsoleData> {
 				next: () => Promise<Message>
 			) => {
 				if (newAuthHeader !== undefined) {
-					m.headers['+auth_'] = newAuthHeader;
+					m.headers['@auth_'] = newAuthHeader;
 				}
 
 				return next();

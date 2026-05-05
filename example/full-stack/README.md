@@ -8,8 +8,8 @@ production-boundary concerns from
 [`doc/04-operate/01-production-guide.md`](../../doc/04-operate/01-production-guide.md):
 
 - HTTP-only session cookies stay at the transport boundary and are translated into
-  `+auth_`
-- `on_auth` normalizes identity into internal headers such as `+userId` and `+role`
+  `@auth_`
+- `on_auth` normalizes identity into internal headers such as `@userId` and `@role`
 - Telepact hooks emit request IDs, per-function metrics, and structured events
   without logging whole request payloads
 - authorization stays in the handler that owns the admin-only business rule

@@ -89,7 +89,7 @@ Example response:
 ```json
 [
   {
-    "+base64_": {
+    "@base64_": {
       "Ok_": {
         "blob": true
       }
