@@ -14,12 +14,12 @@
 //|  limitations under the License.
 //|
 
-import { ChildProcessWithoutNullStreams, spawn } from 'node:child_process';
+import { ChildProcess, spawn } from 'node:child_process';
 import { once } from 'node:events';
 import path from 'node:path';
 
 export type RunningPythonServer = {
-    process: ChildProcessWithoutNullStreams;
+    process: ChildProcess;
     url: string;
 };
 

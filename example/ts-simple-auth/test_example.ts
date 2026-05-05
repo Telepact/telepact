@@ -28,7 +28,7 @@ test('simple auth example runs end to end', async () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: serializer.serialize(message),
+                body: Buffer.from(serializer.serialize(message)),
             });
             const responseBytes = new Uint8Array(await response.arrayBuffer());
             return serializer.deserialize(responseBytes);
