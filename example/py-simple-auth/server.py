@@ -40,7 +40,7 @@ async def on_auth(headers: dict[str, object]) -> dict[str, object]:
     auth = headers.get('@auth_')
     password = auth.get('Password') if isinstance(auth, dict) else None
     if not isinstance(password, dict):
-        return {}
+        raise ValueError('missing or invalid bakery credentials')
 
     if password == EXPLODING_CREDENTIALS:
         raise RuntimeError('bakery auth backend unavailable')
@@ -51,7 +51,7 @@ async def on_auth(headers: dict[str, object]) -> dict[str, object]:
     if password == CASHIER_CREDENTIALS:
         return {'@employeeId': 'cashier-002', '@station': 'counter'}
 
-    return {}
+    raise ValueError('missing or invalid bakery credentials')
 
 
 options.on_auth = on_auth
@@ -70,15 +70,6 @@ def _log_identity(request_message: Message) -> None:
 
 async def middleware(request_message: Message, function_router: FunctionRouter) -> Message:
     _log_identity(request_message)
-
-    employee_id = request_message.headers.get('@employeeId')
-    station = request_message.headers.get('@station')
-    if not isinstance(employee_id, str) or not isinstance(station, str):
-        return Message({}, {
-            'ErrorUnauthenticated_': {
-                'message!': 'missing or invalid bakery credentials',
-            },
-        })
 
     try:
         return await function_router.route(request_message)
