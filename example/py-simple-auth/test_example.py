@@ -42,7 +42,7 @@ async def run_example() -> None:
             '@auth_': {
                 'Password': {
                     'username': 'lead-baker',
-                    'password': 'sourdough',
+                    'password': 'opensesame',
                 },
             },
         }, {
@@ -59,7 +59,7 @@ async def run_example() -> None:
             '@auth_': {
                 'Password': {
                     'username': 'cashier',
-                    'password': 'croissant',
+                    'password': 'knockknock',
                 },
             },
         }, {

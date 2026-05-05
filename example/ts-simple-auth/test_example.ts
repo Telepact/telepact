@@ -34,7 +34,7 @@ test('simple auth example runs end to end against the python server', async () =
             '@auth_': {
                 'Password': {
                     'username': 'lead-baker',
-                    'password': 'sourdough',
+                    'password': 'opensesame',
                 },
             },
         }, {
@@ -51,7 +51,7 @@ test('simple auth example runs end to end against the python server', async () =
             '@auth_': {
                 'Password': {
                     'username': 'cashier',
-                    'password': 'croissant',
+                    'password': 'knockknock',
                 },
             },
         }, {

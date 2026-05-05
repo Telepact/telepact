@@ -13,8 +13,8 @@ It demonstrates three common auth patterns:
 
 Hard-coded credentials used by the example:
 
-- `lead-baker` / `sourdough` -> `@employeeId=baker-001`, `@station=oven`
-- `cashier` / `croissant` -> `@employeeId=cashier-002`, `@station=counter`
+- `lead-baker` / `opensesame` -> `@employeeId=baker-001`, `@station=oven`
+- `cashier` / `knockknock` -> `@employeeId=cashier-002`, `@station=counter`
 - `explode` / `boom` -> throws in `on_auth`
 
 Browse the files:

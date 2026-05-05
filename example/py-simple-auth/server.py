@@ -23,8 +23,8 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 from telepact import FunctionRouter, Message, Server, TelepactSchema
 
-LEAD_BAKER_CREDENTIALS = {'username': 'lead-baker', 'password': 'sourdough'}
-CASHIER_CREDENTIALS = {'username': 'cashier', 'password': 'croissant'}
+LEAD_BAKER_CREDENTIALS = {'username': 'lead-baker', 'password': 'opensesame'}
+CASHIER_CREDENTIALS = {'username': 'cashier', 'password': 'knockknock'}
 EXPLODING_CREDENTIALS = {'username': 'explode', 'password': 'boom'}
 
 MIDDLEWARE_EVENTS: list[dict[str, object | None]] = []
