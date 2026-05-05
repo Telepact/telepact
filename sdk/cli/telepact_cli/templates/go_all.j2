@@ -482,7 +482,8 @@ func (h *TypedServerHandler) Handler(message telepact.Message) (telepact.Message
         return telepact.Message{}, errors.New("telepact: typed server not configured")
     }
 
-    functionRouter := telepact.NewFunctionRouter(h.FunctionRoutes())
+    functionRouter := telepact.NewFunctionRouter()
+    functionRouter.RegisterUnauthenticatedRoutes(h.FunctionRoutes())
     if functionRouter == nil {
         return telepact.Message{}, fmt.Errorf("telepact: typed server not configured")
     }

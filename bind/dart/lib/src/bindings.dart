@@ -99,14 +99,12 @@ extension type ServerOptions._(JSObject _) implements JSObject {
   external JSFunction get onRequest;
   external JSFunction get onResponse;
   external JSFunction get middleware;
-  external bool get authRequired;
   external Serialization get serialization;
 
   external void set onError(JSFunction onError);
   external void set onRequest(JSFunction onRequest);
   external void set onResponse(JSFunction onResponse);
   external void set middleware(JSFunction middleware);
-  external void set authRequired(bool authRequired);
   external void set serialization(Serialization serialization);
 
   external factory ServerOptions();

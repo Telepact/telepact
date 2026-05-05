@@ -24,7 +24,6 @@ const VALID_SESSION = 'demo-session';
 const files = new TelepactSchemaFiles('api', fs, path);
 const schema = TelepactSchema.fromFileJsonMap(files.filenamesToJson);
 const options = new ServerOptions();
-options.authRequired = false;
 options.onAuth = async (headers: Record<string, any>): Promise<Record<string, any>> => {
     const auth = headers['@auth_'];
     const session = typeof auth === 'object' && auth !== null ? auth['Session'] : undefined;
@@ -50,7 +49,8 @@ async function me(_functionName: string, requestMessage: Message): Promise<Messa
     });
 }
 
-const functionRouter = new FunctionRouter({ 'fn.me': me });
+const functionRouter = new FunctionRouter();
+functionRouter.registerAuthenticatedRoutes({ 'fn.me': me });
 const telepactServer = new Server(schema, functionRouter, options);
 
 function readRequestBytes(request: IncomingMessage): Promise<Uint8Array> {

@@ -30,7 +30,7 @@ if TYPE_CHECKING:
     from .types.TType import TType
     from ..TelepactSchema import TelepactSchema
 
-_INTERNAL_FUNCTIONS_BYPASSING_AUTH = {"fn.ping_", "fn.api_"}
+_UNAUTHENTICATED_MESSAGE = "Valid authentication is required."
 
 
 async def handle_message(
@@ -62,7 +62,6 @@ async def handle_message(
     request_target_init = request_entry[0]
     request_payload = cast(
         dict[str, object], request_entry[1])
-    bypass_auth_for_function = request_target_init in _INTERNAL_FUNCTIONS_BYPASSING_AUTH
 
     unknown_target: str | None
     request_target: str
@@ -76,6 +75,7 @@ async def handle_message(
     function_name = request_target
     call_type = cast(TUnion, parsed_telepact_schema[request_target])
     result_union_type = cast(TUnion, parsed_telepact_schema[request_target + '.->'])
+    requires_authentication = unknown_target is None and function_router.requires_authentication(function_name)
 
     call_id = request_headers.get("@id_")
     if call_id is not None:
@@ -102,14 +102,19 @@ async def handle_message(
             response_headers,
         )
 
-    if "@auth_" in request_headers and not bypass_auth_for_function:
+    if requires_authentication and "@auth_" not in request_headers:
+        return build_unauthenticated_error_message(result_union_type, response_headers)
+
+    if requires_authentication:
         try:
             auth_headers = on_auth(request_headers)
             if isawaitable(auth_headers):
                 auth_headers = await auth_headers
             auth_headers = auth_headers or {}
             request_headers.update(auth_headers)
-        except Exception as e:
+        except BaseException as e:
+            if isinstance(e, (KeyboardInterrupt, SystemExit, GeneratorExit)):
+                raise
             wrapped = TelepactError(
                 f"telepact auth handler failed while handling {function_name}",
                 kind="handler",
@@ -119,7 +124,7 @@ async def handle_message(
                 on_error(wrapped)
             except Exception:
                 pass
-            return build_unknown_error_message(wrapped, response_headers)
+            return build_unauthenticated_error_message(result_union_type, response_headers)
 
     if "@bin_" in request_headers:
         client_known_binary_checksums = cast(
@@ -254,3 +259,15 @@ async def handle_message(
         final_result_union = result_union
 
     return Message(final_response_headers, final_result_union)
+
+
+def build_unauthenticated_error_message(result_union_type: 'TUnion', headers: dict[str, object]) -> Message:
+    from ..internal.validation.ValidateResult import validate_result
+
+    result: dict[str, object] = {
+        "ErrorUnauthenticated_": {
+            "message!": _UNAUTHENTICATED_MESSAGE,
+        }
+    }
+    validate_result(result_union_type, result)
+    return Message(headers, result)

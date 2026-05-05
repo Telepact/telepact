@@ -78,8 +78,9 @@ Two common ways it gets populated:
 - a Telepact-aware client sends `@auth_` directly
 - the transport adapter extracts credentials from transport-specific state and writes `@auth_` before calling `server.process(...)`
 
-Telepact runs `onAuth` only when `@auth_` is present. For protected calls, make
-sure the caller or the transport adapter provides it.
+Telepact runs `onAuth` only for functions registered in the authenticated route
+map. If a protected call is missing `@auth_`, Telepact returns
+`ErrorUnauthenticated_` before it reaches your handler.
 
 ## Auth error shapes
 
@@ -113,6 +114,10 @@ Inside the server:
 2. `onAuth` validates or resolves the credential
 3. `onAuth` returns normalized internal headers
 4. middleware and function routes use those normalized headers for policy and business logic
+
+Define protected handlers in the authenticated route map and public handlers in
+the unauthenticated route map. Telepact automatically keeps `fn.ping_` and
+`fn.api_` unauthenticated.
 
 Typical normalized headers are internal values like:
 

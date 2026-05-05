@@ -140,8 +140,8 @@ const functionRoutes = {
 };
 
 const options = new ServerOptions();
-options.authRequired = false;
-const functionRouter = new FunctionRouter(functionRoutes);
+const functionRouter = new FunctionRouter();
+functionRouter.registerUnauthenticatedRoutes(functionRoutes);
 const telepactServer = new Server(schema, functionRouter, options);
 
 // Assuming `transport` is defined elsewhere
@@ -167,9 +167,9 @@ async def example(request_message: 'Message') -> 'Message':
     return Message({}, {'Ok_': {}})
 
 options = Server.Options()
-options.auth_required = False
 function_routes = {'fn.example': lambda function_name, request_message: example(request_message)}
-function_router = FunctionRouter(function_routes)
+function_router = FunctionRouter()
+function_router.register_unauthenticated_routes(function_routes)
 telepactServer = Server(schema, function_router, options)
 
 # Assuming `transport` is defined elsewhere
@@ -197,8 +197,8 @@ Map<String, FunctionRoute> functionRoutes = Map.of(
 );
 
 var options = new Server.Options();
-options.authRequired = false;
-var functionRouter = new FunctionRouter(functionRoutes);
+var functionRouter = new FunctionRouter();
+functionRouter.registerUnauthenticatedRoutes(functionRoutes);
 var telepactServer = new Server(schema, functionRouter, options);
 
 // Assuming `transport` is defined elsewhere
@@ -246,8 +246,8 @@ functionRoutes := map[string]telepact.FunctionRoute{
 }
 
 telepactOptions := telepact.NewServerOptions()
-telepactOptions.AuthRequired = false
-functionRouter := telepact.NewFunctionRouter(functionRoutes)
+functionRouter := telepact.NewFunctionRouter()
+functionRouter.RegisterUnauthenticatedRoutes(functionRoutes)
 telepactServer, err := telepact.NewServer(schema, functionRouter, telepactOptions)
 if err != nil {
     return err
@@ -547,7 +547,8 @@ define functionRoutes mapping fn.* names to handlers:
     run business logic
     return Message(headers, resultUnion)
 
-functionRouter = FunctionRouter(functionRoutes)
+functionRouter = FunctionRouter()
+functionRouter.register_unauthenticated_routes(functionRoutes)
 telepactServer = Server(schema, functionRouter, options)
 
 transport.on_request(requestBytes):

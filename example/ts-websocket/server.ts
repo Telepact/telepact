@@ -24,7 +24,6 @@ import type { RawData } from 'ws';
 const files = new TelepactSchemaFiles('api', fs, path);
 const schema = TelepactSchema.fromFileJsonMap(files.filenamesToJson);
 const options = new ServerOptions();
-options.authRequired = false;
 
 async function greet(functionName: string, requestMessage: Message): Promise<Message> {
     const argument = requestMessage.body[functionName] as Record<string, string>;
@@ -36,7 +35,8 @@ async function greet(functionName: string, requestMessage: Message): Promise<Mes
     });
 }
 
-const functionRouter = new FunctionRouter({ 'fn.greet': greet });
+const functionRouter = new FunctionRouter();
+functionRouter.registerUnauthenticatedRoutes({ 'fn.greet': greet });
 const telepactServer = new Server(schema, functionRouter, options);
 
 function rawDataToBytes(data: RawData): Uint8Array {

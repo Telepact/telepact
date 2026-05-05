@@ -44,7 +44,6 @@ type ServerOptions struct {
 	OnResponse    func(Message)
 	OnAuth        AuthHandler
 	Middleware    Middleware
-	AuthRequired  bool
 	Serialization Serialization
 }
 
@@ -58,7 +57,6 @@ func NewServerOptions() *ServerOptions {
 		Middleware: func(requestMessage Message, functionRouter *FunctionRouter) (Message, error) {
 			return functionRouter.Route(requestMessage)
 		},
-		AuthRequired:  true,
 		Serialization: NewDefaultSerialization(),
 	}
 }
@@ -83,7 +81,7 @@ func NewServer(telepactSchema *TelepactSchema, functionRouter *FunctionRouter, o
 	if functionRouter == nil {
 		return nil, NewTelepactError("telepact: function router must not be nil")
 	}
-	functionRouter.RegisterRoutes(createInternalFunctionRoutes(telepactSchema))
+	functionRouter.RegisterUnauthenticatedRoutes(createInternalFunctionRoutes(telepactSchema))
 
 	if options == nil {
 		options = NewServerOptions()
@@ -121,8 +119,8 @@ func NewServer(telepactSchema *TelepactSchema, functionRouter *FunctionRouter, o
 	base64Encoder := binary.NewServerBase64Encoder()
 	serializer := NewSerializer(serializationImpl, binaryEncoder, base64Encoder)
 
-	if _, exists := telepactSchema.Parsed["union.Auth_"]; !exists && options.AuthRequired {
-		return nil, NewTelepactError("Unauthenticated server. Either define a `union.Auth_` in your schema or set `options.auth_required` to `false`.")
+	if _, exists := telepactSchema.Parsed["union.Auth_"]; !exists && functionRouter.HasAuthenticatedRoutes() {
+		return nil, NewTelepactError("Authenticated routes require `union.Auth_` in your schema.")
 	}
 
 	return &Server{
@@ -258,4 +256,11 @@ func (a *serverFunctionRouterAdapter) Route(message telepactinternal.ServerMessa
 	}
 
 	return telepactinternal.ServerMessage{Headers: response.Headers, Body: response.Body}, nil
+}
+
+func (a *serverFunctionRouterAdapter) RequiresAuthentication(functionName string) bool {
+	if a == nil || a.functionRouter == nil {
+		return false
+	}
+	return a.functionRouter.RequiresAuthentication(functionName)
 }

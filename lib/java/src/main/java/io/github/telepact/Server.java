@@ -85,11 +85,6 @@ public class Server {
         public Middleware middleware = (requestMessage, functionRouter) -> functionRouter.route(requestMessage);
 
         /**
-         * Flag to indicate if authentication via the _auth header is required.
-         */
-        public boolean authRequired = true;
-
-        /**
          * The serialization implementation that should be used to serialize and
          * deserialize messages.
          */
@@ -113,7 +108,7 @@ public class Server {
      * @param options The options for configuring the server.
      */
     public Server(TelepactSchema telepactSchema, FunctionRouter functionRouter, Options options) {
-        functionRouter.registerRoutes(CreateInternalFunctionRoutes.createInternalFunctionRoutes(telepactSchema));
+        functionRouter.registerUnauthenticatedRoutes(CreateInternalFunctionRoutes.createInternalFunctionRoutes(telepactSchema));
         this.functionRouter = functionRouter;
         this.middleware = options.middleware;
         this.onError = options.onError;
@@ -128,9 +123,9 @@ public class Server {
 
         this.serializer = new Serializer(options.serialization, binaryEncoder, base64Encoder);
 
-        if (!this.telepactSchema.parsed.containsKey("union.Auth_") && options.authRequired) {
+        if (!this.telepactSchema.parsed.containsKey("union.Auth_") && this.functionRouter.hasAuthenticatedRoutes()) {
             throw new RuntimeException(
-                    "Unauthenticated server. Either define a `union.Auth_` in your schema or set `options.authRequired` to `false`.");
+                    "Authenticated routes require `union.Auth_` in your schema.");
         }
     }
 

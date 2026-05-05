@@ -48,7 +48,6 @@ Map<String, FunctionRoute> functionRoutes = Map.of(
 );
 var options = new Server.Options();
 // Set this to false when your schema does not define union.Auth_.
-options.authRequired = false;
 options.middleware = (requestMessage, functionRouter) -> {
     var functionName = requestMessage.getBodyTarget();
     try {
@@ -58,7 +57,8 @@ options.middleware = (requestMessage, functionRouter) -> {
         log.info("Function finished", Map.of("function", functionName));
     }
 };
-var functionRouter = new FunctionRouter(functionRoutes);
+var functionRouter = new FunctionRouter();
+functionRouter.registerUnauthenticatedRoutes(functionRoutes);
 var server = new Server(schema, functionRouter, options);
 
 

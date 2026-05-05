@@ -39,7 +39,6 @@ const functionRoutes = {
 
 const options = new ServerOptions();
 // Set this to false when your schema does not define union.Auth_.
-options.authRequired = false;
 options.middleware = async (requestMessage: Message, functionRouter): Promise<Message> => {
     const functionName = requestMessage.getBodyTarget();
     try {
@@ -49,7 +48,8 @@ options.middleware = async (requestMessage: Message, functionRouter): Promise<Me
         log.info("Function finished", {function: functionName});
     }
 };
-const functionRouter = new FunctionRouter(functionRoutes);
+const functionRouter = new FunctionRouter();
+functionRouter.registerUnauthenticatedRoutes(functionRoutes);
 const server = new Server(schema, functionRouter, options);
 
 // Wire up request/response bytes from your transport of choice

@@ -48,7 +48,6 @@ export class MockServer {
 
         const serverOptions = new ServerOptions();
         serverOptions.onError = options.onError;
-        serverOptions.authRequired = false;
 
         const telepactSchema = new TelepactSchema(
             mockTelepactSchema.original,
@@ -58,7 +57,8 @@ export class MockServer {
             mockTelepactSchema.parsedResponseHeaders,
         );
 
-        const functionRouter = new FunctionRouter(this.createFunctionRoutes(telepactSchema));
+        const functionRouter = new FunctionRouter();
+        functionRouter.registerUnauthenticatedRoutes(this.createFunctionRoutes(telepactSchema));
         this.server = new Server(telepactSchema, functionRouter, serverOptions);
     }
 
