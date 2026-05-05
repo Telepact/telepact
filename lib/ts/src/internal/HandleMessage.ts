@@ -68,9 +68,9 @@ export async function handleMessage(
     const resultUnionType: TUnion = parsedTelepactSchema[`${requestTarget}.->`] as TUnion;
     const requiresAuthentication = unknownTarget === null && functionRouter.requiresAuthentication(functionName);
 
-    const callId = requestHeaders['@id_'];
+    const callId = requestHeaders['+id_'];
     if (callId !== undefined) {
-        responseHeaders['@id_'] = callId;
+        responseHeaders['+id_'] = callId;
     }
 
     if ('_parseFailures' in requestHeaders) {
@@ -98,7 +98,7 @@ export async function handleMessage(
         );
     }
 
-    if (requiresAuthentication && !('@auth_' in requestHeaders)) {
+    if (requiresAuthentication && !('+auth_' in requestHeaders)) {
         return buildUnauthenticatedErrorMessage(resultUnionType, responseHeaders);
     }
 
@@ -116,14 +116,14 @@ export async function handleMessage(
         }
     }
 
-    if ('@bin_' in requestHeaders) {
-        const clientKnownBinaryChecksums = requestHeaders['@bin_'] as any[];
+    if ('+bin_' in requestHeaders) {
+        const clientKnownBinaryChecksums = requestHeaders['+bin_'] as any[];
 
-        responseHeaders['@binary_'] = true;
-        responseHeaders['@clientKnownBinaryChecksums_'] = clientKnownBinaryChecksums;
+        responseHeaders['+binary_'] = true;
+        responseHeaders['+clientKnownBinaryChecksums_'] = clientKnownBinaryChecksums;
 
-        if ('@pac_' in requestHeaders) {
-            responseHeaders['@pac_'] = requestHeaders['@pac_'];
+        if ('+pac_' in requestHeaders) {
+            responseHeaders['+pac_'] = requestHeaders['+pac_'];
     }
 }
 
@@ -137,7 +137,7 @@ function buildUnauthenticatedErrorMessage(resultUnionType: TUnion, headers: Reco
     return new Message(headers, result);
 }
 
-    const selectStructFieldsHeader: Record<string, any> | null = requestHeaders['@select_'] || null;
+    const selectStructFieldsHeader: Record<string, any> | null = requestHeaders['+select_'] || null;
 
     if (unknownTarget !== null) {
         const newErrorResult: Record<string, any> = {
@@ -173,9 +173,9 @@ function buildUnauthenticatedErrorMessage(resultUnionType: TUnion, headers: Reco
         .filter(filterOutWarnings);
     if (callValidationFailures.length > 0) {
         if (warnings.length > 0) {
-            const existingWarnings = responseHeaders['@warn_'] || [];
+            const existingWarnings = responseHeaders['+warn_'] || [];
             const moreWarnings = mapValidationFailuresToInvalidFieldCases(warnings);
-            responseHeaders['@warn_'] = existingWarnings.concat(moreWarnings);
+            responseHeaders['+warn_'] = existingWarnings.concat(moreWarnings);
         }
 
         return getInvalidErrorMessage(
@@ -190,7 +190,7 @@ function buildUnauthenticatedErrorMessage(resultUnionType: TUnion, headers: Reco
         serverBase64Decode(requestBody, callValidateCtx.bytesCoercions);
     }
 
-    const unsafeResponseEnabled = requestHeaders['@unsafe_'] || false;
+    const unsafeResponseEnabled = requestHeaders['+unsafe_'] || false;
 
     const callMessage: Message = new Message(requestHeaders, { [functionName]: requestPayload });
 
@@ -214,16 +214,16 @@ function buildUnauthenticatedErrorMessage(resultUnionType: TUnion, headers: Reco
 
     const skipResultValidation: boolean = unsafeResponseEnabled;
 
-    const coerceBase64 = requestHeaders["@binary_"] != true
+    const coerceBase64 = requestHeaders["+binary_"] != true
     const resultValidateCtx = new ValidateContext(selectStructFieldsHeader, functionName, coerceBase64);
     const resultValidationFailures: ValidationFailure[] = resultUnionType
         .validate(resultUnion, [], resultValidateCtx)
         .filter(filterOutWarnings);
 
     if (warnings.length > 0) {
-        const existingWarnings = responseHeaders['@warn_'] || [];
+        const existingWarnings = responseHeaders['+warn_'] || [];
         const moreWarnings = mapValidationFailuresToInvalidFieldCases(warnings);
-        responseHeaders['@warn_'] = existingWarnings.concat(moreWarnings);
+        responseHeaders['+warn_'] = existingWarnings.concat(moreWarnings);
     }
 
     if (resultValidationFailures.length > 0 && !skipResultValidation) {
@@ -246,7 +246,7 @@ function buildUnauthenticatedErrorMessage(resultUnionType: TUnion, headers: Reco
     }
 
     if (Object.keys(resultValidateCtx.base64Coercions).length > 0) {
-        finalResponseHeaders['@base64_'] = resultValidateCtx.base64Coercions;
+        finalResponseHeaders['+base64_'] = resultValidateCtx.base64Coercions;
     }
 
     if (Object.keys(resultValidateCtx.bytesCoercions).length > 0) {

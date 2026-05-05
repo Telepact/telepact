@@ -28,7 +28,7 @@ public class ServerBinaryEncode {
     static List<Object> serverBinaryEncode(List<Object> message, BinaryEncoding binaryEncoder) {
         final var headers = (Map<String, Object>) message.get(0);
         final var messageBody = (Map<String, Object>) message.get(1);
-        final var clientKnownBinaryChecksums = (List<Integer>) headers.remove("@clientKnownBinaryChecksums_");
+        final var clientKnownBinaryChecksums = (List<Integer>) headers.remove("+clientKnownBinaryChecksums_");
 
         final var resultTag = new ArrayList<>(messageBody.keySet()).get(0);
 
@@ -37,14 +37,14 @@ public class ServerBinaryEncode {
         }
 
         if (clientKnownBinaryChecksums == null || !clientKnownBinaryChecksums.contains(binaryEncoder.checksum)) {
-            headers.put("@enc_", binaryEncoder.encodeMap);
+            headers.put("+enc_", binaryEncoder.encodeMap);
         }
 
-        headers.put("@bin_", List.of(binaryEncoder.checksum));
+        headers.put("+bin_", List.of(binaryEncoder.checksum));
         final var encodedMessageBody = encodeBody(messageBody, binaryEncoder);
 
         final Map<Object, Object> finalEncodedMessageBody;
-        if (Objects.equals(true, headers.get("@pac_"))) {
+        if (Objects.equals(true, headers.get("+pac_"))) {
             finalEncodedMessageBody = packBody(encodedMessageBody);
         } else {
             finalEncodedMessageBody = encodedMessageBody;

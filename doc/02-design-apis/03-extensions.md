@@ -46,7 +46,7 @@ deterministic example payloads for those types.
 
 ## Extension Guides
 
-- [`_ext.Select_`](./04-select-extension.md) covers the `@select_` header and
+- [`_ext.Select_`](./04-select-extension.md) covers the `+select_` header and
   response-shaping payloads.
 - [Mock extensions](./05-mock-extensions.md) covers `_ext.Call_`,
   `_ext.Stub_`, and how `fn.verify_` consumes `_ext.Call_`.

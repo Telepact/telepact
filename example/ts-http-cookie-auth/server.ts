@@ -25,16 +25,16 @@ const files = new TelepactSchemaFiles('api', fs, path);
 const schema = TelepactSchema.fromFileJsonMap(files.filenamesToJson);
 const options = new ServerOptions();
 options.onAuth = async (headers: Record<string, any>): Promise<Record<string, any>> => {
-    const auth = headers['@auth_'];
+    const auth = headers['+auth_'];
     const session = typeof auth === 'object' && auth !== null ? auth['Session'] : undefined;
     if (typeof session === 'object' && session !== null && session['token'] === VALID_SESSION) {
-        return { '@userId': 'user-123' };
+        return { '+userId': 'user-123' };
     }
     return {};
 };
 
 async function me(_functionName: string, requestMessage: Message): Promise<Message> {
-    if (requestMessage.headers['@userId'] !== 'user-123') {
+    if (requestMessage.headers['+userId'] !== 'user-123') {
         return new Message({}, {
             'ErrorUnauthenticated_': {
                 'message!': 'missing or invalid session cookie',
@@ -66,7 +66,7 @@ function readRequestBytes(request: IncomingMessage): Promise<Uint8Array> {
 
 function writeTelepactResponse(responseWriter: ServerResponse, response: Response): void {
     responseWriter.statusCode = 200;
-    responseWriter.setHeader('Content-Type', '@bin_' in response.headers ? 'application/octet-stream' : 'application/json');
+    responseWriter.setHeader('Content-Type', '+bin_' in response.headers ? 'application/octet-stream' : 'application/json');
     responseWriter.end(Buffer.from(response.bytes));
 }
 
@@ -98,7 +98,7 @@ export function createHttpServer(): HttpServer {
             const sessionToken = readSessionCookie(request.headers.cookie);
             const response = await telepactServer.process(requestBytes, (headers: Record<string, any>) => {
                 if (sessionToken !== undefined) {
-                    headers['@auth_'] = { 'Session': { 'token': sessionToken } };
+                    headers['+auth_'] = { 'Session': { 'token': sessionToken } };
                 }
             });
             writeTelepactResponse(responseWriter, response);

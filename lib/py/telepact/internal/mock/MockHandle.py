@@ -98,7 +98,7 @@ async def handle_auto_mock_function(request_message: 'Message', stubs: list['Moc
 
     header: dict[str, object] = request_message.headers
 
-    enable_generation_stub = header.get("@gen_", False)
+    enable_generation_stub = header.get("+gen_", False)
     function_name = request_message.get_body_target()
     argument = request_message.get_body_payload()
 

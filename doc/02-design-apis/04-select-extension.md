@@ -1,6 +1,6 @@
 # `_ext.Select_`
 
-`_ext.Select_` is the type behind the `@select_` header and any payload field
+`_ext.Select_` is the type behind the `+select_` header and any payload field
 that wants the same "select fields from a result graph" behavior.
 
 ## Why It Is An Extension
@@ -50,7 +50,7 @@ The active result union can be selected through `->`:
 
 ## How To Use It
 
-- Send it in the `@select_` header to trim fields from response payloads.
+- Send it in the `+select_` header to trim fields from response payloads.
 - You only need to specify the parts you want to narrow; omitted selections
   default to the full reachable shape.
 - It applies recursively through arrays and objects when the nested value type
@@ -104,7 +104,7 @@ then this request:
 ```json
 [
   {
-    "@select_": {
+    "+select_": {
       "->": {
         "Ok_": ["card", "item"]
       },

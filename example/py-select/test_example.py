@@ -31,7 +31,7 @@ def test_select_example_runs_end_to_end() -> None:
         ])
         selected_payload = post_json(url, [
             {
-                '@select_': {
+                '+select_': {
                     '->': {
                         'Ok_': ['package', 'latestEvent'],
                     },

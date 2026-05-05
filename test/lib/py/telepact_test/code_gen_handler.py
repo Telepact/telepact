@@ -37,7 +37,7 @@ class CodeGenHandler(TypedServerHandler):
         except json.JSONDecodeError as e:
             print(e)
 
-        if "@error" in headers and headers["@error"] == True:
+        if "+error" in headers and headers["+error"] == True:
             return {}, test.Output.from_ErrorExample2(field1="Boom!")
 
         ok: test.Output.Ok_ = None

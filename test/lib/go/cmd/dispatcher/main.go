@@ -807,7 +807,7 @@ func startTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscription, 
 
 	onAuth := func(requestHeaders map[string]any) <-chan map[string]any {
 		result := make(chan map[string]any, 1)
-		authRaw, ok := requestHeaders["@auth_"]
+		authRaw, ok := requestHeaders["+auth_"]
 		if !ok {
 			result <- map[string]any{}
 			return result
@@ -830,9 +830,9 @@ func startTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscription, 
 		token, _ := tokenMap["token"].(string)
 		switch token {
 		case "ok":
-			result <- map[string]any{"@ok_": map[string]any{}}
+			result <- map[string]any{"+ok_": map[string]any{}}
 		case "unauthorized":
-			result <- map[string]any{"@result": map[string]any{"ErrorUnauthorized_": map[string]any{"message!": "a"}}}
+			result <- map[string]any{"+result": map[string]any{"ErrorUnauthorized_": map[string]any{"message!": "a"}}}
 		case "":
 			result <- map[string]any{}
 		default:
@@ -852,14 +852,14 @@ func startTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscription, 
 			if msg.Headers == nil {
 				msg.Headers = map[string]any{}
 			}
-			msg.Headers["@codegens_"] = true
+			msg.Headers["+codegens_"] = true
 		}
 
-		if boolValue(reqHeaders["@toggleAlternateServer_"]) {
+		if boolValue(reqHeaders["+toggleAlternateServer_"]) {
 			serveAlternate.Store(!serveAlternate.Load())
 		}
 
-		if boolValue(reqHeaders["@throwError_"]) {
+		if boolValue(reqHeaders["+throwError_"]) {
 			return telepact.Message{}, thisError{}
 		}
 
@@ -888,16 +888,16 @@ func startTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscription, 
 	}
 	options.OnRequest = func(msg telepact.Message) {
 		switch {
-		case boolValue(msg.Headers["@assertOnErrorNested_"]):
+		case boolValue(msg.Headers["+assertOnErrorNested_"]):
 			onErrorExpectation = "nested"
-		case boolValue(msg.Headers["@assertOnErrorStandalone_"]):
+		case boolValue(msg.Headers["+assertOnErrorStandalone_"]):
 			onErrorExpectation = "standalone"
 		default:
 			onErrorExpectation = ""
 		}
 		onErrorFailed = false
 		onErrorObserved = false
-		if boolValue(msg.Headers["@onRequestError_"]) {
+		if boolValue(msg.Headers["+onRequestError_"]) {
 			panic(handlerError{})
 		}
 	}
@@ -906,12 +906,12 @@ func startTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscription, 
 			if msg.Headers == nil {
 				msg.Headers = map[string]any{}
 			}
-			msg.Headers["@assertionError"] = true
+			msg.Headers["+assertionError"] = true
 		}
 		onErrorExpectation = ""
 		onErrorFailed = false
 		onErrorObserved = false
-		if boolValue(msg.Headers["@onResponseError_"]) {
+		if boolValue(msg.Headers["+onResponseError_"]) {
 			panic(handlerError{})
 		}
 	}
@@ -971,7 +971,7 @@ func startTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscription, 
 			resp, err = alternateServer.Process(msg.Data)
 		} else {
 			updateHeaders := func(headers map[string]any) {
-				headers["@override"] = "new"
+				headers["+override"] = "new"
 			}
 			resp, err = server.ProcessWithHeaders(msg.Data, updateHeaders)
 		}
@@ -1052,16 +1052,16 @@ func (d *Dispatcher) handleClientRequest(
 
 	switch {
 	case testClient != nil:
-		if seed, ok := intFromAny(headers["@setSeed"]); ok {
+		if seed, ok := intFromAny(headers["+setSeed"]); ok {
 			testClient.SetSeed(int32(seed))
 		}
 		expectMatch := true
-		if raw, ok := headers["@expectMatch"]; ok {
+		if raw, ok := headers["+expectMatch"]; ok {
 			expectMatch = boolValue(raw)
 		}
 
 		var expected map[string]any
-		if raw := headers["@expectedPseudoJsonBody"]; raw != nil {
+		if raw := headers["+expectedPseudoJsonBody"]; raw != nil {
 			if converted, err := asMap(raw); err == nil {
 				expected = converted
 			}
@@ -1070,7 +1070,7 @@ func (d *Dispatcher) handleClientRequest(
 		resp, err := testClient.AssertRequest(message, expected, expectMatch)
 		if err != nil {
 			d.logger.Printf("test client assertion failed: %v", err)
-			headers := map[string]any{"@assertionError": true}
+			headers := map[string]any{"+assertionError": true}
 			response = telepact.NewMessage(headers, map[string]any{"ErrorUnknown_": map[string]any{}})
 		} else {
 			response = resp
@@ -1097,15 +1097,15 @@ func (d *Dispatcher) handleClientRequest(
 		if response.Headers == nil {
 			response.Headers = map[string]any{}
 		}
-		response.Headers["@clientReturnedBinary"] = true
+		response.Headers["+clientReturnedBinary"] = true
 	}
 
 	if generatedClient != nil {
 		if response.Headers == nil {
 			response.Headers = map[string]any{}
 		}
-		if _, exists := response.Headers["@codegens_"]; !exists {
-			response.Headers["@codegens_"] = true
+		if _, exists := response.Headers["+codegens_"]; !exists {
+			response.Headers["+codegens_"] = true
 		}
 	}
 

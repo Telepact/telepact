@@ -38,7 +38,7 @@ func ClientBinaryEncode(message []any, cache BinaryEncodingCache, strategy *Clie
 	delete(headers, "_forceSendJson")
 
 	checksums := strategy.GetCurrentChecksums()
-	headers["@bin_"] = checksums
+	headers["+bin_"] = checksums
 
 	if forceSendJSON {
 		return nil, BinaryEncoderUnavailableError{}
@@ -63,7 +63,7 @@ func ClientBinaryEncode(message []any, cache BinaryEncodingCache, strategy *Clie
 	}
 
 	var finalBody map[any]any
-	if isStrictTrue(headers["@pac_"]) {
+	if isStrictTrue(headers["+pac_"]) {
 		packedBody, packErr := PackBody(encodedBody)
 		if packErr != nil {
 			return nil, packErr

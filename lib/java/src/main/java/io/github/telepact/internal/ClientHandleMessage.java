@@ -35,19 +35,19 @@ public class ClientHandleMessage {
         final Map<String, Object> header = requestMessage.headers;
 
         try {
-            if (!header.containsKey("@time_")) {
-                header.put("@time_", timeoutMsDefault);
+            if (!header.containsKey("+time_")) {
+                header.put("+time_", timeoutMsDefault);
             }
 
             if (useBinaryDefault) {
-                header.put("@binary_", true);
+                header.put("+binary_", true);
             }
 
-            if (Objects.equals(header.get("@binary_"), true) && alwaysSendJson) {
+            if (Objects.equals(header.get("+binary_"), true) && alwaysSendJson) {
                 header.put("_forceSendJson", true);
             }
 
-            final var timeoutMs = ((Number) header.get("@time_")).longValue();
+            final var timeoutMs = ((Number) header.get("+time_")).longValue();
 
             final var responseMessage = adapter.apply(requestMessage, serializer).get(timeoutMs, TimeUnit.MILLISECONDS);
 
@@ -55,7 +55,7 @@ public class ClientHandleMessage {
                     Map.of("ErrorParseFailure_",
                             Map.of("reasons", List.of(Map.of("IncompatibleBinaryEncoding", Map.of())))))) {
                 // Try again, but as json
-                header.put("@binary_", true);
+                header.put("+binary_", true);
                 header.put("_forceSendJson", true);
 
                 return adapter.apply(requestMessage, serializer).get(timeoutMs,
@@ -76,7 +76,7 @@ public class ClientHandleMessage {
             final var cause = e.getCause() != null ? e.getCause() : e;
             if (cause instanceof java.util.concurrent.TimeoutException) {
                 throw new TelepactError(
-                        "telepact client transport timed out after %sms".formatted(header.get("@time_")),
+                        "telepact client transport timed out after %sms".formatted(header.get("+time_")),
                         "transport",
                         cause);
             }

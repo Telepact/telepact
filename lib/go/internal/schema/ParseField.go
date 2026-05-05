@@ -28,7 +28,7 @@ func ParseField(path []any, fieldDeclaration string, typeDeclarationValue any, i
 		return nil, nil
 	}
 
-	headerRegex := "^@[a-z][a-zA-Z0-9_]*$"
+	headerRegex := "^\\+[a-z][a-zA-Z0-9_]*$"
 	fieldRegex := "^([a-z][a-zA-Z0-9_]*)(!)?$"
 
 	regexToUse := fieldRegex

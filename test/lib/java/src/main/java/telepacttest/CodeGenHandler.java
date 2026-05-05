@@ -56,7 +56,7 @@ public class CodeGenHandler extends TypedServerHandler {
             e.printStackTrace();
         }
 
-        if (Objects.equals(true, headers.get("@error"))) {
+        if (Objects.equals(true, headers.get("+error"))) {
             var errorOutput = test.Output.from_ErrorExample2(new ErrorExample2.Builder().field1("Boom!").build());
             return new TypedMessage<test.Output>(new HashMap<>(), errorOutput);
         }
