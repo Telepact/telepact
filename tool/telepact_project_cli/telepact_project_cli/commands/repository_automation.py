@@ -28,7 +28,6 @@ from github.PullRequest import PullRequest
 from .doc_versions import _read_go_module_path, _read_maven_gav, _read_package_json_name, _read_pyproject_name
 from .project_version import create_version_bump_commit
 from ..release_plan import (
-    changed_paths_since_last_version_change,
     compute_release_manifest_from_git,
     find_repo_root,
     load_release_target_rules,
@@ -632,16 +631,12 @@ def open_version_bump_pr() -> None:
     github_repository = _require_env("GITHUB_REPOSITORY")
 
     repo_root = find_repo_root(Path("."))
-    changed_paths = changed_paths_since_last_version_change(repo_root)
-    preview_manifest = compute_release_manifest_from_git(repo_root)
-    if not preview_manifest.targets:
-        click.echo("No publish targets detected since the previous version bump; skipping PR creation.")
-        return
+    current_version = (repo_root / "VERSION.txt").read_text(encoding="utf-8").strip()
 
     github_client = Github(github_token)
     repo = github_client.get_repo(github_repository)
     owner_login = repo.owner.login
-    version_parts = preview_manifest.version.rsplit(".", 1)
+    version_parts = current_version.rsplit(".", 1)
     next_version = f"{version_parts[0]}.{int(version_parts[1]) + 1}"
     branch_name = f"{VERSION_BUMP_BRANCH_PREFIX}{next_version}"
     existing_pr = next(iter(repo.get_pulls(state="open", head=f"{owner_login}:{branch_name}", base=MAIN_BRANCH)), None)
@@ -650,13 +645,12 @@ def open_version_bump_pr() -> None:
         return
 
     _git("checkout", "-B", branch_name)
-    new_version = create_version_bump_commit(changed_paths=changed_paths)
+    new_version = create_version_bump_commit(compute_release_targets=False)
     _push_current_branch(branch_name)
 
-    release_targets = ", ".join(preview_manifest.targets)
     pr = repo.create_pull(
         title=f"Bump version to {new_version}",
-        body=f"Automated version bump PR.\n\nRelease targets: {release_targets}",
+        body="Automated version bump PR.",
         head=f"{owner_login}:{branch_name}",
         base=MAIN_BRANCH,
     )

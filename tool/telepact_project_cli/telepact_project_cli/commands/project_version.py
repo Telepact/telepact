@@ -161,11 +161,18 @@ def _changed_paths_since_main(main_ref: str = "origin/main") -> list[str]:
     return [path for path in result.stdout.strip().splitlines() if path]
 
 
-def create_version_bump_commit(pr_number: int | None = None, changed_paths: list[str] | None = None) -> str:
+def create_version_bump_commit(
+    pr_number: int | None = None,
+    changed_paths: list[str] | None = None,
+    *,
+    compute_release_targets: bool = True,
+) -> str:
     """Create the release bump commit for either an existing PR flow or a standalone bump PR."""
     version_file = "VERSION.txt"
-    if changed_paths is None:
+    if changed_paths is None and compute_release_targets:
         changed_paths = _changed_paths_since_main()
+    elif changed_paths is None:
+        changed_paths = []
 
     if not os.path.exists(version_file):
         raise click.ClickException(f"Version file {version_file} does not exist.")
@@ -173,18 +180,21 @@ def create_version_bump_commit(pr_number: int | None = None, changed_paths: list
     with open(version_file, "r") as f:
         version = f.read().strip()
 
-    release_manifest = compute_release_manifest(
-        Path("."),
-        changed_paths=changed_paths,
-        version=version,
-        pr_number=pr_number,
-    )
-    sorted_release_targets = list(release_manifest.targets)
+    if compute_release_targets:
+        release_manifest = compute_release_manifest(
+            Path("."),
+            changed_paths=changed_paths,
+            version=version,
+            pr_number=pr_number,
+        )
+        sorted_release_targets = list(release_manifest.targets)
+    else:
+        sorted_release_targets = []
 
     new_version = version
     edited_files: list[str] = []
 
-    if sorted_release_targets:
+    if sorted_release_targets or not compute_release_targets:
         new_version = _bump_version(version)
 
         with open(version_file, "w") as f:
@@ -217,8 +227,11 @@ def create_version_bump_commit(pr_number: int | None = None, changed_paths: list
     edited_files.append(repo_relative_doc_versions_path)
     click.echo(f"Updated {repo_relative_doc_versions_path}")
 
-    release_target_lines = "\n".join(sorted_release_targets) if sorted_release_targets else "(none)"
-    new_commit_msg = f"Bump version to {new_version}\n\nRelease targets:\n{release_target_lines}"
+    if compute_release_targets:
+        release_target_lines = "\n".join(sorted_release_targets) if sorted_release_targets else "(none)"
+        new_commit_msg = f"Bump version to {new_version}\n\nRelease targets:\n{release_target_lines}"
+    else:
+        new_commit_msg = f"Bump version to {new_version}"
 
     subprocess.run(["git", "add"] + list(dict.fromkeys(edited_files)), check=True)
     subprocess.run(["git", "commit", "-m", new_commit_msg], check=True)

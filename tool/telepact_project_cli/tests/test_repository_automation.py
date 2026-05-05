@@ -17,6 +17,7 @@
 import sys
 import tempfile
 import unittest
+import os
 from pathlib import Path
 from types import SimpleNamespace
 from unittest import mock
@@ -310,6 +311,55 @@ version = "1.0.0-alpha.318"
                 github_output.read_text(encoding="utf-8"),
                 "skip_merge_loop=true\nmerge_ready_count=2\n",
             )
+
+    def test_open_version_bump_pr_does_not_compute_release_targets(self) -> None:
+        repo = mock.Mock()
+        repo.owner = SimpleNamespace(login="Telepact")
+        repo.get_pulls.return_value = iter(())
+        repo.create_pull.return_value = SimpleNamespace(html_url="https://github.com/Telepact/telepact/pull/99")
+
+        github_client = mock.Mock()
+        github_client.get_repo.return_value = repo
+
+        runner = CliRunner()
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            repo_root = Path(tmp_dir)
+            (repo_root / "VERSION.txt").write_text("1.0.0-alpha.214", encoding="utf-8")
+            old_cwd = os.getcwd()
+            os.chdir(repo_root)
+            try:
+                with (
+                    mock.patch("telepact_project_cli.commands.repository_automation.Github", return_value=github_client),
+                    mock.patch("telepact_project_cli.commands.repository_automation.compute_release_manifest_from_git") as compute_release_manifest_from_git,
+                    mock.patch("telepact_project_cli.commands.repository_automation._git") as git,
+                    mock.patch("telepact_project_cli.commands.repository_automation._push_current_branch") as push_current_branch,
+                    mock.patch(
+                        "telepact_project_cli.commands.repository_automation.create_version_bump_commit",
+                        return_value="1.0.0-alpha.215",
+                    ) as create_version_bump_commit,
+                ):
+                    result = runner.invoke(
+                        main,
+                        ["open-version-bump-pr"],
+                        env={
+                            "GITHUB_TOKEN": "token",
+                            "GITHUB_REPOSITORY": "Telepact/telepact",
+                        },
+                    )
+            finally:
+                os.chdir(old_cwd)
+
+        self.assertEqual(result.exit_code, 0, msg=result.output)
+        compute_release_manifest_from_git.assert_not_called()
+        git.assert_called_once_with("checkout", "-B", "version-bump/1.0.0-alpha.215")
+        create_version_bump_commit.assert_called_once_with(compute_release_targets=False)
+        push_current_branch.assert_called_once_with("version-bump/1.0.0-alpha.215")
+        repo.create_pull.assert_called_once_with(
+            title="Bump version to 1.0.0-alpha.215",
+            body="Automated version bump PR.",
+            head="Telepact:version-bump/1.0.0-alpha.215",
+            base="main",
+        )
 
     def test_process_merge_ready_pull_request_admin_flow_updates_and_merges(self) -> None:
         initial_pr = mock.Mock()
