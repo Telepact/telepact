@@ -468,7 +468,10 @@ def _release_pr_metadata(repo, default_title: str) -> tuple[str, int | None, str
     pr_number = _head_commit_pr_number()
     if pr_number is None:
         return (default_title, None, None)
-    pr = repo.get_pull(pr_number)
+    try:
+        pr = repo.get_pull(pr_number)
+    except GithubException:
+        return (default_title, pr_number, None)
     return (pr.title, pr.number, pr.html_url)
 
 
@@ -640,9 +643,9 @@ def open_version_bump_pr() -> None:
     version_parts = preview_manifest.version.rsplit(".", 1)
     next_version = f"{version_parts[0]}.{int(version_parts[1]) + 1}"
     branch_name = f"{VERSION_BUMP_BRANCH_PREFIX}{next_version}"
-    open_prs = list(repo.get_pulls(state="open", head=f"{owner_login}:{branch_name}", base=MAIN_BRANCH))
-    if open_prs:
-        click.echo(f"Version bump pull request already exists: {open_prs[0].html_url}")
+    existing_pr = next(iter(repo.get_pulls(state="open", head=f"{owner_login}:{branch_name}", base=MAIN_BRANCH)), None)
+    if existing_pr is not None:
+        click.echo(f"Version bump pull request already exists: {existing_pr.html_url}")
         return
 
     _git("checkout", "-B", branch_name)

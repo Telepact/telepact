@@ -101,7 +101,7 @@ def _read_version(repo_root: Path, ref: str = "HEAD") -> str:
     return stdout.strip()
 
 
-def _version_change_diff_base(repo_root: Path, ref: str = "HEAD") -> str | None:
+def _previous_version_change_commit(repo_root: Path, ref: str = "HEAD") -> str | None:
     commits = _version_change_commits(repo_root, ref)
     if not commits:
         raise click.ClickException(f"No commits found that changed {VERSION_FILE_RELATIVE_PATH}.")
@@ -120,7 +120,7 @@ def _resolved_commit_sha(repo_root: Path, ref: str) -> str:
 def changed_paths_since_last_version_change(repo_root: Path | str = ".", ref: str = "HEAD") -> list[str]:
     repo_root = find_repo_root(repo_root)
     version_change_commits = _version_change_commits(repo_root, ref)
-    base_commit = _version_change_diff_base(repo_root, ref)
+    base_commit = _previous_version_change_commit(repo_root, ref)
     end_ref = ref
     if version_change_commits and _resolved_commit_sha(repo_root, ref) == version_change_commits[0]:
         try:

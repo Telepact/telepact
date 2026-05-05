@@ -170,6 +170,27 @@ class ReleasePlanTests(unittest.TestCase):
                 ["lib/py/impl.py"],
             )
 
+    def test_changed_paths_since_last_version_change_filters_version_file_from_git_diff(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            repo_root = Path(tmp_dir)
+            (repo_root / "VERSION.txt").write_text("1.0.0-alpha.214", encoding="utf-8")
+            _write_release_targets(repo_root)
+
+            with mock.patch(
+                "telepact_project_cli.release_plan._version_change_commits",
+                return_value=["head", "previous"],
+            ), mock.patch(
+                "telepact_project_cli.release_plan._resolved_commit_sha",
+                return_value="not-a-version-commit",
+            ), mock.patch(
+                "telepact_project_cli.release_plan._git_stdout",
+                side_effect=["VERSION.txt\nlib/py/impl.py\n"],
+            ):
+                self.assertEqual(
+                    changed_paths_since_last_version_change(repo_root),
+                    ["lib/py/impl.py"],
+                )
+
     def test_compute_release_manifest_from_git_uses_previous_version_commit_as_base(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             repo_root = Path(tmp_dir)
