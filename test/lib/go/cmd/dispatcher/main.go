@@ -806,7 +806,6 @@ func startTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscription, 
 
 	onAuth := func(requestHeaders map[string]any) <-chan map[string]any {
 		result := make(chan map[string]any, 1)
-		defer close(result)
 		authRaw, ok := requestHeaders["@auth_"]
 		if !ok {
 			result <- map[string]any{}
