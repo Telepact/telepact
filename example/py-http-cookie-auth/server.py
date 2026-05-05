@@ -25,7 +25,6 @@ VALID_SESSION = 'demo-session'
 files = TelepactSchemaFiles('api')
 schema = TelepactSchema.from_file_json_map(files.filenames_to_json)
 options = Server.Options()
-options.auth_required = False
 
 
 async def on_auth(headers: dict[str, object]) -> dict[str, object]:
@@ -54,7 +53,7 @@ async def me(function_name: str, request_message: Message) -> Message:
     })
 
 
-function_router = FunctionRouter({'fn.me': me})
+function_router = FunctionRouter({'fn.me': me}, {})
 telepact_server = Server(schema, function_router, options)
 
 

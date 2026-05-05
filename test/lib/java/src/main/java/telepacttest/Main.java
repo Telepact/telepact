@@ -412,7 +412,6 @@ public class Main {
             e.printStackTrace();
             System.err.flush();
         };
-        options.authRequired = false;
         var functionRouter = new FunctionRouter(functionRoutes);
         var server = new Server(telepact, functionRouter, options);
 
@@ -493,7 +492,7 @@ public class Main {
                 return Map.of("@result", Map.of("ErrorUnauthorized_", Map.of("message!", "a")));
             }
             if (token != null) {
-                return Map.of("@result", Map.of("ErrorUnauthenticated_", Map.of("message!", "a")));
+                throw new RuntimeException("invalid auth");
             }
             return Map.of();
         });
@@ -596,22 +595,22 @@ public class Main {
         };
         options.onAuth = onAuth;
         options.middleware = middleware;
-        options.authRequired = authRequired;
 
         var functionRoutes = useCodeGen ? codeGenHandler.functionRoutes()
                 : schemaFunctionRoutes(telepact, backdoorRoute);
-        var functionRouter = new FunctionRouter(functionRoutes);
+        var functionRouter = authRequired ? new FunctionRouter(functionRoutes, Map.of()) : new FunctionRouter(functionRoutes);
         var server = new Server(telepact, functionRouter, options);
 
         var alternateOptions = new Server.Options();
         alternateOptions.onError = (e) -> e.printStackTrace();
         alternateOptions.onAuth = onAuth;
         alternateOptions.middleware = middleware;
-        alternateOptions.authRequired = authRequired;
 
         var alternateFunctionRoutes = useCodeGen ? codeGenHandler.functionRoutes()
                 : schemaFunctionRoutes(alternateTelepact, backdoorRoute);
-        var alternateFunctionRouter = new FunctionRouter(alternateFunctionRoutes);
+        var alternateFunctionRouter = authRequired
+                ? new FunctionRouter(alternateFunctionRoutes, Map.of())
+                : new FunctionRouter(alternateFunctionRoutes);
         var alternateServer = new Server(alternateTelepact, alternateFunctionRouter, alternateOptions);
 
         var dispatcher = connection.createDispatcher((msg) -> {
@@ -712,7 +711,9 @@ public class Main {
                             var apiSchemaPath = (String) payload.get("apiSchemaPath");
                             var frontdoorTopic = (String) payload.get("frontdoorTopic");
                             var backdoorTopic = (String) payload.get("backdoorTopic");
-                            var authRequired = (Boolean) payload.getOrDefault("authRequired!", false);
+                            var authRequired = (Boolean) payload.getOrDefault(
+                                    "authRequired!",
+                                    payload.getOrDefault("authRequired", false));
                             var useCodeGen = (Boolean) payload.getOrDefault("useCodeGen", false);
 
                             var d = startTestServer(connection, metrics, apiSchemaPath, frontdoorTopic,

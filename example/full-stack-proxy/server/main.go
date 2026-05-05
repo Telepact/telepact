@@ -128,7 +128,6 @@ func buildTelepactServer(apiDir string, subject string) (*telepact.Server, error
 	})
 
 	options := telepact.NewServerOptions()
-	options.AuthRequired = false
 	return telepact.NewServer(schema, functionRouter, options)
 }
 

@@ -48,7 +48,6 @@ export class MockServer {
 
         const serverOptions = new ServerOptions();
         serverOptions.onError = options.onError;
-        serverOptions.authRequired = false;
 
         const telepactSchema = new TelepactSchema(
             mockTelepactSchema.original,

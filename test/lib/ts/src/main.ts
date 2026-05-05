@@ -376,7 +376,6 @@ function startSchemaTestServer(
 
     const options: ServerOptions = new ServerOptions();
     options.onError = (e: Error) => console.error(e);
-    options.authRequired = false;
 
     const functionRouter = new FunctionRouter(functionRoutes);
     const server: Server = new Server(telepact, functionRouter, options);
@@ -445,7 +444,7 @@ function startTestServer(
             return { "@result": { ErrorUnauthorized_: { "message!": "a" } } };
         }
         if (token !== undefined) {
-            return { "@result": { ErrorUnauthenticated_: { "message!": "a" } } };
+            throw new Error("invalid auth");
         }
         return {};
     };
@@ -526,23 +525,23 @@ function startTestServer(
     };
     options.onAuth = onAuth;
     options.middleware = middleware;
-    options.authRequired = authRequired;
 
     const functionRoutes = useCodegen
         ? codeGenHandler.functionRoutes()
         : createFunctionRoutes(telepact, forwardRequest);
-    const functionRouter = new FunctionRouter(functionRoutes);
+    const functionRouter = authRequired ? new FunctionRouter(functionRoutes, {}) : new FunctionRouter(functionRoutes);
     const server: Server = new Server(telepact, functionRouter, options);
 
     const alternateOptions = new ServerOptions();
     alternateOptions.onError = (e) => console.error(e);
     alternateOptions.onAuth = onAuth;
     alternateOptions.middleware = middleware;
-    alternateOptions.authRequired = authRequired;
     const alternateFunctionRoutes = useCodegen
         ? codeGenHandler.functionRoutes()
         : createFunctionRoutes(alternateTelepact, forwardRequest);
-    const alternateFunctionRouter = new FunctionRouter(alternateFunctionRoutes);
+    const alternateFunctionRouter = authRequired
+        ? new FunctionRouter(alternateFunctionRoutes, {})
+        : new FunctionRouter(alternateFunctionRoutes);
     const alternateServer: Server = new Server(alternateTelepact, alternateFunctionRouter, alternateOptions);
 
     const subscription: Subscription = connection.subscribe(frontdoorTopic);
@@ -633,7 +632,7 @@ async function runDispatcherServer(): Promise<void> {
                         const apiSchemaPath = payload["apiSchemaPath"] as string;
                         const frontdoorTopic = payload["frontdoorTopic"] as string;
                         const backdoorTopic = payload["backdoorTopic"] as string;
-                        const authRequired: boolean = payload["authRequired!"] ?? false;
+                        const authRequired: boolean = payload["authRequired!"] ?? payload["authRequired"] ?? false;
                         const useCodegen: boolean = payload["useCodeGen"] ?? false;
 
                         const d = startTestServer(

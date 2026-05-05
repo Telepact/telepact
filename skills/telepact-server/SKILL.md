@@ -140,7 +140,6 @@ const functionRoutes = {
 };
 
 const options = new ServerOptions();
-options.authRequired = false;
 const functionRouter = new FunctionRouter(functionRoutes);
 const telepactServer = new Server(schema, functionRouter, options);
 
@@ -167,7 +166,6 @@ async def example(request_message: 'Message') -> 'Message':
     return Message({}, {'Ok_': {}})
 
 options = Server.Options()
-options.auth_required = False
 function_routes = {'fn.example': lambda function_name, request_message: example(request_message)}
 function_router = FunctionRouter(function_routes)
 telepactServer = Server(schema, function_router, options)
@@ -197,7 +195,6 @@ Map<String, FunctionRoute> functionRoutes = Map.of(
 );
 
 var options = new Server.Options();
-options.authRequired = false;
 var functionRouter = new FunctionRouter(functionRoutes);
 var telepactServer = new Server(schema, functionRouter, options);
 
@@ -246,7 +243,6 @@ functionRoutes := map[string]telepact.FunctionRoute{
 }
 
 telepactOptions := telepact.NewServerOptions()
-telepactOptions.AuthRequired = false
 functionRouter := telepact.NewFunctionRouter(functionRoutes)
 telepactServer, err := telepact.NewServer(schema, functionRouter, telepactOptions)
 if err != nil {

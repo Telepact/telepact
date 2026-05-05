@@ -718,10 +718,13 @@ def demo_server(port: int) -> None:
         replace_namespace(cast(str, username), blob)
         return Message({}, {'Ok_': {}})
 
-    function_routes = {
+    authenticated_function_routes = {
+        'fn.logout': logout_route,
+    }
+
+    unauthenticated_function_routes = {
         'fn.add': add_route,
         'fn.login': login_route,
-        'fn.logout': logout_route,
         'fn.saveVariable': save_variable_route,
         'fn.saveVariables': save_variables_route,
         'fn.getVariable': get_variable_route,
@@ -740,9 +743,8 @@ def demo_server(port: int) -> None:
     telepact_schema = TelepactSchema.from_json(telepact_json)
 
     server_options = Server.Options()
-    server_options.auth_required = True
     server_options.on_error = lambda e: print(e)
-    function_router = FunctionRouter(function_routes)
+    function_router = FunctionRouter(authenticated_function_routes, unauthenticated_function_routes)
     telepact_server = Server(telepact_schema, function_router, server_options)
 
     print('Telepact Server running at /api')

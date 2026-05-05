@@ -24,7 +24,6 @@ import { GreetInput, GreetOutput, TypedServerHandler, greet } from './gen/genTyp
 const files = new TelepactSchemaFiles('api', fs, path);
 const schema = TelepactSchema.fromFileJsonMap(files.filenamesToJson);
 const options = new ServerOptions();
-options.authRequired = false;
 
 class GreetingHandler extends TypedServerHandler {
     async greet(_headers: Record<string, any>, input: GreetInput): Promise<TypedMessage<GreetOutput>> {

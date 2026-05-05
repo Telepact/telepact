@@ -89,7 +89,6 @@ async def greet(function_name: str, request_message: Message) -> Message:
     return Message({}, {'Ok_': {'message': f'Hello {subject}!'}})
 
 options = Server.Options()
-options.auth_required = False
 function_router = FunctionRouter({'fn.greet': greet})
 server = Server(schema, function_router, options)
 
@@ -176,7 +175,6 @@ async def greet(function_name: str, request_message: Message) -> Message:
     return Message({}, {'Ok_': {'message': f'Hello {subject}!'}})
 
 options = Server.Options()
-options.auth_required = False
 function_router = FunctionRouter({'fn.greet': greet})
 server = Server(schema, function_router, options)
 

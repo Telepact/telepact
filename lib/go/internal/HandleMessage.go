@@ -23,10 +23,7 @@ import (
 	"github.com/telepact/telepact/lib/go/internal/types"
 )
 
-var internalFunctionsBypassingAuth = map[string]struct{}{
-	"fn.ping_": {},
-	"fn.api_":  {},
-}
+const unauthenticatedMessage = "Valid authentication is required."
 
 // HandleMessage mirrors the Python server handler orchestration using primitive maps.
 func HandleMessage(
@@ -74,7 +71,6 @@ func HandleMessage(
 		return ServerMessage{}, fmt.Errorf("telepact: schema missing parsed definitions")
 	}
 	_, hasRequestedTarget := parsed[requestTargetInit]
-	_, bypassAuthForFunction := internalFunctionsBypassingAuth[requestTargetInit]
 
 	requestTarget := requestTargetInit
 	unknownTarget := ""
@@ -128,6 +124,7 @@ func HandleMessage(
 	}
 
 	functionName := requestTarget
+	requiresAuthentication := hasRequestedTarget && functionRouter.RequiresAuthentication(functionName)
 
 	requestHeaderFailures := types.ValidateHeaders(requestHeaders, schema.RequestHeaderDeclarations(), functionName)
 	if len(requestHeaderFailures) > 0 {
@@ -135,7 +132,11 @@ func HandleMessage(
 		return invalidMessage, err
 	}
 
-	if _, ok := requestHeaders["@auth_"]; ok && !bypassAuthForFunction {
+	if requiresAuthentication {
+		if _, ok := requestHeaders["@auth_"]; !ok {
+			return newUnauthenticatedResponse(responseHeaders, resultUnionType)
+		}
+
 		authHeaders, err := invokeOnAuth(onAuth, requestHeaders)
 		if err != nil {
 			wrapped := newTelepactError(
@@ -144,7 +145,7 @@ func HandleMessage(
 				err,
 			)
 			invokeOnError(onError, wrapped)
-			return newUnknownErrorResponse(responseHeaders, wrapped.CaseID()), nil
+			return newUnauthenticatedResponse(responseHeaders, resultUnionType)
 		}
 		for key, value := range authHeaders {
 			requestHeaders[key] = value
@@ -299,6 +300,18 @@ func invokeOnAuth(callback func(map[string]any) <-chan map[string]any, headers m
 		return map[string]any{}, nil
 	}
 	return result, nil
+}
+
+func newUnauthenticatedResponse(headers map[string]any, resultUnionType *types.TUnion) (ServerMessage, error) {
+	result := map[string]any{
+		"ErrorUnauthenticated_": map[string]any{
+			"message!": unauthenticatedMessage,
+		},
+	}
+	if err := validateResult(resultUnionType, result); err != nil {
+		return ServerMessage{}, err
+	}
+	return ServerMessage{Headers: cloneStringAnyMap(headers), Body: result}, nil
 }
 
 func invokeUpdateHeaders(callback func(map[string]any), headers map[string]any) (err error) {

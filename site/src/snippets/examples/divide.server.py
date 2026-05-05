@@ -10,7 +10,6 @@ async def divide(function_name: str, request_message: Message) -> Message:
     return Message({}, {'Ok_': {'result': x / y}})
 
 options = Server.Options()
-options.auth_required = False
 function_router = FunctionRouter({'fn.divide': divide})
 server = Server(schema, function_router, options)
 

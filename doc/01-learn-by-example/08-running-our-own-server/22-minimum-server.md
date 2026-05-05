@@ -36,7 +36,6 @@ from telepact import FunctionRouter, Message, Server, TelepactSchema
 schema = TelepactSchema.from_directory('./api')
 
 options = Server.Options()
-options.auth_required = False
 
 
 async def hello(function_name: str, request_message: Message) -> Message:

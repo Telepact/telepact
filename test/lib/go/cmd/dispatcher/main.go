@@ -701,7 +701,6 @@ func startSchemaTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscrip
 			d.logger.Printf("schema server error: %v", err)
 		}
 	}
-	options.AuthRequired = false
 
 	functionRouter := telepact.NewFunctionRouter(functionRoutes)
 	server, err := telepact.NewServer(schema, functionRouter, options)
@@ -807,40 +806,38 @@ func startTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscription, 
 
 	onAuth := func(requestHeaders map[string]any) <-chan map[string]any {
 		result := make(chan map[string]any, 1)
-		go func() {
-			defer close(result)
-			authRaw, ok := requestHeaders["@auth_"]
-			if !ok {
-				result <- map[string]any{}
-				return
-			}
-			authMap, ok := authRaw.(map[string]any)
-			if !ok {
-				result <- map[string]any{}
-				return
-			}
-			tokenRaw, ok := authMap["Token"]
-			if !ok {
-				result <- map[string]any{}
-				return
-			}
-			tokenMap, ok := tokenRaw.(map[string]any)
-			if !ok {
-				result <- map[string]any{}
-				return
-			}
-			token, _ := tokenMap["token"].(string)
-			switch token {
-			case "ok":
-				result <- map[string]any{"@ok_": map[string]any{}}
-			case "unauthorized":
-				result <- map[string]any{"@result": map[string]any{"ErrorUnauthorized_": map[string]any{"message!": "a"}}}
-			case "":
-				result <- map[string]any{}
-			default:
-				result <- map[string]any{"@result": map[string]any{"ErrorUnauthenticated_": map[string]any{"message!": "a"}}}
-			}
-		}()
+		defer close(result)
+		authRaw, ok := requestHeaders["@auth_"]
+		if !ok {
+			result <- map[string]any{}
+			return result
+		}
+		authMap, ok := authRaw.(map[string]any)
+		if !ok {
+			result <- map[string]any{}
+			return result
+		}
+		tokenRaw, ok := authMap["Token"]
+		if !ok {
+			result <- map[string]any{}
+			return result
+		}
+		tokenMap, ok := tokenRaw.(map[string]any)
+		if !ok {
+			result <- map[string]any{}
+			return result
+		}
+		token, _ := tokenMap["token"].(string)
+		switch token {
+		case "ok":
+			result <- map[string]any{"@ok_": map[string]any{}}
+		case "unauthorized":
+			result <- map[string]any{"@result": map[string]any{"ErrorUnauthorized_": map[string]any{"message!": "a"}}}
+		case "":
+			result <- map[string]any{}
+		default:
+			panic("invalid auth")
+		}
 		return result
 	}
 
@@ -870,7 +867,6 @@ func startTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscription, 
 	}
 
 	options := telepact.NewServerOptions()
-	options.AuthRequired = cfg.AuthRequired
 	options.OnError = func(err *telepact.TelepactError) {
 		if err != nil {
 			d.logger.Printf("server error: %v", err)
@@ -929,13 +925,15 @@ func startTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscription, 
 		})
 	}
 	functionRouter := telepact.NewFunctionRouter(functionRoutes)
+	if cfg.AuthRequired {
+		functionRouter = telepact.NewFunctionRouter(functionRoutes, map[string]telepact.FunctionRoute{})
+	}
 	server, err := telepact.NewServer(tele, functionRouter, options)
 	if err != nil {
 		return nil, err
 	}
 
 	alternateOptions := telepact.NewServerOptions()
-	alternateOptions.AuthRequired = cfg.AuthRequired
 	alternateOptions.OnError = func(err *telepact.TelepactError) {
 		if err != nil {
 			d.logger.Printf("alternate server error: %v", err)
@@ -950,6 +948,9 @@ func startTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscription, 
 		})
 	}
 	alternateFunctionRouter := telepact.NewFunctionRouter(alternateFunctionRoutes)
+	if cfg.AuthRequired {
+		alternateFunctionRouter = telepact.NewFunctionRouter(alternateFunctionRoutes, map[string]telepact.FunctionRoute{})
+	}
 	alternateServer, err := telepact.NewServer(alternateTele, alternateFunctionRouter, alternateOptions)
 	if err != nil {
 		return nil, err

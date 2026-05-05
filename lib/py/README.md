@@ -48,7 +48,6 @@ async def middleware(request_message: 'Message', function_router) -> 'Message':
 
 options = Server.Options()
 # Set this to False when your schema does not define union.Auth_.
-options.auth_required = False
 options.middleware = middleware
 function_router = FunctionRouter({'fn.greet': greet})
 server = Server(schema, function_router, options)

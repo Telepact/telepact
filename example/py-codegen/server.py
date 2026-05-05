@@ -23,7 +23,6 @@ from gen.gen_types import TypedServerHandler, greet
 
 schema = TelepactSchema.from_directory('api')
 options = Server.Options()
-options.auth_required = False
 
 
 class GreetingHandler(TypedServerHandler):

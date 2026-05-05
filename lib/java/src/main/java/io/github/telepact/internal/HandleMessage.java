@@ -44,8 +44,8 @@ import io.github.telepact.internal.types.TUnion;
 import io.github.telepact.internal.validation.ValidateContext;
 import io.github.telepact.internal.validation.ValidationFailure;
 
-    public class HandleMessage {
-    private static final Set<String> INTERNAL_FUNCTIONS_BYPASSING_AUTH = Set.of("fn.ping_", "fn.api_");
+public class HandleMessage {
+    private static final String UNAUTHENTICATED_MESSAGE = "Valid authentication is required.";
 
     static Message handleMessage(Message requestMessage, Consumer<Map<String, Object>> updateHeaders, TelepactSchema telepactSchema, Middleware middleware,
             FunctionRouter functionRouter,
@@ -62,8 +62,6 @@ import io.github.telepact.internal.validation.ValidationFailure;
 
         final String requestTargetInit = requestEntry.getKey();
         final Map<String, Object> requestPayload = (Map<String, Object>) requestEntry.getValue();
-        final var bypassAuthForFunction = INTERNAL_FUNCTIONS_BYPASSING_AUTH.contains(requestTargetInit);
-
         final String unknownTarget;
         final String requestTarget;
         if (!parsedTelepactSchema.containsKey(requestTargetInit)) {
@@ -77,6 +75,7 @@ import io.github.telepact.internal.validation.ValidationFailure;
         final var functionName = requestTarget;
         final var callType = (TUnion) parsedTelepactSchema.get(requestTarget);
         final var resultUnionType = (TUnion) parsedTelepactSchema.get(requestTarget + ".->");
+        final var requiresAuthentication = unknownTarget == null && functionRouter.requiresAuthentication(functionName);
 
         final var callId = requestHeaders.get("@id_");
         if (callId != null) {
@@ -101,7 +100,11 @@ import io.github.telepact.internal.validation.ValidationFailure;
                     responseHeaders);
         }
 
-        if (requestHeaders.containsKey("@auth_") && !bypassAuthForFunction) {
+        if (requiresAuthentication && !requestHeaders.containsKey("@auth_")) {
+            return buildUnauthenticatedErrorMessage(resultUnionType, responseHeaders);
+        }
+
+        if (requiresAuthentication) {
             try {
                 final var authFuture = onAuth.apply(requestHeaders);
                 final var authHeaders = authFuture == null ? Map.<String, Object>of() : authFuture.get();
@@ -120,7 +123,7 @@ import io.github.telepact.internal.validation.ValidationFailure;
                     onError.accept(wrapped);
                 } catch (Throwable ignored) {
                 }
-                return buildUnknownErrorMessage(wrapped, responseHeaders);
+                return buildUnauthenticatedErrorMessage(resultUnionType, responseHeaders);
             }
         }
 
@@ -241,5 +244,13 @@ import io.github.telepact.internal.validation.ValidationFailure;
         }
 
         return new Message(finalResponseHeaders, finalResultUnion);
+    }
+
+    private static Message buildUnauthenticatedErrorMessage(TUnion resultUnionType, Map<String, Object> headers) {
+        final Map<String, Object> result = Map.of(
+                "ErrorUnauthenticated_",
+                Map.of("message!", UNAUTHENTICATED_MESSAGE));
+        validateResult(resultUnionType, result);
+        return new Message(headers, result);
     }
 }

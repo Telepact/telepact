@@ -31,6 +31,5 @@ def build_telepact_server() -> Server:
     files = TelepactSchemaFiles('api')
     schema = TelepactSchema.from_file_json_map(files.filenames_to_json)
     options = Server.Options()
-    options.auth_required = False
     function_router = FunctionRouter({'fn.getNumbers': get_numbers})
     return Server(schema, function_router, options)

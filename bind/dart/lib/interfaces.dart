@@ -214,9 +214,6 @@ class ServerOptions {
   set onResponse(void Function(JSObject) value) =>
       _options.onResponse = value.toJS;
 
-  /// Sets whether authentication is required.
-  set authRequired(bool value) => _options.authRequired = value;
-
   /// Sets the serialization method.
   set serialization(b.Serialization value) => _options.serialization = value;
 }

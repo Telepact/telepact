@@ -26,7 +26,6 @@ log = logging.getLogger('hello-server')
 schema = TelepactSchema.from_directory('./api')
 
 options = Server.Options()
-options.auth_required = False
 
 
 async def middleware(request_message: Message, function_router) -> Message:

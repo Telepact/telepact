@@ -39,7 +39,6 @@ const functionRoutes = {
 
 const options = new ServerOptions();
 // Set this to false when your schema does not define union.Auth_.
-options.authRequired = false;
 options.middleware = async (requestMessage: Message, functionRouter): Promise<Message> => {
     const functionName = requestMessage.getBodyTarget();
     try {

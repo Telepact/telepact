@@ -30,15 +30,15 @@ import { serverBase64Decode } from './binary/ServerBase64Decode.js';
 import { TelepactError } from '../TelepactError.js';
 import type { AuthHandler, UpdateHeaders } from '../Server.js';
 import { buildUnknownErrorMessage } from './UnknownError.js';
-
-const INTERNAL_FUNCTIONS_BYPASSING_AUTH = new Set(['fn.ping_', 'fn.api_']);
+import type { FunctionRouter, Middleware } from './ProcessBytes.js';
+const UNAUTHENTICATED_MESSAGE = 'Valid authentication is required.';
 
 export async function handleMessage(
     requestMessage: Message,
     updateHeaders: UpdateHeaders | undefined,
     telepactSchema: TelepactSchema,
-    middleware: (requestMessage: Message, functionRouter: { route: (message: Message) => Promise<Message> }) => Promise<Message>,
-    functionRouter: { route: (message: Message) => Promise<Message> },
+    middleware: Middleware,
+    functionRouter: FunctionRouter,
     onError: (error: TelepactError) => void,
     onAuth: AuthHandler,
 ): Promise<Message> {
@@ -52,7 +52,6 @@ export async function handleMessage(
 
     const requestTargetInit = requestEntry[0];
     const requestPayload = requestEntry[1] as Record<string, any>;
-    const bypassAuthForFunction = INTERNAL_FUNCTIONS_BYPASSING_AUTH.has(requestTargetInit);
 
     let unknownTarget: string | null;
     let requestTarget: string;
@@ -67,6 +66,7 @@ export async function handleMessage(
     const functionName = requestTarget;
     const callType = parsedTelepactSchema[requestTarget] as TUnion;
     const resultUnionType: TUnion = parsedTelepactSchema[`${requestTarget}.->`] as TUnion;
+    const requiresAuthentication = unknownTarget === null && functionRouter.requiresAuthentication(functionName);
 
     const callId = requestHeaders['@id_'];
     if (callId !== undefined) {
@@ -98,7 +98,11 @@ export async function handleMessage(
         );
     }
 
-    if ('@auth_' in requestHeaders && !bypassAuthForFunction) {
+    if (requiresAuthentication && !('@auth_' in requestHeaders)) {
+        return buildUnauthenticatedErrorMessage(resultUnionType, responseHeaders);
+    }
+
+    if (requiresAuthentication) {
         try {
             const authHeaders = (await onAuth(requestHeaders)) ?? {};
             Object.assign(requestHeaders, authHeaders);
@@ -108,7 +112,7 @@ export async function handleMessage(
                 onError(wrapped);
             } catch (ignored) {
             }
-            return buildUnknownErrorMessage(wrapped, responseHeaders);
+            return buildUnauthenticatedErrorMessage(resultUnionType, responseHeaders);
         }
     }
 
@@ -120,8 +124,18 @@ export async function handleMessage(
 
         if ('@pac_' in requestHeaders) {
             responseHeaders['@pac_'] = requestHeaders['@pac_'];
-        }
     }
+}
+
+function buildUnauthenticatedErrorMessage(resultUnionType: TUnion, headers: Record<string, any>): Message {
+    const result = {
+        ErrorUnauthenticated_: {
+            'message!': UNAUTHENTICATED_MESSAGE,
+        },
+    };
+    validateResult(resultUnionType, result);
+    return new Message(headers, result);
+}
 
     const selectStructFieldsHeader: Record<string, any> | null = requestHeaders['@select_'] || null;
 
