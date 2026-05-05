@@ -1,24 +1,14 @@
 {
   "changed_paths": [
-    "example/Makefile",
-    "example/README.md",
-    "example/py-simple-auth/Makefile",
+    "doc/01-learn-by-example/08-running-our-own-server/24-server-auth.md",
+    "doc/03-build-clients-and-servers/05-auth.md",
     "example/py-simple-auth/README.md",
-    "example/py-simple-auth/api/auth.telepact.yaml",
     "example/py-simple-auth/server.py",
-    "example/py-simple-auth/test_example.py",
-    "example/py-simple-auth/test_support.py",
-    "example/ts-simple-auth/Makefile",
     "example/ts-simple-auth/README.md",
-    "example/ts-simple-auth/api/auth.telepact.yaml",
-    "example/ts-simple-auth/package.json",
-    "example/ts-simple-auth/server.py",
-    "example/ts-simple-auth/test_example.ts",
-    "example/ts-simple-auth/test_support.ts",
-    "example/ts-simple-auth/tsconfig.json"
+    "example/ts-simple-auth/server.py"
   ],
   "direct_targets": [],
-  "pr_number": 522,
+  "pr_number": 524,
   "targets": [],
   "version": "1.0.0-alpha.335"
 }
