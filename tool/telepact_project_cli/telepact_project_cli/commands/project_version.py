@@ -162,6 +162,7 @@ def _changed_paths_since_main(main_ref: str = "origin/main") -> list[str]:
 
 
 def create_version_bump_commit(pr_number: int | None = None, changed_paths: list[str] | None = None) -> str:
+    """Create the release bump commit for either an existing PR flow or a standalone bump PR."""
     version_file = "VERSION.txt"
     if changed_paths is None:
         changed_paths = _changed_paths_since_main()

@@ -126,6 +126,7 @@ def changed_paths_since_last_version_change(repo_root: Path | str = ".", ref: st
         try:
             end_ref = _git_stdout(repo_root, "rev-parse", f"{ref}^").strip()
         except subprocess.CalledProcessError:
+            # The initial version-setting commit has no parent; in that case diff against the commit itself.
             end_ref = ref
 
     try:

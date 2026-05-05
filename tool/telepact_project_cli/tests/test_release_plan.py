@@ -48,7 +48,7 @@ def _pushd(path: Path):
         os.chdir(old_cwd)
 
 
-def _git(repo_root: Path, *args: str) -> str:
+def _run_git(repo_root: Path, *args: str) -> str:
     result = subprocess.run(
         ["git", *args],
         cwd=repo_root,
@@ -61,9 +61,9 @@ def _git(repo_root: Path, *args: str) -> str:
 
 
 def _init_repo(repo_root: Path) -> None:
-    _git(repo_root, "init")
-    _git(repo_root, "config", "user.name", "Test User")
-    _git(repo_root, "config", "user.email", "test@example.com")
+    _run_git(repo_root, "init")
+    _run_git(repo_root, "config", "user.name", "Test User")
+    _run_git(repo_root, "config", "user.email", "test@example.com")
 
 
 def _write_release_targets(repo_root: Path) -> None:
@@ -97,8 +97,8 @@ def _write_release_targets(repo_root: Path) -> None:
 
 
 def _commit_all(repo_root: Path, message: str) -> None:
-    _git(repo_root, "add", ".")
-    _git(repo_root, "commit", "-m", message)
+    _run_git(repo_root, "add", ".")
+    _run_git(repo_root, "commit", "-m", message)
 
 
 class ReleasePlanTests(unittest.TestCase):

@@ -64,6 +64,7 @@ FAILED_CHECK_RUN_CONCLUSIONS = {"action_required", "cancelled", "failure", "star
 SUCCESSFUL_CHECK_RUN_CONCLUSIONS = {"neutral", "skipped", "success"}
 
 AUTOMERGE_ALLOWED_AUTHORS = ["dependabot[bot]"]
+# Matches PR numbers appended by GitHub squash merges, e.g. "Bump version to 1.2.3 (#123)".
 SQUASH_PR_NUMBER_RE = re.compile(r"\(#(?P<pr_number>\d+)\)$")
 
 AUTOMERGE_ALLOWED_FILES = [
