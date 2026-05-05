@@ -113,6 +113,8 @@ async def handle_message(
             auth_headers = auth_headers or {}
             request_headers.update(auth_headers)
         except BaseException as e:
+            if isinstance(e, (KeyboardInterrupt, SystemExit, GeneratorExit)):
+                raise
             wrapped = TelepactError(
                 f"telepact auth handler failed while handling {function_name}",
                 kind="handler",
