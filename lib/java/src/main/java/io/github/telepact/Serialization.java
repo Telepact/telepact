@@ -30,7 +30,7 @@ public interface Serialization {
      *
      * @param message the object to serialize
      * @return the serialized JSON as a byte array
-     * .throws Throwable if serialization fails
+     * @throws Throwable if serialization fails
      */
     byte[] toJson(Object message) throws Throwable;
 
@@ -39,7 +39,7 @@ public interface Serialization {
      *
      * @param message the object to serialize
      * @return the serialized MessagePack as a byte array
-     * .throws Throwable if serialization fails
+     * @throws Throwable if serialization fails
      */
     byte[] toMsgPack(Object message) throws Throwable;
 
@@ -48,7 +48,7 @@ public interface Serialization {
      *
      * @param bytes the JSON byte array
      * @return the deserialized object
-     * .throws Throwable if deserialization fails
+     * @throws Throwable if deserialization fails
      */
     Object fromJson(byte[] bytes) throws Throwable;
 
@@ -57,7 +57,7 @@ public interface Serialization {
      *
      * @param bytes the MessagePack byte array
      * @return the deserialized object
-     * .throws Throwable if deserialization fails
+     * @throws Throwable if deserialization fails
      */
     Object fromMsgPack(byte[] bytes) throws Throwable;
 }
