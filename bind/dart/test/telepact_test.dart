@@ -107,7 +107,7 @@ void main() {
         print('Received response: ${response.body}');
 
         Message expectedResponse = Message({
-          '@enc_': {
+          '+enc_': {
             'Ok_': 0,
             'api': 1,
             'fn.add': 2,
@@ -119,7 +119,7 @@ void main() {
             'x': 8,
             'y': 9
           },
-          '@bin_': [-260261837]
+          '+bin_': [-260261837]
         }, {
           "Ok_": {}
         });
@@ -139,7 +139,7 @@ void main() {
         print('response: ${response.body}');
 
         Message expectedResponse = Message({
-          '@bin_': [-260261837]
+          '+bin_': [-260261837]
         }, {
           "Ok_": {'result': 3}
         });
