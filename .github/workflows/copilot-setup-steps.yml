@@ -66,8 +66,3 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y nats-server
 
-      - name: Preinstall Playwright browsers
-        working-directory: ./sdk/console
-        run: |
-          npm ci --ignore-scripts
-          npx playwright install --with-deps --force
