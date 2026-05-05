@@ -14,7 +14,6 @@
 #|  limitations under the License.
 #|
 
-import json
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
@@ -24,8 +23,27 @@ import click
 import yaml
 
 RELEASE_CONFIG_RELATIVE_PATH = Path(".release/release-targets.yaml")
-RELEASE_MANIFEST_RELATIVE_PATH = Path(".release/release-manifest.json")
-
+VERSION_FILE_RELATIVE_PATH = Path("VERSION.txt")
+DOC_VERSIONS_RELATIVE_PATH = Path("doc/04-operate/03-versions.md")
+VERSION_BUMP_MANAGED_PATHS = (
+    VERSION_FILE_RELATIVE_PATH.as_posix(),
+    "bind/dart/package-lock.json",
+    "bind/dart/package.json",
+    "bind/dart/pubspec.lock",
+    "bind/dart/pubspec.yaml",
+    DOC_VERSIONS_RELATIVE_PATH.as_posix(),
+    "lib/java/pom.xml",
+    "lib/py/pyproject.toml",
+    "lib/py/uv.lock",
+    "lib/ts/package-lock.json",
+    "lib/ts/package.json",
+    "sdk/cli/pyproject.toml",
+    "sdk/cli/uv.lock",
+    "sdk/console/package-lock.json",
+    "sdk/console/package.json",
+    "sdk/prettier/package-lock.json",
+    "sdk/prettier/package.json",
+)
 
 PUBLISH_TARGETS = ("java", "ts", "py", "go", "cli", "console", "prettier")
 
@@ -46,7 +64,7 @@ class ReleaseTargetConfig:
 @dataclass(frozen=True)
 class ReleaseManifest:
     version: str
-    pr_number: int
+    pr_number: int | None
     changed_paths: tuple[str, ...]
     direct_targets: tuple[str, ...]
     targets: tuple[str, ...]
@@ -69,13 +87,70 @@ def find_repo_root(start: Path | str = ".") -> Path:
     raise click.ClickException("Unable to locate repo root (VERSION.txt not found).")
 
 
-def release_manifest_path(repo_root: Path | str = ".") -> Path:
-    return find_repo_root(repo_root) / RELEASE_MANIFEST_RELATIVE_PATH
-
-
 def _normalize_repo_path(path: str) -> str:
     normalized = path.strip().strip("/")
     return normalized.replace("\\", "/")
+
+
+def _git_stdout(repo_root: Path, *args: str) -> str:
+    result = subprocess.run(
+        ["git", *args],
+        cwd=repo_root,
+        check=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
+    return result.stdout
+
+
+def _version_change_commits(repo_root: Path, ref: str = "HEAD") -> list[str]:
+    try:
+        stdout = _git_stdout(repo_root, "log", "--format=%H", ref, "--", VERSION_FILE_RELATIVE_PATH.as_posix())
+    except subprocess.CalledProcessError as exc:
+        raise click.ClickException(f"Unable to inspect {VERSION_FILE_RELATIVE_PATH} history at {ref}: {exc.stderr.strip()}")
+    return [line.strip() for line in stdout.splitlines() if line.strip()]
+
+
+def _read_version(repo_root: Path, ref: str = "HEAD") -> str:
+    version_file = VERSION_FILE_RELATIVE_PATH.as_posix()
+    try:
+        stdout = _git_stdout(repo_root, "show", f"{ref}:{version_file}")
+    except subprocess.CalledProcessError as exc:
+        raise click.ClickException(f"Unable to read {version_file} at {ref}: {exc.stderr.strip()}")
+    return stdout.strip()
+
+
+def _version_change_diff_base(repo_root: Path, ref: str = "HEAD") -> str | None:
+    commits = _version_change_commits(repo_root, ref)
+    if not commits:
+        raise click.ClickException(f"No commits found that changed {VERSION_FILE_RELATIVE_PATH}.")
+    if len(commits) < 2:
+        return None
+    return commits[1]
+
+
+def changed_paths_since_last_version_change(repo_root: Path | str = ".", ref: str = "HEAD") -> list[str]:
+    repo_root = find_repo_root(repo_root)
+    base_commit = _version_change_diff_base(repo_root, ref)
+
+    try:
+        if base_commit is None:
+            stdout = _git_stdout(repo_root, "ls-tree", "-r", "--name-only", ref)
+        else:
+            stdout = _git_stdout(repo_root, "diff", "--name-only", f"{base_commit}..{ref}")
+    except subprocess.CalledProcessError as exc:
+        raise click.ClickException(f"Unable to compute changed paths for release planning at {ref}: {exc.stderr.strip()}")
+
+    changed_paths = sorted(
+        {
+            normalized
+            for path in stdout.splitlines()
+            for normalized in [_normalize_repo_path(path)]
+            if normalized and normalized not in VERSION_BUMP_MANAGED_PATHS
+        }
+    )
+    return changed_paths
 
 
 def _load_release_target_config_data(repo_root: Path) -> dict:
@@ -167,7 +242,7 @@ def compute_release_manifest(
     repo_root: Path | str,
     changed_paths: Iterable[str],
     version: str,
-    pr_number: int,
+    pr_number: int | None,
 ) -> ReleaseManifest:
     repo_root = find_repo_root(repo_root)
     config = load_release_target_rules(repo_root)
@@ -193,51 +268,18 @@ def compute_release_manifest(
     )
 
 
-def write_release_manifest(repo_root: Path | str, manifest: ReleaseManifest) -> Path:
+def compute_release_manifest_from_git(
+    repo_root: Path | str = ".",
+    ref: str = "HEAD",
+    pr_number: int | None = None,
+) -> ReleaseManifest:
     repo_root = find_repo_root(repo_root)
-    manifest_path = repo_root / RELEASE_MANIFEST_RELATIVE_PATH
-    manifest_path.parent.mkdir(parents=True, exist_ok=True)
-    manifest_path.write_text(json.dumps(manifest.to_dict(), indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    return manifest_path
-
-
-def load_release_manifest(repo_root: Path | str = ".") -> dict:
-    manifest_path = release_manifest_path(repo_root)
-    if not manifest_path.exists():
-        raise click.ClickException(f"Release manifest not found: {manifest_path}")
-    try:
-        data = json.loads(manifest_path.read_text(encoding="utf-8"))
-    except json.JSONDecodeError as exc:
-        raise click.ClickException(f"Invalid JSON in {manifest_path}: {exc}")
-    if not isinstance(data, dict):
-        raise click.ClickException(f"Release manifest must be a JSON object: {manifest_path}")
-    return data
-
-
-def load_release_manifest_at_commit(repo_root: Path | str, sha: str) -> dict | None:
-    repo_root = find_repo_root(repo_root)
-    git_path = RELEASE_MANIFEST_RELATIVE_PATH.as_posix()
-    result = subprocess.run(
-        ["git", "show", f"{sha}:{git_path}"],
-        cwd=repo_root,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        text=True,
+    return compute_release_manifest(
+        repo_root,
+        changed_paths=changed_paths_since_last_version_change(repo_root, ref=ref),
+        version=_read_version(repo_root, ref=ref),
+        pr_number=pr_number,
     )
-    if result.returncode != 0:
-        if "exists on disk, but not in" in result.stderr or "path '" in result.stderr:
-            return None
-        raise click.ClickException(f"git show failed for {git_path} at {sha}: {result.stderr.strip()}")
-
-    try:
-        data = json.loads(result.stdout)
-    except json.JSONDecodeError as exc:
-        raise click.ClickException(
-            f"Invalid JSON in {git_path} at {sha}: {exc}"
-        )
-    if not isinstance(data, dict):
-        raise click.ClickException(f"Release manifest at {sha} must be a JSON object.")
-    return data
 
 
 def resolve_publish_targets(
@@ -245,18 +287,12 @@ def resolve_publish_targets(
     release_tag: str | None = None,
     release_body: str | None = None,
 ) -> dict[str, bool]:
-    targets: set[str]
-    manifest_path = release_manifest_path(repo_root)
-    if manifest_path.exists():
-        data = load_release_manifest(repo_root)
-        version = data.get("version")
-        if release_tag and version != release_tag:
-            raise click.ClickException(
-                f"Release manifest version {version!r} does not match release tag {release_tag!r}"
-            )
-        targets = set(data.get("targets", []))
-    else:
-        raise click.ClickException(f"Release manifest not found: {manifest_path}")
+    manifest = compute_release_manifest_from_git(repo_root)
+    if release_tag and manifest.version != release_tag:
+        raise click.ClickException(
+            f"Computed release version {manifest.version!r} does not match release tag {release_tag!r}"
+        )
+    targets = set(manifest.targets)
 
     return {
         f"publish_{target}": target in targets

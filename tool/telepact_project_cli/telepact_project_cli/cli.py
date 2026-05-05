@@ -18,7 +18,7 @@ import click
 
 from .commands.license_header import license_header
 from .commands.project_version import bump, get, set_version
-from .commands.repository_automation import automerge, mark_merge_ready, merge_pr, publish_targets, release
+from .commands.repository_automation import automerge, mark_merge_ready, merge_pr, open_version_bump_pr, publish_targets, release
 from .commands.consolidated_readme import consolidated_readme
 from .commands.doc_versions import doc_versions
 
@@ -36,6 +36,7 @@ main.add_command(license_header)
 main.add_command(mark_merge_ready)
 main.add_command(merge_pr)
 main.add_command(release)
+main.add_command(open_version_bump_pr)
 main.add_command(publish_targets)
 main.add_command(automerge)
 main.add_command(consolidated_readme)

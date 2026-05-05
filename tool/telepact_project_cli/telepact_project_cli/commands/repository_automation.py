@@ -15,6 +15,7 @@
 #|
 
 import os
+import re
 import subprocess
 import time
 from pathlib import Path
@@ -26,7 +27,13 @@ from github.PullRequest import PullRequest
 
 from .doc_versions import _read_go_module_path, _read_maven_gav, _read_package_json_name, _read_pyproject_name
 from .project_version import create_version_bump_commit
-from ..release_plan import find_repo_root, load_release_manifest, load_release_target_rules, resolve_publish_targets
+from ..release_plan import (
+    changed_paths_since_last_version_change,
+    compute_release_manifest_from_git,
+    find_repo_root,
+    load_release_target_rules,
+    resolve_publish_targets,
+)
 
 RELEASE_TARGET_ASSET_DIRECTORY_MAP = {
     "java": ["lib/java/target/central-publishing"],
@@ -46,6 +53,7 @@ MERGE_ALLOWED_PERMISSIONS = {"write", "maintain", "admin"}
 MERGE_READY_LABEL = "Merge Ready"
 MERGE_READY_LABEL_COLOR = "0e8a16"
 MERGE_TRIGGER_COMMENT = "/merge"
+VERSION_BUMP_BRANCH_PREFIX = "version-bump/"
 PENDING_MERGEABLE_STATES = {"unknown"}
 PENDING_CHECK_STATES = {"expected", "pending", "queued", "requested", "waiting", "in_progress"}
 FAILED_COMBINED_STATUS_STATES = {"error", "failure"}
@@ -56,6 +64,7 @@ FAILED_CHECK_RUN_CONCLUSIONS = {"action_required", "cancelled", "failure", "star
 SUCCESSFUL_CHECK_RUN_CONCLUSIONS = {"neutral", "skipped", "success"}
 
 AUTOMERGE_ALLOWED_AUTHORS = ["dependabot[bot]"]
+SQUASH_PR_NUMBER_RE = re.compile(r"\(#(?P<pr_number>\d+)\)$")
 
 AUTOMERGE_ALLOWED_FILES = [
     "bind/dart/package-lock.json",
@@ -133,8 +142,8 @@ def _build_release_body(
     repo_root: Path,
     *,
     pr_title: str,
-    pr_number: int,
-    pr_url: str,
+    pr_number: int | None,
+    pr_url: str | None,
     direct_targets: list[str],
     release_targets: list[str],
 ) -> str:
@@ -169,8 +178,12 @@ def _build_release_body(
         for target in release_targets
     ] or ["(None)"]
 
+    heading = f"## {pr_title}"
+    if pr_number is not None and pr_url:
+        heading = f"{heading} [(#{pr_number})]({pr_url})"
+
     return (
-        f"## {pr_title} [(#{pr_number})]({pr_url})\n\n"
+        f"{heading}\n\n"
         "### Direct package changes\n"
         f"{chr(10).join(direct_lines)}\n\n"
         "### Dependency-triggered republishes\n"
@@ -440,6 +453,25 @@ def _pull_request_changed_paths(pr: PullRequest) -> list[str]:
     return sorted({file.filename for file in pr.get_files() if file.filename})
 
 
+def _head_commit_subject() -> str:
+    return _git("log", "-1", "--format=%s", capture_output=True)
+
+
+def _head_commit_pr_number() -> int | None:
+    match = SQUASH_PR_NUMBER_RE.search(_head_commit_subject())
+    if match is None:
+        return None
+    return int(match.group("pr_number"))
+
+
+def _release_pr_metadata(repo, default_title: str) -> tuple[str, int | None, str | None]:
+    pr_number = _head_commit_pr_number()
+    if pr_number is None:
+        return (default_title, None, None)
+    pr = repo.get_pull(pr_number)
+    return (pr.title, pr.number, pr.html_url)
+
+
 def _process_merge_ready_pull_request(repo, pr_number: int) -> None:
     commenter_login = _latest_merge_commenter_login(repo, pr_number)
     commenter_permission = _commenter_permission(repo, commenter_login)
@@ -455,8 +487,6 @@ def _process_merge_ready_pull_request(repo, pr_number: int) -> None:
     expected_head_sha = pr.head.sha
     pr = _wait_for_pr_stable(repo, pr_number, expected_head_sha)
     _validate_merge_request(pr, is_admin)
-    changed_paths = _pull_request_changed_paths(pr)
-
     if pr.draft:
         click.echo(f"Marking pull request #{pr.number} ready for review.")
         pr.mark_ready_for_review()
@@ -469,16 +499,7 @@ def _process_merge_ready_pull_request(repo, pr_number: int) -> None:
         pr = _wait_for_pr_head_update(repo, pr_number, previous_head_sha)
         expected_head_sha = pr.head.sha
 
-    _checkout_pr_branch(pr.head.ref)
     _verify_pull_request_ci(repo, pr_number, expected_head_sha)
-
-    click.echo(f"Bumping version on branch {pr.head.ref}.")
-    create_version_bump_commit(pr_number, changed_paths=changed_paths)
-    bumped_head_sha = _current_head_sha()
-    _push_current_branch(pr.head.ref)
-
-    pr = _wait_for_expected_head(repo, pr_number, expected_head_sha, bumped_head_sha)
-    expected_head_sha = pr.head.sha
 
     merge_result = pr.merge(merge_method="squash", sha=expected_head_sha)
     if not merge_result.merged:
@@ -505,30 +526,19 @@ def release() -> None:
     ).stdout.strip()
 
     print(f"head_commit: {head_commit}")
-
-    manifest_file = Path(".release/release-manifest.json")
-    if manifest_file.exists():
-        release_manifest = load_release_manifest(Path("."))
-        version = release_manifest["version"]
-        pr_number = int(release_manifest["pr_number"])
-        direct_targets = list(release_manifest.get("direct_targets", []))
-        release_targets = list(release_manifest.get("targets", []))
-        click.echo("Loaded release metadata from .release/release-manifest.json")
-    else:
-        click.echo("No release manifest found.")
-        return
+    release_manifest = compute_release_manifest_from_git(Path("."))
+    version = release_manifest.version
+    direct_targets = list(release_manifest.direct_targets)
+    release_targets = list(release_manifest.targets)
 
     print(f"release_targets: {release_targets}")
     print(f"version: {version}")
-    print(f"pr_number: {pr_number}")
 
     tag_name = version
     release_name = version
 
     g = Github(token)
     repo = g.get_repo(repository)
-    pr = repo.get_pull(pr_number)
-
     if "go" in release_targets:
         go_tag_version = version if version.startswith("v") else f"v{version}"
         go_module_tag = f"lib/go/{go_tag_version}"
@@ -546,8 +556,7 @@ def release() -> None:
             repo.create_git_ref(ref=f"refs/tags/{go_module_tag}", sha=head_commit)
             click.echo(f"Created Go module tag: {go_module_tag}")
 
-    pr_title = pr.title
-    pr_url = pr.html_url
+    pr_title, pr_number, pr_url = _release_pr_metadata(repo, _head_commit_subject())
     final_release_body = _build_release_body(
         find_repo_root(Path(".")),
         pr_title=pr_title,
@@ -611,6 +620,43 @@ def publish_targets(release_tag: str | None, release_body: str | None, github_ou
         github_output.write_text("\n".join(lines) + "\n", encoding="utf-8")
     else:
         click.echo("\n".join(lines))
+
+
+@click.command(name="open-version-bump-pr")
+def open_version_bump_pr() -> None:
+    github_token = _require_env("GITHUB_TOKEN")
+    github_repository = _require_env("GITHUB_REPOSITORY")
+
+    repo_root = find_repo_root(Path("."))
+    changed_paths = changed_paths_since_last_version_change(repo_root)
+    preview_manifest = compute_release_manifest_from_git(repo_root)
+    if not preview_manifest.targets:
+        click.echo("No publish targets detected since the previous version bump; skipping PR creation.")
+        return
+
+    github_client = Github(github_token)
+    repo = github_client.get_repo(github_repository)
+    owner_login = repo.owner.login
+    version_parts = preview_manifest.version.rsplit(".", 1)
+    next_version = f"{version_parts[0]}.{int(version_parts[1]) + 1}"
+    branch_name = f"{VERSION_BUMP_BRANCH_PREFIX}{next_version}"
+    open_prs = list(repo.get_pulls(state="open", head=f"{owner_login}:{branch_name}", base=MAIN_BRANCH))
+    if open_prs:
+        click.echo(f"Version bump pull request already exists: {open_prs[0].html_url}")
+        return
+
+    _git("checkout", "-B", branch_name)
+    new_version = create_version_bump_commit(changed_paths=changed_paths)
+    _push_current_branch(branch_name)
+
+    release_targets = ", ".join(preview_manifest.targets)
+    pr = repo.create_pull(
+        title=f"Bump version to {new_version}",
+        body=f"Automated version bump PR.\n\nRelease targets: {release_targets}",
+        head=f"{owner_login}:{branch_name}",
+        base=MAIN_BRANCH,
+    )
+    click.echo(f"Created version bump pull request: {pr.html_url}")
 
 
 @click.command(name="mark-merge-ready")
