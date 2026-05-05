@@ -14,19 +14,10 @@
 #|  limitations under the License.
 #|
 
-EXAMPLES := full-stack full-stack-proxy py-binary py-codegen py-http-cookie-auth py-links py-select py-simple-auth py-websocket ts-binary ts-codegen ts-http-cookie-auth ts-links ts-select ts-simple-auth ts-websocket
+SHELL := /bin/bash
+PYTHON := .venv/bin/python
 
-.PHONY: list check run
-
-list:
-	@printf '%s\n' $(EXAMPLES)
-
-check:
-	@for example in $(EXAMPLES); do \
-		echo "==> $$example"; \
-		$(MAKE) -C $$example run || exit $$?; \
-	done
+.PHONY: run
 
 run:
-	@test -n "$(EXAMPLE)" || (echo "Usage: make run EXAMPLE=<name>" && exit 1)
-	@$(MAKE) -C $(EXAMPLE) run
+	@set -euo pipefail; $(MAKE) -C ../../lib/py; rm -rf .venv; uv venv --python python3.11 .venv; uv pip install --python $(PYTHON) pytest ../../lib/py/dist/*.tar.gz; $(PYTHON) -m pytest -q
