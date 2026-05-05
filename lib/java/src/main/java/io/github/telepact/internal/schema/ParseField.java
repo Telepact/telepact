@@ -36,7 +36,7 @@ public class ParseField {
             Object typeDeclarationValue,
             boolean isHeader,
             ParseContext ctx) {
-        final var headerRegexString = "^\.[a-z][a-zA-Z0-9_]*$";
+        final var headerRegexString = "^\\.[a-z][a-zA-Z0-9_]*$";
         final var regexString = "^([a-z][a-zA-Z0-9_]*)(!)?$";
         final var regexToUse = isHeader ? headerRegexString : regexString;
         final var regex = Pattern.compile(regexToUse);
