@@ -70,7 +70,7 @@ def _post_demo_server(payload: list[dict[str, object]], *, port: int = 8000) -> 
 
 
 def _demo_auth_headers(username: str) -> dict[str, object]:
-    return {'@auth_': {'Ephemeral': {'username': username}}}
+    return {'.auth_': {'Ephemeral': {'username': username}}}
 
 
 def _wait_for_demo_server(*, port: int = 8000) -> None:
@@ -407,7 +407,7 @@ def test_demo_server_export_import_replaces_authenticated_namespace() -> None:
 
 
 def test_fetch_sets_content_type_header() -> None:
-    expected_request = b'[{"@time_": 5000}, {"fn.api_": {}}]'
+    expected_request = b'[{".time_": 5000}, {"fn.api_": {}}]'
     ok_response = b'[{},{"Ok_":{"api":[]}}]'
     requests_seen: list[tuple[str | None, bytes]] = []
 

@@ -33,7 +33,7 @@ public class ClientBinaryEncode {
         final var forceSendJson = headers.remove("_forceSendJson");
 
         final var checksums = binaryChecksumStrategy.getCurrentChecksums();
-        headers.put("@bin_", checksums);
+        headers.put(".bin_", checksums);
 
 
         if (Objects.equals(forceSendJson, true)) {
@@ -53,7 +53,7 @@ public class ClientBinaryEncode {
         final var encodedMessageBody = encodeBody(messageBody, binaryEncoding);
 
         final Map<Object, Object> finalEncodedMessageBody;
-        if (Objects.equals(true, headers.get("@pac_"))) {
+        if (Objects.equals(true, headers.get(".pac_"))) {
             finalEncodedMessageBody = packBody(encodedMessageBody);
         } else {
             finalEncodedMessageBody = encodedMessageBody;

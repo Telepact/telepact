@@ -27,8 +27,8 @@ def validate_headers(headers: dict[str, object], parsed_request_headers: dict[st
     validation_failures = []
 
     for header, header_value in headers.items():
-        if not header.startswith("@"):
-            validation_failures.append(ValidationFailure([header], "RequiredObjectKeyPrefixMissing", {"prefix": "@"}))
+        if not header.startswith("."):
+            validation_failures.append(ValidationFailure([header], "RequiredObjectKeyPrefixMissing", {"prefix": "."}))
 
         field = parsed_request_headers.get(header)
         if field:

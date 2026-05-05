@@ -44,7 +44,7 @@ Now we also see:
 ```json
 {
   "headers.Auth_": {
-    "@auth_": "union.Auth_"
+    ".auth_": "union.Auth_"
   }
 }
 ```
@@ -70,7 +70,7 @@ curl -s localhost:8000/api -d '[{}, {"fn.logout": {"username": "shared"}}]'
 [{}, {"ErrorUnauthenticated_": {"message!": "Valid authentication is required."}}]
 ```
 
-## Log in, then send `@auth_`
+## Log in, then send `.auth_`
 
 Login:
 
@@ -87,7 +87,7 @@ Example response:
 Now use that token:
 
 ```sh
-curl -s localhost:8000/api -d '[{"@auth_": {"Session": {"token": "nj-tuNyu6XVA7TAtg4RWOA"}}}, {"fn.logout": {"username": "doc-user"}}]'
+curl -s localhost:8000/api -d '[{".auth_": {"Session": {"token": "nj-tuNyu6XVA7TAtg4RWOA"}}}, {"fn.logout": {"username": "doc-user"}}]'
 ```
 
 ```json
@@ -96,7 +96,7 @@ curl -s localhost:8000/api -d '[{"@auth_": {"Session": {"token": "nj-tuNyu6XVA7T
 
 This login/logout pair is specific to the demo server. Other Telepact services
 can choose different auth policies. The common convention is that caller
-credentials travel through `@auth_`, with `union.Auth_` as the canonical public
+credentials travel through `.auth_`, with `union.Auth_` as the canonical public
 schema shape.
 
 Next: [19. Minimum Python client](../06-using-telepact-client-library-code/19-minimum-python-client.md)

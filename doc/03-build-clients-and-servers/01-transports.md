@@ -102,7 +102,7 @@ async def http_handler(request):
 
     media_type = (
         'application/octet-stream'
-        if '@bin_' in response.headers
+        if '.bin_' in response.headers
         else 'application/json'
     )
     return Response(content=response_bytes, media_type=media_type)

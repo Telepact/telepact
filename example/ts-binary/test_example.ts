@@ -26,7 +26,7 @@ test('binary example runs end to end', async () => {
     const adapter = async (message: Message, serializer: Serializer): Promise<Message> => {
         const requestBytes = serializer.serialize(message);
         const response = await telepactServer.process(requestBytes);
-        if ('@bin_' in response.headers) {
+        if ('.bin_' in response.headers) {
             sawBinaryResponse = true;
         }
         return serializer.deserialize(response.bytes);

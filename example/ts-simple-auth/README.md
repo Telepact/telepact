@@ -5,7 +5,7 @@ server and shows a simple auth flow with hard-coded credentials.
 
 It demonstrates the same auth boundary as the Python example:
 
-- `on_auth` maps a hard-coded username/password from `@auth_` into normalized
+- `on_auth` maps a hard-coded username/password from `.auth_` into normalized
   identity headers, and throws if authentication fails
 - middleware logs those normalized identity headers and catches a custom
   `Unauthorized` exception to coerce it into `ErrorUnauthorized_`
@@ -14,8 +14,8 @@ It demonstrates the same auth boundary as the Python example:
 
 Hard-coded credentials used by the example:
 
-- `lead-baker` / `opensesame` -> `@employeeId=baker-001`, `@station=oven`
-- `cashier` / `knockknock` -> `@employeeId=cashier-002`, `@station=counter`
+- `lead-baker` / `opensesame` -> `.employeeId=baker-001`, `.station=oven`
+- `cashier` / `knockknock` -> `.employeeId=cashier-002`, `.station=counter`
 - `explode` / `boom` -> throws in `on_auth`
 
 Browse the files:

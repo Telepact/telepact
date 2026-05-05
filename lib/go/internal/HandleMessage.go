@@ -89,8 +89,8 @@ func HandleMessage(
 		return ServerMessage{}, err
 	}
 
-	if callID, ok := requestHeaders["@id_"]; ok && callID != nil {
-		responseHeaders["@id_"] = callID
+	if callID, ok := requestHeaders[".id_"]; ok && callID != nil {
+		responseHeaders[".id_"] = callID
 	}
 
 	if parseFailuresRaw, ok := requestHeaders["_parseFailures"]; ok {
@@ -133,7 +133,7 @@ func HandleMessage(
 	}
 
 	if requiresAuthentication {
-		if _, ok := requestHeaders["@auth_"]; !ok {
+		if _, ok := requestHeaders[".auth_"]; !ok {
 			return newUnauthenticatedResponse(responseHeaders, resultUnionType)
 		}
 
@@ -152,15 +152,15 @@ func HandleMessage(
 		}
 	}
 
-	if clientKnownRaw, ok := requestHeaders["@bin_"]; ok {
-		responseHeaders["@binary_"] = true
-		responseHeaders["@clientKnownBinaryChecksums_"] = convertToAnySlice(clientKnownRaw)
-		if pac, ok := requestHeaders["@pac_"]; ok {
-			responseHeaders["@pac_"] = pac
+	if clientKnownRaw, ok := requestHeaders[".bin_"]; ok {
+		responseHeaders[".binary_"] = true
+		responseHeaders[".clientKnownBinaryChecksums_"] = convertToAnySlice(clientKnownRaw)
+		if pac, ok := requestHeaders[".pac_"]; ok {
+			responseHeaders[".pac_"] = pac
 		}
 	}
 
-	selectStructFields := extractSelectStructFields(requestHeaders["@select_"])
+	selectStructFields := extractSelectStructFields(requestHeaders[".select_"])
 
 	callValidateCtx := types.NewValidateContext(nil, functionName, false)
 	callValidationFailures := callUnion.Validate(requestBody, nil, callValidateCtx)
@@ -175,7 +175,7 @@ func HandleMessage(
 		}
 	}
 
-	unsafeResponseEnabled := boolValue(requestHeaders["@unsafe_"])
+	unsafeResponseEnabled := boolValue(requestHeaders[".unsafe_"])
 
 	callMessage := ServerMessage{
 		Headers: requestHeaders,
@@ -207,7 +207,7 @@ func HandleMessage(
 	}
 
 	skipResultValidation := unsafeResponseEnabled
-	coerceBase64 := !boolValue(finalResponseHeaders["@binary_"])
+	coerceBase64 := !boolValue(finalResponseHeaders[".binary_"])
 
 	resultValidateCtx := types.NewValidateContext(selectStructFields, functionName, coerceBase64)
 	resultValidationFailures := resultUnionType.Validate(resultUnion, nil, resultValidateCtx)
@@ -218,7 +218,7 @@ func HandleMessage(
 	}
 
 	if len(resultValidateCtx.Base64Coercions) > 0 {
-		finalResponseHeaders["@base64_"] = resultValidateCtx.Base64Coercions
+		finalResponseHeaders[".base64_"] = resultValidateCtx.Base64Coercions
 	}
 	if len(resultValidateCtx.BytesCoercions) > 0 {
 		if err := binary.ServerBase64Decode(resultUnion, resultValidateCtx.BytesCoercions); err != nil {

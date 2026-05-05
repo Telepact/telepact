@@ -455,7 +455,7 @@ def demo_server(port: int) -> None:
     usernames_by_token: dict[str, str] = {}
 
     def get_username(message: Message, require_session: bool = False) -> str | None:
-        auth = cast(dict[str, object] | None, message.headers.get('@auth_'))
+        auth = cast(dict[str, object] | None, message.headers.get('.auth_'))
         if auth is None:
             return None
         if 'Ephemeral' in auth:
@@ -483,7 +483,7 @@ def demo_server(port: int) -> None:
         unavailable_response = _demo_unavailable_response()
         if unavailable_response is not None:
             return unavailable_response, None
-        if '@auth_' not in request_message.headers:
+        if '.auth_' not in request_message.headers:
             return None, shared_namespace
         username = get_username(request_message)
         if username is None:

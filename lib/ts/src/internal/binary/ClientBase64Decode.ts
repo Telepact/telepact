@@ -20,7 +20,7 @@ export function clientBase64Decode(message: object[]): void {
     const headers = message[0] as Record<string, unknown>;
     const body = message[1] as Record<string, unknown>;
 
-    const base64Paths = (headers["@base64_"] || {}) as Record<string, unknown>;
+    const base64Paths = (headers[".base64_"] || {}) as Record<string, unknown>;
 
     travelBase64Decode(body, base64Paths);
 }

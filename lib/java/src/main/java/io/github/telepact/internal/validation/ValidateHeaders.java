@@ -31,8 +31,8 @@ public class ValidateHeaders {
             final var header = entry.getKey();
             final var headerValue = entry.getValue();
 
-            if (!header.startsWith("@")) {
-                validationFailures.add(new ValidationFailure(List.of(header), "RequiredObjectKeyPrefixMissing", Map.of("prefix", "@")));
+            if (!header.startsWith(".")) {
+                validationFailures.add(new ValidationFailure(List.of(header), "RequiredObjectKeyPrefixMissing", Map.of("prefix", ".")));
             }
 
             final var field = parsedRequestHeaders.get(header);

@@ -84,7 +84,7 @@ See:
 
 ## Select
 
-Telepact supports response shaping through the `@select_` header. Clients can
+Telepact supports response shaping through the `.select_` header. Clients can
 ask for fewer fields from a response graph without inventing a separate query
 language.
 

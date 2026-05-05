@@ -77,9 +77,9 @@ async def handle_message(
     result_union_type = cast(TUnion, parsed_telepact_schema[request_target + '.->'])
     requires_authentication = unknown_target is None and function_router.requires_authentication(function_name)
 
-    call_id = request_headers.get("@id_")
+    call_id = request_headers.get(".id_")
     if call_id is not None:
-        response_headers["@id_"] = call_id
+        response_headers[".id_"] = call_id
 
     if "_parseFailures" in request_headers:
         parse_failures = cast(list[object], request_headers["_parseFailures"])
@@ -102,7 +102,7 @@ async def handle_message(
             response_headers,
         )
 
-    if requires_authentication and "@auth_" not in request_headers:
+    if requires_authentication and ".auth_" not in request_headers:
         return build_unauthenticated_error_message(result_union_type, response_headers)
 
     if requires_authentication:
@@ -126,18 +126,18 @@ async def handle_message(
                 pass
             return build_unauthenticated_error_message(result_union_type, response_headers)
 
-    if "@bin_" in request_headers:
+    if ".bin_" in request_headers:
         client_known_binary_checksums = cast(
-            list[object], request_headers["@bin_"])
+            list[object], request_headers[".bin_"])
 
-        response_headers["@binary_"] = True
-        response_headers["@clientKnownBinaryChecksums_"] = client_known_binary_checksums
+        response_headers[".binary_"] = True
+        response_headers[".clientKnownBinaryChecksums_"] = client_known_binary_checksums
 
-        if "@pac_" in request_headers:
-            response_headers["@pac_"] = request_headers["@pac_"]
+        if ".pac_" in request_headers:
+            response_headers[".pac_"] = request_headers[".pac_"]
 
     select_struct_fields_header: dict[str, object] | None = cast(dict[str, object] | None, request_headers.get(
-        "@select_"
+        ".select_"
     ))
 
     if unknown_target is not None:
@@ -172,7 +172,7 @@ async def handle_message(
     if len(call_validate_ctx.bytes_coercions) > 0:
         server_base64_decode(request_body, call_validate_ctx.bytes_coercions)
 
-    unsafe_response_enabled = cast(bool, request_headers.get("@unsafe_", False))
+    unsafe_response_enabled = cast(bool, request_headers.get(".unsafe_", False))
 
     call_message: Message = Message(
         request_headers, {request_target: request_payload})
@@ -199,7 +199,7 @@ async def handle_message(
 
     skip_result_validation: bool = unsafe_response_enabled
 
-    coerce_base64 = final_response_headers.get("@binary_", False) == False
+    coerce_base64 = final_response_headers.get(".binary_", False) == False
     result_validate_ctx = ValidateContext(select_struct_fields_header, function_name, coerce_base64=coerce_base64)
     result_validation_failures: list[ValidationFailure] = result_union_type.validate(
         result_union, [], result_validate_ctx)
@@ -223,7 +223,7 @@ async def handle_message(
         return res
     
     if result_validate_ctx.base64_coercions:
-        final_response_headers["@base64_"] = result_validate_ctx.base64_coercions
+        final_response_headers[".base64_"] = result_validate_ctx.base64_coercions
 
     if result_validate_ctx.bytes_coercions:
         server_base64_decode(result_union, result_validate_ctx.bytes_coercions)

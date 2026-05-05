@@ -22,7 +22,7 @@ def client_base64_decode(message: list[object]) -> None:
     headers = cast(dict[str, object], message[0])
     body = cast(dict[str, object], message[1])
 
-    base64_paths = cast(dict[str, object], headers.get('@base64_', {}))
+    base64_paths = cast(dict[str, object], headers.get('.base64_', {}))
 
     travel_base64_decode(body, base64_paths)
 

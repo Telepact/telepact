@@ -270,10 +270,10 @@ Pattern:
 
 ```yaml
 headers.Auth:
-  "@requestId": string
-  "@traceId": string
+  ".requestId": string
+  ".traceId": string
 ->:
-  "@ratelimitRemaining": integer
+  ".ratelimitRemaining": integer
 ```
 
 Rules:
@@ -331,7 +331,7 @@ union.Auth_:
       token: string
 ```
 
-This enables Telepact auth definitions such as the `@auth_` header and auth-related errors. Put auth-related credential variants inside `union.Auth_`.
+This enables Telepact auth definitions such as the `.auth_` header and auth-related errors. Put auth-related credential variants inside `union.Auth_`.
 
 ### Mock Definitions
 

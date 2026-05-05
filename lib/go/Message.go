@@ -108,7 +108,7 @@ func bodyKeyPriority(key string) int {
 		return 1
 	case key == "Err_":
 		return 2
-	case !strings.HasPrefix(key, "_") && !strings.HasPrefix(key, "@"):
+	case !strings.HasPrefix(key, "_") && !strings.HasPrefix(key, "."):
 		return 3
 	case strings.HasPrefix(key, "_"):
 		return 4

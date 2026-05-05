@@ -28,7 +28,7 @@ export function parseField(
     isHeader: boolean,
     ctx: ParseContext,
 ): TFieldDeclaration {
-    const headerRegexString = '^@[a-z][a-zA-Z0-9_]*$';
+    const headerRegexString = '^\.[a-z][a-zA-Z0-9_]*$';
     const regexString = '^([a-z][a-zA-Z0-9_]*)(!)?$';
     const regexToUse = isHeader ? headerRegexString : regexString;
     const regex = new RegExp(regexToUse);

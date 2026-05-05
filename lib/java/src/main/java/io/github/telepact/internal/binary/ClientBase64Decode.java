@@ -26,7 +26,7 @@ public class ClientBase64Decode {
         Map<String, Object> headers = (Map<String, Object>) message.get(0);
         Map<String, Object> body = (Map<String, Object>) message.get(1);
 
-        Map<String, Object> base64Paths = (Map<String, Object>) headers.getOrDefault("@base64_", Map.of());
+        Map<String, Object> base64Paths = (Map<String, Object>) headers.getOrDefault(".base64_", Map.of());
 
         travelBase64Decode(body, base64Paths);
     }

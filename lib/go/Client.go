@@ -114,7 +114,7 @@ func (c *Client) RequestWithContext(ctx context.Context, request Message) (Messa
 	)
 	if err != nil {
 		timeoutMS := c.timeoutMSDefault
-		if value, ok := internalRequest.Headers["@time_"]; ok {
+		if value, ok := internalRequest.Headers[".time_"]; ok {
 			switch typed := value.(type) {
 			case int:
 				timeoutMS = typed

@@ -20,7 +20,7 @@ export function serverBase64Encode(message: object[]): void {
     const headers = message[0] as Record<string, any>;
     const body = message[1] as Record<string, any>;
 
-    const base64Paths = headers["@base64_"] as Record<string, any> || {};
+    const base64Paths = headers[".base64_"] as Record<string, any> || {};
 
     travelBase64Encode(body, base64Paths);
 }

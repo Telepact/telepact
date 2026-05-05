@@ -63,15 +63,15 @@ python client.py
 Example output:
 
 ```text
-call 1: {'request_headers': {'@time_': 5000, '@bin_': []}, 'request_len': 56, 'response_headers': {'@enc_': {...}, '@bin_': [900069279]}, 'response_len': 480}
-call 2: {'request_headers': {'@time_': 5000, '@bin_': [900069279]}, 'request_len': 27, 'response_headers': {'@bin_': [900069279]}, 'response_len': 25}
+call 1: {'request_headers': {'.time_': 5000, '.bin_': []}, 'request_len': 56, 'response_headers': {'.enc_': {...}, '.bin_': [900069279]}, 'response_len': 480}
+call 2: {'request_headers': {'.time_': 5000, '.bin_': [900069279]}, 'request_len': 27, 'response_headers': {'.bin_': [900069279]}, 'response_len': 25}
 ```
 
 Three nice things happened for us:
 
 1. the client automatically started the binary handshake
 2. it cached the negotiated checksum and reused it
-3. it sent `@time_` for us so the server can understand the client's timeout
+3. it sent `.time_` for us so the server can understand the client's timeout
 
 This is the normal way to use binary with Telepact. If the schema changes, the
 runtime client can re-negotiate instead of forcing us through a codegen ABI

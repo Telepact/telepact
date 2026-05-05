@@ -247,25 +247,25 @@ public class Main {
                 try {
                     if (useTestClient) {
                         try {
-                            var resetSeed = (Integer) requestHeaders.get("@setSeed");
+                            var resetSeed = (Integer) requestHeaders.get(".setSeed");
                             if (resetSeed != null) {
                                 testClient.setSeed(resetSeed);
                             }
-                            var expectedPseudoJsonBody = (Map<String, Object>) requestHeaders.get("@expectedPseudoJsonBody");
-                            var expectMatch = (Boolean) requestHeaders.getOrDefault("@expectMatch", true);
+                            var expectedPseudoJsonBody = (Map<String, Object>) requestHeaders.get(".expectedPseudoJsonBody");
+                            var expectMatch = (Boolean) requestHeaders.getOrDefault(".expectMatch", true);
                             response = testClient.assertRequest(request, expectedPseudoJsonBody, expectMatch);
                         } catch (Throwable e) {
                             e.printStackTrace();
                             var responseHeaders = new HashMap<String, Object>();
                             if (e instanceof AssertionError) {
-                                responseHeaders.put("@assertionError", true);
+                                responseHeaders.put(".assertionError", true);
                             }
                             response = new Message(responseHeaders, Map.of("ErrorUnknown_", Map.of()));
                         }
                     } else if (useCodeGen && "fn.test".equals(functionName)) {
                         var outputMessage = generatedClient.test(requestHeaders, new test.Input(requestBody));
                         var responseHeaders = outputMessage.headers;
-                        responseHeaders.put("@codegenc_", true);
+                        responseHeaders.put(".codegenc_", true);
                         response = new Message(responseHeaders, outputMessage.body.pseudoJson);
                     } else {
                         try (var time = timers.time()) {
@@ -276,7 +276,7 @@ public class Main {
                     e.printStackTrace();
                     var responseHeaders = new HashMap<String, Object>();
                     if (e instanceof AssertionError) {
-                        responseHeaders.put("@assertionError", true);
+                        responseHeaders.put(".assertionError", true);
                     }
                     response = new Message(responseHeaders, Map.of("ErrorUnknown_", Map.of()));
                 }
@@ -298,7 +298,7 @@ public class Main {
                 var clientReturnedBinary = containsBytesArray(responsePseudoJson);
 
                 if (clientReturnedBinary) {
-                    ((Map<String, Object>)responsePseudoJson.get(0)).put("@clientReturnedBinary", true);
+                    ((Map<String, Object>)responsePseudoJson.get(0)).put(".clientReturnedBinary", true);
                 }
 
                 var responseBytes = objectMapper.writeValueAsBytes(responsePseudoJson);
@@ -475,7 +475,7 @@ public class Main {
         }
 
         Server.AuthHandler onAuth = (requestHeaders) -> CompletableFuture.supplyAsync(() -> {
-            Object authObject = requestHeaders.get("@auth_");
+            Object authObject = requestHeaders.get(".auth_");
             if (!(authObject instanceof Map<?, ?> authMap)) {
                 return Map.of();
             }
@@ -487,10 +487,10 @@ public class Main {
 
             Object token = tokenMap.get("token");
             if (Objects.equals("ok", token)) {
-                return Map.of("@ok_", Map.of());
+                return Map.of(".ok_", Map.of());
             }
             if (Objects.equals("unauthorized", token)) {
-                return Map.of("@result", Map.of("ErrorUnauthorized_", Map.of("message!", "a")));
+                return Map.of(".result", Map.of("ErrorUnauthorized_", Map.of("message!", "a")));
             }
             if (token != null) {
                 throw new RuntimeException("invalid auth");
@@ -536,15 +536,15 @@ public class Main {
                 var message = functionRouter.route(requestMessage);
 
                 if (useCodeGen) {
-                    message.headers.put("@codegens_", true);
+                    message.headers.put(".codegens_", true);
                 }
 
-                var toggleAlternateServer = requestMessage.headers.get("@toggleAlternateServer_");
+                var toggleAlternateServer = requestMessage.headers.get(".toggleAlternateServer_");
                 if (Objects.equals(true, toggleAlternateServer)) {
                     serveAlternateServer.set(!serveAlternateServer.get());
                 }
 
-                var throwError = requestMessage.headers.get("@throwError_");
+                var throwError = requestMessage.headers.get(".throwError_");
                 if (Objects.equals(true, throwError)) {
                     throw new ThisError();
                 }
@@ -570,27 +570,27 @@ public class Main {
             }
         };
         options.onRequest = m -> {
-            if (Objects.equals(true, m.headers.get("@assertOnErrorNested_"))) {
+            if (Objects.equals(true, m.headers.get(".assertOnErrorNested_"))) {
                 onErrorExpectation.set("nested");
-            } else if (Objects.equals(true, m.headers.get("@assertOnErrorStandalone_"))) {
+            } else if (Objects.equals(true, m.headers.get(".assertOnErrorStandalone_"))) {
                 onErrorExpectation.set("standalone");
             } else {
                 onErrorExpectation.set(null);
             }
             onErrorFailed.set(false);
             onErrorObserved.set(false);
-            if ((Boolean) m.headers.getOrDefault("@onRequestError_", false)) {
+            if ((Boolean) m.headers.getOrDefault(".onRequestError_", false)) {
                 throw new RuntimeException();
             }
         };
         options.onResponse = m -> {
             if (onErrorExpectation.get() != null && (onErrorFailed.get() || !onErrorObserved.get())) {
-                m.headers.put("@assertionError", true);
+                m.headers.put(".assertionError", true);
             }
             onErrorExpectation.set(null);
             onErrorFailed.set(false);
             onErrorObserved.set(false);
-            if ((Boolean) m.headers.getOrDefault("@onResponseError_", false)) {
+            if ((Boolean) m.headers.getOrDefault(".onResponseError_", false)) {
                 throw new RuntimeException();
             }
         };
@@ -636,7 +636,7 @@ public class Main {
                     responseBytes = response.bytes;
                 } else {
                     final var response = server.process(requestBytes, (headers) -> {
-                        headers.put("@override", "new");
+                        headers.put(".override", "new");
                     });
                     responseBytes = response.bytes;
                 }

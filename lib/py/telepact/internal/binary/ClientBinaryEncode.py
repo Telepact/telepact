@@ -33,7 +33,7 @@ def client_binary_encode(message: list[object], binary_encoding_cache: 'BinaryEn
     force_send_json = headers.pop("_forceSendJson", None)
 
     checksums = binary_checksum_strategy.get_current_checksums()
-    headers["@bin_"] = checksums
+    headers[".bin_"] = checksums
 
     if force_send_json == True:
         raise BinaryEncoderUnavailableError()
@@ -49,6 +49,6 @@ def client_binary_encode(message: list[object], binary_encoding_cache: 'BinaryEn
     encoded_message_body = encode_body(message_body, binary_encoding)
 
     final_encoded_message_body = pack_body(encoded_message_body) if headers.get(
-        "@pac_") == True else encoded_message_body
+        ".pac_") == True else encoded_message_body
 
     return [headers, final_encoded_message_body]

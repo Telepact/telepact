@@ -52,26 +52,26 @@ func ClientHandleMessage(
 	}
 
 	headers := ensureHeaders(request)
-	if _, ok := headers["@time_"]; !ok {
-		headers["@time_"] = timeoutMSDefault
+	if _, ok := headers[".time_"]; !ok {
+		headers[".time_"] = timeoutMSDefault
 	}
 
 	if useBinaryDefault {
-		headers["@binary_"] = true
+		headers[".binary_"] = true
 	}
 
 	if isBinary(headers) && alwaysSendJSON {
 		headers["_forceSendJson"] = true
 	}
 
-	timeout := timeoutFromHeader(headers["@time_"], timeoutMSDefault)
+	timeout := timeoutFromHeader(headers[".time_"], timeoutMSDefault)
 	response, err := executeWithTimeout(ctx, timeout, adapter, request)
 	if err != nil {
 		return nil, err
 	}
 
 	if isIncompatibleBinaryEncoding(response.Body) {
-		headers["@binary_"] = true
+		headers[".binary_"] = true
 		headers["_forceSendJson"] = true
 
 		return executeWithTimeout(ctx, timeout, adapter, request)
@@ -88,7 +88,7 @@ func ensureHeaders(message *ClientMessage) map[string]any {
 }
 
 func isBinary(headers map[string]any) bool {
-	flag, ok := headers["@binary_"].(bool)
+	flag, ok := headers[".binary_"].(bool)
 	return ok && flag
 }
 

@@ -34,13 +34,13 @@ func ClientBinaryDecode(message []any, cache BinaryEncodingCache, strategy *Clie
 		return nil, err
 	}
 
-	checksums, err := extractIntSlice(headers["@bin_"])
+	checksums, err := extractIntSlice(headers[".bin_"])
 	if err != nil || len(checksums) == 0 {
 		return nil, BinaryEncoderUnavailableError{}
 	}
 	binaryChecksum := checksums[0]
 
-	if encodingRaw, ok := headers["@enc_"]; ok {
+	if encodingRaw, ok := headers[".enc_"]; ok {
 		encodingMap, castErr := toStringIntMap(encodingRaw)
 		if castErr != nil {
 			return nil, castErr
@@ -60,7 +60,7 @@ func ClientBinaryDecode(message []any, cache BinaryEncodingCache, strategy *Clie
 	}
 
 	var workingBody map[any]any
-	if isStrictTrue(headers["@pac_"]) {
+	if isStrictTrue(headers[".pac_"]) {
 		packed, packErr := UnpackBody(encodedBody)
 		if packErr != nil {
 			return nil, packErr

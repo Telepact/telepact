@@ -8,7 +8,7 @@ Now let's turn on our first opt-in feature: field selection.
 telepact demo-server --port 8000
 ```
 
-## Find the internal `@select_` header
+## Find the internal `.select_` header
 
 ```sh
 curl -s localhost:8000/api -d '[{}, {"fn.api_": {"includeInternal!": true}}]'
@@ -19,7 +19,7 @@ The schema entry looks like this:
 ```json
 {
   "headers.Select_": {
-    "@select_": "_ext.Select_"
+    ".select_": "_ext.Select_"
   },
   "->": {}
 }
@@ -43,7 +43,7 @@ curl -s localhost:8000/api -d '[{}, {"fn.evaluate": {"expression": {"Add": {"lef
 Selected response:
 
 ```sh
-curl -s localhost:8000/api -d '[{"@select_": {"->": {"Ok_": ["result"]}}}, {"fn.evaluate": {"expression": {"Add": {"left": {"Constant": {"value": 2}}, "right": {"Constant": {"value": 3}}}}}}]'
+curl -s localhost:8000/api -d '[{".select_": {"->": {"Ok_": ["result"]}}}, {"fn.evaluate": {"expression": {"Add": {"left": {"Constant": {"value": 2}}, "right": {"Constant": {"value": 3}}}}}}]'
 ```
 
 ```json
@@ -53,7 +53,7 @@ curl -s localhost:8000/api -d '[{"@select_": {"->": {"Ok_": ["result"]}}}, {"fn.
 Nothing about the function changed. We just told the server which response fields
 we wanted back.
 
-`@select_` always uses the same shape:
+`.select_` always uses the same shape:
 
 - `->` selects fields on the active result union
 - `struct.*` selects fields on reachable structs

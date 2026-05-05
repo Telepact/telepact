@@ -184,7 +184,7 @@ to type safety deficits early in the development phase.
 
 Clients who are uniquely vulnerable to hard server failures and who find it
 advantageous to receive the malformed data anyway are able to turn off this
-response validation by submitting their requests with the `{"@unsafe_":true}`
+response validation by submitting their requests with the `{".unsafe_":true}`
 header.
 
 ## If all I want is compact binary serialization, why not just use gRPC?
@@ -241,9 +241,9 @@ all union tags are associated with structs means the backwards compatible option
 of adding a new struct field is always available to software designers dealing
 with the needs of evolving software.
 
-## Why can I not omit fn.\* fields using the `"@select_"` header?
+## Why can I not omit fn.\* fields using the `".select_"` header?
 
-The `"@select_"` header is used to omit fields from the response result graph:
+The `".select_"` header is used to omit fields from the response result graph:
 the active result union, reachable structs, and reachable union payload
 structs. It does not apply to the argument struct included with function
 definitions.
@@ -255,5 +255,5 @@ Telepact console specifically utilizes this technique to allow end-users to
 "click through" graphs designed by the API provider.
 
 Omitting fields in the argument struct disrupts the API provider's ability to
-established well-defined links, and consequently, the `"@select_"` header is
+established well-defined links, and consequently, the `".select_"` header is
 disallowed from omitting fields in function argument structs.

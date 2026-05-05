@@ -71,7 +71,7 @@ public class TestClient {
      * @param expectMatch          Whether to expect a match or not
      * @return The response body if a match was expected and found, or the expected
      *         body if no match was expected and none was found
-     * @throws AssertionError if the expectation is not met
+     * .throws AssertionError if the expectation is not met
      */
     public Message assertRequest(Message requestMessage, Map<String, Object> expectedPseudoJsonBody, boolean expectMatch) {
         var s = schema.updateAndGet(nullValue -> {

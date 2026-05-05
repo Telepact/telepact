@@ -150,7 +150,7 @@ def normalized_identity(session_token: str | None) -> SessionIdentity | None:
 
 
 async def on_auth(headers: dict[str, object]) -> dict[str, object]:
-    auth = headers.get('@auth_')
+    auth = headers.get('.auth_')
     session = auth.get('Session') if isinstance(auth, dict) else None
     token = session.get('token') if isinstance(session, dict) else None
     identity = normalized_identity(token if isinstance(token, str) else None)
@@ -159,8 +159,8 @@ async def on_auth(headers: dict[str, object]) -> dict[str, object]:
 
     _merge_context(userId=identity.user_id, role=identity.role, displayName=identity.display_name)
     return {
-        '@userId': identity.user_id,
-        '@role': identity.role,
+        '.userId': identity.user_id,
+        '.role': identity.role,
         '@displayName': identity.display_name,
     }
 
@@ -227,8 +227,8 @@ options.middleware = middleware
 
 
 async def me(_function_name: str, request_message: Message) -> Message:
-    user_id = request_message.headers.get('@userId')
-    role = request_message.headers.get('@role')
+    user_id = request_message.headers.get('.userId')
+    role = request_message.headers.get('.role')
     display_name = request_message.headers.get('@displayName')
     if not isinstance(user_id, str) or not isinstance(role, str) or not isinstance(display_name, str):
         return Message({}, {
@@ -247,14 +247,14 @@ async def me(_function_name: str, request_message: Message) -> Message:
 
 
 async def admin_report(_function_name: str, request_message: Message) -> Message:
-    if request_message.headers.get('@userId') is None:
+    if request_message.headers.get('.userId') is None:
         return Message({}, {
             'ErrorUnauthenticated_': {
                 'message!': 'sign in before requesting the admin report',
             },
         })
 
-    if request_message.headers.get('@role') != 'admin':
+    if request_message.headers.get('.role') != 'admin':
         return Message({}, {
             'ErrorUnauthorized_': {
                 'message!': 'admin role required',
@@ -292,12 +292,12 @@ def process_telepact_request(request_bytes: bytes, request_id: str, session_toke
     loop = asyncio.new_event_loop()
     try:
         def update_headers(headers: dict[str, object]) -> None:
-            headers['@requestId'] = request_id
+            headers['.requestId'] = request_id
             if session_token is not None:
-                headers['@auth_'] = {'Session': {'token': session_token}}
+                headers['.auth_'] = {'Session': {'token': session_token}}
 
         response = loop.run_until_complete(telepact_server.process(request_bytes, update_headers))
-        content_type = 'application/octet-stream' if '@bin_' in response.headers else 'application/json'
+        content_type = 'application/octet-stream' if '.bin_' in response.headers else 'application/json'
         return TelepactHttpResponse(response_bytes=response.bytes, content_type=content_type)
     finally:
         loop.close()

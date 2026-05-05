@@ -64,8 +64,8 @@ Telepact cares mainly about placement.
 Telepact's auth convention is:
 
 - define caller-visible credential variants in `union.Auth_`
-- carry them in `@auth_`
-- translate transport-specific credential state into `@auth_` at the transport boundary when needed
+- carry them in `.auth_`
+- translate transport-specific credential state into `.auth_` at the transport boundary when needed
 - use `onAuth` to normalize authenticated identity into internal headers
 - keep authorization decisions near the business logic that owns the resource
 
@@ -96,7 +96,7 @@ logs describe connections and byte-level behavior; Telepact logs can describe
 which Telepact function ran and how it completed.
 
 One Telepact-specific pitfall: avoid dumping whole request or response `Message`
-objects just because they are available. Even though `@auth_` is treated
+objects just because they are available. Even though `.auth_` is treated
 carefully by Telepact, application payloads may still contain sensitive data.
 
 ### Request ids and tracing
