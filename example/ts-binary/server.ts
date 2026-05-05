@@ -32,7 +32,7 @@ export function buildTelepactServer(): Server {
     const files = new TelepactSchemaFiles('api', fs, path);
     const schema = TelepactSchema.fromFileJsonMap(files.filenamesToJson);
     const options = new ServerOptions();
-    options.authRequired = false;
-    const functionRouter = new FunctionRouter({ 'fn.getNumbers': getNumbers });
+    const functionRouter = new FunctionRouter();
+    functionRouter.registerUnauthenticatedRoutes({ 'fn.getNumbers': getNumbers });
     return new Server(schema, functionRouter, options);
 }

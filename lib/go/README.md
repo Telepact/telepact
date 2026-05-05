@@ -64,7 +64,6 @@ func main() {
 
 	serverOptions := telepact.NewServerOptions()
 	// Set this to false when your schema does not define union.Auth_.
-	serverOptions.AuthRequired = false
 	serverOptions.Middleware = func(request telepact.Message, functionRouter *telepact.FunctionRouter) (telepact.Message, error) {
         functionName, err := request.BodyTarget()
         if err != nil {
@@ -74,7 +73,8 @@ func main() {
         defer log.Printf("Function finished: %s", functionName)
         return functionRouter.Route(request)
     }
-	functionRouter := telepact.NewFunctionRouter(functionRoutes)
+	functionRouter := telepact.NewFunctionRouter()
+	functionRouter.RegisterUnauthenticatedRoutes(functionRoutes)
 	server, err := telepact.NewServer(schema, functionRouter, serverOptions)
 	if err != nil {
 		log.Fatal(err)

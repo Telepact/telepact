@@ -22,7 +22,6 @@ import { FunctionRouter, Message, Response, Server, ServerOptions, TelepactSchem
 const files = new TelepactSchemaFiles('api', fs, path);
 const schema = TelepactSchema.fromFileJsonMap(files.filenamesToJson);
 const options = new ServerOptions();
-options.authRequired = false;
 
 async function createIssueLink(functionName: string, requestMessage: Message): Promise<Message> {
     const argument = requestMessage.body[functionName] as Record<string, string>;
@@ -51,7 +50,8 @@ async function getFollowUp(functionName: string, requestMessage: Message): Promi
     });
 }
 
-const functionRouter = new FunctionRouter({
+const functionRouter = new FunctionRouter();
+functionRouter.registerUnauthenticatedRoutes({
     'fn.createIssueLink': createIssueLink,
     'fn.getFollowUp': getFollowUp,
 });

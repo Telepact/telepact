@@ -52,6 +52,8 @@ The important shape here is:
 1. read credentials from `@auth_`
 2. validate them in `on_auth`
 3. return normalized identity or authorization headers for later handlers
+4. register protected handlers in the authenticated route map so missing
+   credentials automatically become `ErrorUnauthenticated_`
 
 That normalization step is the core Telepact server-side auth pattern.
 

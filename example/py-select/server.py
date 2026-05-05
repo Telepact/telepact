@@ -22,7 +22,6 @@ from telepact import FunctionRouter, Message, Server, TelepactSchema, TelepactSc
 files = TelepactSchemaFiles('api')
 schema = TelepactSchema.from_file_json_map(files.filenames_to_json)
 options = Server.Options()
-options.auth_required = False
 
 
 async def track_package(_function_name: str, _request_message: Message) -> Message:
@@ -44,7 +43,8 @@ async def track_package(_function_name: str, _request_message: Message) -> Messa
     })
 
 
-function_router = FunctionRouter({'fn.trackPackage': track_package})
+function_router = FunctionRouter()
+function_router.register_unauthenticated_routes({'fn.trackPackage': track_package})
 telepact_server = Server(schema, function_router, options)
 
 

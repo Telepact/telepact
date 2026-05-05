@@ -45,13 +45,12 @@ export class Server {
     serializer: Serializer;
 
     constructor(telepactSchema: TelepactSchema, functionRouter: FunctionRouter | FunctionRoutes, options: ServerOptions) {
-        const normalizedFunctionRouter =
-            functionRouter instanceof FunctionRouter ? functionRouter : new FunctionRouter(functionRouter);
+        const normalizedFunctionRouter = functionRouter instanceof FunctionRouter ? functionRouter : new FunctionRouter();
+        if (!(functionRouter instanceof FunctionRouter)) {
+            normalizedFunctionRouter.registerUnauthenticatedRoutes(functionRouter);
+        }
 
-        normalizedFunctionRouter.functionRoutes = {
-            ...normalizedFunctionRouter.functionRoutes,
-            ...createInternalFunctionRoutes(telepactSchema),
-        };
+        normalizedFunctionRouter.registerUnauthenticatedRoutes(createInternalFunctionRoutes(telepactSchema));
         this.functionRouter = normalizedFunctionRouter;
         this.middleware = options.middleware;
         this.onError = options.onError;
@@ -67,9 +66,9 @@ export class Server {
 
         this.serializer = new Serializer(options.serialization, binaryEncoder, base64Encoder);
 
-        if (!('union.Auth_' in this.telepactSchema.parsed) && options.authRequired) {
+        if (!('union.Auth_' in this.telepactSchema.parsed) && this.functionRouter.hasAuthenticatedRoutes()) {
             throw new Error(
-                'Unauthenticated server. Either define a `union.Auth_` in your schema or set `options.authRequired` to `false`.',
+                'Authenticated routes require `union.Auth_` in your schema.',
             );
         }
     }
@@ -96,7 +95,6 @@ export class ServerOptions {
     onResponse: (message: Message) => void;
     onAuth: AuthHandler;
     middleware: Middleware;
-    authRequired: boolean;
     serialization: Serialization;
 
     constructor() {
@@ -106,7 +104,6 @@ export class ServerOptions {
         this.onAuth = (headers: Record<string, any>) => ({});
         this.middleware = async (requestMessage: Message, functionRouter: FunctionRouter): Promise<Message> =>
             await functionRouter.route(requestMessage);
-        this.authRequired = true;
         this.serialization = new DefaultSerialization();
     }
 }

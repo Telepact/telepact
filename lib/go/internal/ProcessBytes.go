@@ -20,6 +20,7 @@ import "fmt"
 
 type FunctionRouter interface {
 	Route(ServerMessage) (ServerMessage, error)
+	RequiresAuthentication(functionName string) bool
 }
 
 type Middleware func(ServerMessage, FunctionRouter) (ServerMessage, error)

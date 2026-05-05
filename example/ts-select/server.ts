@@ -22,7 +22,6 @@ import { FunctionRouter, Message, Response, Server, ServerOptions, TelepactSchem
 const files = new TelepactSchemaFiles('api', fs, path);
 const schema = TelepactSchema.fromFileJsonMap(files.filenamesToJson);
 const options = new ServerOptions();
-options.authRequired = false;
 
 async function trackPackage(_functionName: string, _requestMessage: Message): Promise<Message> {
     return new Message({}, {
@@ -43,7 +42,8 @@ async function trackPackage(_functionName: string, _requestMessage: Message): Pr
     });
 }
 
-const functionRouter = new FunctionRouter({ 'fn.trackPackage': trackPackage });
+const functionRouter = new FunctionRouter();
+functionRouter.registerUnauthenticatedRoutes({ 'fn.trackPackage': trackPackage });
 const telepactServer = new Server(schema, functionRouter, options);
 
 function readRequestBytes(request: IncomingMessage): Promise<Uint8Array> {

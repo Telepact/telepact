@@ -72,7 +72,7 @@ async def on_auth(request_headers: dict[str, object]) -> dict[str, object]:
         return {"@ok_": {}}
     if token == "unauthorized":
         return {"@result": {"ErrorUnauthorized_": {"message!": "a"}}}
-    return {"@result": {"ErrorUnauthenticated_": {"message!": "a"}}}
+    raise RuntimeError("invalid auth")
 
 
 def is_function_route_name(type_name: str) -> bool:
@@ -295,8 +295,8 @@ async def start_schema_test_server(connection: NatsClient, metrics: CollectorReg
 
     options = Server.Options()
     options.on_error = on_err
-    options.auth_required = False
-    function_router = FunctionRouter({"fn.validateSchema": validate_schema_route})
+    function_router = FunctionRouter()
+    function_router.register_unauthenticated_routes({"fn.validateSchema": validate_schema_route})
     server = Server(telepact, function_router, options)
 
     async def handle_message(msg: Msg) -> None:
@@ -440,18 +440,24 @@ async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, 
     options.on_response = server_on_response
     options.on_auth = on_auth
     options.middleware = middleware
-    options.auth_required = auth_required
 
     function_routes = code_gen_handler.function_routes() if use_codegen else create_function_routes(telepact, forward_request)
-    function_router = FunctionRouter(function_routes)
+    function_router = FunctionRouter()
+    if auth_required:
+        function_router.register_authenticated_routes(function_routes)
+    else:
+        function_router.register_unauthenticated_routes(function_routes)
     server = Server(telepact, function_router, options)
     alternate_options = Server.Options()
     alternate_options.on_error = on_err
     alternate_options.on_auth = on_auth
     alternate_options.middleware = middleware
-    alternate_options.auth_required = auth_required
     alternate_function_routes = code_gen_handler.function_routes() if use_codegen else create_function_routes(alternate_telepact, forward_request)
-    alternate_function_router = FunctionRouter(alternate_function_routes)
+    alternate_function_router = FunctionRouter()
+    if auth_required:
+        alternate_function_router.register_authenticated_routes(alternate_function_routes)
+    else:
+        alternate_function_router.register_unauthenticated_routes(alternate_function_routes)
     alternate_server = Server(
         alternate_telepact, alternate_function_router, alternate_options)
 

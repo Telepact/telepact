@@ -46,10 +46,10 @@ async def divide(function_name, request_message):
     return Message({}, {'Ok_': {'result': result}})
 
 options = Server.Options()
-options.auth_required = False
 
 api = TelepactSchema.from_directory('./api')
-function_router = FunctionRouter({'fn.divide': divide})
+function_router = FunctionRouter()
+function_router.register_unauthenticated_routes({'fn.divide': divide})
 server = Server(api, function_router, options)
 
 async def http_handler(request):

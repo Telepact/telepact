@@ -109,7 +109,8 @@ func buildTelepactServer(apiDir string, subject string) (*telepact.Server, error
 		return nil, err
 	}
 
-	functionRouter := telepact.NewFunctionRouter(map[string]telepact.FunctionRoute{
+	functionRouter := telepact.NewFunctionRouter()
+	functionRouter.RegisterUnauthenticatedRoutes(map[string]telepact.FunctionRoute{
 		"fn.greet": func(functionName string, requestMessage telepact.Message) (telepact.Message, error) {
 			arguments, ok := requestMessage.Body[functionName].(map[string]any)
 			if !ok {
@@ -128,7 +129,6 @@ func buildTelepactServer(apiDir string, subject string) (*telepact.Server, error
 	})
 
 	options := telepact.NewServerOptions()
-	options.AuthRequired = false
 	return telepact.NewServer(schema, functionRouter, options)
 }
 
