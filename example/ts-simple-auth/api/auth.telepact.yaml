@@ -15,8 +15,9 @@
 #|
 
 - union.Auth_:
-    - Session:
-        token: "string"
+    - Credentials:
+        username: "string"
+        password: "string"
 - fn.me: {}
   ->:
     - Ok_:

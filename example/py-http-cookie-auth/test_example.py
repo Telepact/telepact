@@ -31,15 +31,31 @@ def test_cookie_auth_example_runs_end_to_end() -> None:
             },
         ])
         unauthenticated_body = unauthenticated[1]
-        assert 'Ok_' not in unauthenticated_body
-        assert any('error' in key.lower() for key in unauthenticated_body)
+        assert unauthenticated_body['ErrorUnauthenticated_']['message!'] == 'missing or invalid session cookie'
 
-        authenticated = post_json(url, [
+        reader = post_json(url, [
             {},
             {
                 'fn.me': {},
             },
-        ], headers={'Cookie': 'session=demo-session'})
-        assert authenticated[1]['Ok_']['userId'] == 'user-123'
+        ], headers={'Cookie': 'session=demo-user-session'})
+        assert reader[1]['Ok_']['userId'] == 'user-123'
+        assert reader[1]['Ok_']['role'] == 'reader'
+
+        unauthorized = post_json(url, [
+            {},
+            {
+                'fn.adminReport': {},
+            },
+        ], headers={'Cookie': 'session=demo-user-session'})
+        assert unauthorized[1]['ErrorUnauthorized_']['message!'] == 'admin role required'
+
+        admin = post_json(url, [
+            {},
+            {
+                'fn.adminReport': {},
+            },
+        ], headers={'Cookie': 'session=demo-admin-session'})
+        assert admin[1]['Ok_']['summary'] == 'secret report for admin-456'
     finally:
         stop_server(server, thread)

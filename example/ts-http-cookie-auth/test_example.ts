@@ -34,16 +34,32 @@ test('cookie auth example runs end to end', async () => {
             },
         ]);
         const unauthenticatedBody = unauthenticated[1] as Record<string, any>;
-        assert.equal('Ok_' in unauthenticatedBody, false);
-        assert.equal(Object.keys(unauthenticatedBody).some((key) => key.toLowerCase().includes('error')), true);
+        assert.equal(unauthenticatedBody['ErrorUnauthenticated_']['message!'], 'missing or invalid session cookie');
 
-        const authenticated = await postJson(url, [
+        const reader = await postJson(url, [
             {},
             {
                 'fn.me': {},
             },
-        ], { 'Cookie': 'session=demo-session' });
-        assert.equal(authenticated[1]['Ok_']['userId'], 'user-123');
+        ], { 'Cookie': 'session=demo-user-session' });
+        assert.equal(reader[1]['Ok_']['userId'], 'user-123');
+        assert.equal(reader[1]['Ok_']['role'], 'reader');
+
+        const unauthorized = await postJson(url, [
+            {},
+            {
+                'fn.adminReport': {},
+            },
+        ], { 'Cookie': 'session=demo-user-session' });
+        assert.equal(unauthorized[1]['ErrorUnauthorized_']['message!'], 'admin role required');
+
+        const admin = await postJson(url, [
+            {},
+            {
+                'fn.adminReport': {},
+            },
+        ], { 'Cookie': 'session=demo-admin-session' });
+        assert.equal(admin[1]['Ok_']['summary'], 'secret report for admin-456');
     } finally {
         await stopServer(server);
     }

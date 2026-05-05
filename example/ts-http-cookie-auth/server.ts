@@ -19,7 +19,16 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { FunctionRouter, Message, Response, Server, ServerOptions, TelepactSchema, TelepactSchemaFiles } from 'telepact';
 
-const VALID_SESSION = 'demo-session';
+const VALID_SESSIONS: Record<string, Record<string, string>> = {
+    'demo-user-session': {
+        '@userId': 'user-123',
+        '@role': 'reader',
+    },
+    'demo-admin-session': {
+        '@userId': 'admin-456',
+        '@role': 'admin',
+    },
+};
 
 const files = new TelepactSchemaFiles('api', fs, path);
 const schema = TelepactSchema.fromFileJsonMap(files.filenamesToJson);
@@ -28,14 +37,19 @@ options.authRequired = false;
 options.onAuth = async (headers: Record<string, any>): Promise<Record<string, any>> => {
     const auth = headers['@auth_'];
     const session = typeof auth === 'object' && auth !== null ? auth['Session'] : undefined;
-    if (typeof session === 'object' && session !== null && session['token'] === VALID_SESSION) {
-        return { '@userId': 'user-123' };
+    const token = typeof session === 'object' && session !== null ? session['token'] : undefined;
+    if (typeof token === 'string') {
+        return VALID_SESSIONS[token] ?? {};
     }
     return {};
 };
 
-async function me(_functionName: string, requestMessage: Message): Promise<Message> {
-    if (requestMessage.headers['@userId'] !== 'user-123') {
+options.middleware = async (requestMessage: Message, functionRouter: FunctionRouter): Promise<Message> => {
+    if (requestMessage.getBodyTarget() === 'fn.api_') {
+        return await functionRouter.route(requestMessage);
+    }
+
+    if (typeof requestMessage.headers['@userId'] !== 'string' || typeof requestMessage.headers['@role'] !== 'string') {
         return new Message({}, {
             'ErrorUnauthenticated_': {
                 'message!': 'missing or invalid session cookie',
@@ -43,14 +57,38 @@ async function me(_functionName: string, requestMessage: Message): Promise<Messa
         });
     }
 
+    return await functionRouter.route(requestMessage);
+};
+
+async function me(_functionName: string, requestMessage: Message): Promise<Message> {
     return new Message({}, {
         'Ok_': {
-            'userId': 'user-123',
+            'userId': requestMessage.headers['@userId'],
+            'role': requestMessage.headers['@role'],
         },
     });
 }
 
-const functionRouter = new FunctionRouter({ 'fn.me': me });
+async function adminReport(_functionName: string, requestMessage: Message): Promise<Message> {
+    if (requestMessage.headers['@role'] !== 'admin') {
+        return new Message({}, {
+            'ErrorUnauthorized_': {
+                'message!': 'admin role required',
+            },
+        });
+    }
+
+    return new Message({}, {
+        'Ok_': {
+            'summary': `secret report for ${requestMessage.headers['@userId']}`,
+        },
+    });
+}
+
+const functionRouter = new FunctionRouter({
+    'fn.me': me,
+    'fn.adminReport': adminReport,
+});
 const telepactServer = new Server(schema, functionRouter, options);
 
 function readRequestBytes(request: IncomingMessage): Promise<Uint8Array> {

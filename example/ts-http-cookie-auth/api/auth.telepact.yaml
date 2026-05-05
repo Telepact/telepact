@@ -21,3 +21,8 @@
   ->:
     - Ok_:
         userId: "string"
+        role: "string"
+- fn.adminReport: {}
+  ->:
+    - Ok_:
+        summary: "string"

@@ -14,18 +14,18 @@
 #|  limitations under the License.
 #|
 
+import argparse
 import asyncio
-from http.cookies import SimpleCookie
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 from telepact import FunctionRouter, Message, Server, TelepactSchema, TelepactSchemaFiles
 
-VALID_SESSIONS = {
-    'demo-user-session': {
+VALID_CREDENTIALS = {
+    ('demo-user', 'demo-pass'): {
         '@userId': 'user-123',
         '@role': 'reader',
     },
-    'demo-admin-session': {
+    ('demo-admin', 'demo-pass'): {
         '@userId': 'admin-456',
         '@role': 'admin',
     },
@@ -39,9 +39,12 @@ options.auth_required = False
 
 async def on_auth(headers: dict[str, object]) -> dict[str, object]:
     auth = headers.get('@auth_')
-    session = auth.get('Session') if isinstance(auth, dict) else None
-    token = session.get('token') if isinstance(session, dict) else None
-    return VALID_SESSIONS.get(token) if isinstance(token, str) else {}
+    credentials = auth.get('Credentials') if isinstance(auth, dict) else None
+    username = credentials.get('username') if isinstance(credentials, dict) else None
+    password = credentials.get('password') if isinstance(credentials, dict) else None
+    if isinstance(username, str) and isinstance(password, str):
+        return VALID_CREDENTIALS.get((username, password), {})
+    return {}
 
 
 options.on_auth = on_auth
@@ -80,7 +83,7 @@ async def middleware(request_message: Message, function_router: FunctionRouter) 
     if request_message.headers.get('@userId') is None or request_message.headers.get('@role') is None:
         return Message({}, {
             'ErrorUnauthenticated_': {
-                'message!': 'missing or invalid session cookie',
+                'message!': 'missing or invalid credentials',
             },
         })
 
@@ -97,16 +100,6 @@ function_router = FunctionRouter({
 telepact_server = Server(schema, function_router, options)
 
 
-def read_session_cookie(cookie_header: str | None) -> str | None:
-    if not cookie_header:
-        return None
-
-    cookie = SimpleCookie()
-    cookie.load(cookie_header)
-    session = cookie.get('session')
-    return session.value if session is not None else None
-
-
 def create_http_server(host: str = '127.0.0.1', port: int = 0) -> ThreadingHTTPServer:
     class RequestHandler(BaseHTTPRequestHandler):
         def do_POST(self) -> None:
@@ -117,13 +110,7 @@ def create_http_server(host: str = '127.0.0.1', port: int = 0) -> ThreadingHTTPS
 
             content_length = int(self.headers.get('Content-Length', '0'))
             request_bytes = self.rfile.read(content_length)
-            session_token = read_session_cookie(self.headers.get('Cookie'))
-
-            def update_headers(headers: dict[str, object]) -> None:
-                if session_token is not None:
-                    headers['@auth_'] = {'Session': {'token': session_token}}
-
-            response = asyncio.run(telepact_server.process(request_bytes, update_headers))
+            response = asyncio.run(telepact_server.process(request_bytes))
             content_type = 'application/octet-stream' if '@bin_' in response.headers else 'application/json'
 
             self.send_response(200)
@@ -135,3 +122,21 @@ def create_http_server(host: str = '127.0.0.1', port: int = 0) -> ThreadingHTTPS
             return
 
     return ThreadingHTTPServer((host, port), RequestHandler)
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--host', default='127.0.0.1')
+    parser.add_argument('--port', type=int, default=0)
+    args = parser.parse_args()
+
+    server = create_http_server(args.host, args.port)
+    print(f'listening {server.server_address[1]}', flush=True)
+    try:
+        server.serve_forever()
+    finally:
+        server.server_close()
+
+
+if __name__ == '__main__':
+    main()

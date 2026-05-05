@@ -7,6 +7,8 @@ flow:
 - read the browser cookie at the HTTP boundary
 - translate it into `@auth_`
 - normalize it in `on_auth`
+- reject missing or invalid sessions in middleware with `ErrorUnauthenticated_`
+- reject non-admin callers in the protected route with `ErrorUnauthorized_`
 
 Browse the files:
 
