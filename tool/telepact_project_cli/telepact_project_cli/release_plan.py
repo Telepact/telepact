@@ -24,26 +24,6 @@ import yaml
 
 RELEASE_CONFIG_RELATIVE_PATH = Path(".release/release-targets.yaml")
 VERSION_FILE_RELATIVE_PATH = Path("VERSION.txt")
-DOC_VERSIONS_RELATIVE_PATH = Path("doc/04-operate/03-versions.md")
-VERSION_BUMP_MANAGED_PATHS = (
-    VERSION_FILE_RELATIVE_PATH.as_posix(),
-    "bind/dart/package-lock.json",
-    "bind/dart/package.json",
-    "bind/dart/pubspec.lock",
-    "bind/dart/pubspec.yaml",
-    DOC_VERSIONS_RELATIVE_PATH.as_posix(),
-    "lib/java/pom.xml",
-    "lib/py/pyproject.toml",
-    "lib/py/uv.lock",
-    "lib/ts/package-lock.json",
-    "lib/ts/package.json",
-    "sdk/cli/pyproject.toml",
-    "sdk/cli/uv.lock",
-    "sdk/console/package-lock.json",
-    "sdk/console/package.json",
-    "sdk/prettier/package-lock.json",
-    "sdk/prettier/package.json",
-)
 
 PUBLISH_TARGETS = ("java", "ts", "py", "go", "cli", "console", "prettier")
 
@@ -130,15 +110,29 @@ def _version_change_diff_base(repo_root: Path, ref: str = "HEAD") -> str | None:
     return commits[1]
 
 
+def _resolved_commit_sha(repo_root: Path, ref: str) -> str:
+    try:
+        return _git_stdout(repo_root, "rev-parse", ref).strip()
+    except subprocess.CalledProcessError as exc:
+        raise click.ClickException(f"Unable to resolve git ref {ref!r}: {exc.stderr.strip()}")
+
+
 def changed_paths_since_last_version_change(repo_root: Path | str = ".", ref: str = "HEAD") -> list[str]:
     repo_root = find_repo_root(repo_root)
+    version_change_commits = _version_change_commits(repo_root, ref)
     base_commit = _version_change_diff_base(repo_root, ref)
+    end_ref = ref
+    if version_change_commits and _resolved_commit_sha(repo_root, ref) == version_change_commits[0]:
+        try:
+            end_ref = _git_stdout(repo_root, "rev-parse", f"{ref}^").strip()
+        except subprocess.CalledProcessError:
+            end_ref = ref
 
     try:
         if base_commit is None:
-            stdout = _git_stdout(repo_root, "ls-tree", "-r", "--name-only", ref)
+            stdout = _git_stdout(repo_root, "ls-tree", "-r", "--name-only", end_ref)
         else:
-            stdout = _git_stdout(repo_root, "diff", "--name-only", f"{base_commit}..{ref}")
+            stdout = _git_stdout(repo_root, "diff", "--name-only", f"{base_commit}..{end_ref}")
     except subprocess.CalledProcessError as exc:
         raise click.ClickException(f"Unable to compute changed paths for release planning at {ref}: {exc.stderr.strip()}")
 
@@ -147,7 +141,7 @@ def changed_paths_since_last_version_change(repo_root: Path | str = ".", ref: st
             normalized
             for path in stdout.splitlines()
             for normalized in [_normalize_repo_path(path)]
-            if normalized and normalized not in VERSION_BUMP_MANAGED_PATHS
+            if normalized and normalized != VERSION_FILE_RELATIVE_PATH.as_posix()
         }
     )
     return changed_paths
