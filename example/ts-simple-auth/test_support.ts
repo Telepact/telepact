@@ -16,6 +16,7 @@
 
 import { ChildProcessWithoutNullStreams, spawn } from 'node:child_process';
 import { once } from 'node:events';
+import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 export type PythonServer = {
@@ -30,9 +31,10 @@ function delay(ms: number): Promise<void> {
 }
 
 export async function startPythonServer(): Promise<PythonServer> {
-    const cwd = fileURLToPath(new URL('..', import.meta.url));
-    const python = fileURLToPath(new URL('../.venv/bin/python', import.meta.url));
-    const script = fileURLToPath(new URL('../server.py', import.meta.url));
+    const here = path.dirname(fileURLToPath(import.meta.url));
+    const cwd = path.resolve(here, '..');
+    const python = path.join(cwd, '.venv', 'bin', 'python');
+    const script = path.join(cwd, 'server.py');
     const child = spawn(python, ['-u', script, '--port', '0'], { cwd }) as ChildProcessWithoutNullStreams;
 
     let stdout = '';
