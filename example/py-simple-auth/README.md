@@ -6,10 +6,11 @@ shift board and shows a simple auth flow with hard-coded credentials.
 It demonstrates three common auth patterns:
 
 - `on_auth` normalizes a hard-coded username/password into internal headers like
-  `@employeeId` and `@station`
+  `@employeeId` and `@station`, and throws if authentication fails
 - middleware logs those normalized identity headers and catches a custom
   `Unauthorized` exception to coerce it into `ErrorUnauthorized_`
-- any exception thrown by `on_auth` becomes `ErrorUnauthenticated_` on the client
+- completion of `on_auth` means identity normalization succeeded for the
+  authenticated route
 
 Hard-coded credentials used by the example:
 

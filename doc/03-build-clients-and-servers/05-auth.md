@@ -115,6 +115,14 @@ Inside the server:
 3. `onAuth` returns normalized internal headers
 4. middleware and function routes use those normalized headers for policy and business logic
 
+Convention:
+
+- if `onAuth` returns normally, authentication succeeded and the returned headers are the normalized identity
+- if credentials are invalid or the auth backend fails, throw from `onAuth` instead of returning empty or partial identity and checking later in shared middleware
+
+That keeps the auth boundary attached to the authenticated route map and avoids
+accidentally turning shared middleware into a gate for unauthenticated routes.
+
 Define protected handlers in the authenticated route map and public handlers in
 the unauthenticated route map. Telepact automatically keeps `fn.ping_` and
 `fn.api_` unauthenticated.

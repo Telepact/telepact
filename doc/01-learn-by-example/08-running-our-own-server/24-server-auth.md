@@ -35,15 +35,13 @@ def on_auth(headers: dict[str, object]) -> dict[str, object]:
     auth = headers.get('@auth_')
     if auth == {'Password': {'password': 'swordfish'}}:
         return {'@role': 'admin'}
-    return {}
+    raise ValueError('missing or invalid credentials')
 
 
 options.on_auth = on_auth
 
 
 async def secret(function_name: str, request_message: Message) -> Message:
-    if request_message.headers.get('@role') != 'admin':
-        return Message({}, {'ErrorUnauthenticated_': {'message!': 'missing or invalid credentials'}})
     return Message({}, {'Ok_': {'message': 'welcome'}})
 ```
 
@@ -53,9 +51,11 @@ The important shape here is:
 2. validate them in `on_auth`
 3. return normalized identity or authorization headers for later handlers
 4. register protected handlers in the authenticated route map so missing
-   credentials automatically become `ErrorUnauthenticated_`
+    credentials automatically become `ErrorUnauthenticated_`
 
 That normalization step is the core Telepact server-side auth pattern.
+If validation fails, throw in `on_auth` rather than returning an empty identity
+and checking for it later in shared middleware.
 
 ## Call it
 

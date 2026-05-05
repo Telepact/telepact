@@ -6,10 +6,11 @@ server and shows a simple auth flow with hard-coded credentials.
 It demonstrates the same auth boundary as the Python example:
 
 - `on_auth` maps a hard-coded username/password from `@auth_` into normalized
-  identity headers
+  identity headers, and throws if authentication fails
 - middleware logs those normalized identity headers and catches a custom
   `Unauthorized` exception to coerce it into `ErrorUnauthorized_`
-- any exception thrown by `on_auth` becomes `ErrorUnauthenticated_` on the client
+- completion of `on_auth` means identity normalization succeeded for the
+  authenticated route
 
 Hard-coded credentials used by the example:
 
