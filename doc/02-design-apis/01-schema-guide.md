@@ -254,7 +254,7 @@ struct definitions, with a few exceptions:
 -   additional header fields not specified in the definition will be allowed
     during validation
 
-Header names therefore follow the pattern `^@[a-z][a-zA-Z0-9_]*$`.
+Header names therefore follow the pattern `^\+[a-z][a-zA-Z0-9_]*$`.
 
 Headers definitions cannot be used in type expressions.
 

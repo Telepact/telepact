@@ -35,7 +35,7 @@ function formatKey(key: string): string {
 }
 
 function isTelepactFieldName(key: string): boolean {
-    return /^@[a-z][a-zA-Z0-9_]*$/.test(key) || /^[a-z][a-zA-Z0-9_]*!?$/.test(key);
+    return /^\+[a-z][a-zA-Z0-9_]*$/.test(key) || /^[a-z][a-zA-Z0-9_]*!?$/.test(key);
 }
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {

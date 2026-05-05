@@ -31,7 +31,7 @@ def parse_field(path: list[object], field_declaration: str, type_declaration_val
     from ...internal.schema.GetTypeUnexpectedParseFailure import get_type_unexpected_parse_failure
     from ...internal.schema.ParseTypeDeclaration import parse_type_declaration
 
-    header_regex_string = r"^@[a-z][a-zA-Z0-9_]*$"
+    header_regex_string = r"^\\+[a-z][a-zA-Z0-9_]*$"
     regex_string = r"^([a-z][a-zA-Z0-9_]*)(!)?$"
     regex_to_use = header_regex_string if is_header else regex_string
     regex = re.compile(regex_to_use)
