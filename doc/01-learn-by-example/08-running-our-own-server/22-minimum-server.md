@@ -43,7 +43,8 @@ async def hello(function_name: str, request_message: Message) -> Message:
     return Message({}, {'Ok_': {'message': f'Hello, {name}!'}})
 
 
-function_router = FunctionRouter({'fn.hello': hello})
+function_router = FunctionRouter()
+function_router.register_unauthenticated_routes({'fn.hello': hello})
 telepact_server = Server(schema, function_router, options)
 
 

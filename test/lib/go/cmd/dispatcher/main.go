@@ -702,7 +702,8 @@ func startSchemaTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscrip
 		}
 	}
 
-	functionRouter := telepact.NewFunctionRouter(functionRoutes)
+	functionRouter := telepact.NewFunctionRouter()
+	functionRouter.RegisterUnauthenticatedRoutes(functionRoutes)
 	server, err := telepact.NewServer(schema, functionRouter, options)
 	if err != nil {
 		return nil, err
@@ -923,9 +924,11 @@ func startTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscription, 
 			return forwardRequest(requestMessage)
 		})
 	}
-	functionRouter := telepact.NewFunctionRouter(functionRoutes)
+	functionRouter := telepact.NewFunctionRouter()
 	if cfg.AuthRequired {
-		functionRouter = telepact.NewFunctionRouter(functionRoutes, map[string]telepact.FunctionRoute{})
+		functionRouter.RegisterAuthenticatedRoutes(functionRoutes)
+	} else {
+		functionRouter.RegisterUnauthenticatedRoutes(functionRoutes)
 	}
 	server, err := telepact.NewServer(tele, functionRouter, options)
 	if err != nil {
@@ -946,9 +949,11 @@ func startTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscription, 
 			return forwardRequest(requestMessage)
 		})
 	}
-	alternateFunctionRouter := telepact.NewFunctionRouter(alternateFunctionRoutes)
+	alternateFunctionRouter := telepact.NewFunctionRouter()
 	if cfg.AuthRequired {
-		alternateFunctionRouter = telepact.NewFunctionRouter(alternateFunctionRoutes, map[string]telepact.FunctionRoute{})
+		alternateFunctionRouter.RegisterAuthenticatedRoutes(alternateFunctionRoutes)
+	} else {
+		alternateFunctionRouter.RegisterUnauthenticatedRoutes(alternateFunctionRoutes)
 	}
 	alternateServer, err := telepact.NewServer(alternateTele, alternateFunctionRouter, alternateOptions)
 	if err != nil {

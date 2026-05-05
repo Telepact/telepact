@@ -25,21 +25,12 @@ type FunctionRouter struct {
 	unauthenticatedFunctionRoutes map[string]FunctionRoute
 }
 
-// NewFunctionRouter constructs a FunctionRouter from the supplied function routes.
-func NewFunctionRouter(authenticatedRoutes map[string]FunctionRoute, unauthenticatedRoutes ...map[string]FunctionRoute) *FunctionRouter {
-	router := &FunctionRouter{
+// NewFunctionRouter constructs an empty FunctionRouter.
+func NewFunctionRouter() *FunctionRouter {
+	return &FunctionRouter{
 		authenticatedFunctionRoutes:   make(map[string]FunctionRoute),
 		unauthenticatedFunctionRoutes: make(map[string]FunctionRoute),
 	}
-
-	if len(unauthenticatedRoutes) == 0 {
-		router.RegisterUnauthenticatedRoutes(authenticatedRoutes)
-		return router
-	}
-
-	router.RegisterAuthenticatedRoutes(authenticatedRoutes)
-	router.RegisterUnauthenticatedRoutes(unauthenticatedRoutes[0])
-	return router
 }
 
 // RegisterRoutes merges the supplied routes into the router, replacing any existing routes with the same name.

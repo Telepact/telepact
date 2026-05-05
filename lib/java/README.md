@@ -57,7 +57,8 @@ options.middleware = (requestMessage, functionRouter) -> {
         log.info("Function finished", Map.of("function", functionName));
     }
 };
-var functionRouter = new FunctionRouter(functionRoutes);
+var functionRouter = new FunctionRouter();
+functionRouter.registerUnauthenticatedRoutes(functionRoutes);
 var server = new Server(schema, functionRouter, options);
 
 

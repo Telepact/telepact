@@ -73,7 +73,8 @@ func main() {
         defer log.Printf("Function finished: %s", functionName)
         return functionRouter.Route(request)
     }
-	functionRouter := telepact.NewFunctionRouter(functionRoutes)
+	functionRouter := telepact.NewFunctionRouter()
+	functionRouter.RegisterUnauthenticatedRoutes(functionRoutes)
 	server, err := telepact.NewServer(schema, functionRouter, serverOptions)
 	if err != nil {
 		log.Fatal(err)

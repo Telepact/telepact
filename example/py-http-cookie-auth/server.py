@@ -53,7 +53,8 @@ async def me(function_name: str, request_message: Message) -> Message:
     })
 
 
-function_router = FunctionRouter({'fn.me': me}, {})
+function_router = FunctionRouter()
+function_router.register_authenticated_routes({'fn.me': me})
 telepact_server = Server(schema, function_router, options)
 
 

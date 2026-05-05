@@ -23,15 +23,9 @@ export class FunctionRouter {
     authenticatedFunctionRoutes: FunctionRoutes;
     unauthenticatedFunctionRoutes: FunctionRoutes;
 
-    constructor(authenticatedFunctionRoutes: FunctionRoutes, unauthenticatedFunctionRoutes: FunctionRoutes = {}) {
-        if (arguments.length === 1) {
-            this.authenticatedFunctionRoutes = {};
-            this.unauthenticatedFunctionRoutes = { ...authenticatedFunctionRoutes };
-            return;
-        }
-
-        this.authenticatedFunctionRoutes = { ...authenticatedFunctionRoutes };
-        this.unauthenticatedFunctionRoutes = { ...unauthenticatedFunctionRoutes };
+    constructor() {
+        this.authenticatedFunctionRoutes = {};
+        this.unauthenticatedFunctionRoutes = {};
     }
 
     registerAuthenticatedRoutes(functionRoutes: FunctionRoutes): void {

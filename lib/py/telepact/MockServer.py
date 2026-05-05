@@ -62,7 +62,8 @@ class MockServer:
 
         telepact_schema = TelepactSchema(mock_telepact_schema.original, mock_telepact_schema.full, mock_telepact_schema.parsed,
                                          mock_telepact_schema.parsed_request_headers, mock_telepact_schema.parsed_response_headers)
-        function_router = FunctionRouter(self._create_function_routes(telepact_schema))
+        function_router = FunctionRouter()
+        function_router.register_unauthenticated_routes(self._create_function_routes(telepact_schema))
 
         self.server = Server(
             telepact_schema, function_router, server_options)

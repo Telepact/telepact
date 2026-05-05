@@ -89,7 +89,8 @@ func NewMockServer(mockSchema *MockTelepactSchema, options *MockServerOptions) (
 		mockSchema.ParsedResponseHeaders,
 	)
 
-	functionRouter := NewFunctionRouter(ms.createFunctionRoutes(telepactSchema))
+	functionRouter := NewFunctionRouter()
+	functionRouter.RegisterUnauthenticatedRoutes(ms.createFunctionRoutes(telepactSchema))
 	server, err := NewServer(telepactSchema, functionRouter, serverOptions)
 	if err != nil {
 		return nil, err

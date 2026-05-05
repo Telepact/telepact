@@ -89,7 +89,8 @@ async def greet(function_name: str, request_message: Message) -> Message:
     return Message({}, {'Ok_': {'message': f'Hello {subject}!'}})
 
 options = Server.Options()
-function_router = FunctionRouter({'fn.greet': greet})
+function_router = FunctionRouter()
+function_router.register_unauthenticated_routes({'fn.greet': greet})
 server = Server(schema, function_router, options)
 
 async def http_handler(request):
@@ -175,7 +176,8 @@ async def greet(function_name: str, request_message: Message) -> Message:
     return Message({}, {'Ok_': {'message': f'Hello {subject}!'}})
 
 options = Server.Options()
-function_router = FunctionRouter({'fn.greet': greet})
+function_router = FunctionRouter()
+function_router.register_unauthenticated_routes({'fn.greet': greet})
 server = Server(schema, function_router, options)
 
 async def websocket_handler(websocket):

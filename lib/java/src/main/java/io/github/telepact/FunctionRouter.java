@@ -27,17 +27,9 @@ public class FunctionRouter {
     private final Map<String, FunctionRoute> authenticatedFunctionRoutes;
     private final Map<String, FunctionRoute> unauthenticatedFunctionRoutes;
 
-    public FunctionRouter(Map<String, FunctionRoute> functionRoutes) {
-        this(Map.of(), functionRoutes);
-    }
-
-    public FunctionRouter(
-            Map<String, FunctionRoute> authenticatedFunctionRoutes,
-            Map<String, FunctionRoute> unauthenticatedFunctionRoutes) {
+    public FunctionRouter() {
         this.authenticatedFunctionRoutes = new HashMap<>();
         this.unauthenticatedFunctionRoutes = new HashMap<>();
-        registerAuthenticatedRoutes(authenticatedFunctionRoutes);
-        registerUnauthenticatedRoutes(unauthenticatedFunctionRoutes);
     }
 
     public void registerRoutes(Map<String, FunctionRoute> functionRoutes) {

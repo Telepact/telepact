@@ -45,8 +45,10 @@ export class Server {
     serializer: Serializer;
 
     constructor(telepactSchema: TelepactSchema, functionRouter: FunctionRouter | FunctionRoutes, options: ServerOptions) {
-        const normalizedFunctionRouter =
-            functionRouter instanceof FunctionRouter ? functionRouter : new FunctionRouter(functionRouter);
+        const normalizedFunctionRouter = functionRouter instanceof FunctionRouter ? functionRouter : new FunctionRouter();
+        if (!(functionRouter instanceof FunctionRouter)) {
+            normalizedFunctionRouter.registerUnauthenticatedRoutes(functionRouter);
+        }
 
         normalizedFunctionRouter.registerUnauthenticatedRoutes(createInternalFunctionRoutes(telepactSchema));
         this.functionRouter = normalizedFunctionRouter;

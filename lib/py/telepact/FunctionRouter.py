@@ -24,18 +24,9 @@ FunctionRoute = Callable[[str, 'Message'], Awaitable['Message']]
 
 
 class FunctionRouter:
-    def __init__(
-        self,
-        authenticated_function_routes: dict[str, FunctionRoute],
-        unauthenticated_function_routes: dict[str, FunctionRoute] | None = None,
-    ) -> None:
-        if unauthenticated_function_routes is None:
-            self.authenticated_function_routes = {}
-            self.unauthenticated_function_routes = dict(authenticated_function_routes)
-            return
-
-        self.authenticated_function_routes = dict(authenticated_function_routes)
-        self.unauthenticated_function_routes = dict(unauthenticated_function_routes)
+    def __init__(self) -> None:
+        self.authenticated_function_routes: dict[str, FunctionRoute] = {}
+        self.unauthenticated_function_routes: dict[str, FunctionRoute] = {}
 
     def register_authenticated_routes(self, function_routes: dict[str, FunctionRoute]) -> None:
         for function_name, function_route in function_routes.items():

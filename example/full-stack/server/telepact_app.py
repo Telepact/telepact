@@ -278,11 +278,12 @@ async def trigger_failure(_function_name: str, request_message: Message) -> Mess
     raise RuntimeError(f'demo bug for {actor}')
 
 
-function_router = FunctionRouter({
+function_router = FunctionRouter()
+function_router.register_authenticated_routes({
     'fn.me': me,
     'fn.adminReport': admin_report,
     'fn.triggerFailure': trigger_failure,
-}, {})
+})
 telepact_server = Server(schema, function_router, options)
 
 

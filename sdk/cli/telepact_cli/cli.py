@@ -744,7 +744,9 @@ def demo_server(port: int) -> None:
 
     server_options = Server.Options()
     server_options.on_error = lambda e: print(e)
-    function_router = FunctionRouter(authenticated_function_routes, unauthenticated_function_routes)
+    function_router = FunctionRouter()
+    function_router.register_authenticated_routes(authenticated_function_routes)
+    function_router.register_unauthenticated_routes(unauthenticated_function_routes)
     telepact_server = Server(telepact_schema, function_router, server_options)
 
     print('Telepact Server running at /api')

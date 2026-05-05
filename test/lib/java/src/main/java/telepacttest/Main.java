@@ -412,7 +412,8 @@ public class Main {
             e.printStackTrace();
             System.err.flush();
         };
-        var functionRouter = new FunctionRouter(functionRoutes);
+        var functionRouter = new FunctionRouter();
+        functionRouter.registerUnauthenticatedRoutes(functionRoutes);
         var server = new Server(telepact, functionRouter, options);
 
         var dispatcher = connection.createDispatcher((msg) -> {
@@ -598,7 +599,12 @@ public class Main {
 
         var functionRoutes = useCodeGen ? codeGenHandler.functionRoutes()
                 : schemaFunctionRoutes(telepact, backdoorRoute);
-        var functionRouter = authRequired ? new FunctionRouter(functionRoutes, Map.of()) : new FunctionRouter(functionRoutes);
+        var functionRouter = new FunctionRouter();
+        if (authRequired) {
+            functionRouter.registerAuthenticatedRoutes(functionRoutes);
+        } else {
+            functionRouter.registerUnauthenticatedRoutes(functionRoutes);
+        }
         var server = new Server(telepact, functionRouter, options);
 
         var alternateOptions = new Server.Options();
@@ -608,9 +614,12 @@ public class Main {
 
         var alternateFunctionRoutes = useCodeGen ? codeGenHandler.functionRoutes()
                 : schemaFunctionRoutes(alternateTelepact, backdoorRoute);
-        var alternateFunctionRouter = authRequired
-                ? new FunctionRouter(alternateFunctionRoutes, Map.of())
-                : new FunctionRouter(alternateFunctionRoutes);
+        var alternateFunctionRouter = new FunctionRouter();
+        if (authRequired) {
+            alternateFunctionRouter.registerAuthenticatedRoutes(alternateFunctionRoutes);
+        } else {
+            alternateFunctionRouter.registerUnauthenticatedRoutes(alternateFunctionRoutes);
+        }
         var alternateServer = new Server(alternateTelepact, alternateFunctionRouter, alternateOptions);
 
         var dispatcher = connection.createDispatcher((msg) -> {
