@@ -1,7 +1,7 @@
 # ts-simple-auth
 
-Minimal TypeScript Telepact client example that starts a minimum Python server
-and shows a simple auth flow with hard-coded credentials.
+Minimal TypeScript Telepact client example that starts a minimum Python bakery
+server and shows a simple auth flow with hard-coded credentials.
 
 It demonstrates the same auth boundary as the Python example:
 
@@ -13,8 +13,8 @@ It demonstrates the same auth boundary as the Python example:
 
 Hard-coded credentials used by the example:
 
-- `admin` / `swordfish` -> `@userId=user-123`, `@role=admin`
-- `viewer` / `opensesame` -> `@userId=user-456`, `@role=viewer`
+- `lead-baker` / `sourdough` -> `@employeeId=baker-001`, `@station=oven`
+- `cashier` / `croissant` -> `@employeeId=cashier-002`, `@station=counter`
 - `explode` / `boom` -> throws in `on_auth`
 
 Browse the files:

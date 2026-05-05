@@ -30,35 +30,36 @@ test('simple auth example runs end to end against the python server', async () =
         };
         const client = new Client(adapter, new ClientOptions());
 
-        const meResponse = await client.request(new Message({
+        const shiftResponse = await client.request(new Message({
             '@auth_': {
                 'Password': {
-                    'username': 'admin',
-                    'password': 'swordfish',
+                    'username': 'lead-baker',
+                    'password': 'sourdough',
                 },
             },
         }, {
-            'fn.me': {},
+            'fn.myShift': {},
         }));
-        assert.equal(meResponse.getBodyTarget(), 'Ok_');
-        assert.deepEqual(meResponse.getBodyPayload(), {
-            'userId': 'user-123',
-            'role': 'admin',
+        assert.equal(shiftResponse.getBodyTarget(), 'Ok_');
+        assert.deepEqual(shiftResponse.getBodyPayload(), {
+            'employeeId': 'baker-001',
+            'station': 'oven',
+            'pastry': 'sesame loaf',
         });
 
-        const adminReportResponse = await client.request(new Message({
+        const specialResponse = await client.request(new Message({
             '@auth_': {
                 'Password': {
-                    'username': 'viewer',
-                    'password': 'opensesame',
+                    'username': 'cashier',
+                    'password': 'croissant',
                 },
             },
         }, {
-            'fn.adminReport': {},
+            'fn.approveSpecial': {},
         }));
-        assert.equal(adminReportResponse.getBodyTarget(), 'ErrorUnauthorized_');
-        assert.deepEqual(adminReportResponse.getBodyPayload(), {
-            'message!': 'admin role required',
+        assert.equal(specialResponse.getBodyTarget(), 'ErrorUnauthorized_');
+        assert.deepEqual(specialResponse.getBodyPayload(), {
+            'message!': 'oven station required to approve the special',
         });
 
         const authFailureResponse = await client.request(new Message({
@@ -69,15 +70,15 @@ test('simple auth example runs end to end against the python server', async () =
                 },
             },
         }, {
-            'fn.me': {},
+            'fn.myShift': {},
         }));
         assert.equal(authFailureResponse.getBodyTarget(), 'ErrorUnauthenticated_');
         assert.deepEqual(authFailureResponse.getBodyPayload(), {
             'message!': 'Valid authentication is required.',
         });
 
-        await waitForLog(server, '"event": "middleware.identity", "function": "fn.me", "role": "admin", "userId": "user-123"');
-        await waitForLog(server, '"event": "middleware.identity", "function": "fn.adminReport", "role": "viewer", "userId": "user-456"');
+        await waitForLog(server, '"employeeId": "baker-001", "event": "middleware.identity", "function": "fn.myShift", "station": "oven"');
+        await waitForLog(server, '"employeeId": "cashier-002", "event": "middleware.identity", "function": "fn.approveSpecial", "station": "counter"');
     } finally {
         await stopPythonServer(server);
     }

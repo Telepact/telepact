@@ -18,12 +18,13 @@
     - Password:
         username: "string"
         password: "string"
-- fn.me: {}
+- fn.myShift: {}
   ->:
     - Ok_:
-        userId: "string"
-        role: "string"
-- fn.adminReport: {}
+        employeeId: "string"
+        station: "string"
+        pastry: "string"
+- fn.approveSpecial: {}
   ->:
     - Ok_:
         message: "string"

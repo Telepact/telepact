@@ -23,8 +23,8 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 from telepact import FunctionRouter, Message, Server, TelepactSchema
 
-ADMIN_CREDENTIALS = {'username': 'admin', 'password': 'swordfish'}
-VIEWER_CREDENTIALS = {'username': 'viewer', 'password': 'opensesame'}
+LEAD_BAKER_CREDENTIALS = {'username': 'lead-baker', 'password': 'sourdough'}
+CASHIER_CREDENTIALS = {'username': 'cashier', 'password': 'croissant'}
 EXPLODING_CREDENTIALS = {'username': 'explode', 'password': 'boom'}
 
 MIDDLEWARE_EVENTS: list[dict[str, object | None]] = []
@@ -43,13 +43,13 @@ async def on_auth(headers: dict[str, object]) -> dict[str, object]:
         return {}
 
     if password == EXPLODING_CREDENTIALS:
-        raise RuntimeError('auth backend unavailable')
+        raise RuntimeError('bakery auth backend unavailable')
 
-    if password == ADMIN_CREDENTIALS:
-        return {'@userId': 'user-123', '@role': 'admin'}
+    if password == LEAD_BAKER_CREDENTIALS:
+        return {'@employeeId': 'baker-001', '@station': 'oven'}
 
-    if password == VIEWER_CREDENTIALS:
-        return {'@userId': 'user-456', '@role': 'viewer'}
+    if password == CASHIER_CREDENTIALS:
+        return {'@employeeId': 'cashier-002', '@station': 'counter'}
 
     return {}
 
@@ -61,8 +61,8 @@ def _log_identity(request_message: Message) -> None:
     event = {
         'event': 'middleware.identity',
         'function': request_message.get_body_target(),
-        'userId': request_message.headers.get('@userId'),
-        'role': request_message.headers.get('@role'),
+        'employeeId': request_message.headers.get('@employeeId'),
+        'station': request_message.headers.get('@station'),
     }
     MIDDLEWARE_EVENTS.append(event)
     print(json.dumps(event, sort_keys=True), flush=True)
@@ -71,12 +71,12 @@ def _log_identity(request_message: Message) -> None:
 async def middleware(request_message: Message, function_router: FunctionRouter) -> Message:
     _log_identity(request_message)
 
-    user_id = request_message.headers.get('@userId')
-    role = request_message.headers.get('@role')
-    if not isinstance(user_id, str) or not isinstance(role, str):
+    employee_id = request_message.headers.get('@employeeId')
+    station = request_message.headers.get('@station')
+    if not isinstance(employee_id, str) or not isinstance(station, str):
         return Message({}, {
             'ErrorUnauthenticated_': {
-                'message!': 'missing or invalid credentials',
+                'message!': 'missing or invalid bakery credentials',
             },
         })
 
@@ -93,30 +93,32 @@ async def middleware(request_message: Message, function_router: FunctionRouter) 
 options.middleware = middleware
 
 
-async def me(_function_name: str, request_message: Message) -> Message:
+async def my_shift(_function_name: str, request_message: Message) -> Message:
+    pastry = 'sesame loaf' if request_message.headers['@station'] == 'oven' else 'almond croissant'
     return Message({}, {
         'Ok_': {
-            'userId': request_message.headers['@userId'],
-            'role': request_message.headers['@role'],
+            'employeeId': request_message.headers['@employeeId'],
+            'station': request_message.headers['@station'],
+            'pastry': pastry,
         },
     })
 
 
-async def admin_report(_function_name: str, request_message: Message) -> Message:
-    if request_message.headers.get('@role') != 'admin':
-        raise Unauthorized('admin role required')
+async def approve_special(_function_name: str, request_message: Message) -> Message:
+    if request_message.headers.get('@station') != 'oven':
+        raise Unauthorized('oven station required to approve the special')
 
     return Message({}, {
         'Ok_': {
-            'message': 'sensitive admin report',
+            'message': 'special approved: cardamom morning bun',
         },
     })
 
 
 function_router = FunctionRouter()
 function_router.register_authenticated_routes({
-    'fn.me': me,
-    'fn.adminReport': admin_report,
+    'fn.myShift': my_shift,
+    'fn.approveSpecial': approve_special,
 })
 telepact_server = Server(schema, function_router, options)
 

@@ -38,35 +38,36 @@ async def run_example() -> None:
 
         client = Client(adapter, Client.Options())
 
-        me_response = await client.request(Message({
+        shift_response = await client.request(Message({
             '@auth_': {
                 'Password': {
-                    'username': 'admin',
-                    'password': 'swordfish',
+                    'username': 'lead-baker',
+                    'password': 'sourdough',
                 },
             },
         }, {
-            'fn.me': {},
+            'fn.myShift': {},
         }))
-        assert me_response.get_body_target() == 'Ok_'
-        assert me_response.get_body_payload() == {
-            'userId': 'user-123',
-            'role': 'admin',
+        assert shift_response.get_body_target() == 'Ok_'
+        assert shift_response.get_body_payload() == {
+            'employeeId': 'baker-001',
+            'station': 'oven',
+            'pastry': 'sesame loaf',
         }
 
-        admin_report_response = await client.request(Message({
+        special_response = await client.request(Message({
             '@auth_': {
                 'Password': {
-                    'username': 'viewer',
-                    'password': 'opensesame',
+                    'username': 'cashier',
+                    'password': 'croissant',
                 },
             },
         }, {
-            'fn.adminReport': {},
+            'fn.approveSpecial': {},
         }))
-        assert admin_report_response.get_body_target() == 'ErrorUnauthorized_'
-        assert admin_report_response.get_body_payload() == {
-            'message!': 'admin role required',
+        assert special_response.get_body_target() == 'ErrorUnauthorized_'
+        assert special_response.get_body_payload() == {
+            'message!': 'oven station required to approve the special',
         }
 
         auth_failure_response = await client.request(Message({
@@ -77,7 +78,7 @@ async def run_example() -> None:
                 },
             },
         }, {
-            'fn.me': {},
+            'fn.myShift': {},
         }))
         assert auth_failure_response.get_body_target() == 'ErrorUnauthenticated_'
         assert auth_failure_response.get_body_payload() == {
@@ -87,15 +88,15 @@ async def run_example() -> None:
         assert get_middleware_events() == [
             {
                 'event': 'middleware.identity',
-                'function': 'fn.me',
-                'userId': 'user-123',
-                'role': 'admin',
+                'function': 'fn.myShift',
+                'employeeId': 'baker-001',
+                'station': 'oven',
             },
             {
                 'event': 'middleware.identity',
-                'function': 'fn.adminReport',
-                'userId': 'user-456',
-                'role': 'viewer',
+                'function': 'fn.approveSpecial',
+                'employeeId': 'cashier-002',
+                'station': 'counter',
             },
         ]
     finally:
