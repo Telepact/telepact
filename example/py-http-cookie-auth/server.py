@@ -41,7 +41,7 @@ async def on_auth(headers: dict[str, object]) -> dict[str, object]:
     auth = headers.get('@auth_')
     session = auth.get('Session') if isinstance(auth, dict) else None
     token = session.get('token') if isinstance(session, dict) else None
-    return VALID_SESSIONS.get(token) if isinstance(token, str) else {}
+    return VALID_SESSIONS.get(token, {}) if isinstance(token, str) else {}
 
 
 options.on_auth = on_auth
