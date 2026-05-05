@@ -247,18 +247,18 @@ public class Main {
                 try {
                     if (useTestClient) {
                         try {
-                            var resetSeed = (Integer) requestHeaders.get("@setSeed");
+                            var resetSeed = (Integer) requestHeaders.get("+setSeed");
                             if (resetSeed != null) {
                                 testClient.setSeed(resetSeed);
                             }
-                            var expectedPseudoJsonBody = (Map<String, Object>) requestHeaders.get("@expectedPseudoJsonBody");
-                            var expectMatch = (Boolean) requestHeaders.getOrDefault("@expectMatch", true);
+                            var expectedPseudoJsonBody = (Map<String, Object>) requestHeaders.get("+expectedPseudoJsonBody");
+                            var expectMatch = (Boolean) requestHeaders.getOrDefault("+expectMatch", true);
                             response = testClient.assertRequest(request, expectedPseudoJsonBody, expectMatch);
                         } catch (Throwable e) {
                             e.printStackTrace();
                             var responseHeaders = new HashMap<String, Object>();
                             if (e instanceof AssertionError) {
-                                responseHeaders.put("@assertionError", true);
+                                responseHeaders.put("+assertionError", true);
                             }
                             response = new Message(responseHeaders, Map.of("ErrorUnknown_", Map.of()));
                         }
@@ -276,7 +276,7 @@ public class Main {
                     e.printStackTrace();
                     var responseHeaders = new HashMap<String, Object>();
                     if (e instanceof AssertionError) {
-                        responseHeaders.put("@assertionError", true);
+                        responseHeaders.put("+assertionError", true);
                     }
                     response = new Message(responseHeaders, Map.of("ErrorUnknown_", Map.of()));
                 }
@@ -585,7 +585,7 @@ public class Main {
         };
         options.onResponse = m -> {
             if (onErrorExpectation.get() != null && (onErrorFailed.get() || !onErrorObserved.get())) {
-                m.headers.put("@assertionError", true);
+                m.headers.put("+assertionError", true);
             }
             onErrorExpectation.set(null);
             onErrorFailed.set(false);

@@ -218,18 +218,18 @@ function startClientTestServer(
             try {
                 if (useTestClient) {
                     try {
-                        const resetSeed = requestHeaders["@setSeed"];
+                        const resetSeed = requestHeaders["+setSeed"];
                         if (resetSeed != null) {
                             testClient.setSeed(resetSeed);
                         }
-                        const expectedPseudoJsonBody = requestHeaders["@expectedPseudoJsonBody"];
-                        const expectMatch = requestHeaders["@expectMatch"] ?? true;
+                        const expectedPseudoJsonBody = requestHeaders["+expectedPseudoJsonBody"];
+                        const expectMatch = requestHeaders["+expectMatch"] ?? true;
                         response = await testClient.assertRequest(request, expectedPseudoJsonBody, expectMatch);
                     } catch (e) {
                         console.error(e);
                         const responseHeaders: Record<string, any> = {};
                         if (e instanceof Error && e.message.includes("Expected response body")) {
-                            responseHeaders["@assertionError"] = true;
+                            responseHeaders["+assertionError"] = true;
                         }
                         response = new Message(responseHeaders, { ErrorUnknown_: {} });
                     }
@@ -245,7 +245,7 @@ function startClientTestServer(
                 console.error(e);
                 const responseHeaders: Record<string, any> = {};
                 if (e instanceof Error && e.message.includes("Expected response body")) {
-                    responseHeaders["@assertionError"] = true;
+                    responseHeaders["+assertionError"] = true;
                 }
                 response = new Message(responseHeaders, { ErrorUnknown_: {} });
             } finally {
@@ -515,7 +515,7 @@ function startTestServer(
     };
     options.onResponse = (m: Message) => {
         if (onErrorExpectation.mode !== null && (onErrorExpectation.failed || !onErrorExpectation.observed)) {
-            m.headers["@assertionError"] = true;
+            m.headers["+assertionError"] = true;
         }
         onErrorExpectation.mode = null;
         onErrorExpectation.failed = false;

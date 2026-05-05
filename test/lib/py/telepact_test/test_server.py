@@ -168,17 +168,17 @@ async def start_client_test_server(connection: NatsClient, metrics: CollectorReg
         async def c() -> 'Message':
             if use_test_client:
                 try:
-                    reset_seed = request_headers.get("@setSeed")
+                    reset_seed = request_headers.get("+setSeed")
                     if reset_seed is not None:
                         test_client.set_seed(reset_seed)
-                    expected_pseudo_json_body = request_headers.get("@expectedPseudoJsonBody")
-                    expect_match = request_headers.get("@expectMatch", True)
+                    expected_pseudo_json_body = request_headers.get("+expectedPseudoJsonBody")
+                    expect_match = request_headers.get("+expectMatch", True)
                     return await test_client.assert_request(Message(request_headers, request_body), expected_pseudo_json_body, expect_match)
                 except Exception as e:
                     on_err(e)
                     response_headers = {}
                     if isinstance(e, AssertionError):
-                        response_headers["@assertionError"] = True
+                        response_headers["+assertionError"] = True
                     return Message(response_headers, {"ErrorUnknown_": {}})
             elif use_codegen and function_name == "fn.test":
                 headers, output = await generated_client.test(request_headers, fntest.Input(request_body))
@@ -193,7 +193,7 @@ async def start_client_test_server(connection: NatsClient, metrics: CollectorReg
             on_err(e)
             response_headers = {}
             if isinstance(e, AssertionError):
-                response_headers["@assertionError"] = True
+                response_headers["+assertionError"] = True
             response = Message(response_headers, {"ErrorUnknown_": {}})
 
         if find_bytes(response.body):
@@ -429,7 +429,7 @@ async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, 
         nonlocal on_error_observed
 
         if on_error_expectation is not None and (on_error_failed or not on_error_observed):
-            message.headers["@assertionError"] = True
+            message.headers["+assertionError"] = True
         on_error_expectation = None
         on_error_failed = False
         on_error_observed = False

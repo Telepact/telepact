@@ -906,7 +906,7 @@ func startTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscription, 
 			if msg.Headers == nil {
 				msg.Headers = map[string]any{}
 			}
-			msg.Headers["@assertionError"] = true
+			msg.Headers["+assertionError"] = true
 		}
 		onErrorExpectation = ""
 		onErrorFailed = false
@@ -1052,16 +1052,16 @@ func (d *Dispatcher) handleClientRequest(
 
 	switch {
 	case testClient != nil:
-		if seed, ok := intFromAny(headers["@setSeed"]); ok {
+		if seed, ok := intFromAny(headers["+setSeed"]); ok {
 			testClient.SetSeed(int32(seed))
 		}
 		expectMatch := true
-		if raw, ok := headers["@expectMatch"]; ok {
+		if raw, ok := headers["+expectMatch"]; ok {
 			expectMatch = boolValue(raw)
 		}
 
 		var expected map[string]any
-		if raw := headers["@expectedPseudoJsonBody"]; raw != nil {
+		if raw := headers["+expectedPseudoJsonBody"]; raw != nil {
 			if converted, err := asMap(raw); err == nil {
 				expected = converted
 			}
@@ -1070,7 +1070,7 @@ func (d *Dispatcher) handleClientRequest(
 		resp, err := testClient.AssertRequest(message, expected, expectMatch)
 		if err != nil {
 			d.logger.Printf("test client assertion failed: %v", err)
-			headers := map[string]any{"@assertionError": true}
+			headers := map[string]any{"+assertionError": true}
 			response = telepact.NewMessage(headers, map[string]any{"ErrorUnknown_": map[string]any{}})
 		} else {
 			response = resp

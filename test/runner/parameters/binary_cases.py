@@ -33,10 +33,10 @@ _BINARY_CHECKSUM = 1059755324
 cases = {
     'binary': [
         [[{'+bin_': []}, {'fn.ping_': {}}], [{'+enc_': _BINARY_ENCODING, '+bin_': [_BINARY_CHECKSUM]}, {0: {}}]],
-        [[{'@msgpack': True, '+bin_': [0]}, {0: {}}], [{}, {'ErrorParseFailure_': {'reasons': [{'IncompatibleBinaryEncoding': {}}]}}]],
-        [[{'@msgpack': True, '+bin_': [_BINARY_CHECKSUM]}, {5: {}}], [{'+bin_': [_BINARY_CHECKSUM]}, {0: {}}]],
-        [[{'@msgpack': True, '+bin_': [_BINARY_CHECKSUM], '+pac_': True, '+ok_': {'data': [{'id': 1, 'name': 'one'}, {'id': 2, 'name': 'two'}]}}, {4: {}}], [{'+bin_': [_BINARY_CHECKSUM], '+pac_': True}, {0: {2: [ExtType(17, b''), [None, 6, 9], [1, 'one'], [2, 'two']]}}]],
-        [[{'@msgpack': True, '+bin_': [_BINARY_CHECKSUM]}, {255: {}}], [{}, {'ErrorParseFailure_': {'reasons': [{'BinaryDecodeFailure': {}}]}}]],
+        [[{'+msgpack': True, '+bin_': [0]}, {0: {}}], [{}, {'ErrorParseFailure_': {'reasons': [{'IncompatibleBinaryEncoding': {}}]}}]],
+        [[{'+msgpack': True, '+bin_': [_BINARY_CHECKSUM]}, {5: {}}], [{'+bin_': [_BINARY_CHECKSUM]}, {0: {}}]],
+        [[{'+msgpack': True, '+bin_': [_BINARY_CHECKSUM], '+pac_': True, '+ok_': {'data': [{'id': 1, 'name': 'one'}, {'id': 2, 'name': 'two'}]}}, {4: {}}], [{'+bin_': [_BINARY_CHECKSUM], '+pac_': True}, {0: {2: [ExtType(17, b''), [None, 6, 9], [1, 'one'], [2, 'two']]}}]],
+        [[{'+msgpack': True, '+bin_': [_BINARY_CHECKSUM]}, {255: {}}], [{}, {'ErrorParseFailure_': {'reasons': [{'BinaryDecodeFailure': {}}]}}]],
         [[{'+bin_': None}, {'fn.ping_': {}}], [{}, {'ErrorInvalidRequestHeaders_': {'cases': [{'path': ['+bin_'], 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Array': {}}}}}]}}]],
         [[{'+bin_': False}, {'fn.ping_': {}}], [{}, {'ErrorInvalidRequestHeaders_': {'cases': [{'path': ['+bin_'], 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Array': {}}}}}]}}]],
         [[{'+bin_': 0}, {'fn.ping_': {}}], [{}, {'ErrorInvalidRequestHeaders_': {'cases': [{'path': ['+bin_'], 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Array': {}}}}}]}}]],
