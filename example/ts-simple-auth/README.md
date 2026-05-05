@@ -1,6 +1,6 @@
 # ts-simple-auth
 
-Minimal TypeScript Telepact example that starts a minimum Python Telepact server
+Minimal TypeScript Telepact example that starts a minimal Python Telepact server
 and calls it with hard-coded credentials in `@auth_`.
 
 - define a credential shape in `union.Auth_`

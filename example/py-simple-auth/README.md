@@ -1,6 +1,6 @@
 # py-simple-auth
 
-Minimal Python Telepact example that starts a small Python Telepact server and
+Minimal Python Telepact example that starts a minimal Python Telepact server and
 matches hard-coded credentials sent in `@auth_`.
 
 - define a credential shape in `union.Auth_`
