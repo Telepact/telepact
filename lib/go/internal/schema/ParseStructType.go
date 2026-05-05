@@ -16,7 +16,11 @@
 
 package schema
 
-import "github.com/telepact/telepact/lib/go/internal/types"
+import (
+	"strings"
+
+	"github.com/telepact/telepact/lib/go/internal/types"
+)
 
 // ParseStructType parses a struct type definition from pseudo JSON.
 func ParseStructType(path []any, structDefinition map[string]any, schemaKey string, ignoreKeys []string, ctx *ParseContext) (*types.TStruct, error) {
@@ -34,6 +38,11 @@ func ParseStructType(path []any, structDefinition map[string]any, schemaKey stri
 	delete(otherKeys, schemaKey)
 	delete(otherKeys, "///")
 	delete(otherKeys, "_ignoreIfDuplicate")
+	for key := range otherKeys {
+		if strings.HasPrefix(key, "@") {
+			delete(otherKeys, key)
+		}
+	}
 	for _, key := range ignoreKeys {
 		delete(otherKeys, key)
 	}

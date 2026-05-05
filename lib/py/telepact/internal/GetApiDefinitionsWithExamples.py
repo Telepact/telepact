@@ -252,7 +252,7 @@ def _get_default_fn_scope(parsed_types: dict[str, 'TType']) -> str:
 
 def _get_schema_key(definition: dict[str, object]) -> str:
     for key in definition.keys():
-        if key not in {'///', '->', '_errors'}:
+        if key not in {'///', '->', '_errors'} and not key.startswith('@'):
             return key
 
     raise ValueError(f'Schema entry has no schema key: {definition}')

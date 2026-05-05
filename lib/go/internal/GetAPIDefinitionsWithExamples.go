@@ -390,7 +390,7 @@ func getDefaultFnScope(parsedTypes map[string]types.TType) string {
 
 func getSchemaKey(definition map[string]any) string {
 	for key := range definition {
-		if key != "///" && key != "->" && key != "_errors" {
+		if key != "///" && key != "->" && key != "_errors" && !strings.HasPrefix(key, "@") {
 			return key
 		}
 	}

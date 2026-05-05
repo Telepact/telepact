@@ -79,16 +79,17 @@ public class ParseFunctionType {
 
 
         final var errorsRegexKey = "_errors";
+        final var isInternal = schemaKey.endsWith("_") || Boolean.TRUE.equals(functionDefinitionAsParsedJson.get("@internal_"));
 
         final var regexPath = new ArrayList<>(path);
         regexPath.add(errorsRegexKey);
 
         String errorsRegex = null;
-        if (functionDefinitionAsParsedJson.containsKey(errorsRegexKey) && !schemaKey.endsWith("_")) {
+        if (functionDefinitionAsParsedJson.containsKey(errorsRegexKey) && !isInternal) {
             parseFailures.add(new SchemaParseFailure(ctx.documentName, regexPath, "ObjectKeyDisallowed", Map.of()));
         } else {
             final Object errorsRegexInit = functionDefinitionAsParsedJson.getOrDefault(errorsRegexKey,
-                    "^errors\\..*$");
+                    isInternal ? "^errors\\.Validation_$" : "^errors\\..*$");
 
             if (!(errorsRegexInit instanceof String)) {
                 final List<SchemaParseFailure> thisParseFailures = getTypeUnexpectedParseFailure(

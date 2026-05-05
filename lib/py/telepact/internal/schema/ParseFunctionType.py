@@ -74,16 +74,17 @@ def parse_function_errors_regex(path: list[object], function_definition_as_parse
     parse_failures = []
 
     errors_regex_key = "_errors"
+    is_internal = schema_key.endswith("_") or function_definition_as_parsed_json.get("@internal_") is True
 
     regex_path = path + [errors_regex_key]
 
     errors_regex: str | None = None
-    if errors_regex_key in function_definition_as_parsed_json and not schema_key.endswith("_"):
+    if errors_regex_key in function_definition_as_parsed_json and not is_internal:
         parse_failures.append(SchemaParseFailure(
             ctx.document_name, regex_path, "ObjectKeyDisallowed", {}))
     else:
         errors_regex_init = function_definition_as_parsed_json.get(
-            errors_regex_key, "^errors\\..*$")
+            errors_regex_key, "^errors\\.Validation_$" if is_internal else "^errors\\..*$")
 
         if not isinstance(errors_regex_init, str):
             this_parse_failures = get_type_unexpected_parse_failure(

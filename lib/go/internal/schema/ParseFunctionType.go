@@ -83,12 +83,21 @@ func ParseFunctionErrorsRegex(path []any, functionDefinition map[string]any, sch
 
 	parseFailures := make([]*SchemaParseFailure, 0)
 	errorsRegexKey := "_errors"
+	isInternal := strings.HasSuffix(schemaKey, "_")
+	if value, exists := functionDefinition["@internal_"]; exists {
+		if internal, ok := value.(bool); ok && internal {
+			isInternal = true
+		}
+	}
 	regexPath := append(append([]any{}, path...), errorsRegexKey)
 
 	errorsRegex := "^errors\\..*$"
+	if isInternal {
+		errorsRegex = "^errors\\.Validation_$"
+	}
 
 	if value, exists := functionDefinition[errorsRegexKey]; exists {
-		if !strings.HasSuffix(schemaKey, "_") {
+		if !isInternal {
 			parseFailures = append(parseFailures, NewSchemaParseFailure(ctx.DocumentName, regexPath, "ObjectKeyDisallowed", map[string]any{}))
 		}
 

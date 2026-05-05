@@ -34,6 +34,11 @@ export function parseStructType(
     otherKeys.delete(schemaKey);
     otherKeys.delete('///');
     otherKeys.delete('_ignoreIfDuplicate');
+    for (const key of otherKeys) {
+        if (key.startsWith('@')) {
+            otherKeys.delete(key);
+        }
+    }
     for (const ignoreKey of ignoreKeys) {
         otherKeys.delete(ignoreKey);
     }

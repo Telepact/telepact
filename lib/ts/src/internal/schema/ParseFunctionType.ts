@@ -80,17 +80,20 @@ export function parseFunctionErrorsRegex(
     const parseFailures: SchemaParseFailure[] = [];
 
     const errorsRegexKey = '_errors';
+    const isInternal = schemaKey.endsWith('_') || functionDefinitionAsParsedJson['@internal_'] === true;
 
     const regexPath = [...path, errorsRegexKey];
 
     let errorsRegex: string | null = null;
-    if (errorsRegexKey in functionDefinitionAsParsedJson && !schemaKey.endsWith('_')) {
+    if (errorsRegexKey in functionDefinitionAsParsedJson && !isInternal) {
         parseFailures.push(new SchemaParseFailure(ctx.documentName, regexPath, 'ObjectKeyDisallowed', {}));
     } else {
         const errorsRegexInit =
             errorsRegexKey in functionDefinitionAsParsedJson
                 ? functionDefinitionAsParsedJson[errorsRegexKey]
-                : '^errors\\..*$';
+                : isInternal
+                  ? '^errors\\.Validation_$'
+                  : '^errors\\..*$';
 
         if (typeof errorsRegexInit !== 'string') {
             const thisParseFailures = getTypeUnexpectedParseFailure(

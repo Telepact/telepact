@@ -36,6 +36,7 @@ def parse_struct_type(path: list[object], struct_definition_as_pseudo_json: dict
     other_keys.discard(schema_key)
     other_keys.discard("///")
     other_keys.discard("_ignoreIfDuplicate")
+    other_keys = {key for key in other_keys if not key.startswith("@")}
     for ignore_key in ignore_keys:
         other_keys.discard(ignore_key)
 
