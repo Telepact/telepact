@@ -14,6 +14,7 @@
 #|  limitations under the License.
 #|
 
+import contextlib
 import sys
 import tempfile
 import unittest
@@ -37,6 +38,16 @@ from telepact_project_cli.commands.repository_automation import (
     _verify_pull_request_ci,
     _wait_for_pr_stable,
 )
+
+
+@contextlib.contextmanager
+def _pushd(path: Path):
+    old_cwd = Path.cwd()
+    os.chdir(path)
+    try:
+        yield
+    finally:
+        os.chdir(old_cwd)
 
 
 class RepositoryAutomationTests(unittest.TestCase):
@@ -325,9 +336,7 @@ version = "1.0.0-alpha.318"
         with tempfile.TemporaryDirectory() as tmp_dir:
             repo_root = Path(tmp_dir)
             (repo_root / "VERSION.txt").write_text("1.0.0-alpha.214", encoding="utf-8")
-            old_cwd = os.getcwd()
-            os.chdir(repo_root)
-            try:
+            with _pushd(repo_root):
                 with (
                     mock.patch("telepact_project_cli.commands.repository_automation.Github", return_value=github_client),
                     mock.patch("telepact_project_cli.commands.repository_automation.compute_release_manifest_from_git") as compute_release_manifest_from_git,
@@ -346,8 +355,6 @@ version = "1.0.0-alpha.318"
                             "GITHUB_REPOSITORY": "Telepact/telepact",
                         },
                     )
-            finally:
-                os.chdir(old_cwd)
 
         self.assertEqual(result.exit_code, 0, msg=result.output)
         compute_release_manifest_from_git.assert_not_called()

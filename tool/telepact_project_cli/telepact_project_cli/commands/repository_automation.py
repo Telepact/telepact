@@ -26,7 +26,7 @@ from github import Github, GithubException
 from github.PullRequest import PullRequest
 
 from .doc_versions import _read_go_module_path, _read_maven_gav, _read_package_json_name, _read_pyproject_name
-from .project_version import create_version_bump_commit
+from .project_version import _bump_version, create_version_bump_commit
 from ..release_plan import (
     compute_release_manifest_from_git,
     find_repo_root,
@@ -632,12 +632,10 @@ def open_version_bump_pr() -> None:
 
     repo_root = find_repo_root(Path("."))
     current_version = (repo_root / "VERSION.txt").read_text(encoding="utf-8").strip()
-
     github_client = Github(github_token)
     repo = github_client.get_repo(github_repository)
     owner_login = repo.owner.login
-    version_parts = current_version.rsplit(".", 1)
-    next_version = f"{version_parts[0]}.{int(version_parts[1]) + 1}"
+    next_version = _bump_version(current_version)
     branch_name = f"{VERSION_BUMP_BRANCH_PREFIX}{next_version}"
     existing_pr = next(iter(repo.get_pulls(state="open", head=f"{owner_login}:{branch_name}", base=MAIN_BRANCH)), None)
     if existing_pr is not None:
