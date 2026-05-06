@@ -21,6 +21,9 @@ on:
     types:
       - published
 
+permissions:
+  contents: read
+
 jobs:
   resolve-release-plan:
     runs-on: ubuntu-latest
@@ -42,12 +45,41 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v6
 
+      - name: Download release manifest asset
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import sys
+          import urllib.request
+
+          event = json.loads(open(os.environ["GITHUB_EVENT_PATH"], encoding="utf-8").read())
+          assets = event["release"].get("assets", [])
+          asset = next((item for item in assets if item.get("name") == "release-manifest.json"), None)
+          if asset is None:
+              raise SystemExit("release-manifest.json asset is missing from the release.")
+
+          request = urllib.request.Request(
+              asset["url"],
+              headers={
+                  "Accept": "application/octet-stream",
+                  "Authorization": f"Bearer {os.environ['GITHUB_TOKEN']}",
+                  "X-GitHub-Api-Version": "2022-11-28",
+              },
+          )
+          with urllib.request.urlopen(request) as response, open("release-manifest.json", "wb") as manifest_file:
+              manifest_file.write(response.read())
+          PY
+
       - name: Resolve release manifest
         id: resolve
         run: |
           ./tool/telepact-project publish-targets \
             --release-tag "${{ github.event.release.tag_name }}" \
             --release-body "${{ github.event.release.body }}" \
+            --release-manifest-path release-manifest.json \
             --github-output "$GITHUB_OUTPUT"
 
   publish-java:

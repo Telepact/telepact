@@ -17,6 +17,7 @@
 import os
 import re
 import subprocess
+import tempfile
 import time
 from pathlib import Path
 
@@ -31,6 +32,7 @@ from ..release_plan import (
     compute_release_manifest_from_git,
     find_repo_root,
     load_release_target_rules,
+    render_release_manifest_for_stdout,
     render_release_manifest_from_git,
     resolve_publish_targets,
 )
@@ -46,6 +48,7 @@ RELEASE_TARGET_ASSET_DIRECTORY_MAP = {
 }
 
 MAX_ASSETS = 10
+RELEASE_MANIFEST_ASSET_NAME = "release-manifest.json"
 MAIN_BRANCH = "main"
 WAIT_TIMEOUT_SECONDS = 20 * 60  # 20 minutes
 WAIT_INTERVAL_SECONDS = 10
@@ -582,17 +585,28 @@ def release() -> None:
         click.echo(f"Release created: {release.html_url}")
 
         asset_count = 0
-        for target in release_targets:
-            asset_directories = RELEASE_TARGET_ASSET_DIRECTORY_MAP.get(target, [])
-            for asset_directory in asset_directories:
-                if os.path.exists(asset_directory):
-                    for file_name in os.listdir(asset_directory):
-                        if asset_count >= MAX_ASSETS:
-                            click.echo("Maximum asset upload limit reached. Aborting.")
-                            return
-                        file_path = os.path.join(asset_directory, file_name)
-                        if os.path.isfile(file_path):
-                            with open(file_path, "rb") as asset_file:
+        with tempfile.NamedTemporaryFile("w", encoding="utf-8", suffix=".json", delete=False) as manifest_file:
+            manifest_file.write(render_release_manifest_for_stdout(release_manifest))
+            manifest_path = manifest_file.name
+        try:
+            release.upload_asset(
+                path=manifest_path,
+                name=RELEASE_MANIFEST_ASSET_NAME,
+                label=RELEASE_MANIFEST_ASSET_NAME,
+            )
+            asset_count += 1
+            click.echo(f"Uploaded asset: {RELEASE_MANIFEST_ASSET_NAME}")
+
+            for target in release_targets:
+                asset_directories = RELEASE_TARGET_ASSET_DIRECTORY_MAP.get(target, [])
+                for asset_directory in asset_directories:
+                    if os.path.exists(asset_directory):
+                        for file_name in os.listdir(asset_directory):
+                            if asset_count >= MAX_ASSETS:
+                                click.echo("Maximum asset upload limit reached. Aborting.")
+                                return
+                            file_path = os.path.join(asset_directory, file_name)
+                            if os.path.isfile(file_path):
                                 release.upload_asset(
                                     path=file_path,
                                     name=file_name,
@@ -600,8 +614,10 @@ def release() -> None:
                                 )
                                 asset_count += 1
                                 click.echo(f"Uploaded asset: {file_name} for target: {target}")
-                else:
-                    click.echo(f"Asset directory does not exist: {asset_directory} for target: {target}")
+                    else:
+                        click.echo(f"Asset directory does not exist: {asset_directory} for target: {target}")
+        finally:
+            Path(manifest_path).unlink(missing_ok=True)
 
     except Exception as e:
         click.echo(f"Failed to create release or upload assets: {e}")
@@ -610,12 +626,24 @@ def release() -> None:
 @click.command(name="publish-targets")
 @click.option("--release-tag", default=None, help="Expected release tag/version for validation.")
 @click.option("--release-body", default=None, help="Unused compatibility option; release targets come from the manifest.")
+@click.option(
+    "--release-manifest-path",
+    default=None,
+    type=click.Path(dir_okay=False, path_type=Path),
+    help="Path to the release-manifest.json asset to resolve publish targets from.",
+)
 @click.option("--github-output", default=None, type=click.Path(dir_okay=False, path_type=Path), help="Write key=value lines for GitHub Actions outputs.")
-def publish_targets(release_tag: str | None, release_body: str | None, github_output: Path | None) -> None:
+def publish_targets(
+    release_tag: str | None,
+    release_body: str | None,
+    release_manifest_path: Path | None,
+    github_output: Path | None,
+) -> None:
     outputs = resolve_publish_targets(
         Path("."),
         release_tag=release_tag,
         release_body=release_body,
+        release_manifest_path=release_manifest_path,
     )
 
     lines = [f"{key}={'true' if value else 'false'}" for key, value in outputs.items()]

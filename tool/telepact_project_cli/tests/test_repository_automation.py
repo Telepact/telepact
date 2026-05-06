@@ -15,6 +15,7 @@
 #|
 
 import contextlib
+import json
 import sys
 import tempfile
 import unittest
@@ -51,6 +52,85 @@ def _pushd(path: Path):
 
 
 class RepositoryAutomationTests(unittest.TestCase):
+    def test_release_command_uploads_release_manifest_asset(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            repo_root = Path(tmp_dir)
+            from test_release_plan import _commit_all, _init_repo, _pushd, _write_release_targets
+
+            _init_repo(repo_root)
+            _write_release_targets(repo_root)
+            (repo_root / "VERSION.txt").write_text("1.0.0-alpha.214", encoding="utf-8")
+            (repo_root / "lib" / "py").mkdir(parents=True)
+            (repo_root / "lib" / "py" / "pyproject.toml").write_text(
+                '[project]\nname = "telepact"\nversion = "1.0.0-alpha.214"\n',
+                encoding="utf-8",
+            )
+            (repo_root / "sdk" / "cli").mkdir(parents=True)
+            (repo_root / "sdk" / "cli" / "pyproject.toml").write_text(
+                '[project]\nname = "telepact-cli"\nversion = "1.0.0-alpha.214"\n',
+                encoding="utf-8",
+            )
+            _commit_all(repo_root, "Initial release")
+
+            (repo_root / "lib" / "py" / "impl.py").write_text("print('changed')\n", encoding="utf-8")
+            _commit_all(repo_root, "Feature change")
+
+            (repo_root / "VERSION.txt").write_text("1.0.0-alpha.215", encoding="utf-8")
+            (repo_root / "lib" / "py" / "pyproject.toml").write_text(
+                '[project]\nname = "telepact"\nversion = "1.0.0-alpha.215"\n',
+                encoding="utf-8",
+            )
+            (repo_root / "sdk" / "cli" / "pyproject.toml").write_text(
+                '[project]\nname = "telepact-cli"\nversion = "1.0.0-alpha.215"\n',
+                encoding="utf-8",
+            )
+            _commit_all(repo_root, "Bump version")
+
+            uploaded_assets: dict[str, str] = {}
+
+            def _upload_asset(*, path: str, name: str, label: str) -> None:
+                uploaded_assets[name] = Path(path).read_text(encoding="utf-8")
+
+            release_obj = mock.Mock(html_url="https://example.test/release/1")
+            release_obj.upload_asset.side_effect = _upload_asset
+
+            repo = mock.Mock()
+            repo.create_git_release.return_value = release_obj
+            github_client = mock.Mock()
+            github_client.get_repo.return_value = repo
+
+            runner = CliRunner()
+            with (
+                _pushd(repo_root),
+                mock.patch("telepact_project_cli.commands.repository_automation.Github", return_value=github_client),
+                mock.patch(
+                    "telepact_project_cli.commands.repository_automation._release_pr_metadata",
+                    return_value=("Release title", 7, "https://github.com/Telepact/telepact/pull/7"),
+                ),
+                mock.patch("telepact_project_cli.commands.repository_automation._head_commit_subject", return_value="Release title"),
+            ):
+                result = runner.invoke(
+                    main,
+                    ["release"],
+                    env={
+                        "GITHUB_TOKEN": "token",
+                        "GITHUB_REPOSITORY": "Telepact/telepact",
+                    },
+                )
+
+            self.assertEqual(result.exit_code, 0, msg=result.output)
+            self.assertIn("release-manifest.json", uploaded_assets)
+            self.assertEqual(
+                json.loads(uploaded_assets["release-manifest.json"]),
+                {
+                    "changed_paths": ["lib/py/impl.py"],
+                    "direct_targets": ["py"],
+                    "pr_number": None,
+                    "targets": ["cli", "py"],
+                    "version": "1.0.0-alpha.215",
+                },
+            )
+
     def test_build_release_body_separates_direct_and_dependency_triggered_targets(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             repo_root = Path(tmp_dir)
