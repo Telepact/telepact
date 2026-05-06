@@ -14,6 +14,7 @@
 #|  limitations under the License.
 #|
 
+import json
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
@@ -274,6 +275,24 @@ def compute_release_manifest_from_git(
         changed_paths=changed_paths_since_last_version_change(repo_root, ref=ref),
         version=_read_version(repo_root, ref=ref),
         pr_number=pr_number,
+    )
+
+
+def render_release_manifest_for_stdout(manifest: ReleaseManifest) -> str:
+    return json.dumps(manifest.to_dict(), indent=2, sort_keys=True)
+
+
+def render_release_manifest_from_git(
+    repo_root: Path | str = ".",
+    ref: str = "HEAD",
+    pr_number: int | None = None,
+) -> str:
+    return render_release_manifest_for_stdout(
+        compute_release_manifest_from_git(
+            repo_root,
+            ref=ref,
+            pr_number=pr_number,
+        )
     )
 
 

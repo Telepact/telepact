@@ -15,6 +15,7 @@
 #|
 
 import contextlib
+import json
 import os
 import subprocess
 import sys
@@ -35,6 +36,7 @@ from telepact_project_cli.release_plan import (
     changed_paths_since_last_version_change,
     compute_release_manifest,
     compute_release_manifest_from_git,
+    render_release_manifest_for_stdout,
 )
 
 
@@ -138,6 +140,32 @@ class ReleasePlanTests(unittest.TestCase):
             self.assertEqual(
                 manifest.changed_paths,
                 ("README.md", "lib/ts/src/main.ts", "sdk/prettier/package.json"),
+            )
+
+    def test_render_release_manifest_for_stdout_returns_sorted_json(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            repo_root = Path(tmp_dir)
+            (repo_root / "VERSION.txt").write_text("1.0.0-alpha.214", encoding="utf-8")
+            _write_release_targets(repo_root)
+
+            manifest = compute_release_manifest(
+                repo_root,
+                changed_paths=["sdk/prettier/package.json", "lib/ts/src/main.ts"],
+                version="1.0.0-alpha.215",
+                pr_number=None,
+            )
+
+            rendered = render_release_manifest_for_stdout(manifest)
+
+            self.assertEqual(
+                json.loads(rendered),
+                {
+                    "changed_paths": ["lib/ts/src/main.ts", "sdk/prettier/package.json"],
+                    "direct_targets": ["prettier", "ts"],
+                    "pr_number": None,
+                    "targets": ["console", "dart", "prettier", "ts"],
+                    "version": "1.0.0-alpha.215",
+                },
             )
 
     def test_changed_paths_since_last_version_change_ignores_version_bump_files(self) -> None:
@@ -288,6 +316,54 @@ class ReleasePlanTests(unittest.TestCase):
                     "publish_py=true",
                     "publish_ts=false",
                 ],
+            )
+
+    def test_print_release_manifest_command_writes_manifest_to_stdout(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            repo_root = Path(tmp_dir)
+            _init_repo(repo_root)
+            _write_release_targets(repo_root)
+            (repo_root / "VERSION.txt").write_text("1.0.0-alpha.214", encoding="utf-8")
+            (repo_root / "lib" / "py").mkdir(parents=True)
+            (repo_root / "lib" / "py" / "pyproject.toml").write_text(
+                '[project]\nname = "telepact"\nversion = "1.0.0-alpha.214"\n',
+                encoding="utf-8",
+            )
+            (repo_root / "sdk" / "cli").mkdir(parents=True)
+            (repo_root / "sdk" / "cli" / "pyproject.toml").write_text(
+                '[project]\nname = "telepact-cli"\nversion = "1.0.0-alpha.214"\n',
+                encoding="utf-8",
+            )
+            _commit_all(repo_root, "Initial release")
+
+            (repo_root / "lib" / "py" / "impl.py").write_text("print('changed')\n", encoding="utf-8")
+            _commit_all(repo_root, "Feature change")
+
+            (repo_root / "VERSION.txt").write_text("1.0.0-alpha.215", encoding="utf-8")
+            (repo_root / "lib" / "py" / "pyproject.toml").write_text(
+                '[project]\nname = "telepact"\nversion = "1.0.0-alpha.215"\n',
+                encoding="utf-8",
+            )
+            (repo_root / "sdk" / "cli" / "pyproject.toml").write_text(
+                '[project]\nname = "telepact-cli"\nversion = "1.0.0-alpha.215"\n',
+                encoding="utf-8",
+            )
+            _commit_all(repo_root, "Bump version")
+
+            runner = CliRunner()
+            with _pushd(repo_root):
+                result = runner.invoke(main, ["print-release-manifest"])
+
+            self.assertEqual(result.exit_code, 0, msg=result.output)
+            self.assertEqual(
+                json.loads(result.output),
+                {
+                    "changed_paths": ["lib/py/impl.py"],
+                    "direct_targets": ["py"],
+                    "pr_number": None,
+                    "targets": ["cli", "py"],
+                    "version": "1.0.0-alpha.215",
+                },
             )
 
     def test_bump_command_updates_version_when_targets_exist(self) -> None:
