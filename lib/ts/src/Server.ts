@@ -45,12 +45,13 @@ export class Server {
     serializer: Serializer;
 
     constructor(telepactSchema: TelepactSchema, functionRouter: FunctionRouter | FunctionRoutes, options: ServerOptions) {
-        const normalizedFunctionRouter = functionRouter instanceof FunctionRouter ? functionRouter : new FunctionRouter();
-        if (!(functionRouter instanceof FunctionRouter)) {
-            normalizedFunctionRouter.registerUnauthenticatedRoutes(functionRouter);
-        }
-
-        normalizedFunctionRouter.registerUnauthenticatedRoutes(createInternalFunctionRoutes(telepactSchema));
+        const normalizedFunctionRouter = functionRouter instanceof FunctionRouter
+            ? functionRouter
+            : new FunctionRouter(functionRouter);
+        normalizedFunctionRouter.functionRoutes = {
+            ...normalizedFunctionRouter.functionRoutes,
+            ...createInternalFunctionRoutes(telepactSchema),
+        };
         this.functionRouter = normalizedFunctionRouter;
         this.middleware = options.middleware;
         this.onError = options.onError;
@@ -65,12 +66,6 @@ export class Server {
         const base64Encoder = new ServerBase64Encoder();
 
         this.serializer = new Serializer(options.serialization, binaryEncoder, base64Encoder);
-
-        if (!('union.Auth_' in this.telepactSchema.parsed) && this.functionRouter.hasAuthenticatedRoutes()) {
-            throw new Error(
-                'Authenticated routes require `union.Auth_` in your schema.',
-            );
-        }
     }
 
     async process(requestMessageBytes: Uint8Array, updateHeaders?: UpdateHeaders): Promise<Response> {

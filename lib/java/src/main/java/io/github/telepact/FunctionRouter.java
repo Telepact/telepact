@@ -24,48 +24,22 @@ import java.util.Map;
  * target.
  */
 public class FunctionRouter {
-    private final Map<String, FunctionRoute> authenticatedFunctionRoutes;
-    private final Map<String, FunctionRoute> unauthenticatedFunctionRoutes;
+    private final Map<String, FunctionRoute> functionRoutes;
 
-    public FunctionRouter() {
-        this.authenticatedFunctionRoutes = new HashMap<>();
-        this.unauthenticatedFunctionRoutes = new HashMap<>();
-    }
-
-    public void registerRoutes(Map<String, FunctionRoute> functionRoutes) {
-        registerUnauthenticatedRoutes(functionRoutes);
-    }
-
-    public void registerAuthenticatedRoutes(Map<String, FunctionRoute> functionRoutes) {
-        for (var entry : functionRoutes.entrySet()) {
-            this.authenticatedFunctionRoutes.put(entry.getKey(), entry.getValue());
-            this.unauthenticatedFunctionRoutes.remove(entry.getKey());
-        }
-    }
-
-    public void registerUnauthenticatedRoutes(Map<String, FunctionRoute> functionRoutes) {
-        for (var entry : functionRoutes.entrySet()) {
-            this.unauthenticatedFunctionRoutes.put(entry.getKey(), entry.getValue());
-            this.authenticatedFunctionRoutes.remove(entry.getKey());
-        }
-    }
-
-    public boolean requiresAuthentication(String functionName) {
-        return this.authenticatedFunctionRoutes.containsKey(functionName);
-    }
-
-    public boolean hasAuthenticatedRoutes() {
-        return !this.authenticatedFunctionRoutes.isEmpty();
+    public FunctionRouter(Map<String, FunctionRoute> functionRoutes) {
+        this.functionRoutes = functionRoutes == null ? new HashMap<>() : new HashMap<>(functionRoutes);
     }
 
     public Message route(Message requestMessage) {
         final var functionName = requestMessage.getBodyTarget();
-        final var functionRoute = this.authenticatedFunctionRoutes.containsKey(functionName)
-                ? this.authenticatedFunctionRoutes.get(functionName)
-                : this.unauthenticatedFunctionRoutes.get(functionName);
+        final var functionRoute = this.functionRoutes.get(functionName);
         if (functionRoute == null) {
             throw new IllegalArgumentException("Unknown function: " + functionName);
         }
         return functionRoute.apply(functionName, requestMessage);
+    }
+
+    Map<String, FunctionRoute> functionRoutes() {
+        return this.functionRoutes;
     }
 }

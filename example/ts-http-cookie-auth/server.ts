@@ -49,8 +49,7 @@ async function me(_functionName: string, requestMessage: Message): Promise<Messa
     });
 }
 
-const functionRouter = new FunctionRouter();
-functionRouter.registerAuthenticatedRoutes({ 'fn.me': me });
+const functionRouter = new FunctionRouter({ 'fn.me': me });
 const telepactServer = new Server(schema, functionRouter, options);
 
 function readRequestBytes(request: IncomingMessage): Promise<Uint8Array> {

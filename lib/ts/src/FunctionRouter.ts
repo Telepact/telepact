@@ -20,40 +20,15 @@ export type FunctionRoute = (functionName: string, requestMessage: Message) => P
 export type FunctionRoutes = Record<string, FunctionRoute>;
 
 export class FunctionRouter {
-    authenticatedFunctionRoutes: FunctionRoutes;
-    unauthenticatedFunctionRoutes: FunctionRoutes;
+    functionRoutes: FunctionRoutes;
 
-    constructor() {
-        this.authenticatedFunctionRoutes = {};
-        this.unauthenticatedFunctionRoutes = {};
-    }
-
-    registerAuthenticatedRoutes(functionRoutes: FunctionRoutes): void {
-        for (const [functionName, functionRoute] of Object.entries(functionRoutes)) {
-            this.authenticatedFunctionRoutes[functionName] = functionRoute;
-            delete this.unauthenticatedFunctionRoutes[functionName];
-        }
-    }
-
-    registerUnauthenticatedRoutes(functionRoutes: FunctionRoutes): void {
-        for (const [functionName, functionRoute] of Object.entries(functionRoutes)) {
-            this.unauthenticatedFunctionRoutes[functionName] = functionRoute;
-            delete this.authenticatedFunctionRoutes[functionName];
-        }
-    }
-
-    hasAuthenticatedRoutes(): boolean {
-        return Object.keys(this.authenticatedFunctionRoutes).length > 0;
-    }
-
-    requiresAuthentication(functionName: string): boolean {
-        return functionName in this.authenticatedFunctionRoutes;
+    constructor(functionRoutes: FunctionRoutes = {}) {
+        this.functionRoutes = { ...functionRoutes };
     }
 
     async route(requestMessage: Message): Promise<Message> {
         const functionName = requestMessage.getBodyTarget();
-        const functionRoute = this.authenticatedFunctionRoutes[functionName]
-            ?? this.unauthenticatedFunctionRoutes[functionName];
+        const functionRoute = this.functionRoutes[functionName];
         if (functionRoute === undefined) {
             throw new Error(`Unknown function: ${functionName}`);
         }

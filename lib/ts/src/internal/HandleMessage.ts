@@ -31,6 +31,7 @@ import { TelepactError } from '../TelepactError.js';
 import type { AuthHandler, UpdateHeaders } from '../Server.js';
 import { buildUnknownErrorMessage } from './UnknownError.js';
 import type { FunctionRouter, Middleware } from './ProcessBytes.js';
+import { requiresAuthentication } from './RequiresAuthentication.js';
 const UNAUTHENTICATED_MESSAGE = 'Valid authentication is required.';
 
 export async function handleMessage(
@@ -66,7 +67,8 @@ export async function handleMessage(
     const functionName = requestTarget;
     const callType = parsedTelepactSchema[requestTarget] as TUnion;
     const resultUnionType: TUnion = parsedTelepactSchema[`${requestTarget}.->`] as TUnion;
-    const requiresAuthentication = unknownTarget === null && functionRouter.requiresAuthentication(functionName);
+    const functionRequiresAuthentication = unknownTarget === null
+        && requiresAuthentication(telepactSchema, functionName);
 
     const callId = requestHeaders['@id_'];
     if (callId !== undefined) {
@@ -98,11 +100,11 @@ export async function handleMessage(
         );
     }
 
-    if (requiresAuthentication && !('@auth_' in requestHeaders)) {
+    if (functionRequiresAuthentication && !('@auth_' in requestHeaders)) {
         return buildUnauthenticatedErrorMessage(resultUnionType, responseHeaders);
     }
 
-    if (requiresAuthentication) {
+    if (functionRequiresAuthentication) {
         try {
             const authHeaders = (await onAuth(requestHeaders)) ?? {};
             Object.assign(requestHeaders, authHeaders);

@@ -106,8 +106,7 @@ async def approve_special(_function_name: str, request_message: Message) -> Mess
     })
 
 
-function_router = FunctionRouter()
-function_router.register_authenticated_routes({
+function_router = FunctionRouter({
     'fn.myShift': my_shift,
     'fn.approveSpecial': approve_special,
 })

@@ -124,7 +124,7 @@ func HandleMessage(
 	}
 
 	functionName := requestTarget
-	requiresAuthentication := hasRequestedTarget && functionRouter.RequiresAuthentication(functionName)
+	requiresAuthentication := hasRequestedTarget && RequiresAuthentication(schema, functionName)
 
 	requestHeaderFailures := types.ValidateHeaders(requestHeaders, schema.RequestHeaderDeclarations(), functionName)
 	if len(requestHeaderFailures) > 0 {

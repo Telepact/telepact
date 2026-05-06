@@ -81,7 +81,9 @@ func NewServer(telepactSchema *TelepactSchema, functionRouter *FunctionRouter, o
 	if functionRouter == nil {
 		return nil, NewTelepactError("telepact: function router must not be nil")
 	}
-	functionRouter.RegisterUnauthenticatedRoutes(createInternalFunctionRoutes(telepactSchema))
+	for functionName, functionRoute := range createInternalFunctionRoutes(telepactSchema) {
+		functionRouter.functionRoutes[functionName] = functionRoute
+	}
 
 	if options == nil {
 		options = NewServerOptions()
@@ -118,10 +120,6 @@ func NewServer(telepactSchema *TelepactSchema, functionRouter *FunctionRouter, o
 	binaryEncoder := binary.NewServerBinaryEncoder(binaryEncoding)
 	base64Encoder := binary.NewServerBase64Encoder()
 	serializer := NewSerializer(serializationImpl, binaryEncoder, base64Encoder)
-
-	if _, exists := telepactSchema.Parsed["union.Auth_"]; !exists && functionRouter.HasAuthenticatedRoutes() {
-		return nil, NewTelepactError("Authenticated routes require `union.Auth_` in your schema.")
-	}
 
 	return &Server{
 		functionRouter: functionRouter,
@@ -256,11 +254,4 @@ func (a *serverFunctionRouterAdapter) Route(message telepactinternal.ServerMessa
 	}
 
 	return telepactinternal.ServerMessage{Headers: response.Headers, Body: response.Body}, nil
-}
-
-func (a *serverFunctionRouterAdapter) RequiresAuthentication(functionName string) bool {
-	if a == nil || a.functionRouter == nil {
-		return false
-	}
-	return a.functionRouter.RequiresAuthentication(functionName)
 }

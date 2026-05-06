@@ -21,48 +21,17 @@ type FunctionRoute func(functionName string, requestMessage Message) (Message, e
 
 // FunctionRouter routes a request message to the configured function route for its body target.
 type FunctionRouter struct {
-	authenticatedFunctionRoutes   map[string]FunctionRoute
-	unauthenticatedFunctionRoutes map[string]FunctionRoute
+	functionRoutes map[string]FunctionRoute
 }
 
-// NewFunctionRouter constructs an empty FunctionRouter.
-func NewFunctionRouter() *FunctionRouter {
+// NewFunctionRouter constructs a FunctionRouter from the supplied routes.
+func NewFunctionRouter(functionRoutes map[string]FunctionRoute) *FunctionRouter {
+	clonedRoutes := make(map[string]FunctionRoute, len(functionRoutes))
+	for functionName, functionRoute := range functionRoutes {
+		clonedRoutes[functionName] = functionRoute
+	}
 	return &FunctionRouter{
-		authenticatedFunctionRoutes:   make(map[string]FunctionRoute),
-		unauthenticatedFunctionRoutes: make(map[string]FunctionRoute),
-	}
-}
-
-// RegisterRoutes merges the supplied routes into the router, replacing any existing routes with the same name.
-func (r *FunctionRouter) RegisterRoutes(functionRoutes map[string]FunctionRoute) {
-	r.RegisterUnauthenticatedRoutes(functionRoutes)
-}
-
-// RegisterAuthenticatedRoutes merges authenticated routes into the router.
-func (r *FunctionRouter) RegisterAuthenticatedRoutes(functionRoutes map[string]FunctionRoute) {
-	if r == nil || functionRoutes == nil {
-		return
-	}
-	if r.authenticatedFunctionRoutes == nil {
-		r.authenticatedFunctionRoutes = make(map[string]FunctionRoute, len(functionRoutes))
-	}
-	for functionName, functionRoute := range functionRoutes {
-		r.authenticatedFunctionRoutes[functionName] = functionRoute
-		delete(r.unauthenticatedFunctionRoutes, functionName)
-	}
-}
-
-// RegisterUnauthenticatedRoutes merges unauthenticated routes into the router.
-func (r *FunctionRouter) RegisterUnauthenticatedRoutes(functionRoutes map[string]FunctionRoute) {
-	if r == nil || functionRoutes == nil {
-		return
-	}
-	if r.unauthenticatedFunctionRoutes == nil {
-		r.unauthenticatedFunctionRoutes = make(map[string]FunctionRoute, len(functionRoutes))
-	}
-	for functionName, functionRoute := range functionRoutes {
-		r.unauthenticatedFunctionRoutes[functionName] = functionRoute
-		delete(r.authenticatedFunctionRoutes, functionName)
+		functionRoutes: clonedRoutes,
 	}
 }
 
@@ -77,27 +46,10 @@ func (r *FunctionRouter) Route(requestMessage Message) (Message, error) {
 		return Message{}, err
 	}
 
-	functionRoute, ok := r.authenticatedFunctionRoutes[functionName]
-	if !ok || functionRoute == nil {
-		functionRoute, ok = r.unauthenticatedFunctionRoutes[functionName]
-	}
+	functionRoute, ok := r.functionRoutes[functionName]
 	if !ok || functionRoute == nil {
 		return Message{}, NewTelepactError("telepact: unknown function route for " + functionName)
 	}
 
 	return functionRoute(functionName, requestMessage)
-}
-
-// RequiresAuthentication reports whether the named route is configured as authenticated.
-func (r *FunctionRouter) RequiresAuthentication(functionName string) bool {
-	if r == nil {
-		return false
-	}
-	_, ok := r.authenticatedFunctionRoutes[functionName]
-	return ok
-}
-
-// HasAuthenticatedRoutes reports whether the router has any authenticated routes.
-func (r *FunctionRouter) HasAuthenticatedRoutes() bool {
-	return r != nil && len(r.authenticatedFunctionRoutes) > 0
 }

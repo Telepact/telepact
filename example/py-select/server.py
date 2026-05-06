@@ -43,8 +43,7 @@ async def track_package(_function_name: str, _request_message: Message) -> Messa
     })
 
 
-function_router = FunctionRouter()
-function_router.register_unauthenticated_routes({'fn.trackPackage': track_package})
+function_router = FunctionRouter({'fn.trackPackage': track_package})
 telepact_server = Server(schema, function_router, options)
 
 
