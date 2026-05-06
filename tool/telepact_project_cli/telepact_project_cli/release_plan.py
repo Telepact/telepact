@@ -192,7 +192,16 @@ def commits_since_last_version_change(
 ) -> tuple[ReleaseCommit, ...]:
     repo_root = find_repo_root(repo_root)
     base_commit, end_ref = _release_change_window(repo_root, ref)
-    normalized_paths = tuple(sorted({_normalize_repo_path(path) for path in (paths or ()) if _normalize_repo_path(path)}))
+    normalized_paths = tuple(
+        sorted(
+            {
+                normalized_path
+                for path in (paths or ())
+                for normalized_path in [_normalize_repo_path(path)]
+                if normalized_path
+            }
+        )
+    )
 
     try:
         args = ["log", "--format=%H%x1f%s", "--reverse"]

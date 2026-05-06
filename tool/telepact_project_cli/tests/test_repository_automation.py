@@ -119,6 +119,8 @@ class RepositoryAutomationTests(unittest.TestCase):
                 )
 
             self.assertEqual(result.exit_code, 0, msg=result.output)
+            repo.create_git_release.assert_called_once()
+            release_obj.upload_asset.assert_not_called()
             self.assertEqual(uploaded_assets, {})
 
     def test_build_release_body_groups_commits_by_direct_release_target(self) -> None:
