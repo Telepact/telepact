@@ -48,6 +48,7 @@ RELEASE_TARGET_ASSET_DIRECTORY_MAP = {
 }
 
 MAX_ASSETS = 10
+NEWLINE = "\n"
 MAIN_BRANCH = "main"
 WAIT_TIMEOUT_SECONDS = 20 * 60  # 20 minutes
 WAIT_INTERVAL_SECONDS = 10
@@ -183,7 +184,7 @@ def _build_release_body(
         commit_lines = [_format_release_commit(commit) for commit in commits] or ["- No direct commits found."]
         target_sections.append(
             f"### {_release_target_heading(repo_root, target)}\n"
-            f"{chr(10).join(commit_lines)}"
+            f"{NEWLINE.join(commit_lines)}"
         )
     if dependency_targets:
         dependency_lines = [
@@ -192,7 +193,7 @@ def _build_release_body(
         ]
         target_sections.append(
             "### Dependency-triggered republishes\n"
-            f"{chr(10).join(dependency_lines)}"
+            f"{NEWLINE.join(dependency_lines)}"
         )
 
     heading = f"## {pr_title}"
@@ -202,8 +203,8 @@ def _build_release_body(
     return (
         f"{heading}\n\n"
         "### Published targets\n"
-        f"{chr(10).join(published_target_lines)}\n\n"
-        f"{chr(10).join(target_sections) if target_sections else '### Release target changes\\n(None)'}"
+        f"{NEWLINE.join(published_target_lines)}\n\n"
+        f"{NEWLINE.join(target_sections) if target_sections else '### Release target changes\\n(None)'}"
     ).strip()
 
 
