@@ -25,7 +25,7 @@ import toml
 from lxml import etree as ET
 from ruamel.yaml import YAML
 
-from ..release_plan import compute_release_manifest, git_ref_comparison
+from ..release_plan import ReleaseComparison, compute_release_manifest, git_ref_comparison
 
 yaml = YAML()
 
@@ -160,7 +160,7 @@ def _changed_paths_since_main(main_ref: str = "origin/main") -> list[str]:
     return [path for path in result.stdout.strip().splitlines() if path]
 
 
-def _release_comparison_since_main(main_ref: str = "origin/main"):
+def _release_comparison_since_main(main_ref: str = "origin/main") -> ReleaseComparison:
     return git_ref_comparison(Path("."), base_ref=main_ref, head_ref="HEAD", use_merge_base=True)
 
 

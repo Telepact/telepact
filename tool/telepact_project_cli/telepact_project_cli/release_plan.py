@@ -58,7 +58,7 @@ class ReleaseComparison:
     base_commit: str | None
     head_commit: str
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, str | None]:
         return {
             "base_commit": self.base_commit,
             "head_commit": self.head_commit,
@@ -205,6 +205,12 @@ def _release_change_window(repo_root: Path, ref: str = "HEAD") -> tuple[str | No
 
 
 def release_comparison(repo_root: Path | str = ".", ref: str = "HEAD") -> ReleaseComparison:
+    """Resolve the exact commits used for the version-window release comparison.
+
+    base_commit is the prior VERSION.txt-changing commit when one exists. head_commit
+    is the exact commit whose tree or diff is used to compute the manifest changes.
+    """
+
     repo_root = find_repo_root(repo_root)
     base_commit, end_ref = _release_change_window(repo_root, ref)
     return ReleaseComparison(
@@ -220,6 +226,12 @@ def git_ref_comparison(
     head_ref: str = "HEAD",
     use_merge_base: bool = False,
 ) -> ReleaseComparison:
+    """Resolve the exact commits used for a ref-to-ref comparison.
+
+    When use_merge_base is true, base_commit is the merge base of base_ref and
+    head_ref. Otherwise base_commit is the resolved SHA of base_ref itself.
+    """
+
     repo_root = find_repo_root(repo_root)
     if use_merge_base:
         try:
