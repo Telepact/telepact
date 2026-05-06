@@ -585,12 +585,11 @@ def release() -> None:
         click.echo(f"Release created: {release.html_url}")
 
         asset_count = 0
-        with tempfile.NamedTemporaryFile("w", encoding="utf-8", suffix=".json", delete=False) as manifest_file:
-            manifest_file.write(render_release_manifest_for_stdout(release_manifest))
-            manifest_path = manifest_file.name
-        try:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            manifest_path = Path(temp_dir) / RELEASE_MANIFEST_ASSET_NAME
+            manifest_path.write_text(render_release_manifest_for_stdout(release_manifest), encoding="utf-8")
             release.upload_asset(
-                path=manifest_path,
+                path=str(manifest_path),
                 name=RELEASE_MANIFEST_ASSET_NAME,
                 label=RELEASE_MANIFEST_ASSET_NAME,
             )
@@ -616,8 +615,6 @@ def release() -> None:
                                 click.echo(f"Uploaded asset: {file_name} for target: {target}")
                     else:
                         click.echo(f"Asset directory does not exist: {asset_directory} for target: {target}")
-        finally:
-            Path(manifest_path).unlink(missing_ok=True)
 
     except Exception as e:
         click.echo(f"Failed to create release or upload assets: {e}")
