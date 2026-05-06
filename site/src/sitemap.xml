@@ -247,12 +247,6 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://telepact.github.io/telepact/docs/04-operate/03-versions/</loc>
-    <lastmod>2026-04-15</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://telepact.github.io/telepact/docs/05-background-and-reference/01-faq/</loc>
     <lastmod>2026-04-15</lastmod>
     <changefreq>weekly</changefreq>

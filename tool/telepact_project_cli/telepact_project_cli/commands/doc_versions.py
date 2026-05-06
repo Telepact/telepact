@@ -246,7 +246,9 @@ def write_doc_versions(
         out_lines.append(f"| {kind} | `{package}` | {published} | `{row_version}` |")
     out_lines.append("")
 
-    out_path = (output.resolve() if output is not None else (repo_root / "doc" / "04-operate" / "03-versions.md"))
+    if output is None:
+        raise click.ClickException("--output is required.")
+    out_path = output.resolve()
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text("\n".join(out_lines), encoding="utf-8")
     return out_path
@@ -262,8 +264,8 @@ def write_doc_versions(
 @click.option(
     "--output",
     type=click.Path(path_type=Path),
-    default=None,
-    help="Where to write the markdown file (default: doc/04-operate/03-versions.md at repo root).",
+    required=True,
+    help="Where to write the markdown file.",
 )
-def doc_versions(repo_root: Path, output: Path | None) -> None:
+def doc_versions(repo_root: Path, output: Path) -> None:
     write_doc_versions(repo_root, output)

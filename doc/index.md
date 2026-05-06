@@ -79,7 +79,6 @@ servers, or place Telepact inside a larger service.
 - [Operating Boundary Guide](./04-operate/01-production-guide.md) for Telepact-specific auth,
   compatibility, and observability boundaries
 - [Runtime Error Guide](./04-operate/02-runtime-errors.md) for local/runtime debugging
-- [Versions](./04-operate/03-versions.md) for the latest published library and SDK versions
 
 ## Background and reference
 
