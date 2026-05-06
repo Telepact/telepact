@@ -288,7 +288,7 @@ class ReleasePlanTests(unittest.TestCase):
 
             with mock.patch(
                 "telepact_project_cli.release_plan._version_change_commits",
-                side_effect=[["head", "previous"], ["previous"]],
+                side_effect=[["head", "previous"], ["head", "previous"], ["previous"]],
             ), mock.patch(
                 "telepact_project_cli.release_plan._resolved_commit_sha",
                 return_value="not-a-version-commit",
