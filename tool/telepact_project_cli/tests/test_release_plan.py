@@ -346,6 +346,54 @@ class ReleasePlanTests(unittest.TestCase):
             self.assertEqual(manifest.targets, ("cli", "py"))
             self.assertEqual(manifest.changed_paths, ("lib/py/impl.py",))
 
+    def test_compute_release_manifest_from_git_after_version_bump_uses_latest_version_commit_as_base(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            repo_root = Path(tmp_dir)
+            _init_repo(repo_root)
+            _write_release_targets(repo_root)
+            (repo_root / "VERSION.txt").write_text("1.0.0-alpha.200", encoding="utf-8")
+            (repo_root / "lib" / "py").mkdir(parents=True)
+            (repo_root / "lib" / "py" / "pyproject.toml").write_text(
+                '[project]\nname = "telepact"\nversion = "1.0.0-alpha.200"\n',
+                encoding="utf-8",
+            )
+            (repo_root / "sdk" / "cli").mkdir(parents=True)
+            (repo_root / "sdk" / "cli" / "pyproject.toml").write_text(
+                '[project]\nname = "telepact-cli"\nversion = "1.0.0-alpha.200"\n',
+                encoding="utf-8",
+            )
+            _commit_all(repo_root, "Initial release")
+
+            (repo_root / "lib" / "py" / "impl.py").write_text("print('changed before release')\n", encoding="utf-8")
+            _commit_all(repo_root, "Feature change")
+
+            (repo_root / "VERSION.txt").write_text("1.0.0-alpha.201", encoding="utf-8")
+            (repo_root / "lib" / "py" / "pyproject.toml").write_text(
+                '[project]\nname = "telepact"\nversion = "1.0.0-alpha.201"\n',
+                encoding="utf-8",
+            )
+            (repo_root / "sdk" / "cli" / "pyproject.toml").write_text(
+                '[project]\nname = "telepact-cli"\nversion = "1.0.0-alpha.201"\n',
+                encoding="utf-8",
+            )
+            _commit_all(repo_root, "Bump version")
+
+            (repo_root / "sdk" / "cli" / "feature.py").write_text("print('changed after release')\n", encoding="utf-8")
+            _commit_all(repo_root, "Post-release change")
+
+            manifest = compute_release_manifest_from_git(repo_root)
+            version_bump_commit = _run_git(repo_root, "rev-parse", "HEAD~1")
+            post_release_commit = _run_git(repo_root, "rev-parse", "HEAD")
+
+            self.assertEqual(manifest.version, "1.0.0-alpha.201")
+            self.assertEqual(
+                manifest.comparison,
+                ReleaseComparison(base_commit=version_bump_commit, head_commit=post_release_commit),
+            )
+            self.assertEqual(manifest.direct_targets, ("cli",))
+            self.assertEqual(manifest.targets, ("cli",))
+            self.assertEqual(manifest.changed_paths, ("sdk/cli/feature.py",))
+
     def test_compute_release_manifest_for_comparison_uses_comparison_for_targets(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             repo_root = Path(tmp_dir)

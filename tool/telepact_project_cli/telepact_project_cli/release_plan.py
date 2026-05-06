@@ -193,9 +193,16 @@ def _resolved_commit_sha(repo_root: Path, ref: str) -> str:
 
 def _release_change_window(repo_root: Path, ref: str = "HEAD") -> tuple[str | None, str]:
     version_change_commits = _version_change_commits(repo_root, ref)
-    base_commit = _previous_version_change_commit(repo_root, ref)
+    if not version_change_commits:
+        raise click.ClickException(f"No commits found that changed {VERSION_FILE_RELATIVE_PATH}.")
+
+    resolved_ref = _resolved_commit_sha(repo_root, ref)
+    latest_version_change_commit = version_change_commits[0]
+    base_commit = latest_version_change_commit
     end_ref = ref
-    if version_change_commits and _resolved_commit_sha(repo_root, ref) == version_change_commits[0]:
+
+    if resolved_ref == latest_version_change_commit:
+        base_commit = version_change_commits[1] if len(version_change_commits) >= 2 else None
         try:
             end_ref = _git_stdout(repo_root, "rev-parse", f"{ref}^").strip()
         except subprocess.CalledProcessError:
