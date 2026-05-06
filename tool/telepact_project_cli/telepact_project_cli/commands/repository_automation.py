@@ -160,6 +160,9 @@ def _build_release_body(
     release_targets: list[str],
 ) -> str:
     rules = load_release_target_rules(repo_root).projects
+    missing_targets = sorted({target for target in [*direct_targets, *release_targets] if target not in rules})
+    if missing_targets:
+        raise click.ClickException(f"Unknown release target(s): {', '.join(missing_targets)}")
     direct_target_set = set(direct_targets)
     dependency_targets = [target for target in release_targets if target not in direct_target_set]
 

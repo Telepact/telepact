@@ -25,7 +25,10 @@ import yaml
 
 RELEASE_CONFIG_RELATIVE_PATH = Path(".release/release-targets.yaml")
 VERSION_FILE_RELATIVE_PATH = Path("VERSION.txt")
+# Use ASCII Unit Separator so git log records can be split safely even when commit
+# subjects contain common delimiters like pipes, commas, or colons.
 GIT_LOG_FIELD_SEPARATOR = "\x1f"
+GIT_LOG_FORMAT = "--format=%H%x1f%s"
 
 PUBLISH_TARGETS = ("java", "ts", "py", "go", "cli", "console", "prettier")
 
@@ -205,7 +208,7 @@ def commits_since_last_version_change(
     )
 
     try:
-        args = ["log", f"--format=%H{GIT_LOG_FIELD_SEPARATOR}%s", "--reverse"]
+        args = ["log", GIT_LOG_FORMAT, "--reverse"]
         args.append(end_ref if base_commit is None else f"{base_commit}..{end_ref}")
         if normalized_paths:
             args.extend(["--", *normalized_paths])
