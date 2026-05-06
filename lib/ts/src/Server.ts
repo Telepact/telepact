@@ -24,9 +24,9 @@ import { processBytes } from './internal/ProcessBytes.js';
 import { Serialization } from './Serialization.js';
 import { ServerBase64Encoder } from './internal/binary/ServerBase64Encoder.js';
 import { Response } from './Response.js';
-import { TelepactError } from './TelepactError.js';
 import { FunctionRouter, FunctionRoutes } from './FunctionRouter.js';
 import { createInternalFunctionRoutes } from './internal/CreateInternalFunctionRoutes.js';
+import { TelepactError } from './TelepactError.js';
 
 export type Middleware = (requestMessage: Message, functionRouter: FunctionRouter) => Promise<Message>;
 export type AuthHandler = (headers: Record<string, any>) => Record<string, any> | Promise<Record<string, any>>;
