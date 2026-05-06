@@ -118,6 +118,55 @@ class ReleasePlanTests(unittest.TestCase):
             self.assertEqual(result.exit_code, 0, msg=result.output)
             self.assertEqual(package_json.read_text(encoding="utf-8"), original)
 
+    def test_set_version_updates_package_lock_from_current_directory(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            project_root = Path(tmp_dir)
+            (project_root / "package.json").write_text(
+                '{\n  "name": "example",\n  "version": "1.2.3"\n}\n',
+                encoding="utf-8",
+            )
+            (project_root / "package-lock.json").write_text("{}", encoding="utf-8")
+
+            runner = CliRunner()
+            with (
+                _pushd(project_root),
+                mock.patch("telepact_project_cli.commands.project_version.subprocess.run") as run,
+            ):
+                result = runner.invoke(main, ["set-version", "1.2.4"])
+
+            self.assertEqual(result.exit_code, 0, msg=result.output)
+            self.assertEqual(json.loads((project_root / "package.json").read_text(encoding="utf-8"))["version"], "1.2.4")
+            run.assert_called_once_with(["npm", "install"], cwd=Path("."), check=True)
+            self.assertIn("Updated package-lock.json in .", result.output)
+
+    def test_set_version_updates_uv_lock_from_current_directory(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            project_root = Path(tmp_dir)
+            (project_root / "pyproject.toml").write_text(
+                textwrap.dedent(
+                    """
+                    [project]
+                    name = "example"
+                    version = "1.2.3"
+                    """
+                ).strip()
+                + "\n",
+                encoding="utf-8",
+            )
+            (project_root / "uv.lock").write_text("version = 1\n", encoding="utf-8")
+
+            runner = CliRunner()
+            with (
+                _pushd(project_root),
+                mock.patch("telepact_project_cli.commands.project_version.subprocess.run") as run,
+            ):
+                result = runner.invoke(main, ["set-version", "1.2.4"])
+
+            self.assertEqual(result.exit_code, 0, msg=result.output)
+            self.assertIn('version = "1.2.4"', (project_root / "pyproject.toml").read_text(encoding="utf-8"))
+            run.assert_called_once_with(["uv", "lock"], cwd=Path("."), check=True)
+            self.assertIn("Updated uv.lock in .", result.output)
+
     def test_compute_release_manifest_uses_declarative_rules_and_dependency_expansion(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             repo_root = Path(tmp_dir)
