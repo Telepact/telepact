@@ -14,9 +14,11 @@
 #|  limitations under the License.
 #|
 
+import contextlib
 import sys
 import tempfile
 import unittest
+import os
 from pathlib import Path
 from types import SimpleNamespace
 from unittest import mock
@@ -36,6 +38,16 @@ from telepact_project_cli.commands.repository_automation import (
     _verify_pull_request_ci,
     _wait_for_pr_stable,
 )
+
+
+@contextlib.contextmanager
+def _pushd(path: Path):
+    old_cwd = Path.cwd()
+    os.chdir(path)
+    try:
+        yield
+    finally:
+        os.chdir(old_cwd)
 
 
 class RepositoryAutomationTests(unittest.TestCase):
@@ -311,6 +323,51 @@ version = "1.0.0-alpha.318"
                 "skip_merge_loop=true\nmerge_ready_count=2\n",
             )
 
+    def test_open_version_bump_pr_does_not_compute_release_targets(self) -> None:
+        repo = mock.Mock()
+        repo.owner = SimpleNamespace(login="Telepact")
+        repo.get_pulls.return_value = iter(())
+        repo.create_pull.return_value = SimpleNamespace(html_url="https://github.com/Telepact/telepact/pull/99")
+
+        github_client = mock.Mock()
+        github_client.get_repo.return_value = repo
+
+        runner = CliRunner()
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            repo_root = Path(tmp_dir)
+            (repo_root / "VERSION.txt").write_text("1.0.0-alpha.214", encoding="utf-8")
+            with _pushd(repo_root):
+                with (
+                    mock.patch("telepact_project_cli.commands.repository_automation.Github", return_value=github_client),
+                    mock.patch("telepact_project_cli.commands.repository_automation.compute_release_manifest_from_git") as compute_release_manifest_from_git,
+                    mock.patch("telepact_project_cli.commands.repository_automation._git") as git,
+                    mock.patch("telepact_project_cli.commands.repository_automation._push_current_branch") as push_current_branch,
+                    mock.patch(
+                        "telepact_project_cli.commands.repository_automation.create_version_bump_commit",
+                        return_value="1.0.0-alpha.215",
+                    ) as create_version_bump_commit,
+                ):
+                    result = runner.invoke(
+                        main,
+                        ["open-version-bump-pr"],
+                        env={
+                            "GITHUB_TOKEN": "token",
+                            "GITHUB_REPOSITORY": "Telepact/telepact",
+                        },
+                    )
+
+        self.assertEqual(result.exit_code, 0, msg=result.output)
+        compute_release_manifest_from_git.assert_not_called()
+        git.assert_called_once_with("checkout", "-B", "version-bump/1.0.0-alpha.215")
+        create_version_bump_commit.assert_called_once_with(compute_release_targets=False)
+        push_current_branch.assert_called_once_with("version-bump/1.0.0-alpha.215")
+        repo.create_pull.assert_called_once_with(
+            title="Bump version to 1.0.0-alpha.215",
+            body="Automated version bump PR.",
+            head="Telepact:version-bump/1.0.0-alpha.215",
+            base="main",
+        )
+
     def test_process_merge_ready_pull_request_admin_flow_updates_and_merges(self) -> None:
         initial_pr = mock.Mock()
         initial_pr.number = 7
@@ -318,11 +375,6 @@ version = "1.0.0-alpha.318"
         initial_pr.head = SimpleNamespace(sha="head-1", ref="feature")
         initial_pr.mark_ready_for_review = mock.Mock()
         initial_pr.draft = True
-        initial_pr.get_files.return_value = [
-            SimpleNamespace(filename="lib/py/pyproject.toml"),
-            SimpleNamespace(filename="sdk/cli/pyproject.toml"),
-        ]
-
         ready_pr = mock.Mock()
         ready_pr.number = 7
         ready_pr.state = "open"
@@ -334,12 +386,7 @@ version = "1.0.0-alpha.318"
         updated_pr.number = 7
         updated_pr.state = "open"
         updated_pr.head = SimpleNamespace(sha="head-2", ref="feature")
-
-        bumped_pr = mock.Mock()
-        bumped_pr.number = 7
-        bumped_pr.state = "open"
-        bumped_pr.head = SimpleNamespace(sha="head-3", ref="feature")
-        bumped_pr.merge.return_value = SimpleNamespace(merged=True, message="")
+        updated_pr.merge.return_value = SimpleNamespace(merged=True, message="")
 
         issue = mock.Mock()
         issue.get_comments.return_value = [
@@ -357,15 +404,11 @@ version = "1.0.0-alpha.318"
         with (
             mock.patch(
                 "telepact_project_cli.commands.repository_automation._wait_for_pr_stable",
-                side_effect=[initial_pr, ready_pr, bumped_pr],
+                side_effect=[initial_pr, ready_pr],
             ),
             mock.patch(
                 "telepact_project_cli.commands.repository_automation._wait_for_pr_head_update",
                 return_value=updated_pr,
-            ),
-            mock.patch(
-                "telepact_project_cli.commands.repository_automation._wait_for_expected_head",
-                return_value=bumped_pr,
             ),
             mock.patch(
                 "telepact_project_cli.commands.repository_automation._validate_merge_request",
@@ -373,21 +416,13 @@ version = "1.0.0-alpha.318"
             ),
             mock.patch("telepact_project_cli.commands.repository_automation._remove_merge_ready_label") as remove_merge_ready_label,
             mock.patch("telepact_project_cli.commands.repository_automation._verify_pull_request_ci"),
-            mock.patch("telepact_project_cli.commands.repository_automation._checkout_pr_branch"),
-            mock.patch("telepact_project_cli.commands.repository_automation._push_current_branch"),
-            mock.patch("telepact_project_cli.commands.repository_automation._current_head_sha", return_value="head-3"),
-            mock.patch("telepact_project_cli.commands.repository_automation.create_version_bump_commit") as create_version_bump_commit,
         ):
             _process_merge_ready_pull_request(repo, 7)
 
         initial_pr.mark_ready_for_review.assert_called_once_with()
         ready_pr.update_branch.assert_called_once_with(expected_head_sha="head-1")
         self.assertEqual(validate_merge_request.call_count, 1)
-        create_version_bump_commit.assert_called_once_with(
-            7,
-            changed_paths=["lib/py/pyproject.toml", "sdk/cli/pyproject.toml"],
-        )
-        bumped_pr.merge.assert_called_once_with(merge_method="squash", sha="head-3")
+        updated_pr.merge.assert_called_once_with(merge_method="squash", sha="head-2")
         remove_merge_ready_label.assert_called_once_with(repo, 7)
 
     def test_process_merge_ready_pull_request_removes_label_from_closed_pr_without_waiting(self) -> None:
