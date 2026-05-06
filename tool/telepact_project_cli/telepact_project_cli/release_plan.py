@@ -49,6 +49,12 @@ class ReleaseTargetConfig:
 
 @dataclass(frozen=True)
 class ReleaseComparison:
+    """Exact commits used for release-target comparison.
+
+    base_commit is None when the comparison has no explicit git base commit, such as
+    the initial release snapshot where the manifest is derived from the tree at head_commit.
+    """
+
     base_commit: str | None
     head_commit: str
 
@@ -66,7 +72,9 @@ class ReleaseComparison:
         if base_commit is not None and not isinstance(base_commit, str):
             raise click.ClickException("Release manifest comparison field 'base_commit' must be a string or null.")
         head_commit = data.get("head_commit")
-        if not isinstance(head_commit, str) or not head_commit:
+        if not isinstance(head_commit, str):
+            raise click.ClickException("Release manifest comparison field 'head_commit' must be a string.")
+        if not head_commit:
             raise click.ClickException("Release manifest comparison field 'head_commit' must be a non-empty string.")
         return cls(base_commit=base_commit, head_commit=head_commit)
 
