@@ -25,8 +25,9 @@ import yaml
 
 RELEASE_CONFIG_RELATIVE_PATH = Path(".release/release-targets.yaml")
 VERSION_FILE_RELATIVE_PATH = Path("VERSION.txt")
-# Use ASCII Unit Separator so git log records can be split safely even when commit
-# subjects contain common delimiters like pipes, commas, or colons.
+# Use ASCII Unit Separator (`\x1f`, rendered in git log format strings as `%x1f`)
+# so git log records can be split safely even when commit subjects contain common
+# delimiters like pipes, commas, or colons.
 GIT_LOG_FIELD_SEPARATOR = "\x1f"
 GIT_LOG_FORMAT = "--format=%H%x1f%s"
 
