@@ -556,22 +556,21 @@ def release() -> None:
 
     g = Github(token)
     repo = g.get_repo(repository)
-    if "go" in release_targets:
-        go_tag_version = version if version.startswith("v") else f"v{version}"
-        go_module_tag = f"lib/go/{go_tag_version}"
-        try:
-            existing_ref = repo.get_git_ref(f"tags/{go_module_tag}")
-            existing_sha = existing_ref.object.sha
-            if existing_sha != head_commit:
-                raise RuntimeError(
-                    f"Go module tag {go_module_tag} already exists at {existing_sha}, expected {head_commit}."
-                )
-            click.echo(f"Go module tag already exists: {go_module_tag}")
-        except GithubException as e:
-            if e.status != 404:
-                raise
-            repo.create_git_ref(ref=f"refs/tags/{go_module_tag}", sha=head_commit)
-            click.echo(f"Created Go module tag: {go_module_tag}")
+    go_tag_version = version if version.startswith("v") else f"v{version}"
+    go_module_tag = f"lib/go/{go_tag_version}"
+    try:
+        existing_ref = repo.get_git_ref(f"tags/{go_module_tag}")
+        existing_sha = existing_ref.object.sha
+        if existing_sha != head_commit:
+            raise RuntimeError(
+                f"Go module tag {go_module_tag} already exists at {existing_sha}, expected {head_commit}."
+            )
+        click.echo(f"Go module tag already exists: {go_module_tag}")
+    except GithubException as e:
+        if e.status != 404:
+            raise
+        repo.create_git_ref(ref=f"refs/tags/{go_module_tag}", sha=head_commit)
+        click.echo(f"Created Go module tag: {go_module_tag}")
 
     pr_title, pr_number, pr_url = _release_pr_metadata(repo, _head_commit_subject())
     final_release_body = _build_release_body(

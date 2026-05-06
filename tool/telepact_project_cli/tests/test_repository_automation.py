@@ -16,10 +16,11 @@
 
 import contextlib
 import json
+import os
+import subprocess
 import sys
 import tempfile
 import unittest
-import os
 from pathlib import Path
 from types import SimpleNamespace
 from unittest import mock
@@ -28,6 +29,7 @@ PACKAGE_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PACKAGE_ROOT))
 
 from click.testing import CliRunner
+from github import GithubException
 
 from telepact_project_cli.cli import main
 from telepact_project_cli.commands.repository_automation import (
@@ -52,6 +54,81 @@ def _pushd(path: Path):
 
 
 class RepositoryAutomationTests(unittest.TestCase):
+    def test_release_command_creates_go_module_tag_even_without_go_release_target(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            repo_root = Path(tmp_dir)
+            from test_release_plan import _commit_all, _init_repo, _pushd, _write_release_targets
+
+            _init_repo(repo_root)
+            _write_release_targets(repo_root)
+            (repo_root / "VERSION.txt").write_text("1.0.0-alpha.214", encoding="utf-8")
+            (repo_root / "lib" / "py").mkdir(parents=True)
+            (repo_root / "lib" / "py" / "pyproject.toml").write_text(
+                '[project]\nname = "telepact"\nversion = "1.0.0-alpha.214"\n',
+                encoding="utf-8",
+            )
+            (repo_root / "sdk" / "cli").mkdir(parents=True)
+            (repo_root / "sdk" / "cli" / "pyproject.toml").write_text(
+                '[project]\nname = "telepact-cli"\nversion = "1.0.0-alpha.214"\n',
+                encoding="utf-8",
+            )
+            _commit_all(repo_root, "Initial release")
+
+            (repo_root / "lib" / "py" / "impl.py").write_text("print('changed')\n", encoding="utf-8")
+            _commit_all(repo_root, "Feature change")
+
+            (repo_root / "VERSION.txt").write_text("1.0.0-alpha.215", encoding="utf-8")
+            (repo_root / "lib" / "py" / "pyproject.toml").write_text(
+                '[project]\nname = "telepact"\nversion = "1.0.0-alpha.215"\n',
+                encoding="utf-8",
+            )
+            (repo_root / "sdk" / "cli" / "pyproject.toml").write_text(
+                '[project]\nname = "telepact-cli"\nversion = "1.0.0-alpha.215"\n',
+                encoding="utf-8",
+            )
+            _commit_all(repo_root, "Bump version")
+
+            head_commit = subprocess.run(
+                ["git", "rev-parse", "HEAD"],
+                cwd=repo_root,
+                check=True,
+                capture_output=True,
+                text=True,
+            ).stdout.strip()
+
+            release_obj = mock.Mock(html_url="https://example.test/release/1")
+
+            repo = mock.Mock()
+            repo.get_git_ref.side_effect = GithubException(404, {"message": "Not Found"}, None)
+            repo.create_git_release.return_value = release_obj
+            github_client = mock.Mock()
+            github_client.get_repo.return_value = repo
+
+            runner = CliRunner()
+            with (
+                _pushd(repo_root),
+                mock.patch("telepact_project_cli.commands.repository_automation.Github", return_value=github_client),
+                mock.patch(
+                    "telepact_project_cli.commands.repository_automation._release_pr_metadata",
+                    return_value=("Release title", None, None),
+                ),
+                mock.patch("telepact_project_cli.commands.repository_automation._head_commit_subject", return_value="Release title"),
+            ):
+                result = runner.invoke(
+                    main,
+                    ["release"],
+                    env={
+                        "GITHUB_TOKEN": "token",
+                        "GITHUB_REPOSITORY": "Telepact/telepact",
+                    },
+                )
+
+            self.assertEqual(result.exit_code, 0, msg=result.output)
+            repo.create_git_ref.assert_called_once_with(
+                ref="refs/tags/lib/go/v1.0.0-alpha.215",
+                sha=head_commit,
+            )
+
     def test_release_command_does_not_upload_release_manifest_asset(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             repo_root = Path(tmp_dir)
@@ -95,6 +172,7 @@ class RepositoryAutomationTests(unittest.TestCase):
             release_obj.upload_asset.side_effect = _upload_asset
 
             repo = mock.Mock()
+            repo.get_git_ref.side_effect = GithubException(404, {"message": "Not Found"}, None)
             repo.create_git_release.return_value = release_obj
             github_client = mock.Mock()
             github_client.get_repo.return_value = repo
