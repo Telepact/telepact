@@ -588,9 +588,6 @@ def release() -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             manifest_path = Path(temp_dir) / RELEASE_MANIFEST_ASSET_NAME
             manifest_path.write_text(render_release_manifest_for_stdout(release_manifest), encoding="utf-8")
-            if asset_count >= MAX_ASSETS:
-                click.echo("Maximum asset upload limit reached. Aborting.")
-                return
             release.upload_asset(
                 path=str(manifest_path),
                 name=RELEASE_MANIFEST_ASSET_NAME,
