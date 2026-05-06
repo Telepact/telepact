@@ -465,6 +465,8 @@ version = "1.0.0-alpha.318"
             head="Telepact:version-bump/1.0.0-alpha.215",
             base="main",
         )
+        created_pr = repo.create_pull.return_value
+        created_pr.enable_automerge.assert_called_once_with(merge_method="SQUASH")
 
     def test_process_merge_ready_pull_request_admin_flow_updates_and_merges(self) -> None:
         initial_pr = mock.Mock()

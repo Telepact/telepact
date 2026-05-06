@@ -683,6 +683,7 @@ def open_version_bump_pr() -> None:
         head=f"{owner_login}:{branch_name}",
         base=MAIN_BRANCH,
     )
+    pr.enable_automerge(merge_method="SQUASH")
     click.echo(f"Created version bump pull request: {pr.html_url}")
 
 
