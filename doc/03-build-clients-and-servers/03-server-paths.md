@@ -72,4 +72,3 @@ Start here:
 
 - [Operating Boundary Guide](../04-operate/01-production-guide.md)
 - [Runtime Error Guide](../04-operate/02-runtime-errors.md)
-- [Versions](../04-operate/03-versions.md)

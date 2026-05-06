@@ -49,8 +49,6 @@ Install the Telepact CLI first:
 uv tool install --prerelease=allow telepact-cli
 ```
 
-Latest CLI versions can be found at [doc/04-operate/03-versions.md](https://github.com/Telepact/telepact/blob/main/doc/04-operate/03-versions.md).
-
 ## First Step
 
 Classify which of these two setup modes fits better:
