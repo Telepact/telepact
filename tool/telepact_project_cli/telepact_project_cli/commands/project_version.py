@@ -120,21 +120,21 @@ def _set_version_in_project_file(project_file: str, version: str) -> None:
 
 
 def _update_and_get_lock_file_path(project_file: str) -> str | None:
-    project_dir = os.path.dirname(project_file)
-    if project_file.endswith("package.json") and os.path.exists(os.path.join(project_dir, "package-lock.json")):
+    project_dir = Path(project_file).parent
+    if project_file.endswith("package.json") and (project_dir / "package-lock.json").exists():
         subprocess.run(["npm", "install"], cwd=project_dir, check=True)
         click.echo(f"Updated package-lock.json in {project_dir}")
-        return os.path.join(project_dir, "package-lock.json")
+        return str(project_dir / "package-lock.json")
 
-    if project_file.endswith("pyproject.toml") and os.path.exists(os.path.join(project_dir, "uv.lock")):
+    if project_file.endswith("pyproject.toml") and (project_dir / "uv.lock").exists():
         subprocess.run(["uv", "lock"], cwd=project_dir, check=True)
         click.echo(f"Updated uv.lock in {project_dir}")
-        return os.path.join(project_dir, "uv.lock")
+        return str(project_dir / "uv.lock")
 
-    if project_file.endswith("pubspec.yaml") and os.path.exists(os.path.join(project_dir, "pubspec.lock")):
+    if project_file.endswith("pubspec.yaml") and (project_dir / "pubspec.lock").exists():
         subprocess.run(["dart", "pub", "get"], cwd=project_dir, check=True)
         click.echo(f"Updated pubspec.lock in {project_dir}")
-        return os.path.join(project_dir, "pubspec.lock")
+        return str(project_dir / "pubspec.lock")
 
     return None
 
@@ -255,7 +255,10 @@ def set_version(version: str) -> None:
 
     for project_file in ["pom.xml", "package.json", "pyproject.toml", "pubspec.yaml"]:
         if os.path.exists(project_file):
+            current_version = _get_version_from_project_file(project_file)
             _set_version_in_project_file(project_file, version)
+            if current_version != version:
+                _update_and_get_lock_file_path(project_file)
             click.echo(f"Set {project_file} to version {version}")
             updated = True
 
