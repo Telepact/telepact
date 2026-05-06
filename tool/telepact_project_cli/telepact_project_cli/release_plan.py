@@ -48,9 +48,42 @@ class ReleaseTargetConfig:
 
 
 @dataclass(frozen=True)
+class ReleaseComparison:
+    """Exact commits used for release-target comparison.
+
+    base_commit is None when the comparison has no explicit git base commit, such as
+    the initial release snapshot where the manifest is derived from the tree at head_commit.
+    """
+
+    base_commit: str | None
+    head_commit: str
+
+    def to_dict(self) -> dict[str, str | None]:
+        return {
+            "base_commit": self.base_commit,
+            "head_commit": self.head_commit,
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "ReleaseComparison":
+        if not isinstance(data, dict):
+            raise click.ClickException("Release manifest field 'comparison' must be a JSON object.")
+        base_commit = data.get("base_commit")
+        if base_commit is not None and not isinstance(base_commit, str):
+            raise click.ClickException("Release manifest comparison field 'base_commit' must be a string or null.")
+        head_commit = data.get("head_commit")
+        if not isinstance(head_commit, str):
+            raise click.ClickException("Release manifest comparison field 'head_commit' must be a string.")
+        if not head_commit:
+            raise click.ClickException("Release manifest comparison field 'head_commit' must be a non-empty string.")
+        return cls(base_commit=base_commit, head_commit=head_commit)
+
+
+@dataclass(frozen=True)
 class ReleaseManifest:
     version: str
     pr_number: int | None
+    comparison: ReleaseComparison
     changed_paths: tuple[str, ...]
     direct_targets: tuple[str, ...]
     targets: tuple[str, ...]
@@ -59,6 +92,7 @@ class ReleaseManifest:
         return {
             "version": self.version,
             "pr_number": self.pr_number,
+            "comparison": self.comparison.to_dict(),
             "changed_paths": list(self.changed_paths),
             "direct_targets": list(self.direct_targets),
             "targets": list(self.targets),
@@ -80,10 +114,13 @@ class ReleaseManifest:
             if not isinstance(value, list) or not all(isinstance(item, str) for item in value):
                 raise click.ClickException(f"Release manifest field {field_name!r} must be a string list.")
             return tuple(value)
+        if "comparison" not in data:
+            raise click.ClickException("Release manifest must define a 'comparison' object.")
 
         return cls(
             version=version,
             pr_number=pr_number,
+            comparison=ReleaseComparison.from_dict(data["comparison"]),
             changed_paths=_string_list("changed_paths"),
             direct_targets=_string_list("direct_targets"),
             targets=_string_list("targets"),
@@ -167,19 +204,68 @@ def _release_change_window(repo_root: Path, ref: str = "HEAD") -> tuple[str | No
     return (base_commit, end_ref)
 
 
-def changed_paths_since_last_version_change(repo_root: Path | str = ".", ref: str = "HEAD") -> list[str]:
+def release_comparison(repo_root: Path | str = ".", ref: str = "HEAD") -> ReleaseComparison:
+    """Resolve the exact commits used for the version-window release comparison.
+
+    base_commit is the prior VERSION.txt-changing commit when one exists. head_commit
+    is the exact commit whose tree or diff is used to compute the manifest changes.
+    """
+
     repo_root = find_repo_root(repo_root)
     base_commit, end_ref = _release_change_window(repo_root, ref)
+    return ReleaseComparison(
+        base_commit=base_commit,
+        head_commit=_resolved_commit_sha(repo_root, end_ref),
+    )
+
+
+def git_ref_comparison(
+    repo_root: Path | str = ".",
+    *,
+    base_ref: str,
+    head_ref: str = "HEAD",
+    use_merge_base: bool = False,
+) -> ReleaseComparison:
+    """Resolve the exact commits used for a ref-to-ref comparison.
+
+    When use_merge_base is true, base_commit is the merge base of base_ref and
+    head_ref. Otherwise base_commit is the resolved SHA of base_ref itself.
+    """
+
+    repo_root = find_repo_root(repo_root)
+    if use_merge_base:
+        try:
+            base_commit = _git_stdout(repo_root, "merge-base", base_ref, head_ref).strip()
+        except subprocess.CalledProcessError as exc:
+            raise click.ClickException(
+                f"Unable to compute merge base between {base_ref!r} and {head_ref!r}: {exc.stderr.strip()}"
+            )
+    else:
+        base_commit = _resolved_commit_sha(repo_root, base_ref)
+    return ReleaseComparison(
+        base_commit=base_commit,
+        head_commit=_resolved_commit_sha(repo_root, head_ref),
+    )
+
+
+def changed_paths_for_release_comparison(
+    repo_root: Path | str,
+    comparison: ReleaseComparison,
+) -> list[str]:
+    repo_root = find_repo_root(repo_root)
 
     try:
-        if base_commit is None:
-            stdout = _git_stdout(repo_root, "ls-tree", "-r", "--name-only", end_ref)
+        if comparison.base_commit is None:
+            stdout = _git_stdout(repo_root, "ls-tree", "-r", "--name-only", comparison.head_commit)
         else:
-            stdout = _git_stdout(repo_root, "diff", "--name-only", f"{base_commit}..{end_ref}")
+            stdout = _git_stdout(repo_root, "diff", "--name-only", f"{comparison.base_commit}..{comparison.head_commit}")
     except subprocess.CalledProcessError as exc:
-        raise click.ClickException(f"Unable to compute changed paths for release planning at {ref}: {exc.stderr.strip()}")
+        raise click.ClickException(
+            "Unable to compute changed paths for release comparison "
+            f"{comparison.base_commit!r}..{comparison.head_commit!r}: {exc.stderr.strip()}"
+        )
 
-    changed_paths = sorted(
+    return sorted(
         {
             normalized
             for path in stdout.splitlines()
@@ -187,7 +273,11 @@ def changed_paths_since_last_version_change(repo_root: Path | str = ".", ref: st
             if normalized and normalized != VERSION_FILE_RELATIVE_PATH.as_posix()
         }
     )
-    return changed_paths
+
+
+def changed_paths_since_last_version_change(repo_root: Path | str = ".", ref: str = "HEAD") -> list[str]:
+    repo_root = find_repo_root(repo_root)
+    return changed_paths_for_release_comparison(repo_root, release_comparison(repo_root, ref=ref))
 
 
 def commits_since_last_version_change(
@@ -318,6 +408,7 @@ def compute_release_manifest(
     changed_paths: Iterable[str],
     version: str,
     pr_number: int | None,
+    comparison: ReleaseComparison,
 ) -> ReleaseManifest:
     repo_root = find_repo_root(repo_root)
     config = load_release_target_rules(repo_root)
@@ -337,9 +428,26 @@ def compute_release_manifest(
     return ReleaseManifest(
         version=version,
         pr_number=pr_number,
+        comparison=comparison,
         changed_paths=tuple(normalized_changed_paths),
         direct_targets=tuple(direct_targets),
         targets=tuple(expanded_targets),
+    )
+
+
+def compute_release_manifest_for_comparison(
+    repo_root: Path | str,
+    comparison: ReleaseComparison,
+    version: str,
+    pr_number: int | None,
+) -> ReleaseManifest:
+    repo_root = find_repo_root(repo_root)
+    return compute_release_manifest(
+        repo_root,
+        changed_paths=changed_paths_for_release_comparison(repo_root, comparison),
+        version=version,
+        pr_number=pr_number,
+        comparison=comparison,
     )
 
 
@@ -349,9 +457,10 @@ def compute_release_manifest_from_git(
     pr_number: int | None = None,
 ) -> ReleaseManifest:
     repo_root = find_repo_root(repo_root)
-    return compute_release_manifest(
+    comparison = release_comparison(repo_root, ref=ref)
+    return compute_release_manifest_for_comparison(
         repo_root,
-        changed_paths=changed_paths_since_last_version_change(repo_root, ref=ref),
+        comparison=comparison,
         version=_read_version(repo_root, ref=ref),
         pr_number=pr_number,
     )

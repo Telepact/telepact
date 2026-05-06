@@ -25,7 +25,7 @@ import toml
 from lxml import etree as ET
 from ruamel.yaml import YAML
 
-from ..release_plan import compute_release_manifest
+from ..release_plan import ReleaseComparison, compute_release_manifest_for_comparison, git_ref_comparison
 
 yaml = YAML()
 
@@ -143,21 +143,8 @@ def _bump_version(version: str) -> str:
     parts[-1] = str(int(parts[-1]) + 1)
     return ".".join(parts)
 
-
-def _changed_paths_since_main(main_ref: str = "origin/main") -> list[str]:
-    try:
-        result = subprocess.run(
-            ["git", "diff", "--name-only", f"{main_ref}...HEAD"],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-            check=True,
-        )
-    except subprocess.CalledProcessError as exc:
-        raise click.ClickException(
-            f"Unable to compute changed paths against {main_ref}: {exc.stderr.strip()}"
-        )
-    return [path for path in result.stdout.strip().splitlines() if path]
+def _release_comparison_since_main(main_ref: str = "origin/main") -> ReleaseComparison:
+    return git_ref_comparison(Path("."), base_ref=main_ref, head_ref="HEAD", use_merge_base=True)
 
 
 def create_version_bump_commit(
@@ -168,11 +155,6 @@ def create_version_bump_commit(
 ) -> str:
     """Create the release bump commit for either an existing PR flow or a standalone bump PR."""
     version_file = "VERSION.txt"
-    if changed_paths is None and compute_release_targets:
-        changed_paths = _changed_paths_since_main()
-    elif changed_paths is None:
-        changed_paths = []
-
     if not os.path.exists(version_file):
         raise click.ClickException(f"Version file {version_file} does not exist.")
 
@@ -180,9 +162,10 @@ def create_version_bump_commit(
         version = f.read().strip()
 
     if compute_release_targets:
-        release_manifest = compute_release_manifest(
+        comparison = _release_comparison_since_main()
+        release_manifest = compute_release_manifest_for_comparison(
             Path("."),
-            changed_paths=changed_paths,
+            comparison=comparison,
             version=version,
             pr_number=pr_number,
         )
