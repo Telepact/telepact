@@ -18,7 +18,6 @@ import json
 import os
 import subprocess
 import sys
-from dataclasses import replace
 from pathlib import Path
 
 import click
@@ -27,7 +26,7 @@ from lxml import etree as ET
 from ruamel.yaml import YAML
 
 from .doc_versions import write_doc_versions
-from ..release_plan import compute_release_manifest, write_release_manifest
+from ..release_plan import compute_release_manifest
 
 yaml = YAML()
 
@@ -146,7 +145,6 @@ def _bump_version(version: str) -> str:
     return ".".join(parts)
 
 
-# TODO: Remove. This has been replaced by another method that gets changed files direct from the PR
 def _changed_paths_since_main(main_ref: str = "origin/main") -> list[str]:
     try:
         result = subprocess.run(
@@ -163,10 +161,18 @@ def _changed_paths_since_main(main_ref: str = "origin/main") -> list[str]:
     return [path for path in result.stdout.strip().splitlines() if path]
 
 
-def create_version_bump_commit(pr_number: int, changed_paths: list[str] | None = None) -> str:
+def create_version_bump_commit(
+    pr_number: int | None = None,
+    changed_paths: list[str] | None = None,
+    *,
+    compute_release_targets: bool = True,
+) -> str:
+    """Create the release bump commit for either an existing PR flow or a standalone bump PR."""
     version_file = "VERSION.txt"
-    if changed_paths is None:
+    if changed_paths is None and compute_release_targets:
         changed_paths = _changed_paths_since_main()
+    elif changed_paths is None:
+        changed_paths = []
 
     if not os.path.exists(version_file):
         raise click.ClickException(f"Version file {version_file} does not exist.")
@@ -174,18 +180,21 @@ def create_version_bump_commit(pr_number: int, changed_paths: list[str] | None =
     with open(version_file, "r") as f:
         version = f.read().strip()
 
-    release_manifest = compute_release_manifest(
-        Path("."),
-        changed_paths=changed_paths,
-        version=version,
-        pr_number=pr_number,
-    )
-    sorted_release_targets = list(release_manifest.targets)
+    if compute_release_targets:
+        release_manifest = compute_release_manifest(
+            Path("."),
+            changed_paths=changed_paths,
+            version=version,
+            pr_number=pr_number,
+        )
+        sorted_release_targets = list(release_manifest.targets)
+    else:
+        sorted_release_targets = []
 
     new_version = version
     edited_files: list[str] = []
 
-    if sorted_release_targets:
+    if sorted_release_targets or not compute_release_targets:
         new_version = _bump_version(version)
 
         with open(version_file, "w") as f:
@@ -208,13 +217,6 @@ def create_version_bump_commit(pr_number: int, changed_paths: list[str] | None =
             if lock_file is not None:
                 edited_files.append(lock_file)
 
-        release_manifest = replace(release_manifest, version=new_version)
-
-    manifest_path = write_release_manifest(Path("."), release_manifest)
-    repo_relative_manifest_path = os.path.relpath(manifest_path, Path.cwd())
-    edited_files.append(repo_relative_manifest_path)
-    click.echo(f"Updated {repo_relative_manifest_path}")
-
     doc_versions_path = write_doc_versions(
         Path("."),
         None,
@@ -225,7 +227,11 @@ def create_version_bump_commit(pr_number: int, changed_paths: list[str] | None =
     edited_files.append(repo_relative_doc_versions_path)
     click.echo(f"Updated {repo_relative_doc_versions_path}")
 
-    new_commit_msg = "Update release-manifest.json"
+    if compute_release_targets:
+        release_target_lines = "\n".join(sorted_release_targets) if sorted_release_targets else "(none)"
+        new_commit_msg = f"Bump version to {new_version}\n\nRelease targets:\n{release_target_lines}"
+    else:
+        new_commit_msg = f"Bump version to {new_version}"
 
     subprocess.run(["git", "add"] + list(dict.fromkeys(edited_files)), check=True)
     subprocess.run(["git", "commit", "-m", new_commit_msg], check=True)
@@ -260,7 +266,4 @@ def set_version(version: str) -> None:
 @click.command()
 def bump() -> None:
     pr_number_str = os.getenv("PR_NUMBER")
-    if not pr_number_str:
-        click.echo("PR_NUMBER environment variable not set.", err=True)
-        sys.exit(1)
-    create_version_bump_commit(int(pr_number_str))
+    create_version_bump_commit(int(pr_number_str) if pr_number_str else None)

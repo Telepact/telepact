@@ -23,38 +23,15 @@ on:
   #     - main
 
 jobs:
-  should-release:
-    name: Check release trigger
-    runs-on: ubuntu-latest
-    permissions: {}
-    outputs:
-      should_release: ${{ steps.check.outputs.should_release }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Check head commit for version changes
-        id: check
-        run: |
-          if git diff-tree --no-commit-id --name-only -r HEAD | grep -Fxq 'VERSION.txt'; then
-            echo "should_release=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "should_release=false" >> "$GITHUB_OUTPUT"
-          fi
-
   build-release:
     name: Build release
-    needs: [should-release]
     uses: ./.github/workflows/build.yml
     
   create-release:
     name: Create release
     runs-on: ubuntu-latest
     environment: bot
-    needs: [should-release, build-release]
-    if: ${{ needs.should-release.outputs.should_release == 'true' }}
+    needs: [build-release]
     timeout-minutes: 2
     steps:
       - name: Generate GitHub App token
@@ -67,7 +44,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          fetch-depth: 0
           token: ${{ steps.generate-token.outputs.token }}
 
       - name: Download ts artifacts
