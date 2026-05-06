@@ -192,15 +192,10 @@ def _build_release_body(
         ]
         target_sections.append("### Dependency-triggered republishes\n" + "\n".join(dependency_lines))
 
-    heading = f"## {pr_title}"
-    if pr_number is not None and pr_url:
-        heading = f"{heading} [(#{pr_number})]({pr_url})"
-
     published_targets_block = "\n".join(published_target_lines)
     sections_block = "\n".join(target_sections) if target_sections else "### Release target changes\n(None)"
 
     return (
-        f"{heading}\n\n"
         "### Published targets\n"
         f"{published_targets_block}\n\n"
         f"{sections_block}"
