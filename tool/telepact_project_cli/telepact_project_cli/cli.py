@@ -23,7 +23,6 @@ from .commands.repository_automation import (
     mark_merge_ready,
     merge_pr,
     open_version_bump_pr,
-    print_release_manifest,
     publish_targets,
     release,
 )
@@ -46,7 +45,6 @@ main.add_command(merge_pr)
 main.add_command(release)
 main.add_command(open_version_bump_pr)
 main.add_command(publish_targets)
-main.add_command(print_release_manifest)
 main.add_command(automerge)
 main.add_command(consolidated_readme)
 main.add_command(doc_versions)

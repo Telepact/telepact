@@ -31,7 +31,6 @@ from ..release_plan import (
     compute_release_manifest_from_git,
     find_repo_root,
     load_release_target_rules,
-    render_release_manifest_from_git,
     resolve_publish_targets,
 )
 
@@ -624,13 +623,6 @@ def publish_targets(release_tag: str | None, release_body: str | None, github_ou
         github_output.write_text("\n".join(lines) + "\n", encoding="utf-8")
     else:
         click.echo("\n".join(lines))
-
-
-@click.command(name="print-release-manifest")
-@click.option("--ref", default="HEAD", help="Git ref to evaluate for release target computation.")
-def print_release_manifest(ref: str) -> None:
-    click.echo(render_release_manifest_from_git(Path("."), ref=ref))
-
 
 @click.command(name="open-version-bump-pr")
 def open_version_bump_pr() -> None:
