@@ -36,8 +36,7 @@ class GreetingHandler extends TypedServerHandler {
     }
 }
 
-const functionRouter = new FunctionRouter();
-functionRouter.registerUnauthenticatedRoutes(new GreetingHandler().functionRoutes());
+const functionRouter = new FunctionRouter(new GreetingHandler().functionRoutes());
 const telepactServer = new Server(schema, functionRouter, options);
 
 function readRequestBytes(request: IncomingMessage): Promise<Uint8Array> {

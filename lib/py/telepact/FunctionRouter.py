@@ -24,32 +24,12 @@ FunctionRoute = Callable[[str, 'Message'], Awaitable['Message']]
 
 
 class FunctionRouter:
-    def __init__(self) -> None:
-        self.authenticated_function_routes: dict[str, FunctionRoute] = {}
-        self.unauthenticated_function_routes: dict[str, FunctionRoute] = {}
-
-    def register_authenticated_routes(self, function_routes: dict[str, FunctionRoute]) -> None:
-        for function_name, function_route in function_routes.items():
-            self.authenticated_function_routes[function_name] = function_route
-            self.unauthenticated_function_routes.pop(function_name, None)
-
-    def register_unauthenticated_routes(self, function_routes: dict[str, FunctionRoute]) -> None:
-        for function_name, function_route in function_routes.items():
-            self.unauthenticated_function_routes[function_name] = function_route
-            self.authenticated_function_routes.pop(function_name, None)
-
-    def has_authenticated_routes(self) -> bool:
-        return bool(self.authenticated_function_routes)
-
-    def requires_authentication(self, function_name: str) -> bool:
-        return function_name in self.authenticated_function_routes
+    def __init__(self, function_routes: dict[str, FunctionRoute] | None = None) -> None:
+        self.function_routes: dict[str, FunctionRoute] = dict(function_routes or {})
 
     async def route(self, request_message: 'Message') -> 'Message':
         function_name = request_message.get_body_target()
-        function_route = (
-            self.authenticated_function_routes.get(function_name)
-            or self.unauthenticated_function_routes.get(function_name)
-        )
+        function_route = self.function_routes.get(function_name)
         if function_route is None:
             raise RuntimeError(f"Unknown function: {function_name}")
         return await function_route(function_name, request_message)

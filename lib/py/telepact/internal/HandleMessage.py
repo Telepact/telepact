@@ -23,6 +23,7 @@ from ..Message import Message
 from ..TelepactError import TelepactError
 from ..internal.UnknownError import build_unknown_error_message
 from .types.TTypeDeclaration import TTypeDeclaration
+from .RequiresAuthentication import requires_authentication
 
 if TYPE_CHECKING:
     from ..Server import AuthHandler, FunctionRouter, Middleware, UpdateHeaders
@@ -75,7 +76,9 @@ async def handle_message(
     function_name = request_target
     call_type = cast(TUnion, parsed_telepact_schema[request_target])
     result_union_type = cast(TUnion, parsed_telepact_schema[request_target + '.->'])
-    requires_authentication = unknown_target is None and function_router.requires_authentication(function_name)
+    function_requires_authentication = (
+        unknown_target is None and requires_authentication(telepact_schema, function_name)
+    )
 
     call_id = request_headers.get("@id_")
     if call_id is not None:
@@ -102,10 +105,10 @@ async def handle_message(
             response_headers,
         )
 
-    if requires_authentication and "@auth_" not in request_headers:
+    if function_requires_authentication and "@auth_" not in request_headers:
         return build_unauthenticated_error_message(result_union_type, response_headers)
 
-    if requires_authentication:
+    if function_requires_authentication:
         try:
             auth_headers = on_auth(request_headers)
             if isawaitable(auth_headers):

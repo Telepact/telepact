@@ -10,8 +10,7 @@ async def divide(function_name: str, request_message: Message) -> Message:
     return Message({}, {'Ok_': {'result': x / y}})
 
 options = Server.Options()
-function_router = FunctionRouter()
-function_router.register_unauthenticated_routes({'fn.divide': divide})
+function_router = FunctionRouter({'fn.divide': divide})
 server = Server(schema, function_router, options)
 
 # Plug into any framework — Starlette, Flask, FastAPI...

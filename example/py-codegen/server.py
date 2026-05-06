@@ -34,8 +34,7 @@ class GreetingHandler(TypedServerHandler):
         )
 
 
-function_router = FunctionRouter()
-function_router.register_unauthenticated_routes(GreetingHandler().function_routes())
+function_router = FunctionRouter(GreetingHandler().function_routes())
 telepact_server = Server(schema, function_router, options)
 
 

@@ -42,8 +42,7 @@ async function trackPackage(_functionName: string, _requestMessage: Message): Pr
     });
 }
 
-const functionRouter = new FunctionRouter();
-functionRouter.registerUnauthenticatedRoutes({ 'fn.trackPackage': trackPackage });
+const functionRouter = new FunctionRouter({ 'fn.trackPackage': trackPackage });
 const telepactServer = new Server(schema, functionRouter, options);
 
 function readRequestBytes(request: IncomingMessage): Promise<Uint8Array> {

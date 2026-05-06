@@ -377,8 +377,7 @@ function startSchemaTestServer(
     const options: ServerOptions = new ServerOptions();
     options.onError = (e: Error) => console.error(e);
 
-    const functionRouter = new FunctionRouter();
-    functionRouter.registerUnauthenticatedRoutes(functionRoutes);
+    const functionRouter = new FunctionRouter(functionRoutes);
     const server: Server = new Server(telepact, functionRouter, options);
 
     const sub: Subscription = connection.subscribe(frontdoorTopic);
@@ -530,12 +529,7 @@ function startTestServer(
     const functionRoutes = useCodegen
         ? codeGenHandler.functionRoutes()
         : createFunctionRoutes(telepact, forwardRequest);
-    const functionRouter = new FunctionRouter();
-    if (authRequired) {
-        functionRouter.registerAuthenticatedRoutes(functionRoutes);
-    } else {
-        functionRouter.registerUnauthenticatedRoutes(functionRoutes);
-    }
+    const functionRouter = new FunctionRouter(functionRoutes);
     const server: Server = new Server(telepact, functionRouter, options);
 
     const alternateOptions = new ServerOptions();
@@ -545,12 +539,7 @@ function startTestServer(
     const alternateFunctionRoutes = useCodegen
         ? codeGenHandler.functionRoutes()
         : createFunctionRoutes(alternateTelepact, forwardRequest);
-    const alternateFunctionRouter = new FunctionRouter();
-    if (authRequired) {
-        alternateFunctionRouter.registerAuthenticatedRoutes(alternateFunctionRoutes);
-    } else {
-        alternateFunctionRouter.registerUnauthenticatedRoutes(alternateFunctionRoutes);
-    }
+    const alternateFunctionRouter = new FunctionRouter(alternateFunctionRoutes);
     const alternateServer: Server = new Server(alternateTelepact, alternateFunctionRouter, alternateOptions);
 
     const subscription: Subscription = connection.subscribe(frontdoorTopic);

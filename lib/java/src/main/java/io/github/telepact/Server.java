@@ -108,7 +108,7 @@ public class Server {
      * @param options The options for configuring the server.
      */
     public Server(TelepactSchema telepactSchema, FunctionRouter functionRouter, Options options) {
-        functionRouter.registerUnauthenticatedRoutes(CreateInternalFunctionRoutes.createInternalFunctionRoutes(telepactSchema));
+        functionRouter.functionRoutes().putAll(CreateInternalFunctionRoutes.createInternalFunctionRoutes(telepactSchema));
         this.functionRouter = functionRouter;
         this.middleware = options.middleware;
         this.onError = options.onError;
@@ -122,11 +122,6 @@ public class Server {
         final var base64Encoder = new ServerBase64Encoder();
 
         this.serializer = new Serializer(options.serialization, binaryEncoder, base64Encoder);
-
-        if (!this.telepactSchema.parsed.containsKey("union.Auth_") && this.functionRouter.hasAuthenticatedRoutes()) {
-            throw new RuntimeException(
-                    "Authenticated routes require `union.Auth_` in your schema.");
-        }
     }
 
     /**

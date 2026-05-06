@@ -18,6 +18,7 @@
   info.Calculator: {}
 
 - ///: A function that adds two numbers.
+  $authenticated: false
   fn.add:
     x: "number"
     y: "number"
@@ -27,6 +28,7 @@
 
 - ///: |
     Save a variable with a given `name` and `value`. If a variable with the same name already exists, it will be overwritten.
+  $authenticated: false
   fn.saveVariable:
     name: "string"
     value: "number"
@@ -35,6 +37,7 @@
 
 - ///: |
     Save a map of `variables` where keys are variable names and values are their corresponding numeric values. Existing variables with the same names will be overwritten.
+  $authenticated: false
   fn.saveVariables:
     variables: {"string": "number"}
   ->:
@@ -42,6 +45,7 @@
 
 - ///: |
     Retrieve a variable by its `name`.
+  $authenticated: false
   fn.getVariable:
     name: "string"
   ->:
@@ -50,6 +54,7 @@
 
 - ///: |
     Retrieve all variables.
+  $authenticated: false
   fn.getVariables: {}
   ->:
     - Ok_:
@@ -57,6 +62,7 @@
 
 - ///: |
     Delete a variable by its `name`.
+  $authenticated: false
   fn.deleteVariable:
     name: "string"
   ->:
@@ -64,6 +70,7 @@
 
 - ///: |
     Delete multiple variables by their `names`.
+  $authenticated: false
   fn.deleteVariables:
     names: ["string"]
   ->:
@@ -71,6 +78,7 @@
 
 - ///: |
     Evaluate an `expression` and return the result.
+  $authenticated: false
   fn.evaluate:
     expression: "union.Expression"
   ->:
@@ -115,6 +123,7 @@
 
 - ///: |
     Get previous computations, ordered from most recent to least recent, up to the specified `limit`.
+  $authenticated: false
   fn.getPaperTape:
     limit!: "integer"
   ->:
@@ -123,6 +132,7 @@
 
 - ///: |
     Export the saved variables and evaluations for the current namespace as a blob.
+  $authenticated: false
   fn.export: {}
   ->:
     - Ok_:
@@ -130,6 +140,7 @@
 
 - ///: |
     Replace the saved variables and evaluations for the current namespace using a previously exported blob.
+  $authenticated: false
   fn.import:
     blob: "bytes"
   ->:
@@ -145,6 +156,7 @@
 
 - ///: |
     Claim a session for the given `username`, if available.
+  $authenticated: false
   fn.login:
     username: "string"
   ->:

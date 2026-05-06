@@ -50,8 +50,7 @@ async function getFollowUp(functionName: string, requestMessage: Message): Promi
     });
 }
 
-const functionRouter = new FunctionRouter();
-functionRouter.registerUnauthenticatedRoutes({
+const functionRouter = new FunctionRouter({
     'fn.createIssueLink': createIssueLink,
     'fn.getFollowUp': getFollowUp,
 });

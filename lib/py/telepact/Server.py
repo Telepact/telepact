@@ -60,7 +60,7 @@ class Server:
         """
         from .internal.binary.ConstructBinaryEncoding import construct_binary_encoding
 
-        function_router.register_unauthenticated_routes(create_internal_function_routes(telepact_schema))
+        function_router.function_routes.update(create_internal_function_routes(telepact_schema))
         self.function_router = function_router
         self.middleware = options.middleware
         self.on_error = options.on_error
@@ -74,11 +74,6 @@ class Server:
         binary_encoder = ServerBinaryEncoder(binary_encoding)
         base64_encoder = ServerBase64Encoder()
         self.serializer = Serializer(options.serialization, binary_encoder, base64_encoder)
-
-        if "union.Auth_" not in self.telepact_schema.parsed and self.function_router.has_authenticated_routes():
-            raise RuntimeError(
-                "Authenticated routes require `union.Auth_` in your schema."
-            )
 
     async def process(self, request_message_bytes: bytes, update_headers: UpdateHeaders | None = None) -> 'Response':
         """

@@ -51,8 +51,7 @@ async def get_follow_up(function_name: str, request_message: Message) -> Message
     })
 
 
-function_router = FunctionRouter()
-function_router.register_unauthenticated_routes({
+function_router = FunctionRouter({
     'fn.createIssueLink': create_issue_link,
     'fn.getFollowUp': get_follow_up,
 })

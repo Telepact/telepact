@@ -31,7 +31,6 @@ export type ResponseHandler = (message: Message) => void;
 export type AuthHandler = (headers: Record<string, any>) => Record<string, any> | Promise<Record<string, any>>;
 export type FunctionRouter = {
     route: (message: Message) => Promise<Message>;
-    requiresAuthentication: (functionName: string) => boolean;
 };
 export type Middleware = (requestMessage: Message, functionRouter: FunctionRouter) => Promise<Message>;
 

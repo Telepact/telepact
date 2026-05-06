@@ -35,8 +35,7 @@ async function greet(functionName: string, requestMessage: Message): Promise<Mes
     });
 }
 
-const functionRouter = new FunctionRouter();
-functionRouter.registerUnauthenticatedRoutes({ 'fn.greet': greet });
+const functionRouter = new FunctionRouter({ 'fn.greet': greet });
 const telepactServer = new Server(schema, functionRouter, options);
 
 function rawDataToBytes(data: RawData): Uint8Array {

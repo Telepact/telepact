@@ -75,7 +75,8 @@ public class HandleMessage {
         final var functionName = requestTarget;
         final var callType = (TUnion) parsedTelepactSchema.get(requestTarget);
         final var resultUnionType = (TUnion) parsedTelepactSchema.get(requestTarget + ".->");
-        final var requiresAuthentication = unknownTarget == null && functionRouter.requiresAuthentication(functionName);
+        final var requiresAuthentication = unknownTarget == null
+                && RequiresAuthentication.requiresAuthentication(telepactSchema, functionName);
 
         final var callId = requestHeaders.get("@id_");
         if (callId != null) {
