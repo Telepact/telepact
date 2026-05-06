@@ -14,11 +14,13 @@
 #|  limitations under the License.
 #|
 
+import json
 import os
 import re
 import subprocess
 import tempfile
 import time
+import urllib.request
 from pathlib import Path
 
 import click
@@ -29,6 +31,7 @@ from github.PullRequest import PullRequest
 from .doc_versions import _read_go_module_path, _read_maven_gav, _read_package_json_name, _read_pyproject_name
 from .project_version import _bump_version, create_version_bump_commit
 from ..release_plan import (
+    ReleaseManifest,
     compute_release_manifest_from_git,
     find_repo_root,
     load_release_target_rules,
@@ -479,6 +482,63 @@ def _release_pr_metadata(repo, default_title: str) -> tuple[str, int | None, str
     return (pr.title, pr.number, pr.html_url)
 
 
+def _read_release_event_payload(event_path: Path) -> dict:
+    try:
+        data = json.loads(event_path.read_text(encoding="utf-8"))
+    except FileNotFoundError as exc:
+        raise click.ClickException(f"GitHub event payload not found: {event_path}") from exc
+    except json.JSONDecodeError as exc:
+        raise click.ClickException(f"Invalid JSON in GitHub event payload {event_path}: {exc}") from exc
+    if not isinstance(data, dict):
+        raise click.ClickException(f"GitHub event payload must be a JSON object: {event_path}")
+    return data
+
+
+def _download_release_manifest_payload(event_path: Path, github_token: str) -> bytes:
+    event = _read_release_event_payload(event_path)
+    release = event.get("release")
+    if not isinstance(release, dict):
+        raise click.ClickException("GitHub event payload does not include a release object.")
+    assets = release.get("assets", [])
+    if not isinstance(assets, list):
+        raise click.ClickException("GitHub release payload field 'assets' must be a list.")
+
+    asset = next(
+        (
+            item
+            for item in assets
+            if isinstance(item, dict) and item.get("name") == RELEASE_MANIFEST_ASSET_NAME and isinstance(item.get("url"), str)
+        ),
+        None,
+    )
+    if asset is None:
+        raise click.ClickException(f"{RELEASE_MANIFEST_ASSET_NAME} asset is missing from the release.")
+
+    request = urllib.request.Request(
+        asset["url"],
+        headers={
+            "Accept": "application/octet-stream",
+            "Authorization": f"Bearer {github_token}",
+            "X-GitHub-Api-Version": "2022-11-28",
+        },
+    )
+    try:
+        with urllib.request.urlopen(request) as response:
+            return response.read()
+    except Exception as exc:
+        raise click.ClickException(f"Failed to download {RELEASE_MANIFEST_ASSET_NAME}: {exc}") from exc
+
+
+def _parse_release_manifest_payload(payload: bytes) -> ReleaseManifest:
+    try:
+        data = json.loads(payload.decode("utf-8"))
+    except UnicodeDecodeError as exc:
+        raise click.ClickException(f"{RELEASE_MANIFEST_ASSET_NAME} is not valid UTF-8 JSON.") from exc
+    except json.JSONDecodeError as exc:
+        raise click.ClickException(f"{RELEASE_MANIFEST_ASSET_NAME} is not valid JSON: {exc}") from exc
+    return ReleaseManifest.from_dict(data)
+
+
 def _process_merge_ready_pull_request(repo, pr_number: int) -> None:
     commenter_login = _latest_merge_commenter_login(repo, pr_number)
     commenter_permission = _commenter_permission(repo, commenter_login)
@@ -655,6 +715,23 @@ def publish_targets(
 @click.option("--ref", default="HEAD", help="Git ref to evaluate for release target computation.")
 def print_release_manifest(ref: str) -> None:
     click.echo(render_release_manifest_from_git(Path("."), ref=ref))
+
+
+@click.command(name="download-release-manifest")
+@click.option(
+    "--output",
+    default=Path(RELEASE_MANIFEST_ASSET_NAME),
+    type=click.Path(dir_okay=False, path_type=Path),
+    help="Path where the downloaded release manifest should be written.",
+)
+def download_release_manifest(output: Path) -> None:
+    github_token = _require_env("GITHUB_TOKEN")
+    event_path = Path(_require_env("GITHUB_EVENT_PATH"))
+    payload = _download_release_manifest_payload(event_path, github_token)
+    manifest = _parse_release_manifest_payload(payload)
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(render_release_manifest_for_stdout(manifest), encoding="utf-8")
+    click.echo(f"Downloaded {RELEASE_MANIFEST_ASSET_NAME} to {output}")
 
 
 @click.command(name="open-version-bump-pr")

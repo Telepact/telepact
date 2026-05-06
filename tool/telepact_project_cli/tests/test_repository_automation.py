@@ -52,6 +52,65 @@ def _pushd(path: Path):
 
 
 class RepositoryAutomationTests(unittest.TestCase):
+    def test_download_release_manifest_command_writes_manifest_from_event_asset(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            repo_root = Path(tmp_dir)
+            event_path = repo_root / "event.json"
+            event_path.write_text(
+                json.dumps(
+                    {
+                        "release": {
+                            "assets": [
+                                {
+                                    "name": "release-manifest.json",
+                                    "url": "https://example.test/assets/manifest",
+                                }
+                            ]
+                        }
+                    }
+                ),
+                encoding="utf-8",
+            )
+            output_path = repo_root / "nested" / "release-manifest.json"
+            payload = json.dumps(
+                {
+                    "version": "1.0.0-alpha.215",
+                    "pr_number": None,
+                    "changed_paths": ["lib/py/impl.py"],
+                    "direct_targets": ["py"],
+                    "targets": ["cli", "py"],
+                }
+            ).encode("utf-8")
+
+            response = mock.MagicMock()
+            response.read.return_value = payload
+            urlopen_context = mock.MagicMock()
+            urlopen_context.__enter__.return_value = response
+            urlopen_context.__exit__.return_value = None
+
+            runner = CliRunner()
+            with mock.patch("telepact_project_cli.commands.repository_automation.urllib.request.urlopen", return_value=urlopen_context):
+                result = runner.invoke(
+                    main,
+                    ["download-release-manifest", "--output", str(output_path)],
+                    env={
+                        "GITHUB_TOKEN": "token",
+                        "GITHUB_EVENT_PATH": str(event_path),
+                    },
+                )
+
+            self.assertEqual(result.exit_code, 0, msg=result.output)
+            self.assertEqual(
+                json.loads(output_path.read_text(encoding="utf-8")),
+                {
+                    "changed_paths": ["lib/py/impl.py"],
+                    "direct_targets": ["py"],
+                    "pr_number": None,
+                    "targets": ["cli", "py"],
+                    "version": "1.0.0-alpha.215",
+                },
+            )
+
     def test_release_command_uploads_release_manifest_asset(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             repo_root = Path(tmp_dir)

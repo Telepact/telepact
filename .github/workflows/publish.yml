@@ -48,33 +48,7 @@ jobs:
       - name: Download release manifest asset
         env:
           GITHUB_TOKEN: ${{ github.token }}
-        run: |
-          python - <<'PY'
-          import json
-          import os
-          import sys
-          import urllib.request
-
-          event = json.loads(open(os.environ["GITHUB_EVENT_PATH"], encoding="utf-8").read())
-          assets = event["release"].get("assets", [])
-          asset = next((item for item in assets if item.get("name") == "release-manifest.json"), None)
-          if asset is None:
-              raise SystemExit("release-manifest.json asset is missing from the release.")
-
-          request = urllib.request.Request(
-              asset["url"],
-              headers={
-                  "Accept": "application/octet-stream",
-                  "Authorization": f"Bearer {os.environ['GITHUB_TOKEN']}",
-                  "X-GitHub-Api-Version": "2022-11-28",
-              },
-          )
-          with urllib.request.urlopen(request) as response:
-              payload = response.read()
-          json.loads(payload.decode("utf-8"))
-          with open("release-manifest.json", "wb") as manifest_file:
-              manifest_file.write(payload)
-          PY
+        run: ./tool/telepact-project download-release-manifest --output release-manifest.json
 
       - name: Resolve release manifest
         id: resolve
