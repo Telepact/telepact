@@ -179,9 +179,14 @@ def _previous_version_change_commit(repo_root: Path, ref: str = "HEAD") -> str |
     commits = _version_change_commits(repo_root, ref)
     if not commits:
         raise click.ClickException(f"No commits found that changed {VERSION_FILE_RELATIVE_PATH}.")
-    if len(commits) < 2:
+    try:
+        previous_ref = _git_stdout(repo_root, "rev-parse", f"{ref}^").strip()
+    except subprocess.CalledProcessError:
         return None
-    return commits[1]
+    previous_commits = _version_change_commits(repo_root, previous_ref)
+    if not previous_commits:
+        return None
+    return previous_commits[0]
 
 
 def _resolved_commit_sha(repo_root: Path, ref: str) -> str:

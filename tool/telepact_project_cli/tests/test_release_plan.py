@@ -301,6 +301,37 @@ class ReleasePlanTests(unittest.TestCase):
                     ["lib/py/impl.py"],
                 )
 
+    def test_changed_paths_since_last_version_change_excludes_head_before_finding_latest_version_commit(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            repo_root = Path(tmp_dir)
+            _init_repo(repo_root)
+            _write_release_targets(repo_root)
+            (repo_root / "VERSION.txt").write_text("1.0.0-alpha.200", encoding="utf-8")
+            (repo_root / "lib" / "py").mkdir(parents=True)
+            (repo_root / "lib" / "py" / "pyproject.toml").write_text(
+                '[project]\nname = "telepact"\nversion = "1.0.0-alpha.200"\n',
+                encoding="utf-8",
+            )
+            _commit_all(repo_root, "Initial release")
+
+            (repo_root / "lib" / "py" / "feature_before_bump.py").write_text("print('before')\n", encoding="utf-8")
+            _commit_all(repo_root, "Feature before bump")
+
+            (repo_root / "VERSION.txt").write_text("1.0.0-alpha.201", encoding="utf-8")
+            (repo_root / "lib" / "py" / "pyproject.toml").write_text(
+                '[project]\nname = "telepact"\nversion = "1.0.0-alpha.201"\n',
+                encoding="utf-8",
+            )
+            _commit_all(repo_root, "Bump version")
+
+            (repo_root / "lib" / "py" / "feature_after_bump.py").write_text("print('after')\n", encoding="utf-8")
+            _commit_all(repo_root, "Feature after bump")
+
+            self.assertEqual(
+                changed_paths_since_last_version_change(repo_root),
+                ["lib/py/feature_after_bump.py"],
+            )
+
     def test_compute_release_manifest_from_git_uses_previous_version_commit_as_base(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             repo_root = Path(tmp_dir)
