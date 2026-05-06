@@ -200,7 +200,6 @@ def _build_release_body(
     sections_block = "\n".join(target_sections) if target_sections else "### Release target changes\n(None)"
 
     return (
-        f"{heading}\n\n"
         "### Published targets\n"
         f"{published_targets_block}\n\n"
         f"{sections_block}"
