@@ -67,7 +67,7 @@ class ReleaseComparison:
     @classmethod
     def from_dict(cls, data: dict) -> "ReleaseComparison":
         if not isinstance(data, dict):
-            raise click.ClickException("Release manifest field 'comparison' must be an object.")
+            raise click.ClickException("Release manifest field 'comparison' must be a JSON object.")
         base_commit = data.get("base_commit")
         if base_commit is not None and not isinstance(base_commit, str):
             raise click.ClickException("Release manifest comparison field 'base_commit' must be a string or null.")
@@ -114,6 +114,8 @@ class ReleaseManifest:
             if not isinstance(value, list) or not all(isinstance(item, str) for item in value):
                 raise click.ClickException(f"Release manifest field {field_name!r} must be a string list.")
             return tuple(value)
+        if "comparison" not in data:
+            raise click.ClickException("Release manifest must define a 'comparison' object.")
 
         return cls(
             version=version,
