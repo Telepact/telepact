@@ -23,8 +23,8 @@ func ValidateHeaders(headers map[string]any, parsedRequestHeaders map[string]*TF
 	failures := make([]*ValidationFailure, 0)
 
 	for header, value := range headers {
-		if !strings.HasPrefix(header, "+") {
-			failures = append(failures, NewValidationFailure([]any{header}, "RequiredObjectKeyPrefixMissing", map[string]any{"prefix": "+"}))
+		if !strings.HasPrefix(header, "@") {
+			failures = append(failures, NewValidationFailure([]any{header}, "RequiredObjectKeyPrefixMissing", map[string]any{"prefix": "@"}))
 		}
 
 		field := parsedRequestHeaders[header]

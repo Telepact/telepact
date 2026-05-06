@@ -22,8 +22,8 @@ import { BinaryEncoderUnavailableError } from '../../internal/binary/BinaryEncod
 export function serverBinaryEncode(message: any[], binaryEncoder: BinaryEncoding): any[] {
     const headers: { [key: string]: any } = message[0];
     const messageBody: { [key: string]: any } = message[1];
-    const clientKnownBinaryChecksums: number[] | undefined = headers['+clientKnownBinaryChecksums_'];
-    delete headers['+clientKnownBinaryChecksums_'];
+    const clientKnownBinaryChecksums: number[] | undefined = headers['@clientKnownBinaryChecksums_'];
+    delete headers['@clientKnownBinaryChecksums_'];
 
     const resultTag = Object.keys(messageBody)[0];
 
@@ -32,14 +32,14 @@ export function serverBinaryEncode(message: any[], binaryEncoder: BinaryEncoding
     }
 
     if (clientKnownBinaryChecksums === undefined || !clientKnownBinaryChecksums.includes(binaryEncoder.checksum)) {
-        headers['+enc_'] = binaryEncoder.encodeMap;
+        headers['@enc_'] = binaryEncoder.encodeMap;
     }
 
-    headers['+bin_'] = [binaryEncoder.checksum];
+    headers['@bin_'] = [binaryEncoder.checksum];
     const encodedMessageBody = encodeBody(messageBody, binaryEncoder);
 
     let finalEncodedMessageBody: { [key: string]: any };
-    if (headers['+pac_'] === true) {
+    if (headers['@pac_'] === true) {
         finalEncodedMessageBody = packBody(encodedMessageBody);
     } else {
         finalEncodedMessageBody = encodedMessageBody;

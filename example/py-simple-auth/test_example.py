@@ -39,7 +39,7 @@ async def run_example() -> None:
         client = Client(adapter, Client.Options())
 
         shift_response = await client.request(Message({
-            '+auth_': {
+            '@auth_': {
                 'Password': {
                     'username': 'lead-baker',
                     'password': 'opensesame',
@@ -56,7 +56,7 @@ async def run_example() -> None:
         }
 
         special_response = await client.request(Message({
-            '+auth_': {
+            '@auth_': {
                 'Password': {
                     'username': 'cashier',
                     'password': 'knockknock',
@@ -71,7 +71,7 @@ async def run_example() -> None:
         }
 
         auth_failure_response = await client.request(Message({
-            '+auth_': {
+            '@auth_': {
                 'Password': {
                     'username': 'explode',
                     'password': 'boom',

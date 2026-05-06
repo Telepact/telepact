@@ -44,7 +44,7 @@ The envelope is always:
 
 Where:
 
-- `headers` is a JSON object for cross-cutting behavior such as `+id_`, `+time_`, `+select_`, or auth headers
+- `headers` is a JSON object for cross-cutting behavior such as `@id_`, `@time_`, `@select_`, or auth headers
 - `body` is a JSON object with exactly one top-level tag
 
 For requests, that tag is the called function:
@@ -109,18 +109,18 @@ Use the default `fn.api_` call for normal integration work. Use `includeInternal
 
 Common client-facing headers include:
 
-- `+time_`: request timeout in milliseconds
-- `+id_`: correlation ID reflected by the server
-- `+select_`: response field selection
-- `+auth_`: auth data when the schema defines `union.Auth_`
-- `+warn_`: warnings returned by the server
-- `+bin_`, `+enc_`, `+pac_`: binary negotiation headers (though should not use directly)
+- `@time_`: request timeout in milliseconds
+- `@id_`: correlation ID reflected by the server
+- `@select_`: response field selection
+- `@auth_`: auth data when the schema defines `union.Auth_`
+- `@warn_`: warnings returned by the server
+- `@bin_`, `@enc_`, `@pac_`: binary negotiation headers (though should not use directly)
 
 For JSON mode, API schema fields that have the `bytes` type travel as base64 strings.
 
 ## Auth
 
-If the server schema defines `union.Auth_`, send credentials in the `+auth_` header. The value inside `+auth_` must match one variant of `union.Auth_` exactly.
+If the server schema defines `union.Auth_`, send credentials in the `@auth_` header. The value inside `@auth_` must match one variant of `union.Auth_` exactly.
 
 For example, if the schema includes:
 
@@ -135,7 +135,7 @@ then a client request should look like:
 ```json
 [
     {
-        "+auth_": {
+        "@auth_": {
             "Token": {
                 "token": "***"
             }
@@ -152,7 +152,7 @@ Using the Telepact library, that becomes:
 ```ts
 const request = new Message(
     {
-        '+auth_': {
+        '@auth_': {
             token: 'secret-token',
         },
     },
@@ -162,7 +162,7 @@ const request = new Message(
 );
 ```
 
-If the API does not use auth, omit `+auth_`.
+If the API does not use auth, omit `@auth_`.
 
 ## Path A: Raw Client
 
@@ -180,13 +180,13 @@ Use this path when you do not want a Telepact dependency.
 Example request:
 
 ```json
-[{"+id_": "call-123"}, {"fn.exportVariables": {"limit!": 1}}]
+[{"@id_": "call-123"}, {"fn.exportVariables": {"limit!": 1}}]
 ```
 
 Example response:
 
 ```json
-[{"+id_": "call-123"}, {"Ok_": {"variables": [{"name": "a", "value": 1}]}}]
+[{"@id_": "call-123"}, {"Ok_": {"variables": [{"name": "a", "value": 1}]}}]
 ```
 
 ### Raw Client Rules
@@ -199,7 +199,7 @@ Example response:
 
 ### Raw Response Selection
 
-`+select_` lets the client ask the server to trim response payloads.
+`@select_` lets the client ask the server to trim response payloads.
 
 For the full `_ext.Select_` shape and more end-to-end examples, see:
 https://raw.githubusercontent.com/Telepact/telepact/main/doc/02-design-apis/03-extensions.md
@@ -209,7 +209,7 @@ Common patterns:
 ```json
 [
     {
-        "+select_": {
+        "@select_": {
             "struct.User": ["id", "displayName!"],
             "->": {
                 "Ok_": ["users"]
@@ -226,7 +226,7 @@ For unions, select by tag:
 
 ```json
 {
-    "+select_": {
+    "@select_": {
         "union.SearchResult": {
             "User": ["id", "displayName!"]
         }
@@ -244,10 +244,10 @@ Use manual binary only if you fully control both ends and have a concrete reason
 
 If you must implement it manually:
 
-- the client advertises known encodings with `+bin_`
-- the server responds with `+bin_`
-- when the checksum is unknown to the client, the server also returns `+enc_`
-- `+pac_` opts into packed binary form
+- the client advertises known encodings with `@bin_`
+- the server responds with `@bin_`
+- when the checksum is unknown to the client, the server also returns `@enc_`
+- `@pac_` opts into packed binary form
 - on `ErrorParseFailure_` with `IncompatibleBinaryEncoding`, retry after updating the encoding map or fall back to JSON
 
 ## Path B: Telepact Library Client
@@ -286,7 +286,7 @@ It handles:
 - serializing a `Message` to wire bytes
 - deserializing response bytes back into a `Message`
 - JSON/base64 conversion for `bytes` fields
-- defaulting `+time_` when the request does not provide one
+- defaulting `@time_` when the request does not provide one
 - binary negotiation bookkeeping when `useBinary` is enabled
 - retrying once when the server reports `IncompatibleBinaryEncoding`
 
@@ -326,7 +326,7 @@ const client = new Client(adapter, options);
 
 const response = await client.request(
     new Message(
-        { '+select_': { '->': { Ok_: ['summary'] } } },
+        { '@select_': { '->': { Ok_: ['summary'] } } },
         { 'fn.getDashboard': {} },
     ),
 );
@@ -357,7 +357,7 @@ client = Client(adapter, options)
 
 response = await client.request(
     Message(
-        {'+select_': {'->': {'Ok_': ['summary']}}},
+        {'@select_': {'->': {'Ok_': ['summary']}}},
         {'fn.getDashboard': {}},
     )
 )
@@ -384,7 +384,7 @@ options.alwaysSendJson = false;
 var client = new Client(adapter, options);
 var response = client.request(
     new Message(
-        Map.of("+select_", Map.of("->", Map.of("Ok_", List.of("summary")))),
+        Map.of("@select_", Map.of("->", Map.of("Ok_", List.of("summary")))),
         Map.of("fn.getDashboard", Map.of())
     )
 );
@@ -420,7 +420,7 @@ if err != nil {
 response, err := client.Request(
     telepact.NewMessage(
         map[string]any{
-            "+select_": map[string]any{
+            "@select_": map[string]any{
                 "->": map[string]any{
                     "Ok_": []any{"summary"},
                 },
@@ -440,7 +440,7 @@ response, err := client.Request(
 3. Use `{"includeInternal!": true}` with `fn.api_` when you need the full available function surface, including Telepact internal definitions.
 4. Decide whether the client should be raw JSON or Telepact-library based.
 5. Implement the real function calls with exact Telepact message envelopes.
-6. Add optional headers such as `+id_`, `+auth_`, or `+select_` only when they are actually needed.
+6. Add optional headers such as `@id_`, `@auth_`, or `@select_` only when they are actually needed.
 7. Reach for binary only after the JSON path is already working.
 
 ## Client Authoring Rules
@@ -457,7 +457,7 @@ response, err := client.Request(
 ## Debugging Checklist
 
 - If the server says `ErrorInvalidRequestBody_`, compare your function name and argument object directly to the schema.
-- If the server says `ErrorInvalidRequestHeaders_`, check `+select_`, auth headers, and header value types.
+- If the server says `ErrorInvalidRequestHeaders_`, check `@select_`, auth headers, and header value types.
 - If a `bytes` field looks wrong in JSON mode, check whether you forgot base64 encoding or decoding.
 - If binary mode fails with `IncompatibleBinaryEncoding`, retry through the library client or refresh your encoding map before sending another binary request.
 - If the server keeps returning `ErrorUnknown_`, validate the transport first with `fn.ping_` and then inspect the actual response headers and body rather than assuming an HTTP-layer problem.

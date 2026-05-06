@@ -99,7 +99,7 @@ export async function handleAutoMockFunction(
     randomizeOptionalFieldGeneration: boolean,
 ): Promise<Message> {
     const header: Record<string, any> = requestMessage.headers;
-    const enableGenerationStub = header['+gen_'] || false;
+    const enableGenerationStub = header['@gen_'] || false;
     const functionName = requestMessage.getBodyTarget();
     const argument = requestMessage.getBodyPayload();
 

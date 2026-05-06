@@ -6,7 +6,7 @@ shift board and shows a simple auth flow with hard-coded credentials.
 It demonstrates three common auth patterns:
 
 - `on_auth` normalizes a hard-coded username/password into internal headers like
-  `+employeeId` and `+station`, and throws if authentication fails
+  `@employeeId` and `@station`, and throws if authentication fails
 - middleware logs those normalized identity headers and catches a custom
   `Unauthorized` exception to coerce it into `ErrorUnauthorized_`
 - completion of `on_auth` means identity normalization succeeded for the
@@ -14,8 +14,8 @@ It demonstrates three common auth patterns:
 
 Hard-coded credentials used by the example:
 
-- `lead-baker` / `opensesame` -> `+employeeId=baker-001`, `+station=oven`
-- `cashier` / `knockknock` -> `+employeeId=cashier-002`, `+station=counter`
+- `lead-baker` / `opensesame` -> `@employeeId=baker-001`, `@station=oven`
+- `cashier` / `knockknock` -> `@employeeId=cashier-002`, `@station=counter`
 - `explode` / `boom` -> throws in `on_auth`
 
 Browse the files:

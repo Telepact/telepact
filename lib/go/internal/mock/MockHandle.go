@@ -46,7 +46,7 @@ func HandleAutoMockFunction(
 		return nil, nil, fmt.Errorf("telepact: mock handle requires stub and invocation storage")
 	}
 
-	enableGenerationStub := boolValue(headers["+gen_"])
+	enableGenerationStub := boolValue(headers["@gen_"])
 
 	*invocations = append(*invocations, NewMockInvocation(functionName, cloneStringAnyMap(argument)))
 

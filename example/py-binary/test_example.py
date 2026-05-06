@@ -29,7 +29,7 @@ async def run_example() -> None:
         nonlocal saw_binary_response
         request_bytes = serializer.serialize(message)
         response = await telepact_server.process(request_bytes)
-        if '+bin_' in response.headers:
+        if '@bin_' in response.headers:
             saw_binary_response = True
         return serializer.deserialize(response.bytes)
 

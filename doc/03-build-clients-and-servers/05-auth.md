@@ -5,9 +5,9 @@ This page describes Telepact's auth convention.
 The canonical model is:
 
 1. define every client-visible credential shape in `union.Auth_`
-2. carry those credentials in `+auth_`
-3. use the transport adapter to extract transport-specific credentials into `+auth_` when needed
-4. use `onAuth` to validate `+auth_` and normalize it into internal request headers such as `+userId`, `+tenantId`, or `+scopes`
+2. carry those credentials in `@auth_`
+3. use the transport adapter to extract transport-specific credentials into `@auth_` when needed
+4. use `onAuth` to validate `@auth_` and normalize it into internal request headers such as `@userId`, `@tenantId`, or `@scopes`
 5. enforce authorization in middleware and function routes
 6. return `ErrorUnauthenticated_` or `ErrorUnauthorized_` for auth failures
 
@@ -20,7 +20,7 @@ service.
 Telepact owns:
 
 - the schema shape for `union.Auth_`
-- the conventional `+auth_` request header
+- the conventional `@auth_` request header
 - the standard `ErrorUnauthenticated_` and `ErrorUnauthorized_` error shapes
 - validation of schema-defined auth payloads
 - the `onAuth` hook and middleware path where normalized request headers can be attached
@@ -52,7 +52,7 @@ When `union.Auth_` exists, Telepact adds these standard definitions:
 
 ```yaml
 - headers.Auth_:
-    "+auth_": "union.Auth_"
+    "@auth_": "union.Auth_"
 
 - errors.Auth_:
     - ErrorUnauthenticated_:
@@ -64,22 +64,22 @@ When `union.Auth_` exists, Telepact adds these standard definitions:
 Schema rule of thumb:
 
 - put client-visible credential variants in `union.Auth_`
-- keep normalized identity headers such as `+userId` or `+tenantId` out of the public schema unless clients are meant to send or inspect them directly
+- keep normalized identity headers such as `@userId` or `@tenantId` out of the public schema unless clients are meant to send or inspect them directly
 
 `union.Auth_` is the canonical public auth contract. Avoid inventing a second
-public auth header when `+auth_` already represents the caller credentials.
+public auth header when `@auth_` already represents the caller credentials.
 
-## `+auth_`
+## `@auth_`
 
-`+auth_` is the canonical place for credentials inside a Telepact request.
+`@auth_` is the canonical place for credentials inside a Telepact request.
 
 Two common ways it gets populated:
 
-- a Telepact-aware client sends `+auth_` directly
-- the transport adapter extracts credentials from transport-specific state and writes `+auth_` before calling `server.process(...)`
+- a Telepact-aware client sends `@auth_` directly
+- the transport adapter extracts credentials from transport-specific state and writes `@auth_` before calling `server.process(...)`
 
 Telepact runs `onAuth` only for functions registered in the authenticated route
-map. If a protected call is missing `+auth_`, Telepact returns
+map. If a protected call is missing `@auth_`, Telepact returns
 `ErrorUnauthenticated_` before it reaches your handler.
 
 ## Auth error shapes
@@ -99,9 +99,9 @@ state into the canonical Telepact auth shape.
 
 Examples:
 
-- HTTP cookie -> `+auth_ = {"Session": {"token": ...}}`
-- HTTP `Authorization: Bearer ...` -> `+auth_ = {"Bearer": {"token": ...}}`
-- gateway-verified service credential -> `+auth_ = {"Bearer": {"token": ...}}` or another `union.Auth_` variant
+- HTTP cookie -> `@auth_ = {"Session": {"token": ...}}`
+- HTTP `Authorization: Bearer ...` -> `@auth_ = {"Bearer": {"token": ...}}`
+- gateway-verified service credential -> `@auth_ = {"Bearer": {"token": ...}}` or another `union.Auth_` variant
 
 The transport adapter should not grow its own business authorization model. Its
 role is extraction and translation.
@@ -110,7 +110,7 @@ role is extraction and translation.
 
 Inside the server:
 
-1. `onAuth` receives headers, including `+auth_`
+1. `onAuth` receives headers, including `@auth_`
 2. `onAuth` validates or resolves the credential
 3. `onAuth` returns normalized internal headers
 4. middleware and function routes use those normalized headers for policy and business logic
@@ -129,10 +129,10 @@ the unauthenticated route map. Telepact automatically keeps `fn.ping_` and
 
 Typical normalized headers are internal values like:
 
-- `+userId`
-- `+tenantId`
-- `+role`
-- `+scopes`
+- `@userId`
+- `@tenantId`
+- `@role`
+- `@scopes`
 
 Keep these normalized headers service-specific. They are usually internal
 server-to-handler data, not public client contract.
@@ -143,12 +143,12 @@ For browser sessions:
 
 1. the browser sends its session cookie over HTTP
 2. the HTTP adapter reads the cookie
-3. the adapter writes the canonical `+auth_` value
+3. the adapter writes the canonical `@auth_` value
 4. `onAuth` looks up the session and returns normalized identity headers
 5. handlers authorize with those normalized headers
 
 This is a common cookie pattern because the browser does not need to
-handcraft `+auth_`, while the Telepact server still receives one canonical auth
+handcraft `@auth_`, while the Telepact server still receives one canonical auth
 shape internally.
 
 See:
@@ -158,22 +158,22 @@ See:
 
 ## Service-to-service flow
 
-For service-to-service calls, a common shape is explicit `+auth_` when the
+For service-to-service calls, a common shape is explicit `@auth_` when the
 caller is already constructing Telepact messages.
 
 That usually means:
 
 1. the calling service obtains a bearer token, API key, or other service credential
-2. the caller sends it in `+auth_` using a `union.Auth_` variant
+2. the caller sends it in `@auth_` using a `union.Auth_` variant
 3. `onAuth` validates the credential and returns normalized internal headers
 4. middleware and handlers authorize from the normalized identity
 
 If an intermediary gateway or transport already owns the raw credential, it can
-still translate that transport-specific credential into `+auth_` before the
+still translate that transport-specific credential into `@auth_` before the
 Telepact server processes the request.
 
 ## In one sentence
 
-Model caller credentials in `union.Auth_`, move them through `+auth_`, normalize
+Model caller credentials in `union.Auth_`, move them through `@auth_`, normalize
 them with `onAuth`, authorize on normalized identity, and keep transport- and
 deployment-specific auth mechanics outside Telepact itself.
