@@ -20,6 +20,7 @@ import re
 import subprocess
 import tempfile
 import time
+import urllib.error
 import urllib.request
 from pathlib import Path
 
@@ -494,7 +495,7 @@ def _read_release_event_payload(event_path: Path) -> dict:
     return data
 
 
-def _download_release_manifest_payload(event_path: Path, github_token: str) -> bytes:
+def _release_manifest_asset_api_url(event_path: Path) -> str:
     event = _read_release_event_payload(event_path)
     release = event.get("release")
     if not isinstance(release, dict):
@@ -514,8 +515,13 @@ def _download_release_manifest_payload(event_path: Path, github_token: str) -> b
     if asset is None:
         raise click.ClickException(f"{RELEASE_MANIFEST_ASSET_NAME} asset is missing from the release.")
 
+    return asset["url"]
+
+
+def _download_release_manifest_payload(event_path: Path, github_token: str) -> bytes:
+    asset_url = _release_manifest_asset_api_url(event_path)
     request = urllib.request.Request(
-        asset["url"],
+        asset_url,
         headers={
             "Accept": "application/octet-stream",
             "Authorization": f"Bearer {github_token}",
@@ -525,7 +531,7 @@ def _download_release_manifest_payload(event_path: Path, github_token: str) -> b
     try:
         with urllib.request.urlopen(request) as response:
             return response.read()
-    except Exception as exc:
+    except (urllib.error.HTTPError, urllib.error.URLError) as exc:
         raise click.ClickException(f"Failed to download {RELEASE_MANIFEST_ASSET_NAME}: {exc}") from exc
 
 
