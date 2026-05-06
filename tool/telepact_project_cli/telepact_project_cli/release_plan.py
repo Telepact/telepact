@@ -48,9 +48,34 @@ class ReleaseTargetConfig:
 
 
 @dataclass(frozen=True)
+class ReleaseComparison:
+    base_commit: str | None
+    head_commit: str
+
+    def to_dict(self) -> dict:
+        return {
+            "base_commit": self.base_commit,
+            "head_commit": self.head_commit,
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "ReleaseComparison":
+        if not isinstance(data, dict):
+            raise click.ClickException("Release manifest field 'comparison' must be an object.")
+        base_commit = data.get("base_commit")
+        if base_commit is not None and not isinstance(base_commit, str):
+            raise click.ClickException("Release manifest comparison field 'base_commit' must be a string or null.")
+        head_commit = data.get("head_commit")
+        if not isinstance(head_commit, str) or not head_commit:
+            raise click.ClickException("Release manifest comparison field 'head_commit' must be a non-empty string.")
+        return cls(base_commit=base_commit, head_commit=head_commit)
+
+
+@dataclass(frozen=True)
 class ReleaseManifest:
     version: str
     pr_number: int | None
+    comparison: ReleaseComparison
     changed_paths: tuple[str, ...]
     direct_targets: tuple[str, ...]
     targets: tuple[str, ...]
@@ -59,6 +84,7 @@ class ReleaseManifest:
         return {
             "version": self.version,
             "pr_number": self.pr_number,
+            "comparison": self.comparison.to_dict(),
             "changed_paths": list(self.changed_paths),
             "direct_targets": list(self.direct_targets),
             "targets": list(self.targets),
@@ -84,6 +110,7 @@ class ReleaseManifest:
         return cls(
             version=version,
             pr_number=pr_number,
+            comparison=ReleaseComparison.from_dict(data.get("comparison")),
             changed_paths=_string_list("changed_paths"),
             direct_targets=_string_list("direct_targets"),
             targets=_string_list("targets"),
@@ -165,6 +192,38 @@ def _release_change_window(repo_root: Path, ref: str = "HEAD") -> tuple[str | No
             # The initial version-setting commit has no parent; in that case diff against the commit itself.
             end_ref = ref
     return (base_commit, end_ref)
+
+
+def release_comparison(repo_root: Path | str = ".", ref: str = "HEAD") -> ReleaseComparison:
+    repo_root = find_repo_root(repo_root)
+    base_commit, end_ref = _release_change_window(repo_root, ref)
+    return ReleaseComparison(
+        base_commit=base_commit,
+        head_commit=_resolved_commit_sha(repo_root, end_ref),
+    )
+
+
+def git_ref_comparison(
+    repo_root: Path | str = ".",
+    *,
+    base_ref: str,
+    head_ref: str = "HEAD",
+    use_merge_base: bool = False,
+) -> ReleaseComparison:
+    repo_root = find_repo_root(repo_root)
+    if use_merge_base:
+        try:
+            base_commit = _git_stdout(repo_root, "merge-base", base_ref, head_ref).strip()
+        except subprocess.CalledProcessError as exc:
+            raise click.ClickException(
+                f"Unable to compute merge base between {base_ref!r} and {head_ref!r}: {exc.stderr.strip()}"
+            )
+    else:
+        base_commit = _resolved_commit_sha(repo_root, base_ref)
+    return ReleaseComparison(
+        base_commit=base_commit,
+        head_commit=_resolved_commit_sha(repo_root, head_ref),
+    )
 
 
 def changed_paths_since_last_version_change(repo_root: Path | str = ".", ref: str = "HEAD") -> list[str]:
@@ -318,6 +377,7 @@ def compute_release_manifest(
     changed_paths: Iterable[str],
     version: str,
     pr_number: int | None,
+    comparison: ReleaseComparison,
 ) -> ReleaseManifest:
     repo_root = find_repo_root(repo_root)
     config = load_release_target_rules(repo_root)
@@ -337,6 +397,7 @@ def compute_release_manifest(
     return ReleaseManifest(
         version=version,
         pr_number=pr_number,
+        comparison=comparison,
         changed_paths=tuple(normalized_changed_paths),
         direct_targets=tuple(direct_targets),
         targets=tuple(expanded_targets),
@@ -354,6 +415,7 @@ def compute_release_manifest_from_git(
         changed_paths=changed_paths_since_last_version_change(repo_root, ref=ref),
         version=_read_version(repo_root, ref=ref),
         pr_number=pr_number,
+        comparison=release_comparison(repo_root, ref=ref),
     )
 
 

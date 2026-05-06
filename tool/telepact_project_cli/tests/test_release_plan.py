@@ -33,6 +33,7 @@ sys.path.insert(0, str(PACKAGE_ROOT))
 from telepact_project_cli.cli import main
 from telepact_project_cli.commands.doc_versions import _latest_released_versions
 from telepact_project_cli.release_plan import (
+    ReleaseComparison,
     changed_paths_since_last_version_change,
     compute_release_manifest,
     compute_release_manifest_from_git,
@@ -183,8 +184,10 @@ class ReleasePlanTests(unittest.TestCase):
                 ],
                 version="1.0.0-alpha.215",
                 pr_number=None,
+                comparison=ReleaseComparison(base_commit="abc123", head_commit="def456"),
             )
 
+            self.assertEqual(manifest.comparison, ReleaseComparison(base_commit="abc123", head_commit="def456"))
             self.assertEqual(manifest.direct_targets, ("prettier", "ts"))
             self.assertEqual(manifest.targets, ("console", "dart", "prettier", "ts"))
             self.assertEqual(
@@ -203,6 +206,7 @@ class ReleasePlanTests(unittest.TestCase):
                 changed_paths=["sdk/prettier/package.json", "lib/ts/src/main.ts"],
                 version="1.0.0-alpha.215",
                 pr_number=None,
+                comparison=ReleaseComparison(base_commit="abc123", head_commit="def456"),
             )
 
             rendered = render_release_manifest_for_stdout(manifest)
@@ -211,6 +215,7 @@ class ReleasePlanTests(unittest.TestCase):
                 json.loads(rendered),
                 {
                     "changed_paths": ["lib/ts/src/main.ts", "sdk/prettier/package.json"],
+                    "comparison": {"base_commit": "abc123", "head_commit": "def456"},
                     "direct_targets": ["prettier", "ts"],
                     "pr_number": None,
                     "targets": ["console", "dart", "prettier", "ts"],
@@ -300,8 +305,14 @@ class ReleasePlanTests(unittest.TestCase):
             _commit_all(repo_root, "Bump version")
 
             manifest = compute_release_manifest_from_git(repo_root)
+            initial_release_commit = _run_git(repo_root, "rev-parse", "HEAD~2")
+            feature_commit = _run_git(repo_root, "rev-parse", "HEAD~1")
 
             self.assertEqual(manifest.version, "1.0.0-alpha.201")
+            self.assertEqual(
+                manifest.comparison,
+                ReleaseComparison(base_commit=initial_release_commit, head_commit=feature_commit),
+            )
             self.assertEqual(manifest.direct_targets, ("py",))
             self.assertEqual(manifest.targets, ("cli", "py"))
             self.assertEqual(manifest.changed_paths, ("lib/py/impl.py",))
@@ -421,6 +432,10 @@ class ReleasePlanTests(unittest.TestCase):
                 json.loads(result.output),
                 {
                     "changed_paths": ["lib/py/impl.py"],
+                    "comparison": {
+                        "base_commit": _run_git(repo_root, "rev-parse", "HEAD~2"),
+                        "head_commit": _run_git(repo_root, "rev-parse", "HEAD~1"),
+                    },
                     "direct_targets": ["py"],
                     "pr_number": None,
                     "targets": ["cli", "py"],
@@ -436,6 +451,7 @@ class ReleasePlanTests(unittest.TestCase):
                     {
                         "version": "1.0.0-alpha.215",
                         "pr_number": 7,
+                        "comparison": {"base_commit": "abc123", "head_commit": "def456"},
                         "changed_paths": ["lib/py/impl.py"],
                         "direct_targets": ["py"],
                         "targets": ["cli", "py"],
@@ -448,6 +464,7 @@ class ReleasePlanTests(unittest.TestCase):
 
             self.assertEqual(manifest.version, "1.0.0-alpha.215")
             self.assertEqual(manifest.pr_number, 7)
+            self.assertEqual(manifest.comparison, ReleaseComparison(base_commit="abc123", head_commit="def456"))
             self.assertEqual(manifest.changed_paths, ("lib/py/impl.py",))
             self.assertEqual(manifest.direct_targets, ("py",))
             self.assertEqual(manifest.targets, ("cli", "py"))
@@ -470,6 +487,10 @@ class ReleasePlanTests(unittest.TestCase):
             with (
                 _pushd(repo_root),
                 mock.patch("telepact_project_cli.commands.project_version.subprocess.run", side_effect=subprocess_run_side_effect),
+                mock.patch(
+                    "telepact_project_cli.commands.project_version._release_comparison_since_main",
+                    return_value=ReleaseComparison(base_commit="abc123", head_commit="def456"),
+                ),
             ):
                 result = runner.invoke(main, ["bump"])
 
@@ -496,6 +517,10 @@ class ReleasePlanTests(unittest.TestCase):
             with (
                 _pushd(repo_root),
                 mock.patch("telepact_project_cli.commands.project_version.subprocess.run", side_effect=subprocess_run_side_effect),
+                mock.patch(
+                    "telepact_project_cli.commands.project_version._release_comparison_since_main",
+                    return_value=ReleaseComparison(base_commit="abc123", head_commit="def456"),
+                ),
             ):
                 result = runner.invoke(main, ["bump"])
 
