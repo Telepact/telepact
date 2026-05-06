@@ -105,7 +105,7 @@ class RepositoryAutomationTests(unittest.TestCase):
                 mock.patch("telepact_project_cli.commands.repository_automation.Github", return_value=github_client),
                 mock.patch(
                     "telepact_project_cli.commands.repository_automation._release_pr_metadata",
-                    return_value=("Release title", 7, "https://github.com/Telepact/telepact/pull/7"),
+                    return_value=("Release title", None, None),
                 ),
                 mock.patch("telepact_project_cli.commands.repository_automation._head_commit_subject", return_value="Release title"),
             ):

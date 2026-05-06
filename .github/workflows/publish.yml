@@ -69,8 +69,11 @@ jobs:
                   "X-GitHub-Api-Version": "2022-11-28",
               },
           )
-          with urllib.request.urlopen(request) as response, open("release-manifest.json", "wb") as manifest_file:
-              manifest_file.write(response.read())
+          with urllib.request.urlopen(request) as response:
+              payload = response.read()
+          json.loads(payload.decode("utf-8"))
+          with open("release-manifest.json", "wb") as manifest_file:
+              manifest_file.write(payload)
           PY
 
       - name: Resolve release manifest
