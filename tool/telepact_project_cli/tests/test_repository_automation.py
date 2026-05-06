@@ -425,7 +425,7 @@ version = "1.0.0-alpha.318"
         repo = mock.Mock()
         repo.owner = SimpleNamespace(login="Telepact")
         repo.get_pulls.return_value = iter(())
-        repo.create_pull.return_value = SimpleNamespace(html_url="https://github.com/Telepact/telepact/pull/99")
+        repo.create_pull.return_value = mock.Mock(html_url="https://github.com/Telepact/telepact/pull/99")
 
         github_client = mock.Mock()
         github_client.get_repo.return_value = repo
