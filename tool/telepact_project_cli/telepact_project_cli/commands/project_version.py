@@ -255,10 +255,8 @@ def set_version(version: str) -> None:
 
     for project_file in ["pom.xml", "package.json", "pyproject.toml", "pubspec.yaml"]:
         if os.path.exists(project_file):
-            current_version = _get_version_from_project_file(project_file)
             _set_version_in_project_file(project_file, version)
-            if current_version != version:
-                _update_and_get_lock_file_path(project_file)
+            _update_and_get_lock_file_path(project_file)
             click.echo(f"Set {project_file} to version {version}")
             updated = True
 
