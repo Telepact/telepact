@@ -29,7 +29,7 @@ export function parseStructType(
     ctx: ParseContext,
 ): TStruct {
     const parseFailures: SchemaParseFailure[] = [];
-    const otherKeys = new Set(Object.keys(structDefinitionAsPseudoJson));
+    const otherKeys = new Set(Object.keys(structDefinitionAsPseudoJson).filter((key) => !key.startsWith('$')));
 
     otherKeys.delete(schemaKey);
     otherKeys.delete('///');

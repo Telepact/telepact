@@ -410,7 +410,7 @@ export async function loadConsoleData(url: URL): Promise<LoadedConsoleData> {
 		if (showInternalApi) return true;
 		if (
 			typeof item === 'object' &&
-			Object.keys(item).find((i) => i.endsWith('_')) !== undefined
+			Object.keys(item).find((i) => i.endsWith('_') && !i.startsWith('$')) !== undefined
 		) {
 			return false;
 		}

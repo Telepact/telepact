@@ -317,7 +317,9 @@ export function parseTelepactSchema(
 			);
 			const exampleCallJson = JSON.stringify([{}, exampleCall]);
 
-			const errorsRegex = def['_errors'];
+			const errorsRegex =
+				def['_errors'] ??
+				(def['$internal'] === true ? '^errors\\.Validation_$' : '^errors\\..*$');
 			const inheritedErrors = availableErrors.filter((e) => e.name.match(errorsRegex)).map((e) => e.name);
 
 			data = {

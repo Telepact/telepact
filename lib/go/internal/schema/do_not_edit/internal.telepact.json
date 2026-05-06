@@ -1,6 +1,7 @@
 [
   {
     "///": "Ping the server.",
+    "$internal": true,
     "fn.ping_": {
     },
     "->": [
@@ -8,11 +9,11 @@
         "Ok_": {
         }
       }
-    ],
-    "_errors": "^errors\\.Validation_$"
+    ]
   },
   {
     "///": "Get the telepact `schema` of this server.\n\nSet `includeInternal` to `true` to include Telepact internal definitions.\nSet `includeExamples` to `true` to add deterministic example payloads to\neach schema entry.\n",
+    "$internal": true,
     "fn.api_": {
       "includeInternal!": "boolean",
       "includeExamples!": "boolean"
@@ -27,8 +28,7 @@
           ]
         }
       }
-    ],
-    "_errors": "^errors\\.Validation_$"
+    ]
   },
   {
     "///": "`_ext.Select_` is the selection object used by the `@select_` header. Use\n`->` to narrow fields on the active result union, `struct.*` keys to narrow\nstruct fields, and `union.*` keys to narrow fields for specific union tags.\n\nSee https://raw.githubusercontent.com/Telepact/telepact/main/doc/02-design-apis/04-select-extension.md\nfor full `_ext.Select_` rules and end-to-end examples.\n",

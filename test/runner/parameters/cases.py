@@ -59,7 +59,7 @@ def b64(b: bytes):
 
 def _schema_key(definition: dict[str, object]) -> str:
     for key in definition:
-        if key not in {'///', '->', '_errors'}:
+        if key not in {'///', '->', '_errors'} and not key.startswith('$'):
             return key
     raise AssertionError(f'No schema key found in {definition}')
 

@@ -20,7 +20,7 @@ from parameters.schema_loader import load_schema_definitions
 
 
 def _schema_key(definition: dict[str, object]) -> str:
-    return next(key for key in definition.keys() if key not in {'///', '->', '_errors'})
+    return next(key for key in definition.keys() if key not in {'///', '->', '_errors'} and not key.startswith('$'))
 
 
 def _load_sorted_schema(*relative_paths: str) -> list[dict[str, object]]:

@@ -39,6 +39,7 @@ public class ParseStructType {
         otherKeys.remove(schemaKey);
         otherKeys.remove("///");
         otherKeys.remove("_ignoreIfDuplicate");
+        otherKeys.removeIf(key -> key.startsWith("$"));
         for (final var ignoreKey : ignoreKeys) {
             otherKeys.remove(ignoreKey);
         }

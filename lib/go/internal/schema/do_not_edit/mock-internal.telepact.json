@@ -54,6 +54,7 @@
   },
   {
     "///": "Create a mock stub from an `_ext.Stub_`.\n\nBy default the stub matcher is partial, so extra fields on the actual\nrequest argument are allowed. Set `strictMatch!` to `true` to require exact\nargument equality instead.\n\nSet `count!` to limit how many matching calls consume this stub before it\nstops matching.\n",
+    "$internal": true,
     "fn.createStub_": {
       "stub": "_ext.Stub_",
       "strictMatch!": "boolean",
@@ -64,11 +65,11 @@
         "Ok_": {
         }
       }
-    ],
-    "_errors": "^errors\\.Validation_$"
+    ]
   },
   {
     "///": "Verify that the mock received a call matching the given `_ext.Call_`.\n\nBy default verification is partial and succeeds if at least one recorded\ncall contains the given argument as a JSON sub-structure. Set\n`strictMatch!` to `true` to require exact argument equality.\n\nSet `count!` to require `Exact`, `AtLeast`, or `AtMost` matching call\ncounts. Matching calls are marked as verified, which affects\n`fn.verifyNoMoreInteractions_`.\n",
+    "$internal": true,
     "fn.verify_": {
       "call": "_ext.Call_",
       "strictMatch!": "boolean",
@@ -84,11 +85,11 @@
           "reason": "union.VerificationFailure_"
         }
       }
-    ],
-    "_errors": "^errors\\.Validation_$"
+    ]
   },
   {
     "///": "Verify that no interactions have occurred with this mock or that all\ninteractions have been verified.\n",
+    "$internal": true,
     "fn.verifyNoMoreInteractions_": {
     },
     "->": [
@@ -103,11 +104,11 @@
           ]
         }
       }
-    ],
-    "_errors": "^errors\\.Validation_$"
+    ]
   },
   {
     "///": "Clear all stub conditions.",
+    "$internal": true,
     "fn.clearStubs_": {
     },
     "->": [
@@ -115,11 +116,11 @@
         "Ok_": {
         }
       }
-    ],
-    "_errors": "^errors\\.Validation_$"
+    ]
   },
   {
     "///": "Clear all call data.",
+    "$internal": true,
     "fn.clearCalls_": {
     },
     "->": [
@@ -127,11 +128,11 @@
         "Ok_": {
         }
       }
-    ],
-    "_errors": "^errors\\.Validation_$"
+    ]
   },
   {
     "///": "Set the seed of the random generator.",
+    "$internal": true,
     "fn.setRandomSeed_": {
       "seed": "integer"
     },
@@ -140,8 +141,7 @@
         "Ok_": {
         }
       }
-    ],
-    "_errors": "^errors\\.Validation_$"
+    ]
   },
   {
     "errors.Mock_": [

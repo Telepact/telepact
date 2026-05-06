@@ -15,10 +15,10 @@
 #|
 
 - ///: Ping the server.
+  $internal: true
   fn.ping_: {}
   ->:
     - Ok_: {}
-  _errors: '^errors\.Validation_$'
 
 - ///: |
     Get the telepact `schema` of this server.
@@ -26,13 +26,13 @@
     Set `includeInternal` to `true` to include Telepact internal definitions.
     Set `includeExamples` to `true` to add deterministic example payloads to
     each schema entry.
+  $internal: true
   fn.api_:
     includeInternal!: "boolean"
     includeExamples!: "boolean"
   ->:
     - Ok_:
         api: [{"string": "any"}]
-  _errors: '^errors\.Validation_$'
 
 - ///: |
     `_ext.Select_` is the selection object used by the `@select_` header. Use

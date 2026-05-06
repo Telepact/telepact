@@ -240,7 +240,7 @@ function getDefaultFnScope(parsedTypes: Record<string, TType>): string {
 
 function getSchemaKey(definition: Record<string, any>): string {
     for (const key of Object.keys(definition)) {
-        if (key !== '///' && key !== '->' && key !== '_errors') {
+        if (key !== '///' && key !== '->' && key !== '_errors' && !key.startsWith('$')) {
             return key;
         }
     }
