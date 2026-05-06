@@ -469,6 +469,27 @@ class ReleasePlanTests(unittest.TestCase):
             self.assertEqual(manifest.direct_targets, ("py",))
             self.assertEqual(manifest.targets, ("cli", "py"))
 
+    def test_read_release_manifest_allows_null_comparison_base_commit(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            manifest_path = Path(tmp_dir) / "release-manifest.json"
+            manifest_path.write_text(
+                json.dumps(
+                    {
+                        "version": "1.0.0-alpha.215",
+                        "pr_number": None,
+                        "comparison": {"base_commit": None, "head_commit": "def456"},
+                        "changed_paths": ["lib/py/impl.py"],
+                        "direct_targets": ["py"],
+                        "targets": ["cli", "py"],
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            manifest = read_release_manifest(manifest_path)
+
+            self.assertEqual(manifest.comparison, ReleaseComparison(base_commit=None, head_commit="def456"))
+
     def test_bump_command_updates_version_when_targets_exist(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             repo_root = Path(tmp_dir)

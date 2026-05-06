@@ -120,7 +120,7 @@ class ReleaseManifest:
         return cls(
             version=version,
             pr_number=pr_number,
-            comparison=ReleaseComparison.from_dict(data.get("comparison")),
+            comparison=ReleaseComparison.from_dict(data["comparison"]),
             changed_paths=_string_list("changed_paths"),
             direct_targets=_string_list("direct_targets"),
             targets=_string_list("targets"),
