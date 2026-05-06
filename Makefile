@@ -20,10 +20,6 @@ PROJECT_CLI := ./tool/telepact-project
 noop:
 	@echo "No-op. Specify a target."
 
-.PHONY: doc-versions
-doc-versions:
-	$(PROJECT_CLI) doc-versions
-
 .PHONY: local-ci
 local-ci:
 	$(MAKE) clean-java
@@ -250,7 +246,6 @@ version:
 	cd sdk/cli && $(abspath $(PROJECT_CLI)) set-version ${VERSION}
 	cd sdk/prettier && $(abspath $(PROJECT_CLI)) set-version ${VERSION}
 	cd sdk/console && $(abspath $(PROJECT_CLI)) set-version ${VERSION}
-	$(MAKE) doc-versions
 
 license-header:
 	UV_CACHE_DIR=/tmp/uv-cache $(PROJECT_CLI) license-header NOTICE

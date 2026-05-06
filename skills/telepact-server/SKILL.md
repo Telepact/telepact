@@ -38,8 +38,6 @@ Install the matching Telepact library first:
 ```
 
 - Go: `go get github.com/telepact/telepact/lib/go`
-
-Latest library versions can be found at [doc/04-operate/03-versions.md](https://github.com/Telepact/telepact/blob/main/doc/04-operate/03-versions.md).
 For Telepact design decisions around auth, optional headers, and transport
 ownership, see the [FAQ](https://github.com/Telepact/telepact/blob/main/doc/05-background-and-reference/01-faq.md).
 
