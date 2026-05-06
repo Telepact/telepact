@@ -25,6 +25,7 @@ import yaml
 
 RELEASE_CONFIG_RELATIVE_PATH = Path(".release/release-targets.yaml")
 VERSION_FILE_RELATIVE_PATH = Path("VERSION.txt")
+GIT_LOG_FIELD_SEPARATOR = "\x1f"
 
 PUBLISH_TARGETS = ("java", "ts", "py", "go", "cli", "console", "prettier")
 
@@ -204,7 +205,7 @@ def commits_since_last_version_change(
     )
 
     try:
-        args = ["log", "--format=%H%x1f%s", "--reverse"]
+        args = ["log", f"--format=%H{GIT_LOG_FIELD_SEPARATOR}%s", "--reverse"]
         args.append(end_ref if base_commit is None else f"{base_commit}..{end_ref}")
         if normalized_paths:
             args.extend(["--", *normalized_paths])
@@ -216,7 +217,7 @@ def commits_since_last_version_change(
     for line in stdout.splitlines():
         if not line.strip():
             continue
-        sha, separator, subject = line.partition("\x1f")
+        sha, separator, subject = line.partition(GIT_LOG_FIELD_SEPARATOR)
         if not separator:
             raise click.ClickException("Unexpected git log output while computing release commits.")
         commits.append(ReleaseCommit(sha=sha.strip(), subject=subject.strip()))
