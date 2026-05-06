@@ -18,9 +18,11 @@ name: Release
 
 on:
   workflow_dispatch:
-  # push:
-  #   branches:
-  #     - main
+  push:
+    branches:
+      - main
+    paths:
+      - VERSION.txt
 
 jobs:
   build-release:
