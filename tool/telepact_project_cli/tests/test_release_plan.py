@@ -285,6 +285,7 @@ class ReleasePlanTests(unittest.TestCase):
             repo_root = Path(tmp_dir)
             (repo_root / "VERSION.txt").write_text("1.0.0-alpha.214", encoding="utf-8")
             _write_release_targets(repo_root)
+            parent_ref = "parent"
 
             with mock.patch(
                 "telepact_project_cli.release_plan._version_change_commits",
@@ -294,7 +295,7 @@ class ReleasePlanTests(unittest.TestCase):
                 return_value="not-a-version-commit",
             ), mock.patch(
                 "telepact_project_cli.release_plan._git_stdout",
-                side_effect=["parent", "VERSION.txt\nlib/py/impl.py\n"],
+                side_effect=[parent_ref, "VERSION.txt\nlib/py/impl.py\n"],
             ):
                 self.assertEqual(
                     changed_paths_since_last_version_change(repo_root),
