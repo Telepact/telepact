@@ -425,7 +425,7 @@ version = "1.0.0-alpha.318"
         repo = mock.Mock()
         repo.owner = SimpleNamespace(login="Telepact")
         repo.get_pulls.return_value = iter(())
-        repo.create_pull.return_value = SimpleNamespace(html_url="https://github.com/Telepact/telepact/pull/99")
+        repo.create_pull.return_value = mock.Mock(html_url="https://github.com/Telepact/telepact/pull/99")
 
         github_client = mock.Mock()
         github_client.get_repo.return_value = repo
@@ -465,6 +465,8 @@ version = "1.0.0-alpha.318"
             head="Telepact:version-bump/1.0.0-alpha.215",
             base="main",
         )
+        created_pr = repo.create_pull.return_value
+        created_pr.enable_automerge.assert_called_once_with(merge_method="SQUASH")
 
     def test_process_merge_ready_pull_request_admin_flow_updates_and_merges(self) -> None:
         initial_pr = mock.Mock()
