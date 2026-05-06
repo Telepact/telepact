@@ -34,8 +34,10 @@ from telepact_project_cli.cli import main
 from telepact_project_cli.commands.doc_versions import _latest_released_versions
 from telepact_project_cli.release_plan import (
     ReleaseComparison,
+    changed_paths_for_release_comparison,
     changed_paths_since_last_version_change,
     compute_release_manifest,
+    compute_release_manifest_for_comparison,
     compute_release_manifest_from_git,
     read_release_manifest,
     render_release_manifest_for_stdout,
@@ -251,6 +253,33 @@ class ReleasePlanTests(unittest.TestCase):
                 ["lib/py/impl.py"],
             )
 
+    def test_changed_paths_for_release_comparison_uses_exact_commits(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            repo_root = Path(tmp_dir)
+            _init_repo(repo_root)
+            _write_release_targets(repo_root)
+            (repo_root / "VERSION.txt").write_text("1.0.0-alpha.200", encoding="utf-8")
+            (repo_root / "lib" / "py").mkdir(parents=True)
+            (repo_root / "lib" / "py" / "pyproject.toml").write_text(
+                '[project]\nname = "telepact"\nversion = "1.0.0-alpha.200"\n',
+                encoding="utf-8",
+            )
+            _commit_all(repo_root, "Initial release")
+
+            (repo_root / "lib" / "py" / "impl.py").write_text("print('changed')\n", encoding="utf-8")
+            _commit_all(repo_root, "Feature change")
+
+            self.assertEqual(
+                changed_paths_for_release_comparison(
+                    repo_root,
+                    ReleaseComparison(
+                        base_commit=_run_git(repo_root, "rev-parse", "HEAD~1"),
+                        head_commit=_run_git(repo_root, "rev-parse", "HEAD"),
+                    ),
+                ),
+                ["lib/py/impl.py"],
+            )
+
     def test_changed_paths_since_last_version_change_filters_version_file_from_git_diff(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             repo_root = Path(tmp_dir)
@@ -316,6 +345,45 @@ class ReleasePlanTests(unittest.TestCase):
             self.assertEqual(manifest.direct_targets, ("py",))
             self.assertEqual(manifest.targets, ("cli", "py"))
             self.assertEqual(manifest.changed_paths, ("lib/py/impl.py",))
+
+    def test_compute_release_manifest_for_comparison_uses_comparison_for_targets(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            repo_root = Path(tmp_dir)
+            _init_repo(repo_root)
+            _write_release_targets(repo_root)
+            (repo_root / "VERSION.txt").write_text("1.0.0-alpha.200", encoding="utf-8")
+            (repo_root / "lib" / "py").mkdir(parents=True)
+            (repo_root / "lib" / "py" / "pyproject.toml").write_text(
+                '[project]\nname = "telepact"\nversion = "1.0.0-alpha.200"\n',
+                encoding="utf-8",
+            )
+            (repo_root / "sdk" / "cli").mkdir(parents=True)
+            (repo_root / "sdk" / "cli" / "pyproject.toml").write_text(
+                '[project]\nname = "telepact-cli"\nversion = "1.0.0-alpha.200"\n',
+                encoding="utf-8",
+            )
+            _commit_all(repo_root, "Initial release")
+
+            (repo_root / "lib" / "py" / "impl.py").write_text("print('changed')\n", encoding="utf-8")
+            _commit_all(repo_root, "Feature change")
+
+            comparison = ReleaseComparison(
+                base_commit=_run_git(repo_root, "rev-parse", "HEAD~1"),
+                head_commit=_run_git(repo_root, "rev-parse", "HEAD"),
+            )
+
+            manifest = compute_release_manifest_for_comparison(
+                repo_root,
+                comparison=comparison,
+                version="1.0.0-alpha.201",
+                pr_number=17,
+            )
+
+            self.assertEqual(manifest.comparison, comparison)
+            self.assertEqual(manifest.pr_number, 17)
+            self.assertEqual(manifest.changed_paths, ("lib/py/impl.py",))
+            self.assertEqual(manifest.direct_targets, ("py",))
+            self.assertEqual(manifest.targets, ("cli", "py"))
 
     def test_publish_targets_command_writes_github_outputs(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:

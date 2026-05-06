@@ -248,19 +248,24 @@ def git_ref_comparison(
     )
 
 
-def changed_paths_since_last_version_change(repo_root: Path | str = ".", ref: str = "HEAD") -> list[str]:
+def changed_paths_for_release_comparison(
+    repo_root: Path | str,
+    comparison: ReleaseComparison,
+) -> list[str]:
     repo_root = find_repo_root(repo_root)
-    base_commit, end_ref = _release_change_window(repo_root, ref)
 
     try:
-        if base_commit is None:
-            stdout = _git_stdout(repo_root, "ls-tree", "-r", "--name-only", end_ref)
+        if comparison.base_commit is None:
+            stdout = _git_stdout(repo_root, "ls-tree", "-r", "--name-only", comparison.head_commit)
         else:
-            stdout = _git_stdout(repo_root, "diff", "--name-only", f"{base_commit}..{end_ref}")
+            stdout = _git_stdout(repo_root, "diff", "--name-only", f"{comparison.base_commit}..{comparison.head_commit}")
     except subprocess.CalledProcessError as exc:
-        raise click.ClickException(f"Unable to compute changed paths for release planning at {ref}: {exc.stderr.strip()}")
+        raise click.ClickException(
+            "Unable to compute changed paths for release comparison "
+            f"{comparison.base_commit!r}..{comparison.head_commit!r}: {exc.stderr.strip()}"
+        )
 
-    changed_paths = sorted(
+    return sorted(
         {
             normalized
             for path in stdout.splitlines()
@@ -268,7 +273,11 @@ def changed_paths_since_last_version_change(repo_root: Path | str = ".", ref: st
             if normalized and normalized != VERSION_FILE_RELATIVE_PATH.as_posix()
         }
     )
-    return changed_paths
+
+
+def changed_paths_since_last_version_change(repo_root: Path | str = ".", ref: str = "HEAD") -> list[str]:
+    repo_root = find_repo_root(repo_root)
+    return changed_paths_for_release_comparison(repo_root, release_comparison(repo_root, ref=ref))
 
 
 def commits_since_last_version_change(
@@ -426,18 +435,34 @@ def compute_release_manifest(
     )
 
 
+def compute_release_manifest_for_comparison(
+    repo_root: Path | str,
+    comparison: ReleaseComparison,
+    version: str,
+    pr_number: int | None,
+) -> ReleaseManifest:
+    repo_root = find_repo_root(repo_root)
+    return compute_release_manifest(
+        repo_root,
+        changed_paths=changed_paths_for_release_comparison(repo_root, comparison),
+        version=version,
+        pr_number=pr_number,
+        comparison=comparison,
+    )
+
+
 def compute_release_manifest_from_git(
     repo_root: Path | str = ".",
     ref: str = "HEAD",
     pr_number: int | None = None,
 ) -> ReleaseManifest:
     repo_root = find_repo_root(repo_root)
-    return compute_release_manifest(
+    comparison = release_comparison(repo_root, ref=ref)
+    return compute_release_manifest_for_comparison(
         repo_root,
-        changed_paths=changed_paths_since_last_version_change(repo_root, ref=ref),
+        comparison=comparison,
         version=_read_version(repo_root, ref=ref),
         pr_number=pr_number,
-        comparison=release_comparison(repo_root, ref=ref),
     )
 
 
