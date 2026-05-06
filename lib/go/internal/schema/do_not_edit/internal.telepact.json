@@ -1,7 +1,7 @@
 [
   {
     "///": "Ping the server.",
-    "$internal_": true,
+    "$internal": true,
     "fn.ping_": {
     },
     "->": [
@@ -13,7 +13,7 @@
   },
   {
     "///": "Get the telepact `schema` of this server.\n\nSet `includeInternal` to `true` to include Telepact internal definitions.\nSet `includeExamples` to `true` to add deterministic example payloads to\neach schema entry.\n",
-    "$internal_": true,
+    "$internal": true,
     "fn.api_": {
       "includeInternal!": "boolean",
       "includeExamples!": "boolean"

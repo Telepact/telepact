@@ -80,7 +80,7 @@ export function parseFunctionErrorsRegex(
     const parseFailures: SchemaParseFailure[] = [];
 
     const errorsRegexKey = '_errors';
-    const isInternal = schemaKey.endsWith('_') || functionDefinitionAsParsedJson['$internal_'] === true;
+    const isInternal = schemaKey.endsWith('_') || functionDefinitionAsParsedJson['$internal'] === true;
 
     const regexPath = [...path, errorsRegexKey];
 

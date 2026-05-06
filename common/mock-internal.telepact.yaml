@@ -61,7 +61,7 @@
 
     Set `count!` to limit how many matching calls consume this stub before it
     stops matching.
-  $internal_: true
+  $internal: true
   fn.createStub_:
     stub: "_ext.Stub_"
     strictMatch!: "boolean"
@@ -79,7 +79,7 @@
     Set `count!` to require `Exact`, `AtLeast`, or `AtMost` matching call
     counts. Matching calls are marked as verified, which affects
     `fn.verifyNoMoreInteractions_`.
-  $internal_: true
+  $internal: true
   fn.verify_:
     call: "_ext.Call_"
     strictMatch!: "boolean"
@@ -92,7 +92,7 @@
 - ///: |
     Verify that no interactions have occurred with this mock or that all
     interactions have been verified.
-  $internal_: true
+  $internal: true
   fn.verifyNoMoreInteractions_: {}
   ->:
     - Ok_: {}
@@ -100,19 +100,19 @@
         additionalUnverifiedCalls: ["_ext.Call_"]
 
 - ///: Clear all stub conditions.
-  $internal_: true
+  $internal: true
   fn.clearStubs_: {}
   ->:
     - Ok_: {}
 
 - ///: Clear all call data.
-  $internal_: true
+  $internal: true
   fn.clearCalls_: {}
   ->:
     - Ok_: {}
 
 - ///: Set the seed of the random generator.
-  $internal_: true
+  $internal: true
   fn.setRandomSeed_:
     seed: "integer"
   ->:

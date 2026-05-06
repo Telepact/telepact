@@ -84,7 +84,7 @@ func ParseFunctionErrorsRegex(path []any, functionDefinition map[string]any, sch
 	parseFailures := make([]*SchemaParseFailure, 0)
 	errorsRegexKey := "_errors"
 	isInternal := strings.HasSuffix(schemaKey, "_")
-	if value, exists := functionDefinition["$internal_"]; exists {
+	if value, exists := functionDefinition["$internal"]; exists {
 		if internal, ok := value.(bool); ok && internal {
 			isInternal = true
 		}
