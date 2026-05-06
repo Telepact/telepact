@@ -54,7 +54,7 @@
   },
   {
     "///": "Create a mock stub from an `_ext.Stub_`.\n\nBy default the stub matcher is partial, so extra fields on the actual\nrequest argument are allowed. Set `strictMatch!` to `true` to require exact\nargument equality instead.\n\nSet `count!` to limit how many matching calls consume this stub before it\nstops matching.\n",
-    "@internal_": true,
+    "$internal_": true,
     "fn.createStub_": {
       "stub": "_ext.Stub_",
       "strictMatch!": "boolean",
@@ -69,7 +69,7 @@
   },
   {
     "///": "Verify that the mock received a call matching the given `_ext.Call_`.\n\nBy default verification is partial and succeeds if at least one recorded\ncall contains the given argument as a JSON sub-structure. Set\n`strictMatch!` to `true` to require exact argument equality.\n\nSet `count!` to require `Exact`, `AtLeast`, or `AtMost` matching call\ncounts. Matching calls are marked as verified, which affects\n`fn.verifyNoMoreInteractions_`.\n",
-    "@internal_": true,
+    "$internal_": true,
     "fn.verify_": {
       "call": "_ext.Call_",
       "strictMatch!": "boolean",
@@ -89,7 +89,7 @@
   },
   {
     "///": "Verify that no interactions have occurred with this mock or that all\ninteractions have been verified.\n",
-    "@internal_": true,
+    "$internal_": true,
     "fn.verifyNoMoreInteractions_": {
     },
     "->": [
@@ -108,7 +108,7 @@
   },
   {
     "///": "Clear all stub conditions.",
-    "@internal_": true,
+    "$internal_": true,
     "fn.clearStubs_": {
     },
     "->": [
@@ -120,7 +120,7 @@
   },
   {
     "///": "Clear all call data.",
-    "@internal_": true,
+    "$internal_": true,
     "fn.clearCalls_": {
     },
     "->": [
@@ -132,7 +132,7 @@
   },
   {
     "///": "Set the seed of the random generator.",
-    "@internal_": true,
+    "$internal_": true,
     "fn.setRandomSeed_": {
       "seed": "integer"
     },

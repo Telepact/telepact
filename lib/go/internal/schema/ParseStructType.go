@@ -39,7 +39,7 @@ func ParseStructType(path []any, structDefinition map[string]any, schemaKey stri
 	delete(otherKeys, "///")
 	delete(otherKeys, "_ignoreIfDuplicate")
 	for key := range otherKeys {
-		if strings.HasPrefix(key, "@") {
+		if strings.HasPrefix(key, "$") {
 			delete(otherKeys, key)
 		}
 	}

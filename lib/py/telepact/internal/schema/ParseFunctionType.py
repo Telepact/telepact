@@ -74,7 +74,7 @@ def parse_function_errors_regex(path: list[object], function_definition_as_parse
     parse_failures = []
 
     errors_regex_key = "_errors"
-    is_internal = schema_key.endswith("_") or function_definition_as_parsed_json.get("@internal_") is True
+    is_internal = schema_key.endswith("_") or function_definition_as_parsed_json.get("$internal_") is True
 
     regex_path = path + [errors_regex_key]
 

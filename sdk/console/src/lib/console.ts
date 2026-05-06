@@ -319,7 +319,7 @@ export function parseTelepactSchema(
 
 			const errorsRegex =
 				def['_errors'] ??
-				(def['@internal_'] === true ? '^errors\\.Validation_$' : '^errors\\..*$');
+				(def['$internal_'] === true ? '^errors\\.Validation_$' : '^errors\\..*$');
 			const inheritedErrors = availableErrors.filter((e) => e.name.match(errorsRegex)).map((e) => e.name);
 
 			data = {

@@ -260,7 +260,7 @@ public class GetApiDefinitionsWithExamples {
 
     private static String getSchemaKey(Map<String, Object> definition) {
         for (final var key : definition.keySet()) {
-            if (!key.equals("///") && !key.equals("->") && !key.equals("_errors") && !key.startsWith("@")) {
+            if (!key.equals("///") && !key.equals("->") && !key.equals("_errors") && !key.startsWith("$")) {
                 return key;
             }
         }

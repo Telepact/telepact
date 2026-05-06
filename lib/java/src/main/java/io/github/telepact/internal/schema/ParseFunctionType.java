@@ -79,7 +79,7 @@ public class ParseFunctionType {
 
 
         final var errorsRegexKey = "_errors";
-        final var isInternal = schemaKey.endsWith("_") || Boolean.TRUE.equals(functionDefinitionAsParsedJson.get("@internal_"));
+        final var isInternal = schemaKey.endsWith("_") || Boolean.TRUE.equals(functionDefinitionAsParsedJson.get("$internal_"));
 
         final var regexPath = new ArrayList<>(path);
         regexPath.add(errorsRegexKey);

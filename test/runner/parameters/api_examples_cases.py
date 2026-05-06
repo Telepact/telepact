@@ -24,7 +24,7 @@ def _schema_key(definition: dict[str, object]) -> str:
         key
         for key in definition.keys()
         if key not in {'///', '->', '_errors', 'example', 'inputExample', 'outputExample'}
-        and not key.startswith('@')
+        and not key.startswith('$')
     )
 
 

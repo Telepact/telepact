@@ -15,7 +15,7 @@
 #|
 
 - ///: Ping the server.
-  "@internal_": true
+  $internal_: true
   fn.ping_: {}
   ->:
     - Ok_: {}
@@ -26,7 +26,7 @@
     Set `includeInternal` to `true` to include Telepact internal definitions.
     Set `includeExamples` to `true` to add deterministic example payloads to
     each schema entry.
-  "@internal_": true
+  $internal_: true
   fn.api_:
     includeInternal!: "boolean"
     includeExamples!: "boolean"
