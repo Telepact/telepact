@@ -52,7 +52,7 @@ def _pushd(path: Path):
 
 
 class RepositoryAutomationTests(unittest.TestCase):
-    def test_download_release_manifest_command_writes_manifest_from_event_asset(self) -> None:
+    def test_publish_targets_downloads_manifest_from_event_asset(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             repo_root = Path(tmp_dir)
             event_path = repo_root / "event.json"
@@ -71,7 +71,7 @@ class RepositoryAutomationTests(unittest.TestCase):
                 ),
                 encoding="utf-8",
             )
-            output_path = repo_root / "nested" / "release-manifest.json"
+            output_path = repo_root / "github-output.txt"
             payload = json.dumps(
                 {
                     "version": "1.0.0-alpha.215",
@@ -92,7 +92,13 @@ class RepositoryAutomationTests(unittest.TestCase):
             with mock.patch("telepact_project_cli.commands.repository_automation.urllib.request.urlopen", return_value=urlopen_context):
                 result = runner.invoke(
                     main,
-                    ["download-release-manifest", "--output", str(output_path)],
+                    [
+                        "publish-targets",
+                        "--release-tag",
+                        "1.0.0-alpha.215",
+                        "--github-output",
+                        str(output_path),
+                    ],
                     env={
                         "GITHUB_TOKEN": "token",
                         "GITHUB_EVENT_PATH": str(event_path),
@@ -101,14 +107,16 @@ class RepositoryAutomationTests(unittest.TestCase):
 
             self.assertEqual(result.exit_code, 0, msg=result.output)
             self.assertEqual(
-                json.loads(output_path.read_text(encoding="utf-8")),
-                {
-                    "changed_paths": ["lib/py/impl.py"],
-                    "direct_targets": ["py"],
-                    "pr_number": None,
-                    "targets": ["cli", "py"],
-                    "version": "1.0.0-alpha.215",
-                },
+                output_path.read_text(encoding="utf-8").splitlines(),
+                [
+                    "publish_cli=true",
+                    "publish_console=false",
+                    "publish_go=false",
+                    "publish_java=false",
+                    "publish_prettier=false",
+                    "publish_py=true",
+                    "publish_ts=false",
+                ],
             )
 
     def test_release_command_uploads_release_manifest_asset(self) -> None:

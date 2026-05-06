@@ -45,18 +45,13 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v6
 
-      - name: Download release manifest asset
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        run: ./tool/telepact-project download-release-manifest --output release-manifest.json
-
       - name: Resolve release manifest
         id: resolve
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           ./tool/telepact-project publish-targets \
             --release-tag "${{ github.event.release.tag_name }}" \
-            --release-body "${{ github.event.release.body }}" \
-            --release-manifest-path release-manifest.json \
             --github-output "$GITHUB_OUTPUT"
 
   publish-java:

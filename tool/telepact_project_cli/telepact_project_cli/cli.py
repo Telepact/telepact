@@ -20,7 +20,6 @@ from .commands.license_header import license_header
 from .commands.project_version import bump, get, set_version
 from .commands.repository_automation import (
     automerge,
-    download_release_manifest,
     mark_merge_ready,
     merge_pr,
     open_version_bump_pr,
@@ -48,7 +47,6 @@ main.add_command(release)
 main.add_command(open_version_bump_pr)
 main.add_command(publish_targets)
 main.add_command(print_release_manifest)
-main.add_command(download_release_manifest)
 main.add_command(automerge)
 main.add_command(consolidated_readme)
 main.add_command(doc_versions)

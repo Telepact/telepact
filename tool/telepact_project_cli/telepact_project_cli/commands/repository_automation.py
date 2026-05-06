@@ -702,42 +702,35 @@ def publish_targets(
     release_manifest_path: Path | None,
     github_output: Path | None,
 ) -> None:
-    outputs = resolve_publish_targets(
-        Path("."),
-        release_tag=release_tag,
-        release_body=release_body,
-        release_manifest_path=release_manifest_path,
-    )
+    with tempfile.TemporaryDirectory() as temp_dir:
+        effective_manifest_path = release_manifest_path
+        if effective_manifest_path is None and os.getenv("GITHUB_EVENT_PATH"):
+            github_token = _require_env("GITHUB_TOKEN")
+            event_path = Path(_require_env("GITHUB_EVENT_PATH"))
+            payload = _download_release_manifest_payload(event_path, github_token)
+            manifest = _parse_release_manifest_payload(payload)
+            effective_manifest_path = Path(temp_dir) / RELEASE_MANIFEST_ASSET_NAME
+            effective_manifest_path.write_text(render_release_manifest_for_stdout(manifest), encoding="utf-8")
 
-    lines = [f"{key}={'true' if value else 'false'}" for key, value in outputs.items()]
-    if github_output is not None:
-        github_output.parent.mkdir(parents=True, exist_ok=True)
-        github_output.write_text("\n".join(lines) + "\n", encoding="utf-8")
-    else:
-        click.echo("\n".join(lines))
+        outputs = resolve_publish_targets(
+            Path("."),
+            release_tag=release_tag,
+            release_body=release_body,
+            release_manifest_path=effective_manifest_path,
+        )
+
+        lines = [f"{key}={'true' if value else 'false'}" for key, value in outputs.items()]
+        if github_output is not None:
+            github_output.parent.mkdir(parents=True, exist_ok=True)
+            github_output.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        else:
+            click.echo("\n".join(lines))
 
 
 @click.command(name="print-release-manifest")
 @click.option("--ref", default="HEAD", help="Git ref to evaluate for release target computation.")
 def print_release_manifest(ref: str) -> None:
     click.echo(render_release_manifest_from_git(Path("."), ref=ref))
-
-
-@click.command(name="download-release-manifest")
-@click.option(
-    "--output",
-    default=Path(RELEASE_MANIFEST_ASSET_NAME),
-    type=click.Path(dir_okay=False, path_type=Path),
-    help="Path where the downloaded release manifest should be written.",
-)
-def download_release_manifest(output: Path) -> None:
-    github_token = _require_env("GITHUB_TOKEN")
-    event_path = Path(_require_env("GITHUB_EVENT_PATH"))
-    payload = _download_release_manifest_payload(event_path, github_token)
-    manifest = _parse_release_manifest_payload(payload)
-    output.parent.mkdir(parents=True, exist_ok=True)
-    output.write_text(render_release_manifest_for_stdout(manifest), encoding="utf-8")
-    click.echo(f"Downloaded {RELEASE_MANIFEST_ASSET_NAME} to {output}")
 
 
 @click.command(name="open-version-bump-pr")
