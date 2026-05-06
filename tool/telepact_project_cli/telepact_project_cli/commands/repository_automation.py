@@ -14,14 +14,10 @@
 #|  limitations under the License.
 #|
 
-import json
 import os
 import re
 import subprocess
-import tempfile
 import time
-import urllib.error
-import urllib.request
 from pathlib import Path
 
 import click
@@ -32,11 +28,11 @@ from github.PullRequest import PullRequest
 from .doc_versions import _read_go_module_path, _read_maven_gav, _read_package_json_name, _read_pyproject_name
 from .project_version import _bump_version, create_version_bump_commit
 from ..release_plan import (
-    ReleaseManifest,
+    ReleaseCommit,
+    commits_since_last_version_change,
     compute_release_manifest_from_git,
     find_repo_root,
     load_release_target_rules,
-    render_release_manifest_for_stdout,
     render_release_manifest_from_git,
     resolve_publish_targets,
 )
@@ -52,7 +48,6 @@ RELEASE_TARGET_ASSET_DIRECTORY_MAP = {
 }
 
 MAX_ASSETS = 10
-RELEASE_MANIFEST_ASSET_NAME = "release-manifest.json"
 MAIN_BRANCH = "main"
 WAIT_TIMEOUT_SECONDS = 20 * 60  # 20 minutes
 WAIT_INTERVAL_SECONDS = 10
@@ -146,6 +141,15 @@ def _format_release_target(repo_root: Path, target: str) -> str:
     return f"- **{label}** — `{package_name}` ({registry})"
 
 
+def _release_target_heading(repo_root: Path, target: str) -> str:
+    label, package_name, registry = _release_target_details(repo_root, target)
+    return f"{label} — `{package_name}` ({registry})"
+
+
+def _format_release_commit(commit: ReleaseCommit) -> str:
+    return f"- {commit.subject} (`{commit.sha[:7]}`)"
+
+
 def _build_release_body(
     repo_root: Path,
     *,
@@ -156,48 +160,50 @@ def _build_release_body(
     release_targets: list[str],
 ) -> str:
     rules = load_release_target_rules(repo_root).projects
+    missing_targets = sorted({target for target in [*direct_targets, *release_targets] if target not in rules})
+    if missing_targets:
+        raise click.ClickException(f"Unknown release target(s): {', '.join(missing_targets)}")
     direct_target_set = set(direct_targets)
     dependency_targets = [target for target in release_targets if target not in direct_target_set]
-
-    direct_lines = [_format_release_target(repo_root, target) for target in direct_targets] or ["(None)"]
 
     def _dependency_reason(target: str) -> str:
         upstream_targets = sorted(source for source in direct_targets if target in rules[source].is_dependency_for)
         if not upstream_targets:
-            return "dependency-triggered republish; usually no extra review beyond the underlying dependency update."
+            return "dependency-triggered republish"
         upstream_labels = ", ".join(_release_target_details(repo_root, source)[0] for source in upstream_targets)
-        return (
-            f"dependency-triggered republish from {upstream_labels}; "
-            "usually no extra review beyond the underlying dependency update."
-        )
+        return f"dependency-triggered republish from {upstream_labels}"
 
-    republish_lines = [
-        f"{_format_release_target(repo_root, target)} — {_dependency_reason(target)}"
-        for target in dependency_targets
-    ] or ["(None)"]
-
-    summary_lines = [
-        (
-            f"{_format_release_target(repo_root, target)} — "
-            "direct change; review if you use this package directly."
-        )
+    published_target_lines = [
+        _format_release_target(repo_root, target)
         if target in direct_target_set
         else f"{_format_release_target(repo_root, target)} — {_dependency_reason(target)}"
         for target in release_targets
     ] or ["(None)"]
 
+    target_sections = []
+    for target in direct_targets:
+        commits = commits_since_last_version_change(repo_root, paths=rules[target].paths)
+        commit_lines = [_format_release_commit(commit) for commit in commits] or ["- No direct commits found."]
+        target_sections.append(f"### {_release_target_heading(repo_root, target)}\n" + "\n".join(commit_lines))
+    if dependency_targets:
+        dependency_lines = [
+            f"{_format_release_target(repo_root, target)} — {_dependency_reason(target)}"
+            for target in dependency_targets
+        ]
+        target_sections.append("### Dependency-triggered republishes\n" + "\n".join(dependency_lines))
+
     heading = f"## {pr_title}"
     if pr_number is not None and pr_url:
         heading = f"{heading} [(#{pr_number})]({pr_url})"
 
+    published_targets_block = "\n".join(published_target_lines)
+    sections_block = "\n".join(target_sections) if target_sections else "### Release target changes\n(None)"
+
     return (
         f"{heading}\n\n"
-        "### Direct package changes\n"
-        f"{chr(10).join(direct_lines)}\n\n"
-        "### Dependency-triggered republishes\n"
-        f"{chr(10).join(republish_lines)}\n\n"
-        "### Published package summary\n"
-        f"{chr(10).join(summary_lines)}"
+        "### Published targets\n"
+        f"{published_targets_block}\n\n"
+        f"{sections_block}"
     ).strip()
 
 
@@ -483,68 +489,6 @@ def _release_pr_metadata(repo, default_title: str) -> tuple[str, int | None, str
     return (pr.title, pr.number, pr.html_url)
 
 
-def _read_release_event_payload(event_path: Path) -> dict:
-    try:
-        data = json.loads(event_path.read_text(encoding="utf-8"))
-    except FileNotFoundError as exc:
-        raise click.ClickException(f"GitHub event payload not found: {event_path}") from exc
-    except json.JSONDecodeError as exc:
-        raise click.ClickException(f"Invalid JSON in GitHub event payload {event_path}: {exc}") from exc
-    if not isinstance(data, dict):
-        raise click.ClickException(f"GitHub event payload must be a JSON object: {event_path}")
-    return data
-
-
-def _release_manifest_asset_api_url(event_path: Path) -> str:
-    event = _read_release_event_payload(event_path)
-    release = event.get("release")
-    if not isinstance(release, dict):
-        raise click.ClickException("GitHub event payload does not include a release object.")
-    assets = release.get("assets", [])
-    if not isinstance(assets, list):
-        raise click.ClickException("GitHub release payload field 'assets' must be a list.")
-
-    asset = next(
-        (
-            item
-            for item in assets
-            if isinstance(item, dict) and item.get("name") == RELEASE_MANIFEST_ASSET_NAME and isinstance(item.get("url"), str)
-        ),
-        None,
-    )
-    if asset is None:
-        raise click.ClickException(f"{RELEASE_MANIFEST_ASSET_NAME} asset is missing from the release.")
-
-    return asset["url"]
-
-
-def _download_release_manifest_payload(event_path: Path, github_token: str) -> bytes:
-    asset_url = _release_manifest_asset_api_url(event_path)
-    request = urllib.request.Request(
-        asset_url,
-        headers={
-            "Accept": "application/octet-stream",
-            "Authorization": f"Bearer {github_token}",
-            "X-GitHub-Api-Version": "2022-11-28",
-        },
-    )
-    try:
-        with urllib.request.urlopen(request) as response:
-            return response.read()
-    except (urllib.error.HTTPError, urllib.error.URLError) as exc:
-        raise click.ClickException(f"Failed to download {RELEASE_MANIFEST_ASSET_NAME}: {exc}") from exc
-
-
-def _parse_release_manifest_payload(payload: bytes) -> ReleaseManifest:
-    try:
-        data = json.loads(payload.decode("utf-8"))
-    except UnicodeDecodeError as exc:
-        raise click.ClickException(f"{RELEASE_MANIFEST_ASSET_NAME} is not valid UTF-8 JSON.") from exc
-    except json.JSONDecodeError as exc:
-        raise click.ClickException(f"{RELEASE_MANIFEST_ASSET_NAME} is not valid JSON: {exc}") from exc
-    return ReleaseManifest.from_dict(data)
-
-
 def _process_merge_ready_pull_request(repo, pr_number: int) -> None:
     commenter_login = _latest_merge_commenter_login(repo, pr_number)
     commenter_permission = _commenter_permission(repo, commenter_login)
@@ -651,36 +595,25 @@ def release() -> None:
         click.echo(f"Release created: {release.html_url}")
 
         asset_count = 0
-        with tempfile.TemporaryDirectory() as temp_dir:
-            manifest_path = Path(temp_dir) / RELEASE_MANIFEST_ASSET_NAME
-            manifest_path.write_text(render_release_manifest_for_stdout(release_manifest), encoding="utf-8")
-            release.upload_asset(
-                path=str(manifest_path),
-                name=RELEASE_MANIFEST_ASSET_NAME,
-                label=RELEASE_MANIFEST_ASSET_NAME,
-            )
-            asset_count += 1
-            click.echo(f"Uploaded asset: {RELEASE_MANIFEST_ASSET_NAME}")
-
-            for target in release_targets:
-                asset_directories = RELEASE_TARGET_ASSET_DIRECTORY_MAP.get(target, [])
-                for asset_directory in asset_directories:
-                    if os.path.exists(asset_directory):
-                        for file_name in os.listdir(asset_directory):
-                            if asset_count >= MAX_ASSETS:
-                                click.echo("Maximum asset upload limit reached. Aborting.")
-                                return
-                            file_path = os.path.join(asset_directory, file_name)
-                            if os.path.isfile(file_path):
-                                release.upload_asset(
-                                    path=file_path,
-                                    name=file_name,
-                                    label=f" [{target}]: {file_name}",
-                                )
-                                asset_count += 1
-                                click.echo(f"Uploaded asset: {file_name} for target: {target}")
-                    else:
-                        click.echo(f"Asset directory does not exist: {asset_directory} for target: {target}")
+        for target in release_targets:
+            asset_directories = RELEASE_TARGET_ASSET_DIRECTORY_MAP.get(target, [])
+            for asset_directory in asset_directories:
+                if os.path.exists(asset_directory):
+                    for file_name in os.listdir(asset_directory):
+                        if asset_count >= MAX_ASSETS:
+                            click.echo("Maximum asset upload limit reached. Aborting.")
+                            return
+                        file_path = os.path.join(asset_directory, file_name)
+                        if os.path.isfile(file_path):
+                            release.upload_asset(
+                                path=file_path,
+                                name=file_name,
+                                label=f" [{target}]: {file_name}",
+                            )
+                            asset_count += 1
+                            click.echo(f"Uploaded asset: {file_name} for target: {target}")
+                else:
+                    click.echo(f"Asset directory does not exist: {asset_directory} for target: {target}")
 
     except Exception as e:
         click.echo(f"Failed to create release or upload assets: {e}")
@@ -702,29 +635,19 @@ def publish_targets(
     release_manifest_path: Path | None,
     github_output: Path | None,
 ) -> None:
-    with tempfile.TemporaryDirectory() as temp_dir:
-        effective_manifest_path = release_manifest_path
-        if effective_manifest_path is None and os.getenv("GITHUB_EVENT_PATH"):
-            github_token = _require_env("GITHUB_TOKEN")
-            event_path = Path(_require_env("GITHUB_EVENT_PATH"))
-            payload = _download_release_manifest_payload(event_path, github_token)
-            manifest = _parse_release_manifest_payload(payload)
-            effective_manifest_path = Path(temp_dir) / RELEASE_MANIFEST_ASSET_NAME
-            effective_manifest_path.write_text(render_release_manifest_for_stdout(manifest), encoding="utf-8")
+    outputs = resolve_publish_targets(
+        Path("."),
+        release_tag=release_tag,
+        release_body=release_body,
+        release_manifest_path=release_manifest_path,
+    )
 
-        outputs = resolve_publish_targets(
-            Path("."),
-            release_tag=release_tag,
-            release_body=release_body,
-            release_manifest_path=effective_manifest_path,
-        )
-
-        lines = [f"{key}={'true' if value else 'false'}" for key, value in outputs.items()]
-        if github_output is not None:
-            github_output.parent.mkdir(parents=True, exist_ok=True)
-            github_output.write_text("\n".join(lines) + "\n", encoding="utf-8")
-        else:
-            click.echo("\n".join(lines))
+    lines = [f"{key}={'true' if value else 'false'}" for key, value in outputs.items()]
+    if github_output is not None:
+        github_output.parent.mkdir(parents=True, exist_ok=True)
+        github_output.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    else:
+        click.echo("\n".join(lines))
 
 
 @click.command(name="print-release-manifest")

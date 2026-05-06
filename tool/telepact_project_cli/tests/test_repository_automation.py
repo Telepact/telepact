@@ -52,74 +52,7 @@ def _pushd(path: Path):
 
 
 class RepositoryAutomationTests(unittest.TestCase):
-    def test_publish_targets_downloads_manifest_from_event_asset(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp_dir:
-            repo_root = Path(tmp_dir)
-            event_path = repo_root / "event.json"
-            event_path.write_text(
-                json.dumps(
-                    {
-                        "release": {
-                            "assets": [
-                                {
-                                    "name": "release-manifest.json",
-                                    "url": "https://example.test/assets/manifest",
-                                }
-                            ]
-                        }
-                    }
-                ),
-                encoding="utf-8",
-            )
-            output_path = repo_root / "github-output.txt"
-            payload = json.dumps(
-                {
-                    "version": "1.0.0-alpha.215",
-                    "pr_number": None,
-                    "changed_paths": ["lib/py/impl.py"],
-                    "direct_targets": ["py"],
-                    "targets": ["cli", "py"],
-                }
-            ).encode("utf-8")
-
-            response = mock.MagicMock()
-            response.read.return_value = payload
-            urlopen_context = mock.MagicMock()
-            urlopen_context.__enter__.return_value = response
-            urlopen_context.__exit__.return_value = None
-
-            runner = CliRunner()
-            with mock.patch("telepact_project_cli.commands.repository_automation.urllib.request.urlopen", return_value=urlopen_context):
-                result = runner.invoke(
-                    main,
-                    [
-                        "publish-targets",
-                        "--release-tag",
-                        "1.0.0-alpha.215",
-                        "--github-output",
-                        str(output_path),
-                    ],
-                    env={
-                        "GITHUB_TOKEN": "token",
-                        "GITHUB_EVENT_PATH": str(event_path),
-                    },
-                )
-
-            self.assertEqual(result.exit_code, 0, msg=result.output)
-            self.assertEqual(
-                output_path.read_text(encoding="utf-8").splitlines(),
-                [
-                    "publish_cli=true",
-                    "publish_console=false",
-                    "publish_go=false",
-                    "publish_java=false",
-                    "publish_prettier=false",
-                    "publish_py=true",
-                    "publish_ts=false",
-                ],
-            )
-
-    def test_release_command_uploads_release_manifest_asset(self) -> None:
+    def test_release_command_does_not_upload_release_manifest_asset(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             repo_root = Path(tmp_dir)
             from test_release_plan import _commit_all, _init_repo, _pushd, _write_release_targets
@@ -186,41 +119,24 @@ class RepositoryAutomationTests(unittest.TestCase):
                 )
 
             self.assertEqual(result.exit_code, 0, msg=result.output)
-            self.assertIn("release-manifest.json", uploaded_assets)
-            self.assertEqual(
-                json.loads(uploaded_assets["release-manifest.json"]),
-                {
-                    "changed_paths": ["lib/py/impl.py"],
-                    "direct_targets": ["py"],
-                    "pr_number": None,
-                    "targets": ["cli", "py"],
-                    "version": "1.0.0-alpha.215",
-                },
-            )
+            repo.create_git_release.assert_called_once()
+            release_obj.upload_asset.assert_not_called()
+            self.assertEqual(uploaded_assets, {})
 
-    def test_build_release_body_separates_direct_and_dependency_triggered_targets(self) -> None:
+    def test_build_release_body_groups_commits_by_direct_release_target(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             repo_root = Path(tmp_dir)
-            (repo_root / "VERSION.txt").write_text("1.0.0-alpha.318", encoding="utf-8")
-            (repo_root / ".release").mkdir()
-            (repo_root / ".release" / "release-targets.yaml").write_text(
-                """
-projects:
-  py:
-    paths: [lib/py]
-    is_dependency_for: [cli]
-  cli:
-    paths: [sdk/cli]
-""".strip()
-                + "\n",
-                encoding="utf-8",
-            )
+            from test_release_plan import _commit_all, _init_repo, _pushd, _write_release_targets
+
+            _init_repo(repo_root)
+            _write_release_targets(repo_root)
+            (repo_root / "VERSION.txt").write_text("1.0.0-alpha.317", encoding="utf-8")
             (repo_root / "lib" / "py").mkdir(parents=True)
             (repo_root / "lib" / "py" / "pyproject.toml").write_text(
                 """
 [project]
 name = "telepact"
-version = "1.0.0-alpha.318"
+version = "1.0.0-alpha.317"
 """.strip()
                 + "\n",
                 encoding="utf-8",
@@ -230,27 +146,62 @@ version = "1.0.0-alpha.318"
                 """
 [project]
 name = "telepact-cli"
+version = "1.0.0-alpha.317"
+""".strip()
+                + "\n",
+                encoding="utf-8",
+            )
+            (repo_root / "site").mkdir(parents=True)
+            (repo_root / "site" / "README.md").write_text("initial\n", encoding="utf-8")
+            _commit_all(repo_root, "Initial release")
+
+            (repo_root / "lib" / "py" / "impl.py").write_text("print('py')\n", encoding="utf-8")
+            _commit_all(repo_root, "Add Python release feature")
+
+            (repo_root / "site" / "README.md").write_text("updated\n", encoding="utf-8")
+            _commit_all(repo_root, "Refresh website copy")
+
+            (repo_root / "sdk" / "cli" / "cli.py").write_text("print('cli')\n", encoding="utf-8")
+            _commit_all(repo_root, "Add CLI release feature")
+
+            (repo_root / "VERSION.txt").write_text("1.0.0-alpha.318", encoding="utf-8")
+            (repo_root / "lib" / "py" / "pyproject.toml").write_text(
+                """
+[project]
+name = "telepact"
 version = "1.0.0-alpha.318"
 """.strip()
                 + "\n",
                 encoding="utf-8",
             )
-
-            body = _build_release_body(
-                repo_root,
-                pr_title="Improve release notes",
-                pr_number=7,
-                pr_url="https://github.com/Telepact/telepact/pull/7",
-                direct_targets=["py"],
-                release_targets=["cli", "py"],
+            (repo_root / "sdk" / "cli" / "pyproject.toml").write_text(
+                """
+[project]
+name = "telepact-cli"
+version = "1.0.0-alpha.318"
+""".strip()
+                + "\n",
+                encoding="utf-8",
             )
+            _commit_all(repo_root, "Bump version")
 
-            self.assertIn("### Direct package changes", body)
-            self.assertIn("- **Library (Python)** — `telepact` (PyPI)", body)
-            self.assertIn("### Dependency-triggered republishes", body)
-            self.assertIn("- **SDK (CLI)** — `telepact-cli` (PyPI) — dependency-triggered republish from Library (Python)", body)
-            self.assertIn("### Published package summary", body)
-            self.assertIn("direct change; review if you use this package directly.", body)
+            with _pushd(repo_root):
+                body = _build_release_body(
+                    repo_root,
+                    pr_title="Improve release notes",
+                    pr_number=7,
+                    pr_url="https://github.com/Telepact/telepact/pull/7",
+                    direct_targets=["cli", "py"],
+                    release_targets=["cli", "py"],
+                )
+
+            self.assertIn("### Published targets", body)
+            self.assertIn("### Library (Python) — `telepact` (PyPI)", body)
+            self.assertIn("### SDK (CLI) — `telepact-cli` (PyPI)", body)
+            self.assertIn("Add Python release feature", body)
+            self.assertIn("Add CLI release feature", body)
+            self.assertNotIn("Refresh website copy", body)
+            self.assertNotIn("Bump version", body)
 
     def test_combined_status_state_reads_head_commit_status(self) -> None:
         pr = SimpleNamespace(

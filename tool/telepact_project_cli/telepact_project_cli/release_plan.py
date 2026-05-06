@@ -25,6 +25,11 @@ import yaml
 
 RELEASE_CONFIG_RELATIVE_PATH = Path(".release/release-targets.yaml")
 VERSION_FILE_RELATIVE_PATH = Path("VERSION.txt")
+# Use ASCII Unit Separator (`\x1f`, rendered in git log format strings as `%x1f`)
+# so git log records can be split safely even when commit subjects contain common
+# delimiters like pipes, commas, or colons.
+GIT_LOG_FIELD_SEPARATOR = "\x1f"
+GIT_LOG_FORMAT = "--format=%H%x1f%s"
 
 PUBLISH_TARGETS = ("java", "ts", "py", "go", "cli", "console", "prettier")
 
@@ -85,6 +90,12 @@ class ReleaseManifest:
         )
 
 
+@dataclass(frozen=True)
+class ReleaseCommit:
+    sha: str
+    subject: str
+
+
 def find_repo_root(start: Path | str = ".") -> Path:
     start_path = Path(start).resolve()
     for candidate in [start_path, *start_path.parents]:
@@ -143,8 +154,7 @@ def _resolved_commit_sha(repo_root: Path, ref: str) -> str:
         raise click.ClickException(f"Unable to resolve git ref {ref!r}: {exc.stderr.strip()}")
 
 
-def changed_paths_since_last_version_change(repo_root: Path | str = ".", ref: str = "HEAD") -> list[str]:
-    repo_root = find_repo_root(repo_root)
+def _release_change_window(repo_root: Path, ref: str = "HEAD") -> tuple[str | None, str]:
     version_change_commits = _version_change_commits(repo_root, ref)
     base_commit = _previous_version_change_commit(repo_root, ref)
     end_ref = ref
@@ -154,6 +164,12 @@ def changed_paths_since_last_version_change(repo_root: Path | str = ".", ref: st
         except subprocess.CalledProcessError:
             # The initial version-setting commit has no parent; in that case diff against the commit itself.
             end_ref = ref
+    return (base_commit, end_ref)
+
+
+def changed_paths_since_last_version_change(repo_root: Path | str = ".", ref: str = "HEAD") -> list[str]:
+    repo_root = find_repo_root(repo_root)
+    base_commit, end_ref = _release_change_window(repo_root, ref)
 
     try:
         if base_commit is None:
@@ -172,6 +188,44 @@ def changed_paths_since_last_version_change(repo_root: Path | str = ".", ref: st
         }
     )
     return changed_paths
+
+
+def commits_since_last_version_change(
+    repo_root: Path | str = ".",
+    ref: str = "HEAD",
+    paths: Iterable[str] | None = None,
+) -> tuple[ReleaseCommit, ...]:
+    repo_root = find_repo_root(repo_root)
+    base_commit, end_ref = _release_change_window(repo_root, ref)
+    normalized_paths = tuple(
+        sorted(
+            {
+                normalized_path
+                for path in (paths or ())
+                for normalized_path in [_normalize_repo_path(path)]
+                if normalized_path
+            }
+        )
+    )
+
+    try:
+        args = ["log", GIT_LOG_FORMAT, "--reverse"]
+        args.append(end_ref if base_commit is None else f"{base_commit}..{end_ref}")
+        if normalized_paths:
+            args.extend(["--", *normalized_paths])
+        stdout = _git_stdout(repo_root, *args)
+    except subprocess.CalledProcessError as exc:
+        raise click.ClickException(f"Unable to compute release commits at {ref}: {exc.stderr.strip()}")
+
+    commits: list[ReleaseCommit] = []
+    for line in stdout.splitlines():
+        if not line.strip():
+            continue
+        sha, separator, subject = line.partition(GIT_LOG_FIELD_SEPARATOR)
+        if not separator:
+            raise click.ClickException("Unexpected git log output while computing release commits.")
+        commits.append(ReleaseCommit(sha=sha.strip(), subject=subject.strip()))
+    return tuple(commits)
 
 
 def _load_release_target_config_data(repo_root: Path) -> dict:
