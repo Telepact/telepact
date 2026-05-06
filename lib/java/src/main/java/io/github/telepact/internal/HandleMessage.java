@@ -77,9 +77,9 @@ public class HandleMessage {
         final var resultUnionType = (TUnion) parsedTelepactSchema.get(requestTarget + ".->");
         final var requiresAuthentication = unknownTarget == null && functionRouter.requiresAuthentication(functionName);
 
-        final var callId = requestHeaders.get("+id_");
+        final var callId = requestHeaders.get("@id_");
         if (callId != null) {
-            responseHeaders.put("+id_", callId);
+            responseHeaders.put("@id_", callId);
         }
 
         if (requestHeaders.containsKey("_parseFailures")) {
@@ -100,7 +100,7 @@ public class HandleMessage {
                     responseHeaders);
         }
 
-        if (requiresAuthentication && !requestHeaders.containsKey("+auth_")) {
+        if (requiresAuthentication && !requestHeaders.containsKey("@auth_")) {
             return buildUnauthenticatedErrorMessage(resultUnionType, responseHeaders);
         }
 
@@ -127,18 +127,18 @@ public class HandleMessage {
             }
         }
 
-        if (requestHeaders.containsKey("+bin_")) {
-            final List<Object> clientKnownBinaryChecksums = (List<Object>) requestHeaders.get("+bin_");
+        if (requestHeaders.containsKey("@bin_")) {
+            final List<Object> clientKnownBinaryChecksums = (List<Object>) requestHeaders.get("@bin_");
 
-            responseHeaders.put("+binary_", true);
-            responseHeaders.put("+clientKnownBinaryChecksums_", clientKnownBinaryChecksums);
+            responseHeaders.put("@binary_", true);
+            responseHeaders.put("@clientKnownBinaryChecksums_", clientKnownBinaryChecksums);
 
-            if (requestHeaders.containsKey("+pac_")) {
-                responseHeaders.put("+pac_", requestHeaders.get("+pac_"));
+            if (requestHeaders.containsKey("@pac_")) {
+                responseHeaders.put("@pac_", requestHeaders.get("@pac_"));
             }
         }
 
-        final Map<String, Object> selectStructFieldsHeader = (Map<String, Object>) requestHeaders.get("+select_");
+        final Map<String, Object> selectStructFieldsHeader = (Map<String, Object>) requestHeaders.get("@select_");
 
         if (unknownTarget != null) {
             final Map<String, Object> newErrorResult = Map.of("ErrorInvalidRequestBody_",
@@ -165,7 +165,7 @@ public class HandleMessage {
             serverBase64Decode(requestBody, callValidateCtx.bytesCoercions);
         }
 
-        final var unsafeResponseEnabled = Objects.equals(true, requestHeaders.get("+unsafe_"));
+        final var unsafeResponseEnabled = Objects.equals(true, requestHeaders.get("@unsafe_"));
 
         final var callMessage = new Message(requestHeaders, Map.of(requestTarget, requestPayload));
 
@@ -192,7 +192,7 @@ public class HandleMessage {
 
         final var skipResultValidation = unsafeResponseEnabled;
 
-        final var coerceBase64 = !Objects.equals(true, requestHeaders.get("+binary_"));
+        final var coerceBase64 = !Objects.equals(true, requestHeaders.get("@binary_"));
         final var resultValidateCtx = new ValidateContext(selectStructFieldsHeader, requestTarget, coerceBase64);
         
         final var resultValidationFailures = resultUnionType.validate(resultUnion, List.of(), resultValidateCtx);
@@ -210,7 +210,7 @@ public class HandleMessage {
         }
         
         if (!resultValidateCtx.base64Coercions.isEmpty()) {
-            finalResponseHeaders.put("+base64_", resultValidateCtx.base64Coercions);
+            finalResponseHeaders.put("@base64_", resultValidateCtx.base64Coercions);
         }
 
         if (resultValidateCtx.bytesCoercions.size() > 0) {

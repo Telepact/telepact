@@ -40,9 +40,9 @@ func ServerBinaryEncode(message []any, binaryEncoding *BinaryEncoding) ([]any, e
 		return nil, err
 	}
 
-	clientKnownRaw, hasClientKnown := headers["+clientKnownBinaryChecksums_"]
+	clientKnownRaw, hasClientKnown := headers["@clientKnownBinaryChecksums_"]
 	if hasClientKnown {
-		delete(headers, "+clientKnownBinaryChecksums_")
+		delete(headers, "@clientKnownBinaryChecksums_")
 	}
 
 	clientKnown, err := extractIntSlice(clientKnownRaw)
@@ -68,10 +68,10 @@ func ServerBinaryEncode(message []any, binaryEncoding *BinaryEncoding) ([]any, e
 		for key, value := range binaryEncoding.EncodeMap {
 			encodeMapCopy[key] = value
 		}
-		headers["+enc_"] = encodeMapCopy
+		headers["@enc_"] = encodeMapCopy
 	}
 
-	headers["+bin_"] = []int{binaryEncoding.Checksum}
+	headers["@bin_"] = []int{binaryEncoding.Checksum}
 
 	encodedBody, err := EncodeBody(messageBody, binaryEncoding)
 	if err != nil {
@@ -79,7 +79,7 @@ func ServerBinaryEncode(message []any, binaryEncoding *BinaryEncoding) ([]any, e
 	}
 
 	finalEncodedBody := encodedBody
-	if isStrictTrue(headers["+pac_"]) {
+	if isStrictTrue(headers["@pac_"]) {
 		packedBody, err := PackBody(encodedBody)
 		if err != nil {
 			return nil, err

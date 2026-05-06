@@ -34,7 +34,7 @@ func ServerBinaryDecode(message []any, binaryEncoding *BinaryEncoding) ([]any, e
 		return nil, err
 	}
 
-	clientChecksums, err := extractIntSlice(headers["+bin_"])
+	clientChecksums, err := extractIntSlice(headers["@bin_"])
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +48,7 @@ func ServerBinaryDecode(message []any, binaryEncoding *BinaryEncoding) ([]any, e
 	}
 
 	finalEncodedBody := encodedBody
-	if isStrictTrue(headers["+pac_"]) {
+	if isStrictTrue(headers["@pac_"]) {
 		unpacked, err := UnpackBody(encodedBody)
 		if err != nil {
 			return nil, err

@@ -238,8 +238,6 @@ class ReleasePlanTests(unittest.TestCase):
                 '[project]\nname = "telepact"\nversion = "1.0.0-alpha.201"\n',
                 encoding="utf-8",
             )
-            (repo_root / "doc" / "04-operate").mkdir(parents=True)
-            (repo_root / "doc" / "04-operate" / "03-versions.md").write_text("# Versions\n", encoding="utf-8")
             _commit_all(repo_root, "Bump version")
 
             self.assertEqual(
@@ -433,10 +431,6 @@ class ReleasePlanTests(unittest.TestCase):
             with (
                 _pushd(repo_root),
                 mock.patch("telepact_project_cli.commands.project_version.subprocess.run", side_effect=subprocess_run_side_effect),
-                mock.patch(
-                    "telepact_project_cli.commands.project_version.write_doc_versions",
-                    return_value=repo_root / "doc" / "04-operate" / "03-versions.md",
-                ),
             ):
                 result = runner.invoke(main, ["bump"])
 
@@ -463,21 +457,11 @@ class ReleasePlanTests(unittest.TestCase):
             with (
                 _pushd(repo_root),
                 mock.patch("telepact_project_cli.commands.project_version.subprocess.run", side_effect=subprocess_run_side_effect),
-                mock.patch(
-                    "telepact_project_cli.commands.project_version.write_doc_versions",
-                    return_value=repo_root / "doc" / "04-operate" / "03-versions.md",
-                ) as write_doc_versions,
             ):
                 result = runner.invoke(main, ["bump"])
 
             self.assertEqual(result.exit_code, 0, msg=result.output)
             self.assertEqual((repo_root / "VERSION.txt").read_text(encoding="utf-8"), "1.0.0-alpha.214")
-            write_doc_versions.assert_called_once_with(
-                Path("."),
-                None,
-                pending_version=None,
-                pending_targets=[],
-            )
 
     def test_latest_released_versions_uses_version_change_history(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:

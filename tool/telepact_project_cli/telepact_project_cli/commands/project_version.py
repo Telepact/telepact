@@ -25,7 +25,6 @@ import toml
 from lxml import etree as ET
 from ruamel.yaml import YAML
 
-from .doc_versions import write_doc_versions
 from ..release_plan import compute_release_manifest
 
 yaml = YAML()
@@ -216,16 +215,6 @@ def create_version_bump_commit(
             lock_file = _update_and_get_lock_file_path(project_file)
             if lock_file is not None:
                 edited_files.append(lock_file)
-
-    doc_versions_path = write_doc_versions(
-        Path("."),
-        None,
-        pending_version=new_version if sorted_release_targets else None,
-        pending_targets=sorted_release_targets,
-    )
-    repo_relative_doc_versions_path = os.path.relpath(doc_versions_path, Path.cwd())
-    edited_files.append(repo_relative_doc_versions_path)
-    click.echo(f"Updated {repo_relative_doc_versions_path}")
 
     if compute_release_targets:
         release_target_lines = "\n".join(sorted_release_targets) if sorted_release_targets else "(none)"

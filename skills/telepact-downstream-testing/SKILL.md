@@ -49,8 +49,6 @@ Install the Telepact CLI first:
 uv tool install --prerelease=allow telepact-cli
 ```
 
-Latest CLI versions can be found at [doc/04-operate/03-versions.md](https://github.com/Telepact/telepact/blob/main/doc/04-operate/03-versions.md).
-
 ## First Step
 
 Classify which of these two setup modes fits better:
@@ -153,7 +151,7 @@ The most important ones are:
 - `fn.clearStubs_`: clear configured stubs
 - `fn.clearCalls_`: clear recorded invocations
 
-The exact `_ext.Stub_`, `_ext.Call_`, and `+select_` shapes used by these mock
+The exact `_ext.Stub_`, `_ext.Call_`, and `@select_` shapes used by these mock
 controls are documented here:
 https://raw.githubusercontent.com/Telepact/telepact/main/doc/02-design-apis/03-extensions.md
 

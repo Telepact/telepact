@@ -60,7 +60,7 @@ test("preserves the preamble and keeps field-like values inline", async () => {
 #|
 
 - headers.Auth_:
-    "+auth_":
+    "@auth_":
       Session:
         token: string
   ->: {}
@@ -75,7 +75,7 @@ test("preserves the preamble and keeps field-like values inline", async () => {
 #|
 
 - headers.Auth_:
-    "+auth_": {"Session": {"token": "string"}}
+    "@auth_": {"Session": {"token": "string"}}
   ->: {}
 `,
     );
@@ -125,7 +125,7 @@ test("formats array docstrings as markdown blocks", async () => {
 
 test("quotes special keys while keeping Telepact field payloads inline", async () => {
     const input = `- headers.Auth_:
-    "+auth_":
+    "@auth_":
       Session:
         token: string
         scopes: []
@@ -142,7 +142,7 @@ test("quotes special keys while keeping Telepact field payloads inline", async (
     assert.equal(
         output,
         `- headers.Auth_:
-    "+auth_": {"Session": {"token": "string", "scopes": []}}
+    "@auth_": {"Session": {"token": "string", "scopes": []}}
     x-response-header:
       X-Trace-Id: 'string'
   ->:
