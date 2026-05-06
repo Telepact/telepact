@@ -36,6 +36,7 @@ from telepact_project_cli.release_plan import (
     changed_paths_since_last_version_change,
     compute_release_manifest,
     compute_release_manifest_from_git,
+    read_release_manifest,
     render_release_manifest_for_stdout,
 )
 
@@ -343,9 +344,23 @@ class ReleasePlanTests(unittest.TestCase):
                 result = runner.invoke(
                     main,
                     [
+                        "print-release-manifest",
+                    ],
+                )
+
+            self.assertEqual(result.exit_code, 0, msg=result.output)
+            manifest_path = repo_root / "release-manifest.json"
+            manifest_path.write_text(result.output, encoding="utf-8")
+
+            with _pushd(repo_root):
+                result = runner.invoke(
+                    main,
+                    [
                         "publish-targets",
                         "--release-tag",
                         "1.0.0-alpha.215",
+                        "--release-manifest-path",
+                        str(manifest_path),
                         "--github-output",
                         str(output_path),
                     ],
@@ -412,6 +427,30 @@ class ReleasePlanTests(unittest.TestCase):
                     "version": "1.0.0-alpha.215",
                 },
             )
+
+    def test_read_release_manifest_reads_json_file(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            manifest_path = Path(tmp_dir) / "release-manifest.json"
+            manifest_path.write_text(
+                json.dumps(
+                    {
+                        "version": "1.0.0-alpha.215",
+                        "pr_number": 7,
+                        "changed_paths": ["lib/py/impl.py"],
+                        "direct_targets": ["py"],
+                        "targets": ["cli", "py"],
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            manifest = read_release_manifest(manifest_path)
+
+            self.assertEqual(manifest.version, "1.0.0-alpha.215")
+            self.assertEqual(manifest.pr_number, 7)
+            self.assertEqual(manifest.changed_paths, ("lib/py/impl.py",))
+            self.assertEqual(manifest.direct_targets, ("py",))
+            self.assertEqual(manifest.targets, ("cli", "py"))
 
     def test_bump_command_updates_version_when_targets_exist(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:

@@ -59,6 +59,31 @@ class ReleaseManifest:
             "targets": list(self.targets),
         }
 
+    @classmethod
+    def from_dict(cls, data: dict) -> "ReleaseManifest":
+        if not isinstance(data, dict):
+            raise click.ClickException("Release manifest must be a JSON object.")
+        version = data.get("version")
+        if not isinstance(version, str) or not version:
+            raise click.ClickException("Release manifest must define a non-empty string 'version'.")
+        pr_number = data.get("pr_number")
+        if pr_number is not None and not isinstance(pr_number, int):
+            raise click.ClickException("Release manifest field 'pr_number' must be an integer or null.")
+
+        def _string_list(field_name: str) -> tuple[str, ...]:
+            value = data.get(field_name)
+            if not isinstance(value, list) or not all(isinstance(item, str) for item in value):
+                raise click.ClickException(f"Release manifest field {field_name!r} must be a string list.")
+            return tuple(value)
+
+        return cls(
+            version=version,
+            pr_number=pr_number,
+            changed_paths=_string_list("changed_paths"),
+            direct_targets=_string_list("direct_targets"),
+            targets=_string_list("targets"),
+        )
+
 
 def find_repo_root(start: Path | str = ".") -> Path:
     start_path = Path(start).resolve()
@@ -296,12 +321,28 @@ def render_release_manifest_from_git(
     )
 
 
+def read_release_manifest(manifest_path: Path | str) -> ReleaseManifest:
+    manifest_path = Path(manifest_path)
+    try:
+        data = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except FileNotFoundError as exc:
+        raise click.ClickException(f"Release manifest file not found: {manifest_path}") from exc
+    except json.JSONDecodeError as exc:
+        raise click.ClickException(f"Invalid JSON in release manifest {manifest_path}: {exc}") from exc
+    return ReleaseManifest.from_dict(data)
+
+
 def resolve_publish_targets(
     repo_root: Path | str = ".",
     release_tag: str | None = None,
     release_body: str | None = None,
+    release_manifest_path: Path | str | None = None,
 ) -> dict[str, bool]:
-    manifest = compute_release_manifest_from_git(repo_root)
+    manifest = (
+        read_release_manifest(release_manifest_path)
+        if release_manifest_path is not None
+        else compute_release_manifest_from_git(repo_root)
+    )
     if release_tag and manifest.version != release_tag:
         raise click.ClickException(
             f"Computed release version {manifest.version!r} does not match release tag {release_tag!r}"
