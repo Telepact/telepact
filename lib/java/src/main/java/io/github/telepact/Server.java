@@ -85,6 +85,11 @@ public class Server {
         public Middleware middleware = (requestMessage, functionRouter) -> functionRouter.route(requestMessage);
 
         /**
+         * Flag to indicate if authentication via the _auth header is required.
+         */
+        public boolean authRequired = true;
+
+        /**
          * The serialization implementation that should be used to serialize and
          * deserialize messages.
          */
@@ -122,6 +127,11 @@ public class Server {
         final var base64Encoder = new ServerBase64Encoder();
 
         this.serializer = new Serializer(options.serialization, binaryEncoder, base64Encoder);
+
+        if (!this.telepactSchema.parsed.containsKey("union.Auth_") && options.authRequired) {
+            throw new RuntimeException(
+                    "Unauthenticated server. Either define a `union.Auth_` in your schema or set `options.authRequired` to `false`.");
+        }
     }
 
     /**

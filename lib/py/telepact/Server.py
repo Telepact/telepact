@@ -52,6 +52,7 @@ class Server:
             self.on_response = lambda m: None
             self.on_auth: AuthHandler = lambda headers: {}
             self.middleware = _default_middleware
+            self.auth_required = True
             self.serialization = DefaultSerialization()
 
     def __init__(self, telepact_schema: 'TelepactSchema', function_router: FunctionRouter, options: Options):
@@ -74,6 +75,11 @@ class Server:
         binary_encoder = ServerBinaryEncoder(binary_encoding)
         base64_encoder = ServerBase64Encoder()
         self.serializer = Serializer(options.serialization, binary_encoder, base64_encoder)
+
+        if "union.Auth_" not in self.telepact_schema.parsed and options.auth_required:
+            raise RuntimeError(
+                "Unauthenticated server. Either define a `union.Auth_` in your schema or set `options.auth_required` to `false`."
+            )
 
     async def process(self, request_message_bytes: bytes, update_headers: UpdateHeaders | None = None) -> 'Response':
         """

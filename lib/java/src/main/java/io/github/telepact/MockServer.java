@@ -100,6 +100,7 @@ public class MockServer {
 
         final var serverOptions = new Server.Options();
         serverOptions.onError = options.onError;
+        serverOptions.authRequired = false;
 
         final var telepactSchema = new TelepactSchema(mockTelepactSchema.original, mockTelepactSchema.full, mockTelepactSchema.parsed,
                 mockTelepactSchema.parsedRequestHeaders, mockTelepactSchema.parsedResponseHeaders);

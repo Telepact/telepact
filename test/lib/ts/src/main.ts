@@ -376,6 +376,7 @@ function startSchemaTestServer(
 
     const options: ServerOptions = new ServerOptions();
     options.onError = (e: Error) => console.error(e);
+    options.authRequired = false;
 
     const functionRouter = new FunctionRouter(functionRoutes);
     const server: Server = new Server(telepact, functionRouter, options);
@@ -525,6 +526,7 @@ function startTestServer(
     };
     options.onAuth = onAuth;
     options.middleware = middleware;
+    options.authRequired = authRequired;
 
     const functionRoutes = useCodegen
         ? codeGenHandler.functionRoutes()
@@ -536,6 +538,7 @@ function startTestServer(
     alternateOptions.onError = (e) => console.error(e);
     alternateOptions.onAuth = onAuth;
     alternateOptions.middleware = middleware;
+    alternateOptions.authRequired = authRequired;
     const alternateFunctionRoutes = useCodegen
         ? codeGenHandler.functionRoutes()
         : createFunctionRoutes(alternateTelepact, forwardRequest);

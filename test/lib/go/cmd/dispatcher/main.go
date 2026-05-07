@@ -701,6 +701,7 @@ func startSchemaTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscrip
 			d.logger.Printf("schema server error: %v", err)
 		}
 	}
+	options.AuthRequired = false
 
 	functionRouter := telepact.NewFunctionRouter(functionRoutes)
 	server, err := telepact.NewServer(schema, functionRouter, options)
@@ -916,6 +917,7 @@ func startTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscription, 
 	}
 	options.OnAuth = onAuth
 	options.Middleware = middleware
+	options.AuthRequired = cfg.AuthRequired
 
 	functionRoutes := codegenHandler.FunctionRoutes()
 	if functionRoutes == nil {
@@ -937,6 +939,7 @@ func startTestServer(d *Dispatcher, rawCfg map[string]any) (*nats.Subscription, 
 	}
 	alternateOptions.OnAuth = onAuth
 	alternateOptions.Middleware = middleware
+	alternateOptions.AuthRequired = cfg.AuthRequired
 	alternateFunctionRoutes := codegenHandler.FunctionRoutes()
 	if alternateFunctionRoutes == nil {
 		alternateFunctionRoutes = schemaFunctionRoutes(alternateTele, func(functionName string, requestMessage telepact.Message) (telepact.Message, error) {

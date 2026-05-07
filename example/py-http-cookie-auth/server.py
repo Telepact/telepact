@@ -25,6 +25,7 @@ VALID_SESSION = 'demo-session'
 files = TelepactSchemaFiles('api')
 schema = TelepactSchema.from_file_json_map(files.filenames_to_json)
 options = Server.Options()
+options.auth_required = False
 
 
 async def on_auth(headers: dict[str, object]) -> dict[str, object]:

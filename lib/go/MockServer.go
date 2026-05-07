@@ -80,6 +80,7 @@ func NewMockServer(mockSchema *MockTelepactSchema, options *MockServerOptions) (
 
 	serverOptions := NewServerOptions()
 	serverOptions.OnError = options.OnError
+	serverOptions.AuthRequired = false
 
 	telepactSchema := NewTelepactSchema(
 		mockSchema.Original,

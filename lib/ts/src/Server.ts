@@ -66,6 +66,12 @@ export class Server {
         const base64Encoder = new ServerBase64Encoder();
 
         this.serializer = new Serializer(options.serialization, binaryEncoder, base64Encoder);
+
+        if (!('union.Auth_' in this.telepactSchema.parsed) && options.authRequired) {
+            throw new Error(
+                'Unauthenticated server. Either define a `union.Auth_` in your schema or set `options.authRequired` to `false`.',
+            );
+        }
     }
 
     async process(requestMessageBytes: Uint8Array, updateHeaders?: UpdateHeaders): Promise<Response> {
@@ -90,6 +96,7 @@ export class ServerOptions {
     onResponse: (message: Message) => void;
     onAuth: AuthHandler;
     middleware: Middleware;
+    authRequired: boolean;
     serialization: Serialization;
 
     constructor() {
@@ -99,6 +106,7 @@ export class ServerOptions {
         this.onAuth = (headers: Record<string, any>) => ({});
         this.middleware = async (requestMessage: Message, functionRouter: FunctionRouter): Promise<Message> =>
             await functionRouter.route(requestMessage);
+        this.authRequired = true;
         this.serialization = new DefaultSerialization();
     }
 }

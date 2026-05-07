@@ -44,6 +44,7 @@ type ServerOptions struct {
 	OnResponse    func(Message)
 	OnAuth        AuthHandler
 	Middleware    Middleware
+	AuthRequired  bool
 	Serialization Serialization
 }
 
@@ -57,6 +58,7 @@ func NewServerOptions() *ServerOptions {
 		Middleware: func(requestMessage Message, functionRouter *FunctionRouter) (Message, error) {
 			return functionRouter.Route(requestMessage)
 		},
+		AuthRequired:  true,
 		Serialization: NewDefaultSerialization(),
 	}
 }
@@ -120,6 +122,10 @@ func NewServer(telepactSchema *TelepactSchema, functionRouter *FunctionRouter, o
 	binaryEncoder := binary.NewServerBinaryEncoder(binaryEncoding)
 	base64Encoder := binary.NewServerBase64Encoder()
 	serializer := NewSerializer(serializationImpl, binaryEncoder, base64Encoder)
+
+	if _, exists := telepactSchema.Parsed["union.Auth_"]; !exists && options.AuthRequired {
+		return nil, NewTelepactError("Unauthenticated server. Either define a `union.Auth_` in your schema or set `options.auth_required` to `false`.")
+	}
 
 	return &Server{
 		functionRouter: functionRouter,
