@@ -216,6 +216,9 @@ class ServerOptions {
 
   /// Sets the serialization method.
   set serialization(b.Serialization value) => _options.serialization = value;
+
+  /// Sets whether authentication is required.
+  set authRequired(bool value) => _options.authRequired = value;
 }
 
 /// Options for configuring a [MockServer].
