@@ -218,6 +218,9 @@ class ServerOptions {
   set serialization(b.Serialization value) => _options.serialization = value;
 
   /// Sets whether authentication is required.
+  ///
+  /// Defaults to `true`. Set this to `false` when your schema does not define
+  /// `union.Auth_`.
   set authRequired(bool value) => _options.authRequired = value;
 }
 
