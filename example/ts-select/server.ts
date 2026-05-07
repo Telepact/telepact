@@ -22,6 +22,7 @@ import { FunctionRouter, Message, Response, Server, ServerOptions, TelepactSchem
 const files = new TelepactSchemaFiles('api', fs, path);
 const schema = TelepactSchema.fromFileJsonMap(files.filenamesToJson);
 const options = new ServerOptions();
+options.authRequired = false;
 
 async function trackPackage(_functionName: string, _requestMessage: Message): Promise<Message> {
     return new Message({}, {

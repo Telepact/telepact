@@ -62,7 +62,7 @@ void main() {
       }
 
       print('Creating DartServerOptions');
-      final serverOptions = ServerOptions();
+      final serverOptions = ServerOptions()..authRequired = false;
       print('DartServerOptions created: $serverOptions');
 
       print('Creating DartServer');

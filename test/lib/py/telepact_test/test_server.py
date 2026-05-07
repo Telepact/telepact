@@ -295,6 +295,7 @@ async def start_schema_test_server(connection: NatsClient, metrics: CollectorReg
 
     options = Server.Options()
     options.on_error = on_err
+    options.auth_required = False
     function_router = FunctionRouter({"fn.validateSchema": validate_schema_route})
     server = Server(telepact, function_router, options)
 
@@ -439,6 +440,7 @@ async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, 
     options.on_response = server_on_response
     options.on_auth = on_auth
     options.middleware = middleware
+    options.auth_required = auth_required
 
     function_routes = code_gen_handler.function_routes() if use_codegen else create_function_routes(telepact, forward_request)
     function_router = FunctionRouter(function_routes)
@@ -447,6 +449,7 @@ async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, 
     alternate_options.on_error = on_err
     alternate_options.on_auth = on_auth
     alternate_options.middleware = middleware
+    alternate_options.auth_required = auth_required
     alternate_function_routes = code_gen_handler.function_routes() if use_codegen else create_function_routes(alternate_telepact, forward_request)
     alternate_function_router = FunctionRouter(alternate_function_routes)
     alternate_server = Server(

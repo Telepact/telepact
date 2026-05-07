@@ -22,6 +22,7 @@ from telepact import FunctionRouter, Message, Server, TelepactSchema, TelepactSc
 files = TelepactSchemaFiles('api')
 schema = TelepactSchema.from_file_json_map(files.filenames_to_json)
 options = Server.Options()
+options.auth_required = False
 
 
 async def create_issue_link(function_name: str, request_message: Message) -> Message:

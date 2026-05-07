@@ -69,6 +69,7 @@ _REQUEST_CONTEXT: ContextVar[dict[str, object]] = ContextVar('request_context', 
 files = TelepactSchemaFiles(str(EXAMPLE_DIR / 'api'))
 schema = TelepactSchema.from_file_json_map(files.filenames_to_json)
 options = Server.Options()
+options.auth_required = False
 
 
 def _replace_context(context: dict[str, object]) -> None:

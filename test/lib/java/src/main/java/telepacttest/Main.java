@@ -412,6 +412,7 @@ public class Main {
             e.printStackTrace();
             System.err.flush();
         };
+        options.authRequired = false;
         var functionRouter = new FunctionRouter(functionRoutes);
         var server = new Server(telepact, functionRouter, options);
 
@@ -595,6 +596,7 @@ public class Main {
         };
         options.onAuth = onAuth;
         options.middleware = middleware;
+        options.authRequired = authRequired;
 
         var functionRoutes = useCodeGen ? codeGenHandler.functionRoutes()
                 : schemaFunctionRoutes(telepact, backdoorRoute);
@@ -605,6 +607,7 @@ public class Main {
         alternateOptions.onError = (e) -> e.printStackTrace();
         alternateOptions.onAuth = onAuth;
         alternateOptions.middleware = middleware;
+        alternateOptions.authRequired = authRequired;
 
         var alternateFunctionRoutes = useCodeGen ? codeGenHandler.functionRoutes()
                 : schemaFunctionRoutes(alternateTelepact, backdoorRoute);

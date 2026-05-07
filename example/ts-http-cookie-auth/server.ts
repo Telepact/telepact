@@ -24,6 +24,7 @@ const VALID_SESSION = 'demo-session';
 const files = new TelepactSchemaFiles('api', fs, path);
 const schema = TelepactSchema.fromFileJsonMap(files.filenamesToJson);
 const options = new ServerOptions();
+options.authRequired = false;
 options.onAuth = async (headers: Record<string, any>): Promise<Record<string, any>> => {
     const auth = headers['@auth_'];
     const session = typeof auth === 'object' && auth !== null ? auth['Session'] : undefined;
