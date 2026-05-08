@@ -716,7 +716,6 @@ def example_sources_markdown(example_dir: Path) -> str:
         lang = example_code_language(file_path)
         if lang is None:
             continue
-        print(f"Adding example source file to docs: {file_path} (lang={lang})")
         code = file_path.read_text(encoding='utf-8').rstrip("\n")
         parts.append(f"```{lang}\n{code}\n```")
     return "\n\n".join(parts)
