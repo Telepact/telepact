@@ -186,7 +186,7 @@
     results.hidden = false;
     results.innerHTML = matches
       .map((entry) => {
-        const href = new URL(entry.path || "./", docsBaseUrl).toString();
+        const href = entry.path ? new URL(entry.path, docsBaseUrl).toString() : docsBaseUrl.toString();
         const title = renderHighlight(entry.title || "Untitled", terms);
         const section = entry.section ? renderHighlight(entry.section, terms) : "Documentation";
         const snippet = renderHighlight(snippetFor(entry, terms), terms);
