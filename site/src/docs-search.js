@@ -13,7 +13,7 @@
   }
 
   const docsRootUrl = new URL("../", script.src);
-  const searchIndexUrl = new URL(script.dataset.searchIndex || "search-index.json", script.src);
+  const searchIndexUrl = new URL(script.dataset.searchIndex || "search-index.json", window.location.href);
   const isMac = /(Mac|iPhone|iPad|iPod)/i.test(navigator.platform || navigator.userAgent);
   const shortcutLabel = isMac ? "⌘K" : "Ctrl K";
 
@@ -152,7 +152,7 @@
       '<div class="docs-search-list">' +
       matches
         .map((match) => {
-          const meta = [match.title, match.section].filter(Boolean).join(" · ");
+          const meta = match.section ? [match.title, match.section].join(" · ") : "";
           const href = new URL(match.href || "./", docsRootUrl);
           return (
             '<a class="docs-search-result" href="' +

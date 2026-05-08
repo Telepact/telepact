@@ -1368,7 +1368,7 @@ def page_shell(page: Page, body_html: str, pages: dict[Path, Page], resources: s
     <aside class="docs-sidebar">
       <div class="sidebar-card docs-search-launch">
         <button type="button" class="docs-search-button" data-docs-search-open aria-haspopup="dialog" aria-controls="docs-search-modal">
-          <span class="docs-search-button-icon" aria-hidden="true">⌘</span>
+          <span class="docs-search-button-icon" aria-hidden="true">⌕</span>
           <span class="docs-search-button-label">Search docs</span>
           <span class="docs-search-shortcut" data-docs-search-shortcut>⌘K</span>
         </button>
