@@ -41,6 +41,7 @@ INDEX_TEMPLATE = SOURCE_DIR / "index.template.html"
 INDEX_OUTPUT = SITE_DIR / "index.html"
 LLMS_OUTPUT = SITE_DIR / "llms.txt"
 SNIPPETS_DIR = SOURCE_DIR / "snippets"
+DOCS_SEARCH_SCRIPT_SOURCE = SOURCE_DIR / "docs-search.ts"
 STATIC_FILES = (".nojekyll", "404.html", "favicon.ico")
 DEFAULT_BASE_URL = "https://telepact.github.io/telepact/"
 DEFAULT_REPO_URL = "https://github.com/Telepact/telepact"
@@ -1216,105 +1217,9 @@ def render_toc(current: Page) -> str:
     )
 
 
-def render_search_script() -> str:
-    return r"""<script>
-(() => {
-  const searchInput = document.getElementById('docs-search');
-  if (!searchInput) {
-    return;
-  }
-
-  const clearButton = document.querySelector('.docs-search-clear');
-  const noResultsMessage = document.querySelector('.docs-search-empty');
-
-  const normalize = (value) => value.toLowerCase().replace(/\s+/g, ' ').trim();
-  const navGroups = Array.from(document.querySelectorAll('.docs-nav-group')).map((group) => {
-    const directChildren = Array.from(group.children);
-    const topLevelList = directChildren.find((child) => child.tagName === 'UL');
-    const subgroups = directChildren
-      .filter((child) => child.classList.contains('docs-nav-subgroup'))
-      .map((subgroup) => ({
-        element: subgroup,
-        heading: normalize(subgroup.querySelector('.docs-nav-subheading')?.textContent || ''),
-        items: Array.from(subgroup.querySelectorAll('li')).map((item) => ({
-          element: item,
-          text: normalize(item.textContent || ''),
-        })),
-      }));
-
-    return {
-      element: group,
-      heading: normalize(group.querySelector('h3')?.textContent || ''),
-      items: Array.from(topLevelList?.children || []).map((item) => ({
-        element: item,
-        text: normalize(item.textContent || ''),
-      })),
-      subgroups,
-    };
-  });
-
-  const setLinkVisibility = (items, query, parentMatches) => {
-    let anyVisible = false;
-    items.forEach((item) => {
-      const visible = !query || parentMatches || item.text.includes(query);
-      item.element.hidden = !visible;
-      if (visible) {
-        anyVisible = true;
-      }
-    });
-    return anyVisible;
-  };
-
-  const applyFilter = () => {
-    const query = normalize(searchInput.value);
-    if (clearButton) {
-      clearButton.hidden = !query;
-    }
-
-    let anyGroupVisible = false;
-    navGroups.forEach((group) => {
-      const groupMatches = !!query && group.heading.includes(query);
-
-      let groupVisible = setLinkVisibility(
-        group.items,
-        query,
-        groupMatches,
-      );
-
-      group.subgroups.forEach((subgroup) => {
-        const subgroupMatches = groupMatches || (!!query && subgroup.heading.includes(query));
-        const subgroupVisible = setLinkVisibility(
-          subgroup.items,
-          query,
-          subgroupMatches,
-        );
-        subgroup.element.hidden = !!query && !subgroupVisible;
-        groupVisible = groupVisible || subgroupVisible;
-      });
-
-      group.element.hidden = !!query && !groupVisible;
-      if (!group.element.hidden) {
-        anyGroupVisible = true;
-      }
-    });
-
-    if (noResultsMessage) {
-      noResultsMessage.hidden = !query || anyGroupVisible;
-    }
-  };
-
-  searchInput.addEventListener('input', applyFilter);
-  clearButton?.addEventListener('click', () => {
-    searchInput.value = '';
-    applyFilter();
-    searchInput.focus();
-  });
-})();
-</script>"""
-
-
 def page_shell(page: Page, body_html: str, pages: dict[Path, Page], resources: set[Path]) -> str:
     css_href = relative_href(page.output_file.parent, DOCS_DIR / "assets" / "docs.css")
+    docs_search_script_href = relative_href(page.output_file.parent, DOCS_DIR / "assets" / "docs-search.js")
     home_href = relative_href(page.output_file.parent, SITE_DIR / "index.html")
     docs_home_href = relative_href(page.output_file.parent, DOCS_DIR / "index.html", trailing_slash=True)
     favicon_href = relative_href(page.output_file.parent, SITE_DIR / "favicon.ico")
@@ -1399,7 +1304,7 @@ def page_shell(page: Page, body_html: str, pages: dict[Path, Page], resources: s
   </footer>
 
   {prism_scripts}
-  {render_search_script()}
+  <script src="{docs_search_script_href}"></script>
 </body>
 </html>
 """
@@ -1950,6 +1855,13 @@ tbody tr:last-child td { border-bottom: none; }
     (assets_dir / "docs.css").write_text(css, encoding="utf-8")
 
 
+def write_docs_search_script() -> None:
+    assets_dir = DOCS_DIR / "assets"
+    assets_dir.mkdir(parents=True, exist_ok=True)
+    script = DOCS_SEARCH_SCRIPT_SOURCE.read_text(encoding="utf-8")
+    (assets_dir / "docs-search.js").write_text(script, encoding="utf-8")
+
+
 def write_pages(pages: dict[Path, Page], resources: set[Path]) -> None:
     for page in pages.values():
         renderer = MarkdownRenderer(page, pages, resources)
@@ -2039,6 +1951,7 @@ def main() -> None:
     DOCS_DIR.mkdir(parents=True, exist_ok=True)
     MARKDOWN_DOCS_DIR.mkdir(parents=True, exist_ok=True)
     write_css()
+    write_docs_search_script()
     write_pages(pages, resources)
     copy_markdown_docs()
     write_cname()
