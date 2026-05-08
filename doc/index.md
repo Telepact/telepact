@@ -19,6 +19,8 @@ servers, or place Telepact inside a larger service.
   - [Transport Guide](./03-build-clients-and-servers/01-transports.md) for browser TypeScript + `fetch` and WebSocket patterns
   - [Client Paths](./03-build-clients-and-servers/02-client-paths.md) for choosing between plain JSON, runtime libraries, schema-backed mocks, and optional generated code
   - [TypeScript library README](../lib/ts/README.md) for the runtime client/server API
+- **I want an end-to-end browser example**
+  - [`example/full-stack`](../example/full-stack/README.md) for a browser TypeScript frontend + Python backend with Playwright end-to-end coverage
 - **I want schema-backed integration confidence**
   - [Tooling Workflow](./03-build-clients-and-servers/04-tooling-workflow.md) for the fetch/compare/mock/codegen workflow
   - [Learn by Example: Mock server](./01-learn-by-example/04-mocking-an-integration/14-mock-server.md)
