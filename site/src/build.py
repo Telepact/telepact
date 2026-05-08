@@ -1829,7 +1829,11 @@ def write_llms(pages: dict[Path, Page]) -> None:
     for source in sorted((REPO_ROOT / "doc").rglob("*.md")):
         rel_path = source.relative_to(REPO_ROOT / "doc").as_posix()
         page = pages.get(source)
-        title = page.title if page is not None and page.title else display_name(source)
+        title = (
+            page.title
+            if page is not None and page.title
+            else first_heading_title(source.read_text(encoding="utf-8"), display_name(source))
+        )
         lines.append(f"- [{title}]({site_url(f'markdown-docs/{rel_path}')})")
 
     LLMS_OUTPUT.write_text("\n".join(lines) + "\n", encoding="utf-8")
