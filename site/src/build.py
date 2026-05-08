@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import html
+import json
 import os
 import posixpath
 import re
@@ -41,6 +42,7 @@ INDEX_TEMPLATE = SOURCE_DIR / "index.template.html"
 INDEX_OUTPUT = SITE_DIR / "index.html"
 LLMS_OUTPUT = SITE_DIR / "llms.txt"
 SNIPPETS_DIR = SOURCE_DIR / "snippets"
+DOCS_SEARCH_SCRIPT_SOURCE = SOURCE_DIR / "docs-search.js"
 STATIC_FILES = (".nojekyll", "404.html", "favicon.ico")
 DEFAULT_BASE_URL = "https://telepact.github.io/telepact/"
 DEFAULT_REPO_URL = "https://github.com/Telepact/telepact"
@@ -1069,6 +1071,103 @@ def page_excerpt(page: Page) -> str:
     return summary[:155].rstrip() + ("..." if len(summary) > 155 else "")
 
 
+def docs_href(page: Page, anchor: str = "") -> str:
+    href = relative_href(DOCS_DIR, page.output_file, trailing_slash=True)
+    if anchor:
+        return f"{href}#{anchor}"
+    return href
+
+
+def search_text_from_line(line: str) -> str:
+    text = line.strip()
+    text = re.sub(r"^>\s*", "", text)
+    text = re.sub(r"^(\s*)([-*+]|\d+\.)\s+", "", text)
+    text = text.replace("|", " ")
+    text = strip_markdown(text)
+    return re.sub(r"\s+", " ", text).strip()
+
+
+def page_search_entries(page: Page) -> list[dict[str, str]]:
+    lines = page.source.read_text(encoding="utf-8").splitlines()
+    entries: list[dict[str, str]] = []
+    heading_counts: dict[str, int] = {}
+    current_section = page.title
+    current_anchor = ""
+    paragraph_lines: list[str] = []
+    in_code_block = False
+    in_comment = False
+
+    def unique_heading_id(text: str) -> str:
+        base = slugify(text)
+        count = heading_counts.get(base, 0) + 1
+        heading_counts[base] = count
+        if count == 1:
+            return base
+        return f"{base}-{count}"
+
+    def flush_paragraph() -> None:
+        nonlocal paragraph_lines
+        text = re.sub(r"\s+", " ", " ".join(paragraph_lines)).strip()
+        paragraph_lines = []
+        if len(text) < 3:
+            return
+        entries.append({
+            "href": docs_href(page, current_anchor),
+            "title": page.title,
+            "section": "" if current_section == page.title else current_section,
+            "text": text,
+        })
+
+    for line in lines:
+        stripped = line.strip()
+        if in_comment:
+            if "-->" in stripped:
+                in_comment = False
+            continue
+
+        if stripped.startswith("<!--"):
+            flush_paragraph()
+            if "-->" not in stripped:
+                in_comment = True
+            continue
+
+        if stripped.startswith("```"):
+            flush_paragraph()
+            in_code_block = not in_code_block
+            continue
+
+        if in_code_block:
+            continue
+
+        heading = re.match(r"^(#{1,6})\s+(.*)$", stripped)
+        if heading:
+            flush_paragraph()
+            current_section = strip_markdown(heading.group(2).strip())
+            current_anchor = unique_heading_id(current_section)
+            continue
+
+        if not stripped:
+            flush_paragraph()
+            continue
+
+        if re.fullmatch(r"\|?\s*[-:]+(?:\s*\|\s*[-:]+)+\s*\|?", stripped):
+            continue
+
+        text = search_text_from_line(stripped)
+        if text:
+            paragraph_lines.append(text)
+
+    flush_paragraph()
+    return entries
+
+
+def search_index(pages: dict[Path, Page]) -> list[dict[str, str]]:
+    entries: list[dict[str, str]] = []
+    for page in sorted(pages.values(), key=lambda value: value.url):
+        entries.extend(page_search_entries(page))
+    return entries
+
+
 def page_by_rel_source(pages: dict[Path, Page], rel_source: str) -> Page | None:
     for page in pages.values():
         if page.rel_source == rel_source:
@@ -1217,6 +1316,8 @@ def render_toc(current: Page) -> str:
 
 def page_shell(page: Page, body_html: str, pages: dict[Path, Page], resources: set[Path]) -> str:
     css_href = relative_href(page.output_file.parent, DOCS_DIR / "assets" / "docs.css")
+    search_script_href = relative_href(page.output_file.parent, DOCS_DIR / "assets" / "docs-search.js")
+    search_index_href = relative_href(page.output_file.parent, DOCS_DIR / "assets" / "search-index.json")
     home_href = relative_href(page.output_file.parent, SITE_DIR / "index.html")
     docs_home_href = relative_href(page.output_file.parent, DOCS_DIR / "index.html", trailing_slash=True)
     favicon_href = relative_href(page.output_file.parent, SITE_DIR / "favicon.ico")
@@ -1265,6 +1366,13 @@ def page_shell(page: Page, body_html: str, pages: dict[Path, Page], resources: s
 
   <main class="docs-layout container">
     <aside class="docs-sidebar">
+      <div class="sidebar-card docs-search-launch">
+        <button type="button" class="docs-search-button" data-docs-search-open aria-haspopup="dialog" aria-controls="docs-search-modal">
+          <span class="docs-search-button-icon" aria-hidden="true">⌘</span>
+          <span class="docs-search-button-label">Search docs</span>
+          <span class="docs-search-shortcut" data-docs-search-shortcut>⌘K</span>
+        </button>
+      </div>
       {render_nav(page, pages, resources)}
     </aside>
 
@@ -1288,7 +1396,34 @@ def page_shell(page: Page, body_html: str, pages: dict[Path, Page], resources: s
     </div>
   </footer>
 
+  <div class="docs-search-modal" id="docs-search-modal" hidden>
+    <div class="docs-search-backdrop" data-docs-search-close></div>
+    <div class="docs-search-dialog" role="dialog" aria-modal="true" aria-labelledby="docs-search-title">
+      <div class="docs-search-header">
+        <div class="docs-search-input-wrap">
+          <span class="docs-search-input-icon" aria-hidden="true">⌕</span>
+          <input
+            id="docs-search-input"
+            class="docs-search-input"
+            type="search"
+            placeholder="Search Telepact docs"
+            autocomplete="off"
+            spellcheck="false"
+            aria-labelledby="docs-search-title"
+            data-docs-search-input
+          >
+        </div>
+        <button type="button" class="docs-search-close" data-docs-search-close aria-label="Close search">Esc</button>
+      </div>
+      <div class="docs-search-body">
+        <div class="docs-search-status" id="docs-search-title">Search docs by title, section, or prose.</div>
+        <div class="docs-search-results" data-docs-search-results></div>
+      </div>
+    </div>
+  </div>
+
   {prism_scripts}
+  <script src="{search_script_href}" data-search-index="{search_index_href}"></script>
 </body>
 </html>
 """
@@ -1471,6 +1606,62 @@ a:hover { color: #7dd3fc; }
   font-weight: 700;
   font-size: 0.72rem;
   margin-bottom: 10px;
+}
+
+.docs-search-launch {
+  padding: 12px;
+  margin-bottom: 14px;
+}
+
+.docs-search-button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid rgba(56, 189, 248, 0.16);
+  border-radius: 14px;
+  background: rgba(15, 23, 42, 0.72);
+  color: var(--text-muted);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.docs-search-button:hover,
+.docs-search-button:focus-visible {
+  border-color: rgba(56, 189, 248, 0.4);
+  background: rgba(30, 41, 59, 0.88);
+  color: var(--text);
+}
+
+.docs-search-button-icon {
+  width: 1.4rem;
+  height: 1.4rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+  font-size: 0.95rem;
+}
+
+.docs-search-button-label {
+  flex: 1;
+  min-width: 0;
+  font-weight: 600;
+}
+
+.docs-search-shortcut,
+.docs-search-close {
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 999px;
+  padding: 5px 10px;
+  background: rgba(148, 163, 184, 0.08);
+  color: var(--text-muted);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
 }
 
 .intro-card h2 {
@@ -1711,6 +1902,152 @@ tbody tr:last-child td { border-bottom: none; }
 
 .toc-level-3 { margin-left: 12px; }
 
+.docs-search-open {
+  overflow: hidden;
+}
+
+.docs-search-modal[hidden] {
+  display: none;
+}
+
+.docs-search-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+}
+
+.docs-search-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(11, 15, 26, 0.72);
+  backdrop-filter: blur(10px);
+}
+
+.docs-search-dialog {
+  position: relative;
+  width: min(760px, calc(100vw - 32px));
+  margin: 9vh auto 0;
+  background: rgba(15, 23, 42, 0.96);
+  border: 1px solid rgba(56, 189, 248, 0.18);
+  border-radius: 24px;
+  box-shadow: 0 40px 120px rgba(2, 6, 23, 0.68);
+  overflow: hidden;
+}
+
+.docs-search-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px;
+  border-bottom: 1px solid rgba(56, 189, 248, 0.12);
+}
+
+.docs-search-input-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 14px;
+  min-height: 56px;
+  border: 1px solid rgba(56, 189, 248, 0.14);
+  border-radius: 16px;
+  background: rgba(15, 23, 42, 0.9);
+}
+
+.docs-search-input-icon {
+  color: var(--accent);
+  font-size: 1rem;
+}
+
+.docs-search-input {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 1rem;
+}
+
+.docs-search-input::placeholder {
+  color: var(--text-muted);
+}
+
+.docs-search-close {
+  appearance: none;
+  cursor: pointer;
+}
+
+.docs-search-body {
+  max-height: min(70vh, 720px);
+  overflow-y: auto;
+}
+
+.docs-search-status {
+  padding: 16px 20px 0;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.docs-search-results {
+  padding: 12px;
+}
+
+.docs-search-empty {
+  padding: 24px 16px 28px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.docs-search-list {
+  display: grid;
+  gap: 8px;
+}
+
+.docs-search-result {
+  display: block;
+  padding: 16px;
+  border: 1px solid transparent;
+  border-radius: 18px;
+  background: rgba(30, 41, 59, 0.52);
+  transition: 0.18s ease;
+}
+
+.docs-search-result:hover,
+.docs-search-result:focus-visible,
+.docs-search-result.is-active {
+  border-color: rgba(56, 189, 248, 0.32);
+  background: rgba(30, 41, 59, 0.88);
+}
+
+.docs-search-result-title {
+  color: #f8fafc;
+  font-weight: 700;
+}
+
+.docs-search-result-meta {
+  margin-top: 6px;
+  color: var(--accent);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.docs-search-result-snippet {
+  margin-top: 8px;
+  color: var(--text-muted);
+  font-size: 0.94rem;
+  line-height: 1.55;
+}
+
+.docs-search-result-snippet mark {
+  background: rgba(234, 179, 8, 0.24);
+  color: #fef08a;
+  border-radius: 4px;
+  padding: 0 0.15em;
+}
+
 .footer {
   padding: 40px 0;
   border-top: 1px solid var(--border);
@@ -1761,6 +2098,16 @@ tbody tr:last-child td { border-bottom: none; }
     gap: 18px;
   }
 
+  .docs-search-dialog {
+    width: calc(100vw - 20px);
+    margin-top: 12px;
+  }
+
+  .docs-search-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
   .docs-sidebar,
   .docs-toc {
     position: static;
@@ -1800,6 +2147,16 @@ def write_pages(pages: dict[Path, Page], resources: set[Path]) -> None:
         target = output_resource_path(resource)
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(resource, target)
+
+
+def write_search_assets(pages: dict[Path, Page]) -> None:
+    assets_dir = DOCS_DIR / "assets"
+    assets_dir.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(DOCS_SEARCH_SCRIPT_SOURCE, assets_dir / "docs-search.js")
+    (assets_dir / "search-index.json").write_text(
+        json.dumps(search_index(pages), ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
 
 
 def copy_markdown_docs() -> None:
@@ -1870,6 +2227,7 @@ def main() -> None:
     MARKDOWN_DOCS_DIR.mkdir(parents=True, exist_ok=True)
     write_css()
     write_pages(pages, resources)
+    write_search_assets(pages)
     copy_markdown_docs()
     write_cname()
     write_robots()
