@@ -39,7 +39,7 @@ def on_error(error: TelepactError) -> None:
 ```
 
 For a fuller walkthrough, see
-[Learn by example: Logging](../01-learn-by-example/08-running-our-own-server/logging.md).
+[Learn by example: Logging](../learn-by-example/08-running-our-own-server/logging.md).
 
 The main change is the local callback surface:
 

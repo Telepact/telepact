@@ -27,7 +27,7 @@ Responses usually look like:
 ```
 
 For a more complete walkthrough, start with the
-[Quickstart](../example.md) or [Learn Telepact by Example](../01-learn-by-example/README.md).
+[Quickstart](../example.md) or [Learn Telepact by Example](../learn-by-example/README.md).
 
 ## Schema role
 
@@ -79,7 +79,7 @@ link formats.
 
 See:
 
-- [Learn by Example: Functions](../01-learn-by-example/02-schema/functions.md)
+- [Learn by Example: Functions](../learn-by-example/02-schema/functions.md)
 - [Demos](../../example/README.md)
 
 ## Select
@@ -90,7 +90,7 @@ language.
 
 See:
 
-- [Learn by Example: Select](../01-learn-by-example/03-opt-in-features/select.md)
+- [Learn by Example: Select](../learn-by-example/03-opt-in-features/select.md)
 - [`_ext.Select_`](./select-extension.md)
 
 ## Binary
@@ -101,8 +101,8 @@ when it wants more efficiency.
 
 See:
 
-- [Learn by Example: Binary](../01-learn-by-example/03-opt-in-features/binary.md)
-- [Learn by Example: Automatic binary negotiation](../01-learn-by-example/06-using-telepact-client-library-code/automatic-binary-negotiation.md)
+- [Learn by Example: Binary](../learn-by-example/03-opt-in-features/binary.md)
+- [Learn by Example: Automatic binary negotiation](../learn-by-example/06-using-telepact-client-library-code/automatic-binary-negotiation.md)
 
 ## Where to go next
 

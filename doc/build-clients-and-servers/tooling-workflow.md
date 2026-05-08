@@ -69,10 +69,10 @@ actually send, then switch to the live server later.
 
 See:
 
-- [Learn by Example: Mock server](../01-learn-by-example/04-mocking-an-integration/mock-server.md)
-- [Learn by Example: Stock mock](../01-learn-by-example/04-mocking-an-integration/stock-mock.md)
-- [Learn by Example: Stubs](../01-learn-by-example/04-mocking-an-integration/stubs.md)
-- [Learn by Example: Verify](../01-learn-by-example/04-mocking-an-integration/verify.md)
+- [Learn by Example: Mock server](../learn-by-example/04-mocking-an-integration/mock-server.md)
+- [Learn by Example: Stock mock](../learn-by-example/04-mocking-an-integration/stock-mock.md)
+- [Learn by Example: Stubs](../learn-by-example/04-mocking-an-integration/stubs.md)
+- [Learn by Example: Verify](../learn-by-example/04-mocking-an-integration/verify.md)
 
 ## Generate code
 
@@ -91,7 +91,7 @@ bindings only when the extra static ergonomics are worth the toolchain cost.
 
 See:
 
-- [Learn by Example: Code generation](../01-learn-by-example/07-code-generation/code-generation.md)
+- [Learn by Example: Code generation](../learn-by-example/07-code-generation/code-generation.md)
 - [Client Paths](./client-paths.md)
 - [Telepact CLI](../../sdk/cli/README.md)
 

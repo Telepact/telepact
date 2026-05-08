@@ -62,7 +62,7 @@ This path works well when you want:
 
 Start here:
 
-- [Learn by Example: Code generation](../01-learn-by-example/07-code-generation/code-generation.md)
+- [Learn by Example: Code generation](../learn-by-example/07-code-generation/code-generation.md)
 - [Tooling Workflow](./tooling-workflow.md)
 - [Telepact CLI](../../sdk/cli/README.md)
 
