@@ -1634,7 +1634,7 @@ a:hover { color: #7dd3fc; }
 }
 
 .docs-search-empty {
-  color: #f8fafc;
+  color: var(--text);
 }
 
 .sr-only {
