@@ -1155,9 +1155,10 @@ def search_entries_for_page(page: Page) -> list[dict[str, str]]:
             if saw_heading or current_lines:
                 flush()
             heading_text = strip_markdown(heading_match.group(2).strip()) or page_title
+            anchor = heading_anchor(heading_text, heading_counts)
             if saw_heading:
                 current_title = heading_text
-                current_url = docs_page_url(page, heading_anchor(heading_text, heading_counts))
+                current_url = docs_page_url(page, anchor)
             else:
                 current_title = page_title
                 current_url = docs_page_url(page)

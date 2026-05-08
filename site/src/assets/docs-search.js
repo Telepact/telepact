@@ -16,6 +16,9 @@
   const isMac = /(Mac|iPhone|iPad)/i.test(platform);
   const MAX_SNIPPET_LENGTH = 160;
   const TRUNCATED_SNIPPET_LENGTH = MAX_SNIPPET_LENGTH - 3;
+  const SNIPPET_CONTEXT_BEFORE = 64;
+  const SNIPPET_CONTEXT_AFTER = 96;
+  const MIN_HIGHLIGHT_TOKEN_LENGTH = 2;
   const SCORE_TITLE_PREFIX = 140;
   const SCORE_TITLE_MATCH = 110;
   const SCORE_PAGE_TITLE_MATCH = 70;
@@ -78,8 +81,8 @@
     if (matchIndex === -1) {
       return clean.length > MAX_SNIPPET_LENGTH ? `${clean.slice(0, TRUNCATED_SNIPPET_LENGTH).trim()}…` : clean;
     }
-    let start = Math.max(0, matchIndex - 64);
-    let end = Math.min(clean.length, matchIndex + 96);
+    let start = Math.max(0, matchIndex - SNIPPET_CONTEXT_BEFORE);
+    let end = Math.min(clean.length, matchIndex + SNIPPET_CONTEXT_AFTER);
     if (start > 0) {
       const nextSpace = clean.indexOf(" ", start);
       if (nextSpace !== -1 && nextSpace < matchIndex) {
@@ -99,7 +102,7 @@
     let rendered = escapeHtml(text);
     const tokens = [...new Set(queryTokens(query))].sort((left, right) => right.length - left.length);
     for (const token of tokens) {
-      if (token.length < 2) {
+      if (token.length < MIN_HIGHLIGHT_TOKEN_LENGTH) {
         continue;
       }
       rendered = rendered.replace(new RegExp(`(${escapeRegExp(token)})`, "ig"), "<mark>$1</mark>");
