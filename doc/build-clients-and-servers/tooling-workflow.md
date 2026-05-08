@@ -48,7 +48,7 @@ Replace `api` with the schema directory your service checks in.
 
 See:
 
-- [Operating Boundary Guide](../04-operate/production-guide.md)
+- [Operating Boundary Guide](../operate/production-guide.md)
 - [Telepact CLI](../../sdk/cli/README.md)
 
 ## Mock an API

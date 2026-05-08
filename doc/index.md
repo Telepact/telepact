@@ -16,47 +16,47 @@ servers, or place Telepact inside a larger service.
   - [Quickstart](./example.md)
   - Then [Learn Telepact by Example](./01-learn-by-example/README.md)
 - **I want browser + Node usage**
-  - [Transport Guide](./03-build-clients-and-servers/transports.md) for browser TypeScript + `fetch` and WebSocket patterns
-  - [Client Paths](./03-build-clients-and-servers/client-paths.md) for choosing between plain JSON, runtime libraries, schema-backed mocks, and optional generated code
+  - [Transport Guide](./build-clients-and-servers/transports.md) for browser TypeScript + `fetch` and WebSocket patterns
+  - [Client Paths](./build-clients-and-servers/client-paths.md) for choosing between plain JSON, runtime libraries, schema-backed mocks, and optional generated code
   - [TypeScript library README](../lib/ts/README.md) for the runtime client/server API
 - **I want an end-to-end browser example**
   - [`example/full-stack`](../example/full-stack/README.md) for a browser TypeScript frontend + Python backend with Playwright end-to-end coverage
 - **I want schema-backed integration confidence**
-  - [Tooling Workflow](./03-build-clients-and-servers/tooling-workflow.md) for the fetch/compare/mock/codegen workflow
+  - [Tooling Workflow](./build-clients-and-servers/tooling-workflow.md) for the fetch/compare/mock/codegen workflow
   - [Learn by Example: Mock server](./01-learn-by-example/04-mocking-an-integration/mock-server.md)
   - [Learn by Example: Verify](./01-learn-by-example/04-mocking-an-integration/verify.md)
 - **I need auth**
-  - [Auth Guide](./03-build-clients-and-servers/auth.md) for Telepact's canonical auth convention
+  - [Auth Guide](./build-clients-and-servers/auth.md) for Telepact's canonical auth convention
   - [`example/py-http-cookie-auth`](../example/py-http-cookie-auth/README.md) for one browser/session-cookie example
 - **I need operating-boundary guidance**
-  - [Operating Boundary Guide](./04-operate/production-guide.md)
-  - [Runtime Error Guide](./04-operate/runtime-errors.md)
+  - [Operating Boundary Guide](./operate/production-guide.md)
+  - [Runtime Error Guide](./operate/runtime-errors.md)
 - **I need tooling or optional code generation**
-  - [Tooling Workflow](./03-build-clients-and-servers/tooling-workflow.md)
+  - [Tooling Workflow](./build-clients-and-servers/tooling-workflow.md)
   - [CLI](../sdk/cli/README.md)
   - [Learn by Example: Code generation](./01-learn-by-example/07-code-generation/code-generation.md)
 - **I want runnable examples**
   - [Demos](../example/README.md)
-  - [Transport Guide](./03-build-clients-and-servers/transports.md) for the guide-to-demo mapping
+  - [Transport Guide](./build-clients-and-servers/transports.md) for the guide-to-demo mapping
 
 ## Design APIs
 
-- [Schema Writing Guide](./02-design-apis/schema-guide.md) for the full schema language
-- [Core Concepts](./02-design-apis/core-concepts.md) for Telepact's message model, schema
+- [Schema Writing Guide](./design-apis/schema-guide.md) for the full schema language
+- [Core Concepts](./design-apis/core-concepts.md) for Telepact's message model, schema
   role, headers, links, select, and binary at a high level
-- [Extensions overview](./02-design-apis/extensions.md) for Telepact's reserved `_ext.*_` types
-- [`_ext.Select_`](./02-design-apis/select-extension.md) for response selection
-- [Mock extensions](./02-design-apis/mock-extensions.md) for `_ext.Call_` and `_ext.Stub_`
+- [Extensions overview](./design-apis/extensions.md) for Telepact's reserved `_ext.*_` types
+- [`_ext.Select_`](./design-apis/select-extension.md) for response selection
+- [Mock extensions](./design-apis/mock-extensions.md) for `_ext.Call_` and `_ext.Stub_`
 - [JSON Schema](../common/json-schema.json) for schema-file validation
 
 ## Build clients and servers
 
-- [Transport Guide](./03-build-clients-and-servers/transports.md) for HTTP and WebSocket wiring patterns
-- [Client Paths](./03-build-clients-and-servers/client-paths.md) for choosing between plain JSON, client
+- [Transport Guide](./build-clients-and-servers/transports.md) for HTTP and WebSocket wiring patterns
+- [Client Paths](./build-clients-and-servers/client-paths.md) for choosing between plain JSON, client
   libraries, schema-backed mocks, and optional generated code
-- [Server Paths](./03-build-clients-and-servers/server-paths.md) for choosing a runtime and wiring a server
-- [Auth Guide](./03-build-clients-and-servers/auth.md) for Telepact's canonical auth convention
-- [Tooling Workflow](./03-build-clients-and-servers/tooling-workflow.md) for `fetch`, `compare`, `mock`, and
+- [Server Paths](./build-clients-and-servers/server-paths.md) for choosing a runtime and wiring a server
+- [Auth Guide](./build-clients-and-servers/auth.md) for Telepact's canonical auth convention
+- [Tooling Workflow](./build-clients-and-servers/tooling-workflow.md) for `fetch`, `compare`, `mock`, and
   `codegen`
 
 ### Libraries
@@ -78,11 +78,11 @@ servers, or place Telepact inside a larger service.
 
 ## Operate
 
-- [Operating Boundary Guide](./04-operate/production-guide.md) for Telepact-specific auth,
+- [Operating Boundary Guide](./operate/production-guide.md) for Telepact-specific auth,
   compatibility, and observability boundaries
-- [Runtime Error Guide](./04-operate/runtime-errors.md) for local/runtime debugging
+- [Runtime Error Guide](./operate/runtime-errors.md) for local/runtime debugging
 
 ## Background and reference
 
-- [FAQ](./05-background-and-reference/faq.md) for Telepact's more unusual design decisions
-- [Motivation](./05-background-and-reference/motivation.md) for the ecosystem goals and tradeoffs
+- [FAQ](./background-and-reference/faq.md) for Telepact's more unusual design decisions
+- [Motivation](./background-and-reference/motivation.md) for the ecosystem goals and tradeoffs

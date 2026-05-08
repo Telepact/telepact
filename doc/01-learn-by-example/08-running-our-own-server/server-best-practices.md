@@ -15,7 +15,7 @@ Prefer expressive data over HTTP-shaped habits:
 - let Telepact handle request validation instead of inventing a generic "400"
 - use function-specific errors for real business rules
 
-The [FAQ](../../05-background-and-reference/faq.md) is worth reading end to end here.
+The [FAQ](../../background-and-reference/faq.md) is worth reading end to end here.
 
 ## 3. Log on the server
 

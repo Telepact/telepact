@@ -9,7 +9,7 @@ attach its own auth, logging, metrics, routing, and deployment systems in the
 right places.
 
 For byte-level wiring, see the
-[Transport Guide](../03-build-clients-and-servers/transports.md).
+[Transport Guide](../build-clients-and-servers/transports.md).
 
 ## 1. What Telepact owns
 
@@ -79,7 +79,7 @@ Use the standard auth errors consistently:
 - `ErrorUnauthorized_` for authenticated callers who are not allowed to perform the action
 
 For the canonical schema shape and examples, see the
-[Auth Guide](../03-build-clients-and-servers/auth.md).
+[Auth Guide](../build-clients-and-servers/auth.md).
 
 ### Logging and metrics
 
@@ -146,7 +146,7 @@ The Telepact-specific guidance is:
 
 For the practical Git-based workflow to compare the checked-in schema on your
 branch with `origin/main` or a release tag, see
-[Tooling Workflow: Compare schema versions](../03-build-clients-and-servers/tooling-workflow.md#compare-schema-versions).
+[Tooling Workflow: Compare schema versions](../build-clients-and-servers/tooling-workflow.md#compare-schema-versions).
 
 Telepact does not prescribe the surrounding rollout procedure. Whether your
 organization uses canaries, blue/green, staged regional rollout, or something

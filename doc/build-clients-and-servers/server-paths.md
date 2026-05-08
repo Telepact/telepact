@@ -57,7 +57,7 @@ Start here:
 - [Learn by Example: Auth](../01-learn-by-example/05-auth/auth.md)
 - [Learn by Example: Server auth](../01-learn-by-example/08-running-our-own-server/server-auth.md)
 - [Learn by Example: Managed auth](../01-learn-by-example/08-running-our-own-server/managed-auth.md)
-- [Operating Boundary Guide](../04-operate/production-guide.md)
+- [Operating Boundary Guide](../operate/production-guide.md)
 
 ## Operating boundary path
 
@@ -70,5 +70,5 @@ When placing Telepact inside a larger service, focus on:
 
 Start here:
 
-- [Operating Boundary Guide](../04-operate/production-guide.md)
-- [Runtime Error Guide](../04-operate/runtime-errors.md)
+- [Operating Boundary Guide](../operate/production-guide.md)
+- [Runtime Error Guide](../operate/runtime-errors.md)

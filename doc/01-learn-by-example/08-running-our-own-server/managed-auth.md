@@ -5,7 +5,7 @@ common example.
 
 This page shows one browser/session-cookie branch of Telepact's auth
 convention. For the full canonical path, see the
-[Auth Guide](../../03-build-clients-and-servers/auth.md).
+[Auth Guide](../../build-clients-and-servers/auth.md).
 
 ## Install the Python library
 

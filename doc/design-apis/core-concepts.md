@@ -65,9 +65,9 @@ As a rule of thumb:
 
 For more detail, see:
 
-- [Transport Guide](../03-build-clients-and-servers/transports.md)
-- [Operating Boundary Guide](../04-operate/production-guide.md)
-- [FAQ](../05-background-and-reference/faq.md)
+- [Transport Guide](../build-clients-and-servers/transports.md)
+- [Operating Boundary Guide](../operate/production-guide.md)
+- [FAQ](../background-and-reference/faq.md)
 
 ## Function links
 
@@ -107,6 +107,6 @@ See:
 ## Where to go next
 
 - If you are designing an API, go to the [Schema Writing Guide](./schema-guide.md).
-- If you are building a client, go to [Client Paths](../03-build-clients-and-servers/client-paths.md).
-- If you are building a server, go to [Server Paths](../03-build-clients-and-servers/server-paths.md).
-- If you want the CLI and related workflows, go to [Tooling Workflow](../03-build-clients-and-servers/tooling-workflow.md).
+- If you are building a client, go to [Client Paths](../build-clients-and-servers/client-paths.md).
+- If you are building a server, go to [Server Paths](../build-clients-and-servers/server-paths.md).
+- If you want the CLI and related workflows, go to [Tooling Workflow](../build-clients-and-servers/tooling-workflow.md).

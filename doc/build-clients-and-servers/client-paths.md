@@ -21,7 +21,7 @@ This path works well when you want:
 Start here:
 
 - [Quickstart](../example.md)
-- [Core Concepts](../02-design-apis/core-concepts.md)
+- [Core Concepts](../design-apis/core-concepts.md)
 - [Transport Guide](./transports.md)
 
 ## Path 2: Telepact client library
