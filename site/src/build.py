@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import html
+import json
 import os
 import posixpath
 import re
@@ -37,10 +38,15 @@ DOCS_DIR = SITE_DIR / "docs"
 MARKDOWN_DOCS_DIR = SITE_DIR / "markdown-docs"
 GENERATED_SOURCE_DIR = SITE_ROOT / ".generated-docs"
 GENERATED_DOCS_SOURCE_DIR = GENERATED_SOURCE_DIR / "docs"
+SOURCE_ASSETS_DIR = SOURCE_DIR / "assets"
+DOCS_ASSETS_DIR = DOCS_DIR / "assets"
 INDEX_TEMPLATE = SOURCE_DIR / "index.template.html"
 INDEX_OUTPUT = SITE_DIR / "index.html"
 LLMS_OUTPUT = SITE_DIR / "llms.txt"
 SNIPPETS_DIR = SOURCE_DIR / "snippets"
+DOCS_SEARCH_SCRIPT = SOURCE_ASSETS_DIR / "docs-search.js"
+DOCS_SEARCH_STYLES = SOURCE_ASSETS_DIR / "docs-search.css"
+DOCS_SEARCH_INDEX = DOCS_ASSETS_DIR / "search-index.json"
 STATIC_FILES = (".nojekyll", "404.html", "favicon.ico")
 DEFAULT_BASE_URL = "https://telepact.github.io/telepact/"
 DEFAULT_REPO_URL = "https://github.com/Telepact/telepact"
@@ -178,6 +184,7 @@ def slugify(value: str) -> str:
 
 def strip_markdown(value: str) -> str:
     value = re.sub(r"`([^`]+)`", r"\1", value)
+    value = re.sub(r"!\[([^\]]*)\]\([^)]+\)", r"\1", value)
     value = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", value)
     value = value.replace("**", "").replace("__", "").replace("*", "").replace("_", "")
     return value.strip()
@@ -896,12 +903,7 @@ class MarkdownRenderer:
         return "\n".join(parts)
 
     def unique_heading_id(self, text: str) -> str:
-        base = slugify(text)
-        count = self.heading_counts.get(base, 0) + 1
-        self.heading_counts[base] = count
-        if count == 1:
-            return base
-        return f"{base}-{count}"
+        return heading_anchor(text, self.heading_counts)
 
     def is_list_item(self, line: str) -> re.Match[str] | None:
         return re.match(r"^(\s*)([-*+]|\d+\.)\s+(.*)$", line)
@@ -1076,6 +1078,108 @@ def page_by_rel_source(pages: dict[Path, Page], rel_source: str) -> Page | None:
     return None
 
 
+def collapse_whitespace(value: str) -> str:
+    return re.sub(r"\s+", " ", value).strip()
+
+
+def heading_anchor(text: str, counts: dict[str, int]) -> str:
+    base = slugify(text)
+    count = counts.get(base, 0) + 1
+    counts[base] = count
+    if count == 1:
+        return base
+    return f"{base}-{count}"
+
+
+def search_text_from_lines(lines: list[str]) -> str:
+    parts: list[str] = []
+    for line in lines:
+        stripped = line.strip()
+        if not stripped:
+            continue
+        if re.match(r"^\|?[\s:-]+\|[\s|:-]*$", stripped):
+            continue
+        stripped = re.sub(r"^\s*>+\s*", "", stripped)
+        stripped = re.sub(r"^\s*(?:[-*+]|\d+\.)\s+", "", stripped)
+        stripped = strip_markdown(stripped.replace("|", " "))
+        stripped = collapse_whitespace(stripped)
+        if stripped:
+            parts.append(stripped)
+    return collapse_whitespace(" ".join(parts))
+
+
+def search_entries_for_page(page: Page) -> list[dict[str, str]]:
+    entries: list[dict[str, str]] = []
+    heading_counts: dict[str, int] = {}
+    current_title = page.title or page.source.stem
+    current_url = "/" + page.url.lstrip("/")
+    current_lines: list[str] = []
+    in_code_block = False
+    in_comment = False
+    saw_heading = False
+
+    def flush() -> None:
+        text = search_text_from_lines(current_lines)
+        if text:
+            entries.append({
+                "pageTitle": page.title,
+                "title": current_title,
+                "url": current_url,
+                "text": text,
+            })
+
+    for line in page.source.read_text(encoding="utf-8").splitlines():
+        stripped = line.strip()
+        if in_comment:
+            if "-->" in stripped:
+                in_comment = False
+            continue
+        if stripped.startswith("<!--"):
+            if "-->" not in stripped:
+                in_comment = True
+            continue
+        if stripped.startswith("```"):
+            in_code_block = not in_code_block
+            continue
+        if in_code_block:
+            continue
+        heading_match = re.match(r"^(#{1,6})\s+(.*)$", stripped)
+        if heading_match:
+            if saw_heading or current_lines:
+                flush()
+            heading_text = strip_markdown(heading_match.group(2).strip()) or page.title
+            if saw_heading:
+                current_title = heading_text
+                current_url = "/" + page.url.lstrip("/") + f"#{heading_anchor(heading_text, heading_counts)}"
+            else:
+                current_title = page.title or heading_text
+                current_url = "/" + page.url.lstrip("/")
+                saw_heading = True
+            current_lines = []
+            continue
+        current_lines.append(line)
+
+    flush()
+    if not entries and page.summary:
+        entries.append({
+            "pageTitle": page.title,
+            "title": page.title,
+            "url": "/" + page.url.lstrip("/"),
+            "text": page.summary,
+        })
+    return entries
+
+
+def write_docs_search_assets(pages: dict[Path, Page]) -> None:
+    DOCS_ASSETS_DIR.mkdir(parents=True, exist_ok=True)
+    for source in (DOCS_SEARCH_SCRIPT, DOCS_SEARCH_STYLES):
+        shutil.copy2(source, DOCS_ASSETS_DIR / source.name)
+    search_entries: list[dict[str, str]] = []
+    for page in sorted(pages.values(), key=lambda value: value.url):
+        search_entries.extend(search_entries_for_page(page))
+    DOCS_SEARCH_INDEX.write_text(json.dumps(search_entries, indent=2) + "\n", encoding="utf-8")
+
+
 def nav_groups(pages: dict[Path, Page]) -> list[NavGroup]:
     doc_root = GENERATED_DOCS_SOURCE_DIR
     groups: list[NavGroup] = []
@@ -1197,9 +1301,12 @@ def render_toc(current: Page) -> str:
 
 def page_shell(page: Page, body_html: str, pages: dict[Path, Page], resources: set[Path]) -> str:
     css_href = relative_href(page.output_file.parent, DOCS_DIR / "assets" / "docs.css")
+    search_css_href = relative_href(page.output_file.parent, DOCS_SEARCH_STYLES)
     home_href = relative_href(page.output_file.parent, SITE_DIR / "index.html")
     docs_home_href = relative_href(page.output_file.parent, DOCS_DIR / "index.html", trailing_slash=True)
     favicon_href = relative_href(page.output_file.parent, SITE_DIR / "favicon.ico")
+    search_script_href = relative_href(page.output_file.parent, DOCS_SEARCH_SCRIPT)
+    search_index_href = relative_href(page.output_file.parent, DOCS_SEARCH_INDEX)
     canonical = posixpath.join(BASE_URL.rstrip("/"), page.url.lstrip("/"))
     prism_scripts = "\n".join(f'<script src="{src}"></script>' for src in PRISM_JS)
     return f"""<!DOCTYPE html>
@@ -1217,6 +1324,7 @@ def page_shell(page: Page, body_html: str, pages: dict[Path, Page], resources: s
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{PRISM_CSS}">
   <link rel="stylesheet" href="{css_href}">
+  <link rel="stylesheet" href="{search_css_href}">
 </head>
 <body>
   <div class="bg-grid"></div>
@@ -1235,6 +1343,14 @@ def page_shell(page: Page, body_html: str, pages: dict[Path, Page], resources: s
       <div class="navbar-links">
         <a href="{home_href}">Home</a>
         <a href="{docs_home_href}" class="active">Documentation</a>
+        <button type="button" class="docs-search-trigger" data-docs-search-open aria-haspopup="dialog" aria-controls="docs-search-modal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <circle cx="11" cy="11" r="6"></circle>
+            <path d="M20 20l-4.2-4.2"></path>
+          </svg>
+          <span class="docs-search-trigger-label">Search</span>
+          <span class="docs-search-shortcut" data-docs-search-shortcut>⌘K</span>
+        </button>
         <a href="{REPO_URL}" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
           GitHub
@@ -1257,6 +1373,23 @@ def page_shell(page: Page, body_html: str, pages: dict[Path, Page], resources: s
     {render_toc(page)}
   </main>
 
+  <div class="docs-search-modal" id="docs-search-modal" hidden>
+    <button type="button" class="docs-search-backdrop" data-docs-search-close aria-label="Close search"></button>
+    <div class="docs-search-dialog" role="dialog" aria-modal="true" aria-labelledby="docs-search-title">
+      <div class="docs-search-header">
+        <svg class="docs-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+          <circle cx="11" cy="11" r="6"></circle>
+          <path d="M20 20l-4.2-4.2"></path>
+        </svg>
+        <label class="docs-search-title" id="docs-search-title" for="docs-search-input">Search the docs</label>
+        <input id="docs-search-input" class="docs-search-input" type="search" placeholder="Search the documentation…" autocomplete="off" spellcheck="false" data-docs-search-input>
+        <button type="button" class="docs-search-close" data-docs-search-close aria-label="Close search">Esc</button>
+      </div>
+      <div class="docs-search-status" data-docs-search-status>Type to search the documentation.</div>
+      <div class="docs-search-results" data-docs-search-results role="listbox" aria-label="Documentation search results"></div>
+    </div>
+  </div>
+
   <footer class="footer">
     <div class="container">
       <ul class="footer-links">
@@ -1269,6 +1402,7 @@ def page_shell(page: Page, body_html: str, pages: dict[Path, Page], resources: s
   </footer>
 
   {prism_scripts}
+  <script src="{search_script_href}" data-search-index="{search_index_href}" defer></script>
 </body>
 </html>
 """
@@ -1850,6 +1984,7 @@ def main() -> None:
     MARKDOWN_DOCS_DIR.mkdir(parents=True, exist_ok=True)
     write_css()
     write_pages(pages, resources)
+    write_docs_search_assets(pages)
     copy_markdown_docs()
     write_cname()
     write_robots()

@@ -14,13 +14,16 @@
 #|  limitations under the License.
 #|
 
-.PHONY: all dev clean
+.PHONY: all dev clean test
 
 all:
 	python3 src/build.py
 
 dev:
 	npx serve dist
+
+test:
+	python3 -m unittest discover -s tests
 
 clean:
 	rm -rf dist
