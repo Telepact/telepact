@@ -1225,7 +1225,7 @@ def render_search_script() -> str:
   }
 
   const clearButton = document.querySelector('.docs-search-clear');
-  const noResults = document.querySelector('.docs-search-empty');
+  const noResultsMessage = document.querySelector('.docs-search-empty');
 
   const normalize = (value) => value.toLowerCase().replace(/\\s+/g, ' ').trim();
   const navGroups = Array.from(document.querySelectorAll('.docs-nav-group')).map((group) => {
@@ -1298,8 +1298,8 @@ def render_search_script() -> str:
       }
     });
 
-    if (noResults) {
-      noResults.hidden = !query || anyGroupVisible;
+    if (noResultsMessage) {
+      noResultsMessage.hidden = !query || anyGroupVisible;
     }
   };
 
@@ -1366,10 +1366,13 @@ def page_shell(page: Page, body_html: str, pages: dict[Path, Page], resources: s
       <div class="sidebar-card docs-search-card">
         <label class="sidebar-label" for="docs-search">Search docs</label>
         <div class="docs-search-row">
-          <input id="docs-search" class="docs-search-input" type="search" placeholder="Filter pages" autocomplete="off" spellcheck="false">
-          <button class="docs-search-clear" type="button" aria-label="Clear docs search" hidden>&times;</button>
+          <input id="docs-search" class="docs-search-input" type="search" placeholder="Filter pages" autocomplete="off" spellcheck="false" aria-describedby="docs-search-hint">
+          <button class="docs-search-clear" type="button" aria-label="Clear docs search" hidden>
+            <span aria-hidden="true">&times;</span>
+            <span class="sr-only">Clear search</span>
+          </button>
         </div>
-        <p class="docs-search-hint">Search the documentation navigation by page title.</p>
+        <p id="docs-search-hint" class="docs-search-hint">Search the documentation navigation by page title.</p>
         <p class="docs-search-empty" hidden>No pages match that search.</p>
       </div>
       {render_nav(page, pages, resources)}
@@ -1632,6 +1635,18 @@ a:hover { color: #7dd3fc; }
 
 .docs-search-empty {
   color: #f8fafc;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .sidebar-label {
