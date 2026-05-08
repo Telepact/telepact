@@ -13,10 +13,151 @@ DIST_DOCS_DIR = SITE_ROOT / "dist" / "docs"
 SEARCH_INDEX_PATH = DIST_DOCS_DIR / "assets" / "search-index.json"
 DOCS_CSS_PATH = DIST_DOCS_DIR / "assets" / "docs.css"
 DOCS_INDEX_PATH = DIST_DOCS_DIR / "index.html"
+DOCS_SEARCH_SCRIPT_PATH = DIST_DOCS_DIR / "assets" / "docs-search.js"
 
 
 def normalize_docs_path(value: str) -> str:
     return value.split("#", 1)[0] or "./"
+
+
+def run_search_client(entries: list[dict[str, str]], current_href: str, query: str) -> dict[str, object]:
+    node_script = r"""
+const fs = require("fs");
+const vm = require("vm");
+
+const [scriptPath, currentHref, query] = process.argv.slice(1);
+const entries = JSON.parse(fs.readFileSync(0, "utf8"));
+
+function createElement() {
+  return {
+    hidden: false,
+    textContent: "",
+    innerHTML: "",
+    value: "",
+    listeners: {},
+    focus() {},
+    select() {},
+    querySelector() {
+      return null;
+    },
+    addEventListener(type, handler) {
+      this.listeners[type] = handler;
+    },
+  };
+}
+
+const modal = createElement();
+modal.hidden = true;
+const openButton = createElement();
+const closeButton = createElement();
+const input = createElement();
+const results = createElement();
+results.hidden = true;
+const status = createElement();
+const shortcut = createElement();
+
+const document = {
+  baseURI: "https://example.test/docs/",
+  currentScript: {
+    src: "https://example.test/docs/assets/docs-search.js",
+    dataset: {
+      docsSearchIndex: "https://example.test/docs/assets/search-index.json",
+    },
+  },
+  body: {
+    classList: {
+      add() {},
+      remove() {},
+    },
+  },
+  listeners: {},
+  querySelector(selector) {
+    switch (selector) {
+      case "[data-docs-search-modal]":
+        return modal;
+      case "[data-docs-search-input]":
+        return input;
+      case "[data-docs-search-results]":
+        return results;
+      case "[data-docs-search-status]":
+        return status;
+      case "[data-docs-search-shortcut]":
+        return shortcut;
+      default:
+        return null;
+    }
+  },
+  querySelectorAll(selector) {
+    switch (selector) {
+      case "[data-docs-search-open]":
+        return [openButton];
+      case "[data-docs-search-close]":
+        return [closeButton];
+      default:
+        return [];
+    }
+  },
+  addEventListener(type, handler) {
+    this.listeners[type] = handler;
+  },
+};
+
+const context = {
+  console,
+  document,
+  window: {
+    document,
+    location: { href: currentHref },
+    requestAnimationFrame(callback) {
+      callback();
+    },
+  },
+  navigator: { platform: "Linux" },
+  URL,
+  fetch: async () => ({
+    ok: true,
+    async json() {
+      return entries;
+    },
+  }),
+  Promise,
+  setTimeout,
+  clearTimeout,
+};
+
+vm.createContext(context);
+vm.runInContext(fs.readFileSync(scriptPath, "utf8"), context);
+
+(async () => {
+  await Promise.resolve();
+  await Promise.resolve();
+  openButton.listeners.click({});
+  await Promise.resolve();
+  await Promise.resolve();
+  input.value = query;
+  input.listeners.input({});
+  await Promise.resolve();
+  const hrefs = Array.from(results.innerHTML.matchAll(/href="([^"]+)"/g), (match) => match[1]);
+  process.stdout.write(JSON.stringify({
+    status: status.textContent,
+    modalHidden: modal.hidden,
+    resultsHidden: results.hidden,
+    hrefs,
+  }));
+})().catch((error) => {
+  console.error(error);
+  process.exit(1);
+});
+"""
+
+    completed = subprocess.run(
+        ["node", "-e", node_script, str(DOCS_SEARCH_SCRIPT_PATH), current_href, query],
+        input=json.dumps(entries),
+        text=True,
+        capture_output=True,
+        check=True,
+    )
+    return json.loads(completed.stdout)
 
 
 class DocsSearchIndexTest(unittest.TestCase):
@@ -75,3 +216,51 @@ class DocsSearchIndexTest(unittest.TestCase):
         self.assertIn('class="docs-search-modal" data-docs-search-modal hidden', html)
         self.assertIn(".docs-search-modal[hidden]", css)
         self.assertIn(".docs-search-results[hidden]", css)
+
+    def test_search_client_excludes_current_document_and_sorts_doc_types(self) -> None:
+        results = run_search_client(
+            [
+                {
+                    "title": "Concepts",
+                    "section": "Concepts",
+                    "path": "concepts/#overview",
+                    "content": "alpha topic",
+                    "searchText": "concepts alpha topic",
+                },
+                {
+                    "title": "Overview",
+                    "section": "Overview",
+                    "path": "./#intro",
+                    "content": "alpha topic",
+                    "searchText": "overview alpha topic",
+                },
+                {
+                    "title": "Survey",
+                    "section": "Survey",
+                    "path": "lib-and-sdk-survey/#alpha",
+                    "content": "alpha topic",
+                    "searchText": "survey alpha topic",
+                },
+                {
+                    "title": "Example",
+                    "section": "Example",
+                    "path": "examples/full-stack/#alpha",
+                    "content": "alpha topic",
+                    "searchText": "example alpha topic",
+                },
+            ],
+            "https://example.test/docs/",
+            "alpha",
+        )
+
+        self.assertEqual(results["status"], "3 results")
+        self.assertFalse(results["modalHidden"])
+        self.assertFalse(results["resultsHidden"])
+        self.assertEqual(
+            results["hrefs"],
+            [
+                "https://example.test/docs/concepts/#overview",
+                "https://example.test/docs/lib-and-sdk-survey/#alpha",
+                "https://example.test/docs/examples/full-stack/#alpha",
+            ],
+        )

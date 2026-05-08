@@ -3,6 +3,9 @@
   const MAX_SEARCH_RESULTS = 12;
   const SNIPPET_MAX_LENGTH = 180;
   const SNIPPET_CONTEXT_PADDING = 56;
+  const DOCS_PRIORITY_CONCEPT = 0;
+  const DOCS_PRIORITY_DEFAULT = 1;
+  const DOCS_PRIORITY_EXAMPLE = 2;
   const script = document.currentScript;
   const modal = document.querySelector("[data-docs-search-modal]");
   const openButtons = Array.from(document.querySelectorAll("[data-docs-search-open]"));
@@ -22,6 +25,7 @@
     ? new URL(script.dataset.docsSearchIndex, document.baseURI)
     : new URL(`assets/${SEARCH_INDEX_FILENAME}`, docsBaseUrl);
   const shortcutText = isApplePlatform ? "⌘K" : "Ctrl K";
+  const currentDocumentPath = normalizeDocsPath(window.location.href);
   let searchIndexPromise;
   let searchEntries = [];
   let isOpen = false;
@@ -72,6 +76,30 @@
       .trim()
       .split(/\s+/)
       .filter(Boolean);
+  }
+
+  function normalizeDocsPath(value) {
+    const url = new URL(value || "./", docsBaseUrl);
+    let pathname = url.pathname;
+    if (pathname.startsWith(docsBaseUrl.pathname)) {
+      pathname = pathname.slice(docsBaseUrl.pathname.length);
+    }
+    pathname = pathname.replace(/^\/+/, "").replace(/index\.html$/, "");
+    if (!pathname) {
+      return "./";
+    }
+    return pathname.endsWith("/") ? pathname : `${pathname}/`;
+  }
+
+  function documentPriority(path) {
+    const normalizedPath = normalizeDocsPath(path);
+    if (normalizedPath === "concepts/" || normalizedPath.startsWith("concepts/")) {
+      return DOCS_PRIORITY_CONCEPT;
+    }
+    if (normalizedPath === "examples/" || normalizedPath.startsWith("examples/")) {
+      return DOCS_PRIORITY_EXAMPLE;
+    }
+    return DOCS_PRIORITY_DEFAULT;
   }
 
   function renderHighlight(value, terms) {
@@ -163,8 +191,17 @@
     }
     return searchEntries
       .map((entry) => ({ entry, score: scoreEntry(entry, normalizedQuery, terms) }))
-      .filter((item) => item.score >= 0)
-      .sort((left, right) => right.score - left.score)
+      .filter((item) => item.score >= 0 && normalizeDocsPath(item.entry.path) !== currentDocumentPath)
+      .sort((left, right) => {
+        const priorityDiff = documentPriority(left.entry.path) - documentPriority(right.entry.path);
+        if (priorityDiff !== 0) {
+          return priorityDiff;
+        }
+        if (right.score !== left.score) {
+          return right.score - left.score;
+        }
+        return (left.entry.path || "").localeCompare(right.entry.path || "");
+      })
       .slice(0, MAX_SEARCH_RESULTS)
       .map((item) => item.entry);
   }
