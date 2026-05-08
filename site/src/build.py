@@ -716,7 +716,6 @@ def example_sources_markdown(example_dir: Path) -> str:
         lang = example_code_language(file_path)
         if lang is None:
             continue
-        print(f"Adding example source file to docs: {file_path} (lang={lang})")
         code = file_path.read_text(encoding='utf-8').rstrip("\n")
         parts.append(f"```{lang}\n{code}\n```")
     return "\n\n".join(parts)
@@ -1699,6 +1698,15 @@ tbody tr:last-child td { border-bottom: none; }
 
 .docs-toc .sidebar-card {
   padding: 16px 18px;
+  max-height: calc(100vh - 128px);
+  overflow-y: hidden;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+
+.docs-toc .sidebar-card:hover,
+.docs-toc .sidebar-card:focus-within {
+  overflow-y: auto;
 }
 
 .toc-level-3 { margin-left: 12px; }
@@ -1759,6 +1767,12 @@ tbody tr:last-child td { border-bottom: none; }
   }
 
   .heading-anchor { display: none; }
+}
+
+@media (hover: none) {
+  .docs-toc .sidebar-card {
+    overflow-y: auto;
+  }
 }
 """
     assets_dir = DOCS_DIR / "assets"
