@@ -196,6 +196,11 @@ a:hover { color: #7dd3fc; }
   overflow: hidden;
 }
 
+.docs-search-modal[hidden],
+.docs-search-results[hidden] {
+  display: none;
+}
+
 .docs-search-modal {
   position: fixed;
   inset: 0;

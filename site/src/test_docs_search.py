@@ -11,6 +11,8 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 SITE_ROOT = REPO_ROOT / "site"
 DIST_DOCS_DIR = SITE_ROOT / "dist" / "docs"
 SEARCH_INDEX_PATH = DIST_DOCS_DIR / "assets" / "search-index.json"
+DOCS_CSS_PATH = DIST_DOCS_DIR / "assets" / "docs.css"
+DOCS_INDEX_PATH = DIST_DOCS_DIR / "index.html"
 
 
 def normalize_docs_path(value: str) -> str:
@@ -65,3 +67,11 @@ class DocsSearchIndexTest(unittest.TestCase):
             ),
             "Expected Python survey content to be indexed in lib-and-sdk-survey/",
         )
+
+    def test_modal_hidden_state_is_preserved_in_built_assets(self) -> None:
+        html = DOCS_INDEX_PATH.read_text(encoding="utf-8")
+        css = DOCS_CSS_PATH.read_text(encoding="utf-8")
+
+        self.assertIn('class="docs-search-modal" data-docs-search-modal hidden', html)
+        self.assertIn(".docs-search-modal[hidden]", css)
+        self.assertIn(".docs-search-results[hidden]", css)
