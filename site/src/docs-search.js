@@ -15,7 +15,7 @@
   const isApplePlatform = /Mac|iPhone|iPad|iPod/.test(navigator.platform);
   const docsBaseUrl = new URL("../", script.src);
   const indexUrl = script.dataset.docsSearchIndex
-    ? new URL(script.dataset.docsSearchIndex, script.src)
+    ? new URL(script.dataset.docsSearchIndex, document.baseURI)
     : new URL("search-index.json", docsBaseUrl);
   const shortcutText = isApplePlatform ? "⌘K" : "Ctrl K";
   let searchIndexPromise;

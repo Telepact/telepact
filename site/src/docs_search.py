@@ -27,7 +27,7 @@ def build_search_index(pages: Iterable[SearchablePage]) -> list[dict[str, str]]:
 def extract_page_entries(page: SearchablePage) -> list[dict[str, str]]:
     entries: list[dict[str, str]] = []
     heading_counts: dict[str, int] = {}
-    current_heading = page.title
+    heading_stack: list[str] = [page.title]
     current_anchor = ""
     current_block: list[str] = []
     in_code_block = False
@@ -39,8 +39,8 @@ def extract_page_entries(page: SearchablePage) -> list[dict[str, str]]:
         current_block = []
         if not content:
             return
-        heading = "" if current_heading == page.title else current_heading
-        search_text = normalize_search_text(" ".join(part for part in (page.title, heading, content) if part))
+        heading = format_heading_path(heading_stack, page.title)
+        search_text = normalize_search_text(" ".join([page.title, *heading_stack[1:], content]))
         target = page.path
         if current_anchor:
             target += f"#{current_anchor}"
@@ -73,8 +73,11 @@ def extract_page_entries(page: SearchablePage) -> list[dict[str, str]]:
         heading_match = HEADING_RE.match(stripped)
         if heading_match:
             flush()
-            current_heading = strip_markdown(heading_match.group(2).strip()) or page.title
-            current_anchor = unique_heading_id(current_heading, heading_counts)
+            heading_level = len(heading_match.group(1))
+            heading_text = strip_markdown(heading_match.group(2).strip()) or page.title
+            heading_stack[:] = heading_stack[: max(heading_level - 1, 0)]
+            heading_stack.append(heading_text)
+            current_anchor = unique_heading_id(heading_text, heading_counts)
             continue
 
         if not stripped:
@@ -101,6 +104,11 @@ def unique_heading_id(text: str, heading_counts: dict[str, int]) -> str:
     if count == 1:
         return base
     return f"{base}-{count}"
+
+
+def format_heading_path(heading_stack: list[str], page_title: str) -> str:
+    headings = [heading for heading in heading_stack[1:] if heading and heading != page_title]
+    return " › ".join(headings)
 
 
 def slugify(value: str) -> str:

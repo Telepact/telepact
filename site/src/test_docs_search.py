@@ -45,7 +45,6 @@ class DocsSearchIndexTest(unittest.TestCase):
             ("learn-by-example/", "Let's learn Telepact the same way we'll use it in real life"),
             ("examples/", "Runnable end-to-end demos live here"),
             ("examples/full-stack/", "production-boundary concerns"),
-            ("lib-and-sdk-survey/", "Telepact Library for Python"),
         ]
 
         for expected_path, expected_phrase in sampled_expectations:
@@ -57,3 +56,12 @@ class DocsSearchIndexTest(unittest.TestCase):
                 ),
                 f"Expected search entry for {expected_path!r} containing {expected_phrase!r}",
             )
+
+        self.assertTrue(
+            any(
+                normalize_docs_path(entry["path"]) == "lib-and-sdk-survey/"
+                and entry["section"].startswith("Python")
+                for entry in self.entries
+            ),
+            "Expected Python survey content to be indexed in lib-and-sdk-survey/",
+        )

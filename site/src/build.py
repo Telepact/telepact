@@ -1259,6 +1259,7 @@ def write_css() -> None:
 
 def write_search_index(pages: dict[Path, Page]) -> None:
     search_index_path = DOCS_DIR / "assets" / "search-index.json"
+    search_index_path.parent.mkdir(parents=True, exist_ok=True)
     search_pages = [
         SearchablePage(
             title=page.title,
