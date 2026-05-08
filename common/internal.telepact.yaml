@@ -39,7 +39,7 @@
     `->` to narrow fields on the active result union, `struct.*` keys to narrow
     struct fields, and `union.*` keys to narrow fields for specific union tags.
 
-    See https://raw.githubusercontent.com/Telepact/telepact/main/doc/02-design-apis/04-select-extension.md
+    See https://raw.githubusercontent.com/Telepact/telepact/main/doc/02-design-apis/select-extension.md
     for full `_ext.Select_` rules and end-to-end examples.
   _ext.Select_: {}
 

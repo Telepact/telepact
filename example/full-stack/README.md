@@ -5,7 +5,7 @@ frontend.
 
 This example is intentionally broader than the minimal demos. It demonstrates the
 production-boundary concerns from
-[`doc/04-operate/01-production-guide.md`](../../doc/04-operate/01-production-guide.md):
+[`doc/04-operate/production-guide.md`](../../doc/04-operate/production-guide.md):
 
 - HTTP-only session cookies stay at the transport boundary and are translated into
   `@auth_`
