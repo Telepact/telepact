@@ -45,7 +45,7 @@ compare_cases: list = [
                 ]
             }
         ],
-        [],
+        ["Schemas are backwards compatible."],
         0
     ),
     (
@@ -79,7 +79,7 @@ compare_cases: list = [
                 ]
             }
         ],
-        [],
+        ["Schemas are backwards compatible."],
         0
     ),
     (
@@ -368,7 +368,7 @@ compare_cases: list = [
                 ]
             }
         ],
-        [],
+        ["Schemas are backwards compatible."],
         0
     ),
     (

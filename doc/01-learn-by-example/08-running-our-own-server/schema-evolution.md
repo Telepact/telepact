@@ -40,6 +40,12 @@ Compare them:
 telepact compare --old-schema-dir ./old --new-schema-dir ./new-ok
 ```
 
+Output:
+
+```text
+Schemas are backwards compatible.
+```
+
 That succeeds, because we only added an optional argument field.
 
 ## Create an incompatible new schema

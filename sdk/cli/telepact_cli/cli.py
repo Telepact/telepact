@@ -1196,6 +1196,8 @@ def compare(new_schema_dir: str, old_schema_dir: str) -> None:
             print(f" - {error}")
         exit(1)
 
+    print("Schemas are backwards compatible.")
+
 
 main.add_command(codegen)
 main.add_command(demo_server)
