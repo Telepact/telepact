@@ -1226,16 +1226,38 @@ def render_search_script() -> str:
 
   const clearButton = document.querySelector('.docs-search-clear');
   const noResults = document.querySelector('.docs-search-empty');
-  const navGroups = Array.from(document.querySelectorAll('.docs-nav-group'));
 
   const normalize = (value) => value.toLowerCase().replace(/\\s+/g, ' ').trim();
+  const navGroups = Array.from(document.querySelectorAll('.docs-nav-group')).map((group) => {
+    const directChildren = Array.from(group.children);
+    const topLevelList = directChildren.find((child) => child.tagName === 'UL');
+    const subgroups = directChildren
+      .filter((child) => child.classList.contains('docs-nav-subgroup'))
+      .map((subgroup) => ({
+        element: subgroup,
+        heading: normalize(subgroup.querySelector('.docs-nav-subheading')?.textContent || ''),
+        items: Array.from(subgroup.querySelectorAll('li')).map((item) => ({
+          element: item,
+          text: normalize(item.textContent || ''),
+        })),
+      }));
+
+    return {
+      element: group,
+      heading: normalize(group.querySelector('h3')?.textContent || ''),
+      items: Array.from(topLevelList?.children || []).map((item) => ({
+        element: item,
+        text: normalize(item.textContent || ''),
+      })),
+      subgroups,
+    };
+  });
 
   const setLinkVisibility = (items, query, parentMatches) => {
     let anyVisible = false;
     items.forEach((item) => {
-      const text = normalize(item.textContent || '');
-      const visible = !query || parentMatches || text.includes(query);
-      item.hidden = !visible;
+      const visible = !query || parentMatches || item.text.includes(query);
+      item.element.hidden = !visible;
       if (visible) {
         anyVisible = true;
       }
@@ -1251,33 +1273,27 @@ def render_search_script() -> str:
 
     let anyGroupVisible = false;
     navGroups.forEach((group) => {
-      const directChildren = Array.from(group.children);
-      const groupHeading = normalize(group.querySelector('h3')?.textContent || '');
-      const groupMatches = !!query && groupHeading.includes(query);
-
-      const topLevelList = directChildren.find((child) => child.tagName === 'UL');
-      const subgroups = directChildren.filter((child) => child.classList.contains('docs-nav-subgroup'));
+      const groupMatches = !!query && group.heading.includes(query);
 
       let groupVisible = setLinkVisibility(
-        Array.from(topLevelList?.children || []),
+        group.items,
         query,
         groupMatches,
       );
 
-      subgroups.forEach((subgroup) => {
-        const subgroupHeading = normalize(subgroup.querySelector('.docs-nav-subheading')?.textContent || '');
-        const subgroupMatches = groupMatches || (!!query && subgroupHeading.includes(query));
+      group.subgroups.forEach((subgroup) => {
+        const subgroupMatches = groupMatches || (!!query && subgroup.heading.includes(query));
         const subgroupVisible = setLinkVisibility(
-          Array.from(subgroup.querySelectorAll('li')),
+          subgroup.items,
           query,
           subgroupMatches,
         );
-        subgroup.hidden = !!query && !subgroupVisible;
+        subgroup.element.hidden = !!query && !subgroupVisible;
         groupVisible = groupVisible || subgroupVisible;
       });
 
-      group.hidden = !!query && !groupVisible;
-      if (!group.hidden) {
+      group.element.hidden = !!query && !groupVisible;
+      if (!group.element.hidden) {
         anyGroupVisible = true;
       }
     });
