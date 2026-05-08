@@ -1082,6 +1082,11 @@ def collapse_whitespace(value: str) -> str:
     return re.sub(r"\s+", " ", value).strip()
 
 
+def docs_page_url(page: Page, anchor: str = "") -> str:
+    base = "/" + page.url.lstrip("/")
+    return f"{base}#{anchor}" if anchor else base
+
+
 def heading_anchor(text: str, counts: dict[str, int]) -> str:
     """Return the next stable heading anchor while tracking duplicates for the page."""
     base = slugify(text)
@@ -1098,7 +1103,7 @@ def search_text_from_lines(lines: list[str]) -> str:
         stripped = line.strip()
         if not stripped:
             continue
-        if re.match(r"^\|?[\s:-]+\|[\s|:-]*$", stripped):
+        if re.match(r"^\|?[\s:-]+(\|[\s:-]+)+\|?$", stripped):
             continue
         stripped = re.sub(r"^\s*>+\s*", "", stripped)
         stripped = re.sub(r"^\s*(?:[-*+]|\d+\.)\s+", "", stripped)
@@ -1114,7 +1119,7 @@ def search_entries_for_page(page: Page) -> list[dict[str, str]]:
     heading_counts: dict[str, int] = {}
     page_title = page.title or page.source.stem
     current_title = page_title
-    current_url = "/" + page.url.lstrip("/")
+    current_url = docs_page_url(page)
     current_lines: list[str] = []
     in_code_block = False
     in_comment = False
@@ -1152,10 +1157,10 @@ def search_entries_for_page(page: Page) -> list[dict[str, str]]:
             heading_text = strip_markdown(heading_match.group(2).strip()) or page_title
             if saw_heading:
                 current_title = heading_text
-                current_url = "/" + page.url.lstrip("/") + f"#{heading_anchor(heading_text, heading_counts)}"
+                current_url = docs_page_url(page, heading_anchor(heading_text, heading_counts))
             else:
                 current_title = page_title
-                current_url = "/" + page.url.lstrip("/")
+                current_url = docs_page_url(page)
                 saw_heading = True
             current_lines = []
             continue
@@ -1166,7 +1171,7 @@ def search_entries_for_page(page: Page) -> list[dict[str, str]]:
         entries.append({
             "pageTitle": page_title,
             "title": page_title,
-            "url": "/" + page.url.lstrip("/"),
+            "url": docs_page_url(page),
             "text": page.summary,
         })
     return entries

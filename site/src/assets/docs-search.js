@@ -12,7 +12,17 @@
   const openButtons = document.querySelectorAll("[data-docs-search-open]");
   const closeButtons = modal.querySelectorAll("[data-docs-search-close]");
   const shortcutNodes = document.querySelectorAll("[data-docs-search-shortcut]");
-  const isMac = /(Mac|iPhone|iPad)/i.test(navigator.platform || navigator.userAgent || "");
+  const platform = navigator.userAgentData?.platform || navigator.platform || navigator.userAgent || "";
+  const isMac = /(Mac|iPhone|iPad)/i.test(platform);
+  const MAX_SNIPPET_LENGTH = 160;
+  const TRUNCATED_SNIPPET_LENGTH = MAX_SNIPPET_LENGTH - 3;
+  const SCORE_TITLE_PREFIX = 140;
+  const SCORE_TITLE_MATCH = 110;
+  const SCORE_PAGE_TITLE_MATCH = 70;
+  const SCORE_TEXT_MATCH = 28;
+  const SCORE_PAGE_RESULT = 8;
+  const SCORE_TEXT_INDEX_CAP = 400;
+  const SCORE_TEXT_INDEX_DIVISOR = 100;
 
   shortcutNodes.forEach((node) => {
     node.textContent = isMac ? "⌘K" : "Ctrl K";
@@ -62,11 +72,11 @@
     }
     const tokens = queryTokens(query);
     if (!tokens.length) {
-      return clean.length > 160 ? `${clean.slice(0, 157).trim()}…` : clean;
+      return clean.length > MAX_SNIPPET_LENGTH ? `${clean.slice(0, TRUNCATED_SNIPPET_LENGTH).trim()}…` : clean;
     }
     const matchIndex = firstMatchIndex(clean, tokens);
     if (matchIndex === -1) {
-      return clean.length > 160 ? `${clean.slice(0, 157).trim()}…` : clean;
+      return clean.length > MAX_SNIPPET_LENGTH ? `${clean.slice(0, TRUNCATED_SNIPPET_LENGTH).trim()}…` : clean;
     }
     let start = Math.max(0, matchIndex - 64);
     let end = Math.min(clean.length, matchIndex + 96);
@@ -110,13 +120,13 @@
 
     for (const token of tokens) {
       if (title.startsWith(token)) {
-        score += 140;
+        score += SCORE_TITLE_PREFIX;
       } else if (title.includes(token)) {
-        score += 110;
+        score += SCORE_TITLE_MATCH;
       } else if (pageTitle.includes(token)) {
-        score += 70;
+        score += SCORE_PAGE_TITLE_MATCH;
       } else if (text.includes(token)) {
-        score += 28;
+        score += SCORE_TEXT_MATCH;
       } else {
         return null;
       }
@@ -128,10 +138,10 @@
     }
 
     if (bestTextIndex < Number.POSITIVE_INFINITY) {
-      score -= Math.min(bestTextIndex, 400) / 100;
+      score -= Math.min(bestTextIndex, SCORE_TEXT_INDEX_CAP) / SCORE_TEXT_INDEX_DIVISOR;
     }
     if (entry.title === entry.pageTitle) {
-      score += 8;
+      score += SCORE_PAGE_RESULT;
     }
     return score;
   };
