@@ -1699,6 +1699,15 @@ tbody tr:last-child td { border-bottom: none; }
 
 .docs-toc .sidebar-card {
   padding: 16px 18px;
+  max-height: calc(100vh - 128px);
+  overflow-y: hidden;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+
+.docs-toc .sidebar-card:hover,
+.docs-toc .sidebar-card:focus-within {
+  overflow-y: auto;
 }
 
 .toc-level-3 { margin-left: 12px; }
@@ -1759,6 +1768,12 @@ tbody tr:last-child td { border-bottom: none; }
   }
 
   .heading-anchor { display: none; }
+}
+
+@media (hover: none) {
+  .docs-toc .sidebar-card {
+    overflow-y: auto;
+  }
 }
 """
     assets_dir = DOCS_DIR / "assets"
