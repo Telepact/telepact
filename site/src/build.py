@@ -1083,6 +1083,7 @@ def collapse_whitespace(value: str) -> str:
 
 
 def heading_anchor(text: str, counts: dict[str, int]) -> str:
+    """Return the next stable heading anchor while tracking duplicates for the page."""
     base = slugify(text)
     count = counts.get(base, 0) + 1
     counts[base] = count
@@ -1111,7 +1112,8 @@ def search_text_from_lines(lines: list[str]) -> str:
 def search_entries_for_page(page: Page) -> list[dict[str, str]]:
     entries: list[dict[str, str]] = []
     heading_counts: dict[str, int] = {}
-    current_title = page.title or page.source.stem
+    page_title = page.title or page.source.stem
+    current_title = page_title
     current_url = "/" + page.url.lstrip("/")
     current_lines: list[str] = []
     in_code_block = False
@@ -1122,7 +1124,7 @@ def search_entries_for_page(page: Page) -> list[dict[str, str]]:
         text = search_text_from_lines(current_lines)
         if text:
             entries.append({
-                "pageTitle": page.title,
+                "pageTitle": page_title,
                 "title": current_title,
                 "url": current_url,
                 "text": text,
@@ -1147,12 +1149,12 @@ def search_entries_for_page(page: Page) -> list[dict[str, str]]:
         if heading_match:
             if saw_heading or current_lines:
                 flush()
-            heading_text = strip_markdown(heading_match.group(2).strip()) or page.title
+            heading_text = strip_markdown(heading_match.group(2).strip()) or page_title
             if saw_heading:
                 current_title = heading_text
                 current_url = "/" + page.url.lstrip("/") + f"#{heading_anchor(heading_text, heading_counts)}"
             else:
-                current_title = page.title or heading_text
+                current_title = page_title
                 current_url = "/" + page.url.lstrip("/")
                 saw_heading = True
             current_lines = []
@@ -1162,8 +1164,8 @@ def search_entries_for_page(page: Page) -> list[dict[str, str]]:
     flush()
     if not entries and page.summary:
         entries.append({
-            "pageTitle": page.title,
-            "title": page.title,
+            "pageTitle": page_title,
+            "title": page_title,
             "url": "/" + page.url.lstrip("/"),
             "text": page.summary,
         })

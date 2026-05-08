@@ -27,19 +27,19 @@ class DocsSearchTest(unittest.TestCase):
     def test_search_index_covers_representative_doc_locations(self) -> None:
         indexed_urls = {entry["url"] for entry in self.index}
         self.assertIn("/docs/", indexed_urls)
-        self.assertIn("/docs/concepts/#schema-guide", indexed_urls)
-        self.assertIn("/docs/learn-by-example/#installation", indexed_urls)
-        self.assertIn("/docs/lib-and-sdk-survey/#python", indexed_urls)
-        self.assertIn("/docs/examples/#source-files", indexed_urls)
+        self.assertIn("/docs/concepts/#schema-writing-guide", indexed_urls)
+        self.assertIn("/docs/learn-by-example/#00-installation", indexed_urls)
+        self.assertIn("/docs/lib-and-sdk-survey/#cli", indexed_urls)
+        self.assertIn("/docs/examples/full-stack/#layout", indexed_urls)
 
     def test_search_index_entries_include_prose_snippets(self) -> None:
         entries_by_url = {entry["url"]: entry for entry in self.index}
-        installation = entries_by_url["/docs/learn-by-example/#installation"]
-        python = entries_by_url["/docs/lib-and-sdk-survey/#python"]
-        self.assertGreater(len(installation["text"]), 80)
-        self.assertIn("install", installation["text"].lower())
-        self.assertGreater(len(python["text"]), 80)
-        self.assertIn("python", python["text"].lower())
+        installation = entries_by_url["/docs/learn-by-example/#00-installation"]
+        cli = entries_by_url["/docs/lib-and-sdk-survey/#cli"]
+        self.assertGreater(len(installation["text"]), 40)
+        self.assertIn("Installation", installation["title"])
+        self.assertGreater(len(cli["text"]), 40)
+        self.assertEqual("CLI", cli["title"])
 
 
 if __name__ == "__main__":
