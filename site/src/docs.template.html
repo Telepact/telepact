@@ -1,0 +1,85 @@
+<!--|                                                                            |-->
+<!--|  Copyright The Telepact Authors                                            |-->
+<!--|                                                                            |-->
+<!--|  Licensed under the Apache License, Version 2.0 (the "License");           |-->
+<!--|  you may not use this file except in compliance with the License.          |-->
+<!--|  You may obtain a copy of the License at                                   |-->
+<!--|                                                                            |-->
+<!--|  https://www.apache.org/licenses/LICENSE-2.0                               |-->
+<!--|                                                                            |-->
+<!--|  Unless required by applicable law or agreed to in writing, software       |-->
+<!--|  distributed under the License is distributed on an "AS IS" BASIS,         |-->
+<!--|  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  |-->
+<!--|  See the License for the specific language governing permissions and       |-->
+<!--|  limitations under the License.                                            |-->
+<!--|                                                                            |-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{PAGE_TITLE}} | Telepact Documentation</title>
+  <meta name="description" content="{{PAGE_DESCRIPTION}}">
+  <link rel="canonical" href="{{CANONICAL_URL}}">
+  <link rel="icon" href="{{FAVICON_HREF}}" sizes="any">
+  <link rel="icon" type="image/x-icon" href="{{FAVICON_HREF}}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{PRISM_CSS_HREF}}">
+  <link rel="stylesheet" href="{{DOCS_CSS_HREF}}">
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <div class="bg-glow bg-glow-1"></div>
+  <div class="bg-glow bg-glow-2"></div>
+
+  <nav class="navbar" aria-label="Main navigation">
+    <div class="container">
+      <a href="{{HOME_HREF}}" class="navbar-logo" aria-label="Telepact home">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="#38BDF8" stroke-width="1.5">
+          <path d="M 2.093 6.908 C 0.414 4.35 1.447 0.938 3 1 C 3.67 1.171 3.799 1.352 4.057 1.946 C 4.833 4.117 4 11 2 23 L 16 23 M 18 2 A 1 1 0 0 0 17 1 L 3 1 M 18 2 L 18 5 M 16 23 C 16.619 20.297 16.959 17.314 17.252 15.902"/>
+          <g stroke="#EAB308"><path d="M 10 17 L 15 10 L 15 12 L 19 8 L 19.008 9.317 L 23 6 L 18 13 L 18 11 L 14 15 L 13.996 13.561 L 10 17"/></g>
+        </svg>
+        Telepact
+      </a>
+      <div class="navbar-links">
+        <a href="{{HOME_HREF}}">Home</a>
+        <a href="{{DOCS_HOME_HREF}}" class="active">Documentation</a>
+        <a href="{{REPO_URL}}" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+          GitHub
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="docs-layout container">
+    <aside class="docs-sidebar">
+      {{NAVIGATION}}
+    </aside>
+
+    <section class="docs-main">
+      <article class="docs-article">
+        {{BODY_HTML}}
+      </article>
+    </section>
+
+    {{TOC}}
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <ul class="footer-links">
+        <li><a href="{{REPO_URL}}" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+        <li><a href="{{DOCS_HOME_HREF}}">Documentation</a></li>
+        <li><a href="{{REPO_URL}}/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">Apache 2.0 License</a></li>
+      </ul>
+      <p>&copy; Telepact Contributors. Open source under the Apache 2.0 License.</p>
+    </div>
+  </footer>
+
+  {{PRISM_SCRIPTS}}
+</body>
+</html>
