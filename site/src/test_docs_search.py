@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 import subprocess
 import sys
 import unittest
@@ -218,6 +219,7 @@ class DocsSearchIndexTest(unittest.TestCase):
         self.assertIn('class="docs-search-modal" data-docs-search-modal hidden', html)
         self.assertIn(".docs-search-modal[hidden]", css)
         self.assertIn(".docs-search-results[hidden]", css)
+        self.assertRegex(css, re.compile(r"\.docs-search-modal\s*\{[^}]*overflow-y:\s*auto;", re.DOTALL))
 
     def test_search_client_excludes_current_document_and_sorts_doc_types(self) -> None:
         results = run_search_client(
