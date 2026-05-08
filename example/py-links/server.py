@@ -36,6 +36,10 @@ async def create_issue_link(function_name: str, request_message: Message) -> Mes
             'next!': {
                 'fn.getFollowUp': {
                     'id': 'follow-up-1',
+                    'details': {
+                        'kept': title,
+                        'extra': 'for follow-up execution',
+                    },
                 },
             },
         },
@@ -45,9 +49,11 @@ async def create_issue_link(function_name: str, request_message: Message) -> Mes
 async def get_follow_up(function_name: str, request_message: Message) -> Message:
     argument = request_message.body[function_name]
     follow_up_id = argument['id']
+    details = argument['details']
     return Message({}, {
         'Ok_': {
-            'summary': f'Followed up on {follow_up_id}',
+            'summary': f"Followed up on {follow_up_id} with {details['extra']}",
+            'details': details,
         },
     })
 

@@ -41,6 +41,52 @@ def test_links_example_runs_end_to_end() -> None:
             next_call,
         ])
 
-        assert follow_up_payload[INDEX_MESSAGE_BODY]['Ok_']['summary'] == 'Followed up on follow-up-1'
+        assert follow_up_payload[INDEX_MESSAGE_BODY]['Ok_']['summary'] == 'Followed up on follow-up-1 with for follow-up execution'
+        assert follow_up_payload[INDEX_MESSAGE_BODY]['Ok_']['details'] == {
+            'kept': 'Ship docs',
+            'extra': 'for follow-up execution',
+        }
+    finally:
+        stop_server(server, thread)
+
+
+def test_select_can_target_types_downstream_of_a_link_without_trimming_the_link() -> None:
+    server = create_http_server()
+    thread = run_server(server)
+    try:
+        url = f'http://127.0.0.1:{server.server_address[1]}/api/telepact'
+        payload = post_json(url, [
+            {
+                '@select_': {
+                    '->': {
+                        'Ok_': ['next!'],
+                    },
+                    'struct.FollowUpDetails': ['kept'],
+                },
+            },
+            {
+                'fn.createIssueLink': {
+                    'title': 'Ship docs',
+                },
+            },
+        ])
+
+        next_call = payload[INDEX_MESSAGE_BODY]['Ok_']['next!']
+        assert next_call == {
+            'fn.getFollowUp': {
+                'id': 'follow-up-1',
+                'details': {
+                    'kept': 'Ship docs',
+                    'extra': 'for follow-up execution',
+                },
+            },
+        }
+
+        follow_up_payload = post_json(url, [
+            {},
+            next_call,
+        ])
+
+        assert follow_up_payload[INDEX_MESSAGE_BODY]['Ok_']['summary'] == 'Followed up on follow-up-1 with for follow-up execution'
     finally:
         stop_server(server, thread)
