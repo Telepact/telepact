@@ -1216,6 +1216,87 @@ def render_toc(current: Page) -> str:
     )
 
 
+def render_search_script() -> str:
+    return """<script>
+(() => {
+  const searchInput = document.getElementById('docs-search');
+  if (!searchInput) {
+    return;
+  }
+
+  const clearButton = document.querySelector('.docs-search-clear');
+  const noResults = document.querySelector('.docs-search-empty');
+  const navGroups = Array.from(document.querySelectorAll('.docs-nav-group'));
+
+  const normalize = (value) => value.toLowerCase().replace(/\\s+/g, ' ').trim();
+
+  const setLinkVisibility = (items, query, parentMatches) => {
+    let anyVisible = false;
+    items.forEach((item) => {
+      const text = normalize(item.textContent || '');
+      const visible = !query || parentMatches || text.includes(query);
+      item.hidden = !visible;
+      if (visible) {
+        anyVisible = true;
+      }
+    });
+    return anyVisible;
+  };
+
+  const applyFilter = () => {
+    const query = normalize(searchInput.value);
+    if (clearButton) {
+      clearButton.hidden = !query;
+    }
+
+    let anyGroupVisible = false;
+    navGroups.forEach((group) => {
+      const directChildren = Array.from(group.children);
+      const groupHeading = normalize(group.querySelector('h3')?.textContent || '');
+      const groupMatches = !!query && groupHeading.includes(query);
+
+      const topLevelList = directChildren.find((child) => child.tagName === 'UL');
+      const subgroups = directChildren.filter((child) => child.classList.contains('docs-nav-subgroup'));
+
+      let groupVisible = setLinkVisibility(
+        Array.from(topLevelList?.children || []),
+        query,
+        groupMatches,
+      );
+
+      subgroups.forEach((subgroup) => {
+        const subgroupHeading = normalize(subgroup.querySelector('.docs-nav-subheading')?.textContent || '');
+        const subgroupMatches = groupMatches || (!!query && subgroupHeading.includes(query));
+        const subgroupVisible = setLinkVisibility(
+          Array.from(subgroup.querySelectorAll('li')),
+          query,
+          subgroupMatches,
+        );
+        subgroup.hidden = !!query && !subgroupVisible;
+        groupVisible = groupVisible || subgroupVisible;
+      });
+
+      group.hidden = !!query && !groupVisible;
+      if (!group.hidden) {
+        anyGroupVisible = true;
+      }
+    });
+
+    if (noResults) {
+      noResults.hidden = !query || anyGroupVisible;
+    }
+  };
+
+  searchInput.addEventListener('input', applyFilter);
+  clearButton?.addEventListener('click', () => {
+    searchInput.value = '';
+    applyFilter();
+    searchInput.focus();
+  });
+})();
+</script>"""
+
+
 def page_shell(page: Page, body_html: str, pages: dict[Path, Page], resources: set[Path]) -> str:
     css_href = relative_href(page.output_file.parent, DOCS_DIR / "assets" / "docs.css")
     home_href = relative_href(page.output_file.parent, SITE_DIR / "index.html")
@@ -1266,6 +1347,15 @@ def page_shell(page: Page, body_html: str, pages: dict[Path, Page], resources: s
 
   <main class="docs-layout container">
     <aside class="docs-sidebar">
+      <div class="sidebar-card docs-search-card">
+        <label class="sidebar-label" for="docs-search">Search docs</label>
+        <div class="docs-search-row">
+          <input id="docs-search" class="docs-search-input" type="search" placeholder="Filter pages" autocomplete="off" spellcheck="false">
+          <button class="docs-search-clear" type="button" aria-label="Clear docs search" hidden>&times;</button>
+        </div>
+        <p class="docs-search-hint">Search the documentation navigation by page title.</p>
+        <p class="docs-search-empty" hidden>No pages match that search.</p>
+      </div>
       {render_nav(page, pages, resources)}
     </aside>
 
@@ -1290,6 +1380,7 @@ def page_shell(page: Page, body_html: str, pages: dict[Path, Page], resources: s
   </footer>
 
   {prism_scripts}
+  {render_search_script()}
 </body>
 </html>
 """
@@ -1463,6 +1554,68 @@ a:hover { color: #7dd3fc; }
 .intro-card {
   padding: 20px;
   margin-bottom: 18px;
+}
+
+.docs-search-card {
+  padding: 16px 18px;
+  margin-bottom: 14px;
+}
+
+.docs-search-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.docs-search-input {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid rgba(56, 189, 248, 0.18);
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.92);
+  color: var(--text);
+  font: inherit;
+  padding: 10px 14px;
+}
+
+.docs-search-input::placeholder {
+  color: var(--text-muted);
+}
+
+.docs-search-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.12);
+}
+
+.docs-search-clear {
+  border: 1px solid rgba(56, 189, 248, 0.18);
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.92);
+  color: var(--text-muted);
+  cursor: pointer;
+  font: inherit;
+  font-size: 1.1rem;
+  line-height: 1;
+  padding: 8px 12px;
+}
+
+.docs-search-clear:hover,
+.docs-search-clear:focus-visible {
+  color: var(--text);
+  border-color: var(--accent);
+  outline: none;
+}
+
+.docs-search-hint,
+.docs-search-empty {
+  margin: 10px 0 0;
+  color: var(--text-muted);
+  font-size: 0.86rem;
+}
+
+.docs-search-empty {
+  color: #f8fafc;
 }
 
 .sidebar-label {
