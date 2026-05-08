@@ -35,6 +35,8 @@ SOURCE_DIR = SITE_ROOT / "src"
 SITE_DIR = SITE_ROOT / "dist"
 DOCS_DIR = SITE_DIR / "docs"
 MARKDOWN_DOCS_DIR = SITE_DIR / "markdown-docs"
+GENERATED_SOURCE_DIR = SITE_ROOT / ".generated-docs"
+GENERATED_DOCS_SOURCE_DIR = GENERATED_SOURCE_DIR / "docs"
 INDEX_TEMPLATE = SOURCE_DIR / "index.template.html"
 INDEX_OUTPUT = SITE_DIR / "index.html"
 LLMS_OUTPUT = SITE_DIR / "llms.txt"
@@ -49,6 +51,8 @@ PRISM_CSS = (
 )
 PRISM_JS = [
     "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js",
+    "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js",
+    "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js",
     "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js",
     "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js",
     "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js",
@@ -60,6 +64,85 @@ PRISM_JS = [
 SNIPPET_PATTERN = re.compile(
     r'(?P<indent>[ \t]*)<!--\s*SNIPPET:\s*(?P<path>[^|]+?)\s*\|\s*(?P<lang>[a-zA-Z0-9_-]+)\s*-->'
 )
+DOCS_PAGE_BLUEPRINTS = (
+    {
+        "output": "index.md",
+        "title": "Documentation",
+        "intro": "doc/index.md",
+        "sections": (),
+    },
+    {
+        "output": "concepts.md",
+        "title": "Concepts",
+        "sections": (
+            {"source": "doc/example.md"},
+            {"source": "doc/02-design-apis/schema-guide.md"},
+            {"source": "doc/02-design-apis/core-concepts.md"},
+            {"source": "doc/02-design-apis/extensions.md"},
+            {"source": "doc/02-design-apis/select-extension.md"},
+            {"source": "doc/02-design-apis/mock-extensions.md"},
+            {"source": "doc/03-build-clients-and-servers/transports.md"},
+            {"source": "doc/03-build-clients-and-servers/client-paths.md"},
+            {"source": "doc/03-build-clients-and-servers/server-paths.md"},
+            {"source": "doc/03-build-clients-and-servers/auth.md"},
+            {"source": "doc/03-build-clients-and-servers/tooling-workflow.md"},
+            {"source": "doc/04-operate/production-guide.md"},
+            {"source": "doc/04-operate/runtime-errors.md"},
+            {"source": "doc/05-background-and-reference/faq.md"},
+            {"source": "doc/05-background-and-reference/motivation.md"},
+        ),
+    },
+    {
+        "output": "learn-by-example.md",
+        "title": "Learn by Example",
+        "intro": "doc/01-learn-by-example/README.md",
+        "sections": (
+            {"source": "doc/01-learn-by-example/01-getting-started/installation.md"},
+            {"source": "doc/01-learn-by-example/01-getting-started/ping.md"},
+            {"source": "doc/01-learn-by-example/01-getting-started/schema-and-add.md"},
+            {"source": "doc/01-learn-by-example/01-getting-started/data-type-validation.md"},
+            {"source": "doc/01-learn-by-example/02-schema/scalar-types.md"},
+            {"source": "doc/01-learn-by-example/02-schema/collection-types.md"},
+            {"source": "doc/01-learn-by-example/02-schema/structs.md"},
+            {"source": "doc/01-learn-by-example/02-schema/unions.md"},
+            {"source": "doc/01-learn-by-example/02-schema/functions.md"},
+            {"source": "doc/01-learn-by-example/02-schema/service-errors.md"},
+            {"source": "doc/01-learn-by-example/02-schema/headers.md"},
+            {"source": "doc/01-learn-by-example/02-schema/comments.md"},
+            {"source": "doc/01-learn-by-example/03-opt-in-features/select.md"},
+            {"source": "doc/01-learn-by-example/03-opt-in-features/binary.md"},
+            {"source": "doc/01-learn-by-example/04-mocking-an-integration/mock-server.md"},
+            {"source": "doc/01-learn-by-example/04-mocking-an-integration/stock-mock.md"},
+            {"source": "doc/01-learn-by-example/04-mocking-an-integration/stubs.md"},
+            {"source": "doc/01-learn-by-example/04-mocking-an-integration/verify.md"},
+            {"source": "doc/01-learn-by-example/05-auth/auth.md"},
+            {"source": "doc/01-learn-by-example/06-using-telepact-client-library-code/minimum-python-client.md"},
+            {"source": "doc/01-learn-by-example/06-using-telepact-client-library-code/automatic-binary-negotiation.md"},
+            {"source": "doc/01-learn-by-example/07-code-generation/code-generation.md"},
+            {"source": "doc/01-learn-by-example/08-running-our-own-server/minimum-server.md"},
+            {"source": "doc/01-learn-by-example/08-running-our-own-server/logging.md"},
+            {"source": "doc/01-learn-by-example/08-running-our-own-server/server-auth.md"},
+            {"source": "doc/01-learn-by-example/08-running-our-own-server/managed-auth.md"},
+            {"source": "doc/01-learn-by-example/08-running-our-own-server/schema-evolution.md"},
+            {"source": "doc/01-learn-by-example/08-running-our-own-server/test-client-tdd.md"},
+            {"source": "doc/01-learn-by-example/08-running-our-own-server/server-best-practices.md"},
+        ),
+    },
+    {
+        "output": "lib-and-sdk-survey.md",
+        "title": "Lib and SDK Survey",
+        "sections": (
+            {"source": "lib/go/README.md", "title": "Go"},
+            {"source": "lib/java/README.md", "title": "Java"},
+            {"source": "lib/py/README.md", "title": "Python"},
+            {"source": "lib/ts/README.md", "title": "TypeScript"},
+            {"source": "sdk/cli/README.md", "title": "CLI"},
+            {"source": "sdk/console/README.md", "title": "Console"},
+            {"source": "sdk/prettier/README.md", "title": "Prettier Plugin"},
+        ),
+    },
+)
+INLINE_EXAMPLE_SKIP_NAMES = {"README.md", ".gitignore", "go.sum"}
 
 
 def normalize_base_url(value: str) -> str:
@@ -123,6 +206,8 @@ def split_link_target(target: str) -> tuple[str, str]:
 
 
 def is_allowed_repo_path(path: Path) -> bool:
+    if path_in_generated_docs(path):
+        return True
     try:
         rel = path.relative_to(REPO_ROOT).as_posix()
     except ValueError:
@@ -131,10 +216,23 @@ def is_allowed_repo_path(path: Path) -> bool:
 
 
 def repo_rel(path: Path) -> str:
+    if path_in_generated_docs(path):
+        return path.relative_to(GENERATED_DOCS_SOURCE_DIR).as_posix()
     return path.relative_to(REPO_ROOT).as_posix()
 
 
 def output_html_path(source: Path) -> Path:
+    if path_in_generated_docs(source):
+        rel = source.relative_to(GENERATED_DOCS_SOURCE_DIR).as_posix()
+        if rel.endswith("/README.md"):
+            rel = rel[: -len("README.md")]
+        elif rel == "index.md":
+            rel = ""
+        elif rel.endswith("/index.md"):
+            rel = rel[: -len("index.md")]
+        elif rel.endswith(".md"):
+            rel = rel[:-3] + "/"
+        return DOCS_DIR / rel / "index.html"
     rel = repo_rel(source)
     if rel.startswith("doc/"):
         rel = rel[len("doc/") :]
@@ -301,6 +399,26 @@ class NavGroup:
     subgroups: list[NavSubgroup] = field(default_factory=list)
 
 
+@dataclass(frozen=True)
+class GeneratedSection:
+    source: Path
+    title: str
+
+
+@dataclass(frozen=True)
+class GeneratedPage:
+    output: Path
+    title: str
+    intro: Path | None = None
+    sections: tuple[GeneratedSection, ...] = ()
+
+
+@dataclass(frozen=True)
+class GeneratedTarget:
+    output: Path
+    anchor: str = ""
+
+
 ORDERED_NAME_RE = re.compile(r"^(?P<order>\d+)(?:[-_.]|$)(?P<name>.*)$")
 DISPLAY_TOKEN_MAP = {
     "api": "API",
@@ -355,6 +473,277 @@ def display_name(path: Path) -> str:
     return " ".join(rendered)
 
 
+def path_in_generated_docs(path: Path) -> bool:
+    try:
+        path.relative_to(GENERATED_DOCS_SOURCE_DIR)
+        return True
+    except ValueError:
+        return False
+
+
+def page_output_path(output_rel: str) -> Path:
+    return GENERATED_DOCS_SOURCE_DIR / output_rel
+
+
+def relative_posix_path(from_path: Path, to_path: Path) -> str:
+    rel = posixpath.relpath(to_path.as_posix(), from_path.parent.as_posix())
+    return "." if rel == "." else rel
+
+
+def first_heading_title(markdown: str, fallback: str) -> str:
+    for line in markdown.splitlines():
+        match = re.match(r"^(#{1,6})\s+(.*)$", line.strip())
+        if match:
+            return strip_markdown(match.group(2).strip()) or fallback
+    return fallback
+
+
+def drop_first_heading(markdown: str) -> tuple[str | None, str]:
+    lines = markdown.splitlines()
+    for index, line in enumerate(lines):
+        match = re.match(r"^(#{1,6})\s+(.*)$", line.strip())
+        if match:
+            title = strip_markdown(match.group(2).strip())
+            remaining = lines[:index] + lines[index + 1 :]
+            return title, "\n".join(remaining).lstrip("\n")
+    return None, markdown
+
+
+def shift_markdown_headings(markdown: str, levels: int) -> str:
+    if levels <= 0:
+        return markdown
+    lines = markdown.splitlines()
+    rendered: list[str] = []
+    in_code_block = False
+    for line in lines:
+        stripped = line.lstrip()
+        if stripped.startswith("```"):
+            in_code_block = not in_code_block
+            rendered.append(line)
+            continue
+        if not in_code_block:
+            match = re.match(r"^(\s*)(#{1,6})(\s+.*)$", line)
+            if match:
+                hashes = "#" * min(6, len(match.group(2)) + levels)
+                rendered.append(f"{match.group(1)}{hashes}{match.group(3)}")
+                continue
+        rendered.append(line)
+    return "\n".join(rendered)
+
+
+def replace_inline_links(markdown: str, source: Path, current_output: Path, targets: dict[Path, GeneratedTarget]) -> str:
+    lines = markdown.splitlines()
+    rendered: list[str] = []
+    in_code_block = False
+    link_pattern = re.compile(r"\[([^\]]+)\]\(([^)]+)\)")
+
+    def replace_match(match: re.Match[str]) -> str:
+        label, raw_target = match.group(1), match.group(2)
+        if is_external_link(raw_target) or raw_target.startswith("#"):
+            return match.group(0)
+
+        resolved, frag = resolve_local_target(source, raw_target)
+        if resolved is not None and resolved in targets:
+            target = targets[resolved]
+            rel = relative_posix_path(current_output, target.output)
+            if current_output == target.output:
+                rel = ""
+            anchor = frag or target.anchor
+            href = rel
+            if anchor:
+                href += f"#{anchor}"
+            if not href:
+                href = "./"
+            return f"[{label}]({href})"
+
+        if resolved is not None and resolved.exists() and resolved.is_file() and is_allowed_repo_path(resolved):
+            href = "/" + repo_rel(resolved)
+            if frag:
+                href += f"#{frag}"
+            return f"[{label}]({href})"
+
+        return match.group(0)
+
+    for line in lines:
+        stripped = line.lstrip()
+        if stripped.startswith("```"):
+            in_code_block = not in_code_block
+            rendered.append(line)
+            continue
+        if in_code_block:
+            rendered.append(line)
+            continue
+        rendered.append(link_pattern.sub(replace_match, line))
+    return "\n".join(rendered)
+
+
+def example_code_language(path: Path) -> str:
+    if path.name == "Makefile":
+        return "bash"
+    if path.name.endswith(".telepact.yaml"):
+        return "yaml"
+    if path.name.endswith(".telepact.json"):
+        return "json"
+    if path.suffix == ".py":
+        return "python"
+    if path.suffix in {".ts", ".tsx"}:
+        return "typescript"
+    if path.suffix in {".yaml", ".yml"}:
+        return "yaml"
+    if path.suffix == ".json":
+        return "json"
+    if path.suffix == ".go":
+        return "go"
+    if path.suffix == ".java":
+        return "java"
+    if path.suffix == ".sh":
+        return "bash"
+    if path.suffix == ".html":
+        return "html"
+    if path.suffix == ".css":
+        return "css"
+    return ""
+
+
+def example_source_files(example_dir: Path) -> list[Path]:
+    files: list[Path] = []
+    for path in sorted(example_dir.rglob("*")):
+        if not path.is_file():
+            continue
+        if any(part.startswith(".") for part in path.relative_to(example_dir).parts):
+            continue
+        if path.name in INLINE_EXAMPLE_SKIP_NAMES:
+            continue
+        files.append(path)
+    return files
+
+
+def generated_pages() -> list[GeneratedPage]:
+    pages = [
+        GeneratedPage(
+            output=page_output_path(blueprint["output"]),
+            title=blueprint["title"],
+            intro=(REPO_ROOT / blueprint["intro"]) if blueprint.get("intro") else None,
+            sections=tuple(
+                GeneratedSection(
+                    source=REPO_ROOT / section["source"],
+                    title=section.get(
+                        "title",
+                        first_heading_title(
+                            (REPO_ROOT / section["source"]).read_text(encoding="utf-8"),
+                            display_name(REPO_ROOT / section["source"]),
+                        ),
+                    ),
+                )
+                for section in blueprint["sections"]
+            ),
+        )
+        for blueprint in DOCS_PAGE_BLUEPRINTS
+    ]
+
+    example_readme = REPO_ROOT / "example" / "README.md"
+    pages.append(
+        GeneratedPage(
+            output=page_output_path("examples/index.md"),
+            title="Examples",
+            intro=example_readme,
+        )
+    )
+
+    for readme in sorted((REPO_ROOT / "example").glob("*/README.md")):
+        pages.append(
+            GeneratedPage(
+                output=page_output_path(f"examples/{readme.parent.name}.md"),
+                title=readme.parent.name,
+                intro=readme,
+            )
+        )
+    return pages
+
+
+def generated_targets(pages: list[GeneratedPage]) -> dict[Path, GeneratedTarget]:
+    targets: dict[Path, GeneratedTarget] = {}
+    for page in pages:
+        if page.intro is not None:
+            targets[page.intro] = GeneratedTarget(output=page.output)
+        for section in page.sections:
+            targets[section.source] = GeneratedTarget(output=page.output, anchor=slugify(section.title))
+
+        if page.intro is not None and page.intro.parent.parent == REPO_ROOT / "example":
+            example_dir = page.intro.parent
+            targets[example_dir] = GeneratedTarget(output=page.output, anchor="source-files")
+            for file_path in example_source_files(example_dir):
+                rel = file_path.relative_to(example_dir).as_posix()
+                anchor = slugify(rel)
+                targets[file_path] = GeneratedTarget(output=page.output, anchor=anchor)
+                if "/" in rel:
+                    top_level = rel.split("/", 1)[0]
+                    targets.setdefault(
+                        example_dir / top_level,
+                        GeneratedTarget(output=page.output, anchor=slugify(top_level)),
+                    )
+    return targets
+
+
+def section_markdown(section: GeneratedSection, page_output: Path, targets: dict[Path, GeneratedTarget]) -> str:
+    original = section.source.read_text(encoding="utf-8")
+    _, body = drop_first_heading(original)
+    body = replace_inline_links(body, section.source, page_output, targets)
+    body = shift_markdown_headings(body, 1)
+    pieces = [f"## {section.title}"]
+    if body.strip():
+        pieces.append(body.strip())
+    return "\n\n".join(pieces).strip()
+
+
+def example_sources_markdown(example_dir: Path) -> str:
+    files = example_source_files(example_dir)
+    if not files:
+        return ""
+
+    parts = ["## Source Files"]
+    current_group: str | None = None
+    for file_path in files:
+        rel = file_path.relative_to(example_dir).as_posix()
+        top_level = rel.split("/", 1)[0] if "/" in rel else None
+        if top_level is not None and top_level != current_group:
+            current_group = top_level
+            parts.append(f"### {top_level}/")
+        elif top_level is None:
+            current_group = None
+        heading_level = "####" if top_level is not None else "###"
+        parts.append(f"{heading_level} {rel}")
+        lang = example_code_language(file_path)
+        code = file_path.read_text(encoding='utf-8').rstrip("\n")
+        parts.append(f"```{lang}\n{code}\n```")
+    return "\n\n".join(parts)
+
+
+def write_generated_docs() -> None:
+    if GENERATED_SOURCE_DIR.exists():
+        shutil.rmtree(GENERATED_SOURCE_DIR)
+    GENERATED_DOCS_SOURCE_DIR.mkdir(parents=True, exist_ok=True)
+
+    pages = generated_pages()
+    targets = generated_targets(pages)
+
+    for page in pages:
+        parts = [f"# {page.title}"]
+        if page.intro is not None:
+            _, intro_body = drop_first_heading(page.intro.read_text(encoding="utf-8"))
+            intro_body = replace_inline_links(intro_body, page.intro, page.output, targets).strip()
+            if intro_body:
+                parts.append(intro_body)
+        for section in page.sections:
+            parts.append(section_markdown(section, page.output, targets))
+        if page.intro is not None and page.intro.parent.parent == REPO_ROOT / "example":
+            source_markdown = example_sources_markdown(page.intro.parent)
+            if source_markdown:
+                parts.append(source_markdown)
+        page.output.parent.mkdir(parents=True, exist_ok=True)
+        page.output.write_text("\n\n".join(part for part in parts if part).strip() + "\n", encoding="utf-8")
+
+
 def page_for_source(pages: dict[Path, Page], source: Path) -> Page | None:
     return pages.get(source)
 
@@ -390,27 +779,17 @@ def nav_links_for_directory(pages: dict[Path, Page], directory: Path) -> list[Na
 def discover_pages() -> tuple[dict[Path, Page], set[Path]]:
     pages: dict[Path, Page] = {}
     resources: set[Path] = set()
-    queue = sorted((REPO_ROOT / "doc").rglob("*.md"))
-
-    while queue:
-        source = queue.pop(0)
-        if source in pages:
-            continue
+    for source in sorted(GENERATED_DOCS_SOURCE_DIR.rglob("*.md")):
         pages[source] = Page(source=source, output_file=output_html_path(source))
-
         text = source.read_text(encoding="utf-8")
         for _, target in re.findall(r"\[([^\]]+)\]\(([^)]+)\)", text):
             if is_external_link(target):
                 continue
             resolved, _ = resolve_local_target(source, target)
-            if resolved is None:
+            if resolved is None or not resolved.exists() or not resolved.is_file():
                 continue
-            if resolved.exists() and resolved.is_file():
-                if resolved.suffix.lower() == ".md" and is_allowed_repo_path(resolved):
-                    if resolved not in pages and resolved not in queue:
-                        queue.append(resolved)
-                elif is_allowed_repo_path(resolved):
-                    resources.add(resolved)
+            if resolved.suffix.lower() != ".md" and is_allowed_repo_path(resolved):
+                resources.add(resolved)
 
     return pages, resources
 
@@ -696,8 +1075,8 @@ def page_by_rel_source(pages: dict[Path, Page], rel_source: str) -> Page | None:
 
 
 def nav_groups(pages: dict[Path, Page]) -> list[NavGroup]:
-    doc_root = REPO_ROOT / "doc"
-    example_root = REPO_ROOT / "example"
+    doc_root = GENERATED_DOCS_SOURCE_DIR
+    example_root = GENERATED_DOCS_SOURCE_DIR / "examples"
     groups: list[NavGroup] = []
 
     root_items: list[NavLink] = []
@@ -721,7 +1100,7 @@ def nav_groups(pages: dict[Path, Page]) -> list[NavGroup]:
 
     top_level_dirs = [
         child for child in doc_root.iterdir()
-        if child.is_dir() and split_ordered_name(child.name)[0] != 10**9
+        if child.is_dir() and child != example_root and split_ordered_name(child.name)[0] != 10**9
     ]
     for directory in sort_nav_paths(top_level_dirs):
         landing = directory_landing_page(pages, directory)
@@ -763,7 +1142,11 @@ def nav_groups(pages: dict[Path, Page]) -> list[NavGroup]:
 
 
 def render_nav_link(current: Page, pages: dict[Path, Page], resources: set[Path], item: NavLink) -> str:
-    target_path = REPO_ROOT / item.target
+    target_path = (
+        GENERATED_DOCS_SOURCE_DIR / item.target
+        if not item.target.startswith(ALLOWED_PREFIXES)
+        else REPO_ROOT / item.target
+    )
     active = ""
     href = item.target
     if target_path.suffix == ".md":
@@ -1462,6 +1845,7 @@ def main() -> None:
     if SITE_DIR.exists():
         shutil.rmtree(SITE_DIR)
     SITE_DIR.mkdir(parents=True, exist_ok=True)
+    write_generated_docs()
     copy_static_files()
     snippet_count = write_home_page()
     pages, resources = discover_pages()
@@ -1474,6 +1858,8 @@ def main() -> None:
     write_robots()
     write_llms(pages)
     write_sitemap(pages)
+    if GENERATED_SOURCE_DIR.exists():
+        shutil.rmtree(GENERATED_SOURCE_DIR)
     print(
         f"Generated home page from {snippet_count} snippets, "
         f"{len(pages)} documentation pages, and {len(resources)} copied resources into {SITE_DIR}"
