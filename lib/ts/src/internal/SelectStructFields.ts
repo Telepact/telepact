@@ -51,6 +51,10 @@ export function selectStructFields(
 
         return finalMap;
     } else if (typeDeclarationType instanceof TUnion) {
+        if (typeDeclarationType.name.startsWith('fn.')) {
+            return value;
+        }
+
         const valueAsMap = value as { [key: string]: any };
         const [unionTag, unionData] = Object.entries(valueAsMap)[0];
 

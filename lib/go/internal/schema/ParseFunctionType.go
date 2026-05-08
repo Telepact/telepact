@@ -57,7 +57,7 @@ func ParseFunctionResultType(path []any, functionDefinition map[string]any, sche
 		return nil, &ParseError{Failures: parseFailures, DocumentJSON: ctx.TelepactSchemaDocumentNamesToJSON}
 	}
 
-	fnSelectType := DerivePossibleSelects(schemaKey, resultType)
+	fnSelectType := DerivePossibleSelects(schemaKey, resultType, ctx.ParsedTypes)
 	selectTypeAny, err := GetOrParseType([]any{}, "_ext.Select_", ctx)
 	if err != nil {
 		return nil, err

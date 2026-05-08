@@ -202,6 +202,34 @@
         ]
     },
     {
+        "struct.LinkCard": {
+            "hidden": "boolean",
+            "shown": "boolean"
+        }
+    },
+    {
+        "fn.linkCard": {
+            "card": "struct.LinkCard"
+        },
+        "->": [
+            {
+                "Ok_": {
+                    "card": "struct.LinkCard"
+                }
+            }
+        ]
+    },
+    {
+        "fn.linkEnvelope": {},
+        "->": [
+            {
+                "Ok_": {
+                    "next": "fn.linkCard"
+                }
+            }
+        ]
+    },
+    {
         "headers.ExampleHeaders": {
             "@in": "boolean"
         },

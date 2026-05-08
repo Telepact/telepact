@@ -27,7 +27,7 @@ import io.github.telepact.internal.types.TUnion;
 
 public class DerivePossibleSelects {
 
-    public static Map<String, Object> derivePossibleSelect(String fnName, TUnion result) {
+    public static Map<String, Object> derivePossibleSelect(String fnName, TUnion result, Map<String, TType> parsedTypes) {
         final var nestedTypes = new HashMap<String, TType>();
         final var okFields = result.tags.get("Ok_").fields;
 
@@ -35,7 +35,7 @@ public class DerivePossibleSelects {
         Collections.sort(okFieldNames);
 
         for (final var fieldDecl : okFields.values()) {
-            findNestedTypes(fieldDecl.typeDeclaration, nestedTypes);
+            findNestedTypes(fieldDecl.typeDeclaration, nestedTypes, parsedTypes, new HashSet<>());
         }
 
         final var possibleSelect = new HashMap<String, Object>();
@@ -83,9 +83,31 @@ public class DerivePossibleSelects {
         return possibleSelect;
     }
 
-    private static void findNestedTypes(TTypeDeclaration typeDeclaration, Map<String, TType> nestedTypes) {
+    private static void findNestedTypes(
+            TTypeDeclaration typeDeclaration,
+            Map<String, TType> nestedTypes,
+            Map<String, TType> parsedTypes,
+            Set<String> traversedFunctionResults) {
         final var typ = typeDeclaration.type;
         if (typ instanceof TUnion u) {
+            if (u.name.startsWith("fn.")) {
+                final var resultTypeName = u.name + ".->";
+                if (traversedFunctionResults.contains(resultTypeName)) {
+                    return;
+                }
+
+                traversedFunctionResults.add(resultTypeName);
+                final var resultType = parsedTypes.get(resultTypeName);
+                if (resultType instanceof TUnion resultUnion) {
+                    for (final var tag : resultUnion.tags.values()) {
+                        for (final var fieldDecl : tag.fields.values()) {
+                            findNestedTypes(fieldDecl.typeDeclaration, nestedTypes, parsedTypes, traversedFunctionResults);
+                        }
+                    }
+                }
+                return;
+            }
+
             if (!u.name.isEmpty()) {
                 if (nestedTypes.containsKey(u.name)) {
                     return;
@@ -94,7 +116,7 @@ public class DerivePossibleSelects {
             }
             for (final var tag : u.tags.values()) {
                 for (final var fieldDecl : tag.fields.values()) {
-                    findNestedTypes(fieldDecl.typeDeclaration, nestedTypes);
+                    findNestedTypes(fieldDecl.typeDeclaration, nestedTypes, parsedTypes, traversedFunctionResults);
                 }
             }
         } else if (typ instanceof TStruct s) {
@@ -105,10 +127,10 @@ public class DerivePossibleSelects {
                 nestedTypes.put(s.name, typ);
             }
             for (final var fieldDecl : s.fields.values()) {
-                findNestedTypes(fieldDecl.typeDeclaration, nestedTypes);
+                findNestedTypes(fieldDecl.typeDeclaration, nestedTypes, parsedTypes, traversedFunctionResults);
             }
         } else if (typ instanceof TArray || typ instanceof TObject) {
-            findNestedTypes(typeDeclaration.typeParameters.get(0), nestedTypes);
+            findNestedTypes(typeDeclaration.typeParameters.get(0), nestedTypes, parsedTypes, traversedFunctionResults);
         }
     }
 }
