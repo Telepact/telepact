@@ -1,0 +1,24 @@
+#|
+#|  Copyright The Telepact Authors
+#|
+#|  Licensed under the Apache License, Version 2.0 (the "License");
+#|  you may not use this file except in compliance with the License.
+#|  You may obtain a copy of the License at
+#|
+#|  https://www.apache.org/licenses/LICENSE-2.0
+#|
+#|  Unless required by applicable law or agreed to in writing, software
+#|  distributed under the License is distributed on an "AS IS" BASIS,
+#|  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#|  See the License for the specific language governing permissions and
+#|  limitations under the License.
+#|
+
+from .BuildDocumentLocatorFromYamlAst import create_document_locator_from_yaml_text
+
+
+def get_path_document_coordinates_pseudo_json(path: list[object], document: str) -> dict[str, object]:
+    try:
+        return create_document_locator_from_yaml_text(document)(path)
+    except Exception:
+        return {'row': 1, 'col': 1}

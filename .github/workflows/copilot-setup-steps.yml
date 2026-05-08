@@ -56,6 +56,11 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v6
 
+      - name: Install Telepact CLI
+        run: |
+          uv tool install --force ./sdk/cli
+          echo "${HOME}/.local/bin" >> "${GITHUB_PATH}"
+
       - name: Set up Dart
         uses: dart-lang/setup-dart@v1
         with:
@@ -65,4 +70,3 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y nats-server
-
