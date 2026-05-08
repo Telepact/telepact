@@ -345,7 +345,7 @@ Telepact ecosystem.
 You can find details about auth definitions
 [here](../../common/auth.telepact.yaml).
 For the full Telepact auth model, including transport extraction and
-server normalization, see the [Auth Guide](../03-build-clients-and-servers/auth.md).
+server normalization, see the [Auth Guide](../build-clients-and-servers/auth.md).
 
 ### Mock Definitions
 

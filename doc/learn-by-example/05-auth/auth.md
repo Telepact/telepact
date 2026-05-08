@@ -4,7 +4,7 @@ Let's look at Telepact's auth convention from the client's side.
 
 For the full Telepact auth boundary, including transport extraction, `onAuth`
 normalization, browser cookies, and service-to-service credentials, see
-the [Auth Guide](../../03-build-clients-and-servers/auth.md).
+the [Auth Guide](../../build-clients-and-servers/auth.md).
 
 ## Start the demo server
 

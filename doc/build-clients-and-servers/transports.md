@@ -253,5 +253,5 @@ if (response.getBodyTarget() === 'Ok_') {
 ## See also
 
 - [Quickstart](../example.md)
-- [FAQ](../05-background-and-reference/faq.md)
-- [Runtime Error Guide](../04-operate/runtime-errors.md)
+- [FAQ](../background-and-reference/faq.md)
+- [Runtime Error Guide](../operate/runtime-errors.md)

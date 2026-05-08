@@ -88,6 +88,6 @@ if (response.getBodyTarget() === 'Ok_') {
 
 ## See also
 
-- [Transport Guide](../../doc/03-build-clients-and-servers/transports.md) for browser TypeScript + `fetch` and WebSocket examples
-- [Client Paths](../../doc/03-build-clients-and-servers/client-paths.md) for choosing between plain JSON, the runtime library, and generated code
+- [Transport Guide](../../doc/build-clients-and-servers/transports.md) for browser TypeScript + `fetch` and WebSocket examples
+- [Client Paths](../../doc/build-clients-and-servers/client-paths.md) for choosing between plain JSON, the runtime library, and generated code
 - [Demos](../../example/README.md) for runnable end-to-end examples

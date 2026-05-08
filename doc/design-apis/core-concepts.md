@@ -27,7 +27,7 @@ Responses usually look like:
 ```
 
 For a more complete walkthrough, start with the
-[Quickstart](../example.md) or [Learn Telepact by Example](../01-learn-by-example/README.md).
+[Quickstart](../example.md) or [Learn Telepact by Example](../learn-by-example/README.md).
 
 ## Schema role
 
@@ -65,9 +65,9 @@ As a rule of thumb:
 
 For more detail, see:
 
-- [Transport Guide](../03-build-clients-and-servers/transports.md)
-- [Operating Boundary Guide](../04-operate/production-guide.md)
-- [FAQ](../05-background-and-reference/faq.md)
+- [Transport Guide](../build-clients-and-servers/transports.md)
+- [Operating Boundary Guide](../operate/production-guide.md)
+- [FAQ](../background-and-reference/faq.md)
 
 ## Function links
 
@@ -79,7 +79,7 @@ link formats.
 
 See:
 
-- [Learn by Example: Functions](../01-learn-by-example/02-schema/functions.md)
+- [Learn by Example: Functions](../learn-by-example/02-schema/functions.md)
 - [Demos](../../example/README.md)
 
 ## Select
@@ -90,7 +90,7 @@ language.
 
 See:
 
-- [Learn by Example: Select](../01-learn-by-example/03-opt-in-features/select.md)
+- [Learn by Example: Select](../learn-by-example/03-opt-in-features/select.md)
 - [`_ext.Select_`](./select-extension.md)
 
 ## Binary
@@ -101,12 +101,12 @@ when it wants more efficiency.
 
 See:
 
-- [Learn by Example: Binary](../01-learn-by-example/03-opt-in-features/binary.md)
-- [Learn by Example: Automatic binary negotiation](../01-learn-by-example/06-using-telepact-client-library-code/automatic-binary-negotiation.md)
+- [Learn by Example: Binary](../learn-by-example/03-opt-in-features/binary.md)
+- [Learn by Example: Automatic binary negotiation](../learn-by-example/06-using-telepact-client-library-code/automatic-binary-negotiation.md)
 
 ## Where to go next
 
 - If you are designing an API, go to the [Schema Writing Guide](./schema-guide.md).
-- If you are building a client, go to [Client Paths](../03-build-clients-and-servers/client-paths.md).
-- If you are building a server, go to [Server Paths](../03-build-clients-and-servers/server-paths.md).
-- If you want the CLI and related workflows, go to [Tooling Workflow](../03-build-clients-and-servers/tooling-workflow.md).
+- If you are building a client, go to [Client Paths](../build-clients-and-servers/client-paths.md).
+- If you are building a server, go to [Server Paths](../build-clients-and-servers/server-paths.md).
+- If you want the CLI and related workflows, go to [Tooling Workflow](../build-clients-and-servers/tooling-workflow.md).

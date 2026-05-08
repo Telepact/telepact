@@ -76,56 +76,56 @@ DOCS_PAGE_BLUEPRINTS = (
         "title": "Concepts",
         "sections": (
             {"source": "doc/example.md"},
-            {"source": "doc/02-design-apis/schema-guide.md"},
-            {"source": "doc/02-design-apis/core-concepts.md"},
-            {"source": "doc/02-design-apis/extensions.md"},
-            {"source": "doc/02-design-apis/select-extension.md"},
-            {"source": "doc/02-design-apis/mock-extensions.md"},
-            {"source": "doc/03-build-clients-and-servers/transports.md"},
-            {"source": "doc/03-build-clients-and-servers/client-paths.md"},
-            {"source": "doc/03-build-clients-and-servers/server-paths.md"},
-            {"source": "doc/03-build-clients-and-servers/auth.md"},
-            {"source": "doc/03-build-clients-and-servers/tooling-workflow.md"},
-            {"source": "doc/04-operate/production-guide.md"},
-            {"source": "doc/04-operate/runtime-errors.md"},
-            {"source": "doc/05-background-and-reference/faq.md"},
-            {"source": "doc/05-background-and-reference/motivation.md"},
+            {"source": "doc/design-apis/schema-guide.md"},
+            {"source": "doc/design-apis/core-concepts.md"},
+            {"source": "doc/design-apis/extensions.md"},
+            {"source": "doc/design-apis/select-extension.md"},
+            {"source": "doc/design-apis/mock-extensions.md"},
+            {"source": "doc/build-clients-and-servers/transports.md"},
+            {"source": "doc/build-clients-and-servers/client-paths.md"},
+            {"source": "doc/build-clients-and-servers/server-paths.md"},
+            {"source": "doc/build-clients-and-servers/auth.md"},
+            {"source": "doc/build-clients-and-servers/tooling-workflow.md"},
+            {"source": "doc/operate/production-guide.md"},
+            {"source": "doc/operate/runtime-errors.md"},
+            {"source": "doc/background-and-reference/faq.md"},
+            {"source": "doc/background-and-reference/motivation.md"},
         ),
     },
     {
         "output": "learn-by-example.md",
         "title": "Learn by Example",
-        "intro": "doc/01-learn-by-example/README.md",
+        "intro": "doc/learn-by-example/README.md",
         "sections": (
-            {"source": "doc/01-learn-by-example/01-getting-started/installation.md"},
-            {"source": "doc/01-learn-by-example/01-getting-started/ping.md"},
-            {"source": "doc/01-learn-by-example/01-getting-started/schema-and-add.md"},
-            {"source": "doc/01-learn-by-example/01-getting-started/data-type-validation.md"},
-            {"source": "doc/01-learn-by-example/02-schema/scalar-types.md"},
-            {"source": "doc/01-learn-by-example/02-schema/collection-types.md"},
-            {"source": "doc/01-learn-by-example/02-schema/structs.md"},
-            {"source": "doc/01-learn-by-example/02-schema/unions.md"},
-            {"source": "doc/01-learn-by-example/02-schema/functions.md"},
-            {"source": "doc/01-learn-by-example/02-schema/service-errors.md"},
-            {"source": "doc/01-learn-by-example/02-schema/headers.md"},
-            {"source": "doc/01-learn-by-example/02-schema/comments.md"},
-            {"source": "doc/01-learn-by-example/03-opt-in-features/select.md"},
-            {"source": "doc/01-learn-by-example/03-opt-in-features/binary.md"},
-            {"source": "doc/01-learn-by-example/04-mocking-an-integration/mock-server.md"},
-            {"source": "doc/01-learn-by-example/04-mocking-an-integration/stock-mock.md"},
-            {"source": "doc/01-learn-by-example/04-mocking-an-integration/stubs.md"},
-            {"source": "doc/01-learn-by-example/04-mocking-an-integration/verify.md"},
-            {"source": "doc/01-learn-by-example/05-auth/auth.md"},
-            {"source": "doc/01-learn-by-example/06-using-telepact-client-library-code/minimum-python-client.md"},
-            {"source": "doc/01-learn-by-example/06-using-telepact-client-library-code/automatic-binary-negotiation.md"},
-            {"source": "doc/01-learn-by-example/07-code-generation/code-generation.md"},
-            {"source": "doc/01-learn-by-example/08-running-our-own-server/minimum-server.md"},
-            {"source": "doc/01-learn-by-example/08-running-our-own-server/logging.md"},
-            {"source": "doc/01-learn-by-example/08-running-our-own-server/server-auth.md"},
-            {"source": "doc/01-learn-by-example/08-running-our-own-server/managed-auth.md"},
-            {"source": "doc/01-learn-by-example/08-running-our-own-server/schema-evolution.md"},
-            {"source": "doc/01-learn-by-example/08-running-our-own-server/test-client-tdd.md"},
-            {"source": "doc/01-learn-by-example/08-running-our-own-server/server-best-practices.md"},
+            {"source": "doc/learn-by-example/01-getting-started/installation.md"},
+            {"source": "doc/learn-by-example/01-getting-started/ping.md"},
+            {"source": "doc/learn-by-example/01-getting-started/schema-and-add.md"},
+            {"source": "doc/learn-by-example/01-getting-started/data-type-validation.md"},
+            {"source": "doc/learn-by-example/02-schema/scalar-types.md"},
+            {"source": "doc/learn-by-example/02-schema/collection-types.md"},
+            {"source": "doc/learn-by-example/02-schema/structs.md"},
+            {"source": "doc/learn-by-example/02-schema/unions.md"},
+            {"source": "doc/learn-by-example/02-schema/functions.md"},
+            {"source": "doc/learn-by-example/02-schema/service-errors.md"},
+            {"source": "doc/learn-by-example/02-schema/headers.md"},
+            {"source": "doc/learn-by-example/02-schema/comments.md"},
+            {"source": "doc/learn-by-example/03-opt-in-features/select.md"},
+            {"source": "doc/learn-by-example/03-opt-in-features/binary.md"},
+            {"source": "doc/learn-by-example/04-mocking-an-integration/mock-server.md"},
+            {"source": "doc/learn-by-example/04-mocking-an-integration/stock-mock.md"},
+            {"source": "doc/learn-by-example/04-mocking-an-integration/stubs.md"},
+            {"source": "doc/learn-by-example/04-mocking-an-integration/verify.md"},
+            {"source": "doc/learn-by-example/05-auth/auth.md"},
+            {"source": "doc/learn-by-example/06-using-telepact-client-library-code/minimum-python-client.md"},
+            {"source": "doc/learn-by-example/06-using-telepact-client-library-code/automatic-binary-negotiation.md"},
+            {"source": "doc/learn-by-example/07-code-generation/code-generation.md"},
+            {"source": "doc/learn-by-example/08-running-our-own-server/minimum-server.md"},
+            {"source": "doc/learn-by-example/08-running-our-own-server/logging.md"},
+            {"source": "doc/learn-by-example/08-running-our-own-server/server-auth.md"},
+            {"source": "doc/learn-by-example/08-running-our-own-server/managed-auth.md"},
+            {"source": "doc/learn-by-example/08-running-our-own-server/schema-evolution.md"},
+            {"source": "doc/learn-by-example/08-running-our-own-server/test-client-tdd.md"},
+            {"source": "doc/learn-by-example/08-running-our-own-server/server-best-practices.md"},
         ),
     },
     {
@@ -420,6 +420,12 @@ class GeneratedTarget:
 
 
 ORDERED_NAME_RE = re.compile(r"^(?P<order>\d+)(?:[-_.]|$)(?P<name>.*)$")
+TOP_LEVEL_DOC_DIR_ORDER = {
+    "design-apis": 2,
+    "build-clients-and-servers": 3,
+    "operate": 4,
+    "background-and-reference": 5,
+}
 DISPLAY_TOKEN_MAP = {
     "api": "API",
     "apis": "APIs",
@@ -445,13 +451,17 @@ def split_ordered_name(name: str) -> tuple[int, str]:
     return 10**9, name
 
 
-def sort_nav_paths(paths: list[Path]) -> list[Path]:
+def sort_nav_paths(paths: list[Path], order_overrides: dict[str, int] | None = None) -> list[Path]:
+    def sort_key(path: Path) -> tuple[int, str]:
+        raw_name = path.stem if path.is_file() else path.name
+        if order_overrides is not None and raw_name in order_overrides:
+            return order_overrides[raw_name], raw_name.lower()
+        order, remainder = split_ordered_name(raw_name)
+        return order, remainder.lower()
+
     return sorted(
         paths,
-        key=lambda path: (
-            split_ordered_name(path.stem if path.is_file() else path.name)[0],
-            split_ordered_name(path.stem if path.is_file() else path.name)[1].lower(),
-        ),
+        key=sort_key,
     )
 
 
@@ -1101,9 +1111,9 @@ def nav_groups(pages: dict[Path, Page]) -> list[NavGroup]:
 
     top_level_dirs = [
         child for child in doc_root.iterdir()
-        if child.is_dir() and split_ordered_name(child.name)[0] != 10**9
+        if child.is_dir() and child != example_root
     ]
-    for directory in sort_nav_paths(top_level_dirs):
+    for directory in sort_nav_paths(top_level_dirs, order_overrides=TOP_LEVEL_DOC_DIR_ORDER):
         landing = directory_landing_page(pages, directory)
         heading = landing.title if landing is not None else display_name(directory)
         items = nav_links_for_directory(pages, directory)

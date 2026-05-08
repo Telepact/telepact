@@ -153,7 +153,7 @@ shape internally.
 
 See:
 
-- [Learn by Example: Managed auth](../01-learn-by-example/08-running-our-own-server/managed-auth.md)
+- [Learn by Example: Managed auth](../learn-by-example/08-running-our-own-server/managed-auth.md)
 - [`example/py-http-cookie-auth`](../../example/py-http-cookie-auth/README.md)
 
 ## Service-to-service flow

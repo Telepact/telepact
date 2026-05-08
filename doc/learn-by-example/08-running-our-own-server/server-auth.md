@@ -2,7 +2,7 @@
 
 Now let's add one piece of Telepact's auth convention to our own server.
 For the full canonical path, see the
-[Auth Guide](../../03-build-clients-and-servers/auth.md).
+[Auth Guide](../../build-clients-and-servers/auth.md).
 
 ## Install the Python library
 

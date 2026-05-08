@@ -78,6 +78,6 @@ This is the workflow we want in server development: evolve the schema, then let
 
 For the practical Git-based workflow to compare the checked-in schema directory
 on your branch with `origin/main` or a release tag, see
-[Tooling Workflow: Compare schema versions](../../../03-build-clients-and-servers/tooling-workflow.md#compare-schema-versions).
+[Tooling Workflow: Compare schema versions](../../../build-clients-and-servers/tooling-workflow.md#compare-schema-versions).
 
 Next: [27. TDD with TestClient](./test-client-tdd.md)

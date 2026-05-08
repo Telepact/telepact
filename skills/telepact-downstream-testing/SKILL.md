@@ -153,7 +153,7 @@ The most important ones are:
 
 The exact `_ext.Stub_`, `_ext.Call_`, and `@select_` shapes used by these mock
 controls are documented here:
-https://raw.githubusercontent.com/Telepact/telepact/main/doc/02-design-apis/extensions.md
+https://raw.githubusercontent.com/Telepact/telepact/main/doc/design-apis/extensions.md
 
 Use generated responses by default. Add explicit stubs only when the test needs a very specific downstream behavior.
 

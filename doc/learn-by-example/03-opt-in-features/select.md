@@ -26,7 +26,7 @@ The schema entry looks like this:
 ```
 
 For the full rule set, see the
-[`_ext.Select_` guide](../../02-design-apis/select-extension.md).
+[`_ext.Select_` guide](../../design-apis/select-extension.md).
 
 ## Compare a full response with a selected response
 

@@ -21,7 +21,7 @@ This path works well when you want:
 Start here:
 
 - [Quickstart](../example.md)
-- [Core Concepts](../02-design-apis/core-concepts.md)
+- [Core Concepts](../design-apis/core-concepts.md)
 - [Transport Guide](./transports.md)
 
 ## Path 2: Telepact client library
@@ -62,7 +62,7 @@ This path works well when you want:
 
 Start here:
 
-- [Learn by Example: Code generation](../01-learn-by-example/07-code-generation/code-generation.md)
+- [Learn by Example: Code generation](../learn-by-example/07-code-generation/code-generation.md)
 - [Tooling Workflow](./tooling-workflow.md)
 - [Telepact CLI](../../sdk/cli/README.md)
 

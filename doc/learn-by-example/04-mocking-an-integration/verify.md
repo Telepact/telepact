@@ -34,7 +34,7 @@ The entry looks like this:
 ```
 
 For the `_ext.Call_` shape, see the
-[mock extensions guide](../../02-design-apis/mock-extensions.md).
+[mock extensions guide](../../design-apis/mock-extensions.md).
 
 ## Verify before the call
 
