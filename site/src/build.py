@@ -577,7 +577,7 @@ def replace_inline_links(markdown: str, source: Path, current_output: Path, targ
     return "\n".join(rendered)
 
 
-def example_code_language(path: Path) -> str:
+def example_code_language(path: Path) -> str | None:
     if path.name == "Makefile":
         return "bash"
     if path.name.endswith(".telepact.yaml"):
@@ -602,7 +602,7 @@ def example_code_language(path: Path) -> str:
         return "html"
     if path.suffix == ".css":
         return "css"
-    return ""
+    return None
 
 
 def example_source_files(example_dir: Path) -> list[Path]:
@@ -714,6 +714,9 @@ def example_sources_markdown(example_dir: Path) -> str:
         heading_level = "####" if top_level is not None else "###"
         parts.append(f"{heading_level} {rel}")
         lang = example_code_language(file_path)
+        if lang is None:
+            continue
+        print(f"Adding example source file to docs: {file_path} (lang={lang})")
         code = file_path.read_text(encoding='utf-8').rstrip("\n")
         parts.append(f"```{lang}\n{code}\n```")
     return "\n\n".join(parts)
