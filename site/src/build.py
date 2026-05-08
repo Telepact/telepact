@@ -38,6 +38,8 @@ MARKDOWN_DOCS_DIR = SITE_DIR / "markdown-docs"
 GENERATED_SOURCE_DIR = SITE_ROOT / ".generated-docs"
 GENERATED_DOCS_SOURCE_DIR = GENERATED_SOURCE_DIR / "docs"
 INDEX_TEMPLATE = SOURCE_DIR / "index.template.html"
+DOCS_TEMPLATE = SOURCE_DIR / "docs.template.html"
+DOCS_CSS_SOURCE = SOURCE_DIR / "docs.css"
 INDEX_OUTPUT = SITE_DIR / "index.html"
 LLMS_OUTPUT = SITE_DIR / "llms.txt"
 SNIPPETS_DIR = SOURCE_DIR / "snippets"
@@ -319,6 +321,13 @@ def render_snippet(raw_path: str, lang: str) -> str:
     snippet_text = snippet_path.read_text(encoding="utf-8").rstrip("\n")
     snippet_html = snippet_text.replace("&", "&amp;").replace("<", "&lt;")
     return f'<pre><code class="language-{lang}">{snippet_html}</code></pre>'
+
+
+def render_template(template_path: Path, replacements: dict[str, str]) -> str:
+    rendered = template_path.read_text(encoding="utf-8")
+    for key, value in replacements.items():
+        rendered = rendered.replace(f"{{{{{key}}}}}", value)
+    return rendered
 
 
 def write_home_page() -> int:
@@ -1088,6 +1097,7 @@ def page_by_rel_source(pages: dict[Path, Page], rel_source: str) -> Page | None:
 
 def nav_groups(pages: dict[Path, Page]) -> list[NavGroup]:
     doc_root = GENERATED_DOCS_SOURCE_DIR
+    example_root = doc_root / "examples"
     groups: list[NavGroup] = []
 
     root_items: list[NavLink] = []
@@ -1212,562 +1222,30 @@ def page_shell(page: Page, body_html: str, pages: dict[Path, Page], resources: s
     favicon_href = relative_href(page.output_file.parent, SITE_DIR / "favicon.ico")
     canonical = posixpath.join(BASE_URL.rstrip("/"), page.url.lstrip("/"))
     prism_scripts = "\n".join(f'<script src="{src}"></script>' for src in PRISM_JS)
-    return f"""<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{html.escape(page.title)} | Telepact Documentation</title>
-  <meta name="description" content="{html.escape(page_excerpt(page))}">
-  <link rel="canonical" href="{html.escape(canonical)}">
-  <link rel="icon" href="{favicon_href}" sizes="any">
-  <link rel="icon" type="image/x-icon" href="{favicon_href}">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{PRISM_CSS}">
-  <link rel="stylesheet" href="{css_href}">
-</head>
-<body>
-  <div class="bg-grid"></div>
-  <div class="bg-glow bg-glow-1"></div>
-  <div class="bg-glow bg-glow-2"></div>
-
-  <nav class="navbar" aria-label="Main navigation">
-    <div class="container">
-      <a href="{home_href}" class="navbar-logo" aria-label="Telepact home">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="#38BDF8" stroke-width="1.5">
-          <path d="M 2.093 6.908 C 0.414 4.35 1.447 0.938 3 1 C 3.67 1.171 3.799 1.352 4.057 1.946 C 4.833 4.117 4 11 2 23 L 16 23 M 18 2 A 1 1 0 0 0 17 1 L 3 1 M 18 2 L 18 5 M 16 23 C 16.619 20.297 16.959 17.314 17.252 15.902"/>
-          <g stroke="#EAB308"><path d="M 10 17 L 15 10 L 15 12 L 19 8 L 19.008 9.317 L 23 6 L 18 13 L 18 11 L 14 15 L 13.996 13.561 L 10 17"/></g>
-        </svg>
-        Telepact
-      </a>
-      <div class="navbar-links">
-        <a href="{home_href}">Home</a>
-        <a href="{docs_home_href}" class="active">Documentation</a>
-        <a href="{REPO_URL}" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-          GitHub
-        </a>
-      </div>
-    </div>
-  </nav>
-
-  <main class="docs-layout container">
-    <aside class="docs-sidebar">
-      {render_nav(page, pages, resources)}
-    </aside>
-
-    <section class="docs-main">
-      <article class="docs-article">
-        {body_html}
-      </article>
-    </section>
-
-    {render_toc(page)}
-  </main>
-
-  <footer class="footer">
-    <div class="container">
-      <ul class="footer-links">
-        <li><a href="{REPO_URL}" target="_blank" rel="noopener noreferrer">GitHub</a></li>
-        <li><a href="{docs_home_href}">Documentation</a></li>
-        <li><a href="{REPO_URL}/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">Apache 2.0 License</a></li>
-      </ul>
-      <p>&copy; Telepact Contributors. Open source under the Apache 2.0 License.</p>
-    </div>
-  </footer>
-
-  {prism_scripts}
-</body>
-</html>
-"""
+    return render_template(
+        DOCS_TEMPLATE,
+        {
+            "PAGE_TITLE": html.escape(page.title),
+            "PAGE_DESCRIPTION": html.escape(page_excerpt(page)),
+            "CANONICAL_URL": html.escape(canonical),
+            "FAVICON_HREF": html.escape(favicon_href),
+            "PRISM_CSS_HREF": html.escape(PRISM_CSS),
+            "DOCS_CSS_HREF": html.escape(css_href),
+            "HOME_HREF": html.escape(home_href),
+            "DOCS_HOME_HREF": html.escape(docs_home_href),
+            "REPO_URL": html.escape(REPO_URL),
+            "NAVIGATION": render_nav(page, pages, resources),
+            "BODY_HTML": body_html,
+            "TOC": render_toc(page),
+            "PRISM_SCRIPTS": prism_scripts,
+        },
+    )
 
 
 def write_css() -> None:
-    css = """*,
-*::before,
-*::after { box-sizing: border-box; }
-
-:root {
-  --bg: #0B0F1A;
-  --bg-card: rgba(17, 24, 39, 0.86);
-  --bg-elevated: rgba(15, 23, 42, 0.88);
-  --bg-code: #101827;
-  --border: rgba(56, 189, 248, 0.16);
-  --border-strong: rgba(56, 189, 248, 0.28);
-  --text: #e2e8f0;
-  --text-muted: #94a3b8;
-  --accent: #38BDF8;
-  --accent-soft: rgba(56, 189, 248, 0.12);
-  --yellow: #EAB308;
-  --shadow: 0 24px 70px rgba(2, 6, 23, 0.36);
-  --radius: 16px;
-  --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --mono: 'JetBrains Mono', 'Fira Code', monospace;
-}
-
-html { scroll-behavior: smooth; }
-body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--text);
-  font-family: var(--font);
-  line-height: 1.75;
-  -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
-}
-
-a { color: var(--accent); text-decoration: none; }
-a:hover { color: #7dd3fc; }
-
-.bg-grid {
-  position: fixed;
-  inset: 0;
-  z-index: -2;
-  background-image:
-    linear-gradient(rgba(56, 189, 248, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(56, 189, 248, 0.03) 1px, transparent 1px);
-  background-size: 60px 60px;
-}
-
-.bg-glow {
-  position: fixed;
-  z-index: -1;
-  width: 520px;
-  height: 520px;
-  border-radius: 50%;
-  filter: blur(120px);
-  opacity: 0.12;
-  pointer-events: none;
-}
-
-.bg-glow-1 { top: -160px; right: -80px; background: var(--accent); }
-.bg-glow-2 { bottom: -180px; left: -80px; background: #A78BFA; }
-
-.container { max-width: 1440px; margin: 0 auto; padding: 0 24px; }
-
-.navbar {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  padding: 16px 0;
-  background: rgba(11, 15, 26, 0.8);
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(31, 41, 55, 0.5);
-}
-
-.navbar .container {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.navbar-logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--text);
-}
-
-.navbar-logo svg {
-  width: 28px;
-  height: 28px;
-}
-
-.navbar-links {
-  display: flex;
-  align-items: center;
-  gap: 32px;
-  list-style: none;
-}
-
-.navbar-links a {
-  color: var(--text-muted);
-  font-size: 0.9rem;
-  font-weight: 500;
-  transition: color 0.2s;
-}
-
-.navbar-links a.active,
-.navbar-links a:hover { color: var(--text); }
-
-.navbar .btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 22px;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 0.9rem;
-  transition: all 0.2s;
-  border: none;
-  cursor: pointer;
-  font-family: var(--font);
-}
-
-.navbar .btn svg {
-  width: 1.65em;
-  height: 1.65em;
-  flex: none;
-}
-
-.navbar .btn-secondary {
-  background: transparent;
-  color: var(--text);
-  border: 1px solid var(--border);
-}
-
-.navbar .btn-secondary:hover {
-  border-color: var(--accent);
-  background: rgba(56, 189, 248, 0.08);
-}
-
-.docs-layout {
-  display: grid;
-  grid-template-columns: minmax(250px, 300px) minmax(0, 1fr) minmax(180px, 220px);
-  gap: 28px;
-  padding-top: 36px;
-  padding-bottom: 48px;
-  align-items: start;
-}
-
-.docs-sidebar,
-.docs-toc {
-  position: sticky;
-  top: 104px;
-}
-
-.sidebar-card,
-.docs-nav-group,
-.docs-article {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-}
-
-.intro-card {
-  padding: 20px;
-  margin-bottom: 18px;
-}
-
-.sidebar-label {
-  color: var(--accent);
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  font-weight: 700;
-  font-size: 0.72rem;
-  margin-bottom: 10px;
-}
-
-.intro-card h2 {
-  margin: 0 0 10px;
-  font-size: 1.35rem;
-  line-height: 1.2;
-}
-
-.intro-card p {
-  margin: 0;
-  color: var(--text-muted);
-  font-size: 0.96rem;
-}
-
-.sidebar-actions {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-top: 18px;
-}
-
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 999px;
-  padding: 10px 16px;
-  font-size: 0.88rem;
-  font-weight: 700;
-  transition: 0.2s ease;
-}
-
-.btn-primary {
-  background: var(--accent);
-  color: #0b0f1a;
-}
-
-.btn-primary:hover {
-  color: #0b0f1a;
-  transform: translateY(-1px);
-}
-
-.btn-secondary {
-  background: var(--accent-soft);
-  border: 1px solid var(--border);
-  color: var(--text);
-}
-
-.btn-secondary:hover { border-color: var(--border-strong); }
-
-.source-path {
-  margin-top: 16px;
-  padding-top: 14px;
-  border-top: 1px solid rgba(56, 189, 248, 0.1);
-  color: var(--text-muted);
-  font-family: var(--mono);
-  font-size: 0.78rem;
-}
-
-.docs-nav-group {
-  padding: 16px 18px;
-  margin-bottom: 14px;
-}
-
-.docs-nav-group h3 {
-  margin: 0 0 12px;
-  color: var(--text);
-  font-size: 0.98rem;
-}
-
-.docs-nav-subgroup + .docs-nav-subgroup,
-.docs-nav-group ul + .docs-nav-subgroup {
-  margin-top: 14px;
-  padding-top: 14px;
-  border-top: 1px solid rgba(56, 189, 248, 0.08);
-}
-
-.docs-nav-subheading {
-  margin-bottom: 10px;
-  color: var(--accent);
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.docs-nav-group ul,
-.docs-toc ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.docs-nav-group li + li,
-.docs-toc li + li { margin-top: 8px; }
-
-.docs-nav-group a,
-.docs-toc a {
-  color: var(--text-muted);
-  font-size: 0.92rem;
-}
-
-.docs-nav-group a.active,
-.docs-nav-group a:hover,
-.docs-toc a:hover,
-.docs-toc a:focus-visible {
-  color: var(--text);
-}
-
-.docs-main { min-width: 0; }
-
-.docs-article {
-  padding: clamp(24px, 3vw, 40px);
-}
-
-.docs-article > :first-child { margin-top: 0; }
-.docs-article > :last-child { margin-bottom: 0; }
-
-.docs-article h1,
-.docs-article h2,
-.docs-article h3,
-.docs-article h4,
-.docs-article h5,
-.docs-article h6 {
-  position: relative;
-  margin-top: 2.1em;
-  margin-bottom: 0.7em;
-  line-height: 1.2;
-  color: #f8fafc;
-}
-
-.docs-article h1 { font-size: clamp(2rem, 4vw, 2.8rem); margin-top: 0; }
-.docs-article h2 { font-size: 1.55rem; }
-.docs-article h3 { font-size: 1.22rem; }
-
-.heading-anchor {
-  position: absolute;
-  left: -1.2em;
-  opacity: 0;
-  color: var(--accent);
-}
-
-.docs-article h1:hover .heading-anchor,
-.docs-article h2:hover .heading-anchor,
-.docs-article h3:hover .heading-anchor,
-.docs-article h4:hover .heading-anchor,
-.docs-article h5:hover .heading-anchor,
-.docs-article h6:hover .heading-anchor { opacity: 1; }
-
-.docs-article p,
-.docs-article li,
-.docs-article td,
-.docs-article th {
-  color: var(--text);
-}
-
-.docs-article p { margin: 0 0 1.1em; }
-
-.docs-article ul,
-.docs-article ol {
-  margin: 0 0 1.2em 1.3em;
-  padding: 0;
-}
-
-.docs-article li > p:first-child { margin-top: 0; }
-.docs-article li > p:last-child { margin-bottom: 0; }
-.docs-article li + li { margin-top: 0.45em; }
-
-.docs-article code {
-  font-family: var(--mono);
-  font-size: 0.92em;
-  background: rgba(56, 189, 248, 0.1);
-  border: 1px solid rgba(56, 189, 248, 0.14);
-  border-radius: 8px;
-  padding: 0.16em 0.4em;
-}
-
-.code-block {
-  margin: 1.25em 0 1.5em;
-  border: 1px solid rgba(56, 189, 248, 0.18);
-  border-radius: 14px;
-  overflow: hidden;
-  background: var(--bg-code);
-}
-
-.code-block pre {
-  margin: 0;
-  padding: 18px;
-  overflow-x: auto;
-}
-
-.code-block code {
-  background: none;
-  border: none;
-  padding: 0;
-}
-
-.table-wrap {
-  overflow-x: auto;
-  margin: 1.25em 0 1.5em;
-  border: 1px solid rgba(56, 189, 248, 0.14);
-  border-radius: 14px;
-  background: rgba(15, 23, 42, 0.74);
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-th,
-td {
-  padding: 12px 14px;
-  border-bottom: 1px solid rgba(56, 189, 248, 0.1);
-  text-align: left;
-  vertical-align: top;
-}
-
-th {
-  color: #f8fafc;
-  background: rgba(56, 189, 248, 0.08);
-}
-
-tbody tr:last-child td { border-bottom: none; }
-
-.docs-toc .sidebar-card {
-  padding: 16px 18px;
-  max-height: calc(100vh - 128px);
-  overflow-y: hidden;
-  overscroll-behavior: contain;
-  scrollbar-gutter: stable;
-}
-
-.docs-toc .sidebar-card:hover,
-.docs-toc .sidebar-card:focus-within {
-  overflow-y: auto;
-}
-
-.toc-level-3 { margin-left: 12px; }
-
-.footer {
-  padding: 40px 0;
-  border-top: 1px solid var(--border);
-  text-align: center;
-}
-
-.footer p {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-}
-
-.footer-links {
-  display: flex;
-  gap: 24px;
-  justify-content: center;
-  margin-bottom: 16px;
-  list-style: none;
-  padding: 0;
-}
-
-.footer-links a {
-  color: var(--text-muted);
-  font-size: 0.85rem;
-}
-
-.footer-links a:hover { color: var(--text); }
-
-@media (max-width: 1180px) {
-  .docs-layout {
-    grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
-  }
-
-  .docs-toc { display: none; }
-}
-
-@media (max-width: 860px) {
-  .navbar .container {
-    min-height: auto;
-    padding-top: 18px;
-    padding-bottom: 18px;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-  }
-
-  .docs-layout {
-    grid-template-columns: 1fr;
-    gap: 18px;
-  }
-
-  .docs-sidebar,
-  .docs-toc {
-    position: static;
-  }
-
-  .heading-anchor { display: none; }
-}
-
-@media (hover: none) {
-  .docs-toc .sidebar-card {
-    overflow-y: auto;
-  }
-}
-"""
     assets_dir = DOCS_DIR / "assets"
     assets_dir.mkdir(parents=True, exist_ok=True)
-    (assets_dir / "docs.css").write_text(css, encoding="utf-8")
+    shutil.copy2(DOCS_CSS_SOURCE, assets_dir / "docs.css")
 
 
 def write_pages(pages: dict[Path, Page], resources: set[Path]) -> None:
