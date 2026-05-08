@@ -16,9 +16,6 @@
   const navGroups = Array.from(document.querySelectorAll('.docs-nav-group'))
     .filter((group) => group instanceof HTMLElement)
     .map((group) => {
-      if (!(group instanceof HTMLElement)) {
-        return null;
-      }
       const directChildren = Array.from(group.children);
       const topLevelList = directChildren.find((child) => child.tagName === 'UL');
       const subgroups = directChildren
@@ -42,11 +39,10 @@
           .map((item) => ({
             element: item,
             text: normalize(item.textContent || ''),
-          })),
+        })),
         subgroups,
       };
-    })
-    .filter((group) => group !== null);
+    });
 
   /**
    * @param {Array<{ element: HTMLElement; text: string }>} items
