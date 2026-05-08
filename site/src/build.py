@@ -420,6 +420,13 @@ class GeneratedTarget:
 
 
 ORDERED_NAME_RE = re.compile(r"^(?P<order>\d+)(?:[-_.]|$)(?P<name>.*)$")
+TOP_LEVEL_DOC_DIR_ORDER = {
+    "design-apis": 2,
+    "build-clients-and-servers": 3,
+    "operate": 4,
+    "background-and-reference": 5,
+    "01-learn-by-example": 6,
+}
 DISPLAY_TOKEN_MAP = {
     "api": "API",
     "apis": "APIs",
@@ -445,13 +452,17 @@ def split_ordered_name(name: str) -> tuple[int, str]:
     return 10**9, name
 
 
-def sort_nav_paths(paths: list[Path]) -> list[Path]:
+def sort_nav_paths(paths: list[Path], order_overrides: dict[str, int] | None = None) -> list[Path]:
+    def sort_key(path: Path) -> tuple[int, str]:
+        raw_name = path.stem if path.is_file() else path.name
+        if order_overrides is not None and raw_name in order_overrides:
+            return order_overrides[raw_name], raw_name.lower()
+        order, remainder = split_ordered_name(raw_name)
+        return order, remainder.lower()
+
     return sorted(
         paths,
-        key=lambda path: (
-            split_ordered_name(path.stem if path.is_file() else path.name)[0],
-            split_ordered_name(path.stem if path.is_file() else path.name)[1].lower(),
-        ),
+        key=sort_key,
     )
 
 
@@ -1102,9 +1113,9 @@ def nav_groups(pages: dict[Path, Page]) -> list[NavGroup]:
 
     top_level_dirs = [
         child for child in doc_root.iterdir()
-        if child.is_dir() and child != example_root and split_ordered_name(child.name)[0] != 10**9
+        if child.is_dir() and child != example_root
     ]
-    for directory in sort_nav_paths(top_level_dirs):
+    for directory in sort_nav_paths(top_level_dirs, order_overrides=TOP_LEVEL_DOC_DIR_ORDER):
         landing = directory_landing_page(pages, directory)
         heading = landing.title if landing is not None else display_name(directory)
         items = nav_links_for_directory(pages, directory)
