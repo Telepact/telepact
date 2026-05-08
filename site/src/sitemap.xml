@@ -13,247 +13,247 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://telepact.github.io/telepact/docs/01-learn-by-example/</loc>
+    <loc>https://telepact.github.io/telepact/docs/learn-by-example/</loc>
     <lastmod>2026-04-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://telepact.github.io/telepact/docs/01-learn-by-example/01-getting-started/00-installation/</loc>
+    <loc>https://telepact.github.io/telepact/docs/learn-by-example/getting-started/00-installation/</loc>
     <lastmod>2026-04-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://telepact.github.io/telepact/docs/01-learn-by-example/01-getting-started/01-ping/</loc>
+    <loc>https://telepact.github.io/telepact/docs/learn-by-example/getting-started/01-ping/</loc>
     <lastmod>2026-04-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://telepact.github.io/telepact/docs/01-learn-by-example/01-getting-started/02-schema-and-add/</loc>
+    <loc>https://telepact.github.io/telepact/docs/learn-by-example/getting-started/schema-and-add/</loc>
     <lastmod>2026-04-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://telepact.github.io/telepact/docs/01-learn-by-example/01-getting-started/03-data-type-validation/</loc>
+    <loc>https://telepact.github.io/telepact/docs/learn-by-example/getting-started/03-data-type-validation/</loc>
     <lastmod>2026-04-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://telepact.github.io/telepact/docs/01-learn-by-example/02-schema/04-scalar-types/</loc>
+    <loc>https://telepact.github.io/telepact/docs/learn-by-example/schema/04-scalar-types/</loc>
     <lastmod>2026-04-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://telepact.github.io/telepact/docs/01-learn-by-example/02-schema/05-collection-types/</loc>
+    <loc>https://telepact.github.io/telepact/docs/learn-by-example/schema/05-collection-types/</loc>
     <lastmod>2026-04-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://telepact.github.io/telepact/docs/01-learn-by-example/02-schema/06-structs/</loc>
+    <loc>https://telepact.github.io/telepact/docs/learn-by-example/schema/06-structs/</loc>
     <lastmod>2026-04-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://telepact.github.io/telepact/docs/01-learn-by-example/02-schema/07-unions/</loc>
+    <loc>https://telepact.github.io/telepact/docs/learn-by-example/schema/07-unions/</loc>
     <lastmod>2026-04-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://telepact.github.io/telepact/docs/01-learn-by-example/02-schema/08-functions/</loc>
+    <loc>https://telepact.github.io/telepact/docs/learn-by-example/schema/08-functions/</loc>
     <lastmod>2026-04-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://telepact.github.io/telepact/docs/01-learn-by-example/02-schema/09-service-errors/</loc>
+    <loc>https://telepact.github.io/telepact/docs/learn-by-example/schema/09-service-errors/</loc>
     <lastmod>2026-04-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://telepact.github.io/telepact/docs/01-learn-by-example/02-schema/10-headers/</loc>
+    <loc>https://telepact.github.io/telepact/docs/learn-by-example/schema/10-headers/</loc>
     <lastmod>2026-04-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://telepact.github.io/telepact/docs/01-learn-by-example/02-schema/11-comments/</loc>
+    <loc>https://telepact.github.io/telepact/docs/learn-by-example/schema/11-comments/</loc>
     <lastmod>2026-04-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://telepact.github.io/telepact/docs/01-learn-by-example/03-opt-in-features/12-select/</loc>
+    <loc>https://telepact.github.io/telepact/docs/learn-by-example/opt-in-features/12-select/</loc>
     <lastmod>2026-04-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://telepact.github.io/telepact/docs/01-learn-by-example/03-opt-in-features/13-binary/</loc>
+    <loc>https://telepact.github.io/telepact/docs/learn-by-example/opt-in-features/13-binary/</loc>
     <lastmod>2026-04-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://telepact.github.io/telepact/docs/01-learn-by-example/04-mocking-an-integration/14-mock-server/</loc>
+    <loc>https://telepact.github.io/telepact/docs/learn-by-example/mocking-an-integration/14-mock-server/</loc>
     <lastmod>2026-04-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://telepact.github.io/telepact/docs/01-learn-by-example/04-mocking-an-integration/15-stock-mock/</loc>
+    <loc>https://telepact.github.io/telepact/docs/learn-by-example/mocking-an-integration/15-stock-mock/</loc>
     <lastmod>2026-04-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://telepact.github.io/telepact/docs/01-learn-by-example/04-mocking-an-integration/16-stubs/</loc>
+    <loc>https://telepact.github.io/telepact/docs/learn-by-example/mocking-an-integration/16-stubs/</loc>
     <lastmod>2026-04-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://telepact.github.io/telepact/docs/01-learn-by-example/04-mocking-an-integration/17-verify/</loc>
+    <loc>https://telepact.github.io/telepact/docs/learn-by-example/mocking-an-integration/17-verify/</loc>
     <lastmod>2026-04-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://telepact.github.io/telepact/docs/01-learn-by-example/05-auth/18-auth/</loc>
+    <loc>https://telepact.github.io/telepact/docs/learn-by-example/auth/18-auth/</loc>
     <lastmod>2026-04-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://telepact.github.io/telepact/docs/01-learn-by-example/06-using-telepact-client-library-code/19-minimum-python-client/</loc>
+    <loc>https://telepact.github.io/telepact/docs/learn-by-example/using-telepact-client-library-code/19-minimum-python-client/</loc>
     <lastmod>2026-04-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://telepact.github.io/telepact/docs/01-learn-by-example/06-using-telepact-client-library-code/20-automatic-binary-negotiation/</loc>
+    <loc>https://telepact.github.io/telepact/docs/learn-by-example/using-telepact-client-library-code/20-automatic-binary-negotiation/</loc>
     <lastmod>2026-04-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://telepact.github.io/telepact/docs/01-learn-by-example/07-code-generation/21-code-generation/</loc>
+    <loc>https://telepact.github.io/telepact/docs/learn-by-example/code-generation/21-code-generation/</loc>
     <lastmod>2026-04-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://telepact.github.io/telepact/docs/01-learn-by-example/08-running-our-own-server/22-minimum-server/</loc>
+    <loc>https://telepact.github.io/telepact/docs/learn-by-example/running-our-own-server/22-minimum-server/</loc>
     <lastmod>2026-04-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://telepact.github.io/telepact/docs/01-learn-by-example/08-running-our-own-server/23-logging/</loc>
+    <loc>https://telepact.github.io/telepact/docs/learn-by-example/running-our-own-server/23-logging/</loc>
     <lastmod>2026-04-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://telepact.github.io/telepact/docs/01-learn-by-example/08-running-our-own-server/24-server-auth/</loc>
+    <loc>https://telepact.github.io/telepact/docs/learn-by-example/running-our-own-server/24-server-auth/</loc>
     <lastmod>2026-04-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://telepact.github.io/telepact/docs/01-learn-by-example/08-running-our-own-server/25-managed-auth/</loc>
+    <loc>https://telepact.github.io/telepact/docs/learn-by-example/running-our-own-server/25-managed-auth/</loc>
     <lastmod>2026-04-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://telepact.github.io/telepact/docs/01-learn-by-example/08-running-our-own-server/26-schema-evolution/</loc>
+    <loc>https://telepact.github.io/telepact/docs/learn-by-example/running-our-own-server/26-schema-evolution/</loc>
     <lastmod>2026-04-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://telepact.github.io/telepact/docs/01-learn-by-example/08-running-our-own-server/27-test-client-tdd/</loc>
+    <loc>https://telepact.github.io/telepact/docs/learn-by-example/running-our-own-server/27-test-client-tdd/</loc>
     <lastmod>2026-04-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://telepact.github.io/telepact/docs/01-learn-by-example/08-running-our-own-server/28-server-best-practices/</loc>
+    <loc>https://telepact.github.io/telepact/docs/learn-by-example/running-our-own-server/28-server-best-practices/</loc>
     <lastmod>2026-04-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://telepact.github.io/telepact/docs/02-design-apis/01-schema-guide/</loc>
+    <loc>https://telepact.github.io/telepact/docs/design-apis/01-schema-guide/</loc>
     <lastmod>2026-04-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://telepact.github.io/telepact/docs/02-design-apis/02-core-concepts/</loc>
+    <loc>https://telepact.github.io/telepact/docs/design-apis/02-core-concepts/</loc>
     <lastmod>2026-04-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://telepact.github.io/telepact/docs/02-design-apis/03-extensions/</loc>
+    <loc>https://telepact.github.io/telepact/docs/design-apis/03-extensions/</loc>
     <lastmod>2026-04-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://telepact.github.io/telepact/docs/03-build-clients-and-servers/01-transports/</loc>
+    <loc>https://telepact.github.io/telepact/docs/build-clients-and-servers/01-transports/</loc>
     <lastmod>2026-04-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://telepact.github.io/telepact/docs/03-build-clients-and-servers/02-client-paths/</loc>
+    <loc>https://telepact.github.io/telepact/docs/build-clients-and-servers/02-client-paths/</loc>
     <lastmod>2026-04-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://telepact.github.io/telepact/docs/03-build-clients-and-servers/03-server-paths/</loc>
+    <loc>https://telepact.github.io/telepact/docs/build-clients-and-servers/03-server-paths/</loc>
     <lastmod>2026-04-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://telepact.github.io/telepact/docs/03-build-clients-and-servers/04-tooling-workflow/</loc>
+    <loc>https://telepact.github.io/telepact/docs/build-clients-and-servers/04-tooling-workflow/</loc>
     <lastmod>2026-04-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://telepact.github.io/telepact/docs/04-operate/01-production-guide/</loc>
+    <loc>https://telepact.github.io/telepact/docs/operate/01-production-guide/</loc>
     <lastmod>2026-04-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://telepact.github.io/telepact/docs/04-operate/02-runtime-errors/</loc>
+    <loc>https://telepact.github.io/telepact/docs/operate/02-runtime-errors/</loc>
     <lastmod>2026-04-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://telepact.github.io/telepact/docs/05-background-and-reference/01-faq/</loc>
+    <loc>https://telepact.github.io/telepact/docs/background-and-reference/01-faq/</loc>
     <lastmod>2026-04-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://telepact.github.io/telepact/docs/05-background-and-reference/02-motivation/</loc>
+    <loc>https://telepact.github.io/telepact/docs/background-and-reference/02-motivation/</loc>
     <lastmod>2026-04-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>

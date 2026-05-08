@@ -202,7 +202,7 @@ Example response:
 `@select_` lets the client ask the server to trim response payloads.
 
 For the full `_ext.Select_` shape and more end-to-end examples, see:
-https://raw.githubusercontent.com/Telepact/telepact/main/doc/02-design-apis/extensions.md
+https://raw.githubusercontent.com/Telepact/telepact/main/doc/design-apis/extensions.md
 
 Common patterns:
 
