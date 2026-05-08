@@ -1217,7 +1217,7 @@ def render_toc(current: Page) -> str:
 
 
 def render_search_script() -> str:
-    return """<script>
+    return r"""<script>
 (() => {
   const searchInput = document.getElementById('docs-search');
   if (!searchInput) {
@@ -1227,7 +1227,7 @@ def render_search_script() -> str:
   const clearButton = document.querySelector('.docs-search-clear');
   const noResultsMessage = document.querySelector('.docs-search-empty');
 
-  const normalize = (value) => value.toLowerCase().replace(/\\s+/g, ' ').trim();
+  const normalize = (value) => value.toLowerCase().replace(/\s+/g, ' ').trim();
   const navGroups = Array.from(document.querySelectorAll('.docs-nav-group')).map((group) => {
     const directChildren = Array.from(group.children);
     const topLevelList = directChildren.find((child) => child.tagName === 'UL');
