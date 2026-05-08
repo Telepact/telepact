@@ -1150,6 +1150,9 @@ def page_search_entries(page: Page) -> list[dict[str, str]]:
             flush_paragraph()
             continue
 
+        if stripped.startswith("|") and stripped.endswith("|"):
+            continue
+
         if re.fullmatch(r"\|?\s*[-:]+(?:\s*\|\s*[-:]+)+\s*\|?", stripped):
             continue
 

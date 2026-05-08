@@ -152,7 +152,7 @@
       '<div class="docs-search-list">' +
       matches
         .map((match) => {
-          const meta = match.section ? [match.title, match.section].join(" · ") : "";
+          const meta = match.section ? match.title : "";
           const href = new URL(match.href || "./", docsRootUrl);
           return (
             '<a class="docs-search-result" href="' +
