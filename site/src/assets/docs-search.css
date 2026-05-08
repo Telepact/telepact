@@ -1,20 +1,39 @@
 .docs-search-trigger {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 14px;
-  border: 1px solid var(--border);
+  gap: 12px;
+  padding: 8px 10px 8px 8px;
+  border: 1px solid rgba(56, 189, 248, 0.16);
   border-radius: 999px;
-  background: rgba(15, 23, 42, 0.82);
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.96), rgba(15, 23, 42, 0.84));
   color: var(--text);
   cursor: pointer;
+  box-shadow: 0 12px 32px rgba(2, 6, 23, 0.28);
   transition: 0.2s ease;
   font: inherit;
 }
 
 .docs-search-trigger:hover {
   border-color: var(--border-strong);
-  background: rgba(56, 189, 248, 0.08);
+  background: linear-gradient(180deg, rgba(18, 32, 52, 0.98), rgba(15, 23, 42, 0.9));
+  transform: translateY(-1px);
+}
+
+.docs-search-trigger:focus-visible {
+  outline: 2px solid rgba(56, 189, 248, 0.32);
+  outline-offset: 2px;
+}
+
+.docs-search-trigger-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  background: radial-gradient(circle at top, rgba(56, 189, 248, 0.24), rgba(56, 189, 248, 0.08));
+  color: #8ae2ff;
+  box-shadow: inset 0 0 0 1px rgba(125, 211, 252, 0.12);
 }
 
 .docs-search-trigger svg,
@@ -27,6 +46,10 @@
 .docs-search-trigger-label,
 .docs-search-title {
   font-weight: 600;
+}
+
+.docs-search-trigger-label {
+  letter-spacing: 0.01em;
 }
 
 .docs-search-shortcut,

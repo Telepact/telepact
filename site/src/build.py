@@ -46,6 +46,8 @@ LLMS_OUTPUT = SITE_DIR / "llms.txt"
 SNIPPETS_DIR = SOURCE_DIR / "snippets"
 DOCS_SEARCH_SCRIPT = SOURCE_ASSETS_DIR / "docs-search.js"
 DOCS_SEARCH_STYLES = SOURCE_ASSETS_DIR / "docs-search.css"
+DOCS_SEARCH_SCRIPT_OUTPUT = DOCS_ASSETS_DIR / "docs-search.js"
+DOCS_SEARCH_STYLES_OUTPUT = DOCS_ASSETS_DIR / "docs-search.css"
 DOCS_SEARCH_INDEX = DOCS_ASSETS_DIR / "search-index.json"
 STATIC_FILES = (".nojekyll", "404.html", "favicon.ico")
 DEFAULT_BASE_URL = "https://telepact.github.io/telepact/"
@@ -1087,6 +1089,11 @@ def docs_page_url(page: Page, anchor: str = "") -> str:
     return f"{base}#{anchor}" if anchor else base
 
 
+def docs_search_result_url(page: Page, anchor: str = "") -> str:
+    base = relative_href(DOCS_DIR, page.output_file, trailing_slash=True)
+    return f"{base}#{anchor}" if anchor else base
+
+
 def heading_anchor(text: str, counts: dict[str, int]) -> str:
     """Return the next stable heading anchor while tracking duplicates for the page."""
     base = slugify(text)
@@ -1119,7 +1126,7 @@ def search_entries_for_page(page: Page) -> list[dict[str, str]]:
     heading_counts: dict[str, int] = {}
     page_title = page.title or page.source.stem
     current_title = page_title
-    current_url = docs_page_url(page)
+    current_url = docs_search_result_url(page)
     current_lines: list[str] = []
     in_code_block = False
     in_comment = False
@@ -1158,10 +1165,10 @@ def search_entries_for_page(page: Page) -> list[dict[str, str]]:
             anchor = heading_anchor(heading_text, heading_counts)
             if saw_heading:
                 current_title = heading_text
-                current_url = docs_page_url(page, anchor)
+                current_url = docs_search_result_url(page, anchor)
             else:
                 current_title = page_title
-                current_url = docs_page_url(page)
+                current_url = docs_search_result_url(page)
                 saw_heading = True
             current_lines = []
             continue
@@ -1172,7 +1179,7 @@ def search_entries_for_page(page: Page) -> list[dict[str, str]]:
         entries.append({
             "pageTitle": page_title,
             "title": page_title,
-            "url": docs_page_url(page),
+            "url": docs_search_result_url(page),
             "text": page.summary,
         })
     return entries
@@ -1180,8 +1187,8 @@ def search_entries_for_page(page: Page) -> list[dict[str, str]]:
 
 def write_docs_search_assets(pages: dict[Path, Page]) -> None:
     DOCS_ASSETS_DIR.mkdir(parents=True, exist_ok=True)
-    for source in (DOCS_SEARCH_SCRIPT, DOCS_SEARCH_STYLES):
-        shutil.copy2(source, DOCS_ASSETS_DIR / source.name)
+    shutil.copy2(DOCS_SEARCH_SCRIPT, DOCS_SEARCH_SCRIPT_OUTPUT)
+    shutil.copy2(DOCS_SEARCH_STYLES, DOCS_SEARCH_STYLES_OUTPUT)
     search_entries: list[dict[str, str]] = []
     for page in sorted(pages.values(), key=lambda value: value.url):
         search_entries.extend(search_entries_for_page(page))
@@ -1309,11 +1316,11 @@ def render_toc(current: Page) -> str:
 
 def page_shell(page: Page, body_html: str, pages: dict[Path, Page], resources: set[Path]) -> str:
     css_href = relative_href(page.output_file.parent, DOCS_DIR / "assets" / "docs.css")
-    search_css_href = relative_href(page.output_file.parent, DOCS_SEARCH_STYLES)
+    search_css_href = relative_href(page.output_file.parent, DOCS_SEARCH_STYLES_OUTPUT)
     home_href = relative_href(page.output_file.parent, SITE_DIR / "index.html")
     docs_home_href = relative_href(page.output_file.parent, DOCS_DIR / "index.html", trailing_slash=True)
     favicon_href = relative_href(page.output_file.parent, SITE_DIR / "favicon.ico")
-    search_script_href = relative_href(page.output_file.parent, DOCS_SEARCH_SCRIPT)
+    search_script_href = relative_href(page.output_file.parent, DOCS_SEARCH_SCRIPT_OUTPUT)
     search_index_href = relative_href(page.output_file.parent, DOCS_SEARCH_INDEX)
     canonical = posixpath.join(BASE_URL.rstrip("/"), page.url.lstrip("/"))
     prism_scripts = "\n".join(f'<script src="{src}"></script>' for src in PRISM_JS)
@@ -1352,10 +1359,12 @@ def page_shell(page: Page, body_html: str, pages: dict[Path, Page], resources: s
         <a href="{home_href}">Home</a>
         <a href="{docs_home_href}" class="active">Documentation</a>
         <button type="button" class="docs-search-trigger" data-docs-search-open aria-haspopup="dialog" aria-controls="docs-search-modal">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
-            <circle cx="11" cy="11" r="6"></circle>
-            <path d="M20 20l-4.2-4.2"></path>
-          </svg>
+          <span class="docs-search-trigger-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="5.5"></circle>
+              <path d="M15.2 15.2 19 19"></path>
+            </svg>
+          </span>
           <span class="docs-search-trigger-label">Search</span>
           <span class="docs-search-shortcut" data-docs-search-shortcut>⌘K</span>
         </button>

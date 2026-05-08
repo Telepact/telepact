@@ -1,8 +1,10 @@
 (() => {
   const script = document.currentScript;
   const searchIndexUrl = script?.dataset.searchIndex;
+  const resolvedSearchIndexUrl = searchIndexUrl ? new URL(searchIndexUrl, window.location.href) : null;
+  const docsRootUrl = resolvedSearchIndexUrl ? new URL("../", resolvedSearchIndexUrl) : null;
   const modal = document.getElementById("docs-search-modal");
-  if (!searchIndexUrl || !modal) {
+  if (!resolvedSearchIndexUrl || !docsRootUrl || !modal) {
     return;
   }
 
@@ -46,6 +48,7 @@
   const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const normalize = (value) => value.toLowerCase();
   const queryTokens = (value) => normalize(value).trim().split(/\s+/).filter(Boolean);
+  const resolveResultUrl = (value) => new URL(value, docsRootUrl).href;
 
   const setStatus = (message) => {
     statusNode.textContent = message;
@@ -187,7 +190,7 @@
     for (const [index, match] of matches.entries()) {
       const pageLabel = match.entry.title === match.entry.pageTitle ? "Page" : match.entry.pageTitle;
       const result = document.createElement("a");
-      result.href = match.entry.url;
+      result.href = resolveResultUrl(match.entry.url);
       result.className = "docs-search-result";
       result.dataset.index = String(index);
       result.setAttribute("role", "option");
@@ -206,10 +209,10 @@
       return;
     }
     if (loadPromise === null) {
-      loadPromise = fetch(searchIndexUrl)
+      loadPromise = fetch(resolvedSearchIndexUrl)
         .then((response) => {
           if (!response.ok) {
-            throw new Error(`Failed to load ${searchIndexUrl}: ${response.status}`);
+            throw new Error(`Failed to load ${resolvedSearchIndexUrl.href}: ${response.status}`);
           }
           return response.json();
         })
