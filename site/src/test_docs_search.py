@@ -17,10 +17,12 @@ DOCS_SEARCH_SCRIPT_PATH = DIST_DOCS_DIR / "assets" / "docs-search.js"
 
 
 def normalize_docs_path(value: str) -> str:
+    """Return a docs path without any in-page anchor fragment."""
     return value.split("#", 1)[0] or "./"
 
 
 def run_search_client(entries: list[dict[str, str]], current_href: str, query: str) -> dict[str, object]:
+    """Execute the built docs search client under Node and return its rendered result state."""
     node_script = r"""
 const fs = require("fs");
 const vm = require("vm");
