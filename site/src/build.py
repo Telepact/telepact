@@ -425,7 +425,6 @@ TOP_LEVEL_DOC_DIR_ORDER = {
     "build-clients-and-servers": 3,
     "operate": 4,
     "background-and-reference": 5,
-    "01-learn-by-example": 6,
 }
 DISPLAY_TOKEN_MAP = {
     "api": "API",
