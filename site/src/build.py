@@ -644,7 +644,7 @@ def generated_pages() -> list[GeneratedPage]:
     example_readme = REPO_ROOT / "example" / "README.md"
     pages.append(
         GeneratedPage(
-            output=page_output_path("examples/index.md"),
+            output=page_output_path("examples.md"),
             title="Examples",
             intro=example_readme,
         )
@@ -1078,7 +1078,6 @@ def page_by_rel_source(pages: dict[Path, Page], rel_source: str) -> Page | None:
 
 def nav_groups(pages: dict[Path, Page]) -> list[NavGroup]:
     doc_root = GENERATED_DOCS_SOURCE_DIR
-    example_root = GENERATED_DOCS_SOURCE_DIR / "examples"
     groups: list[NavGroup] = []
 
     root_items: list[NavLink] = []
@@ -1102,7 +1101,7 @@ def nav_groups(pages: dict[Path, Page]) -> list[NavGroup]:
 
     top_level_dirs = [
         child for child in doc_root.iterdir()
-        if child.is_dir() and child != example_root and split_ordered_name(child.name)[0] != 10**9
+        if child.is_dir() and split_ordered_name(child.name)[0] != 10**9
     ]
     for directory in sort_nav_paths(top_level_dirs):
         landing = directory_landing_page(pages, directory)
@@ -1121,25 +1120,6 @@ def nav_groups(pages: dict[Path, Page]) -> list[NavGroup]:
                 )
             )
         groups.append(NavGroup(heading=heading, items=items, subgroups=subgroups))
-
-    if example_root.exists():
-        items = nav_links_for_directory(pages, example_root)
-        example_subgroups: list[NavSubgroup] = []
-        child_dirs = [child for child in example_root.iterdir() if child.is_dir()]
-        for child_dir in sort_nav_paths(child_dirs):
-            links = nav_links_for_directory(pages, child_dir)
-            if not links:
-                continue
-            example_subgroups.append(
-                NavSubgroup(
-                    heading=display_name(child_dir),
-                    items=links,
-                )
-            )
-        if items or example_subgroups:
-            landing = directory_landing_page(pages, example_root)
-            heading = landing.title if landing is not None else display_name(example_root)
-            groups.append(NavGroup(heading=heading, items=items, subgroups=example_subgroups))
     return groups
 
 
