@@ -138,8 +138,7 @@ const functionRoutes = {
 };
 
 const options = new ServerOptions();
-const functionRouter = new FunctionRouter();
-functionRouter.registerUnauthenticatedRoutes(functionRoutes);
+const functionRouter = new FunctionRouter(functionRoutes);
 const telepactServer = new Server(schema, functionRouter, options);
 
 // Assuming `transport` is defined elsewhere
@@ -159,15 +158,13 @@ from telepact import FunctionRouter, Message, Server, TelepactSchema, TelepactSc
 files = TelepactSchemaFiles('/path/to/schema/dir')
 schema = TelepactSchema.from_file_json_map(files.filenames_to_json)
 
-async def example(request_message: 'Message') -> 'Message':
-    function_name = next(iter(request_message.body))
+async def example(function_name: str, request_message: 'Message') -> 'Message':
     args = request_message.body[function_name]
     return Message({}, {'Ok_': {}})
 
 options = Server.Options()
-function_routes = {'fn.example': lambda function_name, request_message: example(request_message)}
-function_router = FunctionRouter()
-function_router.register_unauthenticated_routes(function_routes)
+function_routes = {'fn.example': example}
+function_router = FunctionRouter(function_routes)
 telepactServer = Server(schema, function_router, options)
 
 # Assuming `transport` is defined elsewhere
@@ -195,8 +192,7 @@ Map<String, FunctionRoute> functionRoutes = Map.of(
 );
 
 var options = new Server.Options();
-var functionRouter = new FunctionRouter();
-functionRouter.registerUnauthenticatedRoutes(functionRoutes);
+var functionRouter = new FunctionRouter(functionRoutes);
 var telepactServer = new Server(schema, functionRouter, options);
 
 // Assuming `transport` is defined elsewhere
@@ -223,18 +219,12 @@ if err != nil {
 
 functionRoutes := map[string]telepact.FunctionRoute{
     "fn.example": func(functionName string, request telepact.Message) (telepact.Message, error) {
-	functionName, err := request.BodyTarget()
-	if err != nil {
-		return telepact.Message{}, err
-    }
+        args, ok := request.Body[functionName].(map[string]any)
+        if !ok {
+            return telepact.Message{}, fmt.Errorf("unexpected %s payload", functionName)
+        }
 
-    args, err := request.BodyPayload()
-    if err != nil {
-        return telepact.Message{}, err
-    }
-
-    _ = functionName
-    _ = args
+        _ = args
 
 	return telepact.NewMessage(
 		map[string]any{},
@@ -244,8 +234,7 @@ functionRoutes := map[string]telepact.FunctionRoute{
 }
 
 telepactOptions := telepact.NewServerOptions()
-functionRouter := telepact.NewFunctionRouter()
-functionRouter.RegisterUnauthenticatedRoutes(functionRoutes)
+functionRouter := telepact.NewFunctionRouter(functionRoutes)
 telepactServer, err := telepact.NewServer(schema, functionRouter, telepactOptions)
 if err != nil {
     return err
@@ -545,8 +534,7 @@ define functionRoutes mapping fn.* names to handlers:
     run business logic
     return Message(headers, resultUnion)
 
-functionRouter = FunctionRouter()
-functionRouter.register_unauthenticated_routes(functionRoutes)
+functionRouter = FunctionRouter(functionRoutes)
 telepactServer = Server(schema, functionRouter, options)
 
 transport.on_request(requestBytes):

@@ -48,8 +48,7 @@ options.middleware = async (requestMessage: Message, functionRouter): Promise<Me
         log.info("Function finished", {function: functionName});
     }
 };
-const functionRouter = new FunctionRouter();
-functionRouter.registerUnauthenticatedRoutes(functionRoutes);
+const functionRouter = new FunctionRouter(functionRoutes);
 const server = new Server(schema, functionRouter, options);
 
 // Wire up request/response bytes from your transport of choice
