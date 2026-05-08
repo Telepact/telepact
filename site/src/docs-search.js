@@ -1,4 +1,8 @@
 (() => {
+  const SEARCH_INDEX_FILENAME = "search-index.json";
+  const MAX_SEARCH_RESULTS = 12;
+  const SNIPPET_MAX_LENGTH = 180;
+  const SNIPPET_CONTEXT_PADDING = 56;
   const script = document.currentScript;
   const modal = document.querySelector("[data-docs-search-modal]");
   const openButtons = Array.from(document.querySelectorAll("[data-docs-search-open]"));
@@ -16,7 +20,7 @@
   const docsBaseUrl = new URL("../", script.src);
   const indexUrl = script.dataset.docsSearchIndex
     ? new URL(script.dataset.docsSearchIndex, document.baseURI)
-    : new URL("search-index.json", docsBaseUrl);
+    : new URL(`assets/${SEARCH_INDEX_FILENAME}`, docsBaseUrl);
   const shortcutText = isApplePlatform ? "⌘K" : "Ctrl K";
   let searchIndexPromise;
   let searchEntries = [];
@@ -85,18 +89,18 @@
       return "";
     }
     if (!terms.length) {
-      return content.slice(0, 180).trim();
+      return content.slice(0, SNIPPET_MAX_LENGTH).trim();
     }
     const lowered = content.toLowerCase();
     let start = 0;
     for (const term of terms) {
       const matchIndex = lowered.indexOf(term);
       if (matchIndex >= 0) {
-        start = Math.max(0, matchIndex - 56);
+        start = Math.max(0, matchIndex - SNIPPET_CONTEXT_PADDING);
         break;
       }
     }
-    const end = Math.min(content.length, start + 180);
+    const end = Math.min(content.length, start + SNIPPET_MAX_LENGTH);
     const prefix = start > 0 ? "…" : "";
     const suffix = end < content.length ? "…" : "";
     return `${prefix}${content.slice(start, end).trim()}${suffix}`;
@@ -161,7 +165,7 @@
       .map((entry) => ({ entry, score: scoreEntry(entry, normalizedQuery, terms) }))
       .filter((item) => item.score >= 0)
       .sort((left, right) => right.score - left.score)
-      .slice(0, 12)
+      .slice(0, MAX_SEARCH_RESULTS)
       .map((item) => item.entry);
   }
 

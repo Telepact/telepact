@@ -98,6 +98,7 @@ def extract_page_entries(page: SearchablePage) -> list[dict[str, str]]:
 
 
 def unique_heading_id(text: str, heading_counts: dict[str, int]) -> str:
+    """Return the renderer-compatible heading id while updating heading_counts."""
     base = slugify(text)
     count = heading_counts.get(base, 0) + 1
     heading_counts[base] = count
