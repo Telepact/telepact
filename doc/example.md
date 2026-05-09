@@ -35,7 +35,7 @@ from starlette.responses import Response
 from starlette.routing import Route
 import uvicorn
 
-async def divide(function_name, request_message):
+async def divide(function_name: str, request_message: Message) -> Message:
     arguments = request_message.body[function_name]
     x = arguments['x']
     y = arguments['y']
@@ -48,8 +48,7 @@ async def divide(function_name, request_message):
 options = Server.Options()
 
 api = TelepactSchema.from_directory('./api')
-function_router = FunctionRouter()
-function_router.register_unauthenticated_routes({'fn.divide': divide})
+function_router = FunctionRouter({'fn.divide': divide})
 server = Server(api, function_router, options)
 
 async def http_handler(request):
