@@ -287,7 +287,7 @@ def _render_table(headers: list[str], rows: list[list[str]]) -> str:
 
 
 def _build_recommendations(results: list[ScenarioMetrics]) -> list[str]:
-    by_mode = {result.scenario.mode: result for result in results}
+    by_scenario = {result.scenario: result for result in results}
 
     select_candidates = []
     unsafe_candidates = []
@@ -303,25 +303,25 @@ def _build_recommendations(results: list[ScenarioMetrics]) -> list[str]:
         json_key = Scenario(scenario.profile, scenario.size, 'json', scenario.unsafe, scenario.select)
 
         if scenario.select:
-            base = by_mode.get(base_key)
+            base = by_scenario.get(base_key)
             if base is not None:
                 saved = base.steady_state_total_bytes - result.steady_state_total_bytes
                 select_candidates.append((saved, base, result))
 
         if scenario.unsafe:
-            safe = by_mode.get(safe_key)
+            safe = by_scenario.get(safe_key)
             if safe is not None:
                 saved = safe.roundtrip.median_us - result.roundtrip.median_us
                 unsafe_candidates.append((saved, safe, result))
 
         if scenario.mode == 'packed-binary':
-            binary = by_mode.get(binary_key)
+            binary = by_scenario.get(binary_key)
             if binary is not None:
                 saved = binary.steady_state_total_bytes - result.steady_state_total_bytes
                 packed_candidates.append((saved, binary, result))
 
         if scenario.mode == 'binary':
-            json_result = by_mode.get(json_key)
+            json_result = by_scenario.get(json_key)
             if json_result is not None:
                 saved = json_result.steady_state_total_bytes - result.steady_state_total_bytes
                 binary_candidates.append((saved, json_result, result))
