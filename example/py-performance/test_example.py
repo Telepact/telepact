@@ -21,9 +21,9 @@ def test_performance_harness_reports_steady_state_metrics() -> None:
     report = run_benchmark_sync(cycles=6, steady_state_warmup=2)
     measurements = report['measurements']
 
-    assert len(measurements) == 32
+    assert len(measurements) == 96
     assert all(row['steady_state_samples'] == 6 for row in measurements)
-    assert any(row['steady_state_wire_mode'] == 'packed-binary' for row in measurements)
+    assert any(row['use_packed'] and row['steady_state_wire_mode'] == 'packed-binary' for row in measurements)
     assert all(not row['steady_state_handshake_seen'] for row in measurements)
 
     binary_rows = [row for row in measurements if row['client_mode'] == 'binary']
@@ -35,6 +35,7 @@ def test_performance_harness_reports_steady_state_metrics() -> None:
         if row['scenario'] == 'dashboard'
         and row['size'] == 'big'
         and row['client_mode'] == 'json'
+        and not row['use_packed']
         and not row['use_select']
         and not row['use_unsafe']
     )
@@ -43,6 +44,7 @@ def test_performance_harness_reports_steady_state_metrics() -> None:
         if row['scenario'] == 'dashboard'
         and row['size'] == 'big'
         and row['client_mode'] == 'json'
+        and not row['use_packed']
         and row['use_select']
         and not row['use_unsafe']
     )

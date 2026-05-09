@@ -132,7 +132,7 @@ def _contains_packed_binary(value: object) -> bool:
 def classify_wire_mode(message_bytes: bytes) -> str:
     if _is_json_wire(message_bytes):
         return 'json'
-    unpacked = msgpack.unpackb(message_bytes, raw=False)
+    unpacked = msgpack.unpackb(message_bytes, raw=False, strict_map_key=False)
     if _contains_packed_binary(unpacked):
         return 'packed-binary'
     return 'binary'
@@ -195,6 +195,7 @@ async def _measure_permutation(
     scenario: Scenario,
     size: str,
     use_binary: bool,
+    use_packed: bool,
     use_select: bool,
     use_unsafe: bool,
     cycles: int,
@@ -207,7 +208,10 @@ async def _measure_permutation(
     max_attempts = cycles + steady_state_warmup + 8
 
     while len(measured_samples) < cycles:
-        await client.request(_build_request(scenario, size, use_select, use_unsafe))
+        message = _build_request(scenario, size, use_select, use_unsafe)
+        if use_binary and use_packed:
+            message.headers['@pac_'] = True
+        await client.request(message)
         sample = samples[-1]
         attempts += 1
         if attempts > max_attempts:
@@ -241,6 +245,7 @@ async def _measure_permutation(
         'scenario_title': scenario.title,
         'size': size,
         'client_mode': 'binary' if use_binary else 'json',
+        'use_packed': use_packed,
         'steady_state_wire_mode': next(iter(response_wire_modes)),
         'use_select': use_select,
         'use_unsafe': use_unsafe,
@@ -265,6 +270,7 @@ def _measurement_sort_key(row: dict[str, object]) -> tuple[object, ...]:
         row['scenario'],
         row['size'],
         row['client_mode'],
+        row['use_packed'],
         row['use_select'],
         row['use_unsafe'],
     )
@@ -292,12 +298,16 @@ def _build_recommendations(measurements: list[dict[str, object]]) -> list[str]:
         grouped.setdefault((measurement['scenario'], measurement['size']), []).append(measurement)
 
     for (scenario, size), rows in sorted(grouped.items()):
-        baseline = next(row for row in rows if row['client_mode'] == 'json' and not row['use_select'] and not row['use_unsafe'])
+        baseline = next(
+            row for row in rows
+            if row['client_mode'] == 'json' and not row['use_packed'] and not row['use_select'] and not row['use_unsafe']
+        )
         smallest = min(rows, key=lambda row: row['mean_total_bytes'])
         if smallest['mean_total_bytes'] < baseline['mean_total_bytes']:
             savings_pct = round((1 - (smallest['mean_total_bytes'] / baseline['mean_total_bytes'])) * 100, 1)
             recommendations.append(
                 f'{scenario}/{size}: prefer {smallest["client_mode"]} with '
+                f'{"@pac_ + " if smallest["use_packed"] else ""}'
                 f'{"@select_ + " if smallest["use_select"] else ""}'
                 f'{"@unsafe_ + " if smallest["use_unsafe"] else ""}'
                 f'{smallest["steady_state_wire_mode"]} when link bandwidth matters; '
@@ -309,19 +319,19 @@ def _build_recommendations(measurements: list[dict[str, object]]) -> list[str]:
             best_packed = min(packed_rows, key=lambda row: row['mean_total_bytes'])
             savings_pct = round((1 - (best_packed['mean_total_bytes'] / baseline['mean_total_bytes'])) * 100, 1)
             recommendations.append(
-                f'{scenario}/{size}: list-heavy responses automatically enter packed-binary; '
+                f'{scenario}/{size}: enable @pac_ for list-heavy responses; '
                 f'that saved {savings_pct}% vs JSON in this harness.'
             )
 
         safe_rows = {
-            (row['client_mode'], row['use_select']): row
+            (row['client_mode'], row['use_packed'], row['use_select']): row
             for row in rows
             if not row['use_unsafe']
         }
         for row in rows:
             if not row['use_unsafe']:
                 continue
-            peer = safe_rows.get((row['client_mode'], row['use_select']))
+            peer = safe_rows.get((row['client_mode'], row['use_packed'], row['use_select']))
             if peer is None:
                 continue
             if row['median_roundtrip_us'] < peer['median_roundtrip_us']:
@@ -351,17 +361,20 @@ async def run_benchmark(cycles: int = 80, steady_state_warmup: int = 4) -> dict[
         for scenario in SCENARIOS:
             for size in ['small', 'big']:
                 for use_binary in [False, True]:
-                    for use_select in [False, True]:
-                        for use_unsafe in [False, True]:
-                            measurements.append(await _measure_permutation(
-                                scenario=scenario,
-                                size=size,
-                                use_binary=use_binary,
-                                use_select=use_select,
-                                use_unsafe=use_unsafe,
-                                cycles=cycles,
-                                steady_state_warmup=steady_state_warmup,
-                            ))
+                    packed_options = [False, True] if use_binary else [False]
+                    for use_packed in packed_options:
+                        for use_select in [False, True]:
+                            for use_unsafe in [False, True]:
+                                measurements.append(await _measure_permutation(
+                                    scenario=scenario,
+                                    size=size,
+                                    use_binary=use_binary,
+                                    use_packed=use_packed,
+                                    use_select=use_select,
+                                    use_unsafe=use_unsafe,
+                                    cycles=cycles,
+                                    steady_state_warmup=steady_state_warmup,
+                                ))
     finally:
         if gc_enabled:
             gc.enable()
@@ -381,6 +394,7 @@ def render_report(report: dict[str, object]) -> str:
         'scenario': row['scenario'],
         'size': row['size'],
         'mode': row['client_mode'],
+        'packed': row['use_packed'],
         'wire': row['steady_state_wire_mode'],
         'select': row['use_select'],
         'unsafe': row['use_unsafe'],
@@ -399,6 +413,7 @@ def render_report(report: dict[str, object]) -> str:
             'scenario': row['scenario'],
             'size': row['size'],
             'mode': row['client_mode'],
+            'packed': row['use_packed'],
             'wire': row['steady_state_wire_mode'],
             'select': row['use_select'],
             'unsafe': row['use_unsafe'],
@@ -417,6 +432,7 @@ def render_report(report: dict[str, object]) -> str:
             ('scenario', 'scenario'),
             ('size', 'size'),
             ('mode', 'client'),
+            ('packed', '@pac_'),
             ('wire', 'wire'),
             ('select', '@select_'),
             ('unsafe', '@unsafe_'),
@@ -434,6 +450,7 @@ def render_report(report: dict[str, object]) -> str:
             ('scenario', 'scenario'),
             ('size', 'size'),
             ('mode', 'client'),
+            ('packed', '@pac_'),
             ('wire', 'wire'),
             ('select', '@select_'),
             ('unsafe', '@unsafe_'),

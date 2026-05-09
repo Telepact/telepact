@@ -5,7 +5,7 @@ Python Telepact performance harness focused on client-side tuning choices.
 It runs steady-state permutations across:
 
 - JSON vs binary
-- automatic packed-binary responses for list-of-struct workloads
+- `@pac_` packed binary mode
 - `@select_`
 - `@unsafe_`
 - small vs big payloads
