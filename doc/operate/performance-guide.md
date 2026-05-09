@@ -100,7 +100,9 @@ Expected magnitude:
 - in the harness, a large dashboard dropped from about **19 KB** total to about
   **5.4 KB** with `@select_`
 - on the harness's regional 4G profile, that moved the same dashboard from about
-  **62.7 ms** estimated wire time to about **57.2 ms**
+  **62.7 ms** estimated wire time to about **57.2 ms**; the byte reduction is
+  much larger than the latency reduction because that profile already carries a
+  roughly **55 ms** round-trip floor
 
 Typical fit:
 
