@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import hashlib
 from dataclasses import dataclass
+from typing import cast
 
 from telepact import FunctionRouter, Message, Server, TelepactSchema, TelepactSchemaFiles
 
@@ -158,17 +159,20 @@ def build_summary(profile: str, size: str, payload: dict[str, object]) -> dict[s
     approx_characters = 0
 
     if profile == 'typical':
-        shipments = payload['Typical']['shipments']
+        typical_payload = cast(dict[str, object], payload['Typical'])
+        shipments = cast(list[dict[str, object]], typical_payload['shipments'])
         record_count = len(shipments)
         scalar_count = len(shipments) * (8 + (config.nested_count * 6))
         approx_characters = len(shipments) * (180 + (config.nested_count * 32))
     elif profile == 'strings':
-        rows = payload['StringHeavy']['rows']
+        string_payload = cast(dict[str, object], payload['StringHeavy'])
+        rows = cast(list[dict[str, object]], string_payload['rows'])
         record_count = len(rows)
         scalar_count = len(rows) * 8
         approx_characters = len(rows) * (420 if size == 'big' else 220)
     elif profile == 'numbers':
-        rows = payload['NumberHeavy']['rows']
+        number_payload = cast(dict[str, object], payload['NumberHeavy'])
+        rows = cast(list[dict[str, object]], number_payload['rows'])
         record_count = len(rows)
         scalar_count = len(rows) * 8
         approx_characters = len(rows) * 12

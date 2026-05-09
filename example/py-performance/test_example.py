@@ -14,7 +14,7 @@
 #|  limitations under the License.
 #|
 
-from benchmark import MODES, PROFILES, SIZES, format_report, run_harness
+from benchmark import MODES, PROFILES, SIZES, Scenario, format_report, run_harness
 
 
 def test_performance_harness_reports_all_steady_state_permutations() -> None:
@@ -48,13 +48,13 @@ def test_performance_harness_reports_all_steady_state_permutations() -> None:
             assert result.steady_state_response_wire_format == 'msgpack'
             assert result.warmup_request_bytes != result.steady_state_request_bytes
 
-        selected = by_scenario[scenario.__class__(scenario.profile, scenario.size, scenario.mode, scenario.unsafe, True)]
-        full = by_scenario[scenario.__class__(scenario.profile, scenario.size, scenario.mode, scenario.unsafe, False)]
+        selected = by_scenario[Scenario(scenario.profile, scenario.size, scenario.mode, scenario.unsafe, True)]
+        full = by_scenario[Scenario(scenario.profile, scenario.size, scenario.mode, scenario.unsafe, False)]
         if scenario.select:
             assert selected.steady_state_total_bytes < full.steady_state_total_bytes
 
-    big_binary = by_scenario[results[0].scenario.__class__('numbers', 'big', 'binary', False, False)]
-    big_json = by_scenario[results[0].scenario.__class__('numbers', 'big', 'json', False, False)]
-    big_packed = by_scenario[results[0].scenario.__class__('numbers', 'big', 'packed-binary', False, False)]
+    big_binary = by_scenario[Scenario('numbers', 'big', 'binary', False, False)]
+    big_json = by_scenario[Scenario('numbers', 'big', 'json', False, False)]
+    big_packed = by_scenario[Scenario('numbers', 'big', 'packed-binary', False, False)]
     assert big_binary.steady_state_total_bytes < big_json.steady_state_total_bytes
     assert big_packed.steady_state_total_bytes <= big_binary.steady_state_total_bytes

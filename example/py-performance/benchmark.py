@@ -358,9 +358,9 @@ def _build_recommendations(results: list[ScenarioMetrics]) -> list[str]:
         )
 
     if small_binary_candidates:
-        saved, baseline, improved = min(small_binary_candidates, key=lambda item: item[0])
+        smallest_saved, _baseline, improved = min(small_binary_candidates, key=lambda item: item[0])
         recommendations.append(
-            f'Small payloads are less sensitive to wire format: {_describe_scenario(improved.scenario)} changes only {saved} bytes versus JSON, so transport simplicity may matter more there.'
+            f'Small payloads are less sensitive to wire format: {_describe_scenario(improved.scenario)} has the smallest binary/JSON delta in this run at {smallest_saved} bytes, so transport simplicity may matter more there.'
         )
 
     return recommendations
