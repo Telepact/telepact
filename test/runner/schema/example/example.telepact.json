@@ -165,6 +165,44 @@
         ]
     },
     {
+        "struct.Todo": {
+            "title": "string"
+        }
+    },
+    {
+        "struct.FollowUpDetails": {
+            "kept": "string",
+            "extra": "string"
+        }
+    },
+    {
+        "fn.getFollowUp": {
+            "id": "string",
+            "details": "struct.FollowUpDetails"
+        },
+        "->": [
+            {
+                "Ok_": {
+                    "summary": "string",
+                    "details": "struct.FollowUpDetails"
+                }
+            }
+        ]
+    },
+    {
+        "fn.createIssueLink": {
+            "title": "string"
+        },
+        "->": [
+            {
+                "Ok_": {
+                    "todo": "struct.Todo",
+                    "next!": "fn.getFollowUp"
+                }
+            }
+        ]
+    },
+    {
         "fn.selfLink": {
             "required": "boolean",
             "optional!": "boolean"
