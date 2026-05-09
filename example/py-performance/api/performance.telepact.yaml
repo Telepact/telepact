@@ -1,0 +1,52 @@
+#|
+#|  Copyright The Telepact Authors
+#|
+#|  Licensed under the Apache License, Version 2.0 (the "License");
+#|  you may not use this file except in compliance with the License.
+#|  You may obtain a copy of the License at
+#|
+#|  https://www.apache.org/licenses/LICENSE-2.0
+#|
+#|  Unless required by applicable law or agreed to in writing, software
+#|  distributed under the License is distributed on an "AS IS" BASIS,
+#|  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#|  See the License for the specific language governing permissions and
+#|  limitations under the License.
+#|
+
+- struct.PerformanceSummary:
+    profile: "string"
+    itemCount: "integer"
+    tagCount: "integer"
+    revisionCount: "integer"
+- struct.WarehouseSnapshot:
+    region: "string"
+    aisle: "string"
+    bin: "string"
+- struct.AnalyticsSnapshot:
+    views: "integer"
+    purchases: "integer"
+    returns: "integer"
+- struct.RevisionSnapshot:
+    version: "integer"
+    changedBy: "string"
+    note: "string"
+    approved: "boolean"
+- struct.PerformanceItem:
+    id: "integer"
+    sku: "string"
+    title: "string"
+    category: "string"
+    priceCents: "integer"
+    available: "boolean"
+    warehouse: "struct.WarehouseSnapshot"
+    analytics: "struct.AnalyticsSnapshot"
+    tags: ["string"]
+    revisions: ["struct.RevisionSnapshot"]
+- fn.getCatalog:
+    profile: "string"
+  ->:
+    - Ok_:
+        summary: "struct.PerformanceSummary"
+        generatedAt: "string"
+        items: ["struct.PerformanceItem"]

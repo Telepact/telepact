@@ -7,6 +7,7 @@ and the Telepact libraries keep their API surfaces closely aligned across langua
 - [py-codegen](./py-codegen/README.md) - Minimal Python demo that shows generated client and server bindings wired into the runtime
 - [py-http-cookie-auth](./py-http-cookie-auth/README.md) - Minimal Python demo that shows how to pull a session cookie into `@auth_` at the HTTP boundary
 - [py-links](./py-links/README.md) - Minimal Python demo that shows how to return a prepopulated function-type link
+- [py-performance](./py-performance/README.md) - Python performance harness that reports steady-state JSON/binary/packed metrics, payload sizes, and latency estimates
 - [py-select](./py-select/README.md) - Minimal Python demo that shows `->`, `struct.*`, and `union.*` field selection together
 - [py-simple-auth](./py-simple-auth/README.md) - Minimal Python demo that shows hard-coded auth, middleware identity logging, and unauthorized coercion
 - [py-websocket](./py-websocket/README.md) - Minimal Python demo that shows how to use WebSocket request/reply
