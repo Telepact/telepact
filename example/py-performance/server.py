@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 from dataclasses import dataclass
 from typing import cast
 
@@ -191,7 +192,12 @@ async def get_benchmark_payload(_function_name: str, request_message: Message) -
     size = arguments['size']
     payload = build_payload(profile, size)
     summary = build_summary(profile, size, payload)
-    checksum_source = f'{profile}:{size}:{summary["recordCount"]}:{summary["scalarCount"]}'
+    checksum_source = json.dumps({
+        'profile': profile,
+        'size': size,
+        'summary': summary,
+        'payload': payload,
+    }, sort_keys=True, separators=(',', ':'))
     checksum = hashlib.sha256(checksum_source.encode('utf-8')).hexdigest()[:16]
     return Message({}, {
         'Ok_': {
