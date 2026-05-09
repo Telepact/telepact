@@ -1,17 +1,6 @@
 #|
 #|  Copyright The Telepact Authors
-#|
-#|  Licensed under the Apache License, Version 2.0 (the "License");
-#|  you may not use this file except in compliance with the License.
-#|  You may obtain a copy of the License at
-#|
-#|  https://www.apache.org/licenses/LICENSE-2.0
-#|
-#|  Unless required by applicable law or agreed to in writing, software
-#|  distributed under the License is distributed on an "AS IS" BASIS,
-#|  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#|  See the License for the specific language governing permissions and
-#|  limitations under the License.
+#|  SPDX-License-Identifier: Apache-2.0
 #|
 
 import os
@@ -24,14 +13,23 @@ LICENSE_HEADER_IGNORE_FILE = ".license-header-ignore"
 APACHE_LICENSE_SPDX_IDENTIFIER = "SPDX-License-Identifier: Apache-2.0"
 
 
+def _has_shebang(file_path: str) -> bool:
+    with open(file_path, "r") as file:
+        return file.readline().startswith("#!")
+
+
 def _license_header_supported(file_path: str) -> bool:
     file_extension = os.path.splitext(file_path)[1].lower()
     file_name = os.path.basename(file_path)
 
     return (
-        (file_name != "pubspec.yaml" and file_extension in [".py", ".java", ".ts", ".dart", ".sh", ".js", ".yaml", ".yml", ".html", ".css", ".svelte"])
+        (
+            file_name != "pubspec.yaml"
+            and file_extension in [".py", ".java", ".ts", ".tsx", ".dart", ".sh", ".js", ".mjs", ".go", ".rb", ".yaml", ".yml", ".html", ".css", ".svelte"]
+        )
         or file_name == "Dockerfile"
         or file_name == "Makefile"
+        or (not file_extension and _has_shebang(file_path))
     )
 
 
@@ -45,9 +43,9 @@ def _license_header_ignored(file_path: str) -> bool:
 
 
 def _get_comment_syntax(file_extension, file_name):
-    if file_extension in [".py", ".sh", ".yaml", ".yml"] or file_name == "Dockerfile" or file_name == "Makefile":
+    if file_extension in [".py", ".sh", ".rb", ".yaml", ".yml"] or file_name == "Dockerfile" or file_name == "Makefile" or not file_extension:
         return "#|", ""
-    elif file_extension in [".java", ".ts", ".dart", ".js"]:
+    elif file_extension in [".java", ".ts", ".tsx", ".dart", ".js", ".mjs", ".go"]:
         return "//|", ""
     elif file_extension in [".html", ".svelte"]:
         return "<!--|", "|-->"
@@ -90,7 +88,7 @@ def _read_license_header(file_path):
     return source_header_lines
 
 
-def _update_file(file_path, license_header, start_comment_syntax, end_comment_syntax) -> bool:
+def _update_file(file_path, license_header, start_comment_syntax, end_comment_syntax, file_extension) -> bool:
     with open(file_path, "r") as file:
         lines = file.readlines()
 
@@ -98,6 +96,7 @@ def _update_file(file_path, license_header, start_comment_syntax, end_comment_sy
 
     new_lines = []
     start_copying = False
+    in_html_comment_block = False
 
     shebang = lines[0] if lines and lines[0].startswith("#!") else None
 
@@ -109,6 +108,18 @@ def _update_file(file_path, license_header, start_comment_syntax, end_comment_sy
             continue
         if line.startswith(start_comment_syntax):
             continue
+        if file_extension in [".html", ".svelte"]:
+            stripped_line = line.lstrip()
+            if in_html_comment_block:
+                new_lines.append(line)
+                if "-->" in stripped_line:
+                    in_html_comment_block = False
+                continue
+            if stripped_line.startswith("<!--"):
+                new_lines.append(line)
+                if "-->" not in stripped_line:
+                    in_html_comment_block = True
+                continue
         if line.strip() == "":
             continue
         new_lines.append(line)
@@ -158,7 +169,7 @@ def license_header(license_header_path):
         file_extension = os.path.splitext(file_path)[1].lower()
         file_name = os.path.basename(file_path)
         start_comment_syntax, end_comment_syntax = _get_comment_syntax(file_extension, file_name)
-        updated = _update_file(file_path, license_header_lines, start_comment_syntax, end_comment_syntax)
+        updated = _update_file(file_path, license_header_lines, start_comment_syntax, end_comment_syntax, file_extension)
         if updated:
             updated_files += 1
 

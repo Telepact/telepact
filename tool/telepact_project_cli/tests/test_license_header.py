@@ -1,17 +1,6 @@
 #|
 #|  Copyright The Telepact Authors
-#|
-#|  Licensed under the Apache License, Version 2.0 (the "License");
-#|  you may not use this file except in compliance with the License.
-#|  You may obtain a copy of the License at
-#|
-#|  https://www.apache.org/licenses/LICENSE-2.0
-#|
-#|  Unless required by applicable law or agreed to in writing, software
-#|  distributed under the License is distributed on an "AS IS" BASIS,
-#|  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#|  See the License for the specific language governing permissions and
-#|  limitations under the License.
+#|  SPDX-License-Identifier: Apache-2.0
 #|
 
 import contextlib
@@ -113,6 +102,75 @@ class LicenseHeaderTests(unittest.TestCase):
             self.assertEqual(result.exit_code, 0, msg=result.output)
             self.assertTrue(tracked_file.read_text(encoding="utf-8").startswith("//|"))
             self.assertIn("SPDX-License-Identifier: Apache-2.0", tracked_file.read_text(encoding="utf-8"))
+
+    def test_license_header_updates_shebang_file_without_extension(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            repo_root = Path(tmp_dir)
+            _init_git_repo(repo_root)
+            _write_notice(repo_root / "NOTICE")
+
+            tracked_file = repo_root / "telepact-project"
+            tracked_file.write_text("#!/usr/bin/env bash\n\necho hello\n", encoding="utf-8")
+
+            subprocess.run(["git", "add", "."], cwd=repo_root, check=True)
+
+            runner = CliRunner()
+            with _pushd(repo_root):
+                result = runner.invoke(main, ["license-header", "NOTICE"])
+
+            self.assertEqual(result.exit_code, 0, msg=result.output)
+            tracked_file_contents = tracked_file.read_text(encoding="utf-8")
+            self.assertTrue(tracked_file_contents.startswith("#!/usr/bin/env bash\n\n#|"))
+            self.assertIn("SPDX-License-Identifier: Apache-2.0", tracked_file_contents)
+
+    def test_license_header_replaces_existing_html_header_after_leading_comment_preamble(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            repo_root = Path(tmp_dir)
+            _init_git_repo(repo_root)
+            _write_notice(repo_root / "NOTICE")
+
+            tracked_file = repo_root / "site" / "src" / "index.template.html"
+            tracked_file.parent.mkdir(parents=True)
+            tracked_file.write_text(
+                textwrap.dedent(
+                    """
+                    <!--
+                      Source template for the Telepact home page.
+                    -->
+                    <!--|                                                                            |-->
+                    <!--|  Copyright The Telepact Authors                                            |-->
+                    <!--|                                                                            |-->
+                    <!--|  Licensed under the Apache License, Version 2.0 (the "License");           |-->
+                    <!--|  you may not use this file except in compliance with the License.          |-->
+                    <!--|  You may obtain a copy of the License at                                   |-->
+                    <!--|                                                                            |-->
+                    <!--|  https://www.apache.org/licenses/LICENSE-2.0                               |-->
+                    <!--|                                                                            |-->
+                    <!--|  Unless required by applicable law or agreed to in writing, software       |-->
+                    <!--|  distributed under the License is distributed on an "AS IS" BASIS,         |-->
+                    <!--|  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  |-->
+                    <!--|  See the License for the specific language governing permissions and        |-->
+                    <!--|  limitations under the License.                                             |-->
+                    <!--|                                                                            |-->
+
+                    <div>Hello</div>
+                    """
+                ).lstrip(),
+                encoding="utf-8",
+            )
+
+            subprocess.run(["git", "add", "."], cwd=repo_root, check=True)
+
+            runner = CliRunner()
+            with _pushd(repo_root):
+                result = runner.invoke(main, ["license-header", "NOTICE"])
+
+            self.assertEqual(result.exit_code, 0, msg=result.output)
+            tracked_file_contents = tracked_file.read_text(encoding="utf-8")
+            self.assertTrue(tracked_file_contents.startswith("<!--|"))
+            self.assertIn("SPDX-License-Identifier: Apache-2.0", tracked_file_contents)
+            self.assertEqual(tracked_file_contents.count("Source template for the Telepact home page."), 1)
+            self.assertEqual(tracked_file_contents.count('Licensed under the Apache License, Version 2.0 (the "License");'), 0)
 
 
 if __name__ == "__main__":
