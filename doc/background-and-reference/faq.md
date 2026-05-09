@@ -257,3 +257,21 @@ Telepact console specifically utilizes this technique to allow end-users to
 Omitting fields in the argument struct disrupts the API provider's ability to
 established well-defined links, and consequently, the `"@select_"` header is
 disallowed from omitting fields in function argument structs.
+
+## Can I use `"@select_"` for structs and unions that are only reachable through a function link?
+
+Yes. If a returned function link leads to another result graph that contains
+reachable structs or unions, those downstream types may still appear in the
+`"@select_"` header.
+
+Telepact treats that as a response-shaping request, not as permission to edit
+the returned function link itself. The link payload is left intact so it can
+still be copied into a later request and executed as-is.
+
+In practice, this means:
+
+- you may select downstream `struct.*` and `union.*` targets that are reachable
+  through a returned function link
+- Telepact will still avoid stripping fields from the returned `fn.*` payload
+  itself
+- other non-link parts of the same response graph are still selected normally
