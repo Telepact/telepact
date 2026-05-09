@@ -241,7 +241,7 @@ all union tags are associated with structs means the backwards compatible option
 of adding a new struct field is always available to software designers dealing
 with the needs of evolving software.
 
-## Why can I not omit fn.\* fields using the `"@select_"` header?
+## Why can I not omit `fn.*` fields using the `"@select_"` header?
 
 The `"@select_"` header is used to omit fields from the response result graph:
 the active result union, reachable structs, and reachable union payload
@@ -258,20 +258,18 @@ Omitting fields in the argument struct disrupts the API provider's ability to
 established well-defined links, and consequently, the `"@select_"` header is
 disallowed from omitting fields in function argument structs.
 
-## Can I use `"@select_"` for structs and unions that are only reachable through a function link?
+## Why does `"@select_"` not work for fields in structs reachable from a `fn.*` type?
 
-Yes. If a returned function link leads to another result graph that contains
-reachable structs or unions, those downstream types may still appear in the
-`"@select_"` header.
+If a struct appears beneath the json tree of a `fn.*` type, that struct is
+ignored by the `"@select_"` filtering process.
 
-Telepact treats that as a response-shaping request, not as permission to edit
-the returned function link itself. The link payload is left intact so it can
-still be copied into a later request and executed as-is.
+Similarly to why the argument fields of a `fn.*` are ineligible for selection,
+all types that appear beneath a `fn.*` type cannot have field stripped because
+that would compromise the readiness of the "link-like" capability of simply
+copying and pasting the function payload as-is into another call.
 
-In practice, this means:
-
-- you may select downstream `struct.*` and `union.*` targets that are reachable
-  through a returned function link
-- Telepact will still avoid stripping fields from the returned `fn.*` payload
-  itself
-- other non-link parts of the same response graph are still selected normally
+While `"@select_"` will fail loudly if you try to specify a field exactly
+on the `fn.*` type, `"@select_"` directives on structs that appear beneath
+`fn.*` types are ignored silently because those structs could technically
+appear outside a `fn.*` type in the response and would be eligible for normal
+field selection.
