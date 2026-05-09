@@ -505,6 +505,7 @@ def _render_payload_reduction_svg(
     plot_height = height - margin_top - margin_bottom
 
     x_values = [int(row['list_size']) for row in trend_measurements]
+    x_ticks = sorted(set(x_values))
     x_min = min(x_values)
     x_max = max(x_values)
     y_min = 0
@@ -533,7 +534,7 @@ def _render_payload_reduction_svg(
         y_svg = y_to_svg(y_tick)
         parts.append(f'<line class="grid" x1="{margin_left}" y1="{y_svg}" x2="{width - margin_right}" y2="{y_svg}" />')
         parts.append(f'<text x="{margin_left - 12}" y="{y_svg + 4}" text-anchor="end">{y_tick}%</text>')
-    for x_tick in TREND_ROW_COUNTS:
+    for x_tick in x_ticks:
         x_svg = x_to_svg(x_tick)
         parts.append(f'<line class="grid" x1="{x_svg}" y1="{margin_top}" x2="{x_svg}" y2="{height - margin_bottom}" />')
         parts.append(f'<text x="{x_svg}" y="{height - margin_bottom + 22}" text-anchor="middle">{x_tick}</text>')
