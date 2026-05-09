@@ -31,6 +31,16 @@ from telepact import Client, Message, Serializer
 from server import build_telepact_server
 
 PACKED_BYTE = 17
+TREND_ROW_COUNTS = [8, 16, 32, 64, 128, 192, 256, 384]
+TREND_SIZE = 'big'
+SVG_SERIES_COLORS = {
+    'typical_json': '#6b7280',
+    'typical_binary': '#2563eb',
+    'typical_packed_binary': '#1d4ed8',
+    'integers_json': '#9ca3af',
+    'integers_binary': '#ea580c',
+    'integers_packed_binary': '#c2410c',
+}
 
 
 @dataclass(frozen=True)
@@ -39,6 +49,7 @@ class Scenario:
     title: str
     function_name: str
     select_header: dict[str, object]
+    supports_row_count: bool = False
 
 
 @dataclass(frozen=True)
@@ -90,6 +101,7 @@ SCENARIOS = [
             'struct.Record': ['recordId', 'status', 'score'],
             'struct.RecordSummary': ['totalRows', 'totalScore'],
         },
+        supports_row_count=True,
     ),
     Scenario(
         key='integer_row_batch',
@@ -100,6 +112,7 @@ SCENARIOS = [
             'struct.IntegerRow': ['col01', 'col02', 'col03', 'col04'],
             'struct.IntegerRowSummary': ['totalRows', 'maxValue'],
         },
+        supports_row_count=True,
     ),
     Scenario(
         key='dashboard',
@@ -157,13 +170,30 @@ def _estimate_total_network_latency_ms(total_bytes: float, profile: NetworkProfi
     return round(profile.round_trip_ms + transfer_ms, 3)
 
 
-def _build_request(scenario: Scenario, size: str, use_select: bool, use_unsafe: bool) -> Message:
+def _default_row_count(scenario: Scenario, size: str) -> int:
+    if scenario.key == 'record_batch':
+        return 10 if size == 'small' else 120
+    if scenario.key == 'integer_row_batch':
+        return 30 if size == 'small' else 360
+    raise ValueError(f'Scenario does not support row count defaults: {scenario.key}')
+
+
+def _build_request(
+    scenario: Scenario,
+    size: str,
+    use_select: bool,
+    use_unsafe: bool,
+    row_count: int | None = None,
+) -> Message:
     headers: dict[str, object] = {}
     if use_select:
         headers['@select_'] = json.loads(json.dumps(scenario.select_header))
     if use_unsafe:
         headers['@unsafe_'] = True
-    return Message(headers, {scenario.function_name: {'size': size}})
+    request_body: dict[str, object] = {'size': size}
+    if scenario.supports_row_count:
+        request_body['rowCount'] = row_count if row_count is not None else _default_row_count(scenario, size)
+    return Message(headers, {scenario.function_name: request_body})
 
 
 def _build_client(use_binary: bool) -> tuple[Client, list[CallSample]]:
@@ -210,6 +240,7 @@ async def _measure_permutation(
     use_unsafe: bool,
     cycles: int,
     steady_state_warmup: int,
+    row_count: int | None = None,
 ) -> dict[str, object]:
     client, samples = _build_client(use_binary)
     measured_samples: list[CallSample] = []
@@ -218,7 +249,7 @@ async def _measure_permutation(
     max_attempts = cycles + steady_state_warmup + 8
 
     while len(measured_samples) < cycles:
-        message = _build_request(scenario, size, use_select, use_unsafe)
+        message = _build_request(scenario, size, use_select, use_unsafe, row_count=row_count)
         if use_binary and use_packed:
             message.headers['@pac_'] = True
         await client.request(message)
@@ -254,6 +285,7 @@ async def _measure_permutation(
         'scenario': scenario.key,
         'scenario_title': scenario.title,
         'size': size,
+        'row_count': row_count,
         'client_mode': 'binary' if use_binary else 'json',
         'use_packed': use_packed,
         'steady_state_wire_mode': next(iter(response_wire_modes)),
@@ -298,6 +330,258 @@ def _render_table(rows: list[dict[str, object]], columns: list[tuple[str, str]])
         for row in rows
     ]
     return '\n'.join([header, divider, *body])
+
+
+def _format_pct(value: float) -> float:
+    return round(value, 1)
+
+
+def _pct_change(new_value: float, old_value: float) -> float:
+    if old_value == 0:
+        return 0.0
+    return ((new_value / old_value) - 1) * 100
+
+
+def _payload_reduction_pct(new_value: float, baseline: float) -> float:
+    if baseline == 0:
+        return 0.0
+    return (1 - (new_value / baseline)) * 100
+
+
+def _series_key(scenario_key: str, client_mode: str, use_packed: bool) -> str:
+    family = 'typical' if scenario_key == 'record_batch' else 'integers'
+    mode = 'packed_binary' if use_packed else client_mode
+    return f'{family}_{mode}'
+
+
+def _series_title(series_key: str) -> str:
+    return {
+        'typical_json': 'Typical JSON',
+        'typical_binary': 'Typical binary',
+        'typical_packed_binary': 'Typical packed binary',
+        'integers_json': 'Integers JSON',
+        'integers_binary': 'Integers binary',
+        'integers_packed_binary': 'Integers packed binary',
+    }[series_key]
+
+
+def _solve_linear_system(matrix: list[list[float]], vector: list[float]) -> list[float]:
+    size = len(vector)
+    augmented = [row[:] + [value] for row, value in zip(matrix, vector, strict=True)]
+    for pivot_index in range(size):
+        pivot_row = max(range(pivot_index, size), key=lambda row_index: abs(augmented[row_index][pivot_index]))
+        augmented[pivot_index], augmented[pivot_row] = augmented[pivot_row], augmented[pivot_index]
+        pivot = augmented[pivot_index][pivot_index]
+        if abs(pivot) < 1e-12:
+            raise ValueError('Singular matrix')
+        for column_index in range(pivot_index, size + 1):
+            augmented[pivot_index][column_index] /= pivot
+        for row_index in range(size):
+            if row_index == pivot_index:
+                continue
+            factor = augmented[row_index][pivot_index]
+            for column_index in range(pivot_index, size + 1):
+                augmented[row_index][column_index] -= factor * augmented[pivot_index][column_index]
+    return [augmented[row_index][-1] for row_index in range(size)]
+
+
+def _fit_quadratic_regression(xs: list[int], ys: list[float]) -> tuple[float, float, float, int, int]:
+    min_x = min(xs)
+    max_x = max(xs)
+    span = max(max_x - min_x, 1)
+    normalized_xs = [(x - min_x) / span for x in xs]
+    s0 = len(xs)
+    s1 = sum(normalized_xs)
+    s2 = sum(x ** 2 for x in normalized_xs)
+    s3 = sum(x ** 3 for x in normalized_xs)
+    s4 = sum(x ** 4 for x in normalized_xs)
+    sy = sum(ys)
+    sxy = sum(x * y for x, y in zip(normalized_xs, ys, strict=True))
+    sx2y = sum((x ** 2) * y for x, y in zip(normalized_xs, ys, strict=True))
+    try:
+        a, b, c = _solve_linear_system(
+            [
+                [s0, s1, s2],
+                [s1, s2, s3],
+                [s2, s3, s4],
+            ],
+            [sy, sxy, sx2y],
+        )
+    except ValueError:
+        a = mean(ys)
+        b = 0.0
+        c = 0.0
+    return a, b, c, min_x, span
+
+
+def _evaluate_quadratic_regression(coefficients: tuple[float, float, float, int, int], x: float) -> float:
+    a, b, c, min_x, span = coefficients
+    normalized_x = (x - min_x) / span
+    return a + (b * normalized_x) + (c * (normalized_x ** 2))
+
+
+def _build_trend_regressions(trend_measurements: list[dict[str, object]], steps: int = 40) -> list[dict[str, object]]:
+    grouped: dict[str, list[dict[str, object]]] = {}
+    for row in trend_measurements:
+        grouped.setdefault(row['series_key'], []).append(row)
+
+    regressions: list[dict[str, object]] = []
+    for series_key, rows in sorted(grouped.items()):
+        sorted_rows = sorted(rows, key=lambda row: row['list_size'])
+        xs = [int(row['list_size']) for row in sorted_rows]
+        ys = [float(row['payload_reduction_pct']) for row in sorted_rows]
+        coefficients = _fit_quadratic_regression(xs, ys)
+        min_x = min(xs)
+        max_x = max(xs)
+        if max_x == min_x:
+            curve_xs = [float(min_x)]
+        else:
+            curve_xs = [min_x + ((max_x - min_x) * step / (steps - 1)) for step in range(steps)]
+        regressions.append({
+            'series_key': series_key,
+            'series_title': _series_title(series_key),
+            'curve_points': [{
+                'list_size': round(x_value, 2),
+                'payload_reduction_pct': _format_pct(min(100.0, max(0.0, _evaluate_quadratic_regression(coefficients, x_value)))),
+            } for x_value in curve_xs],
+        })
+    return regressions
+
+
+def _build_trend_measurements(
+    measurements: list[dict[str, object]],
+    trend_measurements: list[dict[str, object]],
+) -> list[dict[str, object]]:
+    del measurements
+    return sorted(trend_measurements, key=lambda row: (row['series_key'], row['list_size']))
+
+
+def _build_timing_tradeoffs(measurements: list[dict[str, object]]) -> list[dict[str, object]]:
+    grouped: dict[tuple[str, str], list[dict[str, object]]] = {}
+    for row in measurements:
+        grouped.setdefault((row['scenario'], row['size']), []).append(row)
+
+    rows: list[dict[str, object]] = []
+    technique_specs = [
+        ('@select_', {'client_mode': 'json', 'use_packed': False, 'use_select': True, 'use_unsafe': False}),
+        ('binary', {'client_mode': 'binary', 'use_packed': False, 'use_select': False, 'use_unsafe': False}),
+        ('@pac_ (binary)', {'client_mode': 'binary', 'use_packed': True, 'use_select': False, 'use_unsafe': False}),
+        ('@unsafe_', {'client_mode': 'json', 'use_packed': False, 'use_select': False, 'use_unsafe': True}),
+    ]
+    for (scenario, size), scenario_rows in sorted(grouped.items()):
+        baseline = next(
+            row for row in scenario_rows
+            if row['client_mode'] == 'json' and not row['use_packed'] and not row['use_select'] and not row['use_unsafe']
+        )
+        for technique, criteria in technique_specs:
+            candidate = next(row for row in scenario_rows if all(row[key] == value for key, value in criteria.items()))
+            serialize_change_pct = _format_pct(_pct_change(candidate['median_serialize_us'], baseline['median_serialize_us']))
+            deserialize_change_pct = _format_pct(_pct_change(candidate['median_deserialize_us'], baseline['median_deserialize_us']))
+            payload_reduction_pct = _format_pct(_payload_reduction_pct(candidate['mean_total_bytes'], baseline['mean_total_bytes']))
+            rows.append({
+                'scenario': scenario,
+                'size': size,
+                'technique': technique,
+                'payload_reduction_pct': payload_reduction_pct,
+                'serialize_change_pct': serialize_change_pct,
+                'deserialize_change_pct': deserialize_change_pct,
+                'serialize_note': 'slower' if serialize_change_pct > 3 else 'faster' if serialize_change_pct < -3 else 'about even',
+                'deserialize_note': 'slower' if deserialize_change_pct > 3 else 'faster' if deserialize_change_pct < -3 else 'about even',
+            })
+    return rows
+
+
+def _render_payload_reduction_svg(
+    trend_measurements: list[dict[str, object]],
+    trend_regressions: list[dict[str, object]],
+) -> str:
+    width = 920
+    height = 560
+    margin_left = 90
+    margin_right = 30
+    margin_top = 40
+    margin_bottom = 80
+    plot_width = width - margin_left - margin_right
+    plot_height = height - margin_top - margin_bottom
+
+    x_values = [int(row['list_size']) for row in trend_measurements]
+    x_min = min(x_values)
+    x_max = max(x_values)
+    y_min = 0
+    y_max = 100
+
+    def x_to_svg(x_value: float) -> float:
+        if x_max == x_min:
+            return margin_left + (plot_width / 2)
+        return margin_left + ((x_value - x_min) / (x_max - x_min) * plot_width)
+
+    def y_to_svg(y_value: float) -> float:
+        return margin_top + ((y_max - y_value) / (y_max - y_min) * plot_height)
+
+    parts = [
+        f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" role="img" aria-label="Payload reduction percent by list size">',
+        '<style>',
+        'text { font-family: Arial, sans-serif; font-size: 12px; fill: #111827; }',
+        '.axis { stroke: #111827; stroke-width: 1; }',
+        '.grid { stroke: #e5e7eb; stroke-width: 1; }',
+        '.series-line { fill: none; stroke-width: 2.5; }',
+        '.series-point { stroke: white; stroke-width: 1.5; }',
+        '</style>',
+    ]
+
+    for y_tick in [0, 20, 40, 60, 80, 100]:
+        y_svg = y_to_svg(y_tick)
+        parts.append(f'<line class="grid" x1="{margin_left}" y1="{y_svg}" x2="{width - margin_right}" y2="{y_svg}" />')
+        parts.append(f'<text x="{margin_left - 12}" y="{y_svg + 4}" text-anchor="end">{y_tick}%</text>')
+    for x_tick in TREND_ROW_COUNTS:
+        x_svg = x_to_svg(x_tick)
+        parts.append(f'<line class="grid" x1="{x_svg}" y1="{margin_top}" x2="{x_svg}" y2="{height - margin_bottom}" />')
+        parts.append(f'<text x="{x_svg}" y="{height - margin_bottom + 22}" text-anchor="middle">{x_tick}</text>')
+
+    parts.append(f'<line class="axis" x1="{margin_left}" y1="{height - margin_bottom}" x2="{width - margin_right}" y2="{height - margin_bottom}" />')
+    parts.append(f'<line class="axis" x1="{margin_left}" y1="{margin_top}" x2="{margin_left}" y2="{height - margin_bottom}" />')
+    parts.append(f'<text x="{width / 2}" y="{height - 20}" text-anchor="middle">List size (rows)</text>')
+    parts.append(f'<text x="24" y="{height / 2}" transform="rotate(-90 24 {height / 2})" text-anchor="middle">Payload reduction percent</text>')
+
+    grouped_points: dict[str, list[dict[str, object]]] = {}
+    for row in trend_measurements:
+        grouped_points.setdefault(row['series_key'], []).append(row)
+
+    for regression in trend_regressions:
+        color = SVG_SERIES_COLORS[regression['series_key']]
+        points_attr = ' '.join(
+            f'{x_to_svg(float(point["list_size"])):.2f},{y_to_svg(float(point["payload_reduction_pct"])):.2f}'
+            for point in regression['curve_points']
+        )
+        parts.append(f'<polyline class="series-line" stroke="{color}" points="{points_attr}" />')
+
+    for series_key, rows in sorted(grouped_points.items()):
+        color = SVG_SERIES_COLORS[series_key]
+        for row in sorted(rows, key=lambda item: item['list_size']):
+            parts.append(
+                f'<circle class="series-point" cx="{x_to_svg(float(row["list_size"])):.2f}" '
+                f'cy="{y_to_svg(float(row["payload_reduction_pct"])):.2f}" r="4" fill="{color}" />'
+            )
+
+    legend_x = margin_left + 10
+    legend_y = 18
+    for index, series_key in enumerate([
+        'typical_json',
+        'typical_binary',
+        'typical_packed_binary',
+        'integers_json',
+        'integers_binary',
+        'integers_packed_binary',
+    ]):
+        x_offset = legend_x + ((index % 3) * 245)
+        y_offset = legend_y + ((index // 3) * 18)
+        color = SVG_SERIES_COLORS[series_key]
+        parts.append(f'<line class="series-line" stroke="{color}" x1="{x_offset}" y1="{y_offset}" x2="{x_offset + 24}" y2="{y_offset}" />')
+        parts.append(f'<circle class="series-point" cx="{x_offset + 12}" cy="{y_offset}" r="4" fill="{color}" />')
+        parts.append(f'<text x="{x_offset + 32}" y="{y_offset + 4}">{_series_title(series_key)}</text>')
+
+    parts.append('</svg>')
+    return '\n'.join(parts)
 
 
 def _build_recommendations(measurements: list[dict[str, object]]) -> list[str]:
@@ -367,8 +651,16 @@ def _build_recommendations(measurements: list[dict[str, object]]) -> list[str]:
     return recommendations
 
 
-async def run_benchmark(cycles: int = 80, steady_state_warmup: int = 4) -> dict[str, object]:
+async def run_benchmark(
+    cycles: int = 80,
+    steady_state_warmup: int = 4,
+    trend_cycles: int | None = None,
+    trend_row_counts: list[int] | None = None,
+) -> dict[str, object]:
     measurements: list[dict[str, object]] = []
+    trend_rows: list[dict[str, object]] = []
+    trend_cycles = trend_cycles if trend_cycles is not None else max(4, min(cycles, 8))
+    trend_row_counts = trend_row_counts if trend_row_counts is not None else TREND_ROW_COUNTS
     gc_enabled = gc.isenabled()
     gc.disable()
     try:
@@ -389,21 +681,59 @@ async def run_benchmark(cycles: int = 80, steady_state_warmup: int = 4) -> dict[
                                     cycles=cycles,
                                     steady_state_warmup=steady_state_warmup,
                                 ))
+        trend_scenarios = [scenario for scenario in SCENARIOS if scenario.key in ['record_batch', 'integer_row_batch']]
+        for scenario in trend_scenarios:
+            for row_count in trend_row_counts:
+                scenario_trend_rows: list[dict[str, object]] = []
+                for use_binary in [False, True]:
+                    packed_options = [False, True] if use_binary else [False]
+                    for use_packed in packed_options:
+                        scenario_trend_rows.append(await _measure_permutation(
+                            scenario=scenario,
+                            size=TREND_SIZE,
+                            row_count=row_count,
+                            use_binary=use_binary,
+                            use_packed=use_packed,
+                            use_select=False,
+                            use_unsafe=False,
+                            cycles=trend_cycles,
+                            steady_state_warmup=steady_state_warmup,
+                        ))
+                baseline = next(row for row in scenario_trend_rows if row['client_mode'] == 'json')
+                for row in scenario_trend_rows:
+                    row['family'] = 'typical' if scenario.key == 'record_batch' else 'integers'
+                    row['list_size'] = row_count
+                    row['series_key'] = _series_key(scenario.key, row['client_mode'], row['use_packed'])
+                    row['series_title'] = _series_title(row['series_key'])
+                    row['payload_reduction_pct'] = _format_pct(
+                        _payload_reduction_pct(row['mean_total_bytes'], baseline['mean_total_bytes'])
+                    )
+                    row['baseline_json_total_bytes'] = baseline['mean_total_bytes']
+                    trend_rows.append(row)
     finally:
         if gc_enabled:
             gc.enable()
 
     measurements.sort(key=_measurement_sort_key)
+    trend_measurements = _build_trend_measurements(measurements, trend_rows)
+    trend_regressions = _build_trend_regressions(trend_measurements)
     return {
         'cycles': cycles,
         'steady_state_warmup': steady_state_warmup,
+        'trend_cycles': trend_cycles,
+        'trend_row_counts': trend_row_counts,
         'measurements': measurements,
+        'trend_measurements': trend_measurements,
+        'trend_regressions': trend_regressions,
+        'timing_tradeoffs': _build_timing_tradeoffs(measurements),
         'recommendations': _build_recommendations(measurements),
     }
 
 
 def render_report(report: dict[str, object]) -> str:
     measurements = report['measurements']
+    trend_measurements = report['trend_measurements']
+    timing_tradeoffs = report['timing_tradeoffs']
     measurement_rows = [{
         'scenario': row['scenario'],
         'size': row['size'],
@@ -434,6 +764,25 @@ def render_report(report: dict[str, object]) -> str:
         }
         network_row.update(row['network_latency_ms'])
         network_rows.append(network_row)
+
+    trend_rows = [{
+        'series': row['series_title'],
+        'list_size': row['list_size'],
+        'reduction_pct': row['payload_reduction_pct'],
+        'wire': row['steady_state_wire_mode'],
+        'total_b': row['mean_total_bytes'],
+    } for row in trend_measurements]
+
+    tradeoff_rows = [{
+        'scenario': row['scenario'],
+        'size': row['size'],
+        'technique': row['technique'],
+        'payload_pct': row['payload_reduction_pct'],
+        'ser_pct': row['serialize_change_pct'],
+        'ser_note': row['serialize_note'],
+        'deser_pct': row['deserialize_change_pct'],
+        'deser_note': row['deserialize_note'],
+    } for row in timing_tradeoffs]
 
     return '\n'.join([
         '# Telepact Python performance harness',
@@ -475,22 +824,74 @@ def render_report(report: dict[str, object]) -> str:
             ('intercontinental', 'Intercontinental ms'),
         ]),
         '',
+        '## Packed-binary trend graph',
+        'Scatter points show measured payload reduction vs the same-family JSON baseline; lines are quadratic regression curves over those points.',
+        _render_payload_reduction_svg(trend_measurements, report['trend_regressions']),
+        '',
+        '## Packed-binary trend data',
+        _render_table(trend_rows, [
+            ('series', 'series'),
+            ('list_size', 'list size'),
+            ('reduction_pct', 'payload reduction %'),
+            ('wire', 'wire'),
+            ('total_b', 'total bytes'),
+        ]),
+        '',
+        '## Timing tradeoffs vs plain JSON',
+        _render_table(tradeoff_rows, [
+            ('scenario', 'scenario'),
+            ('size', 'size'),
+            ('technique', 'technique'),
+            ('payload_pct', 'payload reduction %'),
+            ('ser_pct', 'serialize Δ%'),
+            ('ser_note', 'serialize'),
+            ('deser_pct', 'deserialize Δ%'),
+            ('deser_note', 'deserialize'),
+        ]),
+        '',
         '## Recommendations',
         *[f'- {recommendation}' for recommendation in report['recommendations']],
     ])
 
 
-def run_benchmark_sync(cycles: int = 80, steady_state_warmup: int = 4) -> dict[str, object]:
-    return asyncio.run(run_benchmark(cycles=cycles, steady_state_warmup=steady_state_warmup))
+def run_benchmark_sync(
+    cycles: int = 80,
+    steady_state_warmup: int = 4,
+    trend_cycles: int | None = None,
+    trend_row_counts: list[int] | None = None,
+) -> dict[str, object]:
+    return asyncio.run(
+        run_benchmark(
+            cycles=cycles,
+            steady_state_warmup=steady_state_warmup,
+            trend_cycles=trend_cycles,
+            trend_row_counts=trend_row_counts,
+        )
+    )
+
+
+def _parse_row_counts(value: str) -> list[int]:
+    return [int(part.strip()) for part in value.split(',') if part.strip()]
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description='Run the Telepact Python performance harness.')
     parser.add_argument('--cycles', type=int, default=80, help='Steady-state samples to collect per permutation.')
     parser.add_argument('--steady-state-warmup', type=int, default=4, help='Extra steady-state warmup samples to discard after negotiation.')
+    parser.add_argument('--trend-cycles', type=int, help='Steady-state samples to collect per list-size trend point.')
+    parser.add_argument(
+        '--trend-row-counts',
+        type=_parse_row_counts,
+        help='Comma-separated row counts to use for list-size trend plotting (for example: 8,16,32,64,128).',
+    )
     args = parser.parse_args(argv)
 
-    report = run_benchmark_sync(cycles=args.cycles, steady_state_warmup=args.steady_state_warmup)
+    report = run_benchmark_sync(
+        cycles=args.cycles,
+        steady_state_warmup=args.steady_state_warmup,
+        trend_cycles=args.trend_cycles,
+        trend_row_counts=args.trend_row_counts,
+    )
     print(render_report(report))
     return 0
 

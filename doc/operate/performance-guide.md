@@ -77,7 +77,48 @@ If you want a simple rule of thumb:
 - expect `@pac_` to be **minor** for many mixed/nested shapes and **major** for
   large homogeneous row sets, especially integer-only rows
 
-## 4. Guidance by client situation
+The harness now also renders a trend graph for list-heavy workloads. In the
+current Python measurements:
+
+- the **typical row** curves stay fairly flat as list size grows; binary stays
+  around **28% to 29%** smaller than JSON and packed binary stays around
+  **30% to 31%** smaller
+- the **integer-only row** curves stay much higher; binary stays around
+  **73% to 75%** smaller than JSON and packed binary stays around **77% to 81%**
+  smaller
+- the packed-binary advantage becomes easiest to justify when the list is both
+  **large** and **structurally repetitive**, especially for integer-only rows
+
+## 4. Payload size is not the whole story: serialization/deserialization tradeoffs
+
+The Python harness also records client-side serialization and deserialization
+times. That matters because some techniques reduce bytes while increasing codec
+CPU time.
+
+These numbers are from the current Python harness and compare each intervention
+to plain JSON for the same scenario:
+
+| Situation | Technique | Payload change | Serialize change | Deserialize change | What to expect |
+| --- | --- | --- | --- | --- | --- |
+| Large dashboard / partial-read UI response | `@select_` | **-72%** (19.2 KB -> 5.4 KB) | **+28%** (6.8 µs -> 8.6 µs) | **-61%** (88 µs -> 34.8 µs) | Slightly more request work because of the selection header, but much cheaper response decode because far less data comes back |
+| Large dashboard / nested typical payload | binary | **-46%** (19.2 KB -> 10.3 KB) | **+50%** (6.8 µs -> 10.1 µs) | **+920%** (88 µs -> 898 µs) | Smaller wire payload, but the Python client pays much more decode cost than JSON here |
+| Large mixed row batch | binary | **-28%** (39.8 KB -> 28.8 KB) | **+46%** (7.1 µs -> 10.3 µs) | **+881%** (107 µs -> 1,054 µs) | Byte savings help the network, but client decode work goes up substantially |
+| Large mixed row batch | `@pac_` on binary | **-30%** (39.8 KB -> 27.8 KB) | **+117%** (7.1 µs -> 15.3 µs) | **+1,771%** (107 µs -> 2,010 µs) | Only a modest byte win over normal binary, but a noticeably larger codec cost |
+| Large integer-only row batch | binary | **-75%** (70.0 KB -> 17.7 KB) | **+62%** (8.6 µs -> 14.0 µs) | **+930%** (429 µs -> 4,416 µs) | The wire-size gain is dramatic, but Python decode still becomes much slower |
+| Large integer-only row batch | `@pac_` on binary | **-81%** (70.0 KB -> 13.4 KB) | **+128%** (8.6 µs -> 19.7 µs) | **+1,874%** (429 µs -> 8,465 µs) | This is the strongest packed-binary byte win, but also the clearest CPU tradeoff |
+| Large flat string payload | binary | **-9%** (1.9 KB -> 1.7 KB) | **+47%** (4.9 µs -> 7.2 µs) | **+184%** (7.9 µs -> 22.5 µs) | Usually not worth it if your main goal is client-side codec speed |
+| Trusted hot path | `@unsafe_` | roughly **0%** bytes | roughly **noise-level** client serialization change | roughly **noise-level** client deserialization change | Any benefit is mostly server-side validation work, not client codec work |
+
+Two practical implications:
+
+- `@select_` is the cleanest win when the client only needs part of the response,
+  because it usually shrinks bytes **and** reduces response decode time even if
+  request serialization gets a little slower
+- binary and especially packed binary can be excellent **network** optimizations
+  while still being poor **client codec** optimizations in the current Python
+  harness; measure both before optimizing for the wrong bottleneck
+
+## 5. Guidance by client situation
 
 ### Browser or mobile UI reading only part of a large response
 
@@ -99,6 +140,9 @@ Expected magnitude:
   72%**
 - in the harness, a large dashboard dropped from about **19 KB** total to about
   **5.4 KB** with `@select_`
+- in that same case, request serialization rose only slightly, from about
+  **6.8 µs** to **8.6 µs**, while response deserialization fell from about
+  **88 µs** to **34.8 µs**
 - on the harness's regional 4G profile, that moved the same dashboard from about
   **62.7 ms** estimated wire time to about **57.2 ms**; the byte reduction is
   much larger than the latency reduction because that profile already carries a
@@ -131,6 +175,9 @@ Expected magnitude:
   harness saw about **75%** byte reduction on a large integer-only row batch
 - for string-heavy flat payloads, expect much smaller gains; the harness saw
   only about **9%** on the large flat-string case
+- in the current Python harness, these byte reductions often came with
+  **materially slower client deserialization**, so binary is not automatically a
+  client-CPU win
 
 Typical fit:
 
@@ -160,9 +207,15 @@ Expected magnitude:
 - for large integer-only row batches, `@pac_` is much more compelling; the
   harness saw about **24%** additional savings over normal binary and about
   **81%** savings versus JSON overall
+- the trend graph in the harness makes this visible across list sizes: typical
+  packed-binary rows stay near **30%** smaller than JSON, while integer-only
+  packed-binary rows climb into the **high-70s to low-80s**
 - in absolute terms, that large integer-only row batch fell from about **70 KB**
   total in JSON to about **17.7 KB** in binary and about **13.4 KB** in packed
   binary
+- on the client-CPU side, packed binary was also the clearest tradeoff in the
+  Python harness: that same integer-only case pushed deserialization from about
+  **429 µs** in JSON to about **8,465 µs** in packed binary
 - on the harness's regional 4G profile, that same case moved from about
   **83.0 ms** estimated wire time in JSON to about **62.1 ms** in binary and
   about **60.4 ms** in packed binary
@@ -190,9 +243,9 @@ Expected magnitude:
 
 - treat this as a possible **single-digit-percent** optimization, not a primary
   payload optimization
-- in the current Python harness it was effectively noise-level, so do not lead
-  with `@unsafe_` unless you have already measured validation cost in your own
-  real path
+- in the current Python harness it was effectively noise-level on the client
+  serialization/deserialization path, so do not lead with `@unsafe_` unless you
+  have already measured validation cost in your own real path
 
 Use it when all of the following are true:
 
@@ -207,17 +260,18 @@ Avoid it for:
 - newly developed handlers
 - broad default client settings
 
-## 5. Match the optimization to the transport
+## 6. Match the optimization to the transport
 
 ### Low-latency local or same-rack links
 
 Focus first on CPU-side wins:
 
-- binary for repeated calls
+- `@select_` first when the client can skip fields
+- binary only after checking codec cost in your runtime
 - `@unsafe_` only if measurement proves validation cost matters
 
 On very fast local links, RTT is already small, so byte-size savings matter less
-than avoiding unnecessary serialization and validation work.
+than avoiding unnecessary serialization, deserialization, and validation work.
 
 ### Typical office, Wi-Fi, or regional mobile links
 
@@ -258,11 +312,12 @@ Expected magnitude:
 - by contrast, the large integer-row batch still moved by about **9.1 ms**
   because the payload itself was much larger
 
-## 6. Practical recommendations
+## 7. Practical recommendations
 
 - default to JSON for the simplest cold-start integrations and debugging-first
   workflows
-- switch to binary when the same client/server pair talks repeatedly
+- switch to binary when the same client/server pair talks repeatedly **and**
+  network size matters more than local codec cost
 - design list-heavy result sets as arrays of structs so packed binary can help
 - if those rows are mostly or entirely integers, strongly consider `@pac_`; that
   is where the most dramatic packed-binary wins show up
@@ -270,7 +325,7 @@ Expected magnitude:
 - reserve `@unsafe_` for measured, trusted, internal hot paths
 - benchmark with your real payload shapes, not synthetic scalars only
 
-## 7. What to measure in your own environment
+## 8. What to measure in your own environment
 
 At minimum, capture:
 

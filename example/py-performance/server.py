@@ -81,12 +81,13 @@ def _build_flat_strings(size: str) -> dict[str, str]:
     }
 
 
-def _build_record_batch(size: str) -> tuple[list[dict[str, object]], dict[str, object]]:
+def _build_record_batch(size: str, row_count: int | None = None) -> tuple[list[dict[str, object]], dict[str, object]]:
     cfg = _get_size_config(size)
     rows: list[dict[str, object]] = []
     total_score = 0.0
     active_rows = 0
-    for index in range(cfg['row_count']):
+    total_rows = row_count if row_count is not None else cfg['row_count']
+    for index in range(total_rows):
         active = index % 3 != 0
         score = round((index + 1) * 1.75, 2)
         total_score += score
@@ -112,12 +113,13 @@ def _build_record_batch(size: str) -> tuple[list[dict[str, object]], dict[str, o
     return rows, summary
 
 
-def _build_integer_row_batch(size: str) -> tuple[list[dict[str, int]], dict[str, int]]:
+def _build_integer_row_batch(size: str, row_count: int | None = None) -> tuple[list[dict[str, int]], dict[str, int]]:
     cfg = _get_size_config(size)
     rows: list[dict[str, int]] = []
     checksum = 0
     max_value = 0
-    for row_index in range(cfg['row_count'] * 3):
+    total_rows = row_count if row_count is not None else cfg['row_count'] * 3
+    for row_index in range(total_rows):
         row = {}
         for column_index in range(12):
             value = cfg['digit_offset'] + (row_index * 17) + column_index
@@ -212,14 +214,18 @@ async def get_flat_strings(function_name: str, request_message: Message) -> Mess
 
 
 async def get_record_batch(function_name: str, request_message: Message) -> Message:
-    size = request_message.body[function_name]['size']
-    rows, summary = _build_record_batch(size)
+    request = request_message.body[function_name]
+    size = request['size']
+    row_count = request.get('rowCount')
+    rows, summary = _build_record_batch(size, row_count)
     return Message({}, {'Ok_': {'rows': rows, 'summary': summary}})
 
 
 async def get_integer_row_batch(function_name: str, request_message: Message) -> Message:
-    size = request_message.body[function_name]['size']
-    rows, summary = _build_integer_row_batch(size)
+    request = request_message.body[function_name]
+    size = request['size']
+    row_count = request.get('rowCount')
+    rows, summary = _build_integer_row_batch(size, row_count)
     return Message({}, {'Ok_': {'rows': rows, 'summary': summary}})
 
 

@@ -17,6 +17,12 @@ sizes, and round-trip timings, then derives estimated network latency from the
 measured request and response byte counts. Binary handshake calls are discarded
 before the steady-state metrics are reported.
 
+It also generates:
+
+- an inline SVG trend graph for row-heavy payload reduction vs list size
+- regression-curve data for typical and integer-only row batches
+- a timing tradeoff table that shows when smaller payloads cost more CPU time
+
 Browse the files:
 
 - [`api/performance.telepact.yaml`](./api/performance.telepact.yaml) - Telepact schema
@@ -35,4 +41,10 @@ Run the full benchmark directly:
 
 ```bash
 python harness.py --cycles 100
+```
+
+Customize the row-trend graph inputs:
+
+```bash
+python harness.py --cycles 80 --trend-cycles 6 --trend-row-counts 8,16,32,64,128,256,384
 ```

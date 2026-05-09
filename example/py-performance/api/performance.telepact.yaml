@@ -120,12 +120,14 @@
         value: "struct.FlatStrings"
 - fn.getRecordBatch:
     size: "string"
+    rowCount: "integer"
   ->:
     - Ok_:
         rows: ["struct.Record"]
         summary: "struct.RecordSummary"
 - fn.getIntegerRowBatch:
     size: "string"
+    rowCount: "integer"
   ->:
     - Ok_:
         rows: ["struct.IntegerRow"]
