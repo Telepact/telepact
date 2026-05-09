@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from ..types.TTypeDeclaration import TTypeDeclaration
 
 
-def derive_possible_select(fn_name: str, result: 'TUnion') -> dict[str, object]:
+def derive_possible_select(fn_name: str, result: 'TUnion', parsed_types: dict[str, 'TType'] | None = None) -> dict[str, object]:
     from ..types.TUnion import TUnion
     from ..types.TStruct import TStruct
 
@@ -23,7 +23,7 @@ def derive_possible_select(fn_name: str, result: 'TUnion') -> dict[str, object]:
     ok_field_names = sorted(ok_fields.keys())
 
     for field_decl in ok_fields.values():
-        find_nested_types(field_decl.type_declaration, nested_types)
+        find_nested_types(field_decl.type_declaration, nested_types, parsed_types or {}, set())
 
     possible_select: dict[str, object] = {}
 
@@ -57,7 +57,10 @@ def derive_possible_select(fn_name: str, result: 'TUnion') -> dict[str, object]:
     return possible_select
 
 
-def find_nested_types(type_declaration: 'TTypeDeclaration', nested_types: dict[str, 'TType']) -> None:
+def find_nested_types(type_declaration: 'TTypeDeclaration',
+                      nested_types: dict[str, 'TType'],
+                      parsed_types: dict[str, 'TType'],
+                      traversed_function_results: set[str]) -> None:
     from ..types.TUnion import TUnion
     from ..types.TStruct import TStruct
     from ..types.TArray import TArray
@@ -66,19 +69,36 @@ def find_nested_types(type_declaration: 'TTypeDeclaration', nested_types: dict[s
     typ = type_declaration.type
 
     if isinstance(typ, TUnion):
+        if typ.name.startswith('fn.'):
+            result_type_name = f'{typ.name}.->'
+            if result_type_name in traversed_function_results:
+                return
+
+            traversed_function_results.add(result_type_name)
+            result_type = parsed_types.get(result_type_name)
+            if isinstance(result_type, TUnion):
+                for tag in result_type.tags.values():
+                    for field_decl in tag.fields.values():
+                        find_nested_types(field_decl.type_declaration, nested_types,
+                                          parsed_types, traversed_function_results)
+            return
+
         if typ.name in nested_types:
             return
         nested_types[typ.name] = typ
         for tag in typ.tags.values():
             for field_decl in tag.fields.values():
-                find_nested_types(field_decl.type_declaration, nested_types)
+                find_nested_types(field_decl.type_declaration, nested_types,
+                                  parsed_types, traversed_function_results)
 
     elif isinstance(typ, TStruct):
         if typ.name in nested_types:
             return
         nested_types[typ.name] = typ
         for field_decl in typ.fields.values():
-            find_nested_types(field_decl.type_declaration, nested_types)
+            find_nested_types(field_decl.type_declaration, nested_types,
+                              parsed_types, traversed_function_results)
     
     elif isinstance(typ, TArray) or isinstance(typ, TObject):
-        find_nested_types(type_declaration.type_parameters[0], nested_types)
+        find_nested_types(type_declaration.type_parameters[0], nested_types,
+                          parsed_types, traversed_function_results)

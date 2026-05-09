@@ -6,12 +6,18 @@
 - ///: A structure that can point to a follow-up function call.
   struct.Todo:
     title: "string"
+- ///: Data returned by the follow-up function and also carried inside the link.
+  struct.FollowUpDetails:
+    kept: "string"
+    extra: "string"
 - ///: Fetch the next step after creating a todo.
   fn.getFollowUp:
     id: "string"
+    details: "struct.FollowUpDetails"
   ->:
     - Ok_:
         summary: "string"
+        details: "struct.FollowUpDetails"
 - ///: Create a todo and return a link to the next step.
   fn.createIssueLink:
     title: "string"

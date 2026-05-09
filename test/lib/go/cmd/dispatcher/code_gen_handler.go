@@ -69,6 +69,10 @@ func (s *typedCodeGenServer) GetBigList(headers map[string]any, input gen.GetBig
 	return telepact.TypedMessage[gen.GetBigListOutput]{}, telepact.NewTelepactError("generated server getBigList not implemented")
 }
 
+func (s *typedCodeGenServer) DeepExample(headers map[string]any, input gen.DeepExampleInput) (telepact.TypedMessage[gen.DeepExampleOutput], error) {
+	return telepact.TypedMessage[gen.DeepExampleOutput]{}, telepact.NewTelepactError("generated server deepExample not implemented")
+}
+
 func (s *typedCodeGenServer) SelfLink(headers map[string]any, input gen.SelfLinkInput) (telepact.TypedMessage[gen.SelfLinkOutput], error) {
 	return telepact.TypedMessage[gen.SelfLinkOutput]{}, telepact.NewTelepactError("generated server selfLink not implemented")
 }

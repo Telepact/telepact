@@ -52,7 +52,7 @@ public class ParseFunctionType {
             throw new TelepactSchemaParseError(parseFailures, ctx.telepactSchemaDocumentNamesToJson);
         }
 
-        var fnSelectType = derivePossibleSelect(schemaKey, resultType);
+        var fnSelectType = derivePossibleSelect(schemaKey, resultType, ctx.parsedTypes);
         var selectType = (TSelect) getOrParseType(path, "_ext.Select_", ctx);
         selectType.possibleSelects.put(schemaKey, fnSelectType);
 

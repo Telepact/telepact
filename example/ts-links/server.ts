@@ -24,6 +24,10 @@ async function createIssueLink(functionName: string, requestMessage: Message): P
             'next!': {
                 'fn.getFollowUp': {
                     'id': 'follow-up-1',
+                    'details': {
+                        'kept': title,
+                        'extra': 'for follow-up execution',
+                    },
                 },
             },
         },
@@ -31,11 +35,13 @@ async function createIssueLink(functionName: string, requestMessage: Message): P
 }
 
 async function getFollowUp(functionName: string, requestMessage: Message): Promise<Message> {
-    const argument = requestMessage.body[functionName] as Record<string, string>;
+    const argument = requestMessage.body[functionName] as Record<string, any>;
     const followUpId = argument['id'];
+    const details = argument['details'] as Record<string, string>;
     return new Message({}, {
         'Ok_': {
-            'summary': `Followed up on ${followUpId}`,
+            'summary': `Followed up on ${followUpId} with ${details['extra']}`,
+            'details': details,
         },
     });
 }

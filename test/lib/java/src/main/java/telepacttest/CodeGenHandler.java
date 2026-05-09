@@ -343,6 +343,12 @@ public class CodeGenHandler extends TypedServerHandler {
     }
 
     @Override
+    public TypedMessage<telepacttest.gen.deepExample.Output> deepExample(Map<String, Object> headers,
+            telepacttest.gen.deepExample.Input input) {
+        throw new UnsupportedOperationException("Unimplemented method 'deepExample'");
+    }
+
+    @Override
     public TypedMessage<telepacttest.gen.circularLink1.Output> circularLink1(Map<String, Object> headers,
             telepacttest.gen.circularLink1.Input input) {
         // TODO Auto-generated method stub

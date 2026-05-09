@@ -8,6 +8,7 @@
 from __future__ import annotations
 
 import html
+import json
 import os
 import posixpath
 import re
@@ -16,6 +17,8 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Callable
+
+from docs_search import SearchablePage, build_search_index
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -29,6 +32,7 @@ GENERATED_DOCS_SOURCE_DIR = GENERATED_SOURCE_DIR / "docs"
 INDEX_TEMPLATE = SOURCE_DIR / "index.template.html"
 DOCS_TEMPLATE = SOURCE_DIR / "docs.template.html"
 DOCS_CSS_SOURCE = SOURCE_DIR / "docs.css"
+DOCS_SEARCH_SCRIPT_SOURCE = SOURCE_DIR / "docs-search.js"
 INDEX_OUTPUT = SITE_DIR / "index.html"
 LLMS_OUTPUT = SITE_DIR / "llms.txt"
 SNIPPETS_DIR = SOURCE_DIR / "snippets"
@@ -1206,6 +1210,8 @@ def render_toc(current: Page) -> str:
 
 def page_shell(page: Page, body_html: str, pages: dict[Path, Page], resources: set[Path]) -> str:
     css_href = relative_href(page.output_file.parent, DOCS_DIR / "assets" / "docs.css")
+    docs_search_script_href = relative_href(page.output_file.parent, DOCS_DIR / "assets" / "docs-search.js")
+    docs_search_index_href = relative_href(page.output_file.parent, DOCS_DIR / "assets" / "search-index.json")
     home_href = relative_href(page.output_file.parent, SITE_DIR / "index.html")
     docs_home_href = relative_href(page.output_file.parent, DOCS_DIR / "index.html", trailing_slash=True)
     favicon_href = relative_href(page.output_file.parent, SITE_DIR / "favicon.ico")
@@ -1220,6 +1226,8 @@ def page_shell(page: Page, body_html: str, pages: dict[Path, Page], resources: s
             "FAVICON_HREF": html.escape(favicon_href),
             "PRISM_CSS_HREF": html.escape(PRISM_CSS),
             "DOCS_CSS_HREF": html.escape(css_href),
+            "DOCS_SEARCH_SCRIPT_HREF": html.escape(docs_search_script_href),
+            "DOCS_SEARCH_INDEX_HREF": html.escape(docs_search_index_href),
             "HOME_HREF": html.escape(home_href),
             "DOCS_HOME_HREF": html.escape(docs_home_href),
             "REPO_URL": html.escape(REPO_URL),
@@ -1235,6 +1243,25 @@ def write_css() -> None:
     assets_dir = DOCS_DIR / "assets"
     assets_dir.mkdir(parents=True, exist_ok=True)
     shutil.copy2(DOCS_CSS_SOURCE, assets_dir / "docs.css")
+    shutil.copy2(DOCS_SEARCH_SCRIPT_SOURCE, assets_dir / "docs-search.js")
+
+
+def write_search_index(pages: dict[Path, Page]) -> None:
+    search_index_path = DOCS_DIR / "assets" / "search-index.json"
+    search_index_path.parent.mkdir(parents=True, exist_ok=True)
+    search_pages = [
+        SearchablePage(
+            title=page.title,
+            path=relative_href(DOCS_DIR, page.output_file, trailing_slash=True),
+            markdown=page.source.read_text(encoding="utf-8"),
+        )
+        for page in sorted(pages.values(), key=lambda current: current.url)
+    ]
+    search_index = build_search_index(search_pages)
+    search_index_path.write_text(
+        json.dumps(search_index, ensure_ascii=False, separators=(",", ":")),
+        encoding="utf-8",
+    )
 
 
 def write_pages(pages: dict[Path, Page], resources: set[Path]) -> None:
@@ -1245,6 +1272,7 @@ def write_pages(pages: dict[Path, Page], resources: set[Path]) -> None:
         page.title = renderer.title or page.source.stem
         page.summary = renderer.summary
         page.toc = renderer.toc
+    write_search_index(pages)
 
     for page in pages.values():
         renderer = MarkdownRenderer(page, pages, resources)

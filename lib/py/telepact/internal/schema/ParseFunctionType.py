@@ -48,7 +48,7 @@ def parse_function_result_type(path: list[object], function_definition_as_parsed
             parse_failures, ctx.telepact_schema_document_names_to_json)
 
     fn_select_type = derive_possible_select(
-        schema_key, cast(TUnion, result_type))
+        schema_key, cast(TUnion, result_type), ctx.parsed_types)
     select_type = cast(TSelect, get_or_parse_type([], '_ext.Select_', ctx))
     select_type.possible_selects[schema_key] = fn_select_type
 

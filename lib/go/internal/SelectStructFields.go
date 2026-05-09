@@ -43,6 +43,10 @@ func SelectStructFields(typeDeclaration *types.TTypeDeclaration, value any, sele
 		return result
 
 	case *types.TUnion:
+		if strings.HasPrefix(typed.Name, "fn.") {
+			return value
+		}
+
 		valueMap := toStringAnyMap(value)
 		unionTag := firstKey(valueMap)
 		unionData := toStringAnyMap(valueMap[unionTag])

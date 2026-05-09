@@ -52,7 +52,7 @@ export function parseFunctionResultType(
         throw new TelepactSchemaParseError(parseFailures, ctx.telepactSchemaDocumentNamesToJson);
     }
 
-    const fnSelectType = derivePossibleSelect(schemaKey, resultType as TUnion);
+    const fnSelectType = derivePossibleSelect(schemaKey, resultType as TUnion, ctx.parsedTypes);
 
     const selectType = getOrParseType([], '_ext.Select_', ctx) as TSelect;
     selectType.possibleSelects[schemaKey] = fnSelectType;

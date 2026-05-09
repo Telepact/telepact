@@ -13,7 +13,7 @@ import (
 )
 
 // DerivePossibleSelects computes the set of selectable fields for a function result union.
-func DerivePossibleSelects(fnName string, result *types.TUnion) map[string]any {
+func DerivePossibleSelects(fnName string, result *types.TUnion, parsedTypes map[string]types.TType) map[string]any {
 	if result == nil {
 		return map[string]any{}
 	}
@@ -27,7 +27,7 @@ func DerivePossibleSelects(fnName string, result *types.TUnion) map[string]any {
 	okFieldNames := make([]string, 0, len(okStruct.Fields))
 	for name, fieldDecl := range okStruct.Fields {
 		okFieldNames = append(okFieldNames, name)
-		findNestedTypes(fieldDecl.TypeDeclaration, nestedTypes)
+		findNestedTypes(fieldDecl.TypeDeclaration, nestedTypes, parsedTypes, map[string]struct{}{})
 	}
 	sort.Strings(okFieldNames)
 
@@ -89,13 +89,33 @@ func DerivePossibleSelects(fnName string, result *types.TUnion) map[string]any {
 	return possibleSelect
 }
 
-func findNestedTypes(typeDeclaration *types.TTypeDeclaration, nestedTypes map[string]types.TType) {
+func findNestedTypes(typeDeclaration *types.TTypeDeclaration, nestedTypes map[string]types.TType, parsedTypes map[string]types.TType, traversedFunctionResults map[string]struct{}) {
 	if typeDeclaration == nil || typeDeclaration.Type == nil {
 		return
 	}
 
 	switch typed := typeDeclaration.Type.(type) {
 	case *types.TUnion:
+		if strings.HasPrefix(typed.Name, "fn.") {
+			resultTypeName := typed.Name + ".->"
+			if _, ok := traversedFunctionResults[resultTypeName]; ok {
+				return
+			}
+
+			traversedFunctionResults[resultTypeName] = struct{}{}
+			if resultType, ok := parsedTypes[resultTypeName].(*types.TUnion); ok {
+				for _, tag := range resultType.Tags {
+					if tag == nil {
+						continue
+					}
+					for _, fieldDecl := range tag.Fields {
+						findNestedTypes(fieldDecl.TypeDeclaration, nestedTypes, parsedTypes, traversedFunctionResults)
+					}
+				}
+			}
+			return
+		}
+
 		if typed.Name != "" {
 			if nestedTypes[typed.Name] != nil {
 				return
@@ -107,7 +127,7 @@ func findNestedTypes(typeDeclaration *types.TTypeDeclaration, nestedTypes map[st
 				continue
 			}
 			for _, fieldDecl := range tag.Fields {
-				findNestedTypes(fieldDecl.TypeDeclaration, nestedTypes)
+				findNestedTypes(fieldDecl.TypeDeclaration, nestedTypes, parsedTypes, traversedFunctionResults)
 			}
 		}
 	case *types.TStruct:
@@ -118,11 +138,11 @@ func findNestedTypes(typeDeclaration *types.TTypeDeclaration, nestedTypes map[st
 			nestedTypes[typed.Name] = typed
 		}
 		for _, fieldDecl := range typed.Fields {
-			findNestedTypes(fieldDecl.TypeDeclaration, nestedTypes)
+			findNestedTypes(fieldDecl.TypeDeclaration, nestedTypes, parsedTypes, traversedFunctionResults)
 		}
 	case *types.TArray, *types.TObject:
 		if len(typeDeclaration.TypeParameters) > 0 {
-			findNestedTypes(typeDeclaration.TypeParameters[0], nestedTypes)
+			findNestedTypes(typeDeclaration.TypeParameters[0], nestedTypes, parsedTypes, traversedFunctionResults)
 		}
 	}
 }

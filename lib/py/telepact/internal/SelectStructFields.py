@@ -38,6 +38,9 @@ def select_struct_fields(type_declaration: 'TTypeDeclaration', value: object,
 
         return final_map
     elif isinstance(type_declaration_type, TUnion):
+        if type_declaration_type.name.startswith('fn.'):
+            return value
+
         value_as_map = cast(dict[str, object], value)
         union_tag, union_data = cast(
             tuple[str, dict[str, object]], next(iter(value_as_map.items())))

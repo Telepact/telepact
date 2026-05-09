@@ -165,6 +165,19 @@
         ]
     },
     {
+        "fn.deepExample": {
+            "value!": "struct.ExStruct"
+        },
+        "->": [
+            {
+                "Ok_": {
+                    "value!": "struct.ExStruct",
+                    "follow!": "fn.deepExample"
+                }
+            }
+        ]
+    },
+    {
         "fn.selfLink": {
             "required": "boolean",
             "optional!": "boolean"
