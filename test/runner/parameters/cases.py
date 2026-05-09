@@ -81,6 +81,7 @@ _EXAMPLE_FULL_SCHEMA = _load_sorted_schema(
     'common/internal.telepact.yaml',
 )
 
+# Public schema here means the example schema without Telepact internal definitions.
 _EXAMPLE_PUBLIC_SCHEMA = _load_sorted_schema(
     'test/runner/schema/example/example.telepact.json',
 )
