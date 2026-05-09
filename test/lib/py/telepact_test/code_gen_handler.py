@@ -17,7 +17,7 @@
 import json
 import base64
 from typing import Any, Dict, List, Optional, TypeVar, Callable, Tuple
-from telepact_test.gen.gen_types import test, Value, TypedServerHandler, example as fnexample, getBigList, getFollowUp, createIssueLink, Undefined, ExUnion, ExStruct
+from telepact_test.gen.gen_types import test, Value, TypedServerHandler, example as fnexample, getBigList, deepExample, Undefined, ExUnion, ExStruct
 from telepact import Response
 
 
@@ -26,11 +26,8 @@ class CodeGenHandler(TypedServerHandler):
     async def example(self, headers: dict[str, object], input: fnexample.Input) -> Response:
         raise NotImplementedError("Unimplemented method 'example'")
 
-    async def getFollowUp(self, headers: dict[str, object], input: getFollowUp.Input) -> Response:
-        raise NotImplementedError("Unimplemented method 'getFollowUp'")
-
-    async def createIssueLink(self, headers: dict[str, object], input: createIssueLink.Input) -> Response:
-        raise NotImplementedError("Unimplemented method 'createIssueLink'")
+    async def deepExample(self, headers: dict[str, object], input: deepExample.Input) -> Response:
+        raise NotImplementedError("Unimplemented method 'deepExample'")
 
     async def test(self, headers: dict[str, object], input: test.Input) -> Response:
         try:

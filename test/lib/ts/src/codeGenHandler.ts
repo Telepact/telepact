@@ -15,20 +15,17 @@
 //|
 
 import {
-    CreateIssueLinkInput,
-    CreateIssueLinkOutput,
+    DeepExampleInput,
+    DeepExampleOutput,
     ExampleInput,
     ExampleOutput,
     ExUnion,
     ExStruct,
-    GetFollowUpInput,
-    GetFollowUpOutput,
     TestInput,
     TestOutput,
     TypedServerHandler,
-    createIssueLink,
+    deepExample,
     example,
-    getFollowUp,
     test,
     Value,
 } from './gen/genTypes.js';
@@ -40,12 +37,8 @@ export class CodeGenHandler extends TypedServerHandler {
         throw new Error("Unimplemented method 'example'");
     }
 
-    async getFollowUp(headers: { [key: string]: any }, input: GetFollowUpInput): Promise<TypedMessage<GetFollowUpOutput>> {
-        throw new Error("Unimplemented method 'getFollowUp'");
-    }
-
-    async createIssueLink(headers: { [key: string]: any }, input: CreateIssueLinkInput): Promise<TypedMessage<CreateIssueLinkOutput>> {
-        throw new Error("Unimplemented method 'createIssueLink'");
+    async deepExample(headers: { [key: string]: any }, input: DeepExampleInput): Promise<TypedMessage<DeepExampleOutput>> {
+        throw new Error("Unimplemented method 'deepExample'");
     }
 
     async test(headers: { [key: string]: any }, input: TestInput): Promise<TypedMessage<TestOutput>> {

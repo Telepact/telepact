@@ -354,15 +354,9 @@ public class CodeGenHandler extends TypedServerHandler {
     }
 
     @Override
-    public TypedMessage<telepacttest.gen.getFollowUp.Output> getFollowUp(Map<String, Object> headers,
-            telepacttest.gen.getFollowUp.Input input) {
-        throw new UnsupportedOperationException("Unimplemented method 'getFollowUp'");
-    }
-
-    @Override
-    public TypedMessage<telepacttest.gen.createIssueLink.Output> createIssueLink(Map<String, Object> headers,
-            telepacttest.gen.createIssueLink.Input input) {
-        throw new UnsupportedOperationException("Unimplemented method 'createIssueLink'");
+    public TypedMessage<telepacttest.gen.deepExample.Output> deepExample(Map<String, Object> headers,
+            telepacttest.gen.deepExample.Input input) {
+        throw new UnsupportedOperationException("Unimplemented method 'deepExample'");
     }
 
     @Override
