@@ -1,0 +1,120 @@
+#|
+#|  Copyright The Telepact Authors
+#|
+#|  Licensed under the Apache License, Version 2.0 (the "License");
+#|  you may not use this file except in compliance with the License.
+#|  You may obtain a copy of the License at
+#|
+#|  https://www.apache.org/licenses/LICENSE-2.0
+#|
+#|  Unless required by applicable law or agreed to in writing, software
+#|  distributed under the License is distributed on an "AS IS" BASIS,
+#|  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#|  See the License for the specific language governing permissions and
+#|  limitations under the License.
+#|
+
+- struct.FlatNumbers:
+    value01: "number"
+    value02: "number"
+    value03: "number"
+    value04: "number"
+    value05: "number"
+    value06: "number"
+    value07: "number"
+    value08: "number"
+    value09: "number"
+    value10: "number"
+    value11: "number"
+    value12: "number"
+- struct.FlatStrings:
+    value01: "string"
+    value02: "string"
+    value03: "string"
+    value04: "string"
+    value05: "string"
+    value06: "string"
+    value07: "string"
+    value08: "string"
+    value09: "string"
+    value10: "string"
+    value11: "string"
+    value12: "string"
+- struct.Record:
+    recordId: "string"
+    group: "string"
+    owner: "string"
+    status: "string"
+    score: "number"
+    quantity: "integer"
+    active: "boolean"
+    note: "string"
+- struct.RecordSummary:
+    totalRows: "integer"
+    activeRows: "integer"
+    totalScore: "number"
+    averageScore: "number"
+- struct.OrderLine:
+    sku: "string"
+    quantity: "integer"
+    unitPrice: "number"
+    discountRate: "number"
+- struct.Order:
+    orderId: "string"
+    status: "string"
+    shippingCity: "string"
+    subtotal: "number"
+    total: "number"
+    lines: ["struct.OrderLine"]
+- struct.Alert:
+    code: "string"
+    severity: "string"
+    owner: "string"
+    message: "string"
+    acknowledged: "boolean"
+- struct.ActivityEvent:
+    at: "string"
+    actor: "string"
+    action: "string"
+    target: "string"
+    durationMs: "integer"
+- struct.Profile:
+    accountId: "string"
+    plan: "string"
+    region: "string"
+    orgName: "string"
+    accountManager: "string"
+    supportTier: "string"
+- struct.DashboardMetrics:
+    monthlySpend: "number"
+    openInvoices: "integer"
+    activeUsers: "integer"
+    latencyP50Ms: "number"
+    latencyP95Ms: "number"
+- fn.getFlatNumbers:
+    size: "string"
+  ->:
+    - Ok_:
+        value: "struct.FlatNumbers"
+- fn.getFlatStrings:
+    size: "string"
+  ->:
+    - Ok_:
+        value: "struct.FlatStrings"
+- fn.getRecordBatch:
+    size: "string"
+  ->:
+    - Ok_:
+        rows: ["struct.Record"]
+        summary: "struct.RecordSummary"
+- fn.getDashboard:
+    size: "string"
+  ->:
+    - Ok_:
+        profile: "struct.Profile"
+        orders: ["struct.Order"]
+        alerts: ["struct.Alert"]
+        activity: ["struct.ActivityEvent"]
+        metrics: "struct.DashboardMetrics"
+        narrative: "string"
+        generatedAt: "string"

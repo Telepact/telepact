@@ -30,6 +30,7 @@ servers, or place Telepact inside a larger service.
   - [`example/py-http-cookie-auth`](../example/py-http-cookie-auth/README.md) for one browser/session-cookie example
 - **I need operating-boundary guidance**
   - [Operating Boundary Guide](./operate/production-guide.md)
+  - [Performance Guide](./operate/performance-guide.md)
   - [Runtime Error Guide](./operate/runtime-errors.md)
 - **I need tooling or optional code generation**
   - [Tooling Workflow](./build-clients-and-servers/tooling-workflow.md)
@@ -80,6 +81,7 @@ servers, or place Telepact inside a larger service.
 
 - [Operating Boundary Guide](./operate/production-guide.md) for Telepact-specific auth,
   compatibility, and observability boundaries
+- [Performance Guide](./operate/performance-guide.md) for client-side payload and latency tuning choices
 - [Runtime Error Guide](./operate/runtime-errors.md) for local/runtime debugging
 
 ## Background and reference
