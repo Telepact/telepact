@@ -6,3 +6,4 @@ NOTICE
 tmp/
 tests/tmp
 telepact_cli/telepact
+build/

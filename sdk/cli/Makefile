@@ -57,6 +57,7 @@ clean:
 	rm -f LICENSE NOTICE
 	rm -rf .venv
 	rm -f uv.lock
+	rm -rf build
 
 test:
 	uv run python -m pytest -s -vv
