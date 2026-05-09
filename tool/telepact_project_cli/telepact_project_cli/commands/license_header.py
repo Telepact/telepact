@@ -21,6 +21,7 @@ from pathlib import Path
 import click
 
 LICENSE_HEADER_IGNORE_FILE = ".license-header-ignore"
+APACHE_LICENSE_SPDX_IDENTIFIER = "SPDX-License-Identifier: Apache-2.0"
 
 
 def _license_header_supported(file_path: str) -> bool:
@@ -69,7 +70,24 @@ def _read_license_header(file_path):
     while header_lines and not header_lines[-1].strip():
         header_lines.pop()
 
-    return header_lines
+    source_header_lines = []
+    spdx_identifier = None
+
+    for line in header_lines:
+        stripped_line = line.strip()
+        if not stripped_line:
+            continue
+        if stripped_line.startswith("Copyright"):
+            source_header_lines.append(f"{stripped_line}\n")
+            continue
+        if stripped_line.startswith("SPDX-License-Identifier:"):
+            spdx_identifier = stripped_line
+
+    if not source_header_lines:
+        raise click.ClickException("License header source must include at least one copyright line.")
+
+    source_header_lines.append(f"{spdx_identifier or APACHE_LICENSE_SPDX_IDENTIFIER}\n")
+    return source_header_lines
 
 
 def _update_file(file_path, license_header, start_comment_syntax, end_comment_syntax) -> bool:

@@ -88,6 +88,9 @@ class LicenseHeaderTests(unittest.TestCase):
             self.assertEqual(ignored_file.read_text(encoding="utf-8"), ignored_original)
             self.assertNotEqual(updated_file.read_text(encoding="utf-8"), "export const kept = true;\n")
             self.assertTrue(updated_file.read_text(encoding="utf-8").startswith("//|"))
+            self.assertIn("Copyright The Telepact Authors", updated_file.read_text(encoding="utf-8"))
+            self.assertIn("SPDX-License-Identifier: Apache-2.0", updated_file.read_text(encoding="utf-8"))
+            self.assertNotIn('Licensed under the Apache License, Version 2.0 (the "License");', updated_file.read_text(encoding="utf-8"))
             self.assertNotIn("site/src/snippets/hero/example.ts", result.output)
             self.assertIn("sdk/cli/example.ts", result.output)
 
@@ -109,6 +112,7 @@ class LicenseHeaderTests(unittest.TestCase):
 
             self.assertEqual(result.exit_code, 0, msg=result.output)
             self.assertTrue(tracked_file.read_text(encoding="utf-8").startswith("//|"))
+            self.assertIn("SPDX-License-Identifier: Apache-2.0", tracked_file.read_text(encoding="utf-8"))
 
 
 if __name__ == "__main__":
