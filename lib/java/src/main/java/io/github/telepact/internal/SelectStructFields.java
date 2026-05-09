@@ -56,6 +56,10 @@ public class SelectStructFields {
 
             return finalMap;
         } else if (typeDeclarationType instanceof final TUnion u) {
+            if (u.name.startsWith("fn.")) {
+                return value;
+            }
+
             final var valueAsMap = (Map<String, Object>) value;
             final var uEntry = valueAsMap.entrySet().stream().findAny().get();
             final var unionTag = uEntry.getKey();

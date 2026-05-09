@@ -14,13 +14,31 @@
 //|  limitations under the License.
 //|
 
-import { ExampleInput, ExampleOutput, ExUnion, ExStruct, TestInput, TestOutput, TypedServerHandler, example, test, Value } from './gen/genTypes.js';
+import {
+    DeepExampleInput,
+    DeepExampleOutput,
+    ExampleInput,
+    ExampleOutput,
+    ExUnion,
+    ExStruct,
+    TestInput,
+    TestOutput,
+    TypedServerHandler,
+    deepExample,
+    example,
+    test,
+    Value,
+} from './gen/genTypes.js';
 import { TypedMessage } from 'telepact';
 
 export class CodeGenHandler extends TypedServerHandler {
 
     async example(headers: { [key: string]: any }, input: ExampleInput): Promise<TypedMessage<ExampleOutput>> {
         throw new Error("Unimplemented method 'example'");
+    }
+
+    async deepExample(headers: { [key: string]: any }, input: DeepExampleInput): Promise<TypedMessage<DeepExampleOutput>> {
+        throw new Error("Unimplemented method 'deepExample'");
     }
 
     async test(headers: { [key: string]: any }, input: TestInput): Promise<TypedMessage<TestOutput>> {

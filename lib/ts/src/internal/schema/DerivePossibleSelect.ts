@@ -22,7 +22,11 @@ import { TArray } from '../types/TArray.js';
 import { TTypeDeclaration } from '../types/TTypeDeclaration.js';
 import { TObject } from '../types/TObject.js';
 
-export function derivePossibleSelect(fnName: string, result: TUnion): Record<string, any> {
+export function derivePossibleSelect(
+    fnName: string,
+    result: TUnion,
+    parsedTypes: Record<string, TType> = {},
+): Record<string, any> {
     const nestedTypes: Record<string, TType> = {};
     const okFields: Record<string, TFieldDeclaration> = result.tags['Ok_'].fields;
 
@@ -30,7 +34,7 @@ export function derivePossibleSelect(fnName: string, result: TUnion): Record<str
     okFieldNames.sort();
 
     for (const fieldDecl of Object.values(okFields)) {
-        findNestedTypes(fieldDecl.typeDeclaration, nestedTypes);
+        findNestedTypes(fieldDecl.typeDeclaration, nestedTypes, parsedTypes, new Set<string>());
     }
 
     const possibleSelect: Record<string, object> = {};
@@ -79,16 +83,39 @@ export function derivePossibleSelect(fnName: string, result: TUnion): Record<str
     return possibleSelect;
 }
 
-function findNestedTypes(typeDeclaration: TTypeDeclaration, nestedTypes: Record<string, TType>) {
+function findNestedTypes(
+    typeDeclaration: TTypeDeclaration,
+    nestedTypes: Record<string, TType>,
+    parsedTypes: Record<string, TType>,
+    traversedFunctionResults: Set<string>,
+) {
     const typ = typeDeclaration.type;
     if (typ instanceof TUnion) {
+        if (typ.name.startsWith('fn.')) {
+            const resultTypeName = `${typ.name}.->`;
+            if (traversedFunctionResults.has(resultTypeName)) {
+                return;
+            }
+
+            traversedFunctionResults.add(resultTypeName);
+            const resultType = parsedTypes[resultTypeName];
+            if (resultType instanceof TUnion) {
+                for (const tag of Object.values(resultType.tags)) {
+                    for (const fieldDecl of Object.values(tag.fields)) {
+                        findNestedTypes(fieldDecl.typeDeclaration, nestedTypes, parsedTypes, traversedFunctionResults);
+                    }
+                }
+            }
+            return;
+        }
+
         if (nestedTypes[typ.name] !== undefined) {
             return;
         }
         nestedTypes[typ.name] = typ;
         for (const tag of Object.values(typ.tags)) {
             for (const fieldDecl of Object.values(tag.fields)) {
-                findNestedTypes(fieldDecl.typeDeclaration, nestedTypes);
+                findNestedTypes(fieldDecl.typeDeclaration, nestedTypes, parsedTypes, traversedFunctionResults);
             }
         }
     } else if (typ instanceof TStruct) {
@@ -97,9 +124,9 @@ function findNestedTypes(typeDeclaration: TTypeDeclaration, nestedTypes: Record<
         }
         nestedTypes[typ.name] = typ;
         for (const fieldDecl of Object.values(typ.fields)) {
-            findNestedTypes(fieldDecl.typeDeclaration, nestedTypes);
+            findNestedTypes(fieldDecl.typeDeclaration, nestedTypes, parsedTypes, traversedFunctionResults);
         }
     } else if (typ instanceof TArray || typ instanceof TObject) {
-        findNestedTypes(typeDeclaration.typeParameters[0], nestedTypes);
+        findNestedTypes(typeDeclaration.typeParameters[0], nestedTypes, parsedTypes, traversedFunctionResults);
     }
 }

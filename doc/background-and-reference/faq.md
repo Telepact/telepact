@@ -241,7 +241,7 @@ all union tags are associated with structs means the backwards compatible option
 of adding a new struct field is always available to software designers dealing
 with the needs of evolving software.
 
-## Why can I not omit fn.\* fields using the `"@select_"` header?
+## Why can I not omit `fn.*` fields using the `"@select_"` header?
 
 The `"@select_"` header is used to omit fields from the response result graph:
 the active result union, reachable structs, and reachable union payload
@@ -257,3 +257,19 @@ Telepact console specifically utilizes this technique to allow end-users to
 Omitting fields in the argument struct disrupts the API provider's ability to
 established well-defined links, and consequently, the `"@select_"` header is
 disallowed from omitting fields in function argument structs.
+
+## Why does `"@select_"` not work for fields in structs reachable from a `fn.*` type?
+
+If a struct appears beneath the json tree of a `fn.*` type, that struct is
+ignored by the `"@select_"` filtering process.
+
+Similarly to why the argument fields of a `fn.*` are ineligible for selection,
+all types that appear beneath a `fn.*` type cannot have field stripped because
+that would compromise the readiness of the "link-like" capability of simply
+copying and pasting the function payload as-is into another call.
+
+While `"@select_"` will fail loudly if you try to specify a field exactly
+on the `fn.*` type, `"@select_"` directives on structs that appear beneath
+`fn.*` types are ignored silently because those structs could technically
+appear outside a `fn.*` type in the response and would be eligible for normal
+field selection.
