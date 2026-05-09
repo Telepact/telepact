@@ -14,13 +14,38 @@
 //|  limitations under the License.
 //|
 
-import { ExampleInput, ExampleOutput, ExUnion, ExStruct, TestInput, TestOutput, TypedServerHandler, example, test, Value } from './gen/genTypes.js';
+import {
+    CreateIssueLinkInput,
+    CreateIssueLinkOutput,
+    ExampleInput,
+    ExampleOutput,
+    ExUnion,
+    ExStruct,
+    GetFollowUpInput,
+    GetFollowUpOutput,
+    TestInput,
+    TestOutput,
+    TypedServerHandler,
+    createIssueLink,
+    example,
+    getFollowUp,
+    test,
+    Value,
+} from './gen/genTypes.js';
 import { TypedMessage } from 'telepact';
 
 export class CodeGenHandler extends TypedServerHandler {
 
     async example(headers: { [key: string]: any }, input: ExampleInput): Promise<TypedMessage<ExampleOutput>> {
         throw new Error("Unimplemented method 'example'");
+    }
+
+    async getFollowUp(headers: { [key: string]: any }, input: GetFollowUpInput): Promise<TypedMessage<GetFollowUpOutput>> {
+        throw new Error("Unimplemented method 'getFollowUp'");
+    }
+
+    async createIssueLink(headers: { [key: string]: any }, input: CreateIssueLinkInput): Promise<TypedMessage<CreateIssueLinkOutput>> {
+        throw new Error("Unimplemented method 'createIssueLink'");
     }
 
     async test(headers: { [key: string]: any }, input: TestInput): Promise<TypedMessage<TestOutput>> {

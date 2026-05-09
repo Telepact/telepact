@@ -64,6 +64,14 @@ func (s *typedCodeGenServer) GetBigList(headers map[string]any, input gen.GetBig
 	return telepact.TypedMessage[gen.GetBigListOutput]{}, telepact.NewTelepactError("generated server getBigList not implemented")
 }
 
+func (s *typedCodeGenServer) GetFollowUp(headers map[string]any, input gen.GetFollowUpInput) (telepact.TypedMessage[gen.GetFollowUpOutput], error) {
+	return telepact.TypedMessage[gen.GetFollowUpOutput]{}, telepact.NewTelepactError("generated server getFollowUp not implemented")
+}
+
+func (s *typedCodeGenServer) CreateIssueLink(headers map[string]any, input gen.CreateIssueLinkInput) (telepact.TypedMessage[gen.CreateIssueLinkOutput], error) {
+	return telepact.TypedMessage[gen.CreateIssueLinkOutput]{}, telepact.NewTelepactError("generated server createIssueLink not implemented")
+}
+
 func (s *typedCodeGenServer) SelfLink(headers map[string]any, input gen.SelfLinkInput) (telepact.TypedMessage[gen.SelfLinkOutput], error) {
 	return telepact.TypedMessage[gen.SelfLinkOutput]{}, telepact.NewTelepactError("generated server selfLink not implemented")
 }
