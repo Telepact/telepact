@@ -112,6 +112,29 @@ def _build_record_batch(size: str) -> tuple[list[dict[str, object]], dict[str, o
     return rows, summary
 
 
+def _build_integer_row_batch(size: str) -> tuple[list[dict[str, int]], dict[str, int]]:
+    cfg = _get_size_config(size)
+    rows: list[dict[str, int]] = []
+    checksum = 0
+    max_value = 0
+    for row_index in range(cfg['row_count'] * 3):
+        row = {}
+        for column_index in range(12):
+            value = cfg['digit_offset'] + (row_index * 17) + column_index
+            row[f'col{column_index + 1:02d}'] = value
+            checksum += value
+            if value > max_value:
+                max_value = value
+        rows.append(row)
+
+    summary = {
+        'totalRows': len(rows),
+        'checksum': checksum,
+        'maxValue': max_value,
+    }
+    return rows, summary
+
+
 def _build_dashboard(size: str) -> dict[str, object]:
     cfg = _get_size_config(size)
     orders = []
@@ -194,6 +217,12 @@ async def get_record_batch(function_name: str, request_message: Message) -> Mess
     return Message({}, {'Ok_': {'rows': rows, 'summary': summary}})
 
 
+async def get_integer_row_batch(function_name: str, request_message: Message) -> Message:
+    size = request_message.body[function_name]['size']
+    rows, summary = _build_integer_row_batch(size)
+    return Message({}, {'Ok_': {'rows': rows, 'summary': summary}})
+
+
 async def get_dashboard(function_name: str, request_message: Message) -> Message:
     size = request_message.body[function_name]['size']
     return Message({}, {'Ok_': _build_dashboard(size)})
@@ -209,6 +238,7 @@ def build_telepact_server() -> Server:
         'fn.getFlatNumbers': get_flat_numbers,
         'fn.getFlatStrings': get_flat_strings,
         'fn.getRecordBatch': get_record_batch,
+        'fn.getIntegerRowBatch': get_integer_row_batch,
         'fn.getDashboard': get_dashboard,
     })
     return Server(schema, function_router, options)

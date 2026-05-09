@@ -54,6 +54,23 @@
     activeRows: "integer"
     totalScore: "number"
     averageScore: "number"
+- struct.IntegerRow:
+    col01: "integer"
+    col02: "integer"
+    col03: "integer"
+    col04: "integer"
+    col05: "integer"
+    col06: "integer"
+    col07: "integer"
+    col08: "integer"
+    col09: "integer"
+    col10: "integer"
+    col11: "integer"
+    col12: "integer"
+- struct.IntegerRowSummary:
+    totalRows: "integer"
+    checksum: "integer"
+    maxValue: "integer"
 - struct.OrderLine:
     sku: "string"
     quantity: "integer"
@@ -107,6 +124,12 @@
     - Ok_:
         rows: ["struct.Record"]
         summary: "struct.RecordSummary"
+- fn.getIntegerRowBatch:
+    size: "string"
+  ->:
+    - Ok_:
+        rows: ["struct.IntegerRow"]
+        summary: "struct.IntegerRowSummary"
 - fn.getDashboard:
     size: "string"
   ->:

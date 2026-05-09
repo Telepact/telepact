@@ -92,6 +92,16 @@ SCENARIOS = [
         },
     ),
     Scenario(
+        key='integer_row_batch',
+        title='Integer-only list of structs',
+        function_name='fn.getIntegerRowBatch',
+        select_header={
+            '->': {'Ok_': ['rows', 'summary']},
+            'struct.IntegerRow': ['col01', 'col02', 'col03', 'col04'],
+            'struct.IntegerRowSummary': ['totalRows', 'maxValue'],
+        },
+    ),
+    Scenario(
         key='dashboard',
         title='Typical dashboard',
         function_name='fn.getDashboard',
@@ -349,6 +359,10 @@ def _build_recommendations(measurements: list[dict[str, object]]) -> list[str]:
     recommendations.append(
         'Use runtime binary for steady-state caller/server pairs that exchange more than tiny payloads; '
         'the handshake cost is one-time and excluded from the steady-state measurements here.'
+    )
+    recommendations.append(
+        'Large integer-only row batches are the strongest @pac_ case in this harness: repeated field names disappear, '
+        'so packed binary can dramatically outperform both JSON and non-packed binary.'
     )
     return recommendations
 

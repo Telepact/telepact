@@ -21,7 +21,7 @@ def test_performance_harness_reports_steady_state_metrics() -> None:
     report = run_benchmark_sync(cycles=6, steady_state_warmup=2)
     measurements = report['measurements']
 
-    assert len(measurements) == 96
+    assert len(measurements) == 120
     assert all(row['steady_state_samples'] == 6 for row in measurements)
     assert any(row['use_packed'] and row['steady_state_wire_mode'] == 'packed-binary' for row in measurements)
     assert all(not row['steady_state_handshake_seen'] for row in measurements)
@@ -49,6 +49,26 @@ def test_performance_harness_reports_steady_state_metrics() -> None:
         and not row['use_unsafe']
     )
     assert dashboard_selected['mean_total_bytes'] < dashboard_full['mean_total_bytes']
+
+    integer_json = next(
+        row for row in measurements
+        if row['scenario'] == 'integer_row_batch'
+        and row['size'] == 'big'
+        and row['client_mode'] == 'json'
+        and not row['use_packed']
+        and not row['use_select']
+        and not row['use_unsafe']
+    )
+    integer_packed = next(
+        row for row in measurements
+        if row['scenario'] == 'integer_row_batch'
+        and row['size'] == 'big'
+        and row['client_mode'] == 'binary'
+        and row['use_packed']
+        and not row['use_select']
+        and not row['use_unsafe']
+    )
+    assert integer_packed['mean_total_bytes'] < integer_json['mean_total_bytes']
 
     rendered = render_report(report)
     assert 'Steady-state metrics only.' in rendered

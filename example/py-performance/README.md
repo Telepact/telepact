@@ -9,7 +9,8 @@ It runs steady-state permutations across:
 - `@select_`
 - `@unsafe_`
 - small vs big payloads
-- specialized vs typical response shapes
+- specialized vs typical response shapes, including a large integer-only
+  list-of-struct workload where `@pac_` is especially effective
 
 The harness measures local steady-state serialization/deserialization time, wire
 sizes, and round-trip timings, then derives estimated network latency from the
