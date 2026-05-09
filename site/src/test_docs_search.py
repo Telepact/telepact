@@ -220,6 +220,10 @@ class DocsSearchIndexTest(unittest.TestCase):
         self.assertIn(".docs-search-modal[hidden]", css)
         self.assertIn(".docs-search-results[hidden]", css)
         self.assertRegex(css, re.compile(r"\.docs-search-modal\s*\{[^}]*overflow-y:\s*auto;", re.DOTALL))
+        self.assertRegex(css, re.compile(r"\.docs-search-dialog\s*\{[^}]*display:\s*flex;[^}]*flex-direction:\s*column;", re.DOTALL))
+        self.assertRegex(css, re.compile(r"\.docs-search-body\s*\{[^}]*display:\s*flex;[^}]*min-height:\s*0;[^}]*overflow:\s*hidden;", re.DOTALL))
+        self.assertRegex(css, re.compile(r"\.docs-search-results\s*\{[^}]*flex:\s*1 1 auto;[^}]*min-height:\s*0;[^}]*overflow-y:\s*auto;", re.DOTALL))
+        self.assertRegex(css, re.compile(r"\.docs-article h1,\s*\.docs-article h2,\s*\.docs-article h3,\s*\.docs-article h4,\s*\.docs-article h5,\s*\.docs-article h6\s*\{[^}]*scroll-margin-top:\s*96px;", re.DOTALL))
 
     def test_search_client_excludes_current_document_and_sorts_doc_types(self) -> None:
         results = run_search_client(
@@ -268,3 +272,24 @@ class DocsSearchIndexTest(unittest.TestCase):
                 "https://example.test/docs/examples/full-stack/#alpha",
             ],
         )
+
+    def test_search_client_caps_results_at_fifty(self) -> None:
+        results = run_search_client(
+            [
+                {
+                    "title": f"Guide {index}",
+                    "section": "Guide",
+                    "path": f"concepts/#guide-{index}",
+                    "content": "guide topic",
+                    "searchText": f"guide {index} topic",
+                }
+                for index in range(60)
+            ],
+            "https://example.test/docs/",
+            "guide",
+        )
+
+        self.assertEqual(results["status"], "50 results")
+        self.assertEqual(len(results["hrefs"]), 50)
+        self.assertEqual(results["hrefs"][0], "https://example.test/docs/concepts/#guide-0")
+        self.assertEqual(len(set(results["hrefs"])), 50)

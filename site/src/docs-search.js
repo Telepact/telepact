@@ -1,6 +1,6 @@
 (() => {
   const SEARCH_INDEX_FILENAME = "search-index.json";
-  const MAX_SEARCH_RESULTS = 12;
+  const MAX_SEARCH_RESULTS = 50;
   const SNIPPET_MAX_LENGTH = 180;
   const SNIPPET_CONTEXT_PADDING = 56;
   const DOCS_PRIORITY_CONCEPT = 0;
