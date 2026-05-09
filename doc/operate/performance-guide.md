@@ -89,6 +89,11 @@ current Python measurements:
 - the packed-binary advantage becomes easiest to justify when the list is both
   **large** and **structurally repetitive**, especially for integer-only rows
 
+![Packed-binary payload reduction trends by list size](./performance-guide-packed-binary-trends.svg)
+
+This SVG is a snapshot from the current Python harness and plots the six list
+size trend series discussed above.
+
 ## 4. Payload size is not the whole story: serialization/deserialization tradeoffs
 
 The Python harness also records client-side serialization and deserialization

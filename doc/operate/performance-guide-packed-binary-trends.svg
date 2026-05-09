@@ -1,0 +1,113 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 560" role="img" aria-label="Payload reduction percent by list size">
+<style>
+text { font-family: Arial, sans-serif; font-size: 12px; fill: #111827; }
+.axis { stroke: #111827; stroke-width: 1; }
+.grid { stroke: #e5e7eb; stroke-width: 1; }
+.series-line { fill: none; stroke-width: 2.5; }
+.series-point { stroke: white; stroke-width: 1.5; }
+</style>
+<line class="grid" x1="90" y1="480.0" x2="890" y2="480.0" />
+<text x="78" y="484.0" text-anchor="end">0%</text>
+<line class="grid" x1="90" y1="392.0" x2="890" y2="392.0" />
+<text x="78" y="396.0" text-anchor="end">20%</text>
+<line class="grid" x1="90" y1="304.0" x2="890" y2="304.0" />
+<text x="78" y="308.0" text-anchor="end">40%</text>
+<line class="grid" x1="90" y1="216.0" x2="890" y2="216.0" />
+<text x="78" y="220.0" text-anchor="end">60%</text>
+<line class="grid" x1="90" y1="128.0" x2="890" y2="128.0" />
+<text x="78" y="132.0" text-anchor="end">80%</text>
+<line class="grid" x1="90" y1="40.0" x2="890" y2="40.0" />
+<text x="78" y="44.0" text-anchor="end">100%</text>
+<line class="grid" x1="90.0" y1="40" x2="90.0" y2="480" />
+<text x="90.0" y="502" text-anchor="middle">8</text>
+<line class="grid" x1="107.02127659574468" y1="40" x2="107.02127659574468" y2="480" />
+<text x="107.02127659574468" y="502" text-anchor="middle">16</text>
+<line class="grid" x1="141.06382978723406" y1="40" x2="141.06382978723406" y2="480" />
+<text x="141.06382978723406" y="502" text-anchor="middle">32</text>
+<line class="grid" x1="209.14893617021278" y1="40" x2="209.14893617021278" y2="480" />
+<text x="209.14893617021278" y="502" text-anchor="middle">64</text>
+<line class="grid" x1="345.3191489361702" y1="40" x2="345.3191489361702" y2="480" />
+<text x="345.3191489361702" y="502" text-anchor="middle">128</text>
+<line class="grid" x1="481.48936170212767" y1="40" x2="481.48936170212767" y2="480" />
+<text x="481.48936170212767" y="502" text-anchor="middle">192</text>
+<line class="grid" x1="617.6595744680851" y1="40" x2="617.6595744680851" y2="480" />
+<text x="617.6595744680851" y="502" text-anchor="middle">256</text>
+<line class="grid" x1="890.0" y1="40" x2="890.0" y2="480" />
+<text x="890.0" y="502" text-anchor="middle">384</text>
+<line class="axis" x1="90" y1="480" x2="890" y2="480" />
+<line class="axis" x1="90" y1="40" x2="90" y2="480" />
+<text x="460.0" y="540" text-anchor="middle">List size (rows)</text>
+<text x="24" y="280.0" transform="rotate(-90 24 280.0)" text-anchor="middle">Payload reduction percent</text>
+<polyline class="series-line" stroke="#ea580c" points="90.00,155.28 110.51,154.84 131.02,154.40 151.53,154.40 172.04,153.96 192.57,153.52 213.09,153.52 233.60,153.08 254.11,152.64 274.62,152.64 295.13,152.20 315.64,152.20 336.15,151.76 356.66,151.76 377.17,151.76 397.70,151.32 418.21,151.32 438.72,151.32 459.23,150.88 479.74,150.88 500.26,150.88 520.77,150.88 541.28,150.88 561.79,150.88 582.30,150.44 602.83,150.44 623.34,150.44 643.85,150.44 664.36,150.44 684.87,150.44 705.38,150.88 725.89,150.88 746.40,150.88 766.91,150.88 787.43,150.88 807.96,151.32 828.47,151.32 848.98,151.32 869.49,151.32 890.00,151.76" />
+<polyline class="series-line" stroke="#9ca3af" points="90.00,480.00 110.51,480.00 131.02,480.00 151.53,480.00 172.04,480.00 192.57,480.00 213.09,480.00 233.60,480.00 254.11,480.00 274.62,480.00 295.13,480.00 315.64,480.00 336.15,480.00 356.66,480.00 377.17,480.00 397.70,480.00 418.21,480.00 438.72,480.00 459.23,480.00 479.74,480.00 500.26,480.00 520.77,480.00 541.28,480.00 561.79,480.00 582.30,480.00 602.83,480.00 623.34,480.00 643.85,480.00 664.36,480.00 684.87,480.00 705.38,480.00 725.89,480.00 746.40,480.00 766.91,480.00 787.43,480.00 807.96,480.00 828.47,480.00 848.98,480.00 869.49,480.00 890.00,480.00" />
+<polyline class="series-line" stroke="#c2410c" points="90.00,134.60 110.51,133.72 131.02,132.84 151.53,131.96 172.04,131.08 192.57,130.20 213.09,129.32 233.60,128.88 254.11,128.00 274.62,127.56 295.13,127.12 315.64,126.24 336.15,125.80 356.66,125.36 377.17,124.92 397.70,124.48 418.21,124.04 438.72,124.04 459.23,123.60 479.74,123.16 500.26,123.16 520.77,122.72 541.28,122.72 561.79,122.72 582.30,122.72 602.83,122.72 623.34,122.28 643.85,122.72 664.36,122.72 684.87,122.72 705.38,122.72 725.89,123.16 746.40,123.16 766.91,123.60 787.43,123.60 807.96,124.04 828.47,124.48 848.98,124.48 869.49,124.92 890.00,125.36" />
+<polyline class="series-line" stroke="#2563eb" points="90.00,353.72 110.51,354.16 131.02,354.60 151.53,355.04 172.04,355.48 192.57,355.48 213.09,355.92 233.60,356.36 254.11,356.36 274.62,356.80 295.13,356.80 315.64,357.24 336.15,357.24 356.66,357.68 377.17,357.68 397.70,358.12 418.21,358.12 438.72,358.12 459.23,358.12 479.74,358.56 500.26,358.56 520.77,358.56 541.28,358.56 561.79,358.56 582.30,358.56 602.83,358.56 623.34,358.56 643.85,358.56 664.36,358.56 684.87,358.56 705.38,358.56 725.89,358.56 746.40,358.12 766.91,358.12 787.43,358.12 807.96,357.68 828.47,357.68 848.98,357.68 869.49,357.24 890.00,357.24" />
+<polyline class="series-line" stroke="#6b7280" points="90.00,480.00 110.51,480.00 131.02,480.00 151.53,480.00 172.04,480.00 192.57,480.00 213.09,480.00 233.60,480.00 254.11,480.00 274.62,480.00 295.13,480.00 315.64,480.00 336.15,480.00 356.66,480.00 377.17,480.00 397.70,480.00 418.21,480.00 438.72,480.00 459.23,480.00 479.74,480.00 500.26,480.00 520.77,480.00 541.28,480.00 561.79,480.00 582.30,480.00 602.83,480.00 623.34,480.00 643.85,480.00 664.36,480.00 684.87,480.00 705.38,480.00 725.89,480.00 746.40,480.00 766.91,480.00 787.43,480.00 807.96,480.00 828.47,480.00 848.98,480.00 869.49,480.00 890.00,480.00" />
+<polyline class="series-line" stroke="#1d4ed8" points="90.00,346.24 110.51,346.24 131.02,346.24 151.53,346.68 172.04,346.68 192.57,346.68 213.09,346.68 233.60,347.12 254.11,347.12 274.62,347.12 295.13,347.12 315.64,347.56 336.15,347.56 356.66,347.56 377.17,347.56 397.70,347.56 418.21,347.56 438.72,348.00 459.23,348.00 479.74,348.00 500.26,348.00 520.77,348.00 541.28,348.00 561.79,348.00 582.30,348.00 602.83,348.00 623.34,348.00 643.85,348.00 664.36,348.00 684.87,347.56 705.38,347.56 725.89,347.56 746.40,347.56 766.91,347.56 787.43,347.56 807.96,347.56 828.47,347.12 848.98,347.12 869.49,347.12 890.00,347.12" />
+<circle class="series-point" cx="90.00" cy="157.48" r="4" fill="#ea580c" />
+<circle class="series-point" cx="107.02" cy="154.40" r="4" fill="#ea580c" />
+<circle class="series-point" cx="141.06" cy="153.08" r="4" fill="#ea580c" />
+<circle class="series-point" cx="209.15" cy="152.20" r="4" fill="#ea580c" />
+<circle class="series-point" cx="345.32" cy="151.76" r="4" fill="#ea580c" />
+<circle class="series-point" cx="481.49" cy="151.32" r="4" fill="#ea580c" />
+<circle class="series-point" cx="617.66" cy="151.32" r="4" fill="#ea580c" />
+<circle class="series-point" cx="890.00" cy="151.32" r="4" fill="#ea580c" />
+<circle class="series-point" cx="90.00" cy="480.00" r="4" fill="#9ca3af" />
+<circle class="series-point" cx="107.02" cy="480.00" r="4" fill="#9ca3af" />
+<circle class="series-point" cx="141.06" cy="480.00" r="4" fill="#9ca3af" />
+<circle class="series-point" cx="209.15" cy="480.00" r="4" fill="#9ca3af" />
+<circle class="series-point" cx="345.32" cy="480.00" r="4" fill="#9ca3af" />
+<circle class="series-point" cx="481.49" cy="480.00" r="4" fill="#9ca3af" />
+<circle class="series-point" cx="617.66" cy="480.00" r="4" fill="#9ca3af" />
+<circle class="series-point" cx="890.00" cy="480.00" r="4" fill="#9ca3af" />
+<circle class="series-point" cx="90.00" cy="140.76" r="4" fill="#c2410c" />
+<circle class="series-point" cx="107.02" cy="132.84" r="4" fill="#c2410c" />
+<circle class="series-point" cx="141.06" cy="128.44" r="4" fill="#c2410c" />
+<circle class="series-point" cx="209.15" cy="126.24" r="4" fill="#c2410c" />
+<circle class="series-point" cx="345.32" cy="124.92" r="4" fill="#c2410c" />
+<circle class="series-point" cx="481.49" cy="124.92" r="4" fill="#c2410c" />
+<circle class="series-point" cx="617.66" cy="124.48" r="4" fill="#c2410c" />
+<circle class="series-point" cx="890.00" cy="124.48" r="4" fill="#c2410c" />
+<circle class="series-point" cx="90.00" cy="350.64" r="4" fill="#2563eb" />
+<circle class="series-point" cx="107.02" cy="354.60" r="4" fill="#2563eb" />
+<circle class="series-point" cx="141.06" cy="356.80" r="4" fill="#2563eb" />
+<circle class="series-point" cx="209.15" cy="357.68" r="4" fill="#2563eb" />
+<circle class="series-point" cx="345.32" cy="357.68" r="4" fill="#2563eb" />
+<circle class="series-point" cx="481.49" cy="357.68" r="4" fill="#2563eb" />
+<circle class="series-point" cx="617.66" cy="357.68" r="4" fill="#2563eb" />
+<circle class="series-point" cx="890.00" cy="357.68" r="4" fill="#2563eb" />
+<circle class="series-point" cx="90.00" cy="480.00" r="4" fill="#6b7280" />
+<circle class="series-point" cx="107.02" cy="480.00" r="4" fill="#6b7280" />
+<circle class="series-point" cx="141.06" cy="480.00" r="4" fill="#6b7280" />
+<circle class="series-point" cx="209.15" cy="480.00" r="4" fill="#6b7280" />
+<circle class="series-point" cx="345.32" cy="480.00" r="4" fill="#6b7280" />
+<circle class="series-point" cx="481.49" cy="480.00" r="4" fill="#6b7280" />
+<circle class="series-point" cx="617.66" cy="480.00" r="4" fill="#6b7280" />
+<circle class="series-point" cx="890.00" cy="480.00" r="4" fill="#6b7280" />
+<circle class="series-point" cx="90.00" cy="344.92" r="4" fill="#1d4ed8" />
+<circle class="series-point" cx="107.02" cy="346.24" r="4" fill="#1d4ed8" />
+<circle class="series-point" cx="141.06" cy="347.12" r="4" fill="#1d4ed8" />
+<circle class="series-point" cx="209.15" cy="347.56" r="4" fill="#1d4ed8" />
+<circle class="series-point" cx="345.32" cy="347.56" r="4" fill="#1d4ed8" />
+<circle class="series-point" cx="481.49" cy="347.56" r="4" fill="#1d4ed8" />
+<circle class="series-point" cx="617.66" cy="347.56" r="4" fill="#1d4ed8" />
+<circle class="series-point" cx="890.00" cy="347.12" r="4" fill="#1d4ed8" />
+<line class="series-line" stroke="#6b7280" x1="100" y1="18" x2="124" y2="18" />
+<circle class="series-point" cx="112" cy="18" r="4" fill="#6b7280" />
+<text x="132" y="22">Typical JSON</text>
+<line class="series-line" stroke="#2563eb" x1="345" y1="18" x2="369" y2="18" />
+<circle class="series-point" cx="357" cy="18" r="4" fill="#2563eb" />
+<text x="377" y="22">Typical binary</text>
+<line class="series-line" stroke="#1d4ed8" x1="590" y1="18" x2="614" y2="18" />
+<circle class="series-point" cx="602" cy="18" r="4" fill="#1d4ed8" />
+<text x="622" y="22">Typical packed binary</text>
+<line class="series-line" stroke="#9ca3af" x1="100" y1="36" x2="124" y2="36" />
+<circle class="series-point" cx="112" cy="36" r="4" fill="#9ca3af" />
+<text x="132" y="40">Integers JSON</text>
+<line class="series-line" stroke="#ea580c" x1="345" y1="36" x2="369" y2="36" />
+<circle class="series-point" cx="357" cy="36" r="4" fill="#ea580c" />
+<text x="377" y="40">Integers binary</text>
+<line class="series-line" stroke="#c2410c" x1="590" y1="36" x2="614" y2="36" />
+<circle class="series-point" cx="602" cy="36" r="4" fill="#c2410c" />
+<text x="622" y="40">Integers packed binary</text>
+</svg>
