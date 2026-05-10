@@ -317,7 +317,64 @@ Expected magnitude:
 - by contrast, the large integer-row batch still moved by about **9.1 ms**
   because the payload itself was much larger
 
-## 7. Practical recommendations
+## 7. Estimate overall round-trip time, not just payload size
+
+When you are deciding between JSON, binary, and packed binary, compare an
+estimated total steady-state client-visible round trip, not just payload size:
+
+> estimated total RTT ≈ client serialize time + estimated network RTT from
+> measured request/response bytes + client deserialize time
+
+That estimate still omits real server execution time, queueing, congestion, and
+tail effects, so treat it as a **relative decision aid**, not an SLA model. It
+is still useful because it shows when byte savings are large enough to overcome
+extra codec cost in the current runtime.
+
+Using the current Python harness and its built-in network profiles, the
+steady-state big-payload estimates look like this:
+
+| Workload | Mode | Office LAN | Regional 4G | Intercontinental broadband |
+| --- | --- | --- | --- | --- |
+| Large dashboard | JSON | about **2.25 ms** | about **62.76 ms** | about **153.16 ms** |
+| Large dashboard | binary | about **2.98 ms** | about **60.04 ms** | about **152.55 ms** |
+| Large dashboard | packed binary | about **3.84 ms** | about **60.68 ms** | about **153.33 ms** |
+| Large mixed row batch | JSON | about **2.44 ms** | about **71.06 ms** | about **156.49 ms** |
+| Large mixed row batch | binary | about **3.28 ms** | about **67.56 ms** | about **155.66 ms** |
+| Large mixed row batch | packed binary | about **4.26 ms** | about **68.18 ms** | about **156.49 ms** |
+| Large integer-only row batch | JSON | about **3.02 ms** | about **83.47 ms** | about **161.67 ms** |
+| Large integer-only row batch | binary | about **6.63 ms** | about **66.57 ms** | about **157.32 ms** |
+| Large integer-only row batch | packed binary | about **10.66 ms** | about **68.92 ms** | about **160.70 ms** |
+
+How to read that table:
+
+- on a **fast LAN**, JSON still wins for these Python examples because the link
+  is already fast enough that extra binary decode work matters more than the
+  bytes saved
+- on a **regional mobile / low-bandwidth** link, normal binary starts to win on
+  medium/large responses because the wire-size reduction is worth more than the
+  extra codec cost
+- on a **very high-latency long-haul** link, binary can still help, but the gain
+  may be only a fraction of a millisecond on medium payloads because the fixed
+  RTT floor dominates
+- in the current Python harness, **packed binary does not beat normal binary**
+  on these representative big workloads even when it sends fewer bytes, because
+  the extra deserialize cost is larger than the last bit of network savings
+
+That yields a practical decision rule:
+
+- if your payload is **small or string-heavy**, JSON or normal binary will often
+  end up nearly tied overall; pick the simpler mode unless you measure a clear
+  win
+- if your payload is **medium/large and repeated**, binary is usually the first
+  mode worth trying for RTT improvement
+- if your payload is a **large, repetitive list of structs**, packed binary may
+  still be the best **bandwidth** option, but only keep it if your runtime's
+  codec cost does not erase the saved transfer time
+- if your client only needs part of the response, `@select_` often beats all of
+  these transport-only tweaks because it improves both bytes and decode cost at
+  the same time
+
+## 8. Practical recommendations
 
 - default to JSON for the simplest cold-start integrations and debugging-first
   workflows
@@ -330,7 +387,7 @@ Expected magnitude:
 - reserve `@unsafe_` for measured, trusted, internal hot paths
 - benchmark with your real payload shapes, not synthetic scalars only
 
-## 8. What to measure in your own environment
+## 9. What to measure in your own environment
 
 At minimum, capture:
 
