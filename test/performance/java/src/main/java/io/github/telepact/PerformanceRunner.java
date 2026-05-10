@@ -2,8 +2,6 @@ package io.github.telepact;
 
 import static io.github.telepact.internal.binary.ConstructBinaryEncoding.constructBinaryEncoding;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
@@ -12,7 +10,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CountDownLatch;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,9 +23,8 @@ import io.github.telepact.internal.binary.ServerBase64Encoder;
 import io.github.telepact.internal.binary.ServerBinaryEncoder;
 import io.nats.client.Connection;
 import io.nats.client.Dispatcher;
-import io.nats.client.Message;
 import io.nats.client.Nats;
-import io.nats.client.NatsMessage;
+import io.nats.client.impl.NatsMessage;
 import io.nats.client.impl.Headers;
 
 public class PerformanceRunner {
@@ -233,7 +229,11 @@ public class PerformanceRunner {
             }
         });
         dispatcher.subscribe(subject);
-        serverConnection.flush(Duration.ofSeconds(5));
+        try {
+            serverConnection.flush(Duration.ofSeconds(5));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
 
         final var clientOptions = new Client.Options();
         clientOptions.useBinary = method.equals("telepact_binary") || method.equals("telepact_packed_binary");
@@ -308,7 +308,11 @@ public class PerformanceRunner {
             }
         });
         dispatcher.subscribe(subject);
-        serverConnection.flush(Duration.ofSeconds(5));
+        try {
+            serverConnection.flush(Duration.ofSeconds(5));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
 
         return new Bench(() -> {
             final long serializeStart = System.nanoTime();

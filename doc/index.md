@@ -80,6 +80,7 @@ servers, or place Telepact inside a larger service.
 
 - [Operating Boundary Guide](./operate/production-guide.md) for Telepact-specific auth,
   compatibility, and observability boundaries
+- [Binary Serialization Options](./operate/binary-serialization-options.md) for measuring when Telepact binary and packed binary are worth using
 - [Runtime Error Guide](./operate/runtime-errors.md) for local/runtime debugging
 
 ## Background and reference

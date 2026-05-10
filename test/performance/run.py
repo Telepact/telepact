@@ -11,9 +11,10 @@ from pathlib import Path
 from typing import Any
 
 ROOT = Path('/home/runner/work/telepact/telepact/test/performance')
-SCHEMA_DIR = ROOT / 'schema'
+TELEPACT_SCHEMA_DIR = ROOT / 'schema' / 'telepact'
+PROTO_DIR = ROOT / 'schema' / 'protobuf'
 RESULTS_DIR = ROOT / 'results'
-DESCRIPTOR_SET = SCHEMA_DIR / 'performance.desc'
+DESCRIPTOR_SET = ROOT / 'generated' / 'performance.desc'
 PYTHON_VENV = ROOT / 'python' / '.venv' / 'bin' / 'python'
 
 LANGUAGE_COMMANDS = {
@@ -58,10 +59,10 @@ def ensure_descriptor_set() -> None:
         str(PYTHON_VENV),
         '-m',
         'grpc_tools.protoc',
-        f'-I{SCHEMA_DIR}',
+        f'-I{PROTO_DIR}',
         f'--descriptor_set_out={DESCRIPTOR_SET}',
         '--include_imports',
-        str(SCHEMA_DIR / 'performance.proto'),
+        str(PROTO_DIR / 'performance.proto'),
     ]
     subprocess.run(cmd, cwd=ROOT, check=True)
 
@@ -164,6 +165,7 @@ def write_markdown(summary: dict[str, Any], path: Path) -> None:
 def main() -> None:
     args = parse_args()
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+    DESCRIPTOR_SET.parent.mkdir(parents=True, exist_ok=True)
     ensure_descriptor_set()
 
     raw_paths: list[Path] = []
@@ -181,7 +183,7 @@ def main() -> None:
             '--payloads',
             str(ROOT / 'data' / 'payloads.json'),
             '--schema-dir',
-            str(SCHEMA_DIR),
+            str(TELEPACT_SCHEMA_DIR),
             '--descriptor-set',
             str(DESCRIPTOR_SET),
             '--output',

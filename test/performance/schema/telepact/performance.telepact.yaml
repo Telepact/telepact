@@ -2,9 +2,9 @@
     id: string
     name: string
     region: string
-    visits: int32
-    ratio: float64
-    score: int32
+    visits: integer
+    ratio: number
+    score: integer
 - struct.AllStringsData:
     alpha: string
     beta: string
@@ -12,11 +12,11 @@
     delta: string
     epsilon: string
 - struct.AllNumbersData:
-    wholeA: int32
-    wholeB: int32
-    wholeC: int32
-    ratioA: float64
-    ratioB: float64
+    wholeA: integer
+    wholeB: integer
+    wholeC: integer
+    ratioA: number
+    ratioB: number
 - fn.typicalSingle:
     item: struct.TypicalData
   ->:

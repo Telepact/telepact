@@ -305,7 +305,7 @@ async function main(): Promise<void> {
   const serverConnection = await connect({ servers: args['nats-url'] });
   try {
     const results: Record<string, unknown>[] = [];
-    const protoPath = path.join(args['schema-dir'], 'performance.proto');
+    const protoPath = path.join(path.dirname(args['schema-dir']), 'protobuf', 'performance.proto');
     for (const method of ['telepact_json', 'telepact_binary', 'telepact_packed_binary', 'protobuf', 'plain_json']) {
       for (const caseDefinition of payloads.cases) {
         results.push(
