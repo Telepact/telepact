@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+package telepact.performance;
+
+message TypicalData {
+  string id = 1;
+  string name = 2;
+  string region = 3;
+  int32 visits = 4;
+  double ratio = 5;
+  int32 score = 6;
+}
+
+message AllStringsData {
+  string alpha = 1;
+  string beta = 2;
+  string gamma = 3;
+  string delta = 4;
+  string epsilon = 5;
+}
+
+message AllNumbersData {
+  int32 wholeA = 1;
+  int32 wholeB = 2;
+  int32 wholeC = 3;
+  double ratioA = 4;
+  double ratioB = 5;
+}
+
+message TypicalSinglePayload { TypicalData item = 1; }
+message TypicalListPayload { repeated TypicalData items = 1; }
+message StringsSinglePayload { AllStringsData item = 1; }
+message StringsListPayload { repeated AllStringsData items = 1; }
+message NumbersSinglePayload { AllNumbersData item = 1; }
+message NumbersListPayload { repeated AllNumbersData items = 1; }
+
+message Request {
+  oneof body {
+    TypicalSinglePayload typicalSingle = 1;
+    TypicalListPayload typicalList = 2;
+    StringsSinglePayload stringsSingle = 3;
+    StringsListPayload stringsList = 4;
+    NumbersSinglePayload numbersSingle = 5;
+    NumbersListPayload numbersList = 6;
+  }
+}
+
+message Response {
+  oneof body {
+    TypicalSinglePayload typicalSingle = 1;
+    TypicalListPayload typicalList = 2;
+    StringsSinglePayload stringsSingle = 3;
+    StringsListPayload stringsList = 4;
+    NumbersSinglePayload numbersSingle = 5;
+    NumbersListPayload numbersList = 6;
+  }
+}

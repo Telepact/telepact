@@ -1,0 +1,49 @@
+- struct.TypicalData:
+    id: string
+    name: string
+    region: string
+    visits: int32
+    ratio: float64
+    score: int32
+- struct.AllStringsData:
+    alpha: string
+    beta: string
+    gamma: string
+    delta: string
+    epsilon: string
+- struct.AllNumbersData:
+    wholeA: int32
+    wholeB: int32
+    wholeC: int32
+    ratioA: float64
+    ratioB: float64
+- fn.typicalSingle:
+    item: struct.TypicalData
+  ->:
+    - Ok_:
+        item: struct.TypicalData
+- fn.typicalList:
+    items: [struct.TypicalData]
+  ->:
+    - Ok_:
+        items: [struct.TypicalData]
+- fn.stringsSingle:
+    item: struct.AllStringsData
+  ->:
+    - Ok_:
+        item: struct.AllStringsData
+- fn.stringsList:
+    items: [struct.AllStringsData]
+  ->:
+    - Ok_:
+        items: [struct.AllStringsData]
+- fn.numbersSingle:
+    item: struct.AllNumbersData
+  ->:
+    - Ok_:
+        item: struct.AllNumbersData
+- fn.numbersList:
+    items: [struct.AllNumbersData]
+  ->:
+    - Ok_:
+        items: [struct.AllNumbersData]
