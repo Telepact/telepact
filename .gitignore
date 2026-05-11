@@ -16,4 +16,3 @@ go.sum
 !/test/lib/go/go.sum
 !/example/full-stack-proxy/server/go.sum
 site/dist/
-test/performance/results/
