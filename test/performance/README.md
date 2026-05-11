@@ -42,3 +42,5 @@ make run
 ```
 
 Harness output is written to `test/performance/output/<timestamp>/` and mirrored to `test/performance/output/latest/`.
+
+Telepact schema files live under `test/performance/schema/telepact/` and protobuf schema files live under `test/performance/schema/protobuf/`.

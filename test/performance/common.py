@@ -60,6 +60,7 @@ METRICS = (
 @dataclass(frozen=True)
 class Scenario:
     name: str
+    function_name: str
     collection_shape: str
     data_shape: str
     request: dict[str, Any]
@@ -101,12 +102,12 @@ def _payload(data_shape: str, collection_shape: str) -> dict[str, Any]:
     count = COLLECTION_SHAPES[collection_shape]
     if data_shape == "typical_data":
         items = [_typical_item(i) for i in range(count)]
-        return {"TypicalSingle": items[0]} if collection_shape == "single" else {"TypicalList": {"items": items}}
+        return {"typicalSingle": items[0]} if collection_shape == "single" else {"typicalList": {"items": items}}
     if data_shape == "all_strings":
         items = [_string_item(i) for i in range(count)]
-        return {"StringSingle": items[0]} if collection_shape == "single" else {"StringList": {"items": items}}
+        return {"stringSingle": items[0]} if collection_shape == "single" else {"stringList": {"items": items}}
     items = [_number_item(i) for i in range(count)]
-    return {"NumberSingle": items[0]} if collection_shape == "single" else {"NumberList": {"items": items}}
+    return {"numberSingle": items[0]} if collection_shape == "single" else {"numberList": {"items": items}}
 
 
 def build_scenarios() -> list[Scenario]:
@@ -115,11 +116,20 @@ def build_scenarios() -> list[Scenario]:
         for data_shape in DATA_SHAPES:
             name = f"{collection_shape}__{data_shape}"
             payload = _payload(data_shape, collection_shape)
-            request = {"scenario": name, "payload": payload}
-            response = {"scenario": name, "payload": payload}
+            function_name = {
+                ("typical_data", "single"): "fn.typicalSingle",
+                ("typical_data", "list"): "fn.typicalList",
+                ("all_strings", "single"): "fn.stringSingle",
+                ("all_strings", "list"): "fn.stringList",
+                ("all_numbers", "single"): "fn.numberSingle",
+                ("all_numbers", "list"): "fn.numberList",
+            }[(data_shape, "single" if collection_shape == "single" else "list")]
+            request = payload
+            response = payload
             scenarios.append(
                 Scenario(
                     name=name,
+                    function_name=function_name,
                     collection_shape=collection_shape,
                     data_shape=data_shape,
                     request=request,
@@ -140,6 +150,7 @@ def write_manifest(path: Path, *, warmup_iterations: int, measure_iterations: in
         "scenarios": [
             {
                 "name": scenario.name,
+                "functionName": scenario.function_name,
                 "collectionShape": scenario.collection_shape,
                 "dataShape": scenario.data_shape,
                 "request": scenario.request,
@@ -215,12 +226,12 @@ def write_samples_csv(path: Path, samples: list[dict[str, Any]]) -> None:
     if not samples:
         path.write_text("", encoding="utf-8")
         return
-    headers = list(samples[0].keys())
+    headers = sorted({key for sample in samples for key in sample.keys()})
     lines = [",".join(headers)]
     for sample in samples:
         values = []
         for header in headers:
-            value = sample[header]
+            value = sample.get(header, "")
             if isinstance(value, str):
                 values.append(json.dumps(value))
             else:

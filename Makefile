@@ -142,6 +142,12 @@ deploy-go:
 test:
 	$(MAKE) -C test/runner test
 
+performance:
+	$(MAKE) -C test/performance run
+
+clean-performance:
+	$(MAKE) -C test/performance clean
+
 clean-test:
 	$(MAKE) -C test/runner clean
 	$(MAKE) -C test/lib/java clean

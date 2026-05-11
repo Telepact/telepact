@@ -56,21 +56,21 @@ class ProtobufCodec:
     def _payload_to_proto(cls, payload: dict[str, Any]) -> benchmark_pb2.Payload:
         message = benchmark_pb2.Payload()
         variant, value = _payload_value(payload)
-        if variant == "TypicalSingle":
-            cls._item_to_proto(message.typical_single, value)
-        elif variant == "TypicalList":
+        if variant == "typicalSingle":
+            cls._item_to_proto(message.typicalSingle, value)
+        elif variant == "typicalList":
             for item in value["items"]:
-                cls._item_to_proto(message.typical_list.items.add(), item)
-        elif variant == "StringSingle":
-            cls._item_to_proto(message.string_single, value)
-        elif variant == "StringList":
+                cls._item_to_proto(message.typicalList.items.add(), item)
+        elif variant == "stringSingle":
+            cls._item_to_proto(message.stringSingle, value)
+        elif variant == "stringList":
             for item in value["items"]:
-                cls._item_to_proto(message.string_list.items.add(), item)
-        elif variant == "NumberSingle":
-            cls._item_to_proto(message.number_single, value)
-        elif variant == "NumberList":
+                cls._item_to_proto(message.stringList.items.add(), item)
+        elif variant == "numberSingle":
+            cls._item_to_proto(message.numberSingle, value)
+        elif variant == "numberList":
             for item in value["items"]:
-                cls._item_to_proto(message.number_list.items.add(), item)
+                cls._item_to_proto(message.numberList.items.add(), item)
         else:
             raise ValueError(f"unknown payload variant: {variant}")
         return message
@@ -78,16 +78,14 @@ class ProtobufCodec:
     @classmethod
     def encode_request(cls, request: dict[str, Any]) -> bytes:
         message = benchmark_pb2.RoundTripRequest(
-            scenario=request["scenario"],
-            payload=cls._payload_to_proto(request["payload"]),
+            payload=cls._payload_to_proto(request),
         )
         return message.SerializeToString()
 
     @classmethod
     def encode_response(cls, response: dict[str, Any]) -> bytes:
         message = benchmark_pb2.RoundTripResponse(
-            scenario=response["scenario"],
-            payload=cls._payload_to_proto(response["payload"]),
+            payload=cls._payload_to_proto(response),
         )
         return message.SerializeToString()
 
@@ -101,31 +99,23 @@ class ProtobufCodec:
         if which is None:
             raise ValueError("payload missing oneof value")
         value = getattr(payload, which)
-        if which.endswith("_list"):
+        if which.endswith("List"):
             items = [cls._item_from_proto(item) for item in value.items]
-            if which == "typical_list":
-                return {"TypicalList": {"items": items}}
-            if which == "string_list":
-                return {"StringList": {"items": items}}
-            return {"NumberList": {"items": items}}
+            return {which: {"items": items}}
         item = cls._item_from_proto(value)
-        if which == "typical_single":
-            return {"TypicalSingle": item}
-        if which == "string_single":
-            return {"StringSingle": item}
-        return {"NumberSingle": item}
+        return {which: item}
 
     @classmethod
     def decode_request(cls, payload: bytes) -> dict[str, Any]:
         message = benchmark_pb2.RoundTripRequest()
         message.ParseFromString(payload)
-        return {"scenario": message.scenario, "payload": cls._payload_from_proto(message.payload)}
+        return cls._payload_from_proto(message.payload)
 
     @classmethod
     def decode_response(cls, payload: bytes) -> dict[str, Any]:
         message = benchmark_pb2.RoundTripResponse()
         message.ParseFromString(payload)
-        return {"scenario": message.scenario, "payload": cls._payload_from_proto(message.payload)}
+        return cls._payload_from_proto(message.payload)
 
 
 class TelepactBenchClient:
@@ -134,40 +124,50 @@ class TelepactBenchClient:
         self.subject = subject
         self.packed = packed
         self.state = state
+        self.active_sample: dict[str, Any] | None = None
         options = Client.Options()
         options.use_binary = use_binary
         options.always_send_json = not use_binary
         self.client = Client(self._adapter, options)
 
     async def _adapter(self, message: Message, serializer: Any) -> Message:
+        if self.active_sample is None:
+            raise RuntimeError("active sample missing")
+        sample = self.active_sample
         benchmark_id = unique_run_id()
-        sample = self.state[benchmark_id]
-        headers = {BENCHMARK_HEADER: benchmark_id}
+        self.state[benchmark_id] = sample
         request_started = _now_ns()
         request_bytes = serializer.serialize(message)
         sample["client_request_serialize_ns"] = _now_ns() - request_started
         sample["request_size_bytes"] = len(request_bytes)
         sample["client_request_sent_ns"] = _now_ns()
-        response_message = await self.connection.request(self.subject, request_bytes, timeout=30, headers=headers)
+        response_message = await self.connection.request(
+            self.subject,
+            request_bytes,
+            timeout=30,
+            headers={BENCHMARK_HEADER: benchmark_id},
+        )
         sample["client_response_received_ns"] = _now_ns()
         response_bytes = response_message.data
         sample["response_size_bytes"] = len(response_bytes)
         response_started = _now_ns()
         deserialized = serializer.deserialize(response_bytes)
         sample["client_response_deserialize_ns"] = _now_ns() - response_started
-        server_state = self.state.pop(benchmark_id)
-        sample["request_network_transit_ns"] = server_state["server_request_received_ns"] - sample["client_request_sent_ns"]
-        sample["response_network_transit_ns"] = sample["client_response_received_ns"] - server_state["server_response_sent_ns"]
-        sample["server_request_deserialize_ns"] = server_state["server_request_deserialize_ns"]
-        sample["server_response_serialize_ns"] = server_state["server_response_serialize_ns"]
+        sample["request_network_transit_ns"] = sample["server_request_received_ns"] - sample["client_request_sent_ns"]
+        sample["response_network_transit_ns"] = sample["client_response_received_ns"] - sample["server_response_sent_ns"]
+        self.state.pop(benchmark_id, None)
         return deserialized
 
-    async def round_trip(self, request: dict[str, Any]) -> None:
+    async def round_trip(self, function_name: str, request: dict[str, Any], sample: dict[str, Any]) -> None:
         headers: dict[str, Any] = {}
         if self.packed:
             headers["@pac_"] = True
-        response = await self.client.request(Message(headers, {"fn.roundTrip": request}))
-        assert response.body["Ok_"] == request
+        self.active_sample = sample
+        try:
+            response = await self.client.request(Message(headers, {function_name: next(iter(request.values()))}))
+        finally:
+            self.active_sample = None
+        assert response.body["Ok_"] == next(iter(request.values()))
 
 
 async def _build_telepact_server(schema_dir: Path, state: dict[str, dict[str, Any]]) -> Server:
@@ -194,14 +194,28 @@ async def _build_telepact_server(schema_dir: Path, state: dict[str, dict[str, An
     options.on_request = on_request
     options.on_response = on_response
     schema = TelepactSchema.from_directory(str(schema_dir))
-    server = Server(schema, FunctionRouter({"fn.roundTrip": round_trip}), options)
+    function_names = (
+        "fn.typicalSingle",
+        "fn.typicalList",
+        "fn.stringSingle",
+        "fn.stringList",
+        "fn.numberSingle",
+        "fn.numberList",
+    )
+    server = Server(schema, FunctionRouter({name: round_trip for name in function_names}), options)
     server._benchmark_context = current_id  # type: ignore[attr-defined]
     return server
 
 
-async def _run_plain_json(connection: nats.NATS, subject: str, request: dict[str, Any], state: dict[str, dict[str, Any]]) -> dict[str, Any]:
+async def _run_plain_json(
+    connection: nats.NATS,
+    subject: str,
+    request: dict[str, Any],
+    sample: dict[str, Any],
+    state: dict[str, dict[str, Any]],
+) -> dict[str, Any]:
     benchmark_id = unique_run_id()
-    sample = state[benchmark_id]
+    state[benchmark_id] = sample
     request_started = _now_ns()
     request_bytes = json.dumps(request, separators=(",", ":")).encode()
     sample["client_request_serialize_ns"] = _now_ns() - request_started
@@ -214,17 +228,21 @@ async def _run_plain_json(connection: nats.NATS, subject: str, request: dict[str
     response_started = _now_ns()
     decoded = json.loads(response_bytes.decode())
     sample["client_response_deserialize_ns"] = _now_ns() - response_started
-    server_state = state.pop(benchmark_id)
-    sample["request_network_transit_ns"] = server_state["server_request_received_ns"] - sample["client_request_sent_ns"]
-    sample["response_network_transit_ns"] = sample["client_response_received_ns"] - server_state["server_response_sent_ns"]
-    sample["server_request_deserialize_ns"] = server_state["server_request_deserialize_ns"]
-    sample["server_response_serialize_ns"] = server_state["server_response_serialize_ns"]
+    sample["request_network_transit_ns"] = sample["server_request_received_ns"] - sample["client_request_sent_ns"]
+    sample["response_network_transit_ns"] = sample["client_response_received_ns"] - sample["server_response_sent_ns"]
+    state.pop(benchmark_id, None)
     return decoded
 
 
-async def _run_protobuf(connection: nats.NATS, subject: str, request: dict[str, Any], state: dict[str, dict[str, Any]]) -> dict[str, Any]:
+async def _run_protobuf(
+    connection: nats.NATS,
+    subject: str,
+    request: dict[str, Any],
+    sample: dict[str, Any],
+    state: dict[str, dict[str, Any]],
+) -> dict[str, Any]:
     benchmark_id = unique_run_id()
-    sample = state[benchmark_id]
+    state[benchmark_id] = sample
     request_started = _now_ns()
     request_bytes = ProtobufCodec.encode_request(request)
     sample["client_request_serialize_ns"] = _now_ns() - request_started
@@ -237,17 +255,15 @@ async def _run_protobuf(connection: nats.NATS, subject: str, request: dict[str, 
     response_started = _now_ns()
     decoded = ProtobufCodec.decode_response(response_bytes)
     sample["client_response_deserialize_ns"] = _now_ns() - response_started
-    server_state = state.pop(benchmark_id)
-    sample["request_network_transit_ns"] = server_state["server_request_received_ns"] - sample["client_request_sent_ns"]
-    sample["response_network_transit_ns"] = sample["client_response_received_ns"] - server_state["server_response_sent_ns"]
-    sample["server_request_deserialize_ns"] = server_state["server_request_deserialize_ns"]
-    sample["server_response_serialize_ns"] = server_state["server_response_serialize_ns"]
+    sample["request_network_transit_ns"] = sample["server_request_received_ns"] - sample["client_request_sent_ns"]
+    sample["response_network_transit_ns"] = sample["client_response_received_ns"] - sample["server_response_sent_ns"]
+    state.pop(benchmark_id, None)
     return decoded
 
 
 async def _benchmark(args: argparse.Namespace) -> list[dict[str, Any]]:
     manifest = load_json(Path(args.manifest))
-    schema_dir = Path(args.schema_dir)
+    schema_dir = Path(args.telepact_schema_dir)
     state: dict[str, dict[str, Any]] = {}
     connection = await nats.connect(args.nats_url)
     server = await _build_telepact_server(schema_dir, state)
@@ -258,7 +274,9 @@ async def _benchmark(args: argparse.Namespace) -> list[dict[str, Any]]:
     json_subject = f"{subject_prefix}.json"
 
     async def telepact_handler(msg: Msg) -> None:
-        benchmark_id = msg.headers[BENCHMARK_HEADER]
+        benchmark_id = None if msg.headers is None else msg.headers.get(BENCHMARK_HEADER)
+        if benchmark_id is None:
+            raise RuntimeError("missing benchmark header")
         state[benchmark_id]["server_request_received_ns"] = _now_ns()
         token = current_id.set(benchmark_id)
         try:
@@ -270,7 +288,9 @@ async def _benchmark(args: argparse.Namespace) -> list[dict[str, Any]]:
         await connection.publish(msg.reply, response.bytes)
 
     async def protobuf_handler(msg: Msg) -> None:
-        benchmark_id = msg.headers[BENCHMARK_HEADER]
+        benchmark_id = None if msg.headers is None else msg.headers.get(BENCHMARK_HEADER)
+        if benchmark_id is None:
+            raise RuntimeError("missing benchmark header")
         sample = state[benchmark_id]
         sample["server_request_received_ns"] = _now_ns()
         request_started = _now_ns()
@@ -283,7 +303,9 @@ async def _benchmark(args: argparse.Namespace) -> list[dict[str, Any]]:
         await connection.publish(msg.reply, response_bytes)
 
     async def json_handler(msg: Msg) -> None:
-        benchmark_id = msg.headers[BENCHMARK_HEADER]
+        benchmark_id = None if msg.headers is None else msg.headers.get(BENCHMARK_HEADER)
+        if benchmark_id is None:
+            raise RuntimeError("missing benchmark header")
         sample = state[benchmark_id]
         sample["server_request_received_ns"] = _now_ns()
         request_started = _now_ns()
@@ -311,13 +333,15 @@ async def _benchmark(args: argparse.Namespace) -> list[dict[str, Any]]:
     measure_iterations = int(manifest["measureIterations"])
 
     for scenario in manifest["scenarios"]:
+        function_name = scenario["functionName"]
         request = scenario["request"]
+        response = scenario["response"]
         for _ in range(warmup_iterations):
-            await telepact_json_client.round_trip(request)
-            await telepact_binary_client.round_trip(request)
-            await telepact_packed_client.round_trip(request)
-            assert await _run_protobuf(connection, protobuf_subject, request, {unique_run_id(): {}}) == request
-            assert await _run_plain_json(connection, json_subject, request, {unique_run_id(): {}}) == request
+            await telepact_json_client.round_trip(function_name, request, {})
+            await telepact_binary_client.round_trip(function_name, request, {})
+            await telepact_packed_client.round_trip(function_name, request, {})
+            assert await _run_protobuf(connection, protobuf_subject, request, {}, state) == response
+            assert await _run_plain_json(connection, json_subject, request, {}, state) == response
 
         for method in manifest["methods"]:
             for iteration in range(measure_iterations):
@@ -330,23 +354,18 @@ async def _benchmark(args: argparse.Namespace) -> list[dict[str, Any]]:
                     "data_shape": scenario["dataShape"],
                     "iteration": iteration,
                 }
-                benchmark_id = unique_run_id()
-                state[benchmark_id] = sample
                 if method == "telepact_json":
-                    telepact_json_client.state[benchmark_id] = sample
-                    await telepact_json_client.round_trip(request)
+                    await telepact_json_client.round_trip(function_name, request, sample)
                 elif method == "telepact_binary":
-                    telepact_binary_client.state[benchmark_id] = sample
-                    await telepact_binary_client.round_trip(request)
+                    await telepact_binary_client.round_trip(function_name, request, sample)
                 elif method == "telepact_packed_binary":
-                    telepact_packed_client.state[benchmark_id] = sample
-                    await telepact_packed_client.round_trip(request)
+                    await telepact_packed_client.round_trip(function_name, request, sample)
                 elif method == "protobuf":
-                    result = await _run_protobuf(connection, protobuf_subject, request, {benchmark_id: sample})
-                    assert result == request
+                    result = await _run_protobuf(connection, protobuf_subject, request, sample, state)
+                    assert result == response
                 else:
-                    result = await _run_plain_json(connection, json_subject, request, {benchmark_id: sample})
-                    assert result == request
+                    result = await _run_plain_json(connection, json_subject, request, sample, state)
+                    assert result == response
                 samples.append(sample)
 
     for subscription in subscriptions:
@@ -360,7 +379,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--language", default="python")
     parser.add_argument("--latency", required=True)
     parser.add_argument("--nats-url", required=True)
-    parser.add_argument("--schema-dir", required=True)
+    parser.add_argument("--telepact-schema-dir", required=True)
+    parser.add_argument("--proto-file", required=True)
     parser.add_argument("--manifest", required=True)
     parser.add_argument("--output", required=True)
     return parser.parse_args()

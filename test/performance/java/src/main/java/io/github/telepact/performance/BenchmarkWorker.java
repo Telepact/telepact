@@ -53,7 +53,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public final class BenchmarkWorker {
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    private record ParsedArgs(String language, String latency, String natsUrl, String schemaDir, String manifest, String output) {}
+    private record ParsedArgs(String language, String latency, String natsUrl, String telepactSchemaDir, String protoFile, String manifest, String output) {}
 
     private static long nowNs() {
         return System.nanoTime();
@@ -77,9 +77,16 @@ public final class BenchmarkWorker {
                 sample.put("server_response_ready_ns", nowNs());
             }
         };
+        var route = (io.github.telepact.FunctionRoute) (functionName, requestMessage) -> new Message(
+                Map.of(),
+                Map.of("Ok_", requestMessage.body.get(functionName)));
         var functionRouter = new FunctionRouter(Map.of(
-                "fn.roundTrip",
-                (io.github.telepact.FunctionRoute) (requestMessage) -> new Message(Map.of(), Map.of("Ok_", requestMessage.body.get("fn.roundTrip")))));
+                "fn.typicalSingle", route,
+                "fn.typicalList", route,
+                "fn.stringSingle", route,
+                "fn.stringList", route,
+                "fn.numberSingle", route,
+                "fn.numberList", route));
         return new Server(schema, functionRouter, options);
     }
 
@@ -87,12 +94,12 @@ public final class BenchmarkWorker {
         var entry = payloadMap.entrySet().iterator().next();
         var builder = Payload.newBuilder();
         switch (entry.getKey()) {
-            case "TypicalSingle" -> builder.setTypicalSingle(typicalItem((Map<String, Object>) entry.getValue()));
-            case "TypicalList" -> builder.setTypicalList(typicalList((Map<String, Object>) entry.getValue()));
-            case "StringSingle" -> builder.setStringSingle(stringItem((Map<String, Object>) entry.getValue()));
-            case "StringList" -> builder.setStringList(stringList((Map<String, Object>) entry.getValue()));
-            case "NumberSingle" -> builder.setNumberSingle(numberItem((Map<String, Object>) entry.getValue()));
-            case "NumberList" -> builder.setNumberList(numberList((Map<String, Object>) entry.getValue()));
+            case "typicalSingle" -> builder.setTypicalSingle(typicalItem((Map<String, Object>) entry.getValue()));
+            case "typicalList" -> builder.setTypicalList(typicalList((Map<String, Object>) entry.getValue()));
+            case "stringSingle" -> builder.setStringSingle(stringItem((Map<String, Object>) entry.getValue()));
+            case "stringList" -> builder.setStringList(stringList((Map<String, Object>) entry.getValue()));
+            case "numberSingle" -> builder.setNumberSingle(numberItem((Map<String, Object>) entry.getValue()));
+            case "numberList" -> builder.setNumberList(numberList((Map<String, Object>) entry.getValue()));
             default -> throw new IllegalArgumentException("unknown payload variant: " + entry.getKey());
         }
         return builder.build();
@@ -151,32 +158,32 @@ public final class BenchmarkWorker {
 
     private static Map<String, Object> payloadFromProto(Payload payload) {
         return switch (payload.getValueCase()) {
-            case TYPICAL_SINGLE -> Map.of("TypicalSingle", Map.of(
+            case TYPICALSINGLE -> Map.of("typicalSingle", Map.of(
                     "primaryId", payload.getTypicalSingle().getPrimaryId(),
                     "secondaryId", payload.getTypicalSingle().getSecondaryId(),
                     "count", payload.getTypicalSingle().getCount(),
                     "ratio", payload.getTypicalSingle().getRatio()));
-            case TYPICAL_LIST -> Map.of("TypicalList", Map.of("items", payload.getTypicalList().getItemsList().stream().map(item -> Map.of(
+            case TYPICALLIST -> Map.of("typicalList", Map.of("items", payload.getTypicalList().getItemsList().stream().map(item -> Map.of(
                     "primaryId", item.getPrimaryId(),
                     "secondaryId", item.getSecondaryId(),
                     "count", item.getCount(),
                     "ratio", item.getRatio())).toList()));
-            case STRING_SINGLE -> Map.of("StringSingle", Map.of(
+            case STRINGSINGLE -> Map.of("stringSingle", Map.of(
                     "alpha", payload.getStringSingle().getAlpha(),
                     "beta", payload.getStringSingle().getBeta(),
                     "gamma", payload.getStringSingle().getGamma(),
                     "delta", payload.getStringSingle().getDelta()));
-            case STRING_LIST -> Map.of("StringList", Map.of("items", payload.getStringList().getItemsList().stream().map(item -> Map.of(
+            case STRINGLIST -> Map.of("stringList", Map.of("items", payload.getStringList().getItemsList().stream().map(item -> Map.of(
                     "alpha", item.getAlpha(),
                     "beta", item.getBeta(),
                     "gamma", item.getGamma(),
                     "delta", item.getDelta())).toList()));
-            case NUMBER_SINGLE -> Map.of("NumberSingle", Map.of(
+            case NUMBERSINGLE -> Map.of("numberSingle", Map.of(
                     "left", payload.getNumberSingle().getLeft(),
                     "right", payload.getNumberSingle().getRight(),
                     "ratio", payload.getNumberSingle().getRatio(),
                     "offset", payload.getNumberSingle().getOffset()));
-            case NUMBER_LIST -> Map.of("NumberList", Map.of("items", payload.getNumberList().getItemsList().stream().map(item -> Map.of(
+            case NUMBERLIST -> Map.of("numberList", Map.of("items", payload.getNumberList().getItemsList().stream().map(item -> Map.of(
                     "left", item.getLeft(),
                     "right", item.getRight(),
                     "ratio", item.getRatio(),
@@ -187,28 +194,26 @@ public final class BenchmarkWorker {
 
     private static byte[] encodeProtoRequest(Map<String, Object> request) {
         return RoundTripRequest.newBuilder()
-                .setScenario((String) request.get("scenario"))
-                .setPayload(payloadToProto((Map<String, Object>) request.get("payload")))
+                .setPayload(payloadToProto(request))
                 .build()
                 .toByteArray();
     }
 
     private static Map<String, Object> decodeProtoRequest(byte[] payload) throws Exception {
         var request = RoundTripRequest.parseFrom(payload);
-        return Map.of("scenario", request.getScenario(), "payload", payloadFromProto(request.getPayload()));
+        return payloadFromProto(request.getPayload());
     }
 
     private static byte[] encodeProtoResponse(Map<String, Object> response) {
         return RoundTripResponse.newBuilder()
-                .setScenario((String) response.get("scenario"))
-                .setPayload(payloadToProto((Map<String, Object>) response.get("payload")))
+                .setPayload(payloadToProto(response))
                 .build()
                 .toByteArray();
     }
 
     private static Map<String, Object> decodeProtoResponse(byte[] payload) throws Exception {
         var response = RoundTripResponse.parseFrom(payload);
-        return Map.of("scenario", response.getScenario(), "payload", payloadFromProto(response.getPayload()));
+        return payloadFromProto(response.getPayload());
     }
 
     private static final class TelepactBenchClient {
@@ -251,15 +256,15 @@ public final class BenchmarkWorker {
             }), options);
         }
 
-        private void roundTrip(Map<String, Object> request, Map<String, Object> sample) {
+        private void roundTrip(String functionName, Map<String, Object> request, Map<String, Object> sample) {
             currentSample.set(sample);
             try {
                 var headers = new HashMap<String, Object>();
                 if (packed) {
                     headers.put("@pac_", true);
                 }
-                var response = client.request(new Message(headers, Map.of("fn.roundTrip", request)));
-                if (!Objects.equals(response.body.get("Ok_"), request)) {
+                var response = client.request(new Message(headers, Map.of(functionName, request.values().iterator().next())));
+                if (!Objects.equals(response.body.get("Ok_"), request.values().iterator().next())) {
                     throw new IllegalStateException("telepact response mismatch");
                 }
             } finally {
@@ -325,7 +330,8 @@ public final class BenchmarkWorker {
                 parsed.getOrDefault("--language", "java"),
                 parsed.get("--latency"),
                 parsed.get("--nats-url"),
-                parsed.get("--schema-dir"),
+                parsed.get("--telepact-schema-dir"),
+                parsed.get("--proto-file"),
                 parsed.get("--manifest"),
                 parsed.get("--output"));
     }
@@ -343,7 +349,7 @@ public final class BenchmarkWorker {
         var protobufSubject = subjectPrefix + ".protobuf";
         var jsonSubject = subjectPrefix + ".json";
 
-        var server = buildTelepactServer(parsed.schemaDir, currentSample);
+        var server = buildTelepactServer(parsed.telepactSchemaDir, currentSample);
         MessageHandler telepactHandler = msg -> {
             try {
                 var sample = currentSample.get();
@@ -422,12 +428,13 @@ public final class BenchmarkWorker {
         var samples = new ArrayList<Map<String, Object>>();
 
         for (var scenario : scenarios) {
+            var functionName = (String) scenario.get("functionName");
             var request = (Map<String, Object>) scenario.get("request");
             var response = (Map<String, Object>) scenario.get("response");
             for (var warmup = 0; warmup < warmupIterations; warmup += 1) {
-                telepactJsonClient.roundTrip(request, new HashMap<>());
-                telepactBinaryClient.roundTrip(request, new HashMap<>());
-                telepactPackedClient.roundTrip(request, new HashMap<>());
+                telepactJsonClient.roundTrip(functionName, request, new HashMap<>());
+                telepactBinaryClient.roundTrip(functionName, request, new HashMap<>());
+                telepactPackedClient.roundTrip(functionName, request, new HashMap<>());
                 if (!Objects.equals(runProtobuf(connection, protobufSubject, request, new HashMap<>(), currentSample), response)) {
                     throw new IllegalStateException("protobuf warmup mismatch");
                 }
@@ -446,9 +453,9 @@ public final class BenchmarkWorker {
                     sample.put("data_shape", scenario.get("dataShape"));
                     sample.put("iteration", iteration);
                     switch (method) {
-                        case "telepact_json" -> telepactJsonClient.roundTrip(request, sample);
-                        case "telepact_binary" -> telepactBinaryClient.roundTrip(request, sample);
-                        case "telepact_packed_binary" -> telepactPackedClient.roundTrip(request, sample);
+                        case "telepact_json" -> telepactJsonClient.roundTrip(functionName, request, sample);
+                        case "telepact_binary" -> telepactBinaryClient.roundTrip(functionName, request, sample);
+                        case "telepact_packed_binary" -> telepactPackedClient.roundTrip(functionName, request, sample);
                         case "protobuf" -> {
                             if (!Objects.equals(runProtobuf(connection, protobufSubject, request, sample, currentSample), response)) {
                                 throw new IllegalStateException("protobuf mismatch");

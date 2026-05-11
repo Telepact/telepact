@@ -30,7 +30,8 @@ from common import LATENCIES, load_json, refresh_latest, summarize_samples, writ
 
 ROOT = Path(__file__).resolve().parent
 OUTPUT_DIR = ROOT / "output"
-SCHEMA_DIR = ROOT / "schema"
+TELEPACT_SCHEMA_DIR = ROOT / "schema" / "telepact"
+PROTO_FILE = ROOT / "schema" / "protobuf" / "benchmark.proto"
 MANIFEST_PATH = ROOT / "gen" / "manifest.json"
 
 
@@ -99,8 +100,10 @@ def main() -> None:
                         latency,
                         "--nats-url",
                         nats_url,
-                        "--schema-dir",
-                        str(SCHEMA_DIR),
+                        "--telepact-schema-dir",
+                        str(TELEPACT_SCHEMA_DIR),
+                        "--proto-file",
+                        str(PROTO_FILE),
                         "--manifest",
                         str(MANIFEST_PATH),
                         "--output",
@@ -118,8 +121,10 @@ def main() -> None:
                         latency,
                         "--nats-url",
                         nats_url,
-                        "--schema-dir",
-                        str(SCHEMA_DIR),
+                        "--telepact-schema-dir",
+                        str(TELEPACT_SCHEMA_DIR),
+                        "--proto-file",
+                        str(PROTO_FILE),
                         "--manifest",
                         str(MANIFEST_PATH),
                         "--output",
@@ -132,7 +137,7 @@ def main() -> None:
                         "-q",
                         "-s",
                         "settings.xml",
-                        f"-Dexec.args=--language {language} --latency {latency} --nats-url {nats_url} --schema-dir {SCHEMA_DIR} --manifest {MANIFEST_PATH} --output {output_path}",
+                        f"-Dexec.args=--language {language} --latency {latency} --nats-url {nats_url} --telepact-schema-dir {TELEPACT_SCHEMA_DIR} --proto-file {PROTO_FILE} --manifest {MANIFEST_PATH} --output {output_path}",
                         "exec:java",
                     ]
                     _run_worker(command, cwd=ROOT / "java")

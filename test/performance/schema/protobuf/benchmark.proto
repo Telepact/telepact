@@ -5,8 +5,8 @@ option java_package = "io.github.telepact.performance.proto";
 option java_outer_classname = "BenchmarkProto";
 
 message TypicalItem {
-  string primary_id = 1;
-  string secondary_id = 2;
+  string primaryId = 1;
+  string secondaryId = 2;
   int32 count = 3;
   double ratio = 4;
 }
@@ -39,21 +39,19 @@ message NumberList {
 
 message Payload {
   oneof value {
-    TypicalItem typical_single = 1;
-    TypicalList typical_list = 2;
-    StringItem string_single = 3;
-    StringList string_list = 4;
-    NumberItem number_single = 5;
-    NumberList number_list = 6;
+    TypicalItem typicalSingle = 1;
+    TypicalList typicalList = 2;
+    StringItem stringSingle = 3;
+    StringList stringList = 4;
+    NumberItem numberSingle = 5;
+    NumberList numberList = 6;
   }
 }
 
 message RoundTripRequest {
-  string scenario = 1;
-  Payload payload = 2;
+  Payload payload = 1;
 }
 
 message RoundTripResponse {
-  string scenario = 1;
-  Payload payload = 2;
+  Payload payload = 1;
 }

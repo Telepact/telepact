@@ -27,43 +27,42 @@ all: setup
 setup: $(PY_TAR_GZ) $(TS_TAR_GZ) python-deps python-proto ts-deps java-deps
 
 $(PY_TAR_GZ):
-$(MAKE) -C $(ROOT)/lib/py
-cp $(LIB_PY_TAR_GZ) $(PY_TAR_GZ)
+	$(MAKE) -C $(ROOT)/lib/py
+	cp $(LIB_PY_TAR_GZ) $(PY_TAR_GZ)
 
 $(TS_TAR_GZ):
-$(MAKE) -C $(ROOT)/lib/ts
-cp $(LIB_TS_TAR_GZ) $(TS_TAR_GZ)
+	$(MAKE) -C $(ROOT)/lib/ts
+	cp $(LIB_TS_TAR_GZ) $(TS_TAR_GZ)
 
 python-deps: $(PY_TAR_GZ)
-uv sync --all-groups
-uv pip install --python .venv/bin/python ./telepact.tar.gz
+	uv sync --all-groups
+	uv pip install --python .venv/bin/python ./telepact.tar.gz
 
 python-proto:
-mkdir -p gen/py
-protoc --proto_path=schema --python_out=gen/py schema/benchmark.proto
-
+	mkdir -p gen/py
+	uv run python -m grpc_tools.protoc --proto_path=schema/protobuf --python_out=gen/py schema/protobuf/benchmark.proto
 
 ts-deps: $(TS_TAR_GZ)
-npm --prefix ts uninstall telepact || echo "no-op"
-npm --prefix ts install --ignore-scripts ./telepact.tgz
-npm --prefix ts install --ignore-scripts
-npm --prefix ts run build
+	cd ts && npm uninstall telepact || echo "no-op"
+	cd ts && npm install --ignore-scripts ./telepact.tgz
+	cd ts && npm install --ignore-scripts
+	cd ts && npm run build
 
 java-deps:
-$(MAKE) -C $(ROOT)/lib/java
-mkdir -p java/target/dep
-cp $(LIB_JAVA_JAR) java/target/dep/telepact.jar
-cd java && mvn install:install-file -Dfile=target/dep/telepact.jar -DgroupId=io.github.telepact -DartifactId=telepact -Dversion=1.0 -Dpackaging=jar -s settings.xml | grep -v "from central"; if [ $${PIPESTATUS[0]} -ne 0 ]; then exit 1; fi
-cd java && mvn -q -s settings.xml -DskipTests compile
+	$(MAKE) -C $(ROOT)/lib/java
+	mkdir -p java/target/dep
+	cp $(LIB_JAVA_JAR) java/target/dep/telepact.jar
+	cd java && mvn install:install-file -Dfile=target/dep/telepact.jar -DgroupId=io.github.telepact -DartifactId=telepact -Dversion=1.0 -Dpackaging=jar -s settings.xml | grep -v "from central"; if [ $${PIPESTATUS[0]} -ne 0 ]; then exit 1; fi
+	cd java && mvn -q -s settings.xml -DskipTests compile
 
 run: setup
-uv run python run.py
+	uv run python run.py
 
 clean:
-rm -rf .venv
-rm -rf gen
-rm -rf output
-rm -f telepact.tar.gz
-rm -f ts/telepact.tgz
-$(MAKE) -C ts clean
-$(MAKE) -C java clean
+	rm -rf .venv
+	rm -rf gen
+	rm -rf output
+	rm -f telepact.tar.gz
+	rm -f ts/telepact.tgz
+	$(MAKE) -C ts clean
+	$(MAKE) -C java clean

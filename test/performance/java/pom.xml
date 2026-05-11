@@ -47,7 +47,7 @@
         <artifactId>protobuf-maven-plugin</artifactId>
         <version>0.6.1</version>
         <configuration>
-          <protoSourceRoot>${project.basedir}/../schema</protoSourceRoot>
+          <protoSourceRoot>${project.basedir}/../schema/protobuf</protoSourceRoot>
           <protocArtifact>com.google.protobuf:protoc:${protobuf.version}:exe:${os.detected.classifier}</protocArtifact>
         </configuration>
         <executions>

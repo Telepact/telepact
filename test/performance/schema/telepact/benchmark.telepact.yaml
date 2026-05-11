@@ -35,23 +35,51 @@
     items: ["struct.StringItem"]
 - struct.NumberList:
     items: ["struct.NumberItem"]
-- union.Payload:
-    - TypicalSingle: "struct.TypicalItem"
-    - TypicalList: "struct.TypicalList"
-    - StringSingle: "struct.StringItem"
-    - StringList: "struct.StringList"
-    - NumberSingle: "struct.NumberItem"
-    - NumberList: "struct.NumberList"
-- struct.RoundTripRequest:
-    scenario: "string"
-    payload: "union.Payload"
-- struct.RoundTripResponse:
-    scenario: "string"
-    payload: "union.Payload"
-- fn.roundTrip:
-    scenario: "string"
-    payload: "union.Payload"
+- fn.typicalSingle:
+    primaryId: "string"
+    secondaryId: "string"
+    count: "integer"
+    ratio: "number"
   ->:
     - Ok_:
-        scenario: "string"
-        payload: "union.Payload"
+        primaryId: "string"
+        secondaryId: "string"
+        count: "integer"
+        ratio: "number"
+- fn.typicalList:
+    items: ["struct.TypicalItem"]
+  ->:
+    - Ok_:
+        items: ["struct.TypicalItem"]
+- fn.stringSingle:
+    alpha: "string"
+    beta: "string"
+    gamma: "string"
+    delta: "string"
+  ->:
+    - Ok_:
+        alpha: "string"
+        beta: "string"
+        gamma: "string"
+        delta: "string"
+- fn.stringList:
+    items: ["struct.StringItem"]
+  ->:
+    - Ok_:
+        items: ["struct.StringItem"]
+- fn.numberSingle:
+    left: "integer"
+    right: "integer"
+    ratio: "number"
+    offset: "number"
+  ->:
+    - Ok_:
+        left: "integer"
+        right: "integer"
+        ratio: "number"
+        offset: "number"
+- fn.numberList:
+    items: ["struct.NumberItem"]
+  ->:
+    - Ok_:
+        items: ["struct.NumberItem"]

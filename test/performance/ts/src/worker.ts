@@ -24,7 +24,7 @@ import { Client, ClientOptions, FunctionRouter, Message, Serializer, Server, Ser
 const BENCHMARK_HEADER = 'x-benchmark-id';
 
 type Json = Record<string, any>;
-type Sample = Record<string, number | string>;
+type Sample = Record<string, any>;
 
 function nowNs(): number {
     return Number(process.hrtime.bigint());
@@ -59,17 +59,17 @@ class ProtobufCodec {
     private payloadToObject(payload: Json): Json {
         const [variant, value] = payloadEntry(payload);
         switch (variant) {
-            case 'TypicalSingle':
+            case 'typicalSingle':
                 return { typicalSingle: value };
-            case 'TypicalList':
+            case 'typicalList':
                 return { typicalList: value };
-            case 'StringSingle':
+            case 'stringSingle':
                 return { stringSingle: value };
-            case 'StringList':
+            case 'stringList':
                 return { stringList: value };
-            case 'NumberSingle':
+            case 'numberSingle':
                 return { numberSingle: value };
-            case 'NumberList':
+            case 'numberList':
                 return { numberList: value };
             default:
                 throw new Error(`unknown payload variant: ${variant}`);
@@ -77,36 +77,34 @@ class ProtobufCodec {
     }
 
     private payloadFromObject(payload: Json): Json {
-        if (payload.typicalSingle != null) return { TypicalSingle: payload.typicalSingle };
-        if (payload.typicalList != null) return { TypicalList: payload.typicalList };
-        if (payload.stringSingle != null) return { StringSingle: payload.stringSingle };
-        if (payload.stringList != null) return { StringList: payload.stringList };
-        if (payload.numberSingle != null) return { NumberSingle: payload.numberSingle };
-        return { NumberList: payload.numberList };
+        if (payload.typicalSingle != null) return { typicalSingle: payload.typicalSingle };
+        if (payload.typicalList != null) return { typicalList: payload.typicalList };
+        if (payload.stringSingle != null) return { stringSingle: payload.stringSingle };
+        if (payload.stringList != null) return { stringList: payload.stringList };
+        if (payload.numberSingle != null) return { numberSingle: payload.numberSingle };
+        return { numberList: payload.numberList };
     }
 
     encodeRequest(request: Json): Uint8Array {
         return this.requestType.encode(this.requestType.create({
-            scenario: request.scenario,
-            payload: this.payloadToObject(request.payload),
+            payload: this.payloadToObject(request),
         })).finish();
     }
 
     decodeRequest(payload: Uint8Array): Json {
         const decoded = this.requestType.toObject(this.requestType.decode(payload), { defaults: false });
-        return { scenario: decoded.scenario, payload: this.payloadFromObject(decoded.payload as Json) };
+        return this.payloadFromObject(decoded.payload as Json);
     }
 
     encodeResponse(response: Json): Uint8Array {
         return this.responseType.encode(this.responseType.create({
-            scenario: response.scenario,
-            payload: this.payloadToObject(response.payload),
+            payload: this.payloadToObject(response),
         })).finish();
     }
 
     decodeResponse(payload: Uint8Array): Json {
         const decoded = this.responseType.toObject(this.responseType.decode(payload), { defaults: false });
-        return { scenario: decoded.scenario, payload: this.payloadFromObject(decoded.payload as Json) };
+        return this.payloadFromObject(decoded.payload as Json);
     }
 }
 
@@ -150,15 +148,15 @@ class TelepactBenchClient {
         }, options);
     }
 
-    async roundTrip(request: Json, sample: Sample): Promise<void> {
+    async roundTrip(functionName: string, request: Json, sample: Sample): Promise<void> {
         const headers: Json = {};
         if (this.packed) {
             headers['@pac_'] = true;
         }
         this.activeSample = sample;
         try {
-            const response = await this.client.request(new Message(headers, { 'fn.roundTrip': request }));
-            if (JSON.stringify(response.body['Ok_']) !== JSON.stringify(request)) {
+            const response = await this.client.request(new Message(headers, { [functionName]: Object.values(request)[0] }));
+            if (JSON.stringify(response.body['Ok_']) !== JSON.stringify(Object.values(request)[0])) {
                 throw new Error('telepact response mismatch');
             }
         } finally {
@@ -193,11 +191,18 @@ async function buildTelepactServer(schemaDir: string, state: Map<string, Sample>
             sample.server_response_ready_ns = nowNs();
         }
     };
-    const server = new Server(schema, new FunctionRouter({
-        'fn.roundTrip': async (functionName: string, requestMessage: Message): Promise<Message> => {
-            return new Message({}, { 'Ok_': requestMessage.body[functionName] });
-        },
-    }), options);
+    const functionNames = [
+        'fn.typicalSingle',
+        'fn.typicalList',
+        'fn.stringSingle',
+        'fn.stringList',
+        'fn.numberSingle',
+        'fn.numberList',
+    ];
+    const routes = Object.fromEntries(functionNames.map((name) => [name, async (functionName: string, requestMessage: Message): Promise<Message> => {
+        return new Message({}, { 'Ok_': requestMessage.body[functionName] });
+    }]));
+    const server = new Server(schema, new FunctionRouter(routes), options);
     return { server, context };
 }
 
@@ -255,8 +260,8 @@ async function benchmark(args: Json): Promise<Sample[]> {
     const telepactPackedSubject = `${subjectPrefix}.telepact-packed`;
     const protobufSubject = `${subjectPrefix}.protobuf`;
     const jsonSubject = `${subjectPrefix}.json`;
-    const codec = new ProtobufCodec(path.resolve(args.schemaDir, 'benchmark.proto'));
-    const { server, context } = await buildTelepactServer(args.schemaDir, state);
+    const codec = new ProtobufCodec(args.protoFile);
+    const { server, context } = await buildTelepactServer(args.telepactSchemaDir, state);
 
     const telepactHandler = async (msg: Msg): Promise<void> => {
         const benchmarkId = msg.headers?.get(BENCHMARK_HEADER);
@@ -323,10 +328,11 @@ async function benchmark(args: Json): Promise<Sample[]> {
 
     const samples: Sample[] = [];
     for (const scenario of manifest.scenarios as Json[]) {
+        const functionName = scenario.functionName as string;
         for (let index = 0; index < manifest.warmupIterations; index += 1) {
-            await telepactJsonClient.roundTrip(scenario.request, {} as Sample);
-            await telepactBinaryClient.roundTrip(scenario.request, {} as Sample);
-            await telepactPackedClient.roundTrip(scenario.request, {} as Sample);
+            await telepactJsonClient.roundTrip(functionName, scenario.request, {} as Sample);
+            await telepactBinaryClient.roundTrip(functionName, scenario.request, {} as Sample);
+            await telepactPackedClient.roundTrip(functionName, scenario.request, {} as Sample);
             const protoWarmup = await runProtobuf(connection, protobufSubject, scenario.request, {} as Sample, state, codec);
             const jsonWarmup = await runPlainJson(connection, jsonSubject, scenario.request, {} as Sample, state);
             if (JSON.stringify(protoWarmup) !== JSON.stringify(scenario.response) || JSON.stringify(jsonWarmup) !== JSON.stringify(scenario.response)) {
@@ -346,11 +352,11 @@ async function benchmark(args: Json): Promise<Sample[]> {
                     iteration,
                 };
                 if (method === 'telepact_json') {
-                    await telepactJsonClient.roundTrip(scenario.request, sample);
+                    await telepactJsonClient.roundTrip(functionName, scenario.request, sample);
                 } else if (method === 'telepact_binary') {
-                    await telepactBinaryClient.roundTrip(scenario.request, sample);
+                    await telepactBinaryClient.roundTrip(functionName, scenario.request, sample);
                 } else if (method === 'telepact_packed_binary') {
-                    await telepactPackedClient.roundTrip(scenario.request, sample);
+                    await telepactPackedClient.roundTrip(functionName, scenario.request, sample);
                 } else if (method === 'protobuf') {
                     const response = await runProtobuf(connection, protobufSubject, scenario.request, sample, state, codec);
                     if (JSON.stringify(response) !== JSON.stringify(scenario.response)) {
