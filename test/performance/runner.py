@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import json
 import math
+import os
 import statistics
 import subprocess
 from datetime import datetime, timezone
@@ -30,15 +31,23 @@ CONFIG_PATH = ROOT / "config" / "benchmark-config.json"
 LANGUAGES = {
     "python": {
         "cwd": ROOT / "python",
-        "command": ["uv", "run", "python", "perf/main.py"],
+        "command": lambda output_path: ["uv", "run", "python", "perf/main.py", "--output", str(output_path)],
     },
     "typescript": {
         "cwd": ROOT / "typescript",
-        "command": ["node", "dist/benchmark.js"],
+        "command": lambda output_path: ["node", "dist/benchmark.js", "--output", str(output_path)],
     },
     "java": {
         "cwd": ROOT / "java",
-        "command": ["mvn", "-q", "-DskipTests", "exec:java", "-s", "settings.xml"],
+        "command": lambda output_path: [
+            "mvn",
+            "-q",
+            "-DskipTests",
+            f"-Dexec.args=--output {output_path}",
+            "exec:java",
+            "-s",
+            "settings.xml",
+        ],
     },
 }
 METRIC_NAMES = [
@@ -121,23 +130,26 @@ def build_summary(raw: list[dict[str, Any]], config: dict[str, Any]) -> dict[str
 def main() -> None:
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     config = json.loads(CONFIG_PATH.read_text())
+    effective_nats_url = os.environ.get("NATS_URL", config["natsUrl"])
     raw_cases: list[dict[str, Any]] = []
 
     for language, meta in LANGUAGES.items():
         output_path = RESULTS_DIR / f"{language}-raw.json"
-        command = [*meta["command"], "--output", str(output_path)]
+        command = meta["command"](output_path)
         subprocess.run(command, cwd=meta["cwd"], check=True)
         language_payload = json.loads(output_path.read_text())
         raw_cases.extend(language_payload["cases"])
 
     raw_report = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
-        "nats_url": config["natsUrl"],
+        "nats_url": effective_nats_url,
         "cases": raw_cases,
     }
     (RESULTS_DIR / "latest-raw.json").write_text(json.dumps(raw_report, indent=2) + "\n")
 
-    summary = build_summary(raw_cases, config)
+    config_with_effective_url = dict(config)
+    config_with_effective_url["natsUrl"] = effective_nats_url
+    summary = build_summary(raw_cases, config_with_effective_url)
     (RESULTS_DIR / "latest-summary.json").write_text(json.dumps(summary, indent=2) + "\n")
 
 

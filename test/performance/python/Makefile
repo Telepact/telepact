@@ -18,19 +18,19 @@ LIB_TAR_GZ := ../../../lib/py/dist/*.tar.gz
 TAR_GZ := telepact.tar.gz
 
 all: $(TAR_GZ)
-uv sync --all-groups
-uv pip install --python .venv/bin/python ./telepact.tar.gz
+	uv sync --all-groups
+	uv pip install --python .venv/bin/python ./telepact.tar.gz
 
 dep:
-$(MAKE) -C ../../../lib/py
+	$(MAKE) -C ../../../lib/py
 
 $(TAR_GZ): dep
-cp $(LIB_TAR_GZ) telepact.tar.gz
+	cp $(LIB_TAR_GZ) telepact.tar.gz
 
 run:
-uv run python perf/main.py
+	uv run python perf/main.py
 
 clean:
-rm -f telepact.tar.gz
-rm -rf .venv
-rm -f uv.lock
+	rm -f telepact.tar.gz
+	rm -rf .venv
+	rm -f uv.lock

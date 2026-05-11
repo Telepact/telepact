@@ -20,6 +20,7 @@ import argparse
 import asyncio
 import copy
 import json
+import os
 import time
 from pathlib import Path
 from typing import Any, Callable, Coroutine
@@ -35,7 +36,9 @@ ROOT = Path("/home/runner/work/telepact/telepact/test/performance")
 CONFIG = json.loads((ROOT / "config" / "benchmark-config.json").read_text())
 PAYLOADS = json.loads((ROOT / "config" / "payloads.json").read_text())
 SCHEMA_DIR = str(ROOT / "schema")
+TELEPACT_SCHEMA_PATH = ROOT / "schema" / "benchmark.telepact.json"
 LANGUAGE = "python"
+NATS_URL = os.environ.get("NATS_URL", CONFIG["natsUrl"])
 SERVER_HEADER_NAMES = {
     "received_wall_ns": "x-telepact-perf-server-received-wall-ns",
     "request_deserialize_ns": "x-telepact-perf-server-request-deserialize-ns",
@@ -117,13 +120,61 @@ def protobuf_request_factory(data_shape: str, payload: dict[str, Any]) -> tuple[
     raise ValueError(data_shape)
 
 
+def protobuf_message_to_payload(data_shape: str, message: Any) -> dict[str, Any]:
+    if data_shape == "typical_data":
+        return {
+            "items": [
+                {
+                    "primaryText": item.primary_text,
+                    "secondaryText": item.secondary_text,
+                    "primaryInt": int(item.primary_int),
+                    "secondaryInt": int(item.secondary_int),
+                    "primaryNumber": float(item.primary_number),
+                    "secondaryNumber": float(item.secondary_number),
+                }
+                for item in message.items
+            ]
+        }
+    if data_shape == "all_strings":
+        return {
+            "items": [
+                {
+                    "alpha": item.alpha,
+                    "beta": item.beta,
+                    "gamma": item.gamma,
+                    "delta": item.delta,
+                    "epsilon": item.epsilon,
+                    "zeta": item.zeta,
+                }
+                for item in message.items
+            ]
+        }
+    if data_shape == "all_numbers":
+        return {
+            "items": [
+                {
+                    "firstInt": int(item.first_int),
+                    "secondInt": int(item.second_int),
+                    "thirdInt": int(item.third_int),
+                    "firstNumber": float(item.first_number),
+                    "secondNumber": float(item.second_number),
+                    "thirdNumber": float(item.third_number),
+                }
+                for item in message.items
+            ]
+        }
+    raise ValueError(data_shape)
+
+
 async def publish_reply(connection: NatsClient, msg: Msg, payload: bytes, headers: dict[str, str]) -> None:
     await connection.publish(msg.reply, payload, headers=headers)
 
 
 async def start_servers(connection: NatsClient) -> list[Any]:
     subscriptions = []
-    telepact_schema = TelepactSchema.from_directory(SCHEMA_DIR)
+    telepact_schema = TelepactSchema.from_file_json_map(
+        {TELEPACT_SCHEMA_PATH.name: TELEPACT_SCHEMA_PATH.read_text()}
+    )
 
     async def echo_route(_function_name: str, request_message: Message) -> Message:
         return Message({}, {"Ok_": copy.deepcopy(request_message.get_body_payload())})
@@ -198,16 +249,22 @@ async def start_servers(connection: NatsClient) -> list[Any]:
             subscriptions.append(await connection.subscribe(subject_for(method, data_shape), cb=telepact_handler))
 
     for data_shape in CONFIG["dataShapes"]:
+        async def plain_json_callback(msg: Msg, data_shape: str = data_shape) -> None:
+            await plain_json_handler(data_shape, msg)
+
+        async def protobuf_callback(msg: Msg, data_shape: str = data_shape) -> None:
+            await protobuf_handler(data_shape, msg)
+
         subscriptions.append(
             await connection.subscribe(
                 subject_for("plain_json", data_shape),
-                cb=lambda msg, data_shape=data_shape: plain_json_handler(data_shape, msg),
+                cb=plain_json_callback,
             )
         )
         subscriptions.append(
             await connection.subscribe(
                 subject_for("protobuf", data_shape),
-                cb=lambda msg, data_shape=data_shape: protobuf_handler(data_shape, msg),
+                cb=protobuf_callback,
             )
         )
 
@@ -321,7 +378,7 @@ async def run_plain_json_case(connection: NatsClient, data_shape: str, collectio
 async def run_protobuf_case(connection: NatsClient, data_shape: str, collection_shape: str) -> dict[str, Any]:
     payload = PAYLOADS[data_shape][collection_shape]
     request_message, response_from_bytes, _response_builder = protobuf_request_factory(data_shape, payload)
-    response_as_dict = json_format.MessageToDict(response_from_bytes(request_message.SerializeToString()), preserving_proto_field_name=False)
+    response_as_dict = protobuf_message_to_payload(data_shape, response_from_bytes(request_message.SerializeToString()))
     if response_as_dict != payload:
         raise RuntimeError(f"Protobuf schema mismatch for {data_shape}/{collection_shape}")
 
@@ -341,7 +398,7 @@ async def run_protobuf_case(connection: NatsClient, data_shape: str, collection_
         response_deserialize_start_ns = time.perf_counter_ns()
         parsed_response = response_from_bytes(response_msg.data)
         response_deserialize_ns = time.perf_counter_ns() - response_deserialize_start_ns
-        parsed_response_dict = json_format.MessageToDict(parsed_response, preserving_proto_field_name=False)
+        parsed_response_dict = protobuf_message_to_payload(data_shape, parsed_response)
         if parsed_response_dict != payload:
             raise RuntimeError(f"Unexpected protobuf response for {data_shape}/{collection_shape}")
         samples.append(
@@ -368,7 +425,7 @@ async def run_protobuf_case(connection: NatsClient, data_shape: str, collection_
 
 
 async def run_benchmark(output_path: Path) -> None:
-    connection = await nats.connect(CONFIG["natsUrl"])
+    connection = await nats.connect(NATS_URL)
     await start_servers(connection)
     cases: list[dict[str, Any]] = []
 
@@ -387,7 +444,7 @@ async def run_benchmark(output_path: Path) -> None:
         json.dumps(
             {
                 "language": LANGUAGE,
-                "nats_url": CONFIG["natsUrl"],
+                "nats_url": NATS_URL,
                 "cases": cases,
             },
             indent=2,

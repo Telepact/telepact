@@ -19,19 +19,19 @@
 prepare: prepare-py prepare-ts prepare-java
 
 prepare-py:
-$(MAKE) -C python
+	$(MAKE) -C python
 
 prepare-ts:
-$(MAKE) -C typescript
+	$(MAKE) -C typescript
 
 prepare-java:
-$(MAKE) -C java
+	$(MAKE) -C java
 
 run: prepare
-uv run --project python python /home/runner/work/telepact/telepact/test/performance/runner.py
+	uv run --project python python /home/runner/work/telepact/telepact/test/performance/runner.py
 
 clean:
-$(MAKE) -C python clean
-$(MAKE) -C typescript clean
-$(MAKE) -C java clean
-rm -f results/*.json
+	$(MAKE) -C python clean
+	$(MAKE) -C typescript clean
+	$(MAKE) -C java clean
+	rm -f results/*.json

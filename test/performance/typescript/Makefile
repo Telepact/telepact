@@ -18,22 +18,22 @@ LIB_TAR_GZ := ../../../lib/ts/dist-tgz/*.tgz
 TAR_GZ := telepact.tgz
 
 all: $(TAR_GZ)
-npm uninstall telepact || echo "no-op"
-npm install --ignore-scripts ./telepact.tgz
-npm install --ignore-scripts
-npm run build
+	npm uninstall telepact || echo "no-op"
+	npm install --ignore-scripts ./telepact.tgz
+	npm install --ignore-scripts
+	npm run build
 
 dep:
-$(MAKE) -C ../../../lib/ts
+	$(MAKE) -C ../../../lib/ts
 
 $(TAR_GZ): dep
-cp $(LIB_TAR_GZ) telepact.tgz
+	cp $(LIB_TAR_GZ) telepact.tgz
 
 run:
-node dist/benchmark.js
+	node dist/benchmark.js
 
 clean:
-rm -f telepact.tgz
-rm -rf dist
-rm -rf node_modules
-rm -f package-lock.json
+	rm -f telepact.tgz
+	rm -rf dist
+	rm -rf node_modules
+	rm -f package-lock.json
