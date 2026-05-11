@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+package telepact.performance;
+
+message TypicalItem {
+  int64 id = 1;
+  string account = 2;
+  double balance = 3;
+  string region = 4;
+  int64 quantity = 5;
+  double score = 6;
+}
+
+message StringItem {
+  string id = 1;
+  string account = 2;
+  string region = 3;
+  string segment = 4;
+  string status = 5;
+  string note = 6;
+}
+
+message NumberItem {
+  int64 id = 1;
+  int64 quantity = 2;
+  int64 retries = 3;
+  double balance = 4;
+  double score = 5;
+  double ratio = 6;
+}
+
+message RecordItem {
+  oneof value {
+    TypicalItem typical = 1;
+    StringItem all_strings = 2;
+    NumberItem all_numbers = 3;
+  }
+}
+
+message EchoRequest {
+  repeated RecordItem items = 1;
+}
+
+message EchoResponse {
+  repeated RecordItem items = 1;
+}

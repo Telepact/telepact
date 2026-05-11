@@ -1,0 +1,61 @@
+[
+    {
+        "struct.TypicalItem": {
+            "id": "integer",
+            "account": "string",
+            "balance": "number",
+            "region": "string",
+            "quantity": "integer",
+            "score": "number"
+        }
+    },
+    {
+        "struct.StringItem": {
+            "id": "string",
+            "account": "string",
+            "region": "string",
+            "segment": "string",
+            "status": "string",
+            "note": "string"
+        }
+    },
+    {
+        "struct.NumberItem": {
+            "id": "integer",
+            "quantity": "integer",
+            "retries": "integer",
+            "balance": "number",
+            "score": "number",
+            "ratio": "number"
+        }
+    },
+    {
+        "union.RecordItem": [
+            {
+                "Typical": "struct.TypicalItem"
+            },
+            {
+                "AllStrings": "struct.StringItem"
+            },
+            {
+                "AllNumbers": "struct.NumberItem"
+            }
+        ]
+    },
+    {
+        "fn.echo": {
+            "items": [
+                "union.RecordItem"
+            ]
+        },
+        "->": [
+            {
+                "Ok_": {
+                    "items": [
+                        "union.RecordItem"
+                    ]
+                }
+            }
+        ]
+    }
+]
