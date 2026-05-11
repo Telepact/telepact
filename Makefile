@@ -138,9 +138,15 @@ test-trace-go:
 deploy-go:
 	$(MAKE) -C lib/go deploy
 
-.PHONY: test prepare-test-java test-java-run prepare-test-py test-py-run prepare-test-ts test-ts-run prepare-test-go test-go-run site
+.PHONY: test prepare-test-java test-java-run prepare-test-py test-py-run prepare-test-ts test-ts-run prepare-test-go test-go-run prepare-test-performance test-performance site
 test:
 	$(MAKE) -C test/runner test
+
+prepare-test-performance:
+	$(MAKE) -C test/performance prepare
+
+test-performance:
+	$(MAKE) -C test/performance run
 
 clean-test:
 	$(MAKE) -C test/runner clean

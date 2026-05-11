@@ -1,0 +1,10 @@
+.venv/
+uv.lock
+telepact.tar.gz
+ts/telepact.tgz
+ts/node_modules/
+ts/dist/
+java/.m2/
+java/target/
+results/raw/
+results/raw-results.json
