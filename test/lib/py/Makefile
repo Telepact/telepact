@@ -14,6 +14,8 @@
 #|  limitations under the License.
 #|
 
+SHELL := /bin/bash
+
 LIB_TAR_GZ := ../../../lib/py/dist/*.tar.gz
 TAR_GZ := telepact.tar.gz
 
@@ -27,8 +29,12 @@ $(TAR_GZ): dep
 dep:
 	$(MAKE) -C ../../../lib/py
 
-codegen:
-	telepact codegen --schema-dir ../../runner/schema/example --lang py --out telepact_test/gen
+codegen: dep
+	@set -euo pipefail; \
+	rm -rf ../../../sdk/cli/telepact_cli/telepact; \
+	cp -r ../../../lib/py/telepact ../../../sdk/cli/telepact_cli/telepact; \
+	rm -rf telepact_test/gen; \
+	uv run --project ../../../sdk/cli telepact codegen --schema-dir ../../runner/schema/example --lang py --out telepact_test/gen
 
 test-server:
 	uv run python -m telepact_test
