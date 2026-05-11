@@ -22,31 +22,31 @@ all: prepare
 prepare: prepare-py prepare-ts prepare-java
 
 prepare-py: $(TAR_GZ)
-uv sync --all-groups
-uv pip install --python .venv/bin/python ./telepact.tar.gz
+	uv sync --all-groups
+	uv pip install --python .venv/bin/python ./telepact.tar.gz
 
 $(TAR_GZ): dep-py
-cp $(LIB_TAR_GZ) telepact.tar.gz
+	cp $(LIB_TAR_GZ) telepact.tar.gz
 
 dep-py:
-$(MAKE) -C ../../lib/py
+	$(MAKE) -C ../../lib/py
 
 prepare-ts:
-$(MAKE) -C ts
+	$(MAKE) -C ts
 
 prepare-java:
-$(MAKE) -C java
+	$(MAKE) -C java
 
 run: prepare
-uv run python -m perf_harness.run
+	uv run python -m perf_harness.run
 
 clean:
-rm -f telepact.tar.gz
-rm -rf .venv
-rm -f uv.lock
-rm -rf results
-mkdir -p results
-$(MAKE) -C ts clean
-$(MAKE) -C java clean
+	rm -f telepact.tar.gz
+	rm -rf .venv
+	rm -f uv.lock
+	rm -rf results
+	mkdir -p results
+	$(MAKE) -C ts clean
+	$(MAKE) -C java clean
 
 .PHONY: all prepare prepare-py dep-py prepare-ts prepare-java run clean

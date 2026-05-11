@@ -36,6 +36,7 @@ from .common import (
     NATS_TIMEOUT_RETRY_DELAY_SECONDS,
     PLAIN_FUNCTION_NAMES,
     PROTODESC,
+    SCHEMA_DIR,
     Scenario,
     iter_scenarios,
     load_payloads,
@@ -225,11 +226,11 @@ class PythonWorker:
         return sub, request_once
 
     async def _create_telepact_runner(self, server_connection: nats.aio.client.Client, client_connection: RetryingNatsClient, subject: str, scenario: Scenario, queue: asyncio.Queue[dict[str, int]]):
-        schema = TelepactSchema.from_directory(str(Path(__file__).resolve().parents[1] / "schema"))
+        schema = TelepactSchema.from_directory(str(SCHEMA_DIR))
         function_name = FUNCTION_NAMES[scenario.data_shape]
 
         async def echo_route(function_name_unused: str, request_message: Message) -> Message:
-            return Message({}, {"Ok_": {"value": {"items": request_message.body[function_name_unused]["items"]}}})
+            return Message({}, {"Ok_": {"items": request_message.body[function_name_unused]["items"]}})
 
         server_state: dict[str, int] = {}
         function_router = FunctionRouter({
@@ -291,7 +292,7 @@ class PythonWorker:
         async def request_once(payload: list[dict[str, Any]]) -> dict[str, Any]:
             headers = {"@pac_": True} if scenario.method == "telepact-packed-binary" else {}
             response = await client.request(Message(headers, {function_name: {"items": payload}}))
-            assert response.body["Ok_"]["value"]["items"] == payload
+            assert response.body["Ok_"]["items"] == payload
             return dict(adapter.last_sample)
 
         return sub, request_once

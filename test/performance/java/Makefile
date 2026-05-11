@@ -1,3 +1,5 @@
+SHELL := /bin/bash
+
 #|
 #|  Copyright The Telepact Authors
 #|
@@ -18,19 +20,19 @@ ORIG_LIB_JAR := ../../../lib/java/target/telepact-$(shell cat ../../../VERSION.t
 LIB_JAR := target/telepact.jar
 
 all: $(LIB_JAR)
-rm -rf .m2/repository/io/github/telepact
-mvn install:install-file -Dfile=target/telepact.jar -DgroupId=io.github.telepact -DartifactId=telepact -Dversion=1.0 -Dpackaging=jar -s settings.xml | grep -v "from central"; if [ $${PIPESTATUS[0]} -ne 0 ]; then exit 1; fi
-mvn package -DskipTests -s settings.xml | grep -v "from central"; if [ $${PIPESTATUS[0]} -ne 0 ]; then exit 1; fi
+	rm -rf .m2/repository/io/github/telepact
+	mvn install:install-file -Dfile=target/telepact.jar -DgroupId=io.github.telepact -DartifactId=telepact -Dversion=1.0 -Dpackaging=jar -s settings.xml | grep -v "from central"; if [ $${PIPESTATUS[0]} -ne 0 ]; then exit 1; fi
+	mvn package -DskipTests -s settings.xml | grep -v "from central"; if [ $${PIPESTATUS[0]} -ne 0 ]; then exit 1; fi
 
 $(LIB_JAR): dep
-mkdir -p target
-cp ${ORIG_LIB_JAR} target/telepact.jar
+	mkdir -p target
+	cp ${ORIG_LIB_JAR} target/telepact.jar
 
 dep:
-$(MAKE) -C ../../../lib/java
+	$(MAKE) -C ../../../lib/java
 
 clean:
-rm -rf target
-rm -rf .m2
+	rm -rf target
+	rm -rf .m2
 
 .PHONY: all dep clean

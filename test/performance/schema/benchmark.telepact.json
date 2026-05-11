@@ -27,67 +27,37 @@
     }
   },
   {
-    "struct.RoundTripTypicalInput": {
-      "items": ["struct.TypicalItem"]
-    }
-  },
-  {
-    "struct.RoundTripTypicalOutput": {
-      "items": ["struct.TypicalItem"]
-    }
-  },
-  {
-    "struct.RoundTripStringsInput": {
-      "items": ["struct.StringItem"]
-    }
-  },
-  {
-    "struct.RoundTripStringsOutput": {
-      "items": ["struct.StringItem"]
-    }
-  },
-  {
-    "struct.RoundTripNumbersInput": {
-      "items": ["struct.NumberItem"]
-    }
-  },
-  {
-    "struct.RoundTripNumbersOutput": {
-      "items": ["struct.NumberItem"]
-    }
-  },
-  {
     "fn.roundTripTypical": {
-      "input": "struct.RoundTripTypicalInput"
+      "items": ["struct.TypicalItem"]
     },
     "->": [
       {
         "Ok_": {
-          "value": "struct.RoundTripTypicalOutput"
+          "items": ["struct.TypicalItem"]
         }
       }
     ]
   },
   {
     "fn.roundTripStrings": {
-      "input": "struct.RoundTripStringsInput"
+      "items": ["struct.StringItem"]
     },
     "->": [
       {
         "Ok_": {
-          "value": "struct.RoundTripStringsOutput"
+          "items": ["struct.StringItem"]
         }
       }
     ]
   },
   {
     "fn.roundTripNumbers": {
-      "input": "struct.RoundTripNumbersInput"
+      "items": ["struct.NumberItem"]
     },
     "->": [
       {
         "Ok_": {
-          "value": "struct.RoundTripNumbersOutput"
+          "items": ["struct.NumberItem"]
         }
       }
     ]

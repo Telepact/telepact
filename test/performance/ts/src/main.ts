@@ -124,7 +124,7 @@ function loadPayloads(): Record<string, Record<string, JsonMap[]>> {
 }
 
 function schemaPath(): string {
-    return path.resolve(process.cwd(), "../schema");
+    return path.resolve(process.cwd(), "../schema/telepact");
 }
 
 async function requestWithRetry(connection: NatsConnection, subject: string, payload: Uint8Array) {
@@ -251,9 +251,9 @@ async function createTelepactRunner(serverConnection: NatsConnection, clientConn
     const telepactSchema = TelepactSchema.fromDirectory(schemaPath(), fs, path);
     const serverState: { afterDeserializeNs?: number; beforeSerializeNs?: number } = {};
     const functionRoutes = {
-        "fn.roundTripTypical": async (functionName: string, requestMessage: Message): Promise<Message> => new Message({}, { Ok_: { value: { items: requestMessage.body[functionName].items } } }),
-        "fn.roundTripStrings": async (functionName: string, requestMessage: Message): Promise<Message> => new Message({}, { Ok_: { value: { items: requestMessage.body[functionName].items } } }),
-        "fn.roundTripNumbers": async (functionName: string, requestMessage: Message): Promise<Message> => new Message({}, { Ok_: { value: { items: requestMessage.body[functionName].items } } }),
+        "fn.roundTripTypical": async (functionName: string, requestMessage: Message): Promise<Message> => new Message({}, { Ok_: { items: requestMessage.body[functionName].items } }),
+        "fn.roundTripStrings": async (functionName: string, requestMessage: Message): Promise<Message> => new Message({}, { Ok_: { items: requestMessage.body[functionName].items } }),
+        "fn.roundTripNumbers": async (functionName: string, requestMessage: Message): Promise<Message> => new Message({}, { Ok_: { items: requestMessage.body[functionName].items } }),
     };
     const options = new ServerOptions();
     options.authRequired = false;
@@ -314,7 +314,7 @@ async function createTelepactRunner(serverConnection: NatsConnection, clientConn
             const headers = scenario.method === "telepact-packed-binary" ? { "@pac_": true } : {};
             const functionName = FUNCTION_NAMES[scenario.dataShape]!;
             const response = await client.request(new Message(headers, { [functionName]: { items: payload } }));
-            if (JSON.stringify(response.body.Ok_.value.items) !== JSON.stringify(payload)) {
+            if (JSON.stringify(response.body.Ok_.items) !== JSON.stringify(payload)) {
                 throw new Error("telepact payload mismatch");
             }
             return lastSample!;

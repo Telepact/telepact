@@ -240,9 +240,9 @@ public class Main {
     }
 
     private static Runner createTelepactRunner(Connection serverConnection, Connection clientConnection, String subject, Scenario scenario, ArrayBlockingQueue<ServerMetrics> queue) throws Exception {
-        var telepactSchema = TelepactSchema.fromDirectory(Path.of("..", "schema").toString());
+        var telepactSchema = TelepactSchema.fromDirectory(Path.of("..", "schema", "telepact").toString());
         var state = new HashMap<String, Long>();
-        FunctionRoute route = (functionName, requestMessage) -> new Message(Map.of(), Map.of("Ok_", Map.of("value", Map.of("items", ((Map<String, Object>) requestMessage.body.get(functionName)).get("items")))));
+        FunctionRoute route = (functionName, requestMessage) -> new Message(Map.of(), Map.of("Ok_", Map.of("items", ((Map<String, Object>) requestMessage.body.get(functionName)).get("items"))));
         var routes = new HashMap<String, FunctionRoute>();
         routes.put("fn.roundTripTypical", route);
         routes.put("fn.roundTripStrings", route);
@@ -296,8 +296,7 @@ public class Main {
             var headers = Objects.equals(scenario.method(), "telepact-packed-binary") ? new HashMap<String, Object>(Map.of("@pac_", true)) : new HashMap<String, Object>();
             var response = client.request(new Message(headers, Map.of(FUNCTION_NAMES.get(scenario.dataShape()), Map.of("items", payload))));
             var ok = (Map<String, Object>) response.body.get("Ok_");
-            var value = (Map<String, Object>) ok.get("value");
-            if (((List<?>) value.get("items")).size() != payload.size()) {
+            if (((List<?>) ok.get("items")).size() != payload.size()) {
                 throw new IllegalStateException("telepact payload mismatch");
             }
             return lastSample[0];
@@ -391,7 +390,6 @@ public class Main {
         }
 
         void close() throws Exception {
-            dispatcher.unsubscribe(dispatcher.getSubscriptions().iterator().next());
             dispatcher.drain(Duration.ofSeconds(1)).get();
         }
     }

@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && mkdir -p dist/generated && cp src/generated/benchmark.js dist/generated/benchmark.js && cp src/generated/benchmark.d.ts dist/generated/benchmark.d.ts",
     "benchmark": "node dist/main.js"
   },
   "dependencies": {
