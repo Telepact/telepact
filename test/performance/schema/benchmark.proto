@@ -1,0 +1,59 @@
+syntax = "proto3";
+
+package telepact.performance;
+option java_package = "io.github.telepact.performance.proto";
+option java_outer_classname = "BenchmarkProto";
+
+message TypicalItem {
+  string primary_id = 1;
+  string secondary_id = 2;
+  int32 count = 3;
+  double ratio = 4;
+}
+
+message StringItem {
+  string alpha = 1;
+  string beta = 2;
+  string gamma = 3;
+  string delta = 4;
+}
+
+message NumberItem {
+  int32 left = 1;
+  int32 right = 2;
+  double ratio = 3;
+  double offset = 4;
+}
+
+message TypicalList {
+  repeated TypicalItem items = 1;
+}
+
+message StringList {
+  repeated StringItem items = 1;
+}
+
+message NumberList {
+  repeated NumberItem items = 1;
+}
+
+message Payload {
+  oneof value {
+    TypicalItem typical_single = 1;
+    TypicalList typical_list = 2;
+    StringItem string_single = 3;
+    StringList string_list = 4;
+    NumberItem number_single = 5;
+    NumberList number_list = 6;
+  }
+}
+
+message RoundTripRequest {
+  string scenario = 1;
+  Payload payload = 2;
+}
+
+message RoundTripResponse {
+  string scenario = 1;
+  Payload payload = 2;
+}

@@ -1,0 +1,11 @@
+.venv/
+uv.lock
+telepact.tar.gz
+gen/
+output/
+ts/node_modules/
+ts/package-lock.json
+ts/dist/
+ts/telepact.tgz
+java/.m2/
+java/target/
