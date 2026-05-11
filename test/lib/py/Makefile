@@ -14,8 +14,6 @@
 #|  limitations under the License.
 #|
 
-SHELL := /bin/bash
-
 LIB_TAR_GZ := ../../../lib/py/dist/*.tar.gz
 TAR_GZ := telepact.tar.gz
 
@@ -30,11 +28,13 @@ dep:
 	$(MAKE) -C ../../../lib/py
 
 codegen: dep
-	@set -euo pipefail; \
-	rm -rf ../../../sdk/cli/telepact_cli/telepact; \
-	cp -r ../../../lib/py/telepact ../../../sdk/cli/telepact_cli/telepact; \
+	@tmpdir="$$(mktemp -d)"; \
+	trap 'rm -rf "$$tmpdir"' EXIT; \
+	cp -r ../../../sdk/cli "$$tmpdir/sdk-cli"; \
+	rm -rf "$$tmpdir/sdk-cli/telepact_cli/telepact"; \
+	cp -r ../../../lib/py/telepact "$$tmpdir/sdk-cli/telepact_cli/telepact"; \
 	rm -rf telepact_test/gen; \
-	uv run --project ../../../sdk/cli telepact codegen --schema-dir ../../runner/schema/example --lang py --out telepact_test/gen
+	uv run --project "$$tmpdir/sdk-cli" telepact codegen --schema-dir ../../runner/schema/example --lang py --out telepact_test/gen
 
 test-server:
 	uv run python -m telepact_test
