@@ -25,6 +25,7 @@ import uuid
 from typing import Any, Awaitable, Callable
 
 import nats
+from nats.errors import NoRespondersError as NatsNoRespondersError
 from nats.errors import TimeoutError as NatsTimeoutError
 from telepact import Client, FunctionRouter, Message, Server, TelepactSchema
 
@@ -54,7 +55,7 @@ class RetryingNatsClient:
         for attempt in range(NATS_TIMEOUT_ADDITIONAL_RETRIES + 1):
             try:
                 return await self._client.request(subject, payload, timeout=timeout)
-            except NatsTimeoutError:
+            except (NatsTimeoutError, NatsNoRespondersError):
                 if attempt >= NATS_TIMEOUT_ADDITIONAL_RETRIES:
                     raise
                 await asyncio.sleep(NATS_TIMEOUT_RETRY_DELAY_SECONDS)

@@ -29,7 +29,7 @@ from typing import Any, Iterable
 LANGUAGES = ("python", "typescript", "java")
 NETWORK_LATENCIES = ("close", "far")
 DATA_SHAPES = ("typical", "all-strings", "all-numbers")
-COLLECTION_SHAPES = ("single", "small-list", "big-list", "really-big-list")
+COLLECTION_SHAPES = ("single", "small-list", "big-list", "really-big-list", "huge-list")
 METHODS = (
     "telepact-json",
     "telepact-binary",
@@ -70,6 +70,7 @@ COLLECTION_SIZES = {
     "small-list": 8,
     "big-list": 64,
     "really-big-list": 512,
+    "huge-list": 1200,
 }
 NATS_REQUEST_TIMEOUT_SECONDS = 15
 NATS_TIMEOUT_ADDITIONAL_RETRIES = 2

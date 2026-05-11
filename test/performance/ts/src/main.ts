@@ -50,7 +50,7 @@ type ServerMetrics = {
 
 const NETWORKS = ["close", "far"];
 const DATA_SHAPES = ["typical", "all-strings", "all-numbers"];
-const COLLECTION_SHAPES = ["single", "small-list", "big-list", "really-big-list"];
+const COLLECTION_SHAPES = ["single", "small-list", "big-list", "really-big-list", "huge-list"];
 const METHODS = ["telepact-json", "telepact-binary", "telepact-packed-binary", "protobuf", "plain-json"];
 const FUNCTION_NAMES: Record<string, string> = {
     "typical": "fn.roundTripTypical",

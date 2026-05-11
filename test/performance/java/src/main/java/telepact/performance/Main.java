@@ -47,7 +47,7 @@ import telepact.performance.v1.Benchmark;
 public class Main {
     private static final List<String> NETWORKS = List.of("close", "far");
     private static final List<String> DATA_SHAPES = List.of("typical", "all-strings", "all-numbers");
-    private static final List<String> COLLECTION_SHAPES = List.of("single", "small-list", "big-list", "really-big-list");
+    private static final List<String> COLLECTION_SHAPES = List.of("single", "small-list", "big-list", "really-big-list", "huge-list");
     private static final List<String> METHODS = List.of("telepact-json", "telepact-binary", "telepact-packed-binary", "protobuf", "plain-json");
     private static final Map<String, String> FUNCTION_NAMES = Map.of(
             "typical", "fn.roundTripTypical",

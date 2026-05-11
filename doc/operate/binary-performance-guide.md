@@ -3,12 +3,12 @@
 This page summarizes the benchmark data produced by
 [`test/performance`](../../test/performance/).
 
-The harness ran all 360 combinations of:
+The harness ran all 450 combinations of:
 
 - 3 languages: Python, TypeScript, Java
 - 2 NATS latencies: local `nats://127.0.0.1:4222` and remote `nats://demo.nats.io:4222`
 - 3 data shapes: typical, all strings, all numbers
-- 4 collection shapes: single, small list, big list, really big list
+- 5 collection shapes: single, small list, big list, really big list, huge list
 - 5 methods: Telepact JSON, Telepact binary, Telepact packed binary, protobuf, plain JSON
 
 Each combination used 6 warmup requests and then captured 60 steady-state samples,
@@ -25,23 +25,23 @@ The generated artifacts live in:
 
 | Network | Method | Median request size (bytes) | Median total latency (ms) |
 | --- | --- | ---: | ---: |
-| close | Telepact JSON | 3117.5 | 0.3763 |
-| close | Telepact binary | 1423.0 | 0.4041 |
-| close | Telepact packed binary | 1260.0 | 0.5316 |
-| close | protobuf | 1323.0 | 0.3032 |
-| close | plain JSON | 3064.0 | 0.3396 |
-| far | Telepact JSON | 3117.5 | 84.1594 |
-| far | Telepact binary | 1423.0 | 84.3092 |
-| far | Telepact packed binary | 1260.0 | 84.5805 |
-| far | protobuf | 1323.0 | 83.4533 |
-| far | plain JSON | 3064.0 | 84.0924 |
+| close | Telepact JSON | 6362.0 | 0.6818 |
+| close | Telepact binary | 2538.0 | 0.8520 |
+| close | Telepact packed binary | 2235.0 | 0.7551 |
+| close | protobuf | 2379.0 | 0.4265 |
+| close | plain JSON | 6350.0 | 0.5211 |
+| far | Telepact JSON | 6362.0 | 64.9141 |
+| far | Telepact binary | 2538.0 | 65.0361 |
+| far | Telepact packed binary | 2235.0 | 65.0139 |
+| far | protobuf | 2379.0 | 64.5925 |
+| far | plain JSON | 6350.0 | 64.8628 |
 
 The broad pattern is:
 
-- Telepact binary cuts request size by about **54%** versus Telepact JSON.
-- Telepact packed binary cuts another **11%** versus plain Telepact binary in the aggregate.
-- On the **far** network, the wire-latency floor dominates everything else; all methods cluster near **84 ms**.
-- On the **close** network, protobuf is still the lowest-latency option overall, and Telepact packed binary has the highest median CPU cost.
+- Telepact binary cuts request size by about **60%** versus Telepact JSON.
+- Telepact packed binary cuts another **12%** versus plain Telepact binary in the aggregate.
+- On the **far** network, the wire-latency floor dominates everything else; all methods cluster near **65 ms**.
+- On the **close** network, protobuf is still the lowest-latency option overall, while Telepact packed binary improves on plain Telepact binary for large collections but still trails protobuf and plain JSON on latency.
 
 ## 2. Representative size results
 
@@ -50,30 +50,40 @@ The broad pattern is:
 | Method | Request bytes | Response bytes | Total latency (ms) |
 | --- | ---: | ---: | ---: |
 | Telepact JSON | 50532 | 50503 | 1.1745 |
-| Telepact binary | 20082 | 20072 | 1.4796 |
-| Telepact packed binary | 17539 | 17529 | 1.3057 |
-| protobuf | 19027 | 19027 | 0.5044 |
-| plain JSON | 50520 | 50520 | 1.0271 |
+| Telepact binary | 20082 | 20072 | 1.9401 |
+| Telepact packed binary | 17539 | 17529 | 1.7208 |
+| protobuf | 19027 | 19027 | 0.5978 |
+| plain JSON | 50520 | 50520 | 1.5092 |
 
 ### All-numbers data, really big list, close network (median across Python, TypeScript, Java)
 
 | Method | Request bytes | Response bytes | Total latency (ms) |
 | --- | ---: | ---: | ---: |
-| Telepact JSON | 42933 | 42904 | 1.1215 |
-| Telepact binary | 20739 | 20729 | 1.2074 |
-| Telepact packed binary | 18196 | 18186 | 1.1113 |
-| protobuf | 18354 | 18354 | 0.4564 |
-| plain JSON | 42921 | 42921 | 1.1012 |
+| Telepact JSON | 42933 | 42904 | 1.4395 |
+| Telepact binary | 20739 | 20729 | 1.5164 |
+| Telepact packed binary | 18196 | 18186 | 1.4330 |
+| protobuf | 18354 | 18354 | 0.4476 |
+| plain JSON | 42921 | 42921 | 1.3567 |
 
 ### Typical data, single item, close network (median across Python, TypeScript, Java)
 
 | Method | Request bytes | Response bytes | Total latency (ms) |
 | --- | ---: | ---: | ---: |
-| Telepact JSON | 150 | 121 | 0.3672 |
-| Telepact binary | 67 | 57 | 0.3548 |
-| Telepact packed binary | 79 | 69 | 0.4427 |
-| protobuf | 36 | 36 | 0.2970 |
-| plain JSON | 138 | 138 | 0.2654 |
+| Telepact JSON | 150 | 121 | 0.5009 |
+| Telepact binary | 67 | 57 | 0.4609 |
+| Telepact packed binary | 79 | 69 | 0.5812 |
+| protobuf | 36 | 36 | 0.3845 |
+| plain JSON | 138 | 138 | 0.3406 |
+
+### All-numbers data, huge list, far network (median across Python, TypeScript, Java)
+
+| Method | Request bytes | Response bytes | Total latency (ms) |
+| --- | ---: | ---: | ---: |
+| Telepact JSON | 101035 | 101006 | 68.4777 |
+| Telepact binary | 48669 | 48659 | 68.1286 |
+| Telepact packed binary | 42686 | 42676 | 68.0228 |
+| protobuf | 43044 | 43044 | 65.2120 |
+| plain JSON | 101023 | 101023 | 68.8954 |
 
 That last table matters: packed binary is not a universal win. For small payloads it is
 actually larger than regular Telepact binary, because the packing metadata costs more than
@@ -85,7 +95,7 @@ it saves.
 
 If your production path looks more like the remote NATS case than the localhost case,
 Telepact binary choices do not move end-to-end latency much. The far-network medians stayed
-between **83.45 ms and 84.58 ms** across all methods.
+between **64.59 ms and 65.04 ms** across all methods.
 
 That means:
 
@@ -95,7 +105,7 @@ That means:
 ### Use Telepact binary when payload size matters
 
 Telepact binary is the safest general-purpose size optimization in this data set.
-Across the full run it cut median request size from **3117.5 B** to **1423.0 B**.
+Across the full run it cut median request size from **6362.0 B** to **2538.0 B**.
 For the close-network typical really-big-list case it reduced request size from **50.5 KB**
 to **20.1 KB**.
 
@@ -108,13 +118,14 @@ That is useful when:
 ### Use Telepact packed binary selectively, not as the blanket default
 
 Packed binary improved size further, but its latency behavior was mixed.
-Across the close-network aggregate it moved the median from **0.4041 ms** for Telepact
-binary to **0.5316 ms** for packed binary.
+Across the close-network aggregate it moved the median from **0.8520 ms** for Telepact
+binary to **0.7551 ms** for packed binary, but that aggregate win came from the bigger
+collections. It still regressed on small payloads.
 
 It was most defensible when the payload was a **large repeated collection**, especially for
 number-heavy data. In the close-network all-numbers really-big-list slice, packed binary
 reduced request size from **20739 B** to **18196 B** and also slightly improved median total
-latency from **1.2074 ms** to **1.1113 ms**.
+latency from **1.5164 ms** to **1.4330 ms**.
 
 But the same method caused large regressions in Python on very large lists, so the data says:
 
