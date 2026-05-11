@@ -1,0 +1,26 @@
+{
+  "typical_data": {
+    "primaryText": "telepact performance typical alpha payload",
+    "secondaryText": "protobuf comparison typical beta payload",
+    "primaryInt": 104729,
+    "secondaryInt": 1299709,
+    "primaryNumber": 12345.6789,
+    "secondaryNumber": -0.03125
+  },
+  "all_strings": {
+    "alpha": "alpha alpha alpha alpha alpha",
+    "beta": "beta beta beta beta beta",
+    "gamma": "gamma gamma gamma gamma gamma",
+    "delta": "delta delta delta delta delta",
+    "epsilon": "epsilon epsilon epsilon epsilon epsilon",
+    "zeta": "zeta zeta zeta zeta zeta"
+  },
+  "all_numbers": {
+    "firstInt": 7,
+    "secondInt": 2048,
+    "thirdInt": 65535,
+    "firstNumber": 3.1415926535,
+    "secondNumber": 2.7182818284,
+    "thirdNumber": 1.4142135623
+  }
+}

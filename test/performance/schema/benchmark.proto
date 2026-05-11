@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package telepact.performance;
+
+message TypicalItem {
+  string primary_text = 1;
+  string secondary_text = 2;
+  int64 primary_int = 3;
+  int64 secondary_int = 4;
+  double primary_number = 5;
+  double secondary_number = 6;
+}
+
+message AllStringsItem {
+  string alpha = 1;
+  string beta = 2;
+  string gamma = 3;
+  string delta = 4;
+  string epsilon = 5;
+  string zeta = 6;
+}
+
+message AllNumbersItem {
+  int64 first_int = 1;
+  int64 second_int = 2;
+  int64 third_int = 3;
+  double first_number = 4;
+  double second_number = 5;
+  double third_number = 6;
+}
+
+message TypicalRequest {
+  repeated TypicalItem items = 1;
+}
+
+message TypicalResponse {
+  repeated TypicalItem items = 1;
+}
+
+message AllStringsRequest {
+  repeated AllStringsItem items = 1;
+}
+
+message AllStringsResponse {
+  repeated AllStringsItem items = 1;
+}
+
+message AllNumbersRequest {
+  repeated AllNumbersItem items = 1;
+}
+
+message AllNumbersResponse {
+  repeated AllNumbersItem items = 1;
+}

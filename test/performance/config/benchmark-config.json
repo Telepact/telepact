@@ -1,0 +1,41 @@
+{
+  "natsUrl": "nats://demo.nats.io:4222",
+  "subjectPrefix": "telepact.performance",
+  "binaryNegotiationWarmupIterations": 1,
+  "warmupIterations": 10,
+  "steadyStateIterations": 60,
+  "requestTimeoutMs": 20000,
+  "collectionShapes": {
+    "single": 1,
+    "small_list": 16,
+    "big_list": 128,
+    "really_big_list": 512
+  },
+  "methods": [
+    "telepact_json",
+    "telepact_binary",
+    "telepact_packed_binary",
+    "protobuf",
+    "plain_json"
+  ],
+  "dataShapes": {
+    "typical_data": {
+      "telepactFunction": "fn.echoTypical",
+      "protobufRequestType": "telepact.performance.TypicalRequest",
+      "protobufResponseType": "telepact.performance.TypicalResponse",
+      "subjectSuffix": "typical"
+    },
+    "all_strings": {
+      "telepactFunction": "fn.echoAllStrings",
+      "protobufRequestType": "telepact.performance.AllStringsRequest",
+      "protobufResponseType": "telepact.performance.AllStringsResponse",
+      "subjectSuffix": "strings"
+    },
+    "all_numbers": {
+      "telepactFunction": "fn.echoAllNumbers",
+      "protobufRequestType": "telepact.performance.AllNumbersRequest",
+      "protobufResponseType": "telepact.performance.AllNumbersResponse",
+      "subjectSuffix": "numbers"
+    }
+  }
+}

@@ -1,0 +1,71 @@
+[
+  {
+    "info.PerformanceHarness": {}
+  },
+  {
+    "struct.TypicalItem": {
+      "primaryText": "string",
+      "secondaryText": "string",
+      "primaryInt": "integer",
+      "secondaryInt": "integer",
+      "primaryNumber": "number",
+      "secondaryNumber": "number"
+    }
+  },
+  {
+    "struct.AllStringsItem": {
+      "alpha": "string",
+      "beta": "string",
+      "gamma": "string",
+      "delta": "string",
+      "epsilon": "string",
+      "zeta": "string"
+    }
+  },
+  {
+    "struct.AllNumbersItem": {
+      "firstInt": "integer",
+      "secondInt": "integer",
+      "thirdInt": "integer",
+      "firstNumber": "number",
+      "secondNumber": "number",
+      "thirdNumber": "number"
+    }
+  },
+  {
+    "fn.echoTypical": {
+      "items": ["struct.TypicalItem"]
+    },
+    "->": [
+      {
+        "Ok_": {
+          "items": ["struct.TypicalItem"]
+        }
+      }
+    ]
+  },
+  {
+    "fn.echoAllStrings": {
+      "items": ["struct.AllStringsItem"]
+    },
+    "->": [
+      {
+        "Ok_": {
+          "items": ["struct.AllStringsItem"]
+        }
+      }
+    ]
+  },
+  {
+    "fn.echoAllNumbers": {
+      "items": ["struct.AllNumbersItem"]
+    },
+    "->": [
+      {
+        "Ok_": {
+          "items": ["struct.AllNumbersItem"]
+        }
+      }
+    ]
+  }
+]
