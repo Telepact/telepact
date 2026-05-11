@@ -1,0 +1,10 @@
+.venv
+python/.venv
+python/telepact.tar.gz
+python/uv.lock
+typescript/dist
+typescript/node_modules
+typescript/package-lock.json
+typescript/telepact.tgz
+java/.m2
+java/target
