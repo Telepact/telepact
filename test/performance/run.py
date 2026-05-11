@@ -180,7 +180,7 @@ def run_scenario(
     nats_url = "nats://127.0.0.1:4223" if scenario.latency == "close" else "nats://demo.nats.io:4222"
     base_command = LANGUAGE_COMMANDS[scenario.language].copy()
     if scenario.language == "java":
-        base_command[3] = java_classpath
+        base_command[2] = java_classpath
 
     command = base_command + [
         "--method",
@@ -205,6 +205,7 @@ def run_scenario(
 
     env = os.environ.copy()
     env["PYTHONUNBUFFERED"] = "1"
+    env.pop("VIRTUAL_ENV", None)
     completed = subprocess.run(
         command,
         cwd=HARNESS_DIR,

@@ -65,7 +65,7 @@ class Sample:
 
 class ProtobufCodec:
     def __init__(self, schema_dir: Path) -> None:
-        descriptor_bytes = base64.b64decode((schema_dir / "benchmark.desc.base64").read_text(encoding="utf-8"))
+        descriptor_bytes = base64.b64decode((schema_dir / "protobuf" / "benchmark.desc.base64").read_text(encoding="utf-8"))
         file_set = descriptor_pb2.FileDescriptorSet()
         file_set.ParseFromString(descriptor_bytes)
         pool = descriptor_pool.DescriptorPool()
@@ -139,25 +139,47 @@ class PlainJsonCodec:
         return json.loads(payload_bytes.decode("utf-8"))
 
 
+def canonical_to_telepact_payload(payload: dict[str, Any]) -> dict[str, Any]:
+    tag_map = {
+        "typical": "Typical",
+        "all_strings": "AllStrings",
+        "all_numbers": "AllNumbers",
+    }
+    return {
+        "items": [
+            {tag_map[item["kind"]]: copy.deepcopy(item["data"])}
+            for item in payload["items"]
+        ]
+    }
+
+
 class BenchmarkRunner:
     def __init__(self, args: argparse.Namespace) -> None:
         self.args = args
         scenarios = json.loads(Path(args.payloads).read_text(encoding="utf-8"))
         self.payload = scenarios[args.collection_shape][args.data_shape]
-        self.telepact_schema = TelepactSchema.from_directory(args.schema_dir)
-        self.protobuf = ProtobufCodec(Path(args.schema_dir))
+        self.telepact_payload = canonical_to_telepact_payload(self.payload)
+        schema_root = Path(args.schema_dir)
+        self.telepact_schema = TelepactSchema.from_directory(str(schema_root / "telepact"))
+        self.protobuf = ProtobufCodec(schema_root)
         self.nc = None
         self.subscription = None
         self.current_sample: Sample | None = None
+        self.telepact_client: Client | None = None
         self.server_received_ns = 0
         self.server_reply_sent_ns = 0
         self.server_on_request_ns = 0
         self.server_on_response_ns = 0
-        self.server_response_payload = copy.deepcopy(self.payload)
+        self.current_send_ns = 0
+        self.last_request_was_binary = False
+        self.last_response_was_binary = False
+        self.server_response_payload = copy.deepcopy(self.telepact_payload)
 
     async def __aenter__(self) -> "BenchmarkRunner":
         self.nc = await nats.connect(self.args.nats_url)
         await self._start_server()
+        if self.args.method.startswith("telepact"):
+            self._start_telepact_client()
         return self
 
     async def __aexit__(self, exc_type, exc, tb) -> None:
@@ -195,8 +217,9 @@ class BenchmarkRunner:
                     response_ready_ns - self.server_on_response_ns
                 )
                 self.current_sample.response_size_bytes = len(response.bytes)
-                await self.nc.publish(msg.reply, response.bytes)
+                self.last_response_was_binary = response.bytes[0] == 0x92
                 self.server_reply_sent_ns = now_ns()
+                await self.nc.publish(msg.reply, response.bytes)
 
             self.subscription = await self.nc.subscribe(self.args.subject, cb=handler)
         elif self.args.method == "protobuf":
@@ -219,8 +242,8 @@ class BenchmarkRunner:
                     response_encode_end - response_encode_start
                 )
                 self.current_sample.response_size_bytes = len(response_bytes)
-                await self.nc.publish(msg.reply, response_bytes)
                 self.server_reply_sent_ns = now_ns()
+                await self.nc.publish(msg.reply, response_bytes)
 
             self.subscription = await self.nc.subscribe(self.args.subject, cb=handler)
         else:
@@ -243,8 +266,8 @@ class BenchmarkRunner:
                     response_encode_end - response_encode_start
                 )
                 self.current_sample.response_size_bytes = len(response_bytes)
-                await self.nc.publish(msg.reply, response_bytes)
                 self.server_reply_sent_ns = now_ns()
+                await self.nc.publish(msg.reply, response_bytes)
 
             self.subscription = await self.nc.subscribe(self.args.subject, cb=handler)
 
@@ -258,6 +281,32 @@ class BenchmarkRunner:
 
     def _telepact_on_response(self, _message: Message) -> None:
         self.server_on_response_ns = now_ns()
+
+    def _start_telepact_client(self) -> None:
+        assert self.nc is not None
+
+        async def adapter(request_message: Message, serializer) -> Message:
+            assert self.current_sample is not None
+            serialize_start = now_ns()
+            request_bytes = serializer.serialize(request_message)
+            serialize_end = now_ns()
+            self.current_sample.request_serialization_ms = ns_to_ms(serialize_end - serialize_start)
+            self.current_sample.request_size_bytes = len(request_bytes)
+            self.last_request_was_binary = request_bytes[0] == 0x92
+            self.current_send_ns = now_ns()
+            response_msg = await self.nc.request(self.args.subject, request_bytes, timeout=10)
+            response_receive_ns = now_ns()
+            self.current_sample.response_network_transit_ms = ns_to_ms(response_receive_ns - self.server_reply_sent_ns)
+            deserialize_start = now_ns()
+            response_message = serializer.deserialize(response_msg.data)
+            deserialize_end = now_ns()
+            self.current_sample.response_deserialization_ms = ns_to_ms(deserialize_end - deserialize_start)
+            return response_message
+
+        client_options = Client.Options()
+        client_options.use_binary = self.args.method != "telepact-json"
+        client_options.always_send_json = self.args.method == "telepact-json"
+        self.telepact_client = Client(adapter, client_options)
 
     async def run(self) -> dict[str, Any]:
         warmup = self.args.warmup
@@ -300,40 +349,17 @@ class BenchmarkRunner:
         return sample, steady_state
 
     async def _run_telepact_once(self) -> tuple[Sample, bool]:
-        assert self.nc is not None
+        assert self.telepact_client is not None
         sample = Sample()
         self.current_sample = sample
-
-        async def adapter(request_message: Message, serializer) -> Message:
-            serialize_start = now_ns()
-            request_bytes = serializer.serialize(request_message)
-            serialize_end = now_ns()
-            sample.request_serialization_ms = ns_to_ms(serialize_end - serialize_start)
-            sample.request_size_bytes = len(request_bytes)
-            self.current_send_ns = now_ns()
-            response_msg = await self.nc.request(self.args.subject, request_bytes, timeout=10)
-            response_receive_ns = now_ns()
-            sample.response_network_transit_ms = ns_to_ms(response_receive_ns - self.server_reply_sent_ns)
-            deserialize_start = now_ns()
-            response_message = serializer.deserialize(response_msg.data)
-            deserialize_end = now_ns()
-            sample.response_deserialization_ms = ns_to_ms(deserialize_end - deserialize_start)
-            return response_message
-
-        client_options = Client.Options()
-        client_options.use_binary = self.args.method != "telepact-json"
-        client_options.always_send_json = self.args.method == "telepact-json"
-        client = Client(adapter, client_options)
         headers: dict[str, Any] = {}
         if self.args.method == "telepact-packed-binary":
             headers["@pac_"] = True
-        await client.request(Message(headers, {"fn.echo": copy.deepcopy(self.payload)}))
-        steady_state = sample.request_size_bytes > 0 and self.server_reply_sent_ns > 0
-        if self.args.method in {"telepact-binary", "telepact-packed-binary"}:
-            steady_state = sample.request_size_bytes > 0 and sample.request_size_bytes == sample.response_size_bytes and self.current_send_ns > 0
-            # MsgPack messages always begin with 0x92 in this codebase.
-            steady_state = steady_state and getattr(self, "current_send_ns", 0) > 0
-        return sample, self.args.method == "telepact-json" or steady_state
+        await self.telepact_client.request(Message(headers, {"fn.echo": copy.deepcopy(self.telepact_payload)}))
+        steady_state = self.args.method == "telepact-json" or (
+            self.last_request_was_binary and self.last_response_was_binary
+        )
+        return sample, steady_state
 
     async def _run_protobuf_once(self) -> tuple[Sample, bool]:
         assert self.nc is not None

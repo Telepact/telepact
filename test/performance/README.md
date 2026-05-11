@@ -34,7 +34,7 @@ binary-negotiation handshake is excluded from the measured samples.
 - data: `typical-data`, `all-strings`, `all-numbers`
 
 The canonical payload fixtures live in `payloads/scenarios.json`. The equivalent
-Telepact and protobuf schemas live in `schema/`.
+Telepact and protobuf schemas live in `schema/telepact` and `schema/protobuf`.
 
 ## Run
 

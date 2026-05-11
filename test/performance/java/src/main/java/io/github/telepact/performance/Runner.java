@@ -47,8 +47,6 @@ import io.nats.client.Nats;
 public final class Runner {
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final TypeReference<Map<String, Object>> MAP_TYPE = new TypeReference<>() {};
-    private static final TypeReference<Map<String, Map<String, Object>>> STRING_MAP_TYPE = new TypeReference<>() {};
-
     private record Args(
             String method,
             String collectionShape,
@@ -107,7 +105,7 @@ public final class Runner {
         private final Descriptor responseDescriptor;
 
         ProtobufCodec(Path schemaDir) throws Exception {
-            final var descriptorPath = schemaDir.resolve("benchmark.desc.base64");
+            final var descriptorPath = schemaDir.resolve("protobuf").resolve("benchmark.desc.base64");
             final var descriptorBytes = Base64.getDecoder().decode(Files.readString(descriptorPath).trim());
             final var fileDescriptorSet = FileDescriptorSet.parseFrom(descriptorBytes);
             final var fileDescriptors = new HashMap<String, FileDescriptor>();
@@ -189,8 +187,10 @@ public final class Runner {
 
         private Object convertScalar(Object value, FieldDescriptor field) {
             return switch (field.getJavaType()) {
-                case LONG, INT -> ((Number) value).longValue();
-                case FLOAT, DOUBLE -> ((Number) value).doubleValue();
+                case INT -> ((Number) value).intValue();
+                case LONG -> ((Number) value).longValue();
+                case FLOAT -> ((Number) value).floatValue();
+                case DOUBLE -> ((Number) value).doubleValue();
                 case STRING -> String.valueOf(value);
                 default -> value;
             };
@@ -200,12 +200,14 @@ public final class Runner {
     private static final class BenchmarkRunner {
         private final Args args;
         private final Map<String, Object> payload;
+        private final Map<String, Object> telepactPayload;
         private final Map<String, Object> responsePayload;
         private final TelepactSchema telepactSchema;
         private final ProtobufCodec protobufCodec;
         private final PlainJsonCodec plainJsonCodec = new PlainJsonCodec();
         private Connection connection;
         private Dispatcher dispatcher;
+        private Client telepactClient;
         private Sample currentSample;
         private double currentSendMs;
         private double serverReplySentMs;
@@ -216,18 +218,24 @@ public final class Runner {
 
         BenchmarkRunner(Args args) throws Exception {
             this.args = args;
-            final var scenarios = OBJECT_MAPPER.readValue(Path.of(args.payloads).toFile(), STRING_MAP_TYPE);
+            final var scenarios = OBJECT_MAPPER.readValue(Path.of(args.payloads).toFile(), MAP_TYPE);
             @SuppressWarnings("unchecked")
-            final var payloadMap = (Map<String, Object>) scenarios.get(args.collectionShape).get(args.dataShape);
+            final var collection = (Map<String, Object>) scenarios.get(args.collectionShape);
+            @SuppressWarnings("unchecked")
+            final var payloadMap = (Map<String, Object>) collection.get(args.dataShape);
             this.payload = payloadMap;
-            this.responsePayload = deepCopy(payloadMap);
-            this.telepactSchema = TelepactSchema.fromDirectory(args.schemaDir);
+            this.telepactPayload = canonicalToTelepactPayload(payloadMap);
+            this.responsePayload = deepCopy(telepactPayload);
+            this.telepactSchema = TelepactSchema.fromDirectory(Path.of(args.schemaDir).resolve("telepact").toString());
             this.protobufCodec = new ProtobufCodec(Path.of(args.schemaDir));
         }
 
         void setup() throws Exception {
             this.connection = Nats.connect(args.natsUrl);
             startServer();
+            if (args.method.startsWith("telepact")) {
+                startTelepactClient();
+            }
             connection.flush(Duration.ofSeconds(5));
         }
 
@@ -300,10 +308,10 @@ public final class Runner {
                         currentSample.requestNetworkTransitMs = serverReceivedMs - currentSendMs;
                         currentSample.serverRequestDeserializationMs = serverRequestHookMs - serverReceivedMs;
                         currentSample.serverResponseSerializationMs = responseReadyMs - serverResponseHookMs;
-                        currentSample.responseSizeBytes = response.getBytes().length;
-                        lastResponseWasBinary = response.getBytes()[0] == (byte) 0x92;
-                        connection.publish(msg.getReplyTo(), response.getBytes());
+                        currentSample.responseSizeBytes = response.bytes.length;
+                        lastResponseWasBinary = response.bytes[0] == (byte) 0x92;
                         serverReplySentMs = nowMs();
+                        connection.publish(msg.getReplyTo(), response.bytes);
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
@@ -325,8 +333,8 @@ public final class Runner {
                         currentSample.serverRequestDeserializationMs = decodeEndMs - decodeStartMs;
                         currentSample.serverResponseSerializationMs = encodeEndMs - encodeStartMs;
                         currentSample.responseSizeBytes = responseBytes.length;
-                        connection.publish(msg.getReplyTo(), responseBytes);
                         serverReplySentMs = nowMs();
+                        connection.publish(msg.getReplyTo(), responseBytes);
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
@@ -346,23 +354,21 @@ public final class Runner {
                 currentSample.serverRequestDeserializationMs = decodeEndMs - decodeStartMs;
                 currentSample.serverResponseSerializationMs = encodeEndMs - encodeStartMs;
                 currentSample.responseSizeBytes = responseBytes.length;
-                connection.publish(msg.getReplyTo(), responseBytes);
                 serverReplySentMs = nowMs();
+                connection.publish(msg.getReplyTo(), responseBytes);
             });
             dispatcher.subscribe(args.subject);
         }
 
-        private Map<String, Object> runTelepactOnce() {
-            final var sample = new Sample();
-            this.currentSample = sample;
-            final var adapter = (Message requestMessage, io.github.telepact.Serializer serializer) -> {
+        private void startTelepactClient() {
+            java.util.function.BiFunction<Message, io.github.telepact.Serializer, java.util.concurrent.Future<Message>> adapter = (requestMessage, serializer) -> {
                 return java.util.concurrent.CompletableFuture.supplyAsync(() -> {
                     try {
                         final var serializeStartMs = nowMs();
                         final var requestBytes = serializer.serialize(requestMessage);
                         final var serializeEndMs = nowMs();
-                        sample.requestSerializationMs = serializeEndMs - serializeStartMs;
-                        sample.requestSizeBytes = requestBytes.length;
+                        currentSample.requestSerializationMs = serializeEndMs - serializeStartMs;
+                        currentSample.requestSizeBytes = requestBytes.length;
                         lastRequestWasBinary = requestBytes[0] == (byte) 0x92;
                         currentSendMs = nowMs();
                         final var responseMsg = connection.request(args.subject, requestBytes, Duration.ofSeconds(10));
@@ -370,11 +376,11 @@ public final class Runner {
                             throw new IllegalStateException("request timed out");
                         }
                         final var responseReceivedMs = nowMs();
-                        sample.responseNetworkTransitMs = responseReceivedMs - serverReplySentMs;
+                        currentSample.responseNetworkTransitMs = responseReceivedMs - serverReplySentMs;
                         final var deserializeStartMs = nowMs();
                         final var decoded = serializer.deserialize(responseMsg.getData());
                         final var deserializeEndMs = nowMs();
-                        sample.responseDeserializationMs = deserializeEndMs - deserializeStartMs;
+                        currentSample.responseDeserializationMs = deserializeEndMs - deserializeStartMs;
                         return decoded;
                     } catch (Exception e) {
                         throw new RuntimeException(e);
@@ -384,12 +390,17 @@ public final class Runner {
             final var options = new Client.Options();
             options.useBinary = !args.method.equals("telepact-json");
             options.alwaysSendJson = args.method.equals("telepact-json");
-            final var client = new Client(adapter, options);
+            this.telepactClient = new Client(adapter, options);
+        }
+
+        private Map<String, Object> runTelepactOnce() {
+            final var sample = new Sample();
+            this.currentSample = sample;
             final var headers = new HashMap<String, Object>();
             if (args.method.equals("telepact-packed-binary")) {
                 headers.put("@pac_", true);
             }
-            client.request(new Message(headers, Map.of("fn.echo", deepCopy(payload))));
+            telepactClient.request(new Message(headers, Map.of("fn.echo", deepCopy(telepactPayload))));
             return Map.of(
                     "sample", sample.toMap(),
                     "steady_state", args.method.equals("telepact-json") || (lastRequestWasBinary && lastResponseWasBinary));
@@ -417,7 +428,7 @@ public final class Runner {
             return sample;
         }
 
-        private Sample runPlainJsonOnce() {
+        private Sample runPlainJsonOnce() throws Exception {
             final var sample = new Sample();
             this.currentSample = sample;
             final var serializeStartMs = nowMs();
@@ -469,6 +480,26 @@ public final class Runner {
 
     private static Map<String, Object> deepCopy(Map<String, Object> value) {
         return OBJECT_MAPPER.convertValue(value, MAP_TYPE);
+    }
+
+    private static Map<String, Object> canonicalToTelepactPayload(Map<String, Object> payload) {
+        @SuppressWarnings("unchecked")
+        final var items = (List<Map<String, Object>>) payload.get("items");
+        final var telepactItems = new ArrayList<Map<String, Object>>();
+        for (var item : items) {
+            final var kind = (String) item.get("kind");
+            @SuppressWarnings("unchecked")
+            final var data = (Map<String, Object>) item.get("data");
+            final var entry = new HashMap<String, Object>();
+            entry.put(switch (kind) {
+                case "typical" -> "Typical";
+                case "all_strings" -> "AllStrings";
+                case "all_numbers" -> "AllNumbers";
+                default -> throw new IllegalStateException("unexpected kind: " + kind);
+            }, deepCopy(data));
+            telepactItems.add(entry);
+        }
+        return Map.of("items", telepactItems);
     }
 
     private static double nowMs() {

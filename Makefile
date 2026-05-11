@@ -142,6 +142,9 @@ deploy-go:
 test:
 	$(MAKE) -C test/runner test
 
+test-performance:
+	$(MAKE) -C test/performance run
+
 clean-test:
 	$(MAKE) -C test/runner clean
 	$(MAKE) -C test/lib/java clean
@@ -150,6 +153,7 @@ clean-test:
 	$(MAKE) -C test/lib/ts clean
 	$(MAKE) -C test/lib/ts-browser-safe clean
 	$(MAKE) -C test/lib/ts-nodenext clean
+	$(MAKE) -C test/performance clean
 
 example-check:
 	$(MAKE) -C example check

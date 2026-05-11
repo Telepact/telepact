@@ -79,7 +79,7 @@ class ProtobufCodec {
     private readonly responseType: protobuf.Type;
 
     constructor(schemaDir: string) {
-        const root = protobuf.loadSync(path.join(schemaDir, "benchmark.proto"));
+        const root = protobuf.loadSync(path.join(schemaDir, "protobuf", "benchmark.proto"));
         this.requestType = root.lookupType("telepact.performance.EchoRequest") as protobuf.Type;
         this.responseType = root.lookupType("telepact.performance.EchoResponse") as protobuf.Type;
     }
@@ -89,7 +89,7 @@ class ProtobufCodec {
     }
 
     decodeRequest(bytes: Uint8Array): Payload {
-        return this.fromProtobufPayload(this.requestType.toObject(this.requestType.decode(bytes), { defaults: true }));
+        return this.fromProtobufPayload(this.requestType.toObject(this.requestType.decode(bytes), { longs: Number }));
     }
 
     encodeResponse(payload: Payload): Uint8Array {
@@ -97,7 +97,7 @@ class ProtobufCodec {
     }
 
     decodeResponse(bytes: Uint8Array): Payload {
-        return this.fromProtobufPayload(this.responseType.toObject(this.responseType.decode(bytes), { defaults: true }));
+        return this.fromProtobufPayload(this.responseType.toObject(this.responseType.decode(bytes), { longs: Number }));
     }
 
     private toProtobufPayload(payload: Payload): object {
@@ -129,11 +129,26 @@ class ProtobufCodec {
     }
 }
 
+function canonicalToTelepactPayload(payload: Payload): Record<string, unknown> {
+    const tagMap: Record<PayloadItem["kind"], string> = {
+        typical: "Typical",
+        all_strings: "AllStrings",
+        all_numbers: "AllNumbers",
+    };
+    return {
+        items: payload.items.map((item) => ({
+            [tagMap[item.kind]]: structuredClone(item.data),
+        })),
+    };
+}
+
 class BenchmarkRunner {
     private readonly args: Args;
     private readonly payload: Payload;
+    private readonly telepactPayload: Record<string, unknown>;
     private readonly protobuf: ProtobufCodec;
     private readonly telepactSchema: TelepactSchema;
+    private telepactClient: Client | null = null;
     private connection!: NatsConnection;
     private subscription!: Subscription;
     private currentSample: Sample | null = null;
@@ -148,13 +163,17 @@ class BenchmarkRunner {
         this.args = args;
         const scenarios = JSON.parse(fs.readFileSync(args.payloads, "utf-8"));
         this.payload = scenarios[args.collectionShape][args.dataShape] as Payload;
+        this.telepactPayload = canonicalToTelepactPayload(this.payload);
         this.protobuf = new ProtobufCodec(args.schemaDir);
-        this.telepactSchema = TelepactSchema.fromDirectory(args.schemaDir, fs, path);
+        this.telepactSchema = TelepactSchema.fromDirectory(path.join(args.schemaDir, "telepact"), fs, path);
     }
 
     async setup(): Promise<void> {
         this.connection = await connect({ servers: this.args.natsUrl });
         await this.startServer();
+        if (this.args.method.startsWith("telepact")) {
+            this.startTelepactClient();
+        }
     }
 
     async teardown(): Promise<void> {
@@ -209,7 +228,7 @@ class BenchmarkRunner {
             const server = new Server(
                 this.telepactSchema,
                 new FunctionRouter({
-                    "fn.echo": async () => new Message({}, { Ok_: structuredClone(this.payload) }),
+                    "fn.echo": async () => new Message({}, { Ok_: structuredClone(this.telepactPayload) }),
                 }),
                 options,
             );
@@ -226,8 +245,8 @@ class BenchmarkRunner {
                     this.currentSample.server_response_serialization_ms = responseReadyMs - this.serverResponseHookMs;
                     this.currentSample.response_size_bytes = response.bytes.length;
                     this.lastResponseWasBinary = response.bytes[0] === 0x92;
-                    this.connection.publish(msg.reply!, response.bytes);
                     this.serverReplySentMs = nowMs();
+                    this.connection.publish(msg.reply!, response.bytes);
                 },
             });
         } else if (this.args.method === "protobuf") {
@@ -247,8 +266,8 @@ class BenchmarkRunner {
                     this.currentSample.server_request_deserialization_ms = decodeEndMs - decodeStartMs;
                     this.currentSample.server_response_serialization_ms = encodeEndMs - encodeStartMs;
                     this.currentSample.response_size_bytes = responseBytes.length;
-                    this.connection.publish(msg.reply!, responseBytes);
                     this.serverReplySentMs = nowMs();
+                    this.connection.publish(msg.reply!, responseBytes);
                 },
             });
         } else {
@@ -268,12 +287,40 @@ class BenchmarkRunner {
                     this.currentSample.server_request_deserialization_ms = decodeEndMs - decodeStartMs;
                     this.currentSample.server_response_serialization_ms = encodeEndMs - encodeStartMs;
                     this.currentSample.response_size_bytes = responseBytes.length;
-                    this.connection.publish(msg.reply!, responseBytes);
                     this.serverReplySentMs = nowMs();
+                    this.connection.publish(msg.reply!, responseBytes);
                 },
             });
         }
         await this.connection.flush();
+    }
+
+    private startTelepactClient(): void {
+        const adapter = async (message: Message, serializer: any): Promise<Message> => {
+            if (this.currentSample == null) {
+                throw new Error("missing sample");
+            }
+            const serializeStartMs = nowMs();
+            const requestBytes: Uint8Array = serializer.serialize(message);
+            const serializeEndMs = nowMs();
+            this.currentSample.request_serialization_ms = serializeEndMs - serializeStartMs;
+            this.currentSample.request_size_bytes = requestBytes.length;
+            this.lastRequestWasBinary = requestBytes[0] === 0x92;
+            this.currentSendMs = nowMs();
+            const responseMessage = await this.connection.request(this.args.subject, requestBytes, { timeout: 10000 });
+            const responseReceivedMs = nowMs();
+            this.currentSample.response_network_transit_ms = responseReceivedMs - this.serverReplySentMs;
+            const deserializeStartMs = nowMs();
+            const decoded = serializer.deserialize(responseMessage.data);
+            const deserializeEndMs = nowMs();
+            this.currentSample.response_deserialization_ms = deserializeEndMs - deserializeStartMs;
+            return decoded;
+        };
+
+        const options = new ClientOptions();
+        options.useBinary = this.args.method !== "telepact-json";
+        options.alwaysSendJson = this.args.method === "telepact-json";
+        this.telepactClient = new Client(adapter, options);
     }
 
     private async runOnce(record: boolean): Promise<[Sample, boolean]> {
@@ -290,6 +337,9 @@ class BenchmarkRunner {
     }
 
     private async runTelepactOnce(): Promise<[Sample, boolean]> {
+        if (this.telepactClient == null) {
+            throw new Error("telepact client not initialized");
+        }
         const sample: Sample = {
             request_serialization_ms: 0,
             request_size_bytes: 0,
@@ -301,34 +351,11 @@ class BenchmarkRunner {
             response_deserialization_ms: 0,
         };
         this.currentSample = sample;
-
-        const adapter = async (message: Message, serializer: any): Promise<Message> => {
-            const serializeStartMs = nowMs();
-            const requestBytes: Uint8Array = serializer.serialize(message);
-            const serializeEndMs = nowMs();
-            sample.request_serialization_ms = serializeEndMs - serializeStartMs;
-            sample.request_size_bytes = requestBytes.length;
-            this.lastRequestWasBinary = requestBytes[0] === 0x92;
-            this.currentSendMs = nowMs();
-            const responseMessage = await this.connection.request(this.args.subject, requestBytes, { timeout: 10000 });
-            const responseReceivedMs = nowMs();
-            sample.response_network_transit_ms = responseReceivedMs - this.serverReplySentMs;
-            const deserializeStartMs = nowMs();
-            const decoded = serializer.deserialize(responseMessage.data);
-            const deserializeEndMs = nowMs();
-            sample.response_deserialization_ms = deserializeEndMs - deserializeStartMs;
-            return decoded;
-        };
-
-        const options = new ClientOptions();
-        options.useBinary = this.args.method !== "telepact-json";
-        options.alwaysSendJson = this.args.method === "telepact-json";
-        const client = new Client(adapter, options);
         const headers: Record<string, unknown> = {};
         if (this.args.method === "telepact-packed-binary") {
             headers["@pac_"] = true;
         }
-        await client.request(new Message(headers, { "fn.echo": structuredClone(this.payload) }));
+        await this.telepactClient.request(new Message(headers, { "fn.echo": structuredClone(this.telepactPayload) }));
         return [sample, this.args.method === "telepact-json" || (this.lastRequestWasBinary && this.lastResponseWasBinary)];
     }
 
