@@ -1,11 +1,11 @@
 # Binary Serialization Options Guide
 
-Use the harness under `/home/runner/work/telepact/telepact/test/performance` to decide whether Telepact JSON, Telepact binary, or Telepact packed binary is the right tradeoff for a workload.
+Use the harness under `test/performance` to decide whether Telepact JSON, Telepact binary, or Telepact packed binary is the right tradeoff for a workload.
 
 The harness writes its latest report to:
 
-- `/home/runner/work/telepact/telepact/test/performance/output/latest/summary.md`
-- `/home/runner/work/telepact/telepact/test/performance/output/latest/summary.json`
+- `test/performance/output/latest/summary.md`
+- `test/performance/output/latest/summary.json`
 
 Those reports are the source of truth for this guidance.
 
@@ -73,7 +73,7 @@ Questions to ask from the report:
 
 ## Recommended workflow
 
-1. Run `make performance` from `/home/runner/work/telepact/telepact`.
+1. Run `make performance` from the repository root.
 2. Open `test/performance/output/latest/summary.md`.
 3. Find the rows for your language and data shape.
 4. Compare JSON, binary, packed binary, protobuf, and plain JSON side by side.
