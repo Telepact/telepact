@@ -1,0 +1,19 @@
+{
+  "name": "telepact-performance-ts",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "benchmark": "node dist/main.js"
+  },
+  "dependencies": {
+    "nats": "^2.29.3",
+    "protobufjs": "^8.2.0",
+    "telepact": "file:telepact.tgz"
+  },
+  "devDependencies": {
+    "@types/node": "^24.7.2",
+    "typescript": "^5.9.3"
+  }
+}

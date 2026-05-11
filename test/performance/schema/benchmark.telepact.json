@@ -1,0 +1,95 @@
+[
+  {
+    "struct.TypicalItem": {
+      "accountId": "integer",
+      "customerName": "string",
+      "region": "string",
+      "unitPrice": "number",
+      "quantity": "integer"
+    }
+  },
+  {
+    "struct.StringItem": {
+      "code": "string",
+      "city": "string",
+      "country": "string",
+      "segment": "string",
+      "status": "string"
+    }
+  },
+  {
+    "struct.NumberItem": {
+      "accountId": "integer",
+      "visits": "integer",
+      "score": "number",
+      "balance": "number",
+      "ratio": "number"
+    }
+  },
+  {
+    "struct.RoundTripTypicalInput": {
+      "items": ["struct.TypicalItem"]
+    }
+  },
+  {
+    "struct.RoundTripTypicalOutput": {
+      "items": ["struct.TypicalItem"]
+    }
+  },
+  {
+    "struct.RoundTripStringsInput": {
+      "items": ["struct.StringItem"]
+    }
+  },
+  {
+    "struct.RoundTripStringsOutput": {
+      "items": ["struct.StringItem"]
+    }
+  },
+  {
+    "struct.RoundTripNumbersInput": {
+      "items": ["struct.NumberItem"]
+    }
+  },
+  {
+    "struct.RoundTripNumbersOutput": {
+      "items": ["struct.NumberItem"]
+    }
+  },
+  {
+    "fn.roundTripTypical": {
+      "input": "struct.RoundTripTypicalInput"
+    },
+    "->": [
+      {
+        "Ok_": {
+          "value": "struct.RoundTripTypicalOutput"
+        }
+      }
+    ]
+  },
+  {
+    "fn.roundTripStrings": {
+      "input": "struct.RoundTripStringsInput"
+    },
+    "->": [
+      {
+        "Ok_": {
+          "value": "struct.RoundTripStringsOutput"
+        }
+      }
+    ]
+  },
+  {
+    "fn.roundTripNumbers": {
+      "input": "struct.RoundTripNumbersInput"
+    },
+    "->": [
+      {
+        "Ok_": {
+          "value": "struct.RoundTripNumbersOutput"
+        }
+      }
+    ]
+  }
+]

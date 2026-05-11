@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+package telepact.performance.v1;
+
+message TypicalItem {
+  int64 accountId = 1;
+  string customerName = 2;
+  string region = 3;
+  double unitPrice = 4;
+  int64 quantity = 5;
+}
+
+message StringItem {
+  string code = 1;
+  string city = 2;
+  string country = 3;
+  string segment = 4;
+  string status = 5;
+}
+
+message NumberItem {
+  int64 accountId = 1;
+  int64 visits = 2;
+  double score = 3;
+  double balance = 4;
+  double ratio = 5;
+}
+
+message TypicalRequest {
+  repeated TypicalItem items = 1;
+}
+
+message TypicalResponse {
+  repeated TypicalItem items = 1;
+}
+
+message StringsRequest {
+  repeated StringItem items = 1;
+}
+
+message StringsResponse {
+  repeated StringItem items = 1;
+}
+
+message NumbersRequest {
+  repeated NumberItem items = 1;
+}
+
+message NumbersResponse {
+  repeated NumberItem items = 1;
+}
+
+service PerformanceService {
+  rpc RoundTripTypical(TypicalRequest) returns (TypicalResponse);
+  rpc RoundTripStrings(StringsRequest) returns (StringsResponse);
+  rpc RoundTripNumbers(NumbersRequest) returns (NumbersResponse);
+}
