@@ -22,47 +22,37 @@ if TYPE_CHECKING:
     from ...internal.binary.BinaryEncoding import BinaryEncoding
 
 
-def _decode_list(items: list[object], binary_encoder: 'BinaryEncoding') -> list[object]:
-    decoded_items: list[object] = []
-    append = decoded_items.append
-
-    for item in items:
-        if isinstance(item, dict):
-            append(_decode_dict(item, binary_encoder))
-        elif isinstance(item, list):
-            append(_decode_list(item, binary_encoder))
-        else:
-            append(item)
-
-    return decoded_items
-
-
 def _decode_dict(items: dict[object, object], binary_encoder: 'BinaryEncoding') -> dict[str, object]:
     decode_map = binary_encoder.decode_map
     root: dict[str, object] = {}
-    stack: list[tuple[object, dict[str, object]]] = [(iter(items.items()), root)]
+    stack: list[tuple[object, object, bool]] = [(iter(items.items()), root, True)]
 
     while stack:
-        iterator, target = stack[-1]
+        iterator, target, is_mapping = stack[-1]
         try:
             key, value = next(iterator)
         except StopIteration:
             stack.pop()
             continue
 
-        if isinstance(key, str):
-            decoded_key = key
+        if is_mapping:
+            if isinstance(key, str):
+                decoded_key = key
+            else:
+                decoded_key = decode_map.get(key)
+                if decoded_key is None:
+                    raise BinaryEncodingMissing(key)
         else:
-            decoded_key = decode_map.get(key)
-            if decoded_key is None:
-                raise BinaryEncodingMissing(key)
+            decoded_key = key
 
         if isinstance(value, dict):
             child: dict[str, object] = {}
             target[decoded_key] = child
-            stack.append((iter(value.items()), child))
+            stack.append((iter(value.items()), child, True))
         elif isinstance(value, list):
-            target[decoded_key] = _decode_list(value, binary_encoder)
+            child = [None] * len(value)
+            target[decoded_key] = child
+            stack.append((iter(enumerate(value)), child, False))
         else:
             target[decoded_key] = value
 
@@ -73,5 +63,38 @@ def decode_keys(given: object, binary_encoder: 'BinaryEncoding') -> object:
     if isinstance(given, dict):
         return _decode_dict(given, binary_encoder)
     if isinstance(given, list):
-        return _decode_list(given, binary_encoder)
+        root = [None] * len(given)
+        decode_map = binary_encoder.decode_map
+        stack: list[tuple[object, object, bool]] = [(iter(enumerate(given)), root, False)]
+
+        while stack:
+            iterator, target, is_mapping = stack[-1]
+            try:
+                key, value = next(iterator)
+            except StopIteration:
+                stack.pop()
+                continue
+
+            if is_mapping:
+                if isinstance(key, str):
+                    decoded_key = key
+                else:
+                    decoded_key = decode_map.get(key)
+                    if decoded_key is None:
+                        raise BinaryEncodingMissing(key)
+            else:
+                decoded_key = key
+
+            if isinstance(value, dict):
+                child: dict[str, object] = {}
+                target[decoded_key] = child
+                stack.append((iter(value.items()), child, True))
+            elif isinstance(value, list):
+                child = [None] * len(value)
+                target[decoded_key] = child
+                stack.append((iter(enumerate(value)), child, False))
+            else:
+                target[decoded_key] = value
+
+        return root
     return given
