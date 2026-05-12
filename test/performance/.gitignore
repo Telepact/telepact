@@ -8,6 +8,4 @@ java/.m2/
 java/target/
 java/src/main/java/telepact/performance/v1/
 perf_harness/*_pb2.py
-results/raw/
-results/raw-results.json
 ts/src/generated/
