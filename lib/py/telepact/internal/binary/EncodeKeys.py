@@ -24,6 +24,9 @@ def encode_keys(given: object, binary_encoding: 'BinaryEncoding') -> object:
     encode_map = binary_encoding.encode_map
 
     def encode(value: object) -> object:
+        if value is None:
+            return value
+
         value_type = type(value)
 
         if value_type is dict:

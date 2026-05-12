@@ -22,54 +22,31 @@ if TYPE_CHECKING:
     from ...internal.binary.BinaryEncoding import BinaryEncoding
 
 
+def _decode_value(value: object, decode_map_get: object) -> object:
+    value_type = type(value)
+
+    if value_type is dict:
+        decoded: dict[str, object] = {}
+        for key, item in value.items():
+            if type(key) is str:
+                decoded_key = key
+            else:
+                decoded_key = decode_map_get(key)
+                if decoded_key is None:
+                    raise BinaryEncodingMissing(key)
+            decoded[decoded_key] = _decode_value(item, decode_map_get)
+        return decoded
+    if value_type is list:
+        return [_decode_value(item, decode_map_get) for item in value]
+    return value
+
+
 def _decode_dict(items: dict[object, object], binary_encoder: 'BinaryEncoding') -> dict[str, object]:
-    decode_map = binary_encoder.decode_map
-    decode_map_get = decode_map.get
-
-    def decode(value: object) -> object:
-        value_type = type(value)
-
-        if value_type is dict:
-            decoded: dict[str, object] = {}
-            for key, item in value.items():
-                if type(key) is str:
-                    decoded_key = key
-                else:
-                    decoded_key = decode_map_get(key)
-                    if decoded_key is None:
-                        raise BinaryEncodingMissing(key)
-                decoded[decoded_key] = decode(item)
-            return decoded
-        if value_type is list:
-            return [decode(item) for item in value]
-        return value
-
-    return decode(items)
+    return _decode_value(items, binary_encoder.decode_map.get)
 
 
 def _decode_list(items: list[object], binary_encoder: 'BinaryEncoding') -> list[object]:
-    decode_map = binary_encoder.decode_map
-    decode_map_get = decode_map.get
-
-    def decode(value: object) -> object:
-        value_type = type(value)
-
-        if value_type is dict:
-            decoded: dict[str, object] = {}
-            for key, item in value.items():
-                if type(key) is str:
-                    decoded_key = key
-                else:
-                    decoded_key = decode_map_get(key)
-                    if decoded_key is None:
-                        raise BinaryEncodingMissing(key)
-                decoded[decoded_key] = decode(item)
-            return decoded
-        if value_type is list:
-            return [decode(item) for item in value]
-        return value
-
-    return [decode(item) for item in items]
+    return _decode_value(items, binary_encoder.decode_map.get)
 
 
 def decode_keys(given: object, binary_encoder: 'BinaryEncoding') -> object:
