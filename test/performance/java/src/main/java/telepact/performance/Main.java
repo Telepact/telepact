@@ -18,7 +18,9 @@ package telepact.performance;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.protobuf.MessageLite;
+import com.google.protobuf.DescriptorProtos;
+import com.google.protobuf.Descriptors;
+import com.google.protobuf.DynamicMessage;
 import io.github.telepact.Client;
 import io.github.telepact.FunctionRoute;
 import io.github.telepact.FunctionRouter;
@@ -42,7 +44,6 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.function.BiFunction;
-import telepact.performance.v1.Benchmark;
 
 public class Main {
     private static final List<String> NETWORKS = List.of("close", "far");
@@ -61,9 +62,16 @@ public class Main {
     private static final int NATS_REQUEST_ADDITIONAL_RETRIES = 2;
     private static final Duration NATS_RETRY_DELAY = Duration.ofMillis(250);
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private static final Map<String, ProtobufTypes> PROTO_TYPES = createProtobufTypes();
 
     record Scenario(String networkLatency, String dataShape, String collectionShape, String method) {}
     record ServerMetrics(long requestNetworkArrivalNs, long serverRequestDeserializationTimeNs, long serverResponseSerializationTimeNs, long responseSentAtNs) {}
+    record ProtobufTypes(
+            Descriptors.Descriptor requestDescriptor,
+            Descriptors.FieldDescriptor requestItemsField,
+            Descriptors.Descriptor responseDescriptor,
+            Descriptors.FieldDescriptor responseItemsField,
+            Descriptors.Descriptor itemDescriptor) {}
 
     public static void main(String[] args) throws Exception {
         var parsed = parseArgs(args);
@@ -171,35 +179,18 @@ public class Main {
     }
 
     private static Runner createProtobufRunner(Connection serverConnection, Connection clientConnection, String subject, Scenario scenario, ArrayBlockingQueue<ServerMetrics> queue) {
+        var protobufTypes = PROTO_TYPES.get(scenario.dataShape());
         var dispatcher = serverConnection.createDispatcher(msg -> {
             try {
                 long receivedAt = System.nanoTime();
-                byte[] responseBytes;
-                long afterDeserialize;
-                long beforeSerialize;
-                switch (scenario.dataShape()) {
-                    case "typical" -> {
-                        var request = Benchmark.TypicalRequest.parseFrom(msg.getData());
-                        afterDeserialize = System.nanoTime();
-                        var response = Benchmark.TypicalResponse.newBuilder().addAllItems(request.getItemsList()).build();
-                        beforeSerialize = System.nanoTime();
-                        responseBytes = response.toByteArray();
-                    }
-                    case "all-strings" -> {
-                        var request = Benchmark.StringsRequest.parseFrom(msg.getData());
-                        afterDeserialize = System.nanoTime();
-                        var response = Benchmark.StringsResponse.newBuilder().addAllItems(request.getItemsList()).build();
-                        beforeSerialize = System.nanoTime();
-                        responseBytes = response.toByteArray();
-                    }
-                    default -> {
-                        var request = Benchmark.NumbersRequest.parseFrom(msg.getData());
-                        afterDeserialize = System.nanoTime();
-                        var response = Benchmark.NumbersResponse.newBuilder().addAllItems(request.getItemsList()).build();
-                        beforeSerialize = System.nanoTime();
-                        responseBytes = response.toByteArray();
-                    }
+                var request = DynamicMessage.parseFrom(protobufTypes.requestDescriptor(), msg.getData());
+                long afterDeserialize = System.nanoTime();
+                var responseBuilder = DynamicMessage.newBuilder(protobufTypes.responseDescriptor());
+                for (int index = 0; index < request.getRepeatedFieldCount(protobufTypes.requestItemsField()); index += 1) {
+                    responseBuilder.addRepeatedField(protobufTypes.responseItemsField(), request.getRepeatedField(protobufTypes.requestItemsField(), index));
                 }
+                long beforeSerialize = System.nanoTime();
+                byte[] responseBytes = responseBuilder.build().toByteArray();
                 long responseSentAt = System.nanoTime();
                 queue.put(new ServerMetrics(receivedAt, afterDeserialize - receivedAt, responseSentAt - beforeSerialize, responseSentAt));
                 serverConnection.publish(msg.getReplyTo(), responseBytes);
@@ -209,12 +200,7 @@ public class Main {
         });
         dispatcher.subscribe(subject);
         return new Runner(dispatcher, payload -> {
-            MessageLite requestMessage;
-            switch (scenario.dataShape()) {
-                case "typical" -> requestMessage = buildTypicalRequest(payload);
-                case "all-strings" -> requestMessage = buildStringsRequest(payload);
-                default -> requestMessage = buildNumbersRequest(payload);
-            }
+            DynamicMessage requestMessage = buildProtobufRequest(protobufTypes, payload);
             long serializeStart = System.nanoTime();
             var requestBytes = requestMessage.toByteArray();
             long serializeEnd = System.nanoTime();
@@ -222,12 +208,8 @@ public class Main {
             var response = requestWithRetry(clientConnection, subject, requestBytes);
             long receivedAt = System.nanoTime();
             long deserializeStart = System.nanoTime();
-            int responseCount;
-            switch (scenario.dataShape()) {
-                case "typical" -> responseCount = Benchmark.TypicalResponse.parseFrom(response.getData()).getItemsCount();
-                case "all-strings" -> responseCount = Benchmark.StringsResponse.parseFrom(response.getData()).getItemsCount();
-                default -> responseCount = Benchmark.NumbersResponse.parseFrom(response.getData()).getItemsCount();
-            }
+            var responseMessage = DynamicMessage.parseFrom(protobufTypes.responseDescriptor(), response.getData());
+            int responseCount = responseMessage.getRepeatedFieldCount(protobufTypes.responseItemsField());
             long deserializeEnd = System.nanoTime();
             if (responseCount != payload.size()) {
                 throw new IllegalStateException("protobuf payload mismatch");
@@ -342,46 +324,114 @@ public class Main {
                 "clientResponseDeserializationTimeNs", clientResponseDeserializationTimeNs);
     }
 
-    private static Benchmark.TypicalRequest buildTypicalRequest(List<Map<String, Object>> payload) {
-        var builder = Benchmark.TypicalRequest.newBuilder();
+    private static DynamicMessage buildProtobufRequest(ProtobufTypes protobufTypes, List<Map<String, Object>> payload) {
+        var builder = DynamicMessage.newBuilder(protobufTypes.requestDescriptor());
         for (var item : payload) {
-            builder.addItems(Benchmark.TypicalItem.newBuilder()
-                    .setAccountId(((Number) item.get("accountId")).longValue())
-                    .setCustomerName((String) item.get("customerName"))
-                    .setRegion((String) item.get("region"))
-                    .setUnitPrice(((Number) item.get("unitPrice")).doubleValue())
-                    .setQuantity(((Number) item.get("quantity")).longValue())
-                    .build());
+            builder.addRepeatedField(protobufTypes.requestItemsField(), buildProtobufItem(protobufTypes.itemDescriptor(), item));
         }
         return builder.build();
     }
 
-    private static Benchmark.StringsRequest buildStringsRequest(List<Map<String, Object>> payload) {
-        var builder = Benchmark.StringsRequest.newBuilder();
-        for (var item : payload) {
-            builder.addItems(Benchmark.StringItem.newBuilder()
-                    .setCode((String) item.get("code"))
-                    .setCity((String) item.get("city"))
-                    .setCountry((String) item.get("country"))
-                    .setSegment((String) item.get("segment"))
-                    .setStatus((String) item.get("status"))
-                    .build());
+    private static DynamicMessage buildProtobufItem(Descriptors.Descriptor itemDescriptor, Map<String, Object> payload) {
+        var builder = DynamicMessage.newBuilder(itemDescriptor);
+        for (var field : itemDescriptor.getFields()) {
+            builder.setField(field, coerceProtobufValue(field, payload.get(field.getName())));
         }
         return builder.build();
     }
 
-    private static Benchmark.NumbersRequest buildNumbersRequest(List<Map<String, Object>> payload) {
-        var builder = Benchmark.NumbersRequest.newBuilder();
-        for (var item : payload) {
-            builder.addItems(Benchmark.NumberItem.newBuilder()
-                    .setAccountId(((Number) item.get("accountId")).longValue())
-                    .setVisits(((Number) item.get("visits")).longValue())
-                    .setScore(((Number) item.get("score")).doubleValue())
-                    .setBalance(((Number) item.get("balance")).doubleValue())
-                    .setRatio(((Number) item.get("ratio")).doubleValue())
-                    .build());
+    private static Object coerceProtobufValue(Descriptors.FieldDescriptor field, Object value) {
+        return switch (field.getType()) {
+            case INT64 -> ((Number) value).longValue();
+            case DOUBLE -> ((Number) value).doubleValue();
+            case STRING -> (String) value;
+            default -> throw new IllegalArgumentException("Unsupported protobuf field type: " + field.getType());
+        };
+    }
+
+    private static Map<String, ProtobufTypes> createProtobufTypes() {
+        try {
+            var file = DescriptorProtos.FileDescriptorProto.newBuilder()
+                    .setName("benchmark.proto")
+                    .setPackage("telepact.performance.v1")
+                    .setSyntax("proto3");
+            addMessage(file, "TypicalItem", List.of(
+                    scalarField("accountId", 1, DescriptorProtos.FieldDescriptorProto.Type.TYPE_INT64),
+                    scalarField("customerName", 2, DescriptorProtos.FieldDescriptorProto.Type.TYPE_STRING),
+                    scalarField("region", 3, DescriptorProtos.FieldDescriptorProto.Type.TYPE_STRING),
+                    scalarField("unitPrice", 4, DescriptorProtos.FieldDescriptorProto.Type.TYPE_DOUBLE),
+                    scalarField("quantity", 5, DescriptorProtos.FieldDescriptorProto.Type.TYPE_INT64)));
+            addMessage(file, "StringItem", List.of(
+                    scalarField("code", 1, DescriptorProtos.FieldDescriptorProto.Type.TYPE_STRING),
+                    scalarField("city", 2, DescriptorProtos.FieldDescriptorProto.Type.TYPE_STRING),
+                    scalarField("country", 3, DescriptorProtos.FieldDescriptorProto.Type.TYPE_STRING),
+                    scalarField("segment", 4, DescriptorProtos.FieldDescriptorProto.Type.TYPE_STRING),
+                    scalarField("status", 5, DescriptorProtos.FieldDescriptorProto.Type.TYPE_STRING)));
+            addMessage(file, "NumberItem", List.of(
+                    scalarField("accountId", 1, DescriptorProtos.FieldDescriptorProto.Type.TYPE_INT64),
+                    scalarField("visits", 2, DescriptorProtos.FieldDescriptorProto.Type.TYPE_INT64),
+                    scalarField("score", 3, DescriptorProtos.FieldDescriptorProto.Type.TYPE_DOUBLE),
+                    scalarField("balance", 4, DescriptorProtos.FieldDescriptorProto.Type.TYPE_DOUBLE),
+                    scalarField("ratio", 5, DescriptorProtos.FieldDescriptorProto.Type.TYPE_DOUBLE)));
+            addMessage(file, "TypicalRequest", List.of(repeatedMessageField("items", 1, "telepact.performance.v1.TypicalItem")));
+            addMessage(file, "TypicalResponse", List.of(repeatedMessageField("items", 1, "telepact.performance.v1.TypicalItem")));
+            addMessage(file, "StringsRequest", List.of(repeatedMessageField("items", 1, "telepact.performance.v1.StringItem")));
+            addMessage(file, "StringsResponse", List.of(repeatedMessageField("items", 1, "telepact.performance.v1.StringItem")));
+            addMessage(file, "NumbersRequest", List.of(repeatedMessageField("items", 1, "telepact.performance.v1.NumberItem")));
+            addMessage(file, "NumbersResponse", List.of(repeatedMessageField("items", 1, "telepact.performance.v1.NumberItem")));
+
+            var descriptor = Descriptors.FileDescriptor.buildFrom(file.build(), new Descriptors.FileDescriptor[0]);
+            return Map.of(
+                    "typical", protobufTypesFor(descriptor, "TypicalRequest", "TypicalResponse", "TypicalItem"),
+                    "all-strings", protobufTypesFor(descriptor, "StringsRequest", "StringsResponse", "StringItem"),
+                    "all-numbers", protobufTypesFor(descriptor, "NumbersRequest", "NumbersResponse", "NumberItem"));
+        } catch (Descriptors.DescriptorValidationException e) {
+            throw new ExceptionInInitializerError(e);
         }
-        return builder.build();
+    }
+
+    private static ProtobufTypes protobufTypesFor(Descriptors.FileDescriptor descriptor, String requestName, String responseName, String itemName) {
+        var requestDescriptor = descriptor.findMessageTypeByName(requestName);
+        var responseDescriptor = descriptor.findMessageTypeByName(responseName);
+        var itemDescriptor = descriptor.findMessageTypeByName(itemName);
+        return new ProtobufTypes(
+                requestDescriptor,
+                requestDescriptor.findFieldByName("items"),
+                responseDescriptor,
+                responseDescriptor.findFieldByName("items"),
+                itemDescriptor);
+    }
+
+    private static void addMessage(
+            DescriptorProtos.FileDescriptorProto.Builder file,
+            String name,
+            List<DescriptorProtos.FieldDescriptorProto> fields) {
+        var message = file.addMessageTypeBuilder().setName(name);
+        for (var field : fields) {
+            message.addField(field);
+        }
+    }
+
+    private static DescriptorProtos.FieldDescriptorProto scalarField(
+            String name,
+            int number,
+            DescriptorProtos.FieldDescriptorProto.Type type) {
+        return DescriptorProtos.FieldDescriptorProto.newBuilder()
+                .setName(name)
+                .setNumber(number)
+                .setLabel(DescriptorProtos.FieldDescriptorProto.Label.LABEL_OPTIONAL)
+                .setType(type)
+                .build();
+    }
+
+    private static DescriptorProtos.FieldDescriptorProto repeatedMessageField(String name, int number, String typeName) {
+        return DescriptorProtos.FieldDescriptorProto.newBuilder()
+                .setName(name)
+                .setNumber(number)
+                .setLabel(DescriptorProtos.FieldDescriptorProto.Label.LABEL_REPEATED)
+                .setType(DescriptorProtos.FieldDescriptorProto.Type.TYPE_MESSAGE)
+                .setTypeName("." + typeName)
+                .build();
     }
 
     private record Runner(Dispatcher dispatcher, Requester requester) {

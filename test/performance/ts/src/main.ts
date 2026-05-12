@@ -19,7 +19,7 @@ import { connect, NatsConnection, Subscription } from "nats";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import process from "node:process";
-import { telepact as proto } from "./generated/benchmark.js";
+import { Field, Root, Type } from "protobufjs";
 
 type JsonMap = Record<string, any>;
 
@@ -48,6 +48,48 @@ type ServerMetrics = {
     responseSentAtNs: number;
 };
 
+function createItemType(name: string, fields: Array<[string, number, string]>): Type {
+    const type = new Type(name);
+    for (const [fieldName, fieldNumber, fieldType] of fields) {
+        type.add(new Field(fieldName, fieldNumber, fieldType));
+    }
+    return type;
+}
+
+function createRequestType(name: string, itemType: string): Type {
+    return new Type(name).add(new Field("items", 1, itemType, "repeated"));
+}
+
+const protobufRoot = new Root();
+const protobufNamespace = protobufRoot.define("telepact.performance.v1");
+protobufNamespace.add(createItemType("TypicalItem", [
+    ["accountId", 1, "int64"],
+    ["customerName", 2, "string"],
+    ["region", 3, "string"],
+    ["unitPrice", 4, "double"],
+    ["quantity", 5, "int64"],
+]));
+protobufNamespace.add(createItemType("StringItem", [
+    ["code", 1, "string"],
+    ["city", 2, "string"],
+    ["country", 3, "string"],
+    ["segment", 4, "string"],
+    ["status", 5, "string"],
+]));
+protobufNamespace.add(createItemType("NumberItem", [
+    ["accountId", 1, "int64"],
+    ["visits", 2, "int64"],
+    ["score", 3, "double"],
+    ["balance", 4, "double"],
+    ["ratio", 5, "double"],
+]));
+protobufNamespace.add(createRequestType("TypicalRequest", "TypicalItem"));
+protobufNamespace.add(createRequestType("TypicalResponse", "TypicalItem"));
+protobufNamespace.add(createRequestType("StringsRequest", "StringItem"));
+protobufNamespace.add(createRequestType("StringsResponse", "StringItem"));
+protobufNamespace.add(createRequestType("NumbersRequest", "NumberItem"));
+protobufNamespace.add(createRequestType("NumbersResponse", "NumberItem"));
+
 const NETWORKS = ["close", "far"];
 const DATA_SHAPES = ["typical", "all-strings", "all-numbers"];
 const COLLECTION_SHAPES = ["single", "small-list", "big-list", "really-big-list", "huge-list"];
@@ -62,10 +104,19 @@ const PLAIN_FUNCTION_NAMES: Record<string, string> = {
     "all-strings": "roundTripStrings",
     "all-numbers": "roundTripNumbers",
 };
-const PROTO_TYPES: Record<string, { request: any; response: any }> = {
-    "typical": { request: proto.performance.v1.TypicalRequest, response: proto.performance.v1.TypicalResponse },
-    "all-strings": { request: proto.performance.v1.StringsRequest, response: proto.performance.v1.StringsResponse },
-    "all-numbers": { request: proto.performance.v1.NumbersRequest, response: proto.performance.v1.NumbersResponse },
+const PROTO_TYPES: Record<string, { request: Type; response: Type }> = {
+    "typical": {
+        request: protobufRoot.lookupType("telepact.performance.v1.TypicalRequest"),
+        response: protobufRoot.lookupType("telepact.performance.v1.TypicalResponse"),
+    },
+    "all-strings": {
+        request: protobufRoot.lookupType("telepact.performance.v1.StringsRequest"),
+        response: protobufRoot.lookupType("telepact.performance.v1.StringsResponse"),
+    },
+    "all-numbers": {
+        request: protobufRoot.lookupType("telepact.performance.v1.NumbersRequest"),
+        response: protobufRoot.lookupType("telepact.performance.v1.NumbersResponse"),
+    },
 };
 const NATS_REQUEST_TIMEOUT_MS = 15000;
 const NATS_REQUEST_ADDITIONAL_RETRIES = 2;
@@ -200,9 +251,9 @@ async function createProtobufRunner(serverConnection: NatsConnection, clientConn
     (async () => {
         for await (const msg of sub) {
             const receivedAt = nowNs();
-            const requestMessage = requestType.decode(msg.data);
+            const requestMessage = requestType.decode(msg.data) as unknown as { items?: JsonMap[] };
             const afterDeserialize = nowNs();
-            const responseMessage = responseType.create({ items: requestMessage.items });
+            const responseMessage = responseType.create({ items: requestMessage.items ?? [] });
             const beforeSerialize = nowNs();
             const responseBytes = responseType.encode(responseMessage).finish();
             const responseSentAt = nowNs();
@@ -227,7 +278,7 @@ async function createProtobufRunner(serverConnection: NatsConnection, clientConn
             const response = await requestWithRetry(clientConnection, subject, requestBytes);
             const receivedAt = nowNs();
             const deserializeStart = nowNs();
-            const responseMessage = responseType.decode(response.data);
+            const responseMessage = responseType.decode(response.data) as unknown as { items?: JsonMap[] };
             const deserializeEnd = nowNs();
             if ((responseMessage.items ?? []).length !== payload.length) {
                 throw new Error("protobuf payload mismatch");

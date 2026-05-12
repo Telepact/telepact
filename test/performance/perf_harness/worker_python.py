@@ -29,7 +29,6 @@ from nats.errors import NoRespondersError as NatsNoRespondersError
 from nats.errors import TimeoutError as NatsTimeoutError
 from telepact import Client, FunctionRouter, Message, Server, TelepactSchema
 
-from . import benchmark_pb2
 from .common import (
     FUNCTION_NAMES,
     NATS_REQUEST_TIMEOUT_SECONDS,
@@ -37,6 +36,7 @@ from .common import (
     NATS_TIMEOUT_RETRY_DELAY_SECONDS,
     PLAIN_FUNCTION_NAMES,
     PROTODESC,
+    PROTOBUF_MESSAGE_CLASSES,
     SCHEMA_DIR,
     Scenario,
     iter_scenarios,
@@ -167,15 +167,15 @@ class PythonWorker:
 
     async def _create_protobuf_runner(self, server: nats.aio.client.Client, client: RetryingNatsClient, subject: str, scenario: Scenario, queue: asyncio.Queue[dict[str, int]]):
         request_type_name, response_type_name, field_name = PROTODESC[scenario.data_shape]
-        request_type = getattr(benchmark_pb2, request_type_name)
-        response_type = getattr(benchmark_pb2, response_type_name)
+        request_type = PROTOBUF_MESSAGE_CLASSES[request_type_name]
+        response_type = PROTOBUF_MESSAGE_CLASSES[response_type_name]
         item_descriptor = request_type.DESCRIPTOR.fields_by_name[field_name].message_type
-        item_type = getattr(benchmark_pb2, item_descriptor.name)
 
         def build_request(payload: list[dict[str, Any]]):
             message = request_type()
             repeated = getattr(message, field_name)
-            repeated.extend(item_type(**item) for item in payload)
+            for item in payload:
+                repeated.add(**item)
             return message
 
         async def handler(msg: nats.aio.msg.Msg) -> None:

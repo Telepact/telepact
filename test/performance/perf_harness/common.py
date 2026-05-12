@@ -26,6 +26,8 @@ import json
 import statistics
 from typing import Any, Iterable
 
+from google.protobuf import descriptor_pb2, descriptor_pool, message_factory
+
 LANGUAGES = ("python", "typescript", "java")
 NETWORK_LATENCIES = ("close", "far")
 DATA_SHAPES = ("typical", "all-strings", "all-numbers")
@@ -81,6 +83,95 @@ SCHEMA_DIR = PERFORMANCE_ROOT / "schema" / "telepact"
 PAYLOADS_PATH = PERFORMANCE_ROOT / "payloads" / "cases.json"
 RESULTS_DIR = PERFORMANCE_ROOT / "results"
 REPO_ROOT = PERFORMANCE_ROOT.parents[1]
+
+
+def _add_scalar_field(
+    message: descriptor_pb2.DescriptorProto,
+    name: str,
+    number: int,
+    field_type: descriptor_pb2.FieldDescriptorProto.Type.ValueType,
+) -> None:
+    field = message.field.add()
+    field.name = name
+    field.number = number
+    field.label = descriptor_pb2.FieldDescriptorProto.LABEL_OPTIONAL
+    field.type = field_type
+
+
+def _add_repeated_message_field(
+    message: descriptor_pb2.DescriptorProto,
+    package: str,
+    name: str,
+    number: int,
+    message_name: str,
+) -> None:
+    field = message.field.add()
+    field.name = name
+    field.number = number
+    field.label = descriptor_pb2.FieldDescriptorProto.LABEL_REPEATED
+    field.type = descriptor_pb2.FieldDescriptorProto.TYPE_MESSAGE
+    field.type_name = f".{package}.{message_name}"
+
+
+def _build_protobuf_message_classes() -> dict[str, type]:
+    package = "telepact.performance.v1"
+    file_descriptor = descriptor_pb2.FileDescriptorProto()
+    file_descriptor.name = "benchmark.proto"
+    file_descriptor.package = package
+    file_descriptor.syntax = "proto3"
+
+    typical_item = file_descriptor.message_type.add()
+    typical_item.name = "TypicalItem"
+    _add_scalar_field(typical_item, "accountId", 1, descriptor_pb2.FieldDescriptorProto.TYPE_INT64)
+    _add_scalar_field(typical_item, "customerName", 2, descriptor_pb2.FieldDescriptorProto.TYPE_STRING)
+    _add_scalar_field(typical_item, "region", 3, descriptor_pb2.FieldDescriptorProto.TYPE_STRING)
+    _add_scalar_field(typical_item, "unitPrice", 4, descriptor_pb2.FieldDescriptorProto.TYPE_DOUBLE)
+    _add_scalar_field(typical_item, "quantity", 5, descriptor_pb2.FieldDescriptorProto.TYPE_INT64)
+
+    string_item = file_descriptor.message_type.add()
+    string_item.name = "StringItem"
+    _add_scalar_field(string_item, "code", 1, descriptor_pb2.FieldDescriptorProto.TYPE_STRING)
+    _add_scalar_field(string_item, "city", 2, descriptor_pb2.FieldDescriptorProto.TYPE_STRING)
+    _add_scalar_field(string_item, "country", 3, descriptor_pb2.FieldDescriptorProto.TYPE_STRING)
+    _add_scalar_field(string_item, "segment", 4, descriptor_pb2.FieldDescriptorProto.TYPE_STRING)
+    _add_scalar_field(string_item, "status", 5, descriptor_pb2.FieldDescriptorProto.TYPE_STRING)
+
+    number_item = file_descriptor.message_type.add()
+    number_item.name = "NumberItem"
+    _add_scalar_field(number_item, "accountId", 1, descriptor_pb2.FieldDescriptorProto.TYPE_INT64)
+    _add_scalar_field(number_item, "visits", 2, descriptor_pb2.FieldDescriptorProto.TYPE_INT64)
+    _add_scalar_field(number_item, "score", 3, descriptor_pb2.FieldDescriptorProto.TYPE_DOUBLE)
+    _add_scalar_field(number_item, "balance", 4, descriptor_pb2.FieldDescriptorProto.TYPE_DOUBLE)
+    _add_scalar_field(number_item, "ratio", 5, descriptor_pb2.FieldDescriptorProto.TYPE_DOUBLE)
+
+    for request_name, item_name in (
+        ("TypicalRequest", "TypicalItem"),
+        ("TypicalResponse", "TypicalItem"),
+        ("StringsRequest", "StringItem"),
+        ("StringsResponse", "StringItem"),
+        ("NumbersRequest", "NumberItem"),
+        ("NumbersResponse", "NumberItem"),
+    ):
+        message = file_descriptor.message_type.add()
+        message.name = request_name
+        _add_repeated_message_field(message, package, "items", 1, item_name)
+
+    pool = descriptor_pool.DescriptorPool()
+    pool.Add(file_descriptor)
+    return {
+        name: message_factory.GetMessageClass(pool.FindMessageTypeByName(f"{package}.{name}"))
+        for name in (
+            "TypicalRequest",
+            "TypicalResponse",
+            "StringsRequest",
+            "StringsResponse",
+            "NumbersRequest",
+            "NumbersResponse",
+        )
+    }
+
+
+PROTOBUF_MESSAGE_CLASSES = _build_protobuf_message_classes()
 
 
 @dataclass(frozen=True)
