@@ -21,13 +21,14 @@ from ...internal.binary.BinaryPackNode import BinaryPackNode
 
 
 UNDEFINED_BYTE = 18
+UNDEFINED_EXT = ExtType(UNDEFINED_BYTE, b'')
 
 
 def pack_map(m: dict[object, object], header: list[object], key_index_map: dict[int, 'BinaryPackNode']) -> list[object]:
     from ...internal.binary.CannotPack import CannotPack
     from ...internal.binary.Pack import pack
 
-    row: list[object] = []
+    row: list[object] = [UNDEFINED_EXT] * (len(header) - 1)
     for key, value in m.items():
         if isinstance(key, str):
             raise CannotPack()
@@ -44,6 +45,7 @@ def pack_map(m: dict[object, object], header: list[object], key_index_map: dict[
                 header.append(key)
 
             key_index_map[key] = final_key_index
+            row.append(UNDEFINED_EXT)
         else:
             final_key_index = key_index
 
@@ -65,14 +67,11 @@ def pack_map(m: dict[object, object], header: list[object], key_index_map: dict[
             if isinstance(header[key_index_value + 1], list):
                 raise CannotPack()
 
-            packed_value = pack(value)
+            if isinstance(value, list):
+                packed_value = pack(value)
+            else:
+                packed_value = value
 
-        while len(row) < key_index_value:
-            row.append(ExtType(UNDEFINED_BYTE, b''))
-
-        if len(row) == key_index_value:
-            row.append(packed_value)
-        else:
-            row[key_index_value] = packed_value
+        row[key_index_value] = packed_value
 
     return row

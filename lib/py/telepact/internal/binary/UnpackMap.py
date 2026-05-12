@@ -25,9 +25,7 @@ def unpack_map(row: list[object], header: list[object]) -> dict[int, object]:
 
     final_map: dict[int, object] = {}
 
-    for j in range(len(row)):
-        key = header[j + 1]
-        value = row[j]
+    for key, value in zip(header[1:], row):
 
         if isinstance(value, ExtType) and value.code == UNDEFINED_BYTE:
             continue
@@ -41,7 +39,10 @@ def unpack_map(row: list[object], header: list[object]) -> dict[int, object]:
             final_map[i] = m
         else:
             i = key
-            unpacked_value = unpack(value)
+            if isinstance(value, (dict, list)):
+                unpacked_value = unpack(value)
+            else:
+                unpacked_value = value
 
             final_map[i] = unpacked_value
 
