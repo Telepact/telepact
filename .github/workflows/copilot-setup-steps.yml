@@ -56,10 +56,26 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v6
 
+      - name: Build Telepact CLI package
+        run: |
+          make py
+          cp LICENSE NOTICE sdk/cli/
+          rm -rf sdk/cli/tmp sdk/cli/telepact_cli/telepact
+          mkdir -p sdk/cli/tmp
+          tar -xzf lib/py/dist/telepact-*.tar.gz -C sdk/cli/tmp
+          mv sdk/cli/tmp/*/telepact sdk/cli/telepact_cli/telepact
+          rm -rf sdk/cli/tmp
+          (
+            cd sdk/cli
+            uv build
+          )
+
       - name: Install Telepact CLI
         run: |
-          uv tool install --force ./sdk/cli
+          uv tool install --force ./sdk/cli/dist/telepact_cli-*.whl
           echo "${HOME}/.local/bin" >> "${GITHUB_PATH}"
+          export PATH="${HOME}/.local/bin:${PATH}"
+          telepact --help >/dev/null
 
       - name: Set up Dart
         uses: dart-lang/setup-dart@v1
