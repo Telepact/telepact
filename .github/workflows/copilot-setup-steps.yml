@@ -74,8 +74,7 @@ jobs:
         run: |
           uv tool install --force ./sdk/cli/dist/telepact_cli-*.whl
           echo "${HOME}/.local/bin" >> "${GITHUB_PATH}"
-          export PATH="${HOME}/.local/bin:${PATH}"
-          telepact --help >/dev/null
+          "${HOME}/.local/bin/telepact" --help >/dev/null
 
       - name: Set up Dart
         uses: dart-lang/setup-dart@v1
