@@ -58,7 +58,8 @@ jobs:
 
       - name: Install Telepact CLI
         run: |
-          uv tool install --force ./sdk/cli
+          make cli
+          make install-cli
           echo "${HOME}/.local/bin" >> "${GITHUB_PATH}"
 
       - name: Set up Dart
