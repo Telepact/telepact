@@ -10,4 +10,6 @@ java/src/main/java/telepact/performance/v1/
 perf_harness/*_pb2.py
 results/raw/
 results/raw-results.json
+results/summary.csv
+results/summary.json
 ts/src/generated/
