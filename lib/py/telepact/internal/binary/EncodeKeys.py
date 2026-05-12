@@ -21,39 +21,18 @@ if TYPE_CHECKING:
 
 
 def encode_keys(given: object, binary_encoding: 'BinaryEncoding') -> object:
-    if given is None:
-        return given
-
     encode_map = binary_encoding.encode_map
 
-    if isinstance(given, dict):
-        root: dict[object, object] = {}
-        stack: list[tuple[object, object, bool]] = [(iter(given.items()), root, True)]
-    elif isinstance(given, list):
-        root = [None] * len(given)
-        stack = [(iter(enumerate(given)), root, False)]
-    else:
-        return given
+    def encode(value: object) -> object:
+        value_type = type(value)
 
-    while stack:
-        iterator, target, is_mapping = stack[-1]
-        try:
-            key, value = next(iterator)
-        except StopIteration:
-            stack.pop()
-            continue
+        if value_type is dict:
+            return {
+                encode_map.get(key, key): encode(item)
+                for key, item in value.items()
+            }
+        if value_type is list:
+            return [encode(item) for item in value]
+        return value
 
-        final_key = encode_map.get(key, key) if is_mapping else key
-
-        if isinstance(value, dict):
-            child: dict[object, object] = {}
-            target[final_key] = child
-            stack.append((iter(value.items()), child, True))
-        elif isinstance(value, list):
-            child = [None] * len(value)
-            target[final_key] = child
-            stack.append((iter(enumerate(value)), child, False))
-        else:
-            target[final_key] = value
-
-    return root
+    return encode(given)
