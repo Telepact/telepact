@@ -23,7 +23,7 @@ if TYPE_CHECKING:
 def encode_keys(given: object, binary_encoding: 'BinaryEncoding') -> object:
     encode_map = binary_encoding.encode_map
 
-    def encode(value: object) -> object:
+    def encode_value(value: object) -> object:
         if value is None:
             return value
 
@@ -31,11 +31,11 @@ def encode_keys(given: object, binary_encoding: 'BinaryEncoding') -> object:
 
         if value_type is dict:
             return {
-                encode_map.get(key, key): encode(item)
+                encode_map.get(key, key): encode_value(item)
                 for key, item in value.items()
             }
         if value_type is list:
-            return [encode(item) for item in value]
+            return [encode_value(item) for item in value]
         return value
 
-    return encode(given)
+    return encode_value(given)

@@ -15,6 +15,7 @@
 #|
 
 from typing import TYPE_CHECKING
+from typing import Callable
 
 from ...internal.binary.BinaryEncodingMissing import BinaryEncodingMissing
 
@@ -22,7 +23,7 @@ if TYPE_CHECKING:
     from ...internal.binary.BinaryEncoding import BinaryEncoding
 
 
-def _decode_value(value: object, decode_map_get: object) -> object:
+def _decode_value(value: object, decode_map_get: Callable[[object], object | None]) -> object:
     value_type = type(value)
 
     if value_type is dict:
@@ -45,13 +46,11 @@ def _decode_dict(items: dict[object, object], binary_encoder: 'BinaryEncoding') 
     return _decode_value(items, binary_encoder.decode_map.get)
 
 
-def _decode_list(items: list[object], binary_encoder: 'BinaryEncoding') -> list[object]:
-    return _decode_value(items, binary_encoder.decode_map.get)
-
-
 def decode_keys(given: object, binary_encoder: 'BinaryEncoding') -> object:
+    decode_map_get = binary_encoder.decode_map.get
+
     if isinstance(given, dict):
         return _decode_dict(given, binary_encoder)
     if isinstance(given, list):
-        return _decode_list(given, binary_encoder)
+        return _decode_value(given, decode_map_get)
     return given
