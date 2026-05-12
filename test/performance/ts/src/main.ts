@@ -178,6 +178,14 @@ function schemaPath(): string {
     return path.resolve(process.cwd(), "../schema/telepact");
 }
 
+function getDecodedProtobufItems(message: unknown, context: string): JsonMap[] {
+    const items = (message as { items?: unknown }).items;
+    if (!Array.isArray(items)) {
+        throw new Error(`${context} protobuf payload missing items`);
+    }
+    return items as JsonMap[];
+}
+
 async function requestWithRetry(connection: NatsConnection, subject: string, payload: Uint8Array) {
     for (let attempt = 0; attempt <= NATS_REQUEST_ADDITIONAL_RETRIES; attempt += 1) {
         try {
@@ -251,9 +259,9 @@ async function createProtobufRunner(serverConnection: NatsConnection, clientConn
     (async () => {
         for await (const msg of sub) {
             const receivedAt = nowNs();
-            const requestMessage = requestType.decode(msg.data) as unknown as { items?: JsonMap[] };
+            const requestItems = getDecodedProtobufItems(requestType.decode(msg.data), "request");
             const afterDeserialize = nowNs();
-            const responseMessage = responseType.create({ items: requestMessage.items ?? [] });
+            const responseMessage = responseType.create({ items: requestItems });
             const beforeSerialize = nowNs();
             const responseBytes = responseType.encode(responseMessage).finish();
             const responseSentAt = nowNs();
@@ -278,9 +286,9 @@ async function createProtobufRunner(serverConnection: NatsConnection, clientConn
             const response = await requestWithRetry(clientConnection, subject, requestBytes);
             const receivedAt = nowNs();
             const deserializeStart = nowNs();
-            const responseMessage = responseType.decode(response.data) as unknown as { items?: JsonMap[] };
+            const responseItems = getDecodedProtobufItems(responseType.decode(response.data), "response");
             const deserializeEnd = nowNs();
-            if ((responseMessage.items ?? []).length !== payload.length) {
+            if (responseItems.length !== payload.length) {
                 throw new Error("protobuf payload mismatch");
             }
             const serverMetrics = await queue.shift();
