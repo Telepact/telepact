@@ -19,6 +19,9 @@ name: Build
 on:
   workflow_call:
 
+permissions:
+  contents: read
+
 jobs:
   build-ts:
     name: Build TypeScript
