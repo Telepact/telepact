@@ -1,0 +1,16 @@
+[project]
+name = "telepact-performance"
+version = "0.1.0"
+requires-python = ">=3.11,<4"
+dependencies = [
+    "nats-py>=2.14.0,<3",
+    "protobuf>=6.33.5,<7",
+]
+
+[dependency-groups]
+dev = [
+    "grpcio-tools==1.80.0",
+]
+
+[tool.uv]
+package = false

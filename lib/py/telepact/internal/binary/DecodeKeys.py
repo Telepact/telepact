@@ -15,33 +15,38 @@
 #|
 
 from typing import TYPE_CHECKING
+from typing import Callable
+
+from ...internal.binary.BinaryEncodingMissing import BinaryEncodingMissing
 
 if TYPE_CHECKING:
     from ...internal.binary.BinaryEncoding import BinaryEncoding
 
 
+def _decode_keys_recursive(value: object, decode_map_get: Callable[[object], object | None]) -> object:
+    value_type = type(value)
+
+    if value_type is dict:
+        decoded: dict[str, object] = {}
+        for key, item in value.items():
+            if type(key) is str:
+                decoded_key = key
+            else:
+                decoded_key = decode_map_get(key)
+                if decoded_key is None:
+                    raise BinaryEncodingMissing(key)
+            decoded[decoded_key] = _decode_keys_recursive(item, decode_map_get)
+        return decoded
+    if value_type is list:
+        return [_decode_keys_recursive(item, decode_map_get) for item in value]
+    return value
+
+
 def decode_keys(given: object, binary_encoder: 'BinaryEncoding') -> object:
-    from ...internal.binary.BinaryEncodingMissing import BinaryEncodingMissing
+    decode_map_get = binary_encoder.decode_map.get
 
     if isinstance(given, dict):
-        new_dict: dict[str, object] = {}
-
-        for key, value in given.items():
-            if isinstance(key, str):
-                new_key = key
-            else:
-                possible_new_key = binary_encoder.decode_map.get(key)
-
-                if possible_new_key is None:
-                    raise BinaryEncodingMissing(key)
-
-                new_key = possible_new_key
-
-            encoded_value = decode_keys(value, binary_encoder)
-            new_dict[new_key] = encoded_value
-
-        return new_dict
-    elif isinstance(given, list):
-        return [decode_keys(item, binary_encoder) for item in given]
-    else:
-        return given
+        return _decode_keys_recursive(given, decode_map_get)
+    if isinstance(given, list):
+        return _decode_keys_recursive(given, decode_map_get)
+    return given

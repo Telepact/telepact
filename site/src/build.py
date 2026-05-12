@@ -93,6 +93,7 @@ DOCS_PAGE_BLUEPRINTS = (
             {"source": "doc/build-clients-and-servers/auth.md"},
             {"source": "doc/build-clients-and-servers/tooling-workflow.md"},
             {"source": "doc/operate/production-guide.md"},
+            {"source": "doc/operate/binary-performance-guide.md"},
             {"source": "doc/operate/runtime-errors.md"},
             {"source": "doc/background-and-reference/motivation.md"},
             {"source": "doc/background-and-reference/faq.md"},
