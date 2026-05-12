@@ -16,11 +16,16 @@
 
 LIB_TAR_GZ := ../../../lib/ts/dist-tgz/*.tgz
 TAR_GZ := telepact.tgz
+PROTO_FILE := ../schema/benchmark.proto
+GENERATED_DIR := src/generated
+GENERATED_JS := $(GENERATED_DIR)/benchmark.js
+GENERATED_D_TS := $(GENERATED_DIR)/benchmark.d.ts
 
 all: $(TAR_GZ)
 	npm uninstall telepact || echo "no-op"
 	npm install --ignore-scripts ./telepact.tgz
 	npm install --ignore-scripts
+	$(MAKE) codegen
 	npm run build
 
 $(TAR_GZ): dep
@@ -29,10 +34,20 @@ $(TAR_GZ): dep
 dep:
 	$(MAKE) -C ../../../lib/ts
 
+codegen: $(GENERATED_D_TS)
+
+$(GENERATED_D_TS): $(GENERATED_JS)
+	npx pbts --out $(GENERATED_D_TS) $(GENERATED_JS)
+
+$(GENERATED_JS): $(PROTO_FILE)
+	mkdir -p $(GENERATED_DIR)
+	npx pbjs --target static-module --wrap es6 --root telepact --out $(GENERATED_JS) $(PROTO_FILE)
+
 clean:
 	rm -f telepact.tgz
 	rm -rf dist
+	rm -rf $(GENERATED_DIR)
 	rm -rf node_modules
 	rm -f package-lock.json
 
-.PHONY: all dep clean
+.PHONY: all dep codegen clean

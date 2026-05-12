@@ -23,6 +23,7 @@ prepare: prepare-py prepare-ts prepare-java
 
 prepare-py: $(TAR_GZ)
 	uv sync --all-groups
+	uv run python -m grpc_tools.protoc --proto_path=schema --python_out=perf_harness benchmark.proto
 	uv pip install --python .venv/bin/python ./telepact.tar.gz
 
 $(TAR_GZ): dep-py

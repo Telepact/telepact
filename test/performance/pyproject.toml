@@ -8,7 +8,9 @@ dependencies = [
 ]
 
 [dependency-groups]
-dev = []
+dev = [
+    "grpcio-tools==1.80.0",
+]
 
 [tool.uv]
 package = false
