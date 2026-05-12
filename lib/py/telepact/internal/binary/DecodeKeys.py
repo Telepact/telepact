@@ -15,6 +15,7 @@
 #|
 
 from typing import TYPE_CHECKING
+from typing import Callable
 
 from ...internal.binary.BinaryEncodingMissing import BinaryEncodingMissing
 
@@ -22,56 +23,30 @@ if TYPE_CHECKING:
     from ...internal.binary.BinaryEncoding import BinaryEncoding
 
 
-def _decode_list(items: list[object], binary_encoder: 'BinaryEncoding') -> list[object]:
-    decoded_items: list[object] = []
-    append = decoded_items.append
+def _decode_keys_recursive(value: object, decode_map_get: Callable[[object], object | None]) -> object:
+    value_type = type(value)
 
-    for item in items:
-        if isinstance(item, dict):
-            append(_decode_dict(item, binary_encoder))
-        elif isinstance(item, list):
-            append(_decode_list(item, binary_encoder))
-        else:
-            append(item)
-
-    return decoded_items
-
-
-def _decode_dict(items: dict[object, object], binary_encoder: 'BinaryEncoding') -> dict[str, object]:
-    decode_map = binary_encoder.decode_map
-    root: dict[str, object] = {}
-    stack: list[tuple[object, dict[str, object]]] = [(iter(items.items()), root)]
-
-    while stack:
-        iterator, target = stack[-1]
-        try:
-            key, value = next(iterator)
-        except StopIteration:
-            stack.pop()
-            continue
-
-        if isinstance(key, str):
-            decoded_key = key
-        else:
-            decoded_key = decode_map.get(key)
-            if decoded_key is None:
-                raise BinaryEncodingMissing(key)
-
-        if isinstance(value, dict):
-            child: dict[str, object] = {}
-            target[decoded_key] = child
-            stack.append((iter(value.items()), child))
-        elif isinstance(value, list):
-            target[decoded_key] = _decode_list(value, binary_encoder)
-        else:
-            target[decoded_key] = value
-
-    return root
+    if value_type is dict:
+        decoded: dict[str, object] = {}
+        for key, item in value.items():
+            if type(key) is str:
+                decoded_key = key
+            else:
+                decoded_key = decode_map_get(key)
+                if decoded_key is None:
+                    raise BinaryEncodingMissing(key)
+            decoded[decoded_key] = _decode_keys_recursive(item, decode_map_get)
+        return decoded
+    if value_type is list:
+        return [_decode_keys_recursive(item, decode_map_get) for item in value]
+    return value
 
 
 def decode_keys(given: object, binary_encoder: 'BinaryEncoding') -> object:
+    decode_map_get = binary_encoder.decode_map.get
+
     if isinstance(given, dict):
-        return _decode_dict(given, binary_encoder)
+        return _decode_keys_recursive(given, decode_map_get)
     if isinstance(given, list):
-        return _decode_list(given, binary_encoder)
+        return _decode_keys_recursive(given, decode_map_get)
     return given
