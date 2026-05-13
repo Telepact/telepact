@@ -23,6 +23,8 @@ if TYPE_CHECKING:
 
 
 def validate_boolean(value: object) -> list['ValidationFailure']:
-    if type(value) is bool or isinstance(value, bool):
+    if type(value) is bool:
+        return []
+    if isinstance(value, bool):
         return []
     return get_type_unexpected_validation_failure([], value, _BOOLEAN_NAME)
