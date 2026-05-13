@@ -73,8 +73,6 @@ def _try_pack_flat_map_list(lst: list[object]) -> list[object] | None:
 
         row: list[object] = [UNDEFINED_EXT] * row_width
         for key, value in item.items():
-            if type(key) is str:
-                return None
             key_index = key_index_map.get(key)
             if key_index is None:
                 return None
