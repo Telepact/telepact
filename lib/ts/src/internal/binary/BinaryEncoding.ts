@@ -14,12 +14,16 @@
 //|  limitations under the License.
 //|
 
+import { BinaryKey, BinaryTaggedPlan } from './BinaryBodyPlan.js';
+
 export class BinaryEncoding {
     public readonly encodeMap: Map<string, number>;
     public readonly decodeMap: Map<number, string>;
     public readonly checksum: number;
+    public readonly rootPlansBySourceKey: ReadonlyMap<string, BinaryTaggedPlan>;
+    public readonly rootPlansByEncodedKey: ReadonlyMap<BinaryKey, BinaryTaggedPlan>;
 
-    constructor(binaryEncodingMap: Map<string, number>, checksum: number) {
+    constructor(binaryEncodingMap: Map<string, number>, checksum: number, rootPlans: readonly BinaryTaggedPlan[] = []) {
         this.encodeMap = binaryEncodingMap;
         const decodeList: [number, string][] = [...binaryEncodingMap.entries()].map((e: [string, number]) => [
             e[1],
@@ -27,5 +31,7 @@ export class BinaryEncoding {
         ]);
         this.decodeMap = new Map(decodeList);
         this.checksum = checksum;
+        this.rootPlansBySourceKey = new Map(rootPlans.map((plan) => [plan.sourceKey, plan]));
+        this.rootPlansByEncodedKey = new Map(rootPlans.map((plan) => [plan.encodedKey, plan]));
     }
 }
