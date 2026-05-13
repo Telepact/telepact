@@ -54,6 +54,8 @@ def _try_pack_flat_map_list(lst: list[object]) -> list[object] | None:
     key_index_map: dict[object, int] = {}
     for index, (key, value) in enumerate(first_item.items()):
         if type(key) is str:
+            # Packed rows are only safe when keys are already encoded to
+            # integers; string keys need the generic recursive fallback.
             return None
         value_type = type(value)
         if value_type is dict or value_type is list:

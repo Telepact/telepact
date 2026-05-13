@@ -44,7 +44,8 @@ def _try_decode_flat_dict_list(value: list[object], decode_map_get: Callable[[ob
                 return None
 
             if type(key) is str:
-                decoded_key = key
+                decoded_item[key] = item_value
+                continue
             else:
                 decoded_key = decode_map_get(key)
                 if decoded_key is None:

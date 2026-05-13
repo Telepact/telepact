@@ -49,7 +49,7 @@ def _try_unpack_flat_map_list(lst: list[object]) -> list[object] | None:
     headers = cast(list[object], lst[1])
     flat_keys: list[int] = []
     for key in headers[1:]:
-        if type(key) is list:
+        if type(key) is list or type(key) is dict:
             return None
         flat_keys.append(cast(int, key))
 
