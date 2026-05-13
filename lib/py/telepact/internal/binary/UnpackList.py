@@ -70,6 +70,8 @@ def _try_unpack_flat_map_list(lst: list[object]) -> list[object] | None:
         for index in range(row_count):
             value = row[index]
             if type(value) is ExtType:
+                # Flat packed rows only use the undefined sentinel; any other
+                # extension means we need the generic unpacking logic.
                 if value.code == UNDEFINED_BYTE:
                     continue
                 return None
