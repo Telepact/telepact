@@ -41,9 +41,11 @@ def _get_pack():
 def pack_map(m: dict[object, object], header: list[object], key_index_map: dict[int, 'BinaryPackNode']) -> list[object]:
     pack = _get_pack()
 
-    row: list[object] = [UNDEFINED_EXT] * (len(header) - 1)
+    row: list[object] = []
+    row_len = 0
     header_append = header.append
     row_append = row.append
+    row_extend = row.extend
     key_index_map_get = key_index_map.get
 
     for key, value in m.items():
@@ -90,6 +92,14 @@ def pack_map(m: dict[object, object], header: list[object], key_index_map: dict[
             else:
                 packed_value = value
 
-        row[key_index_value] = packed_value
+        if row_len < key_index_value:
+            row_extend([UNDEFINED_EXT] * (key_index_value - row_len))
+            row_len = key_index_value
+
+        if row_len == key_index_value:
+            row_append(packed_value)
+            row_len += 1
+        else:
+            row[key_index_value] = packed_value
 
     return row

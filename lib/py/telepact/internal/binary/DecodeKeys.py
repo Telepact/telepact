@@ -38,7 +38,11 @@ def _decode_keys_recursive(value: object, decode_map_get: Callable[[object], obj
             decoded[decoded_key] = _decode_keys_recursive(item, decode_map_get)
         return decoded
     if value_type is list:
-        return [_decode_keys_recursive(item, decode_map_get) for item in value]
+        lst = value
+        decoded_list: list[object] = [None] * len(lst)
+        for index, item in enumerate(lst):
+            decoded_list[index] = _decode_keys_recursive(item, decode_map_get)
+        return decoded_list
     return value
 
 

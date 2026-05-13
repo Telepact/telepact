@@ -18,4 +18,7 @@ from .Unpack import unpack
 
 
 def unpack_body(body: dict[object, object]) -> dict[object, object]:
-    return {key: unpack(value) for key, value in body.items()}
+    unpacked: dict[object, object] = {}
+    for key, value in body.items():
+        unpacked[key] = unpack(value)
+    return unpacked

@@ -42,18 +42,16 @@ def unpack_list(lst: list[object]) -> list[object]:
 
     first_item = lst[0]
     if type(first_item) is not ExtType or first_item.code != PACKED_BYTE:
-        new_lst = []
-        for item in lst:
-            new_lst.append(unpack(item))
+        new_lst: list[object] = [None] * len(lst)
+        for index, item in enumerate(lst):
+            new_lst[index] = unpack(item)
         return new_lst
 
-    unpacked_lst: list[object] = []
+    unpacked_lst: list[object] = [None] * (len(lst) - 2)
     headers = cast(list[object], lst[1])
 
     for i in range(2, len(lst)):
         row = cast(list[object], lst[i])
-        m = unpack_map(row, headers)
-
-        unpacked_lst.append(m)
+        unpacked_lst[i - 2] = unpack_map(row, headers)
 
     return unpacked_lst
