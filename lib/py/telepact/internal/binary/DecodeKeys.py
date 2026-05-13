@@ -50,7 +50,7 @@ def _try_decode_flat_dict_list(value: list[object], decode_map_get: Callable[[ob
                 if decoded_key is None:
                     raise BinaryEncodingMissing(key)
 
-            decoded_item[decoded_key] = item_value
+            decoded_item[str(decoded_key)] = item_value
 
         decoded_list_append(decoded_item)
 

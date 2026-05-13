@@ -43,6 +43,9 @@ def _try_unpack_flat_map_list(lst: list[object]) -> list[object] | None:
     if type(first_item) is not ExtType or first_item.code != PACKED_BYTE:
         return None
 
+    if len(lst) < 2 or type(lst[1]) is not list:
+        return None
+
     headers = cast(list[object], lst[1])
     flat_keys: list[int] = []
     for key in headers[1:]:
