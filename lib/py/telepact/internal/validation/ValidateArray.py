@@ -17,6 +17,7 @@
 from typing import TYPE_CHECKING
 from ..types.TArray import _ARRAY_NAME
 from ...internal.validation.ValidationFailure import ValidationFailure
+from ...internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
 
 if TYPE_CHECKING:
     from ...internal.validation.ValidateContext import ValidateContext
@@ -25,8 +26,6 @@ if TYPE_CHECKING:
 
 def validate_array(value: object,
                    type_parameters: list['TTypeDeclaration'], ctx: 'ValidateContext') -> list['ValidationFailure']:
-    from ...internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
-
     if isinstance(value, list):
         nested_type_declaration = type_parameters[0]
 

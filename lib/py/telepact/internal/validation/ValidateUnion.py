@@ -17,6 +17,8 @@
 from typing import TYPE_CHECKING, cast
 from ..types.TUnion import _UNION_NAME
 from ...internal.validation.ValidationFailure import ValidationFailure
+from ...internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
+from ...internal.validation.ValidateUnionTags import validate_union_tags
 
 if TYPE_CHECKING:
     from ...internal.validation.ValidateContext import ValidateContext
@@ -26,9 +28,6 @@ if TYPE_CHECKING:
 
 def validate_union(value: object,
                    name: str, tags: dict[str, 'TStruct'], ctx: 'ValidateContext') -> list['ValidationFailure']:
-    from ...internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
-    from ...internal.validation.ValidateUnionTags import validate_union_tags
-
     if isinstance(value, dict):
         selected_tags: dict[str, object]
         if name.startswith("fn."):

@@ -16,17 +16,32 @@
 
 from typing import cast
 from msgpack import ExtType
+from threading import Lock
 
 from ...internal.binary.PackList import PACKED_BYTE
-from ...internal.binary.Unpack import unpack
 from ...internal.binary.UnpackMap import unpack_map
+_UNPACK = None
+_UNPACK_LOCK = Lock()
+
+
+def _get_unpack():
+    global _UNPACK
+    if _UNPACK is None:
+        with _UNPACK_LOCK:
+            if _UNPACK is None:
+                from ...internal.binary.Unpack import unpack as _unpack
+                _UNPACK = _unpack
+    return _UNPACK
 
 
 def unpack_list(lst: list[object]) -> list[object]:
+    unpack = _get_unpack()
+
     if not lst:
         return lst
 
-    if not isinstance(lst[0], ExtType) or lst[0].code != PACKED_BYTE:
+    first_item = lst[0]
+    if type(first_item) is not ExtType or first_item.code != PACKED_BYTE:
         new_lst = []
         for item in lst:
             new_lst.append(unpack(item))

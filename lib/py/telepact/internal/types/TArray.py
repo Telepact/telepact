@@ -28,6 +28,8 @@ from .TType import TType
 
 _ARRAY_NAME = "Array"
 
+from ..validation.ValidateArray import validate_array
+
 
 class TArray(TType):
 
@@ -36,7 +38,6 @@ class TArray(TType):
 
     def validate(self, value: object,
                  type_parameters: list['TTypeDeclaration'], ctx: 'ValidateContext') -> list['ValidationFailure']:
-        from ..validation.ValidateArray import validate_array
         return validate_array(value, type_parameters, ctx)
 
     def generate_random_value(self, blueprint_value: object, use_blueprint_value: bool, type_parameters: list['TTypeDeclaration'], ctx: 'GenerateContext') -> object:

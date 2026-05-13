@@ -14,13 +14,8 @@
 #|  limitations under the License.
 #|
 
+from .Unpack import unpack
+
+
 def unpack_body(body: dict[object, object]) -> dict[object, object]:
-    from ...internal.binary.Unpack import unpack
-
-    result = {}
-
-    for key, value in body.items():
-        unpacked_value = unpack(value)
-        result[key] = unpacked_value
-
-    return result
+    return {key: unpack(value) for key, value in body.items()}

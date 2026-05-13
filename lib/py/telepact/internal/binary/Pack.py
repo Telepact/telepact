@@ -14,17 +14,18 @@
 #|  limitations under the License.
 #|
 
-def pack(value: object) -> object:
-    from ...internal.binary.PackList import pack_list
+from .PackList import pack_list
 
-    if isinstance(value, list):
+
+def pack(value: object) -> object:
+    value_type = type(value)
+    if value_type is list:
         return pack_list(value)
-    elif isinstance(value, dict):
+    if value_type is dict:
         new_map = {}
 
         for key, val in value.items():
             new_map[key] = pack(val)
 
         return new_map
-    else:
-        return value
+    return value

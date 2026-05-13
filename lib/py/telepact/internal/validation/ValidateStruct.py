@@ -16,6 +16,8 @@
 
 from typing import TYPE_CHECKING, cast
 from ..types.TStruct import _STRUCT_NAME
+from ...internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
+from ...internal.validation.ValidateStructFields import validate_struct_fields
 
 if TYPE_CHECKING:
     from ...internal.validation.ValidateContext import ValidateContext
@@ -26,9 +28,6 @@ if TYPE_CHECKING:
 
 def validate_struct(value: object,
                     name: str, fields: dict[str, 'TFieldDeclaration'], ctx: 'ValidateContext') -> list['ValidationFailure']:
-    from ...internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
-    from ...internal.validation.ValidateStructFields import validate_struct_fields
-
     if isinstance(value, dict):
         selected_fields = cast(
             list[str], ctx.select.get(name) if ctx.select else None)

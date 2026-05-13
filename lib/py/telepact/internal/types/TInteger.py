@@ -15,8 +15,6 @@
 #|
 
 from typing import TYPE_CHECKING
-
-
 if TYPE_CHECKING:
     from ..validation.ValidateContext import ValidateContext
     from ...RandomGenerator import RandomGenerator
@@ -28,6 +26,8 @@ from .TType import TType
 
 _INTEGER_NAME: str = "Integer"
 
+from ..validation.ValidateInteger import validate_integer
+
 
 class TInteger(TType):
 
@@ -36,7 +36,6 @@ class TInteger(TType):
 
     def validate(self, value: object,
                  type_parameters: list['TTypeDeclaration'], ctx: 'ValidateContext') -> list['ValidationFailure']:
-        from ..validation.ValidateInteger import validate_integer
         return validate_integer(value)
 
     def generate_random_value(self, blueprint_value: object, use_blueprint_value: bool, type_parameters: list['TTypeDeclaration'], ctx: 'GenerateContext') -> object:
