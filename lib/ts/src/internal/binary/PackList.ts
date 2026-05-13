@@ -21,6 +21,7 @@ import { CannotPack } from './CannotPack.js';
 import { addExtension } from 'msgpackr';
 
 const PACKED_BYTE = 17;
+const EMPTY_BUFFER = Buffer.alloc(0);
 
 export class MsgpackPacked {
     toString() {
@@ -32,10 +33,10 @@ const MSGPACK_PACKED_EXT = {
     Class: MsgpackPacked,
     type: PACKED_BYTE,
     pack(instance: MsgpackPacked) {
-        return Buffer.from([]);
+        return EMPTY_BUFFER;
     },
     unpack(buffer: Buffer) {
-        return new MsgpackPacked();
+        return MSGPACK_PACKED_VALUE;
     },
 };
 addExtension(MSGPACK_PACKED_EXT);
