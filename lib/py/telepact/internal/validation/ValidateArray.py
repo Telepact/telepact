@@ -26,28 +26,26 @@ if TYPE_CHECKING:
 
 def validate_array(value: object,
                    type_parameters: list['TTypeDeclaration'], ctx: 'ValidateContext') -> list['ValidationFailure']:
-    if isinstance(value, list):
-        nested_type_declaration = type_parameters[0]
-
-        validation_failures = []
-        for i, element in enumerate(value):
-            ctx.path.append("*")
-
-            nested_validation_failures = nested_type_declaration.validate(
-                element, ctx)
-            index = i
-
-            ctx.path.pop()
-
-            nested_validation_failures_with_path = []
-            for f in nested_validation_failures:
-                final_path = [index] + f.path
-
-                nested_validation_failures_with_path.append(
-                    ValidationFailure(final_path, f.reason, f.data))
-
-            validation_failures.extend(nested_validation_failures_with_path)
-
-        return validation_failures
-    else:
+    if type(value) is not list and not isinstance(value, list):
         return get_type_unexpected_validation_failure([], value, _ARRAY_NAME)
+
+    nested_type_declaration = type_parameters[0]
+
+    validation_failures = []
+    for i, element in enumerate(value):
+        ctx.path.append("*")
+
+        nested_validation_failures = nested_type_declaration.validate(
+            element, ctx)
+        index = i
+
+        ctx.path.pop()
+
+        if not nested_validation_failures:
+            continue
+
+        for f in nested_validation_failures:
+            validation_failures.append(
+                ValidationFailure([index] + f.path, f.reason, f.data))
+
+    return validation_failures

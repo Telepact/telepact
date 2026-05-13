@@ -28,9 +28,9 @@ if TYPE_CHECKING:
 
 def validate_struct(value: object,
                     name: str, fields: dict[str, 'TFieldDeclaration'], ctx: 'ValidateContext') -> list['ValidationFailure']:
-    if isinstance(value, dict):
-        selected_fields = cast(
-            list[str], ctx.select.get(name) if ctx.select else None)
-        return validate_struct_fields(fields, selected_fields, value, ctx)
-    else:
+    if type(value) is not dict and not isinstance(value, dict):
         return get_type_unexpected_validation_failure([], value, _STRUCT_NAME)
+
+    selected_fields = cast(
+        list[str], ctx.select.get(name) if ctx.select else None)
+    return validate_struct_fields(fields, selected_fields, value, ctx)
