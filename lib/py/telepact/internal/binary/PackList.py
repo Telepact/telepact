@@ -26,10 +26,15 @@ if TYPE_CHECKING:
 
 PACKED_BYTE = 17
 PACKED_EXT = ExtType(PACKED_BYTE, b'')
+_PACK = None
 
 
 def pack_list(lst: list[object]) -> list[object]:
-    from .Pack import pack
+    global _PACK
+    if _PACK is None:
+        from .Pack import pack as _pack
+        _PACK = _pack
+    pack = _PACK
 
     if not lst:
         return lst

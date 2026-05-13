@@ -14,10 +14,12 @@
 #|  limitations under the License.
 #|
 
+from .PackList import pack_list
+
+
 def pack(value: object) -> object:
     value_type = type(value)
     if value_type is list:
-        from .PackList import pack_list
         return pack_list(value)
     if value_type is dict:
         new_map = {}

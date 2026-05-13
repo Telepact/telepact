@@ -18,11 +18,16 @@ from typing import cast
 from msgpack import ExtType
 
 from ...internal.binary.PackList import PACKED_BYTE
+from ...internal.binary.UnpackMap import unpack_map
+_UNPACK = None
 
 
 def unpack_list(lst: list[object]) -> list[object]:
-    from ...internal.binary.Unpack import unpack
-    from ...internal.binary.UnpackMap import unpack_map
+    global _UNPACK
+    if _UNPACK is None:
+        from ...internal.binary.Unpack import unpack as _unpack
+        _UNPACK = _unpack
+    unpack = _UNPACK
 
     if not lst:
         return lst

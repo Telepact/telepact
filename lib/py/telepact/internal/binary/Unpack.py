@@ -14,10 +14,12 @@
 #|  limitations under the License.
 #|
 
+from .UnpackList import unpack_list
+
+
 def unpack(value: object) -> object:
     value_type = type(value)
     if value_type is list:
-        from .UnpackList import unpack_list
         return unpack_list(value)
     if value_type is dict:
         new_dict = {}

@@ -18,13 +18,18 @@ from msgpack import ExtType
 from typing import cast
 
 from ...internal.binary.PackMap import UNDEFINED_BYTE
+_UNPACK = None
 
 
 def unpack_map(row: list[object], header: list[object]) -> dict[int, object]:
-    from .Unpack import unpack
+    global _UNPACK
+    if _UNPACK is None:
+        from .Unpack import unpack as _unpack
+        _UNPACK = _unpack
+    unpack = _UNPACK
 
     final_map: dict[int, object] = {}
-    row_length = len(row)
+    row_length = min(len(row), len(header) - 1)
 
     for index in range(row_length):
         value = row[index]

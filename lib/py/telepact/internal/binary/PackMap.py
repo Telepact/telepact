@@ -23,10 +23,15 @@ from .CannotPack import CannotPack
 
 UNDEFINED_BYTE = 18
 UNDEFINED_EXT = ExtType(UNDEFINED_BYTE, b'')
+_PACK = None
 
 
 def pack_map(m: dict[object, object], header: list[object], key_index_map: dict[int, 'BinaryPackNode']) -> list[object]:
-    from .Pack import pack
+    global _PACK
+    if _PACK is None:
+        from .Pack import pack as _pack
+        _PACK = _pack
+    pack = _PACK
 
     row: list[object] = [UNDEFINED_EXT] * (len(header) - 1)
     header_append = header.append
