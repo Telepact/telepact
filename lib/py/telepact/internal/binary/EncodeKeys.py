@@ -39,7 +39,8 @@ def _try_encode_flat_dict_list(value: list[object], encode_map_get) -> list[obje
             item_value_type = type(item_value)
             if item_value_type is dict or item_value_type is list:
                 return None
-            encoded_item[encode_map_get(key, key)] = item_value
+            encoded_key = encode_map_get(key, key)
+            encoded_item[encoded_key] = item_value
 
         encoded_list_append(encoded_item)
 
