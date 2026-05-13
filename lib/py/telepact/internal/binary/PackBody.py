@@ -18,7 +18,4 @@ from .Pack import pack
 
 
 def pack_body(body: dict[object, object]) -> dict[object, object]:
-    packed: dict[object, object] = {}
-    for key, value in body.items():
-        packed[key] = pack(value)
-    return packed
+    return {key: pack(value) for key, value in body.items()}

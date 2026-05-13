@@ -20,7 +20,6 @@ from ...internal.validation.GetTypeUnexpectedValidationFailure import get_type_u
 
 
 def validate_string(value: object) -> list['ValidationFailure']:
-    if isinstance(value, str):
+    if type(value) is str:
         return []
-    else:
-        return get_type_unexpected_validation_failure([], value, _STRING_NAME)
+    return get_type_unexpected_validation_failure([], value, _STRING_NAME)

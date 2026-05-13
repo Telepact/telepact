@@ -22,7 +22,6 @@ if TYPE_CHECKING:
 
 def encode_keys(given: object, binary_encoding: 'BinaryEncoding') -> object:
     encode_map = binary_encoding.encode_map
-    encode_map_get = encode_map.get
 
     def encode_keys_recursive(value: object) -> object:
         if value is None:
@@ -31,16 +30,12 @@ def encode_keys(given: object, binary_encoding: 'BinaryEncoding') -> object:
         value_type = type(value)
 
         if value_type is dict:
-            encoded: dict[object, object] = {}
-            for key, item in value.items():
-                encoded[encode_map_get(key, key)] = encode_keys_recursive(item)
-            return encoded
+            return {
+                encode_map.get(key, key): encode_keys_recursive(item)
+                for key, item in value.items()
+            }
         if value_type is list:
-            lst = value
-            encoded_list: list[object] = [None] * len(lst)
-            for index, item in enumerate(lst):
-                encoded_list[index] = encode_keys_recursive(item)
-            return encoded_list
+            return [encode_keys_recursive(item) for item in value]
         return value
 
     return encode_keys_recursive(given)
