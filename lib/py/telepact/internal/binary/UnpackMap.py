@@ -37,9 +37,9 @@ def unpack_map(row: list[object], header: list[object]) -> dict[int, object]:
     unpack = _get_unpack()
 
     final_map: dict[int, object] = {}
-    row_length = min(len(row), len(header) - 1)
+    header_entry_count = len(header) - 1
 
-    for index in range(row_length):
+    for index in range(min(len(row), header_entry_count)):
         value = row[index]
         if type(value) is ExtType and value.code == UNDEFINED_BYTE:
             continue

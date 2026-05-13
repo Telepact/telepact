@@ -15,7 +15,6 @@
 #|
 
 from typing import TYPE_CHECKING
-
 if TYPE_CHECKING:
     from ..validation.ValidateContext import ValidateContext
     from ...RandomGenerator import RandomGenerator
