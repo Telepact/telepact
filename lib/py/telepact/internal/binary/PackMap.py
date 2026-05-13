@@ -15,6 +15,7 @@
 #|
 
 from typing import TYPE_CHECKING, cast
+from threading import Lock
 from msgpack import ExtType
 
 from ...internal.binary.BinaryPackNode import BinaryPackNode
@@ -24,14 +25,21 @@ from .CannotPack import CannotPack
 UNDEFINED_BYTE = 18
 UNDEFINED_EXT = ExtType(UNDEFINED_BYTE, b'')
 _PACK = None
+_PACK_LOCK = Lock()
+
+
+def _get_pack():
+    global _PACK
+    if _PACK is None:
+        with _PACK_LOCK:
+            if _PACK is None:
+                from .Pack import pack as _pack
+                _PACK = _pack
+    return _PACK
 
 
 def pack_map(m: dict[object, object], header: list[object], key_index_map: dict[int, 'BinaryPackNode']) -> list[object]:
-    global _PACK
-    if _PACK is None:
-        from .Pack import pack as _pack
-        _PACK = _pack
-    pack = _PACK
+    pack = _get_pack()
 
     row: list[object] = [UNDEFINED_EXT] * (len(header) - 1)
     header_append = header.append

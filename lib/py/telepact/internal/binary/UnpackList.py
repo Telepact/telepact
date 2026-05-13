@@ -16,18 +16,26 @@
 
 from typing import cast
 from msgpack import ExtType
+from threading import Lock
 
 from ...internal.binary.PackList import PACKED_BYTE
 from ...internal.binary.UnpackMap import unpack_map
 _UNPACK = None
+_UNPACK_LOCK = Lock()
+
+
+def _get_unpack():
+    global _UNPACK
+    if _UNPACK is None:
+        with _UNPACK_LOCK:
+            if _UNPACK is None:
+                from ...internal.binary.Unpack import unpack as _unpack
+                _UNPACK = _unpack
+    return _UNPACK
 
 
 def unpack_list(lst: list[object]) -> list[object]:
-    global _UNPACK
-    if _UNPACK is None:
-        from ...internal.binary.Unpack import unpack as _unpack
-        _UNPACK = _unpack
-    unpack = _UNPACK
+    unpack = _get_unpack()
 
     if not lst:
         return lst

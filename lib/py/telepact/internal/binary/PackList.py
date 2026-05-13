@@ -15,6 +15,7 @@
 #|
 
 from typing import TYPE_CHECKING
+from threading import Lock
 
 from msgpack import ExtType
 from .CannotPack import CannotPack
@@ -27,14 +28,21 @@ if TYPE_CHECKING:
 PACKED_BYTE = 17
 PACKED_EXT = ExtType(PACKED_BYTE, b'')
 _PACK = None
+_PACK_LOCK = Lock()
+
+
+def _get_pack():
+    global _PACK
+    if _PACK is None:
+        with _PACK_LOCK:
+            if _PACK is None:
+                from .Pack import pack as _pack
+                _PACK = _pack
+    return _PACK
 
 
 def pack_list(lst: list[object]) -> list[object]:
-    global _PACK
-    if _PACK is None:
-        from .Pack import pack as _pack
-        _PACK = _pack
-    pack = _PACK
+    pack = _get_pack()
 
     if not lst:
         return lst

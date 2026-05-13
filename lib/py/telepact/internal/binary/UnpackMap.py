@@ -16,17 +16,25 @@
 
 from msgpack import ExtType
 from typing import cast
+from threading import Lock
 
 from ...internal.binary.PackMap import UNDEFINED_BYTE
 _UNPACK = None
+_UNPACK_LOCK = Lock()
+
+
+def _get_unpack():
+    global _UNPACK
+    if _UNPACK is None:
+        with _UNPACK_LOCK:
+            if _UNPACK is None:
+                from .Unpack import unpack as _unpack
+                _UNPACK = _unpack
+    return _UNPACK
 
 
 def unpack_map(row: list[object], header: list[object]) -> dict[int, object]:
-    global _UNPACK
-    if _UNPACK is None:
-        from .Unpack import unpack as _unpack
-        _UNPACK = _unpack
-    unpack = _UNPACK
+    unpack = _get_unpack()
 
     final_map: dict[int, object] = {}
     row_length = min(len(row), len(header) - 1)
