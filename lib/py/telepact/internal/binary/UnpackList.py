@@ -18,15 +18,17 @@ from typing import cast
 from msgpack import ExtType
 
 from ...internal.binary.PackList import PACKED_BYTE
-from ...internal.binary.Unpack import unpack
-from ...internal.binary.UnpackMap import unpack_map
 
 
 def unpack_list(lst: list[object]) -> list[object]:
+    from ...internal.binary.Unpack import unpack
+    from ...internal.binary.UnpackMap import unpack_map
+
     if not lst:
         return lst
 
-    if not isinstance(lst[0], ExtType) or lst[0].code != PACKED_BYTE:
+    first_item = lst[0]
+    if type(first_item) is not ExtType or first_item.code != PACKED_BYTE:
         new_lst = []
         for item in lst:
             new_lst.append(unpack(item))

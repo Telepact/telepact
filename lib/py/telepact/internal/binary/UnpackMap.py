@@ -21,25 +21,28 @@ from ...internal.binary.PackMap import UNDEFINED_BYTE
 
 
 def unpack_map(row: list[object], header: list[object]) -> dict[int, object]:
-    from ...internal.binary.Unpack import unpack
+    from .Unpack import unpack
 
     final_map: dict[int, object] = {}
+    row_length = len(row)
 
-    for key, value in zip(header[1:], row):
-
-        if isinstance(value, ExtType) and value.code == UNDEFINED_BYTE:
+    for index in range(row_length):
+        value = row[index]
+        if type(value) is ExtType and value.code == UNDEFINED_BYTE:
             continue
 
-        if isinstance(key, list):
-            nested_header = key
+        key = header[index + 1]
+        if type(key) is list:
+            nested_header = cast(list[object], key)
             nested_row = cast(list[object], value)
             m = unpack_map(nested_row, nested_header)
             i = nested_header[0]
 
             final_map[i] = m
         else:
-            i = key
-            if isinstance(value, (dict, list)):
+            i = cast(int, key)
+            value_type = type(value)
+            if value_type is dict or value_type is list:
                 unpacked_value = unpack(value)
             else:
                 unpacked_value = value

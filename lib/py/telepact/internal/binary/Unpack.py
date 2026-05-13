@@ -15,14 +15,13 @@
 #|
 
 def unpack(value: object) -> object:
-    from ...internal.binary.UnpackList import unpack_list
-
-    if isinstance(value, list):
+    value_type = type(value)
+    if value_type is list:
+        from .UnpackList import unpack_list
         return unpack_list(value)
-    elif isinstance(value, dict):
+    if value_type is dict:
         new_dict = {}
         for key, val in value.items():
             new_dict[key] = unpack(val)
         return new_dict
-    else:
-        return value
+    return value

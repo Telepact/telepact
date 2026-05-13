@@ -18,6 +18,7 @@ from typing import TYPE_CHECKING, cast
 from msgpack import ExtType
 
 from ...internal.binary.BinaryPackNode import BinaryPackNode
+from .CannotPack import CannotPack
 
 
 UNDEFINED_BYTE = 18
@@ -25,49 +26,53 @@ UNDEFINED_EXT = ExtType(UNDEFINED_BYTE, b'')
 
 
 def pack_map(m: dict[object, object], header: list[object], key_index_map: dict[int, 'BinaryPackNode']) -> list[object]:
-    from ...internal.binary.CannotPack import CannotPack
-    from ...internal.binary.Pack import pack
+    from .Pack import pack
 
     row: list[object] = [UNDEFINED_EXT] * (len(header) - 1)
+    header_append = header.append
+    row_append = row.append
+    key_index_map_get = key_index_map.get
+
     for key, value in m.items():
-        if isinstance(key, str):
+        if type(key) is str:
             raise CannotPack()
 
         key = cast(int, key)
-        key_index = key_index_map.get(key)
+        key_index = key_index_map_get(key)
 
         if key_index is None:
             final_key_index = BinaryPackNode(len(header) - 1, {})
 
-            if isinstance(value, dict):
-                header.append([key])
+            if type(value) is dict:
+                header_append([key])
             else:
-                header.append(key)
+                header_append(key)
 
             key_index_map[key] = final_key_index
-            row.append(UNDEFINED_EXT)
+            row_append(UNDEFINED_EXT)
         else:
             final_key_index = key_index
 
         key_index_value = final_key_index.value
         key_index_nested = final_key_index.nested
+        header_value = header[key_index_value + 1]
 
         packed_value: object
 
-        if isinstance(value, dict):
+        if type(value) is dict:
             try:
-                nested_header = header[key_index_value + 1]
-                if not isinstance(nested_header, list):
+                if type(header_value) is not list:
                     raise TypeError()
+                nested_header = cast(list[object], header_value)
             except (IndexError, TypeError):
                 raise CannotPack()
 
             packed_value = pack_map(value, nested_header, key_index_nested)
         else:
-            if isinstance(header[key_index_value + 1], list):
+            if type(header_value) is list:
                 raise CannotPack()
 
-            if isinstance(value, list):
+            if type(value) is list:
                 packed_value = pack(value)
             else:
                 packed_value = value

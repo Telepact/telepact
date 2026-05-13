@@ -27,6 +27,8 @@ if TYPE_CHECKING:
 
 _UNION_NAME: str = "Object"
 
+from ..validation.ValidateUnion import validate_union
+
 
 class TUnion(TType):
 
@@ -39,7 +41,6 @@ class TUnion(TType):
         return 0
 
     def validate(self, value: object, type_parameters: list['TTypeDeclaration'], ctx: 'ValidateContext') -> list['ValidationFailure']:
-        from ..validation.ValidateUnion import validate_union
         return validate_union(value, self.name, self.tags, ctx)
 
     def generate_random_value(self, blueprint_value: object, use_blueprint_value: bool, type_parameters: list['TTypeDeclaration'], ctx: 'GenerateContext') -> object:

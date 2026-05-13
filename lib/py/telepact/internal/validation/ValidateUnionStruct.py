@@ -16,6 +16,7 @@
 
 from typing import TYPE_CHECKING, cast
 from ...internal.validation.ValidationFailure import ValidationFailure
+from ...internal.validation.ValidateStructFields import validate_struct_fields
 
 if TYPE_CHECKING:
     from ...internal.validation.ValidateContext import ValidateContext
@@ -32,7 +33,6 @@ def validate_union_struct(
 ) -> list['ValidationFailure']:
     selected_fields = cast(list[str], selected_tags.get(
         union_tag)) if selected_tags else None
-    from ...internal.validation.ValidateStructFields import validate_struct_fields
 
     ctx.path.append(union_tag)
 

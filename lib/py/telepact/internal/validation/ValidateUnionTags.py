@@ -16,6 +16,8 @@
 
 from typing import TYPE_CHECKING, cast
 from ...internal.validation.ValidationFailure import ValidationFailure
+from ...internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
+from ...internal.validation.ValidateUnionStruct import validate_union_struct
 
 if TYPE_CHECKING:
     from ...internal.validation.ValidateContext import ValidateContext
@@ -24,10 +26,7 @@ if TYPE_CHECKING:
 
 
 def validate_union_tags(reference_tags: dict[str, 'TStruct'], selected_tags: dict[str, object],
-                        actual: dict[object, object], ctx: 'ValidateContext') -> list['ValidationFailure']:
-    from ...internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
-    from ...internal.validation.ValidateUnionStruct import validate_union_struct
-
+                         actual: dict[object, object], ctx: 'ValidateContext') -> list['ValidationFailure']:
     if len(actual) != 1:
         return [
             ValidationFailure([], "ObjectSizeUnexpected", {

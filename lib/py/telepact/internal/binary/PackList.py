@@ -17,18 +17,19 @@
 from typing import TYPE_CHECKING
 
 from msgpack import ExtType
+from .CannotPack import CannotPack
+from .PackMap import pack_map
 
 if TYPE_CHECKING:
     from ...internal.binary.BinaryPackNode import BinaryPackNode
 
 
 PACKED_BYTE = 17
+PACKED_EXT = ExtType(PACKED_BYTE, b'')
 
 
 def pack_list(lst: list[object]) -> list[object]:
-    from ...internal.binary.Pack import pack
-    from ...internal.binary.PackMap import pack_map
-    from ...internal.binary.CannotPack import CannotPack
+    from .Pack import pack
 
     if not lst:
         return lst
@@ -36,7 +37,7 @@ def pack_list(lst: list[object]) -> list[object]:
     packed_list: list[object] = []
     header: list[object] = []
 
-    packed_list.append(ExtType(PACKED_BYTE, b''))
+    packed_list.append(PACKED_EXT)
 
     header.append(None)
 
@@ -45,7 +46,7 @@ def pack_list(lst: list[object]) -> list[object]:
     key_index_map: dict[int, BinaryPackNode] = {}
     try:
         for item in lst:
-            if isinstance(item, dict):
+            if type(item) is dict:
                 row = pack_map(item, header, key_index_map)
                 packed_list.append(row)
             else:
