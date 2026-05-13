@@ -19,6 +19,7 @@ from threading import Lock
 
 from msgpack import ExtType
 from .CannotPack import CannotPack
+from .PackMap import UNDEFINED_EXT
 from .PackMap import pack_map
 
 if TYPE_CHECKING:
