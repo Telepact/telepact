@@ -20,7 +20,7 @@ import { pack } from './Pack.js';
 import { addExtension } from 'msgpackr';
 
 const UNDEFINED_BYTE = 18;
-const EMPTY_BUFFER = Buffer.alloc(0);
+const EMPTY_BUFFER = new Uint8Array(0);
 export class MsgpackUndefined {
     toString() {
         return 'UNDEFINED';
@@ -33,7 +33,7 @@ const MSGPACK_UNDEFINED_EXT = {
     pack(instance: MsgpackUndefined) {
         return EMPTY_BUFFER;
     },
-    unpack(buffer: Buffer) {
+    unpack(buffer: Uint8Array) {
         return MSGPACK_UNDEFINED_VALUE;
     },
 };
