@@ -21,19 +21,25 @@ export function convertMapsToObjects(value: any): any {
             newObj[key] = convertMapsToObjects(val);
         }
         return newObj;
-    } else if (Array.isArray(value)) {
-        const newList: any[] = [];
-        for (const val of value) {
-            const newVal = convertMapsToObjects(val);
-            newList.push(newVal);
+    }
+
+    if (Array.isArray(value)) {
+        const newList = new Array(value.length);
+        for (let index = 0; index < value.length; index += 1) {
+            newList[index] = convertMapsToObjects(value[index]);
         }
         return newList;
-    } else if (typeof value == 'object' && value !== null) {
-        const newObj: Record<string, any> = {};
-        for (const [key, val] of Object.entries(value)) {
-            newObj[key] = convertMapsToObjects(val);
-        }
-    } else {
-        return value;
     }
+
+    if (typeof value === 'object' && value !== null) {
+        const newObj: Record<string, any> = {};
+        for (const key in value) {
+            if (Object.prototype.hasOwnProperty.call(value, key)) {
+                newObj[key] = convertMapsToObjects(value[key]);
+            }
+        }
+        return newObj;
+    }
+
+    return value;
 }

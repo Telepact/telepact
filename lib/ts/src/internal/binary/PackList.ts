@@ -21,20 +21,22 @@ import { CannotPack } from './CannotPack.js';
 import { addExtension } from 'msgpackr';
 
 const PACKED_BYTE = 17;
+const EMPTY_BUFFER = new Uint8Array(0);
 
 export class MsgpackPacked {
     toString() {
         return 'PACKED';
     }
 }
+const MSGPACK_PACKED_VALUE = new MsgpackPacked();
 const MSGPACK_PACKED_EXT = {
     Class: MsgpackPacked,
     type: PACKED_BYTE,
     pack(instance: MsgpackPacked) {
-        return Buffer.from([]);
+        return EMPTY_BUFFER;
     },
-    unpack(buffer: Buffer) {
-        return new MsgpackPacked();
+    unpack(buffer: Uint8Array) {
+        return MSGPACK_PACKED_VALUE;
     },
 };
 addExtension(MSGPACK_PACKED_EXT);
@@ -47,7 +49,7 @@ export function packList(list: any[]): any[] {
     const packedList: any[] = [];
     const header: any[] = [];
 
-    packedList.push(new MsgpackPacked());
+    packedList.push(MSGPACK_PACKED_VALUE);
 
     header.push(null);
 

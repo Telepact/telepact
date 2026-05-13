@@ -20,19 +20,21 @@ import { pack } from './Pack.js';
 import { addExtension } from 'msgpackr';
 
 const UNDEFINED_BYTE = 18;
+const EMPTY_BUFFER = new Uint8Array(0);
 export class MsgpackUndefined {
     toString() {
         return 'UNDEFINED';
     }
 }
+export const MSGPACK_UNDEFINED_VALUE = new MsgpackUndefined();
 const MSGPACK_UNDEFINED_EXT = {
     Class: MsgpackUndefined,
     type: UNDEFINED_BYTE,
     pack(instance: MsgpackUndefined) {
-        return Buffer.from([]);
+        return EMPTY_BUFFER;
     },
-    unpack(buffer: Buffer) {
-        return new MsgpackUndefined();
+    unpack(buffer: Uint8Array) {
+        return MSGPACK_UNDEFINED_VALUE;
     },
 };
 addExtension(MSGPACK_UNDEFINED_EXT);
@@ -81,7 +83,7 @@ export function packMap(m: Map<any, any>, header: any[], keyIndexMap: Map<number
         }
 
         while (row.length < keyIndexValue) {
-            row.push(new MsgpackUndefined());
+            row.push(MSGPACK_UNDEFINED_VALUE);
         }
 
         if (row.length === keyIndexValue) {
