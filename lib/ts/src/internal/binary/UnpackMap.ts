@@ -35,8 +35,7 @@ export function unpackMap(row: any[], header: any[]): Map<any, any> {
             const i = nestedHeader[0] as number;
             finalMap.set(i, m);
         } else {
-            const unpackedValue = unpack(value);
-            finalMap.set(key, unpackedValue);
+            finalMap.set(key, unpack(value));
         }
     }
 

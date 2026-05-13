@@ -27,6 +27,7 @@ export class MsgpackPacked {
         return 'PACKED';
     }
 }
+const MSGPACK_PACKED_VALUE = new MsgpackPacked();
 const MSGPACK_PACKED_EXT = {
     Class: MsgpackPacked,
     type: PACKED_BYTE,
@@ -47,7 +48,7 @@ export function packList(list: any[]): any[] {
     const packedList: any[] = [];
     const header: any[] = [];
 
-    packedList.push(new MsgpackPacked());
+    packedList.push(MSGPACK_PACKED_VALUE);
 
     header.push(null);
 

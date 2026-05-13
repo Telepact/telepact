@@ -25,6 +25,7 @@ export class MsgpackUndefined {
         return 'UNDEFINED';
     }
 }
+export const MSGPACK_UNDEFINED_VALUE = new MsgpackUndefined();
 const MSGPACK_UNDEFINED_EXT = {
     Class: MsgpackUndefined,
     type: UNDEFINED_BYTE,
@@ -81,7 +82,7 @@ export function packMap(m: Map<any, any>, header: any[], keyIndexMap: Map<number
         }
 
         while (row.length < keyIndexValue) {
-            row.push(new MsgpackUndefined());
+            row.push(MSGPACK_UNDEFINED_VALUE);
         }
 
         if (row.length === keyIndexValue) {

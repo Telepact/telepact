@@ -18,24 +18,25 @@ import { BinaryEncoding } from '../../internal/binary/BinaryEncoding.js';
 import { BinaryEncodingMissing } from '../../internal/binary/BinaryEncodingMissing.js';
 
 export function decodeKeys(given: any, binaryEncoder: BinaryEncoding): any {
+    if (Array.isArray(given)) {
+        const result = new Array(given.length);
+        for (let index = 0; index < given.length; index += 1) {
+            result[index] = decodeKeys(given[index], binaryEncoder);
+        }
+        return result;
+    }
+
     if (given instanceof Map) {
         const newMap: { [key: string]: any } = {};
-
         for (const [key, value] of given.entries()) {
             const finalKey = typeof key === 'string' ? key : binaryEncoder.decodeMap.get(key);
-
             if (finalKey === undefined) {
                 throw new BinaryEncodingMissing(key);
             }
-
-            const decodedValue = decodeKeys(value, binaryEncoder);
-            newMap[finalKey] = decodedValue;
+            newMap[finalKey] = decodeKeys(value, binaryEncoder);
         }
-
         return newMap;
-    } else if (Array.isArray(given)) {
-        return given.map((value) => decodeKeys(value, binaryEncoder));
-    } else {
-        return given;
     }
+
+    return given;
 }

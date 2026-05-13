@@ -24,21 +24,19 @@ export function unpackList(list: any[]): any[] {
     }
 
     if (!(list[0] instanceof MsgpackPacked)) {
-        const newList: any[] = [];
-        for (const e of list) {
-            newList.push(unpack(e));
+        const newList = new Array(list.length);
+        for (let index = 0; index < list.length; index += 1) {
+            newList[index] = unpack(list[index]);
         }
         return newList;
     }
 
-    const unpackedList: any[] = [];
+    const unpackedList = new Array(list.length - 2);
     const headers: any[] = list[1];
 
     for (let i = 2; i < list.length; i += 1) {
         const row: any[] = list[i];
-        const m = unpackMap(row, headers);
-
-        unpackedList.push(m);
+        unpackedList[i - 2] = unpackMap(row, headers);
     }
 
     return unpackedList;
