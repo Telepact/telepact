@@ -26,7 +26,7 @@ if TYPE_CHECKING:
 
 def validate_array(value: object,
                    type_parameters: list['TTypeDeclaration'], ctx: 'ValidateContext') -> list['ValidationFailure']:
-    if type(value) is list:
+    if type(value) is list or isinstance(value, list):
         nested_type_declaration = type_parameters[0]
 
         validation_failures = []
