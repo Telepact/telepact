@@ -41,7 +41,55 @@ def _get_pack():
     return _PACK
 
 
+def _try_pack_flat_map_list(lst: list[object]) -> list[object] | None:
+    if not lst:
+        return lst
+
+    first_item = lst[0]
+    if type(first_item) is not dict:
+        return None
+
+    header: list[object] = [None]
+    key_index_map: dict[object, int] = {}
+    for index, (key, value) in enumerate(first_item.items()):
+        if type(key) is str:
+            return None
+        value_type = type(value)
+        if value_type is dict or value_type is list:
+            return None
+        header.append(key)
+        key_index_map[key] = index
+
+    packed_list: list[object] = [PACKED_EXT, header]
+    packed_list_append = packed_list.append
+    row_width = len(header) - 1
+
+    for item in lst:
+        if type(item) is not dict:
+            return None
+
+        row: list[object] = [UNDEFINED_EXT] * row_width
+        for key, value in item.items():
+            if type(key) is str:
+                return None
+            key_index = key_index_map.get(key)
+            if key_index is None:
+                return None
+            value_type = type(value)
+            if value_type is dict or value_type is list:
+                return None
+            row[key_index] = value
+
+        packed_list_append(row)
+
+    return packed_list
+
+
 def pack_list(lst: list[object]) -> list[object]:
+    packed_flat_map_list = _try_pack_flat_map_list(lst)
+    if packed_flat_map_list is not None:
+        return packed_flat_map_list
+
     pack = _get_pack()
 
     if not lst:

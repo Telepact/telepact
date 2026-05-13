@@ -19,6 +19,7 @@ from msgpack import ExtType
 from threading import Lock
 
 from ...internal.binary.PackList import PACKED_BYTE
+from ...internal.binary.PackMap import UNDEFINED_BYTE
 from ...internal.binary.UnpackMap import unpack_map
 _UNPACK = None
 _UNPACK_LOCK = Lock()
@@ -34,7 +35,54 @@ def _get_unpack():
     return _UNPACK
 
 
+def _try_unpack_flat_map_list(lst: list[object]) -> list[object] | None:
+    if not lst:
+        return lst
+
+    first_item = lst[0]
+    if type(first_item) is not ExtType or first_item.code != PACKED_BYTE:
+        return None
+
+    headers = cast(list[object], lst[1])
+    flat_keys: list[int] = []
+    for key in headers[1:]:
+        if type(key) is list:
+            return None
+        flat_keys.append(cast(int, key))
+
+    unpacked_lst: list[object] = []
+    unpacked_lst_append = unpacked_lst.append
+    key_count = len(flat_keys)
+
+    for i in range(2, len(lst)):
+        row = lst[i]
+        if type(row) is not list:
+            return None
+
+        unpacked_item: dict[int, object] = {}
+        row = cast(list[object], row)
+        row_count = min(len(row), key_count)
+        for index in range(row_count):
+            value = row[index]
+            if type(value) is ExtType:
+                if value.code == UNDEFINED_BYTE:
+                    continue
+                return None
+            value_type = type(value)
+            if value_type is dict or value_type is list:
+                return None
+            unpacked_item[flat_keys[index]] = value
+
+        unpacked_lst_append(unpacked_item)
+
+    return unpacked_lst
+
+
 def unpack_list(lst: list[object]) -> list[object]:
+    unpacked_flat_map_list = _try_unpack_flat_map_list(lst)
+    if unpacked_flat_map_list is not None:
+        return unpacked_flat_map_list
+
     unpack = _get_unpack()
 
     if not lst:
