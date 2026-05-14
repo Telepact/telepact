@@ -22,6 +22,7 @@ import { TStruct } from '../types/TStruct.js';
 import { TArray } from '../types/TArray.js';
 import { TObject } from '../types/TObject.js';
 import { TTypeDeclaration } from '../types/TTypeDeclaration.js';
+import { BinarySchemaPlan } from './BinarySchemaPlan.js';
 
 function traceType(typeDeclaration: TTypeDeclaration): string[] {
     const thisAllKeys: string[] = [];
@@ -90,5 +91,12 @@ export function constructBinaryEncoding(telepactSchema: TelepactSchema): BinaryE
     const finalString = sortedAllKeys.join('\n');
     const checksum = createChecksum(finalString);
 
-    return new BinaryEncoding(binaryEncoding, checksum);
+    const decodeList: [number, string][] = [...binaryEncoding.entries()].map((e: [string, number]) => [
+        e[1],
+        e[0],
+    ]);
+    const decodeMap = new Map(decodeList);
+    const schemaPlan = BinarySchemaPlan.compile(telepactSchema, binaryEncoding, decodeMap);
+
+    return new BinaryEncoding(binaryEncoding, checksum, schemaPlan);
 }

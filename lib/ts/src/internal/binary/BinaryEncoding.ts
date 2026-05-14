@@ -14,12 +14,15 @@
 //|  limitations under the License.
 //|
 
+import { BinarySchemaPlan } from './BinarySchemaPlan.js';
+
 export class BinaryEncoding {
     public readonly encodeMap: Map<string, number>;
     public readonly decodeMap: Map<number, string>;
     public readonly checksum: number;
+    public readonly schemaPlan: BinarySchemaPlan | undefined;
 
-    constructor(binaryEncodingMap: Map<string, number>, checksum: number) {
+    constructor(binaryEncodingMap: Map<string, number>, checksum: number, schemaPlan?: BinarySchemaPlan) {
         this.encodeMap = binaryEncodingMap;
         const decodeList: [number, string][] = [...binaryEncodingMap.entries()].map((e: [string, number]) => [
             e[1],
@@ -27,5 +30,6 @@ export class BinaryEncoding {
         ]);
         this.decodeMap = new Map(decodeList);
         this.checksum = checksum;
+        this.schemaPlan = schemaPlan;
     }
 }
