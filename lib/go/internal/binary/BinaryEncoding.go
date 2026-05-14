@@ -55,10 +55,3 @@ func NewBinaryEncoding(binaryEncodingMap map[string]int, checksum int) *BinaryEn
 		Checksum:    checksum,
 	}
 }
-
-func (e *BinaryEncoding) decodeKey(key int) (string, bool) {
-	if e == nil || key < 0 || key >= len(e.DecodeTable) {
-		return "", false
-	}
-	return e.DecodeTable[key], true
-}

@@ -44,11 +44,4 @@ public class BinaryEncoding {
         }
         this.checksum = checksum;
     }
-
-    String decodeKey(int key) {
-        if (key < 0 || key >= this.decodeTable.length) {
-            return null;
-        }
-        return this.decodeTable[key];
-    }
 }

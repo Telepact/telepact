@@ -30,11 +30,12 @@ public class DecodeKeys {
                 if (e.getKey() instanceof final String s) {
                     key = s;
                 } else if (e.getKey() instanceof final Number n) {
-                    key = binaryEncoder.decodeKey(n.intValue());
+                    try {
+                        key = binaryEncoder.decodeTable[n.intValue()];
+                    } catch (RuntimeException ex) {
+                        throw new BinaryEncodingMissing(e.getKey());
+                    }
                 } else {
-                    throw new BinaryEncodingMissing(e.getKey());
-                }
-                if (key == null) {
                     throw new BinaryEncodingMissing(e.getKey());
                 }
                 final var encodedValue = decodeKeys(e.getValue(), binaryEncoder);

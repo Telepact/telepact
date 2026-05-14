@@ -30,9 +30,6 @@ export function decodeKeys(given: any, binaryEncoder: BinaryEncoding): any {
         const newMap: { [key: string]: any } = {};
         for (const [key, value] of given.entries()) {
             const finalKey = typeof key === 'string' ? key : decodeIntegerKey(key, binaryEncoder);
-            if (finalKey === undefined) {
-                throw new BinaryEncodingMissing(key);
-            }
             newMap[finalKey] = decodeKeys(value, binaryEncoder);
         }
         return newMap;
@@ -41,13 +38,10 @@ export function decodeKeys(given: any, binaryEncoder: BinaryEncoding): any {
     return given;
 }
 
-function decodeIntegerKey(key: unknown, binaryEncoder: BinaryEncoding): string | undefined {
-    if (!Number.isInteger(key)) {
-        return undefined;
+function decodeIntegerKey(key: unknown, binaryEncoder: BinaryEncoding): string {
+    try {
+        return binaryEncoder.decodeTable[key as number].toString();
+    } catch {
+        throw new BinaryEncodingMissing(key as object);
     }
-    const keyId = key as number;
-    if (keyId < 0 || keyId >= binaryEncoder.decodeTable.length) {
-        return undefined;
-    }
-    return binaryEncoder.decodeTable[keyId];
 }
