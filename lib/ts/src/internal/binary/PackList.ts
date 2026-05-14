@@ -39,20 +39,38 @@ const MSGPACK_PACKED_EXT = {
 };
 addExtension(MSGPACK_PACKED_EXT);
 
-function packRow(m: Map<any, any>, header: BinaryPackHeader): any[] {
+function packRow(m: Map<any, any>, header: BinaryPackHeader): any[] | undefined {
     const row = new Array<any>(header.length - 1);
+    const expectedKeys = new Set<any>();
 
     for (let index = 1; index < header.length; index += 1) {
         const headerEntry = header[index]!;
         const key = Array.isArray(headerEntry) ? headerEntry[0] : headerEntry;
+        expectedKeys.add(key);
 
-        if (m.has(key)) {
-            const value = m.get(key);
-            row[index - 1] = Array.isArray(headerEntry) && value instanceof Map
-                ? packRow(value, headerEntry)
-                : value;
-        } else {
+        if (!m.has(key)) {
             row[index - 1] = MSGPACK_UNDEFINED_VALUE;
+            continue;
+        }
+
+        const value = m.get(key);
+        if (Array.isArray(headerEntry)) {
+            if (!(value instanceof Map)) {
+                return undefined;
+            }
+            const nestedRow = packRow(value, headerEntry);
+            if (nestedRow === undefined) {
+                return undefined;
+            }
+            row[index - 1] = nestedRow;
+        } else {
+            row[index - 1] = value;
+        }
+    }
+
+    for (const key of m.keys()) {
+        if (!expectedKeys.has(key)) {
+            return undefined;
         }
     }
 
@@ -63,8 +81,8 @@ function packRow(m: Map<any, any>, header: BinaryPackHeader): any[] {
     return row;
 }
 
-export function packList(list: any[], header: BinaryPackHeader): any[] {
-    if (list.length === 0) {
+export function packList(list: any[], header?: BinaryPackHeader): any[] {
+    if (list.length === 0 || header === undefined) {
         return list;
     }
 
@@ -73,7 +91,11 @@ export function packList(list: any[], header: BinaryPackHeader): any[] {
         if (!(entry instanceof Map)) {
             return list;
         }
-        packedList.push(packRow(entry, header));
+        const packedRow = packRow(entry, header);
+        if (packedRow === undefined) {
+            return list;
+        }
+        packedList.push(packedRow);
     }
 
     return packedList;

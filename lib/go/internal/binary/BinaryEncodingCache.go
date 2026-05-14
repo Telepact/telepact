@@ -18,10 +18,10 @@ package binary
 
 // BinaryEncodingCache stores BinaryEncoding instances keyed by checksum values.
 type BinaryEncodingCache interface {
-// Add registers a BinaryEncoding entry for the provided checksum.
-Add(checksum int, binaryEncodingMap map[string]int, packedSites []BinaryPackSiteData)
-// Get retrieves the BinaryEncoding associated with the checksum.
-Get(checksum int) *BinaryEncoding
-// Remove deletes the BinaryEncoding associated with the checksum.
-Remove(checksum int)
+	// Add registers a BinaryEncoding entry for the provided checksum.
+	Add(checksum int, binaryEncodingMap map[string]int, packedSites []BinaryPackSiteData)
+	// Get retrieves the BinaryEncoding associated with the checksum.
+	Get(checksum int) *BinaryEncoding
+	// Remove deletes the BinaryEncoding associated with the checksum.
+	Remove(checksum int)
 }

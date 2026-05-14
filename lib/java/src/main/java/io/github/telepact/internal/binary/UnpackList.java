@@ -27,6 +27,10 @@ import java.util.Map;
 import org.msgpack.jackson.dataformat.MessagePackExtensionType;
 
 public class UnpackList {
+    static List<Object> unpackList(List<Object> list) {
+        return list;
+    }
+
     static List<Object> unpackList(List<Object> list, List<Object> header) {
         if (list.isEmpty()) {
             return list;

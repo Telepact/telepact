@@ -36,7 +36,7 @@ def server_binary_decode(message: list[object], binary_encoder: 'BinaryEncoding'
 
     final_encoded_message_body: dict[object, object]
     if headers.get("@pac_") is True:
-        final_encoded_message_body = unpack_body(encoded_message_body)
+        final_encoded_message_body = unpack_body(encoded_message_body, binary_encoder)
     else:
         final_encoded_message_body = encoded_message_body
 

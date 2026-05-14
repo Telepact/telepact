@@ -16,53 +16,72 @@
 
 package binary
 
+import "reflect"
+
 // PackBody packs the message body map into the compact binary representation when possible.
 func PackBody(body map[any]any, encoding *BinaryEncoding) (map[any]any, error) {
-result := make(map[any]any, len(body))
-for key, value := range body {
-result[key] = value
-}
+	result := make(map[any]any, len(body))
+	for key, value := range body {
+		result[key] = value
+	}
 
-for _, packedSite := range encoding.PackedSites {
-parentMap, ok := getParentMap(result, packedSite.EncodedPath)
-if !ok || len(packedSite.EncodedPath) == 0 {
-continue
-}
-targetKey := packedSite.EncodedPath[len(packedSite.EncodedPath)-1]
-value, ok := parentMap[targetKey]
-if !ok {
-continue
-}
-listValue, ok := value.([]any)
-if !ok {
-continue
-}
-packedValue, err := PackList(listValue, packedSite.Header)
-if err != nil {
-return nil, err
-}
-parentMap[targetKey] = packedValue
-}
+	for _, packedSite := range encoding.PackedSites {
+		parentMap, ok := getParentMap(result, packedSite.EncodedPath)
+		if !ok || len(packedSite.EncodedPath) == 0 {
+			continue
+		}
+		targetKey := packedSite.EncodedPath[len(packedSite.EncodedPath)-1]
+		value, ok := parentMap[targetKey]
+		if !ok {
+			continue
+		}
+		listValue, ok := toAnySlice(value)
+		if !ok {
+			continue
+		}
+		packedValue, err := PackList(listValue, packedSite.Header)
+		if err != nil {
+			return nil, err
+		}
+		parentMap[targetKey] = packedValue
+	}
 
-return result, nil
+	return result, nil
 }
 
 func getParentMap(root map[any]any, path []int) (map[any]any, bool) {
-var current any = root
-for _, key := range path[:max(len(path)-1, 0)] {
-nextMap, err := ensureAnyMap(current)
-if err != nil {
-return nil, false
+	current := root
+	for _, key := range path[:max(len(path)-1, 0)] {
+		nextValue, ok := current[key]
+		if !ok {
+			return nil, false
+		}
+		nextMap, err := ensureAnyMap(nextValue)
+		if err != nil {
+			return nil, false
+		}
+		current[key] = nextMap
+		current = nextMap
+	}
+	if current == nil {
+		return nil, false
+	}
+	return current, true
 }
-nextValue, ok := nextMap[key]
-if !ok {
-return nil, false
-}
-current = nextValue
-}
-result, err := ensureAnyMap(current)
-if err != nil {
-return nil, false
-}
-return result, true
+
+func toAnySlice(value any) ([]any, bool) {
+	if typed, ok := value.([]any); ok {
+		return typed, true
+	}
+
+	reflectValue := reflect.ValueOf(value)
+	if reflectValue.Kind() != reflect.Slice {
+		return nil, false
+	}
+
+	result := make([]any, reflectValue.Len())
+	for i := 0; i < reflectValue.Len(); i++ {
+		result[i] = reflectValue.Index(i).Interface()
+	}
+	return result, true
 }

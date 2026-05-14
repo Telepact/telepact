@@ -23,19 +23,31 @@ PACKED_BYTE = 17
 PACKED_EXT = ExtType(PACKED_BYTE, b'')
 
 
-def pack_row(m: dict[object, object], header: BinaryPackHeader) -> list[object]:
+def pack_row(m: dict[object, object], header: BinaryPackHeader) -> list[object] | None:
     row: list[object] = [UNDEFINED_EXT] * (len(header) - 1)
+    expected_keys: set[object] = set()
 
     for index in range(1, len(header)):
         header_entry = header[index]
         key = header_entry[0] if type(header_entry) is list else header_entry
+        expected_keys.add(key)
 
-        if key in m:
-            value = m[key]
-            if type(header_entry) is list and type(value) is dict:
-                row[index - 1] = pack_row(value, header_entry)
-            else:
-                row[index - 1] = value
+        if key not in m:
+            continue
+
+        value = m[key]
+        if type(header_entry) is list:
+            if type(value) is not dict:
+                return None
+            nested_row = pack_row(value, header_entry)
+            if nested_row is None:
+                return None
+            row[index - 1] = nested_row
+        else:
+            row[index - 1] = value
+
+    if any(key not in expected_keys for key in m.keys()):
+        return None
 
     while row and row[-1] == UNDEFINED_EXT:
         row.pop()
@@ -51,6 +63,9 @@ def pack_list(lst: list[object], header: BinaryPackHeader) -> list[object]:
     for item in lst:
         if type(item) is not dict:
             return lst
-        packed_list.append(pack_row(item, header))
+        packed_row = pack_row(item, header)
+        if packed_row is None:
+            return lst
+        packed_list.append(packed_row)
 
     return packed_list

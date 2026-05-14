@@ -41,8 +41,8 @@ function unpackRow(row: any[], header: BinaryPackHeader): Map<any, any> {
     return finalMap;
 }
 
-export function unpackList(list: any[], header: BinaryPackHeader): any[] {
-    if (list.length === 0 || !(list[0] instanceof MsgpackPacked)) {
+export function unpackList(list: any[], header?: BinaryPackHeader): any[] {
+    if (list.length === 0 || header === undefined || !(list[0] instanceof MsgpackPacked)) {
         return list;
     }
 

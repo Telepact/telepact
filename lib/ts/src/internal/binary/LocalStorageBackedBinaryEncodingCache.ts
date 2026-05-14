@@ -90,9 +90,10 @@ export class LocalStorageBackedBinaryEncodingCache extends BinaryEncodingCache {
 
     private normalizeStoredBinaryEncoding(value: StoredBinaryEncoding | LegacyStoredBinaryEncoding): StoredBinaryEncoding {
         if ('encodeMap' in value) {
+            const storedValue = value as StoredBinaryEncoding;
             return {
-                encodeMap: value.encodeMap,
-                packedSites: value.packedSites ?? [],
+                encodeMap: storedValue.encodeMap,
+                packedSites: storedValue.packedSites ?? [],
             };
         }
 

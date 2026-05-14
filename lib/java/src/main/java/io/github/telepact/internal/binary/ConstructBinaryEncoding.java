@@ -37,6 +37,12 @@ import io.github.telepact.internal.types.TUnion;
 
 public class ConstructBinaryEncoding {
 
+    private static List<String> sortedKeys(Map<String, ?> input) {
+        final var keys = new ArrayList<>(input.keySet());
+        Collections.sort(keys);
+        return keys;
+    }
+
     private static List<String> traceType(TTypeDeclaration typeDeclaration, Set<String> visitedTypeNames) {
         final var thisAllKeys = new ArrayList<String>();
 
@@ -50,9 +56,10 @@ public class ConstructBinaryEncoding {
             }
             final var nextVisitedTypeNames = new HashSet<>(visitedTypeNames);
             nextVisitedTypeNames.add(s.name);
-            for (final var entry : s.fields.entrySet()) {
-                thisAllKeys.add(entry.getKey());
-                thisAllKeys.addAll(traceType(entry.getValue().typeDeclaration, nextVisitedTypeNames));
+            for (final var fieldKey : sortedKeys(s.fields)) {
+                final var field = s.fields.get(fieldKey);
+                thisAllKeys.add(fieldKey);
+                thisAllKeys.addAll(traceType(field.typeDeclaration, nextVisitedTypeNames));
             }
         } else if (typeDeclaration.type instanceof TUnion u) {
             if (visitedTypeNames.contains(u.name)) {
@@ -60,11 +67,13 @@ public class ConstructBinaryEncoding {
             }
             final var nextVisitedTypeNames = new HashSet<>(visitedTypeNames);
             nextVisitedTypeNames.add(u.name);
-            for (final var entry : u.tags.entrySet()) {
-                thisAllKeys.add(entry.getKey());
-                for (final var fieldEntry : entry.getValue().fields.entrySet()) {
-                    thisAllKeys.add(fieldEntry.getKey());
-                    thisAllKeys.addAll(traceType(fieldEntry.getValue().typeDeclaration, nextVisitedTypeNames));
+            for (final var tagKey : sortedKeys(u.tags)) {
+                thisAllKeys.add(tagKey);
+                final var tagValue = u.tags.get(tagKey);
+                for (final var fieldKey : sortedKeys(tagValue.fields)) {
+                    final var field = tagValue.fields.get(fieldKey);
+                    thisAllKeys.add(fieldKey);
+                    thisAllKeys.addAll(traceType(field.typeDeclaration, nextVisitedTypeNames));
                 }
             }
         }
@@ -129,8 +138,9 @@ public class ConstructBinaryEncoding {
         if (typeDeclaration.type instanceof TStruct s) {
             final var header = new ArrayList<Object>();
             header.add(encodedKey);
-            for (final var entry : s.fields.entrySet()) {
-                header.add(buildNestedHeader(entry.getKey(), entry.getValue().typeDeclaration, binaryEncoding));
+            for (final var fieldKey : sortedKeys(s.fields)) {
+                final var field = s.fields.get(fieldKey);
+                header.add(buildNestedHeader(fieldKey, field.typeDeclaration, binaryEncoding));
             }
             return header;
         }
@@ -138,11 +148,13 @@ public class ConstructBinaryEncoding {
         if (typeDeclaration.type instanceof TUnion u) {
             final var header = new ArrayList<Object>();
             header.add(encodedKey);
-            for (final var entry : u.tags.entrySet()) {
+            for (final var tagKey : sortedKeys(u.tags)) {
+                final var tagValue = u.tags.get(tagKey);
                 final var tagHeader = new ArrayList<Object>();
-                tagHeader.add(getEncodedKey(binaryEncoding, entry.getKey()));
-                for (final var fieldEntry : entry.getValue().fields.entrySet()) {
-                    tagHeader.add(buildNestedHeader(fieldEntry.getKey(), fieldEntry.getValue().typeDeclaration, binaryEncoding));
+                tagHeader.add(getEncodedKey(binaryEncoding, tagKey));
+                for (final var fieldKey : sortedKeys(tagValue.fields)) {
+                    final var field = tagValue.fields.get(fieldKey);
+                    tagHeader.add(buildNestedHeader(fieldKey, field.typeDeclaration, binaryEncoding));
                 }
                 header.add(tagHeader);
             }
@@ -155,8 +167,9 @@ public class ConstructBinaryEncoding {
     private static List<Object> buildPackHeader(TStruct structType, Map<String, Integer> binaryEncoding) {
         final var header = new ArrayList<Object>();
         header.add(null);
-        for (final var entry : structType.fields.entrySet()) {
-            header.add(buildNestedHeader(entry.getKey(), entry.getValue().typeDeclaration, binaryEncoding));
+        for (final var fieldKey : sortedKeys(structType.fields)) {
+            final var field = structType.fields.get(fieldKey);
+            header.add(buildNestedHeader(fieldKey, field.typeDeclaration, binaryEncoding));
         }
         return header;
     }
@@ -181,10 +194,11 @@ public class ConstructBinaryEncoding {
             }
             final var nextVisitedTypeNames = new HashSet<>(visitedTypeNames);
             nextVisitedTypeNames.add(s.name);
-            for (final var entry : s.fields.entrySet()) {
+            for (final var fieldKey : sortedKeys(s.fields)) {
+                final var field = s.fields.get(fieldKey);
                 final var nextPath = new ArrayList<>(path);
-                nextPath.add(entry.getKey());
-                collectPackedSites(nextPath, entry.getValue().typeDeclaration, binaryEncoding, packedSites, nextVisitedTypeNames);
+                nextPath.add(fieldKey);
+                collectPackedSites(nextPath, field.typeDeclaration, binaryEncoding, packedSites, nextVisitedTypeNames);
             }
             return;
         }
@@ -195,12 +209,14 @@ public class ConstructBinaryEncoding {
             }
             final var nextVisitedTypeNames = new HashSet<>(visitedTypeNames);
             nextVisitedTypeNames.add(u.name);
-            for (final var entry : u.tags.entrySet()) {
-                for (final var fieldEntry : entry.getValue().fields.entrySet()) {
+            for (final var tagKey : sortedKeys(u.tags)) {
+                final var tagValue = u.tags.get(tagKey);
+                for (final var fieldKey : sortedKeys(tagValue.fields)) {
+                    final var field = tagValue.fields.get(fieldKey);
                     final var nextPath = new ArrayList<>(path);
-                    nextPath.add(entry.getKey());
-                    nextPath.add(fieldEntry.getKey());
-                    collectPackedSites(nextPath, fieldEntry.getValue().typeDeclaration, binaryEncoding, packedSites, nextVisitedTypeNames);
+                    nextPath.add(tagKey);
+                    nextPath.add(fieldKey);
+                    collectPackedSites(nextPath, field.typeDeclaration, binaryEncoding, packedSites, nextVisitedTypeNames);
                 }
             }
         }
@@ -208,10 +224,11 @@ public class ConstructBinaryEncoding {
 
     private static void addRootPackedSites(List<String> rootPath, Map<String, TFieldDeclaration> fields,
             Map<String, Integer> binaryEncoding, List<List<Object>> packedSites) {
-        for (final var entry : fields.entrySet()) {
+        for (final var fieldKey : sortedKeys(fields)) {
+            final var field = fields.get(fieldKey);
             final var nextPath = new ArrayList<>(rootPath);
-            nextPath.add(entry.getKey());
-            collectPackedSites(nextPath, entry.getValue().typeDeclaration, binaryEncoding, packedSites, new HashSet<>());
+            nextPath.add(fieldKey);
+            collectPackedSites(nextPath, field.typeDeclaration, binaryEncoding, packedSites, new HashSet<>());
         }
     }
 
@@ -228,9 +245,10 @@ public class ConstructBinaryEncoding {
                     continue;
                 }
                 allKeys.add("Ok_");
-                for (final var fieldEntry : result.fields.entrySet()) {
-                    allKeys.add(fieldEntry.getKey());
-                    traceType(fieldEntry.getValue().typeDeclaration, new HashSet<>()).forEach(allKeys::add);
+                for (final var fieldKey : sortedKeys(result.fields)) {
+                    final var field = result.fields.get(fieldKey);
+                    allKeys.add(fieldKey);
+                    traceType(field.typeDeclaration, new HashSet<>()).forEach(allKeys::add);
                 }
             } else if (key.startsWith("fn.") && value instanceof TUnion u)  {
                 allKeys.add(key);
@@ -238,9 +256,10 @@ public class ConstructBinaryEncoding {
                 if (args == null) {
                     continue;
                 }
-                for (final var fieldEntry : args.fields.entrySet()) {
-                    allKeys.add(fieldEntry.getKey());
-                    traceType(fieldEntry.getValue().typeDeclaration, new HashSet<>()).forEach(allKeys::add);
+                for (final var fieldKey : sortedKeys(args.fields)) {
+                    final var field = args.fields.get(fieldKey);
+                    allKeys.add(fieldKey);
+                    traceType(field.typeDeclaration, new HashSet<>()).forEach(allKeys::add);
                 }
             }
         }
