@@ -54,14 +54,21 @@ jobs:
           set -euo pipefail
           cert_file=/tmp/repo-maven-proxy-root.pem
           openssl_dump=/tmp/repo-maven-openssl-chain.pem
+          openssl_err=/tmp/repo-maven-openssl.err
           cacerts_password="${JAVA_CACERTS_PASSWORD:-changeit}"
-          echo | openssl s_client -showcerts -servername repo.maven.apache.org -connect repo.maven.apache.org:443 > "${openssl_dump}" 2>&1
+          if ! echo | openssl s_client -showcerts -servername repo.maven.apache.org -connect repo.maven.apache.org:443 > "${openssl_dump}" 2>"${openssl_err}"; then
+            cat "${openssl_err}"
+            exit 1
+          fi
           awk '/BEGIN CERTIFICATE/{n++} n==2{print} /END CERTIFICATE/{if(n==2) exit}' "${openssl_dump}" > "${cert_file}"
           if [ ! -s "${cert_file}" ]; then
             echo "Failed to extract proxy root certificate from repo.maven.apache.org TLS chain."
+            cat "${openssl_err}"
             exit 1
           fi
-          sudo keytool -delete -alias copilot-maven-proxy-root -keystore "${JAVA_HOME}/lib/security/cacerts" -storepass "${cacerts_password}" >/dev/null 2>&1 || true
+          if sudo keytool -list -alias copilot-maven-proxy-root -keystore "${JAVA_HOME}/lib/security/cacerts" -storepass "${cacerts_password}" >/dev/null 2>&1; then
+            sudo keytool -delete -alias copilot-maven-proxy-root -keystore "${JAVA_HOME}/lib/security/cacerts" -storepass "${cacerts_password}"
+          fi
           sudo keytool -importcert -noprompt -trustcacerts -alias copilot-maven-proxy-root -file "${cert_file}" -keystore "${JAVA_HOME}/lib/security/cacerts" -storepass "${cacerts_password}"
 
       - name: Set up Go
