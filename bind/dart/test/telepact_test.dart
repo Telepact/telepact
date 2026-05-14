@@ -89,7 +89,7 @@ void main() {
 
       // Put some data into the local storage to see if it loads in
       final exampleLocalStorageData = {
-        "-1337": {"lol": 1, "notreal": 2}
+        "-1337": {"lol": 0, "notreal": 1}
       };
       //final exampleLocalStorageData = {"-1443216067":{"Ok_":0,"api":1,"fn.add":2,"fn.api_":3,"fn.ping_":4,"includeInternal!":5,"result":6,"x":7,"y":8}};
       web.window.localStorage.setItem(
