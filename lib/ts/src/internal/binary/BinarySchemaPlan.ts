@@ -16,8 +16,8 @@
 
 import { BinaryEncodingMissing } from './BinaryEncodingMissing.js';
 import { pack } from './Pack.js';
-import { MsgpackPacked, MSGPACK_PACKED_VALUE } from './PackList.js';
-import { MsgpackUndefined, MSGPACK_UNDEFINED_VALUE } from './PackMap.js';
+import { MSGPACK_PACKED_VALUE } from './PackList.js';
+import { MSGPACK_UNDEFINED_VALUE } from './PackMap.js';
 import { TelepactSchema } from '../../TelepactSchema.js';
 import { TArray } from '../types/TArray.js';
 import { TObject } from '../types/TObject.js';
@@ -588,6 +588,3 @@ export class BinarySchemaPlan {
 }
 
 class CannotDirectPack extends Error {}
-
-void MsgpackPacked;
-void MsgpackUndefined;

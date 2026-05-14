@@ -38,6 +38,7 @@ export function serverBinaryEncode(message: any[], binaryEncoder: BinaryEncoding
 
     headers['@bin_'] = [binaryEncoder.checksum];
     const responseFunctionName = headers[RESPONSE_FUNCTION_NAME];
+    delete headers[RESPONSE_FUNCTION_NAME];
     const usePackedEncoding = headers['@pac_'] === true;
     const compiledEncodedMessageBody = responseFunctionName
         ? binaryEncoder.schemaPlan?.encodeResponseBody(responseFunctionName, messageBody, usePackedEncoding)
