@@ -38,6 +38,6 @@ export function serverBinaryDecode(message: any[], binaryEncoder: BinaryEncoding
     }
 
     const messageHeader = convertMapsToObjects(headers);
-    const messageBody = decodeBody(finalEncodedMessageBody, binaryEncoder);
+    const messageBody = binaryEncoder.schemaPlan?.decodeRequestBody(finalEncodedMessageBody) ?? decodeBody(finalEncodedMessageBody, binaryEncoder);
     return [messageHeader, messageBody];
 }

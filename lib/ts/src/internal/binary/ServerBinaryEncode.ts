@@ -18,9 +18,10 @@ import { BinaryEncoding } from '../../internal/binary/BinaryEncoding.js';
 import { encodeBody } from '../../internal/binary/EncodeBody.js';
 import { packBody } from '../../internal/binary/PackBody.js';
 import { BinaryEncoderUnavailableError } from '../../internal/binary/BinaryEncoderUnavailableError.js';
+import { BinaryResponseHeaders, RESPONSE_FUNCTION_NAME } from './BinarySchemaPlan.js';
 
 export function serverBinaryEncode(message: any[], binaryEncoder: BinaryEncoding): any[] {
-    const headers: { [key: string]: any } = message[0];
+    const headers = message[0] as BinaryResponseHeaders;
     const messageBody: { [key: string]: any } = message[1];
     const clientKnownBinaryChecksums: number[] | undefined = headers['@clientKnownBinaryChecksums_'];
     delete headers['@clientKnownBinaryChecksums_'];
@@ -36,10 +37,18 @@ export function serverBinaryEncode(message: any[], binaryEncoder: BinaryEncoding
     }
 
     headers['@bin_'] = [binaryEncoder.checksum];
-    const encodedMessageBody = encodeBody(messageBody, binaryEncoder);
+    const responseFunctionName = headers[RESPONSE_FUNCTION_NAME];
+    delete headers[RESPONSE_FUNCTION_NAME];
+    const usePackedEncoding = headers['@pac_'] === true;
+    const compiledEncodedMessageBody = responseFunctionName
+        ? binaryEncoder.schemaPlan?.encodeResponseBody(responseFunctionName, messageBody, usePackedEncoding)
+        : undefined;
+    const encodedMessageBody = compiledEncodedMessageBody ?? encodeBody(messageBody, binaryEncoder);
 
     let finalEncodedMessageBody: { [key: string]: any };
-    if (headers['@pac_'] === true) {
+    if (compiledEncodedMessageBody !== undefined) {
+        finalEncodedMessageBody = encodedMessageBody;
+    } else if (usePackedEncoding) {
         finalEncodedMessageBody = packBody(encodedMessageBody);
     } else {
         finalEncodedMessageBody = encodedMessageBody;

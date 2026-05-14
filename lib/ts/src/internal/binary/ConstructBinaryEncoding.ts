@@ -15,13 +15,14 @@
 //|
 
 import { TelepactSchema } from '../../TelepactSchema.js';
-import { BinaryEncoding } from '../../internal/binary/BinaryEncoding.js';
+import { BinaryEncoding, createDecodeMap } from '../../internal/binary/BinaryEncoding.js';
 import { createChecksum } from '../../internal/binary/CreateChecksum.js';
 import { TUnion } from '../types/TUnion.js';
 import { TStruct } from '../types/TStruct.js';
 import { TArray } from '../types/TArray.js';
 import { TObject } from '../types/TObject.js';
 import { TTypeDeclaration } from '../types/TTypeDeclaration.js';
+import { BinarySchemaPlan } from './BinarySchemaPlan.js';
 
 function traceType(typeDeclaration: TTypeDeclaration): string[] {
     const thisAllKeys: string[] = [];
@@ -90,5 +91,8 @@ export function constructBinaryEncoding(telepactSchema: TelepactSchema): BinaryE
     const finalString = sortedAllKeys.join('\n');
     const checksum = createChecksum(finalString);
 
-    return new BinaryEncoding(binaryEncoding, checksum);
+    const decodeMap = createDecodeMap(binaryEncoding);
+    const schemaPlan = BinarySchemaPlan.compile(telepactSchema, binaryEncoding, decodeMap);
+
+    return new BinaryEncoding(binaryEncoding, checksum, schemaPlan);
 }
