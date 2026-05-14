@@ -21,16 +21,20 @@ export class BinaryEncoding {
 
     constructor(binaryEncodingMap: Map<string, number>, checksum: number) {
         this.encodeMap = binaryEncodingMap;
-        let maxId = -1;
-        for (const value of binaryEncodingMap.values()) {
-            if (value > maxId) {
-                maxId = value;
-            }
-        }
-        this.decodeTable = new Array<string>(maxId + 1);
+        const decodeTable = new Array<string | undefined>(binaryEncodingMap.size);
         for (const [key, value] of binaryEncodingMap.entries()) {
-            this.decodeTable[value] = key;
+            if (value < 0 || value >= decodeTable.length) {
+                throw new Error('Binary encoding ids must be dense sequential integers');
+            }
+            if (decodeTable[value] !== undefined) {
+                throw new Error('Binary encoding ids must be unique');
+            }
+            decodeTable[value] = key;
         }
+        if (decodeTable.some((key) => key === undefined)) {
+            throw new Error('Binary encoding ids must be dense sequential integers');
+        }
+        this.decodeTable = decodeTable as string[];
         this.checksum = checksum;
     }
 }

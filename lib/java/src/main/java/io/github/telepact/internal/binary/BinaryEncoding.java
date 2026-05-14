@@ -26,15 +26,21 @@ public class BinaryEncoding {
 
     public BinaryEncoding(Map<String, Integer> binaryEncodingMap, Integer checksum) {
         this.encodeMap = binaryEncodingMap;
-        int maxId = -1;
+        this.decodeTable = new String[binaryEncodingMap.size()];
         for (final var entry : binaryEncodingMap.entrySet()) {
-            if (entry.getValue() > maxId) {
-                maxId = entry.getValue();
+            final var keyId = entry.getValue();
+            if (keyId < 0 || keyId >= this.decodeTable.length) {
+                throw new IllegalArgumentException("Binary encoding ids must be dense sequential integers");
             }
+            if (this.decodeTable[keyId] != null) {
+                throw new IllegalArgumentException("Binary encoding ids must be unique");
+            }
+            this.decodeTable[keyId] = entry.getKey();
         }
-        this.decodeTable = new String[maxId + 1];
-        for (final var entry : binaryEncodingMap.entrySet()) {
-            this.decodeTable[entry.getValue()] = entry.getKey();
+        for (final var key : this.decodeTable) {
+            if (key == null) {
+                throw new IllegalArgumentException("Binary encoding ids must be dense sequential integers");
+            }
         }
         this.checksum = checksum;
     }

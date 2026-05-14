@@ -27,17 +27,26 @@ type BinaryEncoding struct {
 // NewBinaryEncoding constructs a BinaryEncoding from the provided encoding map and checksum.
 func NewBinaryEncoding(binaryEncodingMap map[string]int, checksum int) *BinaryEncoding {
 	encodeMap := make(map[string]int, len(binaryEncodingMap))
-	maxID := -1
 	for key, value := range binaryEncodingMap {
 		encodeMap[key] = value
-		if value > maxID {
-			maxID = value
-		}
 	}
 
-	decodeTable := make([]string, maxID+1)
+	decodeTable := make([]string, len(encodeMap))
+	decodePresent := make([]bool, len(encodeMap))
 	for key, value := range encodeMap {
+		if value < 0 || value >= len(decodeTable) {
+			panic("binary encoding ids must be dense sequential integers")
+		}
+		if decodePresent[value] {
+			panic("binary encoding ids must be unique")
+		}
 		decodeTable[value] = key
+		decodePresent[value] = true
+	}
+	for _, present := range decodePresent {
+		if !present {
+			panic("binary encoding ids must be dense sequential integers")
+		}
 	}
 
 	return &BinaryEncoding{
