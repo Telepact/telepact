@@ -269,6 +269,10 @@ async def verify_server_case(nats_client, request, expected_response, frontdoor_
         await backdoor_handling_task
 
     if expected_response:
+        _assert_enc_header(response, assert_rules)
+        response[0].pop('@enc_', None)
+        expected_response[0].pop('@enc_', None)
+
         if assert_rules.get('assertCaseId', False):
             case_id = response[1].get('ErrorUnknown_', {}).get('caseId')
             assert isinstance(case_id, str)
@@ -333,6 +337,7 @@ async def verify_client_case(nats_client, request, expected_response, client_fro
         if 'Error' not in next(iter(response[1])):
             assert '@bin_' in response[0]
 
+    _assert_enc_header(response, assert_rules)
     binary_was_used = response[0].pop('@bin_', None) is not None
     response[0].pop('@enc_', None)
     response[0].pop('@pac_', None)
@@ -373,6 +378,28 @@ async def verify_client_case(nats_client, request, expected_response, client_fro
 
     if not binary_was_used:
         assert base64_was_used == client_returned_binary
+
+
+def _assert_enc_header(response, assert_rules):
+    enc_rules = {key: value for key, value in assert_rules.items() if key.startswith('enc')}
+    if not enc_rules:
+        return
+
+    enc_header = response[0].get('@enc_')
+    assert isinstance(enc_header, dict)
+
+    if 'encVersion' in enc_rules:
+        assert enc_header.get('v') == enc_rules['encVersion']
+
+    if 'encPlanId' in enc_rules:
+        assert enc_header.get('p') == enc_rules['encPlanId']
+
+    if 'encHasBundle' in enc_rules:
+        has_bundle = 'k' in enc_header and 'q' in enc_header and 's' in enc_header
+        assert has_bundle == enc_rules['encHasBundle']
+
+    if 'encKeys' in enc_rules:
+        assert enc_header.get('k') == enc_rules['encKeys']
 
 
 async def send_case(nats_client: nats.aio.client.Client, request, expected_response, request_topic, just_send=False):

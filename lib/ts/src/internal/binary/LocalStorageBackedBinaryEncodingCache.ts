@@ -19,7 +19,7 @@ import { BinaryEncoding } from "./BinaryEncoding.js";
 
 export class LocalStorageBackedBinaryEncodingCache extends BinaryEncodingCache {
     private recentBinaryEncoders: Map<number, BinaryEncoding>;
-    private recentBinaryEncodersJson: Record<string, Record<string, number>>;
+    private recentBinaryEncodersJson: Record<string, Record<string, any>>;
     private namespace: string;
 
     constructor(namespace: string) {
@@ -32,7 +32,7 @@ export class LocalStorageBackedBinaryEncodingCache extends BinaryEncodingCache {
 
         console.log(`Binary Encoding loaded from local storage for ${this.namespace}: ${storedJson}`);
 
-        let jsonFromLocalStorage: Record<string, Record<string, number>> = storedJson 
+        let jsonFromLocalStorage: Record<string, Record<string, any>> = storedJson 
             ? JSON.parse(storedJson) 
             : {};
 
@@ -40,8 +40,8 @@ export class LocalStorageBackedBinaryEncodingCache extends BinaryEncodingCache {
         this.recentBinaryEncoders = this.mapJsonToObject(jsonFromLocalStorage);
     }
 
-    add(checksum: number, binaryEncodingMap: Map<string, number>): void {
-        const binaryEncodingJson = Object.fromEntries(binaryEncodingMap);
+    add(checksum: number, binaryEncodingDescriptor: Record<string, any>): void {
+        const binaryEncodingJson = binaryEncodingDescriptor;
         this.recentBinaryEncodersJson[`${checksum}`] = binaryEncodingJson;
 
         this.recentBinaryEncoders = this.mapJsonToObject(this.recentBinaryEncodersJson);
@@ -67,14 +67,12 @@ export class LocalStorageBackedBinaryEncodingCache extends BinaryEncodingCache {
         return Array.from(this.recentBinaryEncoders.keys());
     }
 
-    private mapJsonToObject(json: Record<string, Record<string, number>>): Map<number, BinaryEncoding> {
+    private mapJsonToObject(json: Record<string, Record<string, any>>): Map<number, BinaryEncoding> {
         let newMap = new Map<number, BinaryEncoding>();
 
         for (var [k, v] of Object.entries(json)) {
             let checksum = parseInt(k);
-            let binaryEncodingRecord = v as Record<string, number>;
-            let binaryEncodingMap = new Map(Object.entries(binaryEncodingRecord));
-            let binaryEncoding = new BinaryEncoding(binaryEncodingMap, checksum);
+            let binaryEncoding = BinaryEncoding.fromNegotiationDescriptor(checksum, v as Record<string, any>);
             newMap.set(checksum, binaryEncoding);
         }
 

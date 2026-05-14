@@ -63,8 +63,8 @@ python client.py
 Example output:
 
 ```text
-call 1: {'request_headers': {'@time_': 5000, '@bin_': []}, 'request_len': 56, 'response_headers': {'@enc_': {...}, '@bin_': [900069279]}, 'response_len': 480}
-call 2: {'request_headers': {'@time_': 5000, '@bin_': [900069279]}, 'request_len': 27, 'response_headers': {'@bin_': [900069279]}, 'response_len': 25}
+call 1: {'request_headers': {'@time_': 5000, '@bin_': []}, 'request_len': 56, 'response_headers': {'@enc_': {'v': 1, 'p': ... , 'k': [...], 'q': [...], 's': [...]}, '@bin_': [900069279]}, 'response_len': 480}
+call 2: {'request_headers': {'@time_': 5000, '@bin_': [900069279]}, 'request_len': 27, 'response_headers': {'@enc_': {'v': 1, 'p': ...}, '@bin_': [900069279]}, 'response_len': 25}
 ```
 
 Three nice things happened for us:

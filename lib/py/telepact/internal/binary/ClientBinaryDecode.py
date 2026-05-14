@@ -22,31 +22,23 @@ if TYPE_CHECKING:
 
 
 def client_binary_decode(message: list[object], binary_encoding_cache: 'BinaryEncodingCache',
-                         binary_checksum_strategy: 'ClientBinaryStrategy',
-                         ) -> list[object]:
-    from ...internal.binary.DecodeBody import decode_body
-    from ...internal.binary.UnpackBody import unpack_body
+                          binary_checksum_strategy: 'ClientBinaryStrategy',
+                          ) -> list[object]:
+    from ...internal.binary.BinaryPlan import decode_response_body
 
     headers = cast(dict[str, object], message[0])
     encoded_message_body = cast(dict[object, object], message[1])
     binary_checksums = cast(list[int], headers.get("@bin_", []))
     binary_checksum = binary_checksums[0]
 
-    # If there is a binary encoding included on this message, cache it
-    if "@enc_" in headers:
-        binary_encoding = cast(dict[str, int], headers["@enc_"])
-        binary_encoding_cache.add(binary_checksum, binary_encoding)
+    enc_header = cast(dict[str, object] | None, headers.get("@enc_"))
+    if enc_header and "k" in enc_header:
+        binary_encoding_cache.add(binary_checksum, enc_header)
 
     binary_checksum_strategy.update_checksum(binary_checksum)
     new_current_checksum_strategy = binary_checksum_strategy.get_current_checksums()
 
     binary_encoder = binary_encoding_cache.get(new_current_checksum_strategy[0])
-
-    final_encoded_message_body: dict[object, object]
-    if headers.get("@pac_") is True:
-        final_encoded_message_body = unpack_body(encoded_message_body)
-    else:
-        final_encoded_message_body = encoded_message_body
-
-    message_body = decode_body(final_encoded_message_body, binary_encoder)
+    function_id = cast(int | None, enc_header.get("p") if enc_header else None)
+    message_body = decode_response_body(encoded_message_body, binary_encoder, function_id, headers.get("@pac_") is True)
     return [headers, message_body]

@@ -28,8 +28,8 @@ public class DefaultBinaryEncodingCache implements BinaryEncodingCache {
         this.recentBinaryEncoders = new HashMap<>();
     }
 
-    public void add(int checksum, Map<String, Integer> binaryEncodingMap) {
-        BinaryEncoding binaryEncoding = new BinaryEncoding(binaryEncodingMap, checksum);
+    public void add(int checksum, Map<String, Object> binaryEncodingDescriptor) {
+        BinaryEncoding binaryEncoding = BinaryEncoding.fromNegotiationDescriptor(checksum, binaryEncodingDescriptor);
         this.recentBinaryEncoders.put(checksum, binaryEncoding);
     }
 

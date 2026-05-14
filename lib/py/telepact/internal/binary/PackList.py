@@ -47,6 +47,9 @@ def pack_list(lst: list[object]) -> list[object]:
     if not lst:
         return lst
 
+    if lst[0] == PACKED_EXT:
+        return lst
+
     packed_list: list[object] = []
     header: list[object] = []
 

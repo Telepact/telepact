@@ -73,6 +73,10 @@ export async function processBytes(
 
         let responseBytes: Uint8Array;
         try {
+            const requestTarget = Object.keys(requestMessage.body)[0];
+            if (responseMessage.headers['@binary_'] === true) {
+                responseMessage.headers['_binaryResponseFunctionName_'] = requestTarget;
+            }
             responseBytes = serializer.serialize(responseMessage);
         } catch (error) {
             const wrapped = error instanceof SerializationError

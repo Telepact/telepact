@@ -55,8 +55,61 @@ function traceType(typeDeclaration: TTypeDeclaration): string[] {
     return thisAllKeys;
 }
 
+function compileTypeDescriptor(typeDeclaration: TTypeDeclaration, encodeMap: Map<string, number>, visitedTypeNames: Set<string> = new Set()): any {
+    if (typeDeclaration.type instanceof TArray) {
+        return {
+            t: 'a',
+            i: compileTypeDescriptor(typeDeclaration.typeParameters[0], encodeMap, visitedTypeNames),
+        };
+    }
+
+    if (typeDeclaration.type instanceof TObject) {
+        return { t: 'd' };
+    }
+
+    if (typeDeclaration.type instanceof TStruct) {
+        if (visitedTypeNames.has(typeDeclaration.type.name)) {
+            return { t: 'd' };
+        }
+        const nextVisited = new Set(visitedTypeNames);
+        nextVisited.add(typeDeclaration.type.name);
+        return {
+            t: 's',
+            f: Object.entries(typeDeclaration.type.fields).map(([fieldKey, field]) => [
+                encodeMap.get(fieldKey),
+                compileTypeDescriptor(field.typeDeclaration, encodeMap, nextVisited),
+            ]),
+        };
+    }
+
+    if (typeDeclaration.type instanceof TUnion) {
+        if (visitedTypeNames.has(typeDeclaration.type.name)) {
+            return { t: 'd' };
+        }
+        const nextVisited = new Set(visitedTypeNames);
+        nextVisited.add(typeDeclaration.type.name);
+        return {
+            t: 'u',
+            g: Object.entries(typeDeclaration.type.tags).map(([tagKey, tagValue]) => [
+                encodeMap.get(tagKey),
+                {
+                    t: 's',
+                    f: Object.entries(tagValue.fields).map(([fieldKey, field]) => [
+                        encodeMap.get(fieldKey),
+                        compileTypeDescriptor(field.typeDeclaration, encodeMap, nextVisited),
+                    ]),
+                },
+            ]),
+        };
+    }
+
+    return { t: 'v' };
+}
+
 export function constructBinaryEncoding(telepactSchema: TelepactSchema): BinaryEncoding {
     const allKeys: Set<string> = new Set();
+    const requestPlanDescriptors: any[][] = [];
+    const responsePlanDescriptors: any[][] = [];
 
     for (const [key, value] of Object.entries(telepactSchema.parsed)) {
 
@@ -87,8 +140,36 @@ export function constructBinaryEncoding(telepactSchema: TelepactSchema): BinaryE
         binaryEncoding.set(key, index);
     });
 
+    for (const [key, value] of Object.entries(telepactSchema.parsed)) {
+        if (!(key.startsWith('fn.')) || !(value instanceof TUnion) || !(`${key}.->` in telepactSchema.parsed)) {
+            continue;
+        }
+        requestPlanDescriptors.push([
+            binaryEncoding.get(key),
+            {
+                t: 's',
+                f: Object.entries(value.tags[key].fields).map(([fieldKey, field]) => [
+                    binaryEncoding.get(fieldKey),
+                    compileTypeDescriptor(field.typeDeclaration, binaryEncoding),
+                ]),
+            },
+        ]);
+
+        const responseType = telepactSchema.parsed[`${key}.->`] as TUnion;
+        responsePlanDescriptors.push([
+            binaryEncoding.get(key),
+            {
+                t: 's',
+                f: Object.entries(responseType.tags['Ok_'].fields).map(([fieldKey, field]) => [
+                    binaryEncoding.get(fieldKey),
+                    compileTypeDescriptor(field.typeDeclaration, binaryEncoding),
+                ]),
+            },
+        ]);
+    }
+
     const finalString = sortedAllKeys.join('\n');
     const checksum = createChecksum(finalString);
 
-    return new BinaryEncoding(binaryEncoding, checksum);
+    return new BinaryEncoding(binaryEncoding, checksum, sortedAllKeys, requestPlanDescriptors, responsePlanDescriptors);
 }

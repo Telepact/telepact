@@ -55,6 +55,9 @@ async def process_bytes(request_message_bytes: bytes, update_headers: 'UpdateHea
             pass
 
         try:
+            request_target = next(iter(request_message.body.keys()))
+            if "@binary_" in response_message.headers:
+                response_message.headers["_binaryResponseFunctionId_"] = serializer.binary_encoder.binary_encoder.encode_map.get(request_target)
             response_bytes = serializer.serialize(response_message)
         except Exception as e:
             wrapped = (

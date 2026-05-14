@@ -23,7 +23,10 @@ export function serverBinaryEncode(message: any[], binaryEncoder: BinaryEncoding
     const headers: { [key: string]: any } = message[0];
     const messageBody: { [key: string]: any } = message[1];
     const clientKnownBinaryChecksums: number[] | undefined = headers['@clientKnownBinaryChecksums_'];
+    const functionName: string | undefined = headers['_binaryResponseFunctionName_'];
+    const functionId: number | undefined = functionName !== undefined ? binaryEncoder.encodeMap.get(functionName) : undefined;
     delete headers['@clientKnownBinaryChecksums_'];
+    delete headers['_binaryResponseFunctionName_'];
 
     const resultTag = Object.keys(messageBody)[0];
 
@@ -32,7 +35,9 @@ export function serverBinaryEncode(message: any[], binaryEncoder: BinaryEncoding
     }
 
     if (clientKnownBinaryChecksums === undefined || !clientKnownBinaryChecksums.includes(binaryEncoder.checksum)) {
-        headers['@enc_'] = binaryEncoder.encodeMap;
+        headers['@enc_'] = binaryEncoder.negotiationDescriptor(functionId, true);
+    } else {
+        headers['@enc_'] = binaryEncoder.negotiationDescriptor(functionId, false);
     }
 
     headers['@bin_'] = [binaryEncoder.checksum];

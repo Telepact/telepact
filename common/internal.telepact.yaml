@@ -70,9 +70,8 @@
     header with any value, the server will respond with a `@bin_` header with an
     array containing the currently supported binary encoding checksum. If the
     client's provided checksum does not match the server's checksum, the server
-    will also send an `@enc_` header containing the binary encoding, which is a
-    map of field names to field ids. The response body may also be encoded in
-    binary.
+    will also send an `@enc_` header containing a compiled binary-plan
+    descriptor. The response body may also be encoded in binary.
 
     The `@pac_` header can also be used to indicate usage of 'packed' binary
     encoding strategy. If the client submits a `@pac_` header with a `true`
@@ -82,7 +81,7 @@
     "@pac_": "boolean"
   ->:
     "@bin_": ["integer"]
-    "@enc_": {"string": "integer"}
+    "@enc_": "any"
     "@pac_": "boolean"
 
 - ///: The `@warn_` header is used to send warnings to the client.

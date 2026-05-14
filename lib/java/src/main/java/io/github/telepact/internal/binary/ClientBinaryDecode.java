@@ -34,9 +34,10 @@ public class ClientBinaryDecode {
 
         // If there is a binary encoding included on this message, cache it
         if (headers.containsKey("@enc_")) {
-            final var binaryEncoding = (Map<String, Integer>) headers.get("@enc_");
-
-            binaryEncodingCache.add(binaryChecksum, binaryEncoding);
+            final var binaryEncoding = (Map<String, Object>) headers.get("@enc_");
+            if (binaryEncoding.containsKey("k")) {
+                binaryEncodingCache.add(binaryChecksum, binaryEncoding);
+            }
         }
 
         binaryChecksumStrategy.updateChecksum(binaryChecksum);

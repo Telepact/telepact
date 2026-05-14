@@ -14,7 +14,7 @@
 #|  limitations under the License.
 #|
 
-from typing import List, Dict, Tuple, Set, Union
+from typing import List, Dict, Tuple, Set, Union, cast
 from typing import TYPE_CHECKING
 
 from ...internal.binary.BinaryEncoding import BinaryEncoding
@@ -69,8 +69,11 @@ def trace_type(type_declaration: 'TTypeDeclaration', visited_type_names: set[str
 
 def construct_binary_encoding(telepact_schema: 'TelepactSchema') -> 'BinaryEncoding':
     from ..types.TUnion import TUnion
+    from ...internal.binary.BinaryPlan import compile_type_descriptor
 
     all_keys: set[str] = set()
+    request_plan_descriptors: list[list[object]] = []
+    response_plan_descriptors: list[list[object]] = []
 
     for key, value in telepact_schema.parsed.items():
 
@@ -95,6 +98,30 @@ def construct_binary_encoding(telepact_schema: 'TelepactSchema') -> 'BinaryEncod
     sorted_all_keys = sorted(all_keys)
 
     binary_encoding = {key: i for i, key in enumerate(sorted_all_keys)}
+    for key, value in telepact_schema.parsed.items():
+        if key.startswith('fn.') and isinstance(value, TUnion) and key + '.->' in telepact_schema.parsed:
+            request_plan_descriptors.append([
+                binary_encoding[key],
+                {
+                    "t": "s",
+                    "f": [
+                        [binary_encoding[field_key], compile_type_descriptor(field.type_declaration, binary_encoding)]
+                        for field_key, field in value.tags[key].fields.items()
+                    ],
+                },
+            ])
+            response_key = key + '.->'
+            response_type = cast(TUnion, telepact_schema.parsed[response_key])
+            response_plan_descriptors.append([
+                binary_encoding[key],
+                {
+                    "t": "s",
+                    "f": [
+                        [binary_encoding[field_key], compile_type_descriptor(field.type_declaration, binary_encoding)]
+                        for field_key, field in response_type.tags['Ok_'].fields.items()
+                    ],
+                },
+            ])
     final_string = "\n".join(sorted_all_keys)
     checksum = create_checksum(final_string)
-    return BinaryEncoding(binary_encoding, checksum)
+    return BinaryEncoding(binary_encoding, checksum, sorted_all_keys, request_plan_descriptors, response_plan_descriptors)

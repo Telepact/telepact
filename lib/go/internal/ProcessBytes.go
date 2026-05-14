@@ -53,6 +53,13 @@ func ProcessBytes(
 
 	safeInvokeMessage(onResponse, responseMessage)
 
+	if _, ok := responseMessage.Headers["@binary_"]; ok {
+		requestTarget := firstMapKey(requestMessage.Body)
+		if requestTarget != "" {
+			responseMessage.Headers["_binaryResponseFunctionName_"] = requestTarget
+		}
+	}
+
 	responseBytes, err := serialize(responseMessage)
 	if err != nil {
 		wrapped := wrapUnknownError(
@@ -65,6 +72,13 @@ func ProcessBytes(
 	}
 
 	return responseMessage, responseBytes, nil
+}
+
+func firstMapKey(m map[string]any) string {
+	for key := range m {
+		return key
+	}
+	return ""
 }
 
 func safeInvokeMessage(callback func(ServerMessage), message ServerMessage) {
