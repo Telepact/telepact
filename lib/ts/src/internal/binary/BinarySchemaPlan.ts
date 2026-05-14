@@ -28,6 +28,7 @@ import { TUnion } from '../types/TUnion.js';
 const hasOwn = Object.prototype.hasOwnProperty;
 
 export const RESPONSE_FUNCTION_NAME = Symbol('telepactResponseFunctionName');
+export type BinaryResponseHeaders = Record<string, any> & { [RESPONSE_FUNCTION_NAME]?: string };
 
 type EncodeValue = (value: unknown) => unknown;
 type DecodeValue = (value: unknown) => unknown;
@@ -304,7 +305,7 @@ function compileValuePlan(
         packedStruct = buildPackedStructPlan(fieldPlans);
     } else if (type instanceof TUnion) {
         const tagPlans = Object.entries(type.tags).flatMap(([tagName, tagStruct]) => {
-            const encodedKey = encodeMap.get(tagName)
+            const encodedKey = encodeMap.get(tagName);
             if (encodedKey === undefined) {
                 return [];
             }

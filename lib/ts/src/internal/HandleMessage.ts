@@ -32,7 +32,7 @@ import type { AuthHandler, UpdateHeaders } from '../Server.js';
 import { buildUnknownErrorMessage } from './UnknownError.js';
 import type { FunctionRouter, Middleware } from './ProcessBytes.js';
 import { requiresAuthentication } from './RequiresAuthentication.js';
-import { RESPONSE_FUNCTION_NAME } from './binary/BinarySchemaPlan.js';
+import { BinaryResponseHeaders, RESPONSE_FUNCTION_NAME } from './binary/BinarySchemaPlan.js';
 const UNAUTHENTICATED_MESSAGE = 'Valid authentication is required.';
 
 export async function handleMessage(
@@ -213,7 +213,7 @@ function buildUnauthenticatedErrorMessage(resultUnionType: TUnion, headers: Reco
     const resultUnion: Record<string, any> = resultMessage.body;
 
     resultMessage.headers = { ...resultMessage.headers, ...responseHeaders };
-    const finalResponseHeaders: Record<string, any> = resultMessage.headers;
+    const finalResponseHeaders: BinaryResponseHeaders = resultMessage.headers;
 
     const skipResultValidation: boolean = unsafeResponseEnabled;
 
@@ -291,7 +291,7 @@ function buildUnauthenticatedErrorMessage(resultUnionType: TUnion, headers: Reco
         finalResultUnion = resultUnion;
     }
 
-    (finalResponseHeaders as any)[RESPONSE_FUNCTION_NAME] = functionName;
+    finalResponseHeaders[RESPONSE_FUNCTION_NAME] = functionName;
 
     return new Message(finalResponseHeaders, finalResultUnion);
 }
