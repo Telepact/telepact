@@ -15,7 +15,7 @@
 //|
 
 import { TelepactSchema } from '../../TelepactSchema.js';
-import { BinaryEncoding } from '../../internal/binary/BinaryEncoding.js';
+import { BinaryEncoding, createDecodeMap } from '../../internal/binary/BinaryEncoding.js';
 import { createChecksum } from '../../internal/binary/CreateChecksum.js';
 import { TUnion } from '../types/TUnion.js';
 import { TStruct } from '../types/TStruct.js';
@@ -91,11 +91,7 @@ export function constructBinaryEncoding(telepactSchema: TelepactSchema): BinaryE
     const finalString = sortedAllKeys.join('\n');
     const checksum = createChecksum(finalString);
 
-    const decodeList: [number, string][] = [...binaryEncoding.entries()].map((e: [string, number]) => [
-        e[1],
-        e[0],
-    ]);
-    const decodeMap = new Map(decodeList);
+    const decodeMap = createDecodeMap(binaryEncoding);
     const schemaPlan = BinarySchemaPlan.compile(telepactSchema, binaryEncoding, decodeMap);
 
     return new BinaryEncoding(binaryEncoding, checksum, schemaPlan);

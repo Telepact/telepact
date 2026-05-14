@@ -169,7 +169,7 @@ function compileValuePlan(
                 try {
                     return encodePackedStructArray(value, itemPlan.packedStruct);
                 } catch (error) {
-                    if (!(error instanceof CannotDirectPack)) {
+                    if (!(error instanceof CannotDirectPackError)) {
                         throw error;
                     }
                 }
@@ -445,7 +445,7 @@ function buildPackedStructPlan(fieldPlans: StructFieldPlan[]): PackedStructPlan 
         header,
         encodeRow(value: Record<string, unknown>): unknown[] {
             if (!isRecord(value)) {
-                throw new CannotDirectPack();
+                throw new CannotDirectPackError();
             }
 
             const row: unknown[] = [];
@@ -459,7 +459,7 @@ function buildPackedStructPlan(fieldPlans: StructFieldPlan[]): PackedStructPlan 
                 let encodedValue: unknown;
                 if (packedFieldPlan.nestedPackedStruct !== undefined) {
                     if (!isRecord(rawValue)) {
-                        throw new CannotDirectPack();
+                        throw new CannotDirectPackError();
                     }
                     encodedValue = packedFieldPlan.nestedPackedStruct.encodeRow(rawValue);
                 } else {
@@ -489,7 +489,7 @@ function encodePackedStructArray(list: unknown[], packedStructPlan: PackedStruct
     const packedList: unknown[] = [MSGPACK_PACKED_VALUE, packedStructPlan.header];
     for (const item of list) {
         if (!isRecord(item)) {
-            throw new CannotDirectPack();
+            throw new CannotDirectPackError();
         }
         packedList.push(packedStructPlan.encodeRow(item));
     }
@@ -587,4 +587,4 @@ export class BinarySchemaPlan {
     }
 }
 
-class CannotDirectPack extends Error {}
+class CannotDirectPackError extends Error {}
