@@ -16,120 +16,106 @@
 
 package binary
 
-import (
-	"errors"
-
-	"github.com/vmihailenco/msgpack/v5"
-)
+import "github.com/vmihailenco/msgpack/v5"
 
 const (
-	// PackedByte is the msgpack extension type used to denote a packed list header.
-	PackedByte byte = 17
-	// UndefinedByte is the msgpack extension type used for undefined cells in packed rows.
-	UndefinedByte byte = 18
+// PackedByte is the msgpack extension type used to denote a packed list header.
+PackedByte byte = 17
+// UndefinedByte is the msgpack extension type used for undefined cells in packed rows.
+UndefinedByte byte = 18
 )
 
 var (
-	packedListMarker = &packedListExt{}
-	undefinedMarker  = &undefinedExt{}
+packedListMarker = &packedListExt{}
+undefinedMarker  = &undefinedExt{}
 )
 
 type packedListExt struct{}
 
 func (p *packedListExt) MarshalMsgpack() ([]byte, error) {
-	return nil, nil
+return nil, nil
 }
 
 func (p *packedListExt) UnmarshalMsgpack([]byte) error {
-	return nil
+return nil
 }
 
 type undefinedExt struct{}
 
 func (u *undefinedExt) MarshalMsgpack() ([]byte, error) {
-	return nil, nil
+return nil, nil
 }
 
 func (u *undefinedExt) UnmarshalMsgpack([]byte) error {
-	return nil
+return nil
 }
 
 func init() {
-	msgpack.RegisterExt(int8(PackedByte), (*packedListExt)(nil))
-	msgpack.RegisterExt(int8(UndefinedByte), (*undefinedExt)(nil))
+msgpack.RegisterExt(int8(PackedByte), (*packedListExt)(nil))
+msgpack.RegisterExt(int8(UndefinedByte), (*undefinedExt)(nil))
 }
 
-// PackList attempts to pack a list of maps into the compact representation used by the Telepact binary encoder.
-func PackList(lst []any) ([]any, error) {
-	if len(lst) == 0 {
-		return lst, nil
-	}
-
-	header := []any{nil}
-	packedList := []any{packedListMarker, header}
-	keyIndexMap := make(map[int]*BinaryPackNode)
-
-	for _, item := range lst {
-		mapValue, ok := toIntKeyMap(item)
-		if !ok {
-			return fallbackPackList(lst)
-		}
-
-		row, err := PackMap(mapValue, &header, keyIndexMap)
-		if err != nil {
-			var cannotPack CannotPack
-			if errors.As(err, &cannotPack) {
-				return fallbackPackList(lst)
-			}
-			return nil, err
-		}
-
-		packedList = append(packedList, row)
-	}
-
-	packedList[1] = header
-	return packedList, nil
+// PackList packs a list of maps using a precomputed header.
+func PackList(lst []any, header BinaryPackHeader) ([]any, error) {
+if len(lst) == 0 {
+return lst, nil
 }
 
-func fallbackPackList(lst []any) ([]any, error) {
-	result := make([]any, len(lst))
-	for i, item := range lst {
-		packed, err := Pack(item)
-		if err != nil {
-			return nil, err
-		}
-		result[i] = packed
-	}
-	return result, nil
+packedList := []any{packedListMarker}
+for _, item := range lst {
+mapValue, err := ensureAnyMap(item)
+if err != nil {
+return lst, nil
 }
 
-func toIntKeyMap(value any) (map[int]any, bool) {
-	switch typed := value.(type) {
-	case map[int]any:
-		return typed, true
-	case map[int64]any:
-		result := make(map[int]any, len(typed))
-		for key, val := range typed {
-			result[int(key)] = val
-		}
-		return result, true
-	case map[int32]any:
-		result := make(map[int]any, len(typed))
-		for key, val := range typed {
-			result[int(key)] = val
-		}
-		return result, true
-	case map[any]any:
-		result := make(map[int]any, len(typed))
-		for key, val := range typed {
-			intKey, ok := toInt(key)
-			if !ok {
-				return nil, false
-			}
-			result[intKey] = val
-		}
-		return result, true
-	default:
-		return nil, false
-	}
+row, err := packRow(mapValue, header)
+if err != nil {
+return nil, err
+}
+packedList = append(packedList, row)
+}
+
+return packedList, nil
+}
+
+func packRow(m map[any]any, header BinaryPackHeader) ([]any, error) {
+row := make([]any, len(header)-1)
+for i := 1; i < len(header); i++ {
+headerEntry := header[i]
+key := headerEntry
+if nestedHeader, ok := headerEntry.([]any); ok && len(nestedHeader) > 0 {
+key = nestedHeader[0]
+}
+
+value, ok := m[key]
+if !ok {
+row[i-1] = undefinedMarker
+continue
+}
+
+if nestedHeader, ok := headerEntry.([]any); ok {
+nestedMap, err := ensureAnyMap(value)
+if err != nil {
+row[i-1] = value
+continue
+}
+packedValue, err := packRow(nestedMap, BinaryPackHeader(nestedHeader))
+if err != nil {
+return nil, err
+}
+row[i-1] = packedValue
+} else {
+row[i-1] = value
+}
+}
+
+for len(row) > 0 {
+if _, ok := row[len(row)-1].(*undefinedExt); ok {
+row = row[:len(row)-1]
+continue
+}
+break
+}
+
+return row, nil
 }

@@ -17,6 +17,7 @@
 package io.github.telepact.internal.binary;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -28,8 +29,8 @@ public class DefaultBinaryEncodingCache implements BinaryEncodingCache {
         this.recentBinaryEncoders = new HashMap<>();
     }
 
-    public void add(int checksum, Map<String, Integer> binaryEncodingMap) {
-        BinaryEncoding binaryEncoding = new BinaryEncoding(binaryEncodingMap, checksum);
+    public void add(int checksum, Map<String, Integer> binaryEncodingMap, List<List<Object>> packedSites) {
+        final var binaryEncoding = new BinaryEncoding(binaryEncodingMap, checksum, packedSites);
         this.recentBinaryEncoders.put(checksum, binaryEncoding);
     }
 

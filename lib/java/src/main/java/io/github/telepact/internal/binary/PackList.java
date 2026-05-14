@@ -16,11 +16,10 @@
 
 package io.github.telepact.internal.binary;
 
-import static io.github.telepact.internal.binary.Pack.pack;
-import static io.github.telepact.internal.binary.PackMap.packMap;
+import static io.github.telepact.internal.binary.PackMap.UNDEFINED_BYTE;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -30,39 +29,52 @@ public class PackList {
 
     public static final byte PACKED_BYTE = (byte) 17;
 
-    static List<Object> packList(List<Object> list) {
+    static List<Object> packList(List<Object> list, List<Object> header) {
         if (list.isEmpty()) {
             return list;
         }
 
         final var packedList = new ArrayList<Object>();
-        final var header = new ArrayList<Object>();
-
         packedList.add(new MessagePackExtensionType(PACKED_BYTE, new byte[0]));
 
-        header.add(null);
-
-        packedList.add(header);
-
-        final var keyIndexMap = new HashMap<Integer, BinaryPackNode>();
-        try {
-            for (final var e : list) {
-                if (e instanceof final Map<?, ?> m) {
-                    final var row = packMap(m, header, keyIndexMap);
-
-                    packedList.add(row);
-                } else {
-                    // This list cannot be packed, abort
-                    throw new CannotPack();
-                }
+        for (final var entry : list) {
+            if (!(entry instanceof final Map<?, ?> mapValue)) {
+                return list;
             }
-            return packedList;
-        } catch (final CannotPack ex) {
-            final var newList = new ArrayList<Object>();
-            for (final var e : list) {
-                newList.add(pack(e));
-            }
-            return newList;
+            packedList.add(packRow((Map<Object, Object>) mapValue, header));
         }
+
+        return packedList;
+    }
+
+    private static List<Object> packRow(Map<Object, Object> mapValue, List<Object> header) {
+        final var row = new ArrayList<Object>(Collections.nCopies(header.size() - 1,
+                new MessagePackExtensionType(UNDEFINED_BYTE, new byte[0])));
+
+        for (int index = 1; index < header.size(); index += 1) {
+            final var headerEntry = header.get(index);
+            final var key = headerEntry instanceof final List<?> nestedHeader && !nestedHeader.isEmpty()
+                    ? nestedHeader.get(0)
+                    : headerEntry;
+
+            if (!mapValue.containsKey(key)) {
+                continue;
+            }
+
+            final var value = mapValue.get(key);
+            if (headerEntry instanceof final List<?> nestedHeader && value instanceof final Map<?, ?> nestedMap) {
+                row.set(index - 1, packRow((Map<Object, Object>) nestedMap, (List<Object>) nestedHeader));
+            } else {
+                row.set(index - 1, value);
+            }
+        }
+
+        while (!row.isEmpty()
+                && row.get(row.size() - 1) instanceof final MessagePackExtensionType t
+                && t.getType() == UNDEFINED_BYTE) {
+            row.remove(row.size() - 1);
+        }
+
+        return row;
     }
 }

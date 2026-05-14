@@ -32,11 +32,10 @@ public class ClientBinaryDecode {
         final var binaryChecksums = (List<Integer>) headers.get("@bin_");
         final var binaryChecksum = binaryChecksums.get(0);
 
-        // If there is a binary encoding included on this message, cache it
         if (headers.containsKey("@enc_")) {
             final var binaryEncoding = (Map<String, Integer>) headers.get("@enc_");
-
-            binaryEncodingCache.add(binaryChecksum, binaryEncoding);
+            final var packedSites = (List<List<Object>>) headers.getOrDefault("@pck_", List.of());
+            binaryEncodingCache.add(binaryChecksum, binaryEncoding, packedSites);
         }
 
         binaryChecksumStrategy.updateChecksum(binaryChecksum);
@@ -46,7 +45,7 @@ public class ClientBinaryDecode {
 
         final Map<Object, Object> finalEncodedMessageBody;
         if (Objects.equals(true, headers.get("@pac_"))) {
-            finalEncodedMessageBody = unpackBody(encodedMessageBody);
+            finalEncodedMessageBody = unpackBody(encodedMessageBody, binaryEncoder);
         } else {
             finalEncodedMessageBody = encodedMessageBody;
         }

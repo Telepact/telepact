@@ -38,6 +38,7 @@ public class ServerBinaryEncode {
 
         if (clientKnownBinaryChecksums == null || !clientKnownBinaryChecksums.contains(binaryEncoder.checksum)) {
             headers.put("@enc_", binaryEncoder.encodeMap);
+            headers.put("@pck_", binaryEncoder.toPackedSiteData());
         }
 
         headers.put("@bin_", List.of(binaryEncoder.checksum));
@@ -45,7 +46,7 @@ public class ServerBinaryEncode {
 
         final Map<Object, Object> finalEncodedMessageBody;
         if (Objects.equals(true, headers.get("@pac_"))) {
-            finalEncodedMessageBody = packBody(encodedMessageBody);
+            finalEncodedMessageBody = packBody(encodedMessageBody, binaryEncoder);
         } else {
             finalEncodedMessageBody = encodedMessageBody;
         }

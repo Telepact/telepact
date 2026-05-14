@@ -14,58 +14,43 @@
 #|  limitations under the License.
 #|
 
-from typing import TYPE_CHECKING
-from threading import Lock
-
 from msgpack import ExtType
-from .CannotPack import CannotPack
-from .PackMap import pack_map
 
-if TYPE_CHECKING:
-    from ...internal.binary.BinaryPackNode import BinaryPackNode
-
+from .BinaryEncoding import BinaryPackHeader
+from .PackMap import UNDEFINED_EXT
 
 PACKED_BYTE = 17
 PACKED_EXT = ExtType(PACKED_BYTE, b'')
-_PACK = None
-_PACK_LOCK = Lock()
 
 
-def _get_pack():
-    global _PACK
-    if _PACK is None:
-        with _PACK_LOCK:
-            if _PACK is None:
-                from .Pack import pack as _pack
-                _PACK = _pack
-    return _PACK
+def pack_row(m: dict[object, object], header: BinaryPackHeader) -> list[object]:
+    row: list[object] = [UNDEFINED_EXT] * (len(header) - 1)
+
+    for index in range(1, len(header)):
+        header_entry = header[index]
+        key = header_entry[0] if type(header_entry) is list else header_entry
+
+        if key in m:
+            value = m[key]
+            if type(header_entry) is list and type(value) is dict:
+                row[index - 1] = pack_row(value, header_entry)
+            else:
+                row[index - 1] = value
+
+    while row and row[-1] == UNDEFINED_EXT:
+        row.pop()
+
+    return row
 
 
-def pack_list(lst: list[object]) -> list[object]:
-    pack = _get_pack()
-
+def pack_list(lst: list[object], header: BinaryPackHeader) -> list[object]:
     if not lst:
         return lst
 
-    packed_list: list[object] = []
-    header: list[object] = []
+    packed_list: list[object] = [PACKED_EXT]
+    for item in lst:
+        if type(item) is not dict:
+            return lst
+        packed_list.append(pack_row(item, header))
 
-    packed_list.append(PACKED_EXT)
-
-    header.append(None)
-
-    packed_list.append(header)
-
-    key_index_map: dict[int, BinaryPackNode] = {}
-    try:
-        for item in lst:
-            if type(item) is dict:
-                row = pack_map(item, header, key_index_map)
-                packed_list.append(row)
-            else:
-                # This list cannot be packed, abort
-                raise CannotPack()
-        return packed_list
-    except CannotPack:
-        new_list = [pack(item) for item in lst]
-        return new_list
+    return packed_list

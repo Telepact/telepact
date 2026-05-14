@@ -16,49 +16,59 @@
 
 package binary
 
-import "fmt"
-
 // UnpackList converts packed list representation back into standard pseudo-JSON arrays.
-func UnpackList(lst []any) ([]any, error) {
-	if len(lst) == 0 {
-		return lst, nil
-	}
+func UnpackList(lst []any, header BinaryPackHeader) ([]any, error) {
+if len(lst) == 0 {
+return lst, nil
+}
 
-	switch lst[0].(type) {
-	case *packedListExt:
-		if len(lst) < 2 {
-			return nil, fmt.Errorf("invalid packed list: missing header")
-		}
+if _, ok := lst[0].(*packedListExt); !ok {
+return lst, nil
+}
 
-		header, ok := lst[1].([]any)
-		if !ok {
-			return nil, fmt.Errorf("invalid packed list header type: %T", lst[1])
-		}
+unpacked := make([]any, 0, len(lst)-1)
+for i := 1; i < len(lst); i++ {
+row, ok := lst[i].([]any)
+if !ok {
+unpacked = append(unpacked, lst[i])
+continue
+}
 
-		unpacked := make([]any, 0, len(lst)-2)
-		for i := 2; i < len(lst); i++ {
-			row, ok := lst[i].([]any)
-			if !ok {
-				return nil, fmt.Errorf("invalid packed row type: %T", lst[i])
-			}
+unpackedMap, err := unpackRow(row, header)
+if err != nil {
+return nil, err
+}
+unpacked = append(unpacked, unpackedMap)
+}
 
-			unpackedMap, err := UnpackMap(row, header)
-			if err != nil {
-				return nil, err
-			}
-			unpacked = append(unpacked, unpackedMap)
-		}
+return unpacked, nil
+}
 
-		return unpacked, nil
-	default:
-		result := make([]any, len(lst))
-		for i, item := range lst {
-			unpacked, err := Unpack(item)
-			if err != nil {
-				return nil, err
-			}
-			result[i] = unpacked
-		}
-		return result, nil
-	}
+func unpackRow(row []any, header BinaryPackHeader) (map[any]any, error) {
+finalMap := make(map[any]any, len(row))
+for i, value := range row {
+if i+1 >= len(header) {
+continue
+}
+
+headerEntry := header[i+1]
+if _, ok := value.(*undefinedExt); ok {
+continue
+}
+
+if nestedHeader, ok := headerEntry.([]any); ok {
+nestedRow, ok := value.([]any)
+if !ok || len(nestedHeader) == 0 {
+continue
+}
+nestedMap, err := unpackRow(nestedRow, BinaryPackHeader(nestedHeader))
+if err != nil {
+return nil, err
+}
+finalMap[nestedHeader[0]] = nestedMap
+} else {
+finalMap[headerEntry] = value
+}
+}
+return finalMap, nil
 }

@@ -17,14 +17,52 @@
 package binary
 
 // PackBody packs the message body map into the compact binary representation when possible.
-func PackBody(body map[any]any) (map[any]any, error) {
-	result := make(map[any]any, len(body))
-	for key, value := range body {
-		packedValue, err := Pack(value)
-		if err != nil {
-			return nil, err
-		}
-		result[key] = packedValue
-	}
-	return result, nil
+func PackBody(body map[any]any, encoding *BinaryEncoding) (map[any]any, error) {
+result := make(map[any]any, len(body))
+for key, value := range body {
+result[key] = value
+}
+
+for _, packedSite := range encoding.PackedSites {
+parentMap, ok := getParentMap(result, packedSite.EncodedPath)
+if !ok || len(packedSite.EncodedPath) == 0 {
+continue
+}
+targetKey := packedSite.EncodedPath[len(packedSite.EncodedPath)-1]
+value, ok := parentMap[targetKey]
+if !ok {
+continue
+}
+listValue, ok := value.([]any)
+if !ok {
+continue
+}
+packedValue, err := PackList(listValue, packedSite.Header)
+if err != nil {
+return nil, err
+}
+parentMap[targetKey] = packedValue
+}
+
+return result, nil
+}
+
+func getParentMap(root map[any]any, path []int) (map[any]any, bool) {
+var current any = root
+for _, key := range path[:max(len(path)-1, 0)] {
+nextMap, err := ensureAnyMap(current)
+if err != nil {
+return nil, false
+}
+nextValue, ok := nextMap[key]
+if !ok {
+return nil, false
+}
+current = nextValue
+}
+result, err := ensureAnyMap(current)
+if err != nil {
+return nil, false
+}
+return result, true
 }

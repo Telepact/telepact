@@ -17,14 +17,32 @@
 package binary
 
 // UnpackBody unpacks each entry within the message body map.
-func UnpackBody(body map[any]any) (map[any]any, error) {
-	result := make(map[any]any, len(body))
-	for key, value := range body {
-		unpacked, err := Unpack(value)
-		if err != nil {
-			return nil, err
-		}
-		result[key] = unpacked
-	}
-	return result, nil
+func UnpackBody(body map[any]any, encoding *BinaryEncoding) (map[any]any, error) {
+result := make(map[any]any, len(body))
+for key, value := range body {
+result[key] = value
+}
+
+for _, packedSite := range encoding.PackedSites {
+parentMap, ok := getParentMap(result, packedSite.EncodedPath)
+if !ok || len(packedSite.EncodedPath) == 0 {
+continue
+}
+targetKey := packedSite.EncodedPath[len(packedSite.EncodedPath)-1]
+value, ok := parentMap[targetKey]
+if !ok {
+continue
+}
+listValue, ok := value.([]any)
+if !ok {
+continue
+}
+unpackedValue, err := UnpackList(listValue, packedSite.Header)
+if err != nil {
+return nil, err
+}
+parentMap[targetKey] = unpackedValue
+}
+
+return result, nil
 }

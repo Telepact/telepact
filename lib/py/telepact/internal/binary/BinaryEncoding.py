@@ -14,11 +14,37 @@
 #|  limitations under the License.
 #|
 
+BinaryPackHeader = list[object]
+BinaryPackSiteData = tuple[list[str], BinaryPackHeader]
+
+
+def _clone_binary_pack_header(header: BinaryPackHeader) -> BinaryPackHeader:
+    return [
+        _clone_binary_pack_header(entry) if type(entry) is list else entry
+        for entry in header
+    ]
+
+
+class BinaryPackSite:
+    def __init__(self, site: BinaryPackSiteData, binary_encoding_map: dict[str, int]) -> None:
+        self.path = list(site[0])
+        self.encoded_path = [binary_encoding_map[segment] for segment in self.path]
+        self.header = _clone_binary_pack_header(site[1])
+
+    def to_data(self) -> BinaryPackSiteData:
+        return (list(self.path), _clone_binary_pack_header(self.header))
+
+
 class BinaryEncoding:
-    def __init__(self, binary_encoding_map: dict[str, int], checksum: int) -> None:
-        self.encode_map: dict[str, int] = binary_encoding_map
-        decode_table: list[str | None] = [None] * len(binary_encoding_map)
-        for key, value in binary_encoding_map.items():
+    def __init__(
+        self,
+        binary_encoding_map: dict[str, int],
+        checksum: int,
+        packed_sites: list[BinaryPackSiteData] | None = None,
+    ) -> None:
+        self.encode_map: dict[str, int] = dict(binary_encoding_map)
+        decode_table: list[str | None] = [None] * len(self.encode_map)
+        for key, value in self.encode_map.items():
             if value < 0 or value >= len(decode_table):
                 raise ValueError("binary encoding ids must be dense sequential integers")
             if decode_table[value] is not None:
@@ -28,3 +54,10 @@ class BinaryEncoding:
             raise ValueError("binary encoding ids must be dense sequential integers")
         self.decode_table: list[str] = [key for key in decode_table if key is not None]
         self.checksum: int = checksum
+        self.packed_sites: list[BinaryPackSite] = [
+            BinaryPackSite(site, self.encode_map)
+            for site in (packed_sites or [])
+        ]
+
+    def to_packed_site_data(self) -> list[BinaryPackSiteData]:
+        return [site.to_data() for site in self.packed_sites]

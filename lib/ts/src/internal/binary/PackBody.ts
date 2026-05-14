@@ -14,14 +14,34 @@
 //|  limitations under the License.
 //|
 
-import { pack } from './Pack.js';
+import { BinaryEncoding } from './BinaryEncoding.js';
+import { packList } from './PackList.js';
 
-export function packBody(body: Map<any, any>): Map<any, any> {
-    const result: Map<any, any> = new Map();
+function getParentMap(root: Map<any, any>, path: number[]): Map<any, any> | undefined {
+    let current: any = root;
+    for (let index = 0; index < path.length - 1; index += 1) {
+        if (!(current instanceof Map)) {
+            return undefined;
+        }
+        current = current.get(path[index]);
+    }
+    return current instanceof Map ? current : undefined;
+}
 
-    for (const [key, value] of body.entries()) {
-        const packedValue = pack(value);
-        result.set(key, packedValue);
+export function packBody(body: Map<any, any>, binaryEncoding: BinaryEncoding): Map<any, any> {
+    const result: Map<any, any> = new Map(body);
+
+    for (const packedSite of binaryEncoding.packedSites) {
+        const parentMap = getParentMap(result, packedSite.encodedPath);
+        const targetKey = packedSite.encodedPath[packedSite.encodedPath.length - 1];
+        if (parentMap === undefined || targetKey === undefined || !parentMap.has(targetKey)) {
+            continue;
+        }
+
+        const value = parentMap.get(targetKey);
+        if (Array.isArray(value)) {
+            parentMap.set(targetKey, packList(value, packedSite.header));
+        }
     }
 
     return result;
