@@ -48,6 +48,15 @@ jobs:
           java-version: "21"
           distribution: corretto
 
+      - name: Trust Maven Central proxy root in Java
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo | openssl s_client -showcerts -servername repo.maven.apache.org -connect repo.maven.apache.org:443 2>/dev/null \
+            | awk '/BEGIN CERTIFICATE/{n++} n==2{print} /END CERTIFICATE/{if(n==2) exit}' > /tmp/repo-maven-proxy-root.pem
+          sudo keytool -delete -alias copilot-maven-proxy-root -keystore "${JAVA_HOME}/lib/security/cacerts" -storepass changeit >/dev/null 2>&1 || true
+          sudo keytool -importcert -noprompt -trustcacerts -alias copilot-maven-proxy-root -file /tmp/repo-maven-proxy-root.pem -keystore "${JAVA_HOME}/lib/security/cacerts" -storepass changeit
+
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
@@ -70,4 +79,8 @@ jobs:
       - name: Install repo prerequisites
         run: |
           sudo apt-get update
-          sudo apt-get install -y nats-server
+          sudo apt-get install -y --no-install-recommends ca-certificates ca-certificates-java nats-server
+          sudo update-ca-certificates
+          if [ -x /var/lib/dpkg/info/ca-certificates-java.postinst ]; then
+            sudo /var/lib/dpkg/info/ca-certificates-java.postinst configure
+          fi
