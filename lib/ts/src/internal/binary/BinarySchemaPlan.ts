@@ -303,17 +303,17 @@ function compileValuePlan(
         };
         packedStruct = buildPackedStructPlan(fieldPlans);
     } else if (type instanceof TUnion) {
-        const tagPlans = Object.entries(type.tags).map(([tagName, tagStruct]) => {
-            const encodedKey = encodeMap.get(tagName);
+        const tagPlans = Object.entries(type.tags).flatMap(([tagName, tagStruct]) => {
+            const encodedKey = encodeMap.get(tagName)
             if (encodedKey === undefined) {
-                throw new Error(`Missing binary encoding for union tag ${tagName}`);
+                return [];
             }
             const tagPlan = compileValuePlan(new TTypeDeclaration(tagStruct, false, []), encodeMap, decodeMap);
-            return {
+            return [{
                 tagName,
                 encodedKey,
                 tagPlan,
-            };
+            }];
         });
         const tagByDecodedKey = new Map<string, typeof tagPlans[number]>();
         const tagByEncodedKey = new Map<number, typeof tagPlans[number]>();
