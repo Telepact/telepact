@@ -52,12 +52,14 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          maven_host=repo.maven.apache.org
           cert_file=/tmp/repo-maven-proxy-root.pem
           openssl_dump=/tmp/repo-maven-openssl-chain.pem
           openssl_err=/tmp/repo-maven-openssl.err
           cert_dir=/tmp/repo-maven-chain-certs
           cacerts_password="${JAVA_CACERTS_PASSWORD:-changeit}"
-          if ! echo | openssl s_client -showcerts -servername repo.maven.apache.org -connect repo.maven.apache.org:443 > "${openssl_dump}" 2>"${openssl_err}"; then
+          keystore_path="${JAVA_HOME}/lib/security/cacerts"
+          if ! echo | openssl s_client -showcerts -servername "${maven_host}" -connect "${maven_host}:443" > "${openssl_dump}" 2>"${openssl_err}"; then
             cat "${openssl_err}"
             exit 1
           fi
@@ -79,14 +81,14 @@ jobs:
             fi
           done
           if [ ! -s "${cert_file}" ]; then
-            echo "Failed to find a self-signed root certificate in repo.maven.apache.org TLS chain."
+            echo "Failed to find a self-signed root certificate in ${maven_host} TLS chain."
             cat "${openssl_err}"
             exit 1
           fi
-          if sudo keytool -list -alias copilot-maven-proxy-root -keystore "${JAVA_HOME}/lib/security/cacerts" -storepass "${cacerts_password}" >/dev/null 2>&1; then
-            sudo keytool -delete -alias copilot-maven-proxy-root -keystore "${JAVA_HOME}/lib/security/cacerts" -storepass "${cacerts_password}"
+          if sudo keytool -list -alias copilot-maven-proxy-root -keystore "${keystore_path}" -storepass "${cacerts_password}" >/dev/null 2>&1; then
+            sudo keytool -delete -alias copilot-maven-proxy-root -keystore "${keystore_path}" -storepass "${cacerts_password}"
           fi
-          sudo keytool -importcert -noprompt -trustcacerts -alias copilot-maven-proxy-root -file "${cert_file}" -keystore "${JAVA_HOME}/lib/security/cacerts" -storepass "${cacerts_password}"
+          sudo keytool -importcert -noprompt -trustcacerts -alias copilot-maven-proxy-root -file "${cert_file}" -keystore "${keystore_path}" -storepass "${cacerts_password}"
 
       - name: Set up Go
         uses: actions/setup-go@v5
