@@ -41,7 +41,7 @@ func ClientBinaryDecode(message []any, cache BinaryEncodingCache, strategy *Clie
 	binaryChecksum := checksums[0]
 
 	if encodingRaw, ok := headers["@enc_"]; ok {
-		encodingMap, castErr := toStringIntMap(encodingRaw)
+		encodingMap, castErr := toStringAnyMap(encodingRaw)
 		if castErr != nil {
 			return nil, castErr
 		}
@@ -155,6 +155,21 @@ func toStringIntMap(value any) (map[string]int, error) {
 		return result, nil
 	default:
 		return nil, fmt.Errorf("invalid binary encoding map type: %T", value)
+	}
+}
+
+func toStringAnyMap(value any) (map[string]any, error) {
+	switch typed := value.(type) {
+	case map[string]any:
+		return typed, nil
+	case map[any]any:
+		result := make(map[string]any, len(typed))
+		for rawKey, raw := range typed {
+			result[fmt.Sprint(rawKey)] = raw
+		}
+		return result, nil
+	default:
+		return nil, fmt.Errorf("invalid binary encoding descriptor type: %T", value)
 	}
 }
 

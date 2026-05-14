@@ -44,6 +44,13 @@ func ServerBinaryEncode(message []any, binaryEncoding *BinaryEncoding) ([]any, e
 	if hasClientKnown {
 		delete(headers, "@clientKnownBinaryChecksums_")
 	}
+	var functionID *int
+	if functionName, ok := headers["_binaryResponseFunctionName_"].(string); ok {
+		if value, exists := binaryEncoding.EncodeMap[functionName]; exists {
+			functionID = &value
+		}
+	}
+	delete(headers, "_binaryResponseFunctionName_")
 
 	clientKnown, err := extractIntSlice(clientKnownRaw)
 	if err != nil {
@@ -64,11 +71,9 @@ func ServerBinaryEncode(message []any, binaryEncoding *BinaryEncoding) ([]any, e
 	}
 
 	if !checksumKnown {
-		encodeMapCopy := make(map[string]int, len(binaryEncoding.EncodeMap))
-		for key, value := range binaryEncoding.EncodeMap {
-			encodeMapCopy[key] = value
-		}
-		headers["@enc_"] = encodeMapCopy
+		headers["@enc_"] = binaryEncoding.NegotiationDescriptor(functionID, true)
+	} else {
+		headers["@enc_"] = binaryEncoding.NegotiationDescriptor(functionID, false)
 	}
 
 	headers["@bin_"] = []int{binaryEncoding.Checksum}

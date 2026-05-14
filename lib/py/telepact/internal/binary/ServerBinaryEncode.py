@@ -21,14 +21,14 @@ if TYPE_CHECKING:
 
 
 def server_binary_encode(message: list[object], binary_encoder: 'BinaryEncoding') -> list[object]:
-    from ...internal.binary.EncodeBody import encode_body
-    from ...internal.binary.PackBody import pack_body
+    from ...internal.binary.BinaryPlan import encode_response_body
     from ...internal.binary.BinaryEncoderUnavailableError import BinaryEncoderUnavailableError
 
     headers = cast(dict[str, object], message[0])
     message_body = cast(dict[str, object], message[1])
     client_known_binary_checksums = cast(list[int], headers.pop(
         "@clientKnownBinaryChecksums_", None))
+    function_id = cast(int | None, headers.pop("_binaryResponseFunctionId_", None))
 
     result_tag = list(message_body.keys())[0]
 
@@ -36,15 +36,11 @@ def server_binary_encode(message: list[object], binary_encoder: 'BinaryEncoding'
         raise BinaryEncoderUnavailableError()
 
     if client_known_binary_checksums is None or binary_encoder.checksum not in client_known_binary_checksums:
-        headers["@enc_"] = binary_encoder.encode_map
+        headers["@enc_"] = binary_encoder.negotiation_descriptor(function_id, True)
+    else:
+        headers["@enc_"] = binary_encoder.negotiation_descriptor(function_id, False)
 
     headers["@bin_"] = [binary_encoder.checksum]
-    encoded_message_body = encode_body(message_body, binary_encoder)
-
-    final_encoded_message_body: dict[object, object]
-    if headers.get("@pac_") is True:
-        final_encoded_message_body = pack_body(encoded_message_body)
-    else:
-        final_encoded_message_body = encoded_message_body
+    final_encoded_message_body = encode_response_body(message_body, binary_encoder, function_id, headers.get("@pac_") is True)
 
     return [headers, final_encoded_message_body]

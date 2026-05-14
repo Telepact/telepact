@@ -26,9 +26,9 @@ class DefaultBinaryEncodingCache(BinaryEncodingCache):
     def __init__(self) -> None:
         self.recent_binary_encoders: dict[int, 'BinaryEncoding'] = {}
 
-    def add(self, checksum: int, binary_encoding_map: dict[str, int]) -> None:
-        from .BinaryEncoding import BinaryEncoding        
-        binary_encoding = BinaryEncoding(binary_encoding_map, checksum)
+    def add(self, checksum: int, binary_encoding_descriptor: dict[str, object]) -> None:
+        from .BinaryEncoding import BinaryEncoding
+        binary_encoding = BinaryEncoding.from_negotiation_descriptor(checksum, binary_encoding_descriptor)
         self.recent_binary_encoders[checksum] = binary_encoding
 
     def get(self, checksum: int) -> 'BinaryEncoding':

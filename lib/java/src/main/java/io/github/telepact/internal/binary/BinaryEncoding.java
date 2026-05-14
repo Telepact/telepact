@@ -17,6 +17,8 @@
 package io.github.telepact.internal.binary;
 
 import java.util.Map;
+import java.util.List;
+import java.util.HashMap;
 import java.util.stream.Collectors;
 
 public class BinaryEncoding {
@@ -24,11 +26,42 @@ public class BinaryEncoding {
     public final Map<String, Integer> encodeMap;
     public final Map<Integer, String> decodeMap;
     public final Integer checksum;
+    public final List<String> keys;
+    public final List<Object> requestPlanDescriptors;
+    public final List<Object> responsePlanDescriptors;
 
-    public BinaryEncoding(Map<String, Integer> binaryEncodingMap, Integer checksum) {
+    public BinaryEncoding(Map<String, Integer> binaryEncodingMap, Integer checksum, List<String> keys, List<Object> requestPlanDescriptors, List<Object> responsePlanDescriptors) {
         this.encodeMap = binaryEncodingMap;
         this.decodeMap = binaryEncodingMap.entrySet().stream()
                 .collect(Collectors.toMap(e -> e.getValue(), e -> e.getKey()));
         this.checksum = checksum;
+        this.keys = keys;
+        this.requestPlanDescriptors = requestPlanDescriptors;
+        this.responsePlanDescriptors = responsePlanDescriptors;
+    }
+
+    public Map<String, Object> negotiationDescriptor(Integer functionId, boolean includeBundle) {
+        final Map<String, Object> descriptor = new HashMap<>();
+        descriptor.put("v", 1);
+        if (functionId != null) {
+            descriptor.put("p", functionId);
+        }
+        if (includeBundle) {
+            descriptor.put("k", keys);
+            descriptor.put("q", requestPlanDescriptors);
+            descriptor.put("s", responsePlanDescriptors);
+        }
+        return descriptor;
+    }
+
+    public static BinaryEncoding fromNegotiationDescriptor(Integer checksum, Map<String, Object> descriptor) {
+        final var keys = (List<String>) descriptor.get("k");
+        final Map<String, Integer> encodingMap = new HashMap<>();
+        for (int index = 0; index < keys.size(); index++) {
+            encodingMap.put(keys.get(index), index);
+        }
+        final var requestPlanDescriptors = (List<Object>) descriptor.getOrDefault("q", List.of());
+        final var responsePlanDescriptors = (List<Object>) descriptor.getOrDefault("s", List.of());
+        return new BinaryEncoding(encodingMap, checksum, keys, requestPlanDescriptors, responsePlanDescriptors);
     }
 }

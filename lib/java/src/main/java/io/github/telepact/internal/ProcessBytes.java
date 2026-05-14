@@ -57,6 +57,10 @@ public class ProcessBytes {
 
             final byte[] responseBytes;
             try {
+                if (Boolean.TRUE.equals(responseMessage.headers.get("@binary_"))) {
+                    final var requestTarget = requestMessage.body.keySet().iterator().next();
+                    responseMessage.headers.put("_binaryResponseFunctionName_", requestTarget);
+                }
                 responseBytes = serializer.serialize(responseMessage);
             } catch (Throwable e) {
                 final var wrapped = e instanceof SerializationError

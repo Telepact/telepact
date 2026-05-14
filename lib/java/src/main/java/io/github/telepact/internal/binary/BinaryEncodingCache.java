@@ -26,7 +26,7 @@ public interface BinaryEncodingCache {
      * @param checksum The checksum of the binary encoding.
      * @param binaryEncodingMap The binary encoding map.
      */
-    void add(int checksum, Map<String, Integer> binaryEncodingMap);
+    void add(int checksum, Map<String, Object> binaryEncodingDescriptor);
 
     /**
      * Get a binary encoding from the cache.

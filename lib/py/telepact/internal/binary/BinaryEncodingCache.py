@@ -22,7 +22,7 @@ from .BinaryEncoding import BinaryEncoding
 class BinaryEncodingCache(metaclass=ABCMeta):
 
     @abstractmethod
-    def add(self, checksum: int, binary_encoding_map: dict[str, int]) -> None:
+    def add(self, checksum: int, binary_encoding_descriptor: dict[str, object]) -> None:
         """
         Set a binary encoding in the cache.
 

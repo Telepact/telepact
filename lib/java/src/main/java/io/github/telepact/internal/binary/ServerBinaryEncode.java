@@ -29,6 +29,8 @@ public class ServerBinaryEncode {
         final var headers = (Map<String, Object>) message.get(0);
         final var messageBody = (Map<String, Object>) message.get(1);
         final var clientKnownBinaryChecksums = (List<Integer>) headers.remove("@clientKnownBinaryChecksums_");
+        final var functionName = (String) headers.remove("_binaryResponseFunctionName_");
+        final Integer functionId = functionName == null ? null : binaryEncoder.encodeMap.get(functionName);
 
         final var resultTag = new ArrayList<>(messageBody.keySet()).get(0);
 
@@ -37,7 +39,9 @@ public class ServerBinaryEncode {
         }
 
         if (clientKnownBinaryChecksums == null || !clientKnownBinaryChecksums.contains(binaryEncoder.checksum)) {
-            headers.put("@enc_", binaryEncoder.encodeMap);
+            headers.put("@enc_", binaryEncoder.negotiationDescriptor(functionId, true));
+        } else {
+            headers.put("@enc_", binaryEncoder.negotiationDescriptor(functionId, false));
         }
 
         headers.put("@bin_", List.of(binaryEncoder.checksum));

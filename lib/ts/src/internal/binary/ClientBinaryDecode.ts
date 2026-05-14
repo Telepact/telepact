@@ -31,8 +31,10 @@ export function clientBinaryDecode(
     const binaryChecksum = binaryChecksums[0]!;
 
     if (headers.has("@enc_")) {
-        const binaryEncoding = headers.get("@enc_") as Map<string, number>;
-        binaryEncodingCache.add(binaryChecksum, binaryEncoding);
+        const binaryEncoding = convertMapsToObjects(headers.get("@enc_")) as Record<string, any>;
+        if (binaryEncoding.k !== undefined) {
+            binaryEncodingCache.add(binaryChecksum, binaryEncoding);
+        }
     }
 
     binaryChecksumStrategy.updateChecksum(binaryChecksum);
