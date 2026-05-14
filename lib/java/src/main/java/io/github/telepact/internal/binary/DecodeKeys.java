@@ -29,12 +29,13 @@ public class DecodeKeys {
                 final String key;
                 if (e.getKey() instanceof final String s) {
                     key = s;
+                } else if (e.getKey() instanceof final Number n) {
+                    key = binaryEncoder.decodeKey(n.intValue());
                 } else {
-                    key = (String) binaryEncoder.decodeMap.get(e.getKey());
-
-                    if (key == null) {
-                        throw new BinaryEncodingMissing(key);
-                    }
+                    throw new BinaryEncodingMissing(e.getKey());
+                }
+                if (key == null) {
+                    throw new BinaryEncodingMissing(e.getKey());
                 }
                 final var encodedValue = decodeKeys(e.getValue(), binaryEncoder);
 

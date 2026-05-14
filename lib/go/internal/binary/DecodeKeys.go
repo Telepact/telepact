@@ -47,7 +47,7 @@ func DecodeKeys(given any, encoding *BinaryEncoding) (any, error) {
 			if err != nil {
 				return nil, err
 			}
-			newKey, ok := encoding.DecodeMap[key]
+			newKey, ok := encoding.decodeKey(key)
 			if !ok {
 				return nil, NewBinaryEncodingMissing(key)
 			}
@@ -76,7 +76,7 @@ func DecodeKeys(given any, encoding *BinaryEncoding) (any, error) {
 				if !ok {
 					return nil, fmt.Errorf("invalid key type for decode: %T", rawKey)
 				}
-				newKey, exists := encoding.DecodeMap[intKey]
+				newKey, exists := encoding.decodeKey(intKey)
 				if !exists {
 					return nil, NewBinaryEncodingMissing(intKey)
 				}
@@ -108,7 +108,7 @@ func decodeNumericStringKey(key string, encoding *BinaryEncoding) (string, bool,
 	}
 	if key[0] == '-' || (key[0] >= '0' && key[0] <= '9') {
 		if intKey, err := strconv.Atoi(key); err == nil {
-			if decoded, ok := encoding.DecodeMap[intKey]; ok {
+			if decoded, ok := encoding.decodeKey(intKey); ok {
 				return decoded, true, nil
 			}
 			return "", false, NewBinaryEncodingMissing(intKey)

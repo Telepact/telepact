@@ -16,14 +16,13 @@
 
 from typing import TYPE_CHECKING
 from typing import Callable
-
 from ...internal.binary.BinaryEncodingMissing import BinaryEncodingMissing
 
 if TYPE_CHECKING:
     from ...internal.binary.BinaryEncoding import BinaryEncoding
 
 
-def _decode_keys_recursive(value: object, decode_map_get: Callable[[object], object | None]) -> object:
+def _decode_keys_recursive(value: object, decode_key: 'Callable[[object], str | None]') -> object:
     value_type = type(value)
 
     if value_type is dict:
@@ -32,21 +31,28 @@ def _decode_keys_recursive(value: object, decode_map_get: Callable[[object], obj
             if type(key) is str:
                 decoded_key = key
             else:
-                decoded_key = decode_map_get(key)
+                decoded_key = decode_key(key)
                 if decoded_key is None:
                     raise BinaryEncodingMissing(key)
-            decoded[decoded_key] = _decode_keys_recursive(item, decode_map_get)
+            decoded[decoded_key] = _decode_keys_recursive(item, decode_key)
         return decoded
     if value_type is list:
-        return [_decode_keys_recursive(item, decode_map_get) for item in value]
+        return [_decode_keys_recursive(item, decode_key) for item in value]
     return value
 
 
 def decode_keys(given: object, binary_encoder: 'BinaryEncoding') -> object:
-    decode_map_get = binary_encoder.decode_map.get
+    decode_table = binary_encoder.decode_table
+
+    def decode_key(key: object) -> str | None:
+        if type(key) is not int:
+            return None
+        if key < 0 or key >= len(decode_table):
+            return None
+        return decode_table[key]
 
     if isinstance(given, dict):
-        return _decode_keys_recursive(given, decode_map_get)
+        return _decode_keys_recursive(given, decode_key)
     if isinstance(given, list):
-        return _decode_keys_recursive(given, decode_map_get)
+        return _decode_keys_recursive(given, decode_key)
     return given

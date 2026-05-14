@@ -16,16 +16,21 @@
 
 export class BinaryEncoding {
     public readonly encodeMap: Map<string, number>;
-    public readonly decodeMap: Map<number, string>;
+    public readonly decodeTable: string[];
     public readonly checksum: number;
 
     constructor(binaryEncodingMap: Map<string, number>, checksum: number) {
         this.encodeMap = binaryEncodingMap;
-        const decodeList: [number, string][] = [...binaryEncodingMap.entries()].map((e: [string, number]) => [
-            e[1],
-            e[0],
-        ]);
-        this.decodeMap = new Map(decodeList);
+        let maxId = -1;
+        for (const value of binaryEncodingMap.values()) {
+            if (value > maxId) {
+                maxId = value;
+            }
+        }
+        this.decodeTable = new Array<string>(maxId + 1);
+        for (const [key, value] of binaryEncodingMap.entries()) {
+            this.decodeTable[value] = key;
+        }
         this.checksum = checksum;
     }
 }

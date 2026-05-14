@@ -17,18 +17,32 @@
 package io.github.telepact.internal.binary;
 
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class BinaryEncoding {
 
     public final Map<String, Integer> encodeMap;
-    public final Map<Integer, String> decodeMap;
+    public final String[] decodeTable;
     public final Integer checksum;
 
     public BinaryEncoding(Map<String, Integer> binaryEncodingMap, Integer checksum) {
         this.encodeMap = binaryEncodingMap;
-        this.decodeMap = binaryEncodingMap.entrySet().stream()
-                .collect(Collectors.toMap(e -> e.getValue(), e -> e.getKey()));
+        int maxId = -1;
+        for (final var entry : binaryEncodingMap.entrySet()) {
+            if (entry.getValue() > maxId) {
+                maxId = entry.getValue();
+            }
+        }
+        this.decodeTable = new String[maxId + 1];
+        for (final var entry : binaryEncodingMap.entrySet()) {
+            this.decodeTable[entry.getValue()] = entry.getKey();
+        }
         this.checksum = checksum;
+    }
+
+    String decodeKey(int key) {
+        if (key < 0 || key >= this.decodeTable.length) {
+            return null;
+        }
+        return this.decodeTable[key];
     }
 }
