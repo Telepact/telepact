@@ -29,14 +29,19 @@ export function decodeKeys(given: any, binaryEncoder: BinaryEncoding): any {
     if (given instanceof Map) {
         const newMap: { [key: string]: any } = {};
         for (const [key, value] of given.entries()) {
-            const finalKey = typeof key === 'string' ? key : binaryEncoder.decodeMap.get(key);
-            if (finalKey === undefined) {
-                throw new BinaryEncodingMissing(key);
-            }
+            const finalKey = typeof key === 'string' ? key : decodeIntegerKey(key, binaryEncoder);
             newMap[finalKey] = decodeKeys(value, binaryEncoder);
         }
         return newMap;
     }
 
     return given;
+}
+
+function decodeIntegerKey(key: unknown, binaryEncoder: BinaryEncoding): string {
+    try {
+        return binaryEncoder.decodeTable[key as number].toString();
+    } catch {
+        throw new BinaryEncodingMissing(key as object);
+    }
 }

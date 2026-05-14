@@ -19,9 +19,9 @@ package binary
 // BinaryEncoding stores lookup tables for translating between string keys and integer codes
 // in the binary encoding representation.
 type BinaryEncoding struct {
-	EncodeMap map[string]int
-	DecodeMap map[int]string
-	Checksum  int
+	EncodeMap   map[string]int
+	DecodeTable []string
+	Checksum    int
 }
 
 // NewBinaryEncoding constructs a BinaryEncoding from the provided encoding map and checksum.
@@ -31,14 +31,27 @@ func NewBinaryEncoding(binaryEncodingMap map[string]int, checksum int) *BinaryEn
 		encodeMap[key] = value
 	}
 
-	decodeMap := make(map[int]string, len(binaryEncodingMap))
+	decodeTable := make([]string, len(encodeMap))
+	decodePresent := make([]bool, len(encodeMap))
 	for key, value := range encodeMap {
-		decodeMap[value] = key
+		if value < 0 || value >= len(decodeTable) {
+			panic("binary encoding ids must be dense sequential integers")
+		}
+		if decodePresent[value] {
+			panic("binary encoding ids must be unique")
+		}
+		decodeTable[value] = key
+		decodePresent[value] = true
+	}
+	for _, present := range decodePresent {
+		if !present {
+			panic("binary encoding ids must be dense sequential integers")
+		}
 	}
 
 	return &BinaryEncoding{
-		EncodeMap: encodeMap,
-		DecodeMap: decodeMap,
-		Checksum:  checksum,
+		EncodeMap:   encodeMap,
+		DecodeTable: decodeTable,
+		Checksum:    checksum,
 	}
 }
