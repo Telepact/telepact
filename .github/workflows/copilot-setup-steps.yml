@@ -54,7 +54,7 @@ jobs:
           sudo apt-get install -y --reinstall ca-certificates ca-certificates-java
           sudo update-ca-certificates
           sudo dpkg-reconfigure -f noninteractive ca-certificates-java
-          echo 'JAVA_TOOL_OPTIONS=-Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts' >> "${GITHUB_ENV}"
+          echo 'JAVA_TOOL_OPTIONS=-Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS' >> "${GITHUB_ENV}"
 
       - name: Set up Go
         uses: actions/setup-go@v5
