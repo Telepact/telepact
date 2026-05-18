@@ -71,6 +71,9 @@ func unpackDecodedList(list []any, header BinaryPackHeader, encoding *BinaryEnco
 	if len(list) == 0 {
 		return list, true
 	}
+	if !isPackedMarker(list[0]) {
+		return nil, false
+	}
 	if len(list) <= 1 {
 		return nil, false
 	}
@@ -98,6 +101,9 @@ func unpackDecodedRow(value any, header BinaryPackHeader, encoding *BinaryEncodi
 	result := make(map[string]any, len(row))
 	for index, cell := range row {
 		if index+1 >= len(header) {
+			continue
+		}
+		if isUndefinedMarker(cell) {
 			continue
 		}
 

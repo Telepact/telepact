@@ -85,11 +85,19 @@ func unpackRow(row []any, header BinaryPackHeader) (map[any]any, error) {
 }
 
 func isPackedMarker(value any) bool {
-	_, ok := value.(*packedListExt)
-	return ok
+	switch value.(type) {
+	case *packedListExt, packedListExt:
+		return true
+	default:
+		return false
+	}
 }
 
 func isUndefinedMarker(value any) bool {
-	_, ok := value.(*undefinedExt)
-	return ok
+	switch value.(type) {
+	case *undefinedExt, undefinedExt:
+		return true
+	default:
+		return false
+	}
 }
