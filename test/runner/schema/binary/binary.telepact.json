@@ -1,8 +1,21 @@
 [
     {
+        "struct.Flags": {
+            "active": "boolean",
+            "label": "string"
+        }
+    },
+    {
+        "struct.Meta": {
+            "code": "integer",
+            "flags": "struct.Flags"
+        }
+    },
+    {
         "struct.Data": {
             "id": "integer",
-            "name": "string"
+            "name": "string",
+            "meta": "struct.Meta"
         }
     },
     {
