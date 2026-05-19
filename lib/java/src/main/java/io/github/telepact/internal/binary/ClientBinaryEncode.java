@@ -17,7 +17,6 @@
 package io.github.telepact.internal.binary;
 
 import static io.github.telepact.internal.binary.EncodeBody.encodeBody;
-import static io.github.telepact.internal.binary.PackBody.packBody;
 
 import java.util.List;
 import java.util.Map;
@@ -50,15 +49,6 @@ public class ClientBinaryEncode {
         }
         final BinaryEncoding binaryEncoding = binaryEncodingOpt.get();
 
-        final var encodedMessageBody = encodeBody(messageBody, binaryEncoding);
-
-        final Map<Object, Object> finalEncodedMessageBody;
-        if (Objects.equals(true, headers.get("@pac_"))) {
-            finalEncodedMessageBody = packBody(encodedMessageBody);
-        } else {
-            finalEncodedMessageBody = encodedMessageBody;
-        }
-
-        return List.of(headers, finalEncodedMessageBody);
+        return List.of(headers, encodeBody(messageBody, binaryEncoding));
     }
 }

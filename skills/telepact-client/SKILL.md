@@ -114,7 +114,7 @@ Common client-facing headers include:
 - `@select_`: response field selection
 - `@auth_`: auth data when the schema defines `union.Auth_`
 - `@warn_`: warnings returned by the server
-- `@bin_`, `@enc_`, `@pac_`: binary negotiation headers (though should not use directly)
+- `@bin_`, `@enc_`: binary negotiation headers (though should not use directly)
 
 For JSON mode, API schema fields that have the `bytes` type travel as base64 strings.
 
@@ -247,7 +247,6 @@ If you must implement it manually:
 - the client advertises known encodings with `@bin_`
 - the server responds with `@bin_`
 - when the checksum is unknown to the client, the server also returns `@enc_`
-- `@pac_` opts into packed binary form
 - on `ErrorParseFailure_` with `IncompatibleBinaryEncoding`, retry after updating the encoding map or fall back to JSON
 
 ## Path B: Telepact Library Client

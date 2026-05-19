@@ -48,7 +48,7 @@ public class Main {
     private static final List<String> NETWORKS = List.of("close", "far");
     private static final List<String> DATA_SHAPES = List.of("typical", "all-strings", "all-numbers");
     private static final List<String> COLLECTION_SHAPES = List.of("single", "small-list", "big-list", "really-big-list", "huge-list");
-    private static final List<String> METHODS = List.of("telepact-json", "telepact-binary", "telepact-packed-binary", "protobuf", "plain-json");
+    private static final List<String> METHODS = List.of("telepact-json", "telepact-binary", "protobuf", "plain-json");
     private static final Map<String, String> FUNCTION_NAMES = Map.of(
             "typical", "fn.roundTripTypical",
             "all-strings", "fn.roundTripStrings",
@@ -293,7 +293,7 @@ public class Main {
         clientOptions.alwaysSendJson = Objects.equals(scenario.method(), "telepact-json");
         var client = new Client(adapter, clientOptions);
         return new Runner(dispatcher, payload -> {
-            var headers = Objects.equals(scenario.method(), "telepact-packed-binary") ? new HashMap<String, Object>(Map.of("@pac_", true)) : new HashMap<String, Object>();
+            var headers = new HashMap<String, Object>();
             var response = client.request(new Message(headers, Map.of(FUNCTION_NAMES.get(scenario.dataShape()), Map.of("items", payload))));
             var ok = (Map<String, Object>) response.body.get("Ok_");
             if (((List<?>) ok.get("items")).size() != payload.size()) {

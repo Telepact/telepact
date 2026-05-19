@@ -17,11 +17,9 @@
 package io.github.telepact.internal.binary;
 
 import static io.github.telepact.internal.binary.DecodeBody.decodeBody;
-import static io.github.telepact.internal.binary.UnpackBody.unpackBody;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 public class ClientBinaryDecode {
     static List<Object> clientBinaryDecode(List<Object> message, BinaryEncodingCache binaryEncodingCache,
@@ -44,14 +42,7 @@ public class ClientBinaryDecode {
 
         final var binaryEncoder = binaryEncodingCache.get(newCurrentChecksumStrategy.get(0)).get();
 
-        final Map<Object, Object> finalEncodedMessageBody;
-        if (Objects.equals(true, headers.get("@pac_"))) {
-            finalEncodedMessageBody = unpackBody(encodedMessageBody);
-        } else {
-            finalEncodedMessageBody = encodedMessageBody;
-        }
-
-        final var messageBody = decodeBody(finalEncodedMessageBody, binaryEncoder);
+        final var messageBody = decodeBody(encodedMessageBody, binaryEncoder);
         return List.of(headers, messageBody);
     }
 }

@@ -30,15 +30,26 @@ export function encodeKeys(given: any, binaryEncoder: BinaryEncoding): any {
     }
 
     if (typeof given === 'object') {
-        const newMap = new Map<any, any>();
-        for (const key in given) {
-            if (Object.prototype.hasOwnProperty.call(given, key)) {
-                const finalKey = binaryEncoder.encodeMap.get(key) ?? key;
-                newMap.set(finalKey, encodeKeys(given[key], binaryEncoder));
-            }
-        }
-        return newMap;
+        return createEncodedMapView(given as Record<string, any>, binaryEncoder);
     }
 
     return given;
+}
+
+function createEncodedMapView(given: Record<string, any>, binaryEncoder: BinaryEncoding): Map<any, any> {
+    const view = {
+        constructor: Map,
+        get size() {
+            return Object.keys(given).length;
+        },
+        *[Symbol.iterator](): IterableIterator<[any, any]> {
+            for (const key in given) {
+                if (Object.prototype.hasOwnProperty.call(given, key)) {
+                    yield [binaryEncoder.encodeMap.get(key) ?? key, encodeKeys(given[key], binaryEncoder)];
+                }
+            }
+        },
+    };
+
+    return view as unknown as Map<any, any>;
 }

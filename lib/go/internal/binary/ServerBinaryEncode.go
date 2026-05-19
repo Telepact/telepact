@@ -78,16 +78,7 @@ func ServerBinaryEncode(message []any, binaryEncoding *BinaryEncoding) ([]any, e
 		return nil, err
 	}
 
-	finalEncodedBody := encodedBody
-	if isStrictTrue(headers["@pac_"]) {
-		packedBody, err := PackBody(encodedBody)
-		if err != nil {
-			return nil, err
-		}
-		finalEncodedBody = packedBody
-	}
-
-	return []any{headers, finalEncodedBody}, nil
+	return []any{headers, encodedBody}, nil
 }
 
 func firstKey(m map[string]any) string {

@@ -291,7 +291,7 @@ class PythonWorker:
         client = Client(adapter, client_options)
 
         async def request_once(payload: list[dict[str, Any]]) -> dict[str, Any]:
-            headers = {"@pac_": True} if scenario.method == "telepact-packed-binary" else {}
+            headers = {}
             response = await client.request(Message(headers, {function_name: {"items": payload}}))
             assert response.body["Ok_"]["items"] == payload
             return dict(adapter.last_sample)

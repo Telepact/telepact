@@ -16,7 +16,6 @@
 
 import { BinaryEncoderUnavailableError } from "../../internal/binary/BinaryEncoderUnavailableError.js";
 import { encodeBody } from "../../internal/binary/EncodeBody.js";
-import { packBody } from "../../internal/binary/PackBody.js";
 import { BinaryEncodingCache } from "./BinaryEncodingCache.js";
 import { ClientBinaryStrategy } from "./ClientBinaryStrategy.js";
 
@@ -47,14 +46,5 @@ export function clientBinaryEncode(
         throw new BinaryEncoderUnavailableError();
     }
 
-    const encodedMessageBody = encodeBody(messageBody, binaryEncoding);
-
-    let finalEncodedMessageBody: Map<any, any>;
-    if (headers["@pac_"] === true) {
-        finalEncodedMessageBody = packBody(encodedMessageBody);
-    } else {
-        finalEncodedMessageBody = encodedMessageBody;
-    }
-
-    return [headers, finalEncodedMessageBody];
+    return [headers, encodeBody(messageBody, binaryEncoding)];
 }
