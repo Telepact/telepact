@@ -19,6 +19,7 @@ SHELL := /bin/bash
 ORIG_LIB_JAR := ../../../lib/java/target/telepact-$(shell cat ../../../VERSION.txt).jar
 LIB_JAR := target/telepact.jar
 TARGET_JAR := target/telepacttest-1.0-SNAPSHOT.jar
+CLI := ../../../tool/telepact
 
 all: $(LIB_JAR) codegen
 	rm -rf .m2/repository/io/github/telepact
@@ -36,7 +37,7 @@ dep:
 	$(MAKE) -C ../../../lib/java
 
 codegen:
-	telepact codegen --schema-dir ../../runner/schema/example --lang java --out src/gen/java/telepacttest/gen --package telepacttest.gen
+	$(CLI) codegen --schema-dir ../../runner/schema/example --lang java --out src/gen/java/telepacttest/gen --package telepacttest.gen
 
 test-server:
 	mvn verify -s settings.xml | grep -v "from central"

@@ -15,6 +15,7 @@
 #|
 
 VERSION := $(shell cat VERSION.txt)
+CLI := ./tool/telepact
 PROJECT_CLI := ./tool/telepact-project
 
 noop:
@@ -38,7 +39,6 @@ local-ci:
 	$(MAKE) go
 	$(MAKE) dart
 	$(MAKE) cli
-	$(MAKE) install-cli
 	$(MAKE) console
 	$(MAKE) prettier
 	$(MAKE) example-check
@@ -180,12 +180,6 @@ test-cli:
 
 deploy-cli:
 	$(MAKE) -C sdk/cli deploy
-
-install-cli:
-	uv tool install --force $(wildcard sdk/cli/dist/telepact_cli-*.whl)
-
-uninstall-cli:
-	uv tool uninstall telepact-cli
 
 prettier:
 	$(MAKE) -C sdk/prettier

@@ -236,7 +236,7 @@ jobs:
     name: Build Console
     runs-on: ubuntu-latest
     timeout-minutes: 8
-    needs: [build-ts, build-cli, build-prettier]
+    needs: [build-ts, build-prettier]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -255,20 +255,11 @@ jobs:
           name: build-ts
           path: lib/ts/dist
 
-      - name: Download cli build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: build-cli
-          path: sdk/cli/dist
-
       - name: Download prettier build artifacts
         uses: actions/download-artifact@v4
         with:
           name: build-prettier
           path: sdk/prettier/dist
-      
-      - name: Install CLI
-        run: make install-cli
 
       - name: Build console
         env:
@@ -446,7 +437,7 @@ jobs:
     name: Test Java
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    needs: [build-java, build-cli]
+    needs: [build-java]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -479,15 +470,6 @@ jobs:
           name: build-java
           path: lib/java/target
 
-      - name: Download cli build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: build-cli
-          path: sdk/cli/dist
-
-      - name: Install CLI
-        run: make install-cli
-
       - name: Run Java tests
         run: make test-java
 
@@ -495,7 +477,7 @@ jobs:
     name: Test Python
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    needs: [build-py, build-cli]
+    needs: [build-py]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -514,15 +496,6 @@ jobs:
           name: build-py
           path: lib/py/dist
 
-      - name: Download cli build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: build-cli
-          path: sdk/cli/dist
-
-      - name: Install CLI
-        run: make install-cli
-
       - name: Run Python tests
         run: make test-py
 
@@ -530,7 +503,7 @@ jobs:
     name: Test TypeScript
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    needs: [build-ts, build-cli]
+    needs: [build-ts]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -560,15 +533,6 @@ jobs:
           name: build-ts-tgz
           path: lib/ts/dist-tgz
 
-      - name: Download cli build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: build-cli
-          path: sdk/cli/dist
-
-      - name: Install CLI
-        run: make install-cli
-
       - name: Run TypeScript tests
         run: make test-ts
 
@@ -576,7 +540,7 @@ jobs:
     name: Test Go
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    needs: [build-go, build-cli]
+    needs: [build-go]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -593,15 +557,6 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y nats-server
-
-      - name: Download cli build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: build-cli
-          path: sdk/cli/dist
-
-      - name: Install CLI
-        run: make install-cli
 
       - name: Run Go tests
         run: make test-go

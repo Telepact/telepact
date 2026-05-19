@@ -16,6 +16,7 @@
 
 LIB_TAR_GZ := ../../../lib/ts/dist-tgz/*.tgz
 TAR_GZ := telepact.tgz
+CLI := ../../../tool/telepact
 
 all: codegen $(TAR_GZ)
 	npm uninstall telepact || echo "no-op"
@@ -30,7 +31,7 @@ dep:
 	$(MAKE) -C ../../../lib/ts
 
 codegen:
-	telepact codegen --schema-dir ../../runner/schema/example --lang ts --out src/gen
+	$(CLI) codegen --schema-dir ../../runner/schema/example --lang ts --out src/gen
 
 test-server:
 	npm start
