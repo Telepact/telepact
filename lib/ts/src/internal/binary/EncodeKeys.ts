@@ -37,16 +37,13 @@ export function encodeKeys(given: any, binaryEncoder: BinaryEncoding): any {
 }
 
 function createEncodedMapView(given: Record<string, any>, binaryEncoder: BinaryEncoding): Map<any, any> {
+    const keys = Object.keys(given);
     const view = {
         constructor: Map,
-        get size() {
-            return Object.keys(given).length;
-        },
+        size: keys.length,
         *[Symbol.iterator](): IterableIterator<[any, any]> {
-            for (const key in given) {
-                if (Object.prototype.hasOwnProperty.call(given, key)) {
-                    yield [binaryEncoder.encodeMap.get(key) ?? key, encodeKeys(given[key], binaryEncoder)];
-                }
+            for (const key of keys) {
+                yield [binaryEncoder.encodeMap.get(key) ?? key, encodeKeys(given[key], binaryEncoder)];
             }
         },
     };
