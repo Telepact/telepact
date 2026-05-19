@@ -123,6 +123,8 @@ export async function handleMessage(
 
         responseHeaders['@binary_'] = true;
         responseHeaders['@clientKnownBinaryChecksums_'] = clientKnownBinaryChecksums;
+    }
+
     const selectStructFieldsHeader: Record<string, any> | null = requestHeaders['@select_'] || null;
 
     if (unknownTarget !== null) {

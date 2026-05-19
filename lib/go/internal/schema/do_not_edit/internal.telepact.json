@@ -61,11 +61,11 @@
     }
   },
   {
-    "///": "The `@bin_` header indicates the valid checksums of binary encodings\nnegotiated between the client and server. If the client sends a `@bin_`\nheader with any value, the server will respond with a `@bin_` header with an\narray containing the currently supported binary encoding checksum. If the\nclient's provided checksum does not match the server's checksum, the server\nwill also send an `@enc_` header containing the binary encoding, which is a\nmap of field names to field ids. The response body may also be encoded in\nbinary.",
+    "///": "The `@bin_` header indicates the valid checksums of binary encodings\nnegotiated between the client and server. If the client sends a `@bin_`\nheader with any value, the server will respond with a `@bin_` header with an\narray containing the currently supported binary encoding checksum. If the\nclient's provided checksum does not match the server's checksum, the server\nwill also send an `@enc_` header containing the binary encoding, which is a\nmap of field names to field ids. The response body may also be encoded in\nbinary.\n",
     "headers.Binary_": {
       "@bin_": [
         "integer"
-      ],
+      ]
     },
     "->": {
       "@bin_": [
@@ -73,7 +73,7 @@
       ],
       "@enc_": {
         "string": "integer"
-      },
+      }
     }
   },
   {
