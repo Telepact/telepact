@@ -24,6 +24,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const VERSION = fs.readFileSync(path.resolve(__dirname, '../../VERSION.txt'), 'utf-8').trim();
+const TELEPACT_CLI = path.resolve(__dirname, '../../tool/telepact');
 
 const config: PlaywrightTestConfig = {
 	webServer: [
@@ -33,7 +34,7 @@ const config: PlaywrightTestConfig = {
 		},
 		{
 			command:
-				'telepact mock --port 8085 --dir tests/schema --generated-collection-length-min 2 --generated-collection-length-max 2',
+				`${JSON.stringify(TELEPACT_CLI)} mock --port 8085 --dir tests/schema --generated-collection-length-min 2 --generated-collection-length-max 2`,
 			port: 8085,
 			stdout: 'pipe'
 		}
