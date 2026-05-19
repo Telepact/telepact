@@ -20,6 +20,7 @@ from threading import Lock
 
 from ...internal.binary.PackList import PACKED_BYTE
 from ...internal.binary.UnpackMap import unpack_map
+from ...SerializerMeasurement import measure_serializer_stage
 _UNPACK = None
 _UNPACK_LOCK = Lock()
 
@@ -35,25 +36,28 @@ def _get_unpack():
 
 
 def unpack_list(lst: list[object]) -> list[object]:
-    unpack = _get_unpack()
+    def _run() -> list[object]:
+        unpack = _get_unpack()
 
-    if not lst:
-        return lst
+        if not lst:
+            return lst
 
-    first_item = lst[0]
-    if type(first_item) is not ExtType or first_item.code != PACKED_BYTE:
-        new_lst = []
-        for item in lst:
-            new_lst.append(unpack(item))
-        return new_lst
+        first_item = lst[0]
+        if type(first_item) is not ExtType or first_item.code != PACKED_BYTE:
+            new_lst = []
+            for item in lst:
+                new_lst.append(unpack(item))
+            return new_lst
 
-    unpacked_lst: list[object] = []
-    headers = cast(list[object], lst[1])
+        unpacked_lst: list[object] = []
+        headers = cast(list[object], lst[1])
 
-    for i in range(2, len(lst)):
-        row = cast(list[object], lst[i])
-        m = unpack_map(row, headers)
+        for i in range(2, len(lst)):
+            row = cast(list[object], lst[i])
+            m = unpack_map(row, headers)
 
-        unpacked_lst.append(m)
+            unpacked_lst.append(m)
 
-    return unpacked_lst
+        return unpacked_lst
+
+    return measure_serializer_stage("deserialize.binary.unpackList", _run)

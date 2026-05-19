@@ -19,6 +19,7 @@ from typing import Callable, TYPE_CHECKING, Awaitable
 from .DefaultSerialization import DefaultSerialization
 from .FunctionRouter import FunctionRoute, FunctionRouter
 from .Serializer import Serializer
+from .SerializerMeasurement import SerializerMeasurementObserver
 from .internal.binary.ServerBinaryEncoder import ServerBinaryEncoder
 from .internal.binary.ServerBase64Encoder import ServerBase64Encoder
 from .internal.CreateInternalFunctionRoutes import create_internal_function_routes
@@ -54,6 +55,7 @@ class Server:
             self.middleware = _default_middleware
             self.auth_required = True
             self.serialization = DefaultSerialization()
+            self.measurement_observer: SerializerMeasurementObserver | None = None
 
     def __init__(self, telepact_schema: 'TelepactSchema', function_router: FunctionRouter, options: Options):
         """
@@ -74,7 +76,7 @@ class Server:
         binary_encoding = construct_binary_encoding(self.telepact_schema)
         binary_encoder = ServerBinaryEncoder(binary_encoding)
         base64_encoder = ServerBase64Encoder()
-        self.serializer = Serializer(options.serialization, binary_encoder, base64_encoder)
+        self.serializer = Serializer(options.serialization, binary_encoder, base64_encoder, options.measurement_observer)
 
         if "union.Auth_" not in self.telepact_schema.parsed and options.auth_required:
             raise RuntimeError(

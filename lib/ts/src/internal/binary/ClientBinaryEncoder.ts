@@ -17,6 +17,7 @@
 import { ClientBinaryStrategy } from './ClientBinaryStrategy.js';
 import { clientBinaryEncode } from '../../internal/binary/ClientBinaryEncode.js';
 import { clientBinaryDecode } from '../../internal/binary/ClientBinaryDecode.js';
+import { measureSerializerStage } from '../../SerializerMeasurement.js';
 import { BinaryEncoder } from './BinaryEncoder.js';
 import { BinaryEncoding } from './BinaryEncoding.js';
 import { BinaryEncodingCache } from './BinaryEncodingCache.js';
@@ -31,10 +32,10 @@ export class ClientBinaryEncoder implements BinaryEncoder {
     }
 
     encode(message: any[]): any[] {
-        return clientBinaryEncode(message, this.binaryEncodingCache, this.binaryChecksumStrategy);
+        return measureSerializerStage('serialize.binary.clientEncode', () => clientBinaryEncode(message, this.binaryEncodingCache, this.binaryChecksumStrategy));
     }
 
     decode(message: any[]): any[] {
-        return clientBinaryDecode(message, this.binaryEncodingCache, this.binaryChecksumStrategy);
+        return measureSerializerStage('deserialize.binary.clientDecode', () => clientBinaryDecode(message, this.binaryEncodingCache, this.binaryChecksumStrategy));
     }
 }

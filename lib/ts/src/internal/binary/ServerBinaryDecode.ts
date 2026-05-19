@@ -18,6 +18,7 @@ import { BinaryEncoding } from "../../internal/binary/BinaryEncoding.js";
 import { BinaryEncoderUnavailableError } from "../../internal/binary/BinaryEncoderUnavailableError.js";
 import { decodeBody } from "../../internal/binary/DecodeBody.js";
 import { unpackBody } from "../../internal/binary/UnpackBody.js";
+import { annotateSerializerMeasurement, measureSerializerStage } from '../../SerializerMeasurement.js';
 import { convertMapsToObjects } from "./ConvertMapsToObjects.js";
 
 export function serverBinaryDecode(message: any[], binaryEncoder: BinaryEncoding): any[] {
@@ -32,12 +33,14 @@ export function serverBinaryDecode(message: any[], binaryEncoder: BinaryEncoding
 
     let finalEncodedMessageBody: Map<any, any>;
     if (headers.get("@pac_") === true) {
-        finalEncodedMessageBody = unpackBody(encodedMessageBody);
+        annotateSerializerMeasurement({ packed: true });
+        finalEncodedMessageBody = measureSerializerStage('deserialize.binary.unpackBody', () => unpackBody(encodedMessageBody));
     } else {
+        annotateSerializerMeasurement({ packed: false });
         finalEncodedMessageBody = encodedMessageBody;
     }
 
     const messageHeader = convertMapsToObjects(headers);
-    const messageBody = decodeBody(finalEncodedMessageBody, binaryEncoder);
+    const messageBody = measureSerializerStage('deserialize.binary.decodeBody', () => decodeBody(finalEncodedMessageBody, binaryEncoder));
     return [messageHeader, messageBody];
 }

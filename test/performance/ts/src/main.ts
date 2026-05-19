@@ -14,7 +14,7 @@
 //|  limitations under the License.
 //|
 
-import { Client, ClientOptions, FunctionRouter, Message, Server, ServerOptions, TelepactSchema } from "telepact";
+import { Client, ClientOptions, FunctionRouter, Message, SerializerMeasurement, Server, ServerOptions, TelepactSchema } from "telepact";
 import { connect, NatsConnection, Subscription } from "nats";
 import * as fs from "node:fs";
 import * as path from "node:path";
@@ -39,6 +39,7 @@ type Sample = {
     serializedResponseSizeBytes: number;
     responseNetworkTransitTimeNs: number;
     clientResponseDeserializationTimeNs: number;
+    telepactMeasurements?: Record<string, SerializerMeasurement>;
 };
 
 type ServerMetrics = {
@@ -46,6 +47,7 @@ type ServerMetrics = {
     serverRequestDeserializationTimeNs: number;
     serverResponseSerializationTimeNs: number;
     responseSentAtNs: number;
+    telepactMeasurements?: Record<string, SerializerMeasurement>;
 };
 
 const NETWORKS = ["close", "far"];
@@ -95,6 +97,28 @@ class MetricsQueue {
 
 function nowNs(): number {
     return Number(process.hrtime.bigint());
+}
+
+function cloneMeasurement(measurement: SerializerMeasurement | undefined): SerializerMeasurement | undefined {
+    if (!measurement) {
+        return undefined;
+    }
+    return {
+        ...measurement,
+        stages: Object.fromEntries(
+            Object.entries(measurement.stages).map(([stageName, stats]) => [
+                stageName,
+                { totalDurationNs: stats.totalDurationNs, count: stats.count },
+            ]),
+        ),
+    };
+}
+
+function buildTelepactMeasurements(measurements: Record<string, SerializerMeasurement | undefined>): Record<string, SerializerMeasurement> | undefined {
+    const entries = Object.entries(measurements)
+        .map(([key, measurement]) => [key, cloneMeasurement(measurement)] as const)
+        .filter((entry): entry is [string, SerializerMeasurement] => entry[1] !== undefined);
+    return entries.length > 0 ? Object.fromEntries(entries) : undefined;
 }
 
 function parseArgs(): Record<string, string> {
@@ -250,6 +274,7 @@ async function createProtobufRunner(serverConnection: NatsConnection, clientConn
 async function createTelepactRunner(serverConnection: NatsConnection, clientConnection: NatsConnection, subject: string, scenario: Scenario, queue: MetricsQueue) {
     const telepactSchema = TelepactSchema.fromDirectory(schemaPath(), fs, path);
     const serverState: { afterDeserializeNs?: number; beforeSerializeNs?: number } = {};
+    const serverMeasurements: Partial<Record<"serialize" | "deserialize", SerializerMeasurement>> = {};
     const functionRoutes = {
         "fn.roundTripTypical": async (functionName: string, requestMessage: Message): Promise<Message> => new Message({}, { Ok_: { items: requestMessage.body[functionName].items } }),
         "fn.roundTripStrings": async (functionName: string, requestMessage: Message): Promise<Message> => new Message({}, { Ok_: { items: requestMessage.body[functionName].items } }),
@@ -259,6 +284,7 @@ async function createTelepactRunner(serverConnection: NatsConnection, clientConn
     options.authRequired = false;
     options.onRequest = () => { serverState.afterDeserializeNs = nowNs(); };
     options.onResponse = () => { serverState.beforeSerializeNs = nowNs(); };
+    options.measurementObserver = (measurement) => { serverMeasurements[measurement.operation] = cloneMeasurement(measurement); };
     const server = new Server(telepactSchema, new FunctionRouter(functionRoutes), options);
 
     const sub = serverConnection.subscribe(subject);
@@ -267,6 +293,8 @@ async function createTelepactRunner(serverConnection: NatsConnection, clientConn
             const receivedAt = nowNs();
             serverState.afterDeserializeNs = undefined;
             serverState.beforeSerializeNs = undefined;
+            serverMeasurements.serialize = undefined;
+            serverMeasurements.deserialize = undefined;
             const response = await server.process(msg.data);
             const responseSentAt = nowNs();
             queue.push({
@@ -274,13 +302,20 @@ async function createTelepactRunner(serverConnection: NatsConnection, clientConn
                 serverRequestDeserializationTimeNs: (serverState.afterDeserializeNs ?? responseSentAt) - receivedAt,
                 serverResponseSerializationTimeNs: responseSentAt - (serverState.beforeSerializeNs ?? receivedAt),
                 responseSentAtNs: responseSentAt,
+                telepactMeasurements: buildTelepactMeasurements({
+                    serverDeserialize: serverMeasurements.deserialize,
+                    serverSerialize: serverMeasurements.serialize,
+                }),
             });
             msg.respond(response.bytes);
         }
     })();
 
     let lastSample: Sample | null = null;
+    const clientMeasurements: Partial<Record<"serialize" | "deserialize", SerializerMeasurement>> = {};
     const adapter = async (message: Message, serializer: any): Promise<Message> => {
+        clientMeasurements.serialize = undefined;
+        clientMeasurements.deserialize = undefined;
         const serializeStart = nowNs();
         const requestBytes = serializer.serialize(message);
         const serializeEnd = nowNs();
@@ -300,12 +335,19 @@ async function createTelepactRunner(serverConnection: NatsConnection, clientConn
             serializedResponseSizeBytes: response.data.length,
             responseNetworkTransitTimeNs: receivedAt - serverMetrics.responseSentAtNs,
             clientResponseDeserializationTimeNs: deserializeEnd - deserializeStart,
+            telepactMeasurements: buildTelepactMeasurements({
+                clientSerialize: clientMeasurements.serialize,
+                clientDeserialize: clientMeasurements.deserialize,
+                serverDeserialize: serverMetrics.telepactMeasurements?.serverDeserialize,
+                serverSerialize: serverMetrics.telepactMeasurements?.serverSerialize,
+            }),
         };
         return responseMessage;
     };
     const clientOptions = new ClientOptions();
     clientOptions.useBinary = scenario.method !== "telepact-json";
     clientOptions.alwaysSendJson = scenario.method === "telepact-json";
+    clientOptions.measurementObserver = (measurement) => { clientMeasurements[measurement.operation] = cloneMeasurement(measurement); };
     const client = new Client(adapter, clientOptions);
 
     return {

@@ -21,6 +21,8 @@ import static io.github.telepact.internal.binary.ClientBinaryEncode.clientBinary
 
 import java.util.List;
 
+import io.github.telepact.internal.SerializerMeasurementSupport;
+
 public class ClientBinaryEncoder implements BinaryEncoder {
 
     private final BinaryEncodingCache binaryEncodingCache;
@@ -33,12 +35,15 @@ public class ClientBinaryEncoder implements BinaryEncoder {
 
     @Override
     public List<Object> encode(List<Object> message) throws BinaryEncoderUnavailableError {
-        return clientBinaryEncode(message, this.binaryEncodingCache,
-                this.binaryChecksumStrategy);
+        return SerializerMeasurementSupport.measureSerializerStage(
+                "serialize.binary.clientEncode",
+                () -> clientBinaryEncode(message, this.binaryEncodingCache, this.binaryChecksumStrategy));
     }
 
     @Override
     public List<Object> decode(List<Object> message) throws BinaryEncoderUnavailableError {
-        return clientBinaryDecode(message, this.binaryEncodingCache, this.binaryChecksumStrategy);
+        return SerializerMeasurementSupport.measureSerializerStage(
+                "deserialize.binary.clientDecode",
+                () -> clientBinaryDecode(message, this.binaryEncodingCache, this.binaryChecksumStrategy));
     }
 }

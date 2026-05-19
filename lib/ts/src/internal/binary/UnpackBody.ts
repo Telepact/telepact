@@ -15,14 +15,17 @@
 //|
 
 import { unpack } from './Unpack.js';
+import { measureSerializerStage } from '../../SerializerMeasurement.js';
 
 export function unpackBody(body: Map<any, any>): Map<any, any> {
-    const result: Map<any, any> = new Map();
+    return measureSerializerStage('deserialize.binary.unpackBody.walk', () => {
+        const result: Map<any, any> = new Map();
 
-    for (const [key, value] of body.entries()) {
-        const unpackedValue = unpack(value);
-        result.set(key, unpackedValue);
-    }
+        for (const [key, value] of body.entries()) {
+            const unpackedValue = unpack(value);
+            result.set(key, unpackedValue);
+        }
 
-    return result;
+        return result;
+    });
 }

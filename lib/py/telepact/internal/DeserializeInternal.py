@@ -17,6 +17,12 @@
 from typing import cast, TYPE_CHECKING
 
 from ..Message import Message
+from ..SerializerMeasurement import (
+    SerializerMeasurementObserver,
+    annotate_serializer_measurement,
+    measure_serializer_stage,
+    run_measured_serializer_operation,
+)
 from ..internal.validation.InvalidMessage import InvalidMessage
 from ..internal.validation.InvalidMessageBody import InvalidMessageBody
 
@@ -27,50 +33,93 @@ if TYPE_CHECKING:
 
 
 def deserialize_internal(message_bytes: bytes, serializer: 'Serialization',
-                         binary_encoder: 'BinaryEncoder',
-                         base64_encoder: 'Base64Encoder') -> 'Message':
-    message_as_pseudo_json: object
-    is_msg_pack: bool
+                          binary_encoder: 'BinaryEncoder',
+                          base64_encoder: 'Base64Encoder',
+                          measurement_observer: SerializerMeasurementObserver | None = None) -> 'Message':
+    def _run() -> 'Message':
+        message_as_pseudo_json: object
+        is_msg_pack: bool
 
-    try:
-        if message_bytes[0] == 0x92:  # MsgPack
-            is_msg_pack = True
-            message_as_pseudo_json = serializer.from_msgpack(message_bytes)
+        try:
+            if message_bytes[0] == 0x92:  # MsgPack
+                is_msg_pack = True
+                annotate_serializer_measurement(
+                    transport_encoding="msgpack",
+                    protocol_encoding="binary",
+                )
+                message_as_pseudo_json = measure_serializer_stage(
+                    "deserialize.msgpack.decode",
+                    lambda: serializer.from_msgpack(message_bytes),
+                )
+            else:
+                is_msg_pack = False
+                annotate_serializer_measurement(
+                    transport_encoding="json",
+                    protocol_encoding="base64",
+                )
+                message_as_pseudo_json = measure_serializer_stage(
+                    "deserialize.json.decode",
+                    lambda: serializer.from_json(message_bytes),
+                )
+        except Exception as e:
+            raise InvalidMessage() from e
+
+        if not isinstance(message_as_pseudo_json, list):
+            raise InvalidMessage()
+
+        message_as_pseudo_json_list = cast(list[object], message_as_pseudo_json)
+
+        if len(message_as_pseudo_json_list) != 2:
+            raise InvalidMessage()
+
+        final_message_as_pseudo_json_list: list[object]
+        if is_msg_pack:
+            final_message_as_pseudo_json_list = measure_serializer_stage(
+                "deserialize.binary.decode",
+                lambda: binary_encoder.decode(message_as_pseudo_json_list),
+            )
+            headers_obj = final_message_as_pseudo_json_list[0]
+            annotate_serializer_measurement(
+                packed=isinstance(headers_obj, dict) and headers_obj.get("@pac_") is True,
+            )
         else:
-            is_msg_pack = False
-            message_as_pseudo_json = serializer.from_json(message_bytes)
-    except Exception as e:
-        raise InvalidMessage() from e
+            final_message_as_pseudo_json_list = measure_serializer_stage(
+                "deserialize.base64.decode",
+                lambda: base64_encoder.decode(message_as_pseudo_json_list),
+            )
+            headers_obj = final_message_as_pseudo_json_list[0]
+            annotate_serializer_measurement(
+                packed=isinstance(headers_obj, dict) and headers_obj.get("@pac_") is True,
+            )
 
-    if not isinstance(message_as_pseudo_json, list):
-        raise InvalidMessage()
+        def _validate() -> 'Message':
+            if not isinstance(final_message_as_pseudo_json_list[0], dict):
+                raise InvalidMessage()
 
-    message_as_pseudo_json_list = cast(list[object], message_as_pseudo_json)
+            headers = cast(dict[str, object], final_message_as_pseudo_json_list[0])
 
-    if len(message_as_pseudo_json_list) != 2:
-        raise InvalidMessage()
+            if not isinstance(final_message_as_pseudo_json_list[1], dict):
+                raise InvalidMessage()
 
-    final_message_as_pseudo_json_list: list[object]
-    if is_msg_pack:
-        final_message_as_pseudo_json_list = binary_encoder.decode(
-            message_as_pseudo_json_list)
-    else:
-        final_message_as_pseudo_json_list = base64_encoder.decode(message_as_pseudo_json_list)
+            body = cast(dict[str, object], final_message_as_pseudo_json_list[1])
 
-    if not isinstance(final_message_as_pseudo_json_list[0], dict):
-        raise InvalidMessage()
+            if len(body) != 1:
+                raise InvalidMessageBody()
 
-    headers = cast(dict[str, object], final_message_as_pseudo_json_list[0])
+            if not isinstance(next(iter(body.values())), dict):
+                raise InvalidMessageBody()
 
-    if not isinstance(final_message_as_pseudo_json_list[1], dict):
-        raise InvalidMessage()
+            return Message(headers, body)
 
-    body = cast(dict[str, object], final_message_as_pseudo_json_list[1])
+        return cast(Message, measure_serializer_stage("deserialize.validation", _validate))
 
-    if len(body) != 1:
-        raise InvalidMessageBody()
-
-    if not isinstance(next(iter(body.values())), dict):
-        raise InvalidMessageBody()
-
-    return Message(headers, body)
+    return run_measured_serializer_operation(
+        "deserialize",
+        measurement_observer,
+        binary_requested=False,
+        transport_encoding="json",
+        protocol_encoding="base64",
+        packed=False,
+        fell_back_to_json=False,
+        fn=_run,
+    )

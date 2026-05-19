@@ -16,6 +16,7 @@
 
 import { decodeBody } from "../../internal/binary/DecodeBody.js";
 import { unpackBody } from "../../internal/binary/UnpackBody.js";
+import { annotateSerializerMeasurement, measureSerializerStage } from '../../SerializerMeasurement.js';
 import { convertMapsToObjects } from "./ConvertMapsToObjects.js";
 import { BinaryEncodingCache } from "./BinaryEncodingCache.js";
 import { ClientBinaryStrategy } from "./ClientBinaryStrategy.js";
@@ -42,12 +43,14 @@ export function clientBinaryDecode(
 
     let finalEncodedMessageBody: Map<any, any>;
     if (headers.get("@pac_") === true) {
-        finalEncodedMessageBody = unpackBody(encodedMessageBody);
+        annotateSerializerMeasurement({ packed: true });
+        finalEncodedMessageBody = measureSerializerStage('deserialize.binary.unpackBody', () => unpackBody(encodedMessageBody));
     } else {
+        annotateSerializerMeasurement({ packed: false });
         finalEncodedMessageBody = encodedMessageBody;
     }
 
     const messageHeader = convertMapsToObjects(headers);
-    const messageBody = decodeBody(finalEncodedMessageBody, binaryEncoder);
+    const messageBody = measureSerializerStage('deserialize.binary.decodeBody', () => decodeBody(finalEncodedMessageBody, binaryEncoder));
     return [messageHeader, messageBody];
 }

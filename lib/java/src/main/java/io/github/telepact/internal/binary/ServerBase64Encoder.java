@@ -20,6 +20,8 @@ import static io.github.telepact.internal.binary.ServerBase64Encode.serverBase64
 
 import java.util.List;
 
+import io.github.telepact.internal.SerializerMeasurementSupport;
+
 public class ServerBase64Encoder implements Base64Encoder {
 
     @Override
@@ -30,7 +32,7 @@ public class ServerBase64Encoder implements Base64Encoder {
 
     @Override
     public List<Object> decode(List<Object> message) throws BinaryEncoderUnavailableError {
-        serverBase64Encode(message);
+        SerializerMeasurementSupport.measureSerializerStage("serialize.base64.serverEncode", () -> serverBase64Encode(message));
         return message;
     }
 }

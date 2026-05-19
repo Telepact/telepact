@@ -24,6 +24,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import io.github.telepact.internal.SerializerMeasurementSupport;
+
 public class ClientBinaryEncode {
     static List<Object> clientBinaryEncode(List<Object> message, BinaryEncodingCache binaryEncodingCache,
             ClientBinaryStrategy binaryChecksumStrategy)
@@ -50,12 +52,18 @@ public class ClientBinaryEncode {
         }
         final BinaryEncoding binaryEncoding = binaryEncodingOpt.get();
 
-        final var encodedMessageBody = encodeBody(messageBody, binaryEncoding);
+        final var encodedMessageBody = SerializerMeasurementSupport.measureSerializerStage(
+                "serialize.binary.encodeBody",
+                () -> encodeBody(messageBody, binaryEncoding));
 
         final Map<Object, Object> finalEncodedMessageBody;
         if (Objects.equals(true, headers.get("@pac_"))) {
-            finalEncodedMessageBody = packBody(encodedMessageBody);
+            SerializerMeasurementSupport.annotateSerializerMeasurement(null, null, null, true, null);
+            finalEncodedMessageBody = SerializerMeasurementSupport.measureSerializerStage(
+                    "serialize.binary.packBody",
+                    () -> packBody(encodedMessageBody));
         } else {
+            SerializerMeasurementSupport.annotateSerializerMeasurement(null, null, null, false, null);
             finalEncodedMessageBody = encodedMessageBody;
         }
 

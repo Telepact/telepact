@@ -17,6 +17,7 @@
 from typing import cast, TYPE_CHECKING
 from ...internal.binary.BinaryEncoding import BinaryEncoding
 from ...internal.binary.BinaryEncoderUnavailableError import BinaryEncoderUnavailableError
+from ...SerializerMeasurement import annotate_serializer_measurement, measure_serializer_stage
 
 if TYPE_CHECKING:
     from .BinaryEncodingCache import BinaryEncodingCache
@@ -46,9 +47,19 @@ def client_binary_encode(message: list[object], binary_encoding_cache: 'BinaryEn
     if not binary_encoding:
         raise BinaryEncoderUnavailableError()
 
-    encoded_message_body = encode_body(message_body, binary_encoding)
+    encoded_message_body = measure_serializer_stage(
+        "serialize.binary.encodeBody",
+        lambda: encode_body(message_body, binary_encoding),
+    )
 
-    final_encoded_message_body = pack_body(encoded_message_body) if headers.get(
-        "@pac_") == True else encoded_message_body
+    if headers.get("@pac_") == True:
+        annotate_serializer_measurement(packed=True)
+        final_encoded_message_body = measure_serializer_stage(
+            "serialize.binary.packBody",
+            lambda: pack_body(encoded_message_body),
+        )
+    else:
+        annotate_serializer_measurement(packed=False)
+        final_encoded_message_body = encoded_message_body
 
     return [headers, final_encoded_message_body]

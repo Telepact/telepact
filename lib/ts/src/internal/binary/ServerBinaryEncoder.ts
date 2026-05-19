@@ -16,6 +16,7 @@
 
 import { BinaryEncoder } from './BinaryEncoder.js';
 import { BinaryEncoding } from './BinaryEncoding.js';
+import { measureSerializerStage } from '../../SerializerMeasurement.js';
 import { serverBinaryEncode } from './ServerBinaryEncode.js';
 import { serverBinaryDecode } from './ServerBinaryDecode.js';
 
@@ -27,10 +28,10 @@ export class ServerBinaryEncoder implements BinaryEncoder {
     }
 
     encode(message: any[]): any[] {
-        return serverBinaryEncode(message, this.binaryEncoder);
+        return measureSerializerStage('serialize.binary.serverEncode', () => serverBinaryEncode(message, this.binaryEncoder));
     }
 
     decode(message: any[]): any[] {
-        return serverBinaryDecode(message, this.binaryEncoder);
+        return measureSerializerStage('deserialize.binary.serverDecode', () => serverBinaryDecode(message, this.binaryEncoder));
     }
 }

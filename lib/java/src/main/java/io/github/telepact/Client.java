@@ -20,6 +20,7 @@ import static io.github.telepact.internal.ClientHandleMessage.clientHandleMessag
 
 import java.util.concurrent.Future;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 
 import io.github.telepact.internal.binary.ClientBase64Encoder;
 import io.github.telepact.internal.binary.ClientBinaryEncoder;
@@ -65,6 +66,11 @@ public class Client {
          * deserialize messages.
          */
         public Serialization serializationImpl = new DefaultSerialization();
+
+        /**
+         * Optional observer for per-operation serializer measurements.
+         */
+        public Consumer<SerializerMeasurement> measurementObserver = null;
     }
 
     private final BiFunction<Message, Serializer, Future<Message>> adapter;
@@ -102,7 +108,7 @@ public class Client {
         final var binaryEncoder = new ClientBinaryEncoder(binaryEncodingCache);
         final var base64Encoder = new ClientBase64Encoder();
 
-        this.serializer = new Serializer(options.serializationImpl, binaryEncoder, base64Encoder);
+        this.serializer = new Serializer(options.serializationImpl, binaryEncoder, base64Encoder, options.measurementObserver);
     }
 
     /**

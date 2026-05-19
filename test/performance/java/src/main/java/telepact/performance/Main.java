@@ -23,6 +23,7 @@ import io.github.telepact.Client;
 import io.github.telepact.FunctionRoute;
 import io.github.telepact.FunctionRouter;
 import io.github.telepact.Message;
+import io.github.telepact.SerializerMeasurement;
 import io.github.telepact.Server;
 import io.github.telepact.TelepactSchema;
 import io.nats.client.Connection;
@@ -63,7 +64,8 @@ public class Main {
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     record Scenario(String networkLatency, String dataShape, String collectionShape, String method) {}
-    record ServerMetrics(long requestNetworkArrivalNs, long serverRequestDeserializationTimeNs, long serverResponseSerializationTimeNs, long responseSentAtNs) {}
+    record ServerMetrics(long requestNetworkArrivalNs, long serverRequestDeserializationTimeNs, long serverResponseSerializationTimeNs, long responseSentAtNs,
+            Map<String, Object> telepactMeasurements) {}
 
     public static void main(String[] args) throws Exception {
         var parsed = parseArgs(args);
@@ -142,7 +144,7 @@ public class Main {
                 long beforeSerialize = System.nanoTime();
                 var responseBytes = OBJECT_MAPPER.writeValueAsBytes(response);
                 long responseSentAt = System.nanoTime();
-                queue.put(new ServerMetrics(receivedAt, afterDeserialize - receivedAt, responseSentAt - beforeSerialize, responseSentAt));
+                queue.put(new ServerMetrics(receivedAt, afterDeserialize - receivedAt, responseSentAt - beforeSerialize, responseSentAt, Map.of()));
                 serverConnection.publish(msg.getReplyTo(), responseBytes);
             } catch (Exception e) {
                 throw new RuntimeException(e);
@@ -166,7 +168,7 @@ public class Main {
             var serverMetrics = queue.take();
             return sample(serializeEnd - serializeStart, requestBytes.length, serverMetrics.requestNetworkArrivalNs() - sentAt,
                     serverMetrics.serverRequestDeserializationTimeNs(), serverMetrics.serverResponseSerializationTimeNs(),
-                    response.getData().length, receivedAt - serverMetrics.responseSentAtNs(), deserializeEnd - deserializeStart);
+                    response.getData().length, receivedAt - serverMetrics.responseSentAtNs(), deserializeEnd - deserializeStart, Map.of());
         });
     }
 
@@ -201,7 +203,7 @@ public class Main {
                     }
                 }
                 long responseSentAt = System.nanoTime();
-                queue.put(new ServerMetrics(receivedAt, afterDeserialize - receivedAt, responseSentAt - beforeSerialize, responseSentAt));
+                queue.put(new ServerMetrics(receivedAt, afterDeserialize - receivedAt, responseSentAt - beforeSerialize, responseSentAt, Map.of()));
                 serverConnection.publish(msg.getReplyTo(), responseBytes);
             } catch (Exception e) {
                 throw new RuntimeException(e);
@@ -235,13 +237,14 @@ public class Main {
             var serverMetrics = queue.take();
             return sample(serializeEnd - serializeStart, requestBytes.length, serverMetrics.requestNetworkArrivalNs() - sentAt,
                     serverMetrics.serverRequestDeserializationTimeNs(), serverMetrics.serverResponseSerializationTimeNs(),
-                    response.getData().length, receivedAt - serverMetrics.responseSentAtNs(), deserializeEnd - deserializeStart);
+                    response.getData().length, receivedAt - serverMetrics.responseSentAtNs(), deserializeEnd - deserializeStart, Map.of());
         });
     }
 
     private static Runner createTelepactRunner(Connection serverConnection, Connection clientConnection, String subject, Scenario scenario, ArrayBlockingQueue<ServerMetrics> queue) throws Exception {
         var telepactSchema = TelepactSchema.fromDirectory(Path.of("..", "schema", "telepact").toString());
         var state = new HashMap<String, Long>();
+        var serverMeasurements = new HashMap<String, Map<String, Object>>();
         FunctionRoute route = (functionName, requestMessage) -> new Message(Map.of(), Map.of("Ok_", Map.of("items", ((Map<String, Object>) requestMessage.body.get(functionName)).get("items"))));
         var routes = new HashMap<String, FunctionRoute>();
         routes.put("fn.roundTripTypical", route);
@@ -251,15 +254,19 @@ public class Main {
         options.authRequired = false;
         options.onRequest = message -> state.put("afterDeserializeNs", System.nanoTime());
         options.onResponse = message -> state.put("beforeSerializeNs", System.nanoTime());
+        options.measurementObserver = measurement -> serverMeasurements.put(measurement.operation(), measurementToMap(measurement));
         var server = new Server(telepactSchema, new FunctionRouter(routes), options);
         var dispatcher = serverConnection.createDispatcher(msg -> {
             try {
                 long receivedAt = System.nanoTime();
                 state.clear();
+                serverMeasurements.clear();
                 var response = server.process(msg.getData());
                 long responseSentAt = System.nanoTime();
                 queue.put(new ServerMetrics(receivedAt, state.getOrDefault("afterDeserializeNs", responseSentAt) - receivedAt,
-                        responseSentAt - state.getOrDefault("beforeSerializeNs", receivedAt), responseSentAt));
+                        responseSentAt - state.getOrDefault("beforeSerializeNs", receivedAt), responseSentAt, measurementBundle(
+                                "serverDeserialize", serverMeasurements.get("deserialize"),
+                                "serverSerialize", serverMeasurements.get("serialize"))));
                 serverConnection.publish(msg.getReplyTo(), response.bytes);
             } catch (Exception e) {
                 throw new RuntimeException(e);
@@ -268,8 +275,10 @@ public class Main {
         dispatcher.subscribe(subject);
 
         final Map<String, Object>[] lastSample = new Map[] { null };
+        final Map<String, Object> clientMeasurements = new HashMap<>();
         BiFunction<Message, io.github.telepact.Serializer, Future<Message>> adapter = (message, serializer) -> CompletableFuture.supplyAsync(() -> {
             try {
+                clientMeasurements.clear();
                 long serializeStart = System.nanoTime();
                 var requestBytes = serializer.serialize(message);
                 long serializeEnd = System.nanoTime();
@@ -282,7 +291,12 @@ public class Main {
                 var serverMetrics = queue.take();
                 lastSample[0] = sample(serializeEnd - serializeStart, requestBytes.length, serverMetrics.requestNetworkArrivalNs() - sentAt,
                         serverMetrics.serverRequestDeserializationTimeNs(), serverMetrics.serverResponseSerializationTimeNs(),
-                        response.getData().length, receivedAt - serverMetrics.responseSentAtNs(), deserializeEnd - deserializeStart);
+                        response.getData().length, receivedAt - serverMetrics.responseSentAtNs(), deserializeEnd - deserializeStart,
+                        measurementBundle(
+                                "clientSerialize", (Map<String, Object>) clientMeasurements.get("serialize"),
+                                "clientDeserialize", (Map<String, Object>) clientMeasurements.get("deserialize"),
+                                "serverDeserialize", serverMetrics.telepactMeasurements().get("serverDeserialize"),
+                                "serverSerialize", serverMetrics.telepactMeasurements().get("serverSerialize")));
                 return responseMessage;
             } catch (Exception e) {
                 throw new RuntimeException(e);
@@ -291,6 +305,7 @@ public class Main {
         var clientOptions = new Client.Options();
         clientOptions.useBinary = !Objects.equals(scenario.method(), "telepact-json");
         clientOptions.alwaysSendJson = Objects.equals(scenario.method(), "telepact-json");
+        clientOptions.measurementObserver = measurement -> clientMeasurements.put(measurement.operation(), measurementToMap(measurement));
         var client = new Client(adapter, clientOptions);
         return new Runner(dispatcher, payload -> {
             var headers = Objects.equals(scenario.method(), "telepact-packed-binary") ? new HashMap<String, Object>(Map.of("@pac_", true)) : new HashMap<String, Object>();
@@ -330,7 +345,8 @@ public class Main {
 
     private static Map<String, Object> sample(long clientRequestSerializationTimeNs, long serializedRequestSizeBytes,
             long requestNetworkTransitTimeNs, long serverRequestDeserializationTimeNs, long serverResponseSerializationTimeNs,
-            long serializedResponseSizeBytes, long responseNetworkTransitTimeNs, long clientResponseDeserializationTimeNs) {
+            long serializedResponseSizeBytes, long responseNetworkTransitTimeNs, long clientResponseDeserializationTimeNs,
+            Map<String, Object> telepactMeasurements) {
         return Map.of(
                 "clientRequestSerializationTimeNs", clientRequestSerializationTimeNs,
                 "serializedRequestSizeBytes", serializedRequestSizeBytes,
@@ -339,7 +355,38 @@ public class Main {
                 "serverResponseSerializationTimeNs", serverResponseSerializationTimeNs,
                 "serializedResponseSizeBytes", serializedResponseSizeBytes,
                 "responseNetworkTransitTimeNs", responseNetworkTransitTimeNs,
-                "clientResponseDeserializationTimeNs", clientResponseDeserializationTimeNs);
+                "clientResponseDeserializationTimeNs", clientResponseDeserializationTimeNs,
+                "telepactMeasurements", telepactMeasurements);
+    }
+
+    private static Map<String, Object> measurementToMap(SerializerMeasurement measurement) {
+        var stageMaps = new HashMap<String, Object>();
+        for (var entry : measurement.stages().entrySet()) {
+            stageMaps.put(entry.getKey(), Map.of(
+                    "totalDurationNs", entry.getValue().totalDurationNs(),
+                    "count", entry.getValue().count()));
+        }
+        return Map.of(
+                "operation", measurement.operation(),
+                "totalDurationNs", measurement.totalDurationNs(),
+                "binaryRequested", measurement.binaryRequested(),
+                "transportEncoding", measurement.transportEncoding(),
+                "protocolEncoding", measurement.protocolEncoding(),
+                "packed", measurement.packed(),
+                "fellBackToJson", measurement.fellBackToJson(),
+                "stages", stageMaps);
+    }
+
+    private static Map<String, Object> measurementBundle(Object... values) {
+        var result = new HashMap<String, Object>();
+        for (int i = 0; i < values.length; i += 2) {
+            var key = (String) values[i];
+            var value = values[i + 1];
+            if (value != null) {
+                result.put(key, value);
+            }
+        }
+        return result;
     }
 
     private static Benchmark.TypicalRequest buildTypicalRequest(List<Map<String, Object>> payload) {

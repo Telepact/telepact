@@ -17,6 +17,7 @@
 from typing import TYPE_CHECKING
 
 from ...internal.binary.Base64Encoder import Base64Encoder
+from ...SerializerMeasurement import measure_serializer_stage
 
 if TYPE_CHECKING:
     from .BinaryEncodingCache import BinaryEncodingCache
@@ -25,10 +26,10 @@ class ClientBase64Encoder(Base64Encoder):
 
     def decode(self, message: list[object]) -> list[object]:
         from ...internal.binary.ClientBase64Decode import client_base64_decode
-        client_base64_decode(message)
+        measure_serializer_stage("deserialize.base64.clientDecode", lambda: client_base64_decode(message))
         return message
     
     def encode(self, message: list[object]) -> list[object]:
         from ...internal.binary.ClientBase64Encode import client_base64_encode
-        client_base64_encode(message)
+        measure_serializer_stage("serialize.base64.clientEncode", lambda: client_base64_encode(message))
         return message

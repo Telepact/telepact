@@ -16,6 +16,7 @@
 
 import { DefaultSerialization } from './DefaultSerialization.js';
 import { Serializer } from './Serializer.js';
+import { SerializerMeasurementObserver } from './SerializerMeasurement.js';
 import { ServerBinaryEncoder } from './internal/binary/ServerBinaryEncoder.js';
 import { Message } from './Message.js';
 import { TelepactSchema } from './TelepactSchema.js';
@@ -65,7 +66,7 @@ export class Server {
         const binaryEncoder = new ServerBinaryEncoder(binaryEncoding);
         const base64Encoder = new ServerBase64Encoder();
 
-        this.serializer = new Serializer(options.serialization, binaryEncoder, base64Encoder);
+        this.serializer = new Serializer(options.serialization, binaryEncoder, base64Encoder, options.measurementObserver);
 
         if (!('union.Auth_' in this.telepactSchema.parsed) && options.authRequired) {
             throw new Error(
@@ -98,6 +99,7 @@ export class ServerOptions {
     middleware: Middleware;
     authRequired: boolean;
     serialization: Serialization;
+    measurementObserver?: SerializerMeasurementObserver;
 
     constructor() {
         this.onError = (_error: TelepactError) => {};
@@ -108,5 +110,6 @@ export class ServerOptions {
             await functionRouter.route(requestMessage);
         this.authRequired = true;
         this.serialization = new DefaultSerialization();
+        this.measurementObserver = undefined;
     }
 }

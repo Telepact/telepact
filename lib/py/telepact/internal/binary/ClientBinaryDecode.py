@@ -15,6 +15,7 @@
 #|
 
 from typing import cast, TYPE_CHECKING
+from ...SerializerMeasurement import annotate_serializer_measurement, measure_serializer_stage
 
 if TYPE_CHECKING:
     from .ClientBinaryStrategy import ClientBinaryStrategy
@@ -44,9 +45,17 @@ def client_binary_decode(message: list[object], binary_encoding_cache: 'BinaryEn
 
     final_encoded_message_body: dict[object, object]
     if headers.get("@pac_") is True:
-        final_encoded_message_body = unpack_body(encoded_message_body)
+        annotate_serializer_measurement(packed=True)
+        final_encoded_message_body = measure_serializer_stage(
+            "deserialize.binary.unpackBody",
+            lambda: unpack_body(encoded_message_body),
+        )
     else:
+        annotate_serializer_measurement(packed=False)
         final_encoded_message_body = encoded_message_body
 
-    message_body = decode_body(final_encoded_message_body, binary_encoder)
+    message_body = measure_serializer_stage(
+        "deserialize.binary.decodeBody",
+        lambda: decode_body(final_encoded_message_body, binary_encoder),
+    )
     return [headers, message_body]

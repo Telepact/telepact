@@ -22,17 +22,19 @@ import static io.github.telepact.internal.binary.ClientBase64Encode.clientBase64
 
 import java.util.List;
 
+import io.github.telepact.internal.SerializerMeasurementSupport;
+
 public class ClientBase64Encoder implements Base64Encoder {
 
     @Override
     public List<Object> encode(List<Object> message) throws BinaryEncoderUnavailableError {
-        clientBase64Encode(message);
+        SerializerMeasurementSupport.measureSerializerStage("serialize.base64.clientEncode", () -> clientBase64Encode(message));
         return message;
     }
 
     @Override
     public List<Object> decode(List<Object> message) throws BinaryEncoderUnavailableError {
-        clientBase64Decode(message);
+        SerializerMeasurementSupport.measureSerializerStage("deserialize.base64.clientDecode", () -> clientBase64Decode(message));
         return message;
     }
 }

@@ -166,10 +166,60 @@ def summarize_scenarios(raw_results: list[dict[str, Any]]) -> list[dict[str, Any
             metric_name: summarize_metric([float(sample[metric_name]) for sample in samples])
             for metric_name in ALL_METRICS
         }
-        summarized.append({
+        summarized_record = {
             **{k: v for k, v in record.items() if k != "samples"},
             "metrics": metrics,
+        }
+        telepact_measurements = summarize_telepact_measurements(samples)
+        if telepact_measurements:
+            summarized_record["telepactMeasurements"] = telepact_measurements
+        summarized.append(summarized_record)
+    return summarized
+
+
+def summarize_telepact_measurements(samples: list[dict[str, Any]]) -> dict[str, Any]:
+    measurement_names = sorted({
+        measurement_name
+        for sample in samples
+        for measurement_name in sample.get("telepactMeasurements", {}).keys()
+    })
+    if not measurement_names:
+        return {}
+
+    summarized: dict[str, Any] = {}
+    for measurement_name in measurement_names:
+        measurements = [
+            sample["telepactMeasurements"][measurement_name]
+            for sample in samples
+            if measurement_name in sample.get("telepactMeasurements", {})
+        ]
+        stage_names = sorted({
+            stage_name
+            for measurement in measurements
+            for stage_name in measurement.get("stages", {}).keys()
         })
+        summarized[measurement_name] = {
+            "operation": sorted({measurement["operation"] for measurement in measurements}),
+            "binaryRequested": sorted({bool(measurement["binaryRequested"]) for measurement in measurements}),
+            "transportEncoding": sorted({measurement["transportEncoding"] for measurement in measurements}),
+            "protocolEncoding": sorted({measurement["protocolEncoding"] for measurement in measurements}),
+            "packed": sorted({bool(measurement["packed"]) for measurement in measurements}),
+            "fellBackToJson": sorted({bool(measurement["fellBackToJson"]) for measurement in measurements}),
+            "totalDurationNs": summarize_metric([float(measurement["totalDurationNs"]) for measurement in measurements]),
+            "stages": {
+                stage_name: {
+                    "totalDurationNs": summarize_metric([
+                        float(measurement.get("stages", {}).get(stage_name, {}).get("totalDurationNs", 0))
+                        for measurement in measurements
+                    ]),
+                    "count": summarize_metric([
+                        float(measurement.get("stages", {}).get(stage_name, {}).get("count", 0))
+                        for measurement in measurements
+                    ]),
+                }
+                for stage_name in stage_names
+            },
+        }
     return summarized
 
 

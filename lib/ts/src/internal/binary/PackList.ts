@@ -18,6 +18,7 @@ import { BinaryPackNode } from './BinaryPackNode.js';
 import { pack } from './Pack.js';
 import { packMap } from './PackMap.js';
 import { CannotPack } from './CannotPack.js';
+import { measureSerializerStage } from '../../SerializerMeasurement.js';
 import { addExtension } from 'msgpackr';
 
 const PACKED_BYTE = 17;
@@ -42,37 +43,39 @@ const MSGPACK_PACKED_EXT = {
 addExtension(MSGPACK_PACKED_EXT);
 
 export function packList(list: any[]): any[] {
-    if (list.length === 0) {
-        return list;
-    }
+    return measureSerializerStage('serialize.binary.packList', () => {
+        if (list.length === 0) {
+            return list;
+        }
 
-    const packedList: any[] = [];
-    const header: any[] = [];
+        const packedList: any[] = [];
+        const header: any[] = [];
 
-    packedList.push(MSGPACK_PACKED_VALUE);
+        packedList.push(MSGPACK_PACKED_VALUE);
 
-    header.push(null);
+        header.push(null);
 
-    packedList.push(header);
+        packedList.push(header);
 
-    const keyIndexMap: Map<number, BinaryPackNode> = new Map();
-    try {
-        for (const e of list) {
-            if (e instanceof Map) {
-                const row = packMap(e, header, keyIndexMap);
+        const keyIndexMap: Map<number, BinaryPackNode> = new Map();
+        try {
+            for (const e of list) {
+                if (e instanceof Map) {
+                    const row = packMap(e, header, keyIndexMap);
 
-                packedList.push(row);
-            } else {
-                // This list cannot be packed, abort
-                throw new CannotPack();
+                    packedList.push(row);
+                } else {
+                    // This list cannot be packed, abort
+                    throw new CannotPack();
+                }
             }
+            return packedList;
+        } catch (ex) {
+            const newList: any[] = [];
+            for (const e of list) {
+                newList.push(pack(e));
+            }
+            return newList;
         }
-        return packedList;
-    } catch (ex) {
-        const newList: any[] = [];
-        for (const e of list) {
-            newList.push(pack(e));
-        }
-        return newList;
-    }
+    });
 }

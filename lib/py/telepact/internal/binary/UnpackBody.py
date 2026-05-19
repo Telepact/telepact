@@ -15,7 +15,11 @@
 #|
 
 from .Unpack import unpack
+from ...SerializerMeasurement import measure_serializer_stage
 
 
 def unpack_body(body: dict[object, object]) -> dict[object, object]:
-    return {key: unpack(value) for key, value in body.items()}
+    return measure_serializer_stage(
+        "deserialize.binary.unpackBody.walk",
+        lambda: {key: unpack(value) for key, value in body.items()},
+    )

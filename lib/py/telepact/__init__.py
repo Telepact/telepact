@@ -24,6 +24,7 @@ from .Message import Message
 from .TypedMessage import TypedMessage
 from .Response import Response
 from .Serializer import Serializer
+from .SerializerMeasurement import SerializerMeasurement, SerializerMeasurementStageStats, serializer_measurement_to_dict
 from .SerializationError import SerializationError
 from .Serialization import Serialization
 from .TelepactSchema import TelepactSchema
@@ -40,6 +41,9 @@ __all__ = [
     "MockServer",
     "Message",
     "Serializer",
+    "SerializerMeasurement",
+    "SerializerMeasurementStageStats",
+    "serializer_measurement_to_dict",
     "SerializationError",
     "Serialization",
     "TelepactSchema",

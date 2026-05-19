@@ -25,30 +25,34 @@ import java.util.List;
 
 import org.msgpack.jackson.dataformat.MessagePackExtensionType;
 
+import io.github.telepact.internal.SerializerMeasurementSupport;
+
 public class UnpackList {
     static List<Object> unpackList(List<Object> list) {
-        if (list.isEmpty()) {
-            return list;
-        }
-
-        if (!(list.get(0) instanceof final MessagePackExtensionType t && t.getType() == PACKED_BYTE)) {
-            final var newList = new ArrayList<Object>();
-            for (final var e : list) {
-                newList.add(unpack(e));
+        return SerializerMeasurementSupport.measureSerializerStage("deserialize.binary.unpackList", () -> {
+            if (list.isEmpty()) {
+                return list;
             }
-            return newList;
-        }
 
-        final var unpackedList = new ArrayList<Object>();
-        final var headers = (List<Object>) list.get(1);
+            if (!(list.get(0) instanceof final MessagePackExtensionType t && t.getType() == PACKED_BYTE)) {
+                final var newList = new ArrayList<Object>();
+                for (final var e : list) {
+                    newList.add(unpack(e));
+                }
+                return newList;
+            }
 
-        for (int i = 2; i < list.size(); i += 1) {
-            final var row = (List<Object>) list.get(i);
-            final var m = unpackMap(row, headers);
+            final var unpackedList = new ArrayList<Object>();
+            final var headers = (List<Object>) list.get(1);
 
-            unpackedList.add(m);
-        }
+            for (int i = 2; i < list.size(); i += 1) {
+                final var row = (List<Object>) list.get(i);
+                final var m = unpackMap(row, headers);
 
-        return unpackedList;
+                unpackedList.add(m);
+            }
+
+            return unpackedList;
+        });
     }
 }

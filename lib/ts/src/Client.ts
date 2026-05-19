@@ -16,6 +16,7 @@
 
 import { DefaultSerialization } from './DefaultSerialization.js';
 import { Serializer } from './Serializer.js';
+import { SerializerMeasurementObserver } from './SerializerMeasurement.js';
 import { ClientBinaryEncoder } from './internal/binary/ClientBinaryEncoder.js';
 import { Message } from './Message.js';
 import { clientHandleMessage } from './internal/ClientHandleMessage.js';
@@ -43,7 +44,7 @@ export class Client {
         const binaryEncoder = new ClientBinaryEncoder(binaryEncodingCache);
         const base64Encoder = new ClientBase64Encoder();
 
-        this.serializer = new Serializer(options.serializationImpl, binaryEncoder, base64Encoder);
+        this.serializer = new Serializer(options.serializationImpl, binaryEncoder, base64Encoder, options.measurementObserver);
     }
 
     async request(requestMessage: Message): Promise<Message> {
@@ -64,6 +65,7 @@ export class ClientOptions {
     timeoutMsDefault: number;
     serializationImpl: Serialization;
     localStorageCacheNamespace: string
+    measurementObserver?: SerializerMeasurementObserver;
 
     constructor() {
         this.useBinary = false;
@@ -71,5 +73,6 @@ export class ClientOptions {
         this.timeoutMsDefault = 5000;
         this.serializationImpl = new DefaultSerialization();
         this.localStorageCacheNamespace = ''
+        this.measurementObserver = undefined;
     }
 }

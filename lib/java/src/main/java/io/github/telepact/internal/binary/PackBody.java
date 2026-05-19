@@ -21,15 +21,19 @@ import static io.github.telepact.internal.binary.Pack.pack;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.github.telepact.internal.SerializerMeasurementSupport;
+
 public class PackBody {
     static Map<Object, Object> packBody(Map<Object, Object> body) {
-        final var result = new HashMap<Object, Object>();
+        return SerializerMeasurementSupport.measureSerializerStage("serialize.binary.packBody.walk", () -> {
+            final var result = new HashMap<Object, Object>();
 
-        for (final var entry : body.entrySet()) {
-            final var packedValue = pack(entry.getValue());
-            result.put(entry.getKey(), packedValue);
-        }
+            for (final var entry : body.entrySet()) {
+                final var packedValue = pack(entry.getValue());
+                result.put(entry.getKey(), packedValue);
+            }
 
-        return result;
+            return result;
+        });
     }
 }

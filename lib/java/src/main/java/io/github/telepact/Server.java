@@ -94,6 +94,11 @@ public class Server {
          * deserialize messages.
          */
         public Serialization serialization = new DefaultSerialization();
+
+        /**
+         * Optional observer for per-operation serializer measurements.
+         */
+        public Consumer<SerializerMeasurement> measurementObserver = null;
     }
 
     final TelepactSchema telepactSchema;
@@ -126,7 +131,7 @@ public class Server {
         final var binaryEncoder = new ServerBinaryEncoder(binaryEncoding);
         final var base64Encoder = new ServerBase64Encoder();
 
-        this.serializer = new Serializer(options.serialization, binaryEncoder, base64Encoder);
+        this.serializer = new Serializer(options.serialization, binaryEncoder, base64Encoder, options.measurementObserver);
 
         if (!this.telepactSchema.parsed.containsKey("union.Auth_") && options.authRequired) {
             throw new RuntimeException(

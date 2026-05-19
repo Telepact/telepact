@@ -18,6 +18,7 @@ import { BinaryEncoding } from '../../internal/binary/BinaryEncoding.js';
 import { encodeBody } from '../../internal/binary/EncodeBody.js';
 import { packBody } from '../../internal/binary/PackBody.js';
 import { BinaryEncoderUnavailableError } from '../../internal/binary/BinaryEncoderUnavailableError.js';
+import { annotateSerializerMeasurement, measureSerializerStage } from '../../SerializerMeasurement.js';
 
 export function serverBinaryEncode(message: any[], binaryEncoder: BinaryEncoding): any[] {
     const headers: { [key: string]: any } = message[0];
@@ -36,12 +37,14 @@ export function serverBinaryEncode(message: any[], binaryEncoder: BinaryEncoding
     }
 
     headers['@bin_'] = [binaryEncoder.checksum];
-    const encodedMessageBody = encodeBody(messageBody, binaryEncoder);
+    const encodedMessageBody = measureSerializerStage('serialize.binary.encodeBody', () => encodeBody(messageBody, binaryEncoder));
 
     let finalEncodedMessageBody: { [key: string]: any };
     if (headers['@pac_'] === true) {
-        finalEncodedMessageBody = packBody(encodedMessageBody);
+        annotateSerializerMeasurement({ packed: true });
+        finalEncodedMessageBody = measureSerializerStage('serialize.binary.packBody', () => packBody(encodedMessageBody));
     } else {
+        annotateSerializerMeasurement({ packed: false });
         finalEncodedMessageBody = encodedMessageBody;
     }
 

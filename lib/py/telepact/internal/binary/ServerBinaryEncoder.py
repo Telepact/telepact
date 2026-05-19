@@ -17,6 +17,7 @@
 from typing import TYPE_CHECKING
 
 from ...internal.binary.BinaryEncoder import BinaryEncoder
+from ...SerializerMeasurement import measure_serializer_stage
 
 
 if TYPE_CHECKING:
@@ -29,8 +30,14 @@ class ServerBinaryEncoder(BinaryEncoder):
 
     def encode(self, message: list[object]) -> list[object]:
         from ...internal.binary.ServerBinaryEncode import server_binary_encode
-        return server_binary_encode(message, self.binary_encoder)
+        return measure_serializer_stage(
+            "serialize.binary.serverEncode",
+            lambda: server_binary_encode(message, self.binary_encoder),
+        )
 
     def decode(self, message: list[object]) -> list[object]:
         from ...internal.binary.ServerBinaryDecode import server_binary_decode
-        return server_binary_decode(message, self.binary_encoder)
+        return measure_serializer_stage(
+            "deserialize.binary.serverDecode",
+            lambda: server_binary_decode(message, self.binary_encoder),
+        )

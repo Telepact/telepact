@@ -26,43 +26,47 @@ import java.util.Map;
 
 import org.msgpack.jackson.dataformat.MessagePackExtensionType;
 
+import io.github.telepact.internal.SerializerMeasurementSupport;
+
 public class PackList {
 
     public static final byte PACKED_BYTE = (byte) 17;
 
     static List<Object> packList(List<Object> list) {
-        if (list.isEmpty()) {
-            return list;
-        }
+        return SerializerMeasurementSupport.measureSerializerStage("serialize.binary.packList", () -> {
+            if (list.isEmpty()) {
+                return list;
+            }
 
-        final var packedList = new ArrayList<Object>();
-        final var header = new ArrayList<Object>();
+            final var packedList = new ArrayList<Object>();
+            final var header = new ArrayList<Object>();
 
-        packedList.add(new MessagePackExtensionType(PACKED_BYTE, new byte[0]));
+            packedList.add(new MessagePackExtensionType(PACKED_BYTE, new byte[0]));
 
-        header.add(null);
+            header.add(null);
 
-        packedList.add(header);
+            packedList.add(header);
 
-        final var keyIndexMap = new HashMap<Integer, BinaryPackNode>();
-        try {
-            for (final var e : list) {
-                if (e instanceof final Map<?, ?> m) {
-                    final var row = packMap(m, header, keyIndexMap);
+            final var keyIndexMap = new HashMap<Integer, BinaryPackNode>();
+            try {
+                for (final var e : list) {
+                    if (e instanceof final Map<?, ?> m) {
+                        final var row = packMap(m, header, keyIndexMap);
 
-                    packedList.add(row);
-                } else {
-                    // This list cannot be packed, abort
-                    throw new CannotPack();
+                        packedList.add(row);
+                    } else {
+                        // This list cannot be packed, abort
+                        throw new CannotPack();
+                    }
                 }
+                return packedList;
+            } catch (final CannotPack ex) {
+                final var newList = new ArrayList<Object>();
+                for (final var e : list) {
+                    newList.add(pack(e));
+                }
+                return newList;
             }
-            return packedList;
-        } catch (final CannotPack ex) {
-            final var newList = new ArrayList<Object>();
-            for (final var e : list) {
-                newList.add(pack(e));
-            }
-            return newList;
-        }
+        });
     }
 }

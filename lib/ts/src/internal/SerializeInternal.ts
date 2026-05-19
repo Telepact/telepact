@@ -15,6 +15,7 @@
 //|
 
 import { SerializationError } from '../SerializationError.js';
+import { SerializerMeasurementObserver, annotateSerializerMeasurement, measureSerializerStage, runMeasuredSerializerOperation } from '../SerializerMeasurement.js';
 import { Serialization } from '../Serialization.js';
 import { Message } from '../Message.js';
 import { BinaryEncoder } from '../internal/binary/BinaryEncoder.js';
@@ -25,34 +26,66 @@ export function serializeInternal(
     binaryEncoder: BinaryEncoder,
     base64Encoder: Base64Encoder,
     serializer: Serialization,
+    measurementObserver?: SerializerMeasurementObserver,
 ): Uint8Array {
     const headers: Record<string, any> = message.headers;
+    const binaryRequested = headers['@binary_'] === true;
+    const packed = headers['@pac_'] === true;
 
-    let serializeAsBinary: boolean;
-    if ('@binary_' in headers) {
-        serializeAsBinary = headers['@binary_'] === true;
-        delete headers['@binary_'];
-    } else {
-        serializeAsBinary = false;
-    }
+    return runMeasuredSerializerOperation(
+        'serialize',
+        measurementObserver,
+        {
+            binaryRequested,
+            transportEncoding: 'json',
+            protocolEncoding: 'base64',
+            packed,
+            fellBackToJson: false,
+        },
+        () => {
+            let serializeAsBinary: boolean;
+            measureSerializerStage('serialize.headerDecision', () => {
+                if ('@binary_' in headers) {
+                    serializeAsBinary = headers['@binary_'] === true;
+                    delete headers['@binary_'];
+                } else {
+                    serializeAsBinary = false;
+                }
+            });
 
-    const messageAsPseudoJson: any[] = [message.headers, message.body];
+            const messageAsPseudoJson: any[] = [message.headers, message.body];
 
-    try {
-        if (serializeAsBinary) {
             try {
-                const encodedMessage = binaryEncoder.encode(messageAsPseudoJson);
-                return serializer.toMsgpack(encodedMessage);
+                if (serializeAsBinary!) {
+                    try {
+                        const encodedMessage = measureSerializerStage('serialize.binary.encode', () => binaryEncoder.encode(messageAsPseudoJson));
+                        annotateSerializerMeasurement({
+                            transportEncoding: 'msgpack',
+                            protocolEncoding: 'binary',
+                            fellBackToJson: false,
+                        });
+                        return measureSerializerStage('serialize.msgpack.encode', () => serializer.toMsgpack(encodedMessage));
+                    } catch (error) {
+                        annotateSerializerMeasurement({
+                            transportEncoding: 'json',
+                            protocolEncoding: 'base64',
+                            fellBackToJson: true,
+                        });
+                        const base64EncodedMessage = measureSerializerStage('serialize.base64.encode', () => base64Encoder.encode(messageAsPseudoJson));
+                        return measureSerializerStage('serialize.json.encode', () => serializer.toJson(base64EncodedMessage));
+                    }
+                }
+
+                const base64EncodedMessage = measureSerializerStage('serialize.base64.encode', () => base64Encoder.encode(messageAsPseudoJson));
+                annotateSerializerMeasurement({
+                    transportEncoding: 'json',
+                    protocolEncoding: 'base64',
+                    fellBackToJson: false,
+                });
+                return measureSerializerStage('serialize.json.encode', () => serializer.toJson(base64EncodedMessage));
             } catch (error) {
-                // We can still submit as JSON
-                const base64EncodedMessage = base64Encoder.encode(messageAsPseudoJson);
-                return serializer.toJson(base64EncodedMessage);
+                throw new SerializationError(error, serializeAsBinary! ? 'encoding Telepact message as binary or JSON fallback' : 'encoding Telepact message as JSON');
             }
-        } else {
-            const base64EncodedMessage = base64Encoder.encode(messageAsPseudoJson);
-            return serializer.toJson(base64EncodedMessage);
-        }
-    } catch (error) {
-        throw new SerializationError(error, serializeAsBinary ? 'encoding Telepact message as binary or JSON fallback' : 'encoding Telepact message as JSON');
-    }
+        },
+    );
 }

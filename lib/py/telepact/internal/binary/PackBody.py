@@ -15,7 +15,11 @@
 #|
 
 from .Pack import pack
+from ...SerializerMeasurement import measure_serializer_stage
 
 
 def pack_body(body: dict[object, object]) -> dict[object, object]:
-    return {key: pack(value) for key, value in body.items()}
+    return measure_serializer_stage(
+        "serialize.binary.packBody.walk",
+        lambda: {key: pack(value) for key, value in body.items()},
+    )

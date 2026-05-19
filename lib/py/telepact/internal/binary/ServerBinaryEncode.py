@@ -15,6 +15,7 @@
 #|
 
 from typing import TYPE_CHECKING, cast
+from ...SerializerMeasurement import annotate_serializer_measurement, measure_serializer_stage
 
 if TYPE_CHECKING:
     from ...internal.binary.BinaryEncoding import BinaryEncoding
@@ -39,12 +40,20 @@ def server_binary_encode(message: list[object], binary_encoder: 'BinaryEncoding'
         headers["@enc_"] = binary_encoder.encode_map
 
     headers["@bin_"] = [binary_encoder.checksum]
-    encoded_message_body = encode_body(message_body, binary_encoder)
+    encoded_message_body = measure_serializer_stage(
+        "serialize.binary.encodeBody",
+        lambda: encode_body(message_body, binary_encoder),
+    )
 
     final_encoded_message_body: dict[object, object]
     if headers.get("@pac_") is True:
-        final_encoded_message_body = pack_body(encoded_message_body)
+        annotate_serializer_measurement(packed=True)
+        final_encoded_message_body = measure_serializer_stage(
+            "serialize.binary.packBody",
+            lambda: pack_body(encoded_message_body),
+        )
     else:
+        annotate_serializer_measurement(packed=False)
         final_encoded_message_body = encoded_message_body
 
     return [headers, final_encoded_message_body]

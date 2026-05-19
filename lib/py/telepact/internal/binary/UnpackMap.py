@@ -19,6 +19,7 @@ from typing import cast
 from threading import Lock
 
 from ...internal.binary.PackMap import UNDEFINED_BYTE
+from ...SerializerMeasurement import measure_serializer_stage
 _UNPACK = None
 _UNPACK_LOCK = Lock()
 
@@ -34,32 +35,35 @@ def _get_unpack():
 
 
 def unpack_map(row: list[object], header: list[object]) -> dict[int, object]:
-    unpack = _get_unpack()
+    def _run() -> dict[int, object]:
+        unpack = _get_unpack()
 
-    final_map: dict[int, object] = {}
-    header_entry_count = len(header) - 1
+        final_map: dict[int, object] = {}
+        header_entry_count = len(header) - 1
 
-    for index in range(min(len(row), header_entry_count)):
-        value = row[index]
-        if type(value) is ExtType and value.code == UNDEFINED_BYTE:
-            continue
+        for index in range(min(len(row), header_entry_count)):
+            value = row[index]
+            if type(value) is ExtType and value.code == UNDEFINED_BYTE:
+                continue
 
-        key = header[index + 1]
-        if type(key) is list:
-            nested_header = cast(list[object], key)
-            nested_row = cast(list[object], value)
-            m = unpack_map(nested_row, nested_header)
-            i = nested_header[0]
+            key = header[index + 1]
+            if type(key) is list:
+                nested_header = cast(list[object], key)
+                nested_row = cast(list[object], value)
+                m = unpack_map(nested_row, nested_header)
+                i = nested_header[0]
 
-            final_map[i] = m
-        else:
-            i = cast(int, key)
-            value_type = type(value)
-            if value_type is dict or value_type is list:
-                unpacked_value = unpack(value)
+                final_map[i] = m
             else:
-                unpacked_value = value
+                i = cast(int, key)
+                value_type = type(value)
+                if value_type is dict or value_type is list:
+                    unpacked_value = unpack(value)
+                else:
+                    unpacked_value = value
 
-            final_map[i] = unpacked_value
+                final_map[i] = unpacked_value
 
-    return final_map
+        return final_map
+
+    return measure_serializer_stage("deserialize.binary.unpackMap", _run)

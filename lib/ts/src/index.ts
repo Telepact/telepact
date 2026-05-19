@@ -24,6 +24,7 @@ export * from './Message.js';
 export * from './TypedMessage.js';
 export * from './Response.js';
 export * from './Serializer.js';
+export * from './SerializerMeasurement.js';
 export * from './internal/binary/ClientBinaryStrategy.js';
 export * from './SerializationError.js';
 export * from './Serialization.js';

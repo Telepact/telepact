@@ -20,6 +20,7 @@ from concurrent.futures import Future
 from .internal.binary.DefaultBinaryEncodingCache import DefaultBinaryEncodingCache
 from .DefaultSerialization import DefaultSerialization
 from .Serializer import Serializer
+from .SerializerMeasurement import SerializerMeasurementObserver
 from .internal.binary.ClientBinaryEncoder import ClientBinaryEncoder
 from .internal.binary.ClientBase64Encoder import ClientBase64Encoder
 
@@ -34,6 +35,7 @@ class Client:
             self.always_send_json = True
             self.timeout_ms_default = 5000
             self.serialization_impl = DefaultSerialization()
+            self.measurement_observer: SerializerMeasurementObserver | None = None
 
     def __init__(self, adapter: Callable[['Message', 'Serializer'], Awaitable['Message']], options: 'Options'):
         self.adapter = adapter
@@ -45,7 +47,7 @@ class Client:
         binary_encoder = ClientBinaryEncoder(binary_encoding_cache)
         base64_encoder = ClientBase64Encoder()
 
-        self.serializer = Serializer(options.serialization_impl, binary_encoder, base64_encoder)
+        self.serializer = Serializer(options.serialization_impl, binary_encoder, base64_encoder, options.measurement_observer)
 
     async def request(self, request_message: 'Message') -> 'Message':
         from .internal.ClientHandleMessage import client_handle_message

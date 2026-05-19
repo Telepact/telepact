@@ -27,7 +27,7 @@ from typing import Any, Awaitable, Callable
 import nats
 from nats.errors import NoRespondersError as NatsNoRespondersError
 from nats.errors import TimeoutError as NatsTimeoutError
-from telepact import Client, FunctionRouter, Message, Server, TelepactSchema
+from telepact import Client, FunctionRouter, Message, Server, TelepactSchema, serializer_measurement_to_dict
 
 from . import benchmark_pb2
 from .common import (
@@ -226,9 +226,10 @@ class PythonWorker:
 
         return sub, request_once
 
-    async def _create_telepact_runner(self, server_connection: nats.aio.client.Client, client_connection: RetryingNatsClient, subject: str, scenario: Scenario, queue: asyncio.Queue[dict[str, int]]):
+    async def _create_telepact_runner(self, server_connection: nats.aio.client.Client, client_connection: RetryingNatsClient, subject: str, scenario: Scenario, queue: asyncio.Queue[dict[str, Any]]):
         schema = TelepactSchema.from_directory(str(SCHEMA_DIR))
         function_name = FUNCTION_NAMES[scenario.data_shape]
+        server_measurements: dict[str, dict[str, object]] = {}
 
         async def echo_route(function_name_unused: str, request_message: Message) -> Message:
             return Message({}, {"Ok_": {"items": request_message.body[function_name_unused]["items"]}})
@@ -243,11 +244,13 @@ class PythonWorker:
         options.auth_required = False
         options.on_request = lambda _message: server_state.__setitem__("afterDeserializeNs", time.perf_counter_ns())
         options.on_response = lambda _message: server_state.__setitem__("beforeSerializeNs", time.perf_counter_ns())
+        options.measurement_observer = lambda measurement: server_measurements.__setitem__(measurement.operation, serializer_measurement_to_dict(measurement))
         server = Server(schema, function_router, options)
 
         async def handler(msg: nats.aio.msg.Msg) -> None:
             received_at = time.perf_counter_ns()
             server_state.clear()
+            server_measurements.clear()
             response = await server.process(msg.data)
             response_sent_at = time.perf_counter_ns()
             queue.put_nowait({
@@ -255,6 +258,12 @@ class PythonWorker:
                 "serverRequestDeserializationTimeNs": server_state["afterDeserializeNs"] - received_at,
                 "serverResponseSerializationTimeNs": response_sent_at - server_state["beforeSerializeNs"],
                 "responseSentAtNs": response_sent_at,
+                "telepactMeasurements": {
+                    key: value for key, value in {
+                        "serverDeserialize": server_measurements.get("deserialize"),
+                        "serverSerialize": server_measurements.get("serialize"),
+                    }.items() if value is not None
+                },
             })
             await server_connection.publish(msg.reply, response.bytes)
 
@@ -262,6 +271,7 @@ class PythonWorker:
         await server_connection.flush()
 
         async def adapter(message: Message, serializer) -> Message:
+            client_measurements.clear()
             serialize_start = time.perf_counter_ns()
             request_bytes = serializer.serialize(message)
             serialize_end = time.perf_counter_ns()
@@ -281,13 +291,23 @@ class PythonWorker:
                 "serializedResponseSizeBytes": len(response_msg.data),
                 "responseNetworkTransitTimeNs": received_at - server_metrics["responseSentAtNs"],
                 "clientResponseDeserializationTimeNs": deserialize_end - deserialize_start,
+                "telepactMeasurements": {
+                    key: value for key, value in {
+                        "clientSerialize": client_measurements.get("serialize"),
+                        "clientDeserialize": client_measurements.get("deserialize"),
+                        "serverDeserialize": server_metrics.get("telepactMeasurements", {}).get("serverDeserialize"),
+                        "serverSerialize": server_metrics.get("telepactMeasurements", {}).get("serverSerialize"),
+                    }.items() if value is not None
+                },
             }
             return response_message
 
         adapter.last_sample = {}
+        client_measurements: dict[str, dict[str, object]] = {}
         client_options = Client.Options()
         client_options.use_binary = scenario.method != "telepact-json"
         client_options.always_send_json = scenario.method == "telepact-json"
+        client_options.measurement_observer = lambda measurement: client_measurements.__setitem__(measurement.operation, serializer_measurement_to_dict(measurement))
         client = Client(adapter, client_options)
 
         async def request_once(payload: list[dict[str, Any]]) -> dict[str, Any]:

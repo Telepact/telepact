@@ -18,10 +18,12 @@ package io.github.telepact.internal;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 import io.github.telepact.Message;
 import io.github.telepact.Serialization;
 import io.github.telepact.SerializationError;
+import io.github.telepact.SerializerMeasurement;
 import io.github.telepact.internal.binary.Base64Encoder;
 import io.github.telepact.internal.binary.BinaryEncoder;
 import io.github.telepact.internal.binary.BinaryEncoderUnavailableError;
@@ -29,37 +31,81 @@ import io.github.telepact.internal.binary.BinaryEncoderUnavailableError;
 public class SerializeInternal {
     public static byte[] serializeInternal(Message message, BinaryEncoder binaryEncoder,
             Base64Encoder base64Encoder,
-            Serialization serializer) {
+            Serialization serializer,
+            Consumer<SerializerMeasurement> measurementObserver) {
         final var headers = message.headers;
+        final var binaryRequested = Objects.equals(true, headers.get("@binary_"));
+        final var packed = Objects.equals(true, headers.get("@pac_"));
 
-        final boolean serializeAsBinary;
-        if (headers.containsKey("@binary_")) {
-            serializeAsBinary = Objects.equals(true, headers.remove("@binary_"));
-        } else {
-            serializeAsBinary = false;
-        }
+        return SerializerMeasurementSupport.runMeasuredSerializerOperation(
+                "serialize",
+                measurementObserver,
+                binaryRequested,
+                "json",
+                "base64",
+                packed,
+                false,
+                () -> {
+                    final boolean[] serializeAsBinary = { false };
+                    SerializerMeasurementSupport.measureSerializerStage("serialize.headerDecision", () -> {
+                        if (headers.containsKey("@binary_")) {
+                            serializeAsBinary[0] = Objects.equals(true, headers.remove("@binary_"));
+                        } else {
+                            serializeAsBinary[0] = false;
+                        }
+                    });
 
-        final List<Object> messageAsPseudoJson = List.of(message.headers, message.body);
+                    final List<Object> messageAsPseudoJson = List.of(message.headers, message.body);
 
-        try {
-            if (serializeAsBinary) {
-                try {
-                    final var encodedMessage = binaryEncoder.encode(messageAsPseudoJson);
-                    return serializer.toMsgPack(encodedMessage);
-                } catch (BinaryEncoderUnavailableError e) {
-                    // We can still submit as json
-                    final var base64EncodedMessage = base64Encoder.encode(messageAsPseudoJson);
-                    return serializer.toJson(base64EncodedMessage);
-                }
-            } else {
-                final var base64EncodedMessage = base64Encoder.encode(messageAsPseudoJson);
-                return serializer.toJson(base64EncodedMessage);
-            }
-        } catch (Throwable e) {
-            throw new SerializationError(
-                    e,
-                    serializeAsBinary ? "encoding Telepact message as binary or JSON fallback"
-                            : "encoding Telepact message as JSON");
-        }
+                    try {
+                        if (serializeAsBinary[0]) {
+                            try {
+                                final var encodedMessage = SerializerMeasurementSupport.measureSerializerStage(
+                                        "serialize.binary.encode",
+                                        () -> binaryEncoder.encode(messageAsPseudoJson));
+                                SerializerMeasurementSupport.annotateSerializerMeasurement(
+                                        null,
+                                        "msgpack",
+                                        "binary",
+                                        null,
+                                        false);
+                                return SerializerMeasurementSupport.measureSerializerStage(
+                                        "serialize.msgpack.encode",
+                                        () -> serializer.toMsgPack(encodedMessage));
+                            } catch (BinaryEncoderUnavailableError e) {
+                                SerializerMeasurementSupport.annotateSerializerMeasurement(
+                                        null,
+                                        "json",
+                                        "base64",
+                                        null,
+                                        true);
+                                final var base64EncodedMessage = SerializerMeasurementSupport.measureSerializerStage(
+                                        "serialize.base64.encode",
+                                        () -> base64Encoder.encode(messageAsPseudoJson));
+                                return SerializerMeasurementSupport.measureSerializerStage(
+                                        "serialize.json.encode",
+                                        () -> serializer.toJson(base64EncodedMessage));
+                            }
+                        }
+
+                        final var base64EncodedMessage = SerializerMeasurementSupport.measureSerializerStage(
+                                "serialize.base64.encode",
+                                () -> base64Encoder.encode(messageAsPseudoJson));
+                        SerializerMeasurementSupport.annotateSerializerMeasurement(
+                                null,
+                                "json",
+                                "base64",
+                                null,
+                                false);
+                        return SerializerMeasurementSupport.measureSerializerStage(
+                                "serialize.json.encode",
+                                () -> serializer.toJson(base64EncodedMessage));
+                    } catch (Throwable e) {
+                        throw new SerializationError(
+                                e,
+                                serializeAsBinary[0] ? "encoding Telepact message as binary or JSON fallback"
+                                        : "encoding Telepact message as JSON");
+                    }
+                });
     }
 }

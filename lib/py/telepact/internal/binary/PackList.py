@@ -20,6 +20,7 @@ from threading import Lock
 from msgpack import ExtType
 from .CannotPack import CannotPack
 from .PackMap import pack_map
+from ...SerializerMeasurement import measure_serializer_stage
 
 if TYPE_CHECKING:
     from ...internal.binary.BinaryPackNode import BinaryPackNode
@@ -42,30 +43,33 @@ def _get_pack():
 
 
 def pack_list(lst: list[object]) -> list[object]:
-    pack = _get_pack()
+    def _run() -> list[object]:
+        pack = _get_pack()
 
-    if not lst:
-        return lst
+        if not lst:
+            return lst
 
-    packed_list: list[object] = []
-    header: list[object] = []
+        packed_list: list[object] = []
+        header: list[object] = []
 
-    packed_list.append(PACKED_EXT)
+        packed_list.append(PACKED_EXT)
 
-    header.append(None)
+        header.append(None)
 
-    packed_list.append(header)
+        packed_list.append(header)
 
-    key_index_map: dict[int, BinaryPackNode] = {}
-    try:
-        for item in lst:
-            if type(item) is dict:
-                row = pack_map(item, header, key_index_map)
-                packed_list.append(row)
-            else:
-                # This list cannot be packed, abort
-                raise CannotPack()
-        return packed_list
-    except CannotPack:
-        new_list = [pack(item) for item in lst]
-        return new_list
+        key_index_map: dict[int, BinaryPackNode] = {}
+        try:
+            for item in lst:
+                if type(item) is dict:
+                    row = pack_map(item, header, key_index_map)
+                    packed_list.append(row)
+                else:
+                    # This list cannot be packed, abort
+                    raise CannotPack()
+            return packed_list
+        except CannotPack:
+            new_list = [pack(item) for item in lst]
+            return new_list
+
+    return measure_serializer_stage("serialize.binary.packList", _run)

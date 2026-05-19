@@ -17,6 +17,7 @@
 from typing import TYPE_CHECKING
 
 from ...internal.binary.Base64Encoder import Base64Encoder
+from ...SerializerMeasurement import measure_serializer_stage
 
 if TYPE_CHECKING:
     from .BinaryEncodingCache import BinaryEncodingCache
@@ -29,5 +30,5 @@ class ServerBase64Encoder(Base64Encoder):
     
     def encode(self, message: list[object]) -> list[object]:
         from ...internal.binary.ServerBase64Encode import server_base64_encode
-        server_base64_encode(message)
+        measure_serializer_stage("serialize.base64.serverEncode", lambda: server_base64_encode(message))
         return message

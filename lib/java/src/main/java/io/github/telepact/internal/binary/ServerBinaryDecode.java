@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import io.github.telepact.internal.SerializerMeasurementSupport;
+
 public class ServerBinaryDecode {
     static List<Object> serverBinaryDecode(List<Object> message, BinaryEncoding binaryEncoder) {
         final var headers = (Map<String, Object>) message.get(0);
@@ -36,12 +38,18 @@ public class ServerBinaryDecode {
 
         final Map<Object, Object> finalEncodedMessageBody;
         if (Objects.equals(true, headers.get("@pac_"))) {
-            finalEncodedMessageBody = unpackBody(encodedMessageBody);
+            SerializerMeasurementSupport.annotateSerializerMeasurement(null, null, null, true, null);
+            finalEncodedMessageBody = SerializerMeasurementSupport.measureSerializerStage(
+                    "deserialize.binary.unpackBody",
+                    () -> unpackBody(encodedMessageBody));
         } else {
+            SerializerMeasurementSupport.annotateSerializerMeasurement(null, null, null, false, null);
             finalEncodedMessageBody = encodedMessageBody;
         }
 
-        final var messageBody = (Map<String, Object>) decodeBody(finalEncodedMessageBody, binaryEncoder);
+        final var messageBody = (Map<String, Object>) SerializerMeasurementSupport.measureSerializerStage(
+                "deserialize.binary.decodeBody",
+                () -> decodeBody(finalEncodedMessageBody, binaryEncoder));
         return List.of(headers, messageBody);
     }
 }

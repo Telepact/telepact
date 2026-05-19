@@ -15,6 +15,7 @@
 //|
 
 import { Base64Encoder } from "./Base64Encoder.js";
+import { measureSerializerStage } from '../../SerializerMeasurement.js';
 import { serverBase64Encode } from "./ServerBase64Encode.js";
 
 export class ServerBase64Encoder extends Base64Encoder {
@@ -24,7 +25,7 @@ export class ServerBase64Encoder extends Base64Encoder {
     }
 
     encode(message: object[]): object[] {
-        serverBase64Encode(message);
+        measureSerializerStage('serialize.base64.serverEncode', () => serverBase64Encode(message));
         return message;
     }
 }

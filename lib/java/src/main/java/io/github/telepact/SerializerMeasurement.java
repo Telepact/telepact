@@ -14,18 +14,20 @@
 //|  limitations under the License.
 //|
 
-import { pack } from './Pack.js';
-import { measureSerializerStage } from '../../SerializerMeasurement.js';
+package io.github.telepact;
 
-export function packBody(body: Map<any, any>): Map<any, any> {
-    return measureSerializerStage('serialize.binary.packBody.walk', () => {
-        const result: Map<any, any> = new Map();
+import java.util.Map;
 
-        for (const [key, value] of body.entries()) {
-            const packedValue = pack(value);
-            result.set(key, packedValue);
-        }
+public record SerializerMeasurement(
+        String operation,
+        long totalDurationNs,
+        boolean binaryRequested,
+        String transportEncoding,
+        String protocolEncoding,
+        boolean packed,
+        boolean fellBackToJson,
+        Map<String, Stage> stages) {
 
-        return result;
-    });
+    public record Stage(long totalDurationNs, long count) {
+    }
 }

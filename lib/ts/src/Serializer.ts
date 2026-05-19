@@ -15,6 +15,7 @@
 //|
 
 import { Message } from './Message.js';
+import { SerializerMeasurementObserver } from './SerializerMeasurement.js';
 import { Serialization } from './Serialization.js';
 import { BinaryEncoder } from './internal/binary/BinaryEncoder.js';
 import { serializeInternal } from './internal/SerializeInternal.js';
@@ -29,24 +30,31 @@ export class Serializer {
     private serializationImpl: Serialization;
     private binaryEncoder: BinaryEncoder;
     private base64Encoder: Base64Encoder;
+    private measurementObserver?: SerializerMeasurementObserver;
 
-    constructor(serializationImpl: Serialization, binaryEncoder: BinaryEncoder, base64Encoder: Base64Encoder) {
+    constructor(
+        serializationImpl: Serialization,
+        binaryEncoder: BinaryEncoder,
+        base64Encoder: Base64Encoder,
+        measurementObserver?: SerializerMeasurementObserver,
+    ) {
         this.serializationImpl = serializationImpl;
         this.binaryEncoder = binaryEncoder;
         this.base64Encoder = base64Encoder;
+        this.measurementObserver = measurementObserver;
     }
 
     public serialize(message: Message): Uint8Array {
         /**
          * Serialize a Message into a byte array.
          */
-        return serializeInternal(message, this.binaryEncoder, this.base64Encoder, this.serializationImpl);
+        return serializeInternal(message, this.binaryEncoder, this.base64Encoder, this.serializationImpl, this.measurementObserver);
     }
 
     public deserialize(messageBytes: Uint8Array): Message {
         /**
          * Deserialize a Message from a byte array.
          */
-        return deserializeInternal(messageBytes, this.serializationImpl, this.binaryEncoder, this.base64Encoder);
+        return deserializeInternal(messageBytes, this.serializationImpl, this.binaryEncoder, this.base64Encoder, this.measurementObserver);
     }
 }
