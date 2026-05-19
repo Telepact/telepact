@@ -232,6 +232,39 @@ public class ConstructBinaryEncoding {
         }
     }
 
+    private static List<List<Object>> dedupePackedSites(List<List<Object>> packedSites) {
+        final var deduped = new ArrayList<List<Object>>();
+        final var pathToIndex = new HashMap<List<String>, Integer>();
+        final var conflictingPaths = new HashSet<List<String>>();
+
+        for (final var site : packedSites) {
+            final var path = new ArrayList<>((List<String>) site.get(0));
+            if (conflictingPaths.contains(path)) {
+                continue;
+            }
+
+            final var existingIndex = pathToIndex.get(path);
+            if (existingIndex == null) {
+                pathToIndex.put(path, deduped.size());
+                deduped.add(site);
+                continue;
+            }
+
+            if (!deduped.get(existingIndex).get(1).equals(site.get(1))) {
+                deduped.remove((int) existingIndex);
+                pathToIndex.remove(path);
+                conflictingPaths.add(path);
+                for (final var entry : pathToIndex.entrySet()) {
+                    if (entry.getValue() > existingIndex) {
+                        entry.setValue(entry.getValue() - 1);
+                    }
+                }
+            }
+        }
+
+        return deduped;
+    }
+
     public static BinaryEncoding constructBinaryEncoding(TelepactSchema telepactSchema) {
         final var allKeys = new TreeSet<String>();
 
@@ -293,6 +326,6 @@ public class ConstructBinaryEncoding {
         final var finalString = String.join("\n", sortedAllKeys);
         final var checksum = createChecksum(finalString);
 
-        return new BinaryEncoding(binaryEncoding, checksum, packedSites);
+        return new BinaryEncoding(binaryEncoding, checksum, dedupePackedSites(packedSites));
     }
 }

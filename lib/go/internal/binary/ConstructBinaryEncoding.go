@@ -85,7 +85,7 @@ func ConstructBinaryEncoding(parsed map[string]types.TType) (*BinaryEncoding, er
 	}
 
 	checksum := CreateChecksum(strings.Join(sortedKeys, "\n"))
-	return NewBinaryEncoding(encodingMap, checksum, packedSites), nil
+	return NewBinaryEncoding(encodingMap, checksum, dedupePackedSites(packedSites)), nil
 }
 
 func appendStructKeys(fields map[string]*types.TFieldDeclaration, allKeys map[string]struct{}) {
@@ -279,6 +279,58 @@ func addRootPackedSites(rootPath []string, fields map[string]*types.TFieldDeclar
 		field := fields[fieldKey]
 		collectPackedSites(append(rootPath, fieldKey), field.TypeDeclaration, encodingMap, packedSites, map[string]struct{}{})
 	}
+}
+
+func dedupePackedSites(packedSites []BinaryPackSiteData) []BinaryPackSiteData {
+	deduped := make([]BinaryPackSiteData, 0, len(packedSites))
+	pathToIndex := make(map[string]*int, len(packedSites))
+
+	for _, site := range packedSites {
+		pathKey := strings.Join(site.Path, "\x00")
+		existingIndexPtr, seen := pathToIndex[pathKey]
+		if seen && existingIndexPtr == nil {
+			continue
+		}
+		if !seen {
+			index := len(deduped)
+			pathToIndex[pathKey] = &index
+			deduped = append(deduped, site)
+			continue
+		}
+		existingIndex := *existingIndexPtr
+		if !headersEqual(deduped[existingIndex].Header, site.Header) {
+			deduped = append(deduped[:existingIndex], deduped[existingIndex+1:]...)
+			pathToIndex[pathKey] = nil
+			for otherPathKey, otherIndexPtr := range pathToIndex {
+				if otherIndexPtr != nil && *otherIndexPtr > existingIndex {
+					updated := *otherIndexPtr - 1
+					pathToIndex[otherPathKey] = &updated
+				}
+			}
+		}
+	}
+
+	return deduped
+}
+
+func headersEqual(left BinaryPackHeader, right BinaryPackHeader) bool {
+	if len(left) != len(right) {
+		return false
+	}
+	for index := range left {
+		leftNested, leftIsNested := left[index].([]any)
+		rightNested, rightIsNested := right[index].([]any)
+		if leftIsNested || rightIsNested {
+			if !leftIsNested || !rightIsNested || !headersEqual(BinaryPackHeader(leftNested), BinaryPackHeader(rightNested)) {
+				return false
+			}
+			continue
+		}
+		if left[index] != right[index] {
+			return false
+		}
+	}
+	return true
 }
 
 func copyVisitedTypeNames(input map[string]struct{}) map[string]struct{} {

@@ -189,6 +189,29 @@ def add_root_packed_sites(
         collect_packed_sites(root_path + [field_key], field.type_declaration, binary_encoding, packed_sites)
 
 
+def dedupe_packed_sites(packed_sites: list[BinaryPackSiteData]) -> list[BinaryPackSiteData]:
+    deduped: list[BinaryPackSiteData] = []
+    paths_by_key: dict[tuple[str, ...], int | None] = {}
+
+    for site in packed_sites:
+        path_key = tuple(site[0])
+        existing_index = paths_by_key.get(path_key)
+        if existing_index is None and path_key in paths_by_key:
+            continue
+        if existing_index is None:
+            paths_by_key[path_key] = len(deduped)
+            deduped.append(site)
+            continue
+        if deduped[existing_index][1] != site[1]:
+            deduped.pop(existing_index)
+            paths_by_key[path_key] = None
+            for other_path_key, other_index in list(paths_by_key.items()):
+                if isinstance(other_index, int) and other_index > existing_index:
+                    paths_by_key[other_path_key] = other_index - 1
+
+    return deduped
+
+
 def construct_binary_encoding(telepact_schema: 'TelepactSchema') -> 'BinaryEncoding':
     from ..types.TUnion import TUnion
 
@@ -228,4 +251,4 @@ def construct_binary_encoding(telepact_schema: 'TelepactSchema') -> 'BinaryEncod
 
     final_string = "\n".join(sorted_all_keys)
     checksum = create_checksum(final_string)
-    return BinaryEncoding(binary_encoding, checksum, packed_sites)
+    return BinaryEncoding(binary_encoding, checksum, dedupe_packed_sites(packed_sites))

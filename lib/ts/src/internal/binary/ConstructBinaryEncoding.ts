@@ -197,6 +197,37 @@ function addRootPackedSites(rootPath: string[], fields: { [key: string]: TFieldD
     }
 }
 
+function dedupePackedSites(packedSites: BinaryPackSiteData[]): BinaryPackSiteData[] {
+    const deduped: BinaryPackSiteData[] = [];
+    const pathToIndex = new Map<string, number | null>();
+
+    for (const site of packedSites) {
+        const pathKey = JSON.stringify(site[0]);
+        if (pathToIndex.has(pathKey) && pathToIndex.get(pathKey) === null) {
+            continue;
+        }
+
+        const existingIndex = pathToIndex.get(pathKey);
+        if (existingIndex === undefined) {
+            pathToIndex.set(pathKey, deduped.length);
+            deduped.push(site);
+            continue;
+        }
+
+        if (JSON.stringify(deduped[existingIndex][1]) !== JSON.stringify(site[1])) {
+            deduped.splice(existingIndex, 1);
+            pathToIndex.set(pathKey, null);
+            for (const [otherPathKey, otherIndex] of pathToIndex.entries()) {
+                if (otherIndex !== null && otherIndex > existingIndex) {
+                    pathToIndex.set(otherPathKey, otherIndex - 1);
+                }
+            }
+        }
+    }
+
+    return deduped;
+}
+
 export function constructBinaryEncoding(telepactSchema: TelepactSchema): BinaryEncoding {
     const allKeys: Set<string> = new Set();
 
@@ -247,5 +278,5 @@ export function constructBinaryEncoding(telepactSchema: TelepactSchema): BinaryE
     const finalString = sortedAllKeys.join('\n');
     const checksum = createChecksum(finalString);
 
-    return new BinaryEncoding(binaryEncoding, checksum, packedSites);
+    return new BinaryEncoding(binaryEncoding, checksum, dedupePackedSites(packedSites));
 }
