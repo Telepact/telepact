@@ -1016,10 +1016,8 @@ def trace_type(type_declaration: 'TTypeDeclaration') -> list[str]:
     return this_all_types
 
 
-
 from .telepact.internal.types.TStruct import TStruct
 from .telepact.internal.types.TUnion import TUnion
-
 
 def _get_original_schema_name(schema_original: list, type_name: str, field_name: str) -> str:
     """Helper to get the original type name from the schema's raw data."""

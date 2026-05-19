@@ -16,6 +16,7 @@
 
 LIB_TAR_GZ := ../../../lib/py/dist/*.tar.gz
 TAR_GZ := telepact.tar.gz
+CLI := ../../../tool/telepact
 
 all: codegen $(TAR_GZ)
 	uv sync --all-groups
@@ -28,7 +29,7 @@ dep:
 	$(MAKE) -C ../../../lib/py
 
 codegen:
-	telepact codegen --schema-dir ../../runner/schema/example --lang py --out telepact_test/gen
+	$(CLI) codegen --schema-dir ../../runner/schema/example --lang py --out telepact_test/gen
 
 test-server:
 	uv run python -m telepact_test

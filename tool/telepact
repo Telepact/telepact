@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 #|
 #|  Copyright The Telepact Authors
 #|
@@ -14,27 +16,10 @@
 #|  limitations under the License.
 #|
 
-LIB_TAR_GZ := ../../../lib/ts/dist-tgz/*.tgz
-TAR_GZ := telepact.tgz
-CLI := ../../../tool/telepact
+set -euo pipefail
 
-all: codegen $(TAR_GZ)
-	npm uninstall telepact || echo "no-op"
-	npm install --ignore-scripts ./telepact.tgz
-	npm install --ignore-scripts
-	npm run build
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 
-$(TAR_GZ): dep
-	cp $(LIB_TAR_GZ) telepact.tgz
+make -C "${SCRIPT_DIR}/../sdk/cli"
 
-dep:
-	$(MAKE) -C ../../../lib/ts
-
-codegen:
-	$(CLI) codegen --schema-dir ../../../example/ts-codegen/api --lang ts --out src/gen
-
-clean:
-	rm -f telepact.tgz
-	rm -rf src/gen
-	rm -rf node_modules
-	rm -f package-lock.json
+exec uv run --project "${SCRIPT_DIR}/../sdk/cli" python -m telepact_cli.cli "$@"
