@@ -33,7 +33,8 @@ public class PackMap {
 
     static List<Object> packMap(Map<?, ?> m, List<Object> header,
             Map<Integer, BinaryPackNode> keyIndexMap) throws CannotPack {
-        return SerializerMeasurementSupport.measureSerializerStage("serialize.binary.packMap", () -> {
+        try {
+            return SerializerMeasurementSupport.measureSerializerStageThrowable("serialize.binary.packMap", () -> {
             final var row = new ArrayList<Object>();
             for (final var entry : m.entrySet()) {
                 if (entry.getKey() instanceof final String s) {
@@ -91,6 +92,11 @@ public class PackMap {
                 }
             }
             return row;
-        });
+            });
+        } catch (CannotPack e) {
+            throw e;
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
     }
 }

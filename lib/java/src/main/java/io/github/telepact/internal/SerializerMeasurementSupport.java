@@ -80,6 +80,26 @@ public final class SerializerMeasurementSupport {
         });
     }
 
+    public static <T> T measureSerializerStageThrowable(String stageName, ThrowingSupplier<T> supplier) throws Throwable {
+        var context = currentContext();
+        if (context == null) {
+            return supplier.get();
+        }
+        long startedAtNs = System.nanoTime();
+        try {
+            return supplier.get();
+        } finally {
+            recordStage(context.measurement, stageName, System.nanoTime() - startedAtNs);
+        }
+    }
+
+    public static void measureSerializerStageThrowable(String stageName, ThrowingRunnable runnable) throws Throwable {
+        measureSerializerStageThrowable(stageName, () -> {
+            runnable.run();
+            return null;
+        });
+    }
+
     public static void annotateSerializerMeasurement(
             Boolean binaryRequested,
             String transportEncoding,
@@ -173,5 +193,15 @@ public final class SerializerMeasurementSupport {
     private static final class MutableStage {
         private long totalDurationNs;
         private long count;
+    }
+
+    @FunctionalInterface
+    public interface ThrowingSupplier<T> {
+        T get() throws Throwable;
+    }
+
+    @FunctionalInterface
+    public interface ThrowingRunnable {
+        void run() throws Throwable;
     }
 }

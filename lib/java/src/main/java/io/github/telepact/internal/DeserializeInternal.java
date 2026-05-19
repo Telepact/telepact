@@ -48,13 +48,13 @@ public class DeserializeInternal {
                         if (messageBytes[0] == (byte) 0x92) { // MsgPack
                             isMsgPack = true;
                             SerializerMeasurementSupport.annotateSerializerMeasurement(null, "msgpack", "binary", null, null);
-                            messageAsPseudoJson = SerializerMeasurementSupport.measureSerializerStage(
+                            messageAsPseudoJson = SerializerMeasurementSupport.measureSerializerStageThrowable(
                                     "deserialize.msgpack.decode",
                                     () -> serialization.fromMsgPack(messageBytes));
                         } else {
                             isMsgPack = false;
                             SerializerMeasurementSupport.annotateSerializerMeasurement(null, "json", "base64", null, null);
-                            messageAsPseudoJson = SerializerMeasurementSupport.measureSerializerStage(
+                            messageAsPseudoJson = SerializerMeasurementSupport.measureSerializerStageThrowable(
                                     "deserialize.json.decode",
                                     () -> serialization.fromJson(messageBytes));
                         }

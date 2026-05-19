@@ -69,7 +69,7 @@ public class SerializeInternal {
                                         "binary",
                                         null,
                                         false);
-                                return SerializerMeasurementSupport.measureSerializerStage(
+                                return SerializerMeasurementSupport.measureSerializerStageThrowable(
                                         "serialize.msgpack.encode",
                                         () -> serializer.toMsgPack(encodedMessage));
                             } catch (BinaryEncoderUnavailableError e) {
@@ -82,7 +82,7 @@ public class SerializeInternal {
                                 final var base64EncodedMessage = SerializerMeasurementSupport.measureSerializerStage(
                                         "serialize.base64.encode",
                                         () -> base64Encoder.encode(messageAsPseudoJson));
-                                return SerializerMeasurementSupport.measureSerializerStage(
+                                return SerializerMeasurementSupport.measureSerializerStageThrowable(
                                         "serialize.json.encode",
                                         () -> serializer.toJson(base64EncodedMessage));
                             }
@@ -97,7 +97,7 @@ public class SerializeInternal {
                                 "base64",
                                 null,
                                 false);
-                        return SerializerMeasurementSupport.measureSerializerStage(
+                        return SerializerMeasurementSupport.measureSerializerStageThrowable(
                                 "serialize.json.encode",
                                 () -> serializer.toJson(base64EncodedMessage));
                     } catch (Throwable e) {
