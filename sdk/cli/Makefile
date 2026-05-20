@@ -14,13 +14,16 @@
 #|  limitations under the License.
 #|
 
-.PHONY: all dep clean
+.PHONY: all dep clean docker
 
 VERSION := $(shell cat ../../VERSION.txt)
 
-SRC_FILES := $(shell find telepact_cli -type f)
+SRC_FILES := $(shell find telepact_cli \
+	-type d \( -name __pycache__ -o -path 'telepact_cli/telepact' \) -prune -o \
+	-type f -print)
 TAR_GZ := dist/*.tar.gz
 DEP_TAR_GZ := ../../lib/py/dist/*.tar.gz
+DOCKER_DIST := dist-docker/docker-image-telepact-cli-$(VERSION).tar.gz
 
 $(TAR_GZ): $(DEP_TAR_GZ) $(SRC_FILES)
 	cp ../../LICENSE ../../NOTICE ./
@@ -35,6 +38,10 @@ $(TAR_GZ): $(DEP_TAR_GZ) $(SRC_FILES)
 	uv sync --all-groups
 	uv build
 
+$(DEP_TAR_GZ):
+	$(MAKE) -C ../../lib/py
+
+$(DOCKER_DIST): $(TAR_GZ)
 	mkdir tmp
 	cp dist/telepact_cli-*.tar.gz tmp/telepact_cli.tar.gz
 
@@ -45,9 +52,7 @@ $(TAR_GZ): $(DEP_TAR_GZ) $(SRC_FILES)
 	mkdir -p dist-docker
 	docker save telepact-cli:${VERSION} | gzip > dist-docker/docker-image-telepact-cli-${VERSION}.tar.gz
 
-
-$(DEP_TAR_GZ):
-	$(MAKE) -C ../../lib/py
+docker: $(DOCKER_DIST)
 
 clean:
 	rm -rf dist
