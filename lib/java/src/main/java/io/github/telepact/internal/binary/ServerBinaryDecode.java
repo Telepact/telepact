@@ -19,8 +19,8 @@ package io.github.telepact.internal.binary;
 import static io.github.telepact.internal.binary.DecodeBody.decodeBody;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Map;
+import java.util.Objects;
 
 public class ServerBinaryDecode {
     static List<Object> serverBinaryDecode(List<Object> message, BinaryEncoding binaryEncoder) {
