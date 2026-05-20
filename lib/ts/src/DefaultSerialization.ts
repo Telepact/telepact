@@ -14,8 +14,51 @@
 //|  limitations under the License.
 //|
 
-import { Packr, Unpackr } from 'msgpackr';
+import { addExtension, Packr, Unpackr } from 'msgpackr';
+import { BinaryEncoding } from './internal/binary/BinaryEncoding.js';
+import { BinaryEncodedBody } from './internal/binary/BinaryEncodedBody.js';
 import { Serialization } from './Serialization.js';
+
+function encodeBinaryValue(value: any, binaryEncoder: BinaryEncoding): any {
+    if (value === null || value === undefined) {
+        return value;
+    }
+
+    if (Array.isArray(value)) {
+        const result = new Array(value.length);
+        for (let index = 0; index < value.length; index += 1) {
+            result[index] = encodeBinaryValue(value[index], binaryEncoder);
+        }
+        return result;
+    }
+
+    if (value instanceof Map) {
+        const newMap = new Map<any, any>();
+        for (const [key, item] of value.entries()) {
+            const mappedKey = typeof key === 'string' ? (binaryEncoder.encodeMap.get(key) ?? key) : key;
+            newMap.set(mappedKey, encodeBinaryValue(item, binaryEncoder));
+        }
+        return newMap;
+    }
+
+    if (typeof value === 'object') {
+        const newMap = new Map<any, any>();
+        for (const key of Object.keys(value)) {
+            const mappedKey = binaryEncoder.encodeMap.get(key) ?? key;
+            newMap.set(mappedKey, encodeBinaryValue(value[key], binaryEncoder));
+        }
+        return newMap;
+    }
+
+    return value;
+}
+
+addExtension({
+    Class: BinaryEncodedBody,
+    write(instance: BinaryEncodedBody) {
+        return encodeBinaryValue(instance.value, instance.binaryEncoder);
+    },
+});
 
 export class DefaultSerialization implements Serialization {
     private textEncoder = new TextEncoder();

@@ -14,9 +14,16 @@
 //|  limitations under the License.
 //|
 
-package binary
+package io.github.telepact.internal.binary;
 
-// EncodeBody wraps a pseudo-JSON message body so string field names are swapped during MessagePack encoding.
-func EncodeBody(messageBody map[string]any, encoding *BinaryEncoding) (any, error) {
-    return &BinaryEncodedBody{Value: messageBody, Encoding: encoding}, nil
+import java.util.Map;
+
+public class BinaryEncodedBody {
+    public final Map<String, Object> value;
+    public final BinaryEncoding binaryEncoding;
+
+    public BinaryEncodedBody(Map<String, Object> value, BinaryEncoding binaryEncoding) {
+        this.value = value;
+        this.binaryEncoding = binaryEncoding;
+    }
 }

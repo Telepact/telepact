@@ -17,10 +17,10 @@
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from ...internal.binary.BinaryEncoding import BinaryEncoding
+    from .BinaryEncoding import BinaryEncoding
 
 
-def encode_body(message_body: dict[str, object], binary_encoding: 'BinaryEncoding') -> object:
-    from ...internal.binary.BinaryEncodedBody import BinaryEncodedBody
-
-    return BinaryEncodedBody(message_body, binary_encoding)
+class BinaryEncodedBody:
+    def __init__(self, value: dict[str, object], binary_encoding: 'BinaryEncoding'):
+        self.value = value
+        self.binary_encoding = binary_encoding

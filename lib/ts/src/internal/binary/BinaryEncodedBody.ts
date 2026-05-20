@@ -14,9 +14,14 @@
 //|  limitations under the License.
 //|
 
-package binary
+import { BinaryEncoding } from './BinaryEncoding.js';
 
-// EncodeBody wraps a pseudo-JSON message body so string field names are swapped during MessagePack encoding.
-func EncodeBody(messageBody map[string]any, encoding *BinaryEncoding) (any, error) {
-    return &BinaryEncodedBody{Value: messageBody, Encoding: encoding}, nil
+export class BinaryEncodedBody {
+    public value: Record<string, any>;
+    public binaryEncoder: BinaryEncoding;
+
+    constructor(value: Record<string, any>, binaryEncoder: BinaryEncoding) {
+        this.value = value;
+        this.binaryEncoder = binaryEncoder;
+    }
 }

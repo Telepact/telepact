@@ -15,8 +15,8 @@
 //|
 
 import { BinaryEncoding } from '../../internal/binary/BinaryEncoding.js';
-import { encodeKeys } from '../../internal/binary/EncodeKeys.js';
+import { BinaryEncodedBody } from '../../internal/binary/BinaryEncodedBody.js';
 
-export function encodeBody(messageBody: Record<string, any>, binaryEncoder: BinaryEncoding): Map<any, any> {
-    return encodeKeys(messageBody, binaryEncoder);
+export function encodeBody(messageBody: Record<string, any>, binaryEncoder: BinaryEncoding): BinaryEncodedBody {
+    return new BinaryEncodedBody(messageBody, binaryEncoder);
 }
