@@ -47,16 +47,7 @@ func ServerBinaryDecode(message []any, binaryEncoding *BinaryEncoding) ([]any, e
 		return nil, BinaryEncoderUnavailableError{}
 	}
 
-	finalEncodedBody := encodedBody
-	if isStrictTrue(headers["@pac_"]) {
-		unpacked, err := UnpackBody(encodedBody)
-		if err != nil {
-			return nil, err
-		}
-		finalEncodedBody = unpacked
-	}
-
-	messageBody, err := DecodeBody(finalEncodedBody, binaryEncoding)
+	messageBody, err := DecodeBody(encodedBody, binaryEncoding)
 	if err != nil {
 		return nil, err
 	}

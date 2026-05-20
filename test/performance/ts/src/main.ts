@@ -51,7 +51,7 @@ type ServerMetrics = {
 const NETWORKS = ["close", "far"];
 const DATA_SHAPES = ["typical", "all-strings", "all-numbers"];
 const COLLECTION_SHAPES = ["single", "small-list", "big-list", "really-big-list", "huge-list"];
-const METHODS = ["telepact-json", "telepact-binary", "telepact-packed-binary", "protobuf", "plain-json"];
+const METHODS = ["telepact-json", "telepact-binary", "protobuf", "plain-json"];
 const FUNCTION_NAMES: Record<string, string> = {
     "typical": "fn.roundTripTypical",
     "all-strings": "fn.roundTripStrings",
@@ -311,7 +311,7 @@ async function createTelepactRunner(serverConnection: NatsConnection, clientConn
     return {
         subscription: sub,
         requestOnce: async (payload: JsonMap[]): Promise<Sample> => {
-            const headers = scenario.method === "telepact-packed-binary" ? { "@pac_": true } : {};
+            const headers = {};
             const functionName = FUNCTION_NAMES[scenario.dataShape]!;
             const response = await client.request(new Message(headers, { [functionName]: { items: payload } }));
             if (JSON.stringify(response.body.Ok_.items) !== JSON.stringify(payload)) {

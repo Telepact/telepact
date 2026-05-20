@@ -26,7 +26,6 @@ if TYPE_CHECKING:
 def client_binary_encode(message: list[object], binary_encoding_cache: 'BinaryEncodingCache',
                          binary_checksum_strategy: 'ClientBinaryStrategy') -> list[object]:
     from ...internal.binary.EncodeBody import encode_body
-    from ...internal.binary.PackBody import pack_body
 
     headers = cast(dict[str, object], message[0])
     message_body = cast(dict[str, object], message[1])
@@ -48,7 +47,4 @@ def client_binary_encode(message: list[object], binary_encoding_cache: 'BinaryEn
 
     encoded_message_body = encode_body(message_body, binary_encoding)
 
-    final_encoded_message_body = pack_body(encoded_message_body) if headers.get(
-        "@pac_") == True else encoded_message_body
-
-    return [headers, final_encoded_message_body]
+    return [headers, encoded_message_body]

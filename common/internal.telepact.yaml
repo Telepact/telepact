@@ -74,16 +74,11 @@
     map of field names to field ids. The response body may also be encoded in
     binary.
 
-    The `@pac_` header can also be used to indicate usage of 'packed' binary
-    encoding strategy. If the client submits a `@pac_` header with a `true`
-    value, the server will respond with a `@pac_` header with a `true` value.
   headers.Binary_:
     "@bin_": ["integer"]
-    "@pac_": "boolean"
   ->:
     "@bin_": ["integer"]
     "@enc_": {"string": "integer"}
-    "@pac_": "boolean"
 
 - ///: The `@warn_` header is used to send warnings to the client.
   headers.Warning_: {}

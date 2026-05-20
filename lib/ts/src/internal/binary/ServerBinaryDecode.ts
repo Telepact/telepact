@@ -17,7 +17,6 @@
 import { BinaryEncoding } from "../../internal/binary/BinaryEncoding.js";
 import { BinaryEncoderUnavailableError } from "../../internal/binary/BinaryEncoderUnavailableError.js";
 import { decodeBody } from "../../internal/binary/DecodeBody.js";
-import { unpackBody } from "../../internal/binary/UnpackBody.js";
 import { convertMapsToObjects } from "./ConvertMapsToObjects.js";
 
 export function serverBinaryDecode(message: any[], binaryEncoder: BinaryEncoding): any[] {
@@ -30,14 +29,7 @@ export function serverBinaryDecode(message: any[], binaryEncoder: BinaryEncoding
         throw new BinaryEncoderUnavailableError();
     }
 
-    let finalEncodedMessageBody: Map<any, any>;
-    if (headers.get("@pac_") === true) {
-        finalEncodedMessageBody = unpackBody(encodedMessageBody);
-    } else {
-        finalEncodedMessageBody = encodedMessageBody;
-    }
-
     const messageHeader = convertMapsToObjects(headers);
-    const messageBody = decodeBody(finalEncodedMessageBody, binaryEncoder);
+    const messageBody = decodeBody(encodedMessageBody, binaryEncoder);
     return [messageHeader, messageBody];
 }

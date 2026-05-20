@@ -25,7 +25,6 @@ def client_binary_decode(message: list[object], binary_encoding_cache: 'BinaryEn
                          binary_checksum_strategy: 'ClientBinaryStrategy',
                          ) -> list[object]:
     from ...internal.binary.DecodeBody import decode_body
-    from ...internal.binary.UnpackBody import unpack_body
 
     headers = cast(dict[str, object], message[0])
     encoded_message_body = cast(dict[object, object], message[1])
@@ -42,11 +41,5 @@ def client_binary_decode(message: list[object], binary_encoding_cache: 'BinaryEn
 
     binary_encoder = binary_encoding_cache.get(new_current_checksum_strategy[0])
 
-    final_encoded_message_body: dict[object, object]
-    if headers.get("@pac_") is True:
-        final_encoded_message_body = unpack_body(encoded_message_body)
-    else:
-        final_encoded_message_body = encoded_message_body
-
-    message_body = decode_body(final_encoded_message_body, binary_encoder)
+    message_body = decode_body(encoded_message_body, binary_encoder)
     return [headers, message_body]

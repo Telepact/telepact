@@ -123,21 +123,7 @@ export async function handleMessage(
 
         responseHeaders['@binary_'] = true;
         responseHeaders['@clientKnownBinaryChecksums_'] = clientKnownBinaryChecksums;
-
-        if ('@pac_' in requestHeaders) {
-            responseHeaders['@pac_'] = requestHeaders['@pac_'];
     }
-}
-
-function buildUnauthenticatedErrorMessage(resultUnionType: TUnion, headers: Record<string, any>): Message {
-    const result = {
-        ErrorUnauthenticated_: {
-            'message!': UNAUTHENTICATED_MESSAGE,
-        },
-    };
-    validateResult(resultUnionType, result);
-    return new Message(headers, result);
-}
 
     const selectStructFieldsHeader: Record<string, any> | null = requestHeaders['@select_'] || null;
 
@@ -291,4 +277,14 @@ function buildUnauthenticatedErrorMessage(resultUnionType: TUnion, headers: Reco
     }
 
     return new Message(finalResponseHeaders, finalResultUnion);
+}
+
+function buildUnauthenticatedErrorMessage(resultUnionType: TUnion, headers: Record<string, any>): Message {
+    const result = {
+        ErrorUnauthenticated_: {
+            'message!': UNAUTHENTICATED_MESSAGE,
+        },
+    };
+    validateResult(resultUnionType, result);
+    return new Message(headers, result);
 }

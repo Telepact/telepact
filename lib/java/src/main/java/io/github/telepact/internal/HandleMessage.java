@@ -134,9 +134,6 @@ public class HandleMessage {
             responseHeaders.put("@binary_", true);
             responseHeaders.put("@clientKnownBinaryChecksums_", clientKnownBinaryChecksums);
 
-            if (requestHeaders.containsKey("@pac_")) {
-                responseHeaders.put("@pac_", requestHeaders.get("@pac_"));
-            }
         }
 
         final Map<String, Object> selectStructFieldsHeader = (Map<String, Object>) requestHeaders.get("@select_");
