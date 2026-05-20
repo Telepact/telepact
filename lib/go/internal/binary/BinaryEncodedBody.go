@@ -17,10 +17,11 @@
 package binary
 
 import (
-    "encoding/json"
-    "fmt"
+	"encoding/json"
+	"fmt"
+	"strconv"
 
-    "github.com/vmihailenco/msgpack/v5"
+	"github.com/vmihailenco/msgpack/v5"
 )
 
 type BinaryEncodedBody struct {
@@ -92,19 +93,25 @@ func encodeBinaryMsgpackValue(enc *msgpack.Encoder, value any, encoding *BinaryE
             }
         }
         return nil
-    case []any:
-        if err := enc.EncodeArrayLen(len(typed)); err != nil {
-            return err
+	case []any:
+		if err := enc.EncodeArrayLen(len(typed)); err != nil {
+			return err
         }
         for _, item := range typed {
             if err := encodeBinaryMsgpackValue(enc, item, encoding); err != nil {
                 return err
             }
-        }
-        return nil
-    case json.Number:
-        return enc.Encode(&msgpackJSONNumber{Value: string(typed)})
-    default:
-        return enc.Encode(value)
-    }
+		}
+		return nil
+	case json.Number:
+		if intValue, err := typed.Int64(); err == nil {
+			return enc.EncodeInt(intValue)
+		}
+		if floatValue, err := strconv.ParseFloat(string(typed), 64); err == nil {
+			return enc.EncodeFloat64(floatValue)
+		}
+		return enc.EncodeString(string(typed))
+	default:
+		return enc.Encode(value)
+	}
 }
