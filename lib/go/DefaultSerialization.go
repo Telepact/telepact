@@ -24,27 +24,9 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/telepact/telepact/lib/go/internal/msgpackjsonnumber"
 	"github.com/vmihailenco/msgpack/v5"
 )
-
-const msgpackJSONNumberExtType = 0x2a
-
-type msgpackJSONNumber struct {
-	Value string
-}
-
-func (n *msgpackJSONNumber) MarshalMsgpack() ([]byte, error) {
-	return []byte(n.Value), nil
-}
-
-func (n *msgpackJSONNumber) UnmarshalMsgpack(data []byte) error {
-	n.Value = string(data)
-	return nil
-}
-
-func init() {
-	msgpack.RegisterExt(msgpackJSONNumberExtType, (*msgpackJSONNumber)(nil))
-}
 
 // DefaultSerialization implements the Serialization interface using encoding/json and vmihailenco/msgpack.
 type DefaultSerialization struct{}
@@ -170,8 +152,8 @@ func wrapJSONNumbers(value any) any {
 		}
 		return result
 	case json.Number:
-		return &msgpackJSONNumber{Value: string(v)}
-	case *msgpackJSONNumber:
+		return &msgpackjsonnumber.JSONNumber{Value: string(v)}
+	case *msgpackjsonnumber.JSONNumber:
 		return v
 	default:
 		return value
@@ -195,12 +177,12 @@ func unwrapJSONNumbers(value any) any {
 			v[i] = unwrapJSONNumbers(val)
 		}
 		return v
-	case *msgpackJSONNumber:
+	case *msgpackjsonnumber.JSONNumber:
 		if v == nil {
 			return nil
 		}
 		return json.Number(v.Value)
-	case msgpackJSONNumber:
+	case msgpackjsonnumber.JSONNumber:
 		return json.Number(v.Value)
 	default:
 		return value

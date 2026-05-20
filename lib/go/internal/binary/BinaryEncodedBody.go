@@ -19,8 +19,8 @@ package binary
 import (
 	"encoding/json"
 	"fmt"
-	"strconv"
 
+	"github.com/telepact/telepact/lib/go/internal/msgpackjsonnumber"
 	"github.com/vmihailenco/msgpack/v5"
 )
 
@@ -104,13 +104,7 @@ func encodeBinaryMsgpackValue(enc *msgpack.Encoder, value any, encoding *BinaryE
 		}
 		return nil
 	case json.Number:
-		if intValue, err := typed.Int64(); err == nil {
-			return enc.EncodeInt(intValue)
-		}
-		if floatValue, err := strconv.ParseFloat(string(typed), 64); err == nil {
-			return enc.EncodeFloat64(floatValue)
-		}
-		return enc.EncodeString(string(typed))
+		return enc.Encode(&msgpackjsonnumber.JSONNumber{Value: string(typed)})
 	default:
 		return enc.Encode(value)
 	}
