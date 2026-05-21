@@ -14,46 +14,43 @@
 #|  limitations under the License.
 #|
 
-from typing import cast
 from msgpack import ExtType
-from threading import Lock
 
-from ...internal.binary.PackList import PACKED_BYTE
-from ...internal.binary.UnpackMap import unpack_map
-_UNPACK = None
-_UNPACK_LOCK = Lock()
+from .BinaryEncoding import BinaryPackHeader
+from .PackList import PACKED_BYTE
+from .PackMap import UNDEFINED_BYTE
 
 
-def _get_unpack():
-    global _UNPACK
-    if _UNPACK is None:
-        with _UNPACK_LOCK:
-            if _UNPACK is None:
-                from ...internal.binary.Unpack import unpack as _unpack
-                _UNPACK = _unpack
-    return _UNPACK
+def unpack_row(row: list[object], header: BinaryPackHeader) -> dict[object, object]:
+    final_map: dict[object, object] = {}
+
+    for index, value in enumerate(row):
+        if index + 1 >= len(header):
+            continue
+
+        header_entry = header[index + 1]
+        if type(value) is ExtType and value.code == UNDEFINED_BYTE:
+            continue
+
+        if type(header_entry) is list:
+            if type(value) is list:
+                final_map[header_entry[0]] = unpack_row(value, header_entry)
+        else:
+            final_map[header_entry] = value
+
+    return final_map
 
 
-def unpack_list(lst: list[object]) -> list[object]:
-    unpack = _get_unpack()
-
+def unpack_list(lst: list[object], header: BinaryPackHeader) -> list[object]:
     if not lst:
         return lst
 
     first_item = lst[0]
     if type(first_item) is not ExtType or first_item.code != PACKED_BYTE:
-        new_lst = []
-        for item in lst:
-            new_lst.append(unpack(item))
-        return new_lst
+        return lst
 
     unpacked_lst: list[object] = []
-    headers = cast(list[object], lst[1])
-
-    for i in range(2, len(lst)):
-        row = cast(list[object], lst[i])
-        m = unpack_map(row, headers)
-
-        unpacked_lst.append(m)
+    for row in lst[1:]:
+        unpacked_lst.append(unpack_row(row, header) if type(row) is list else row)
 
     return unpacked_lst

@@ -45,7 +45,11 @@ func ClientBinaryDecode(message []any, cache BinaryEncodingCache, strategy *Clie
 		if castErr != nil {
 			return nil, castErr
 		}
-		cache.Add(binaryChecksum, encodingMap)
+		packedSites, packedErr := toBinaryPackSiteDataList(headers["@pck_"])
+		if packedErr != nil {
+			return nil, packedErr
+		}
+		cache.Add(binaryChecksum, encodingMap, packedSites)
 	}
 
 	strategy.UpdateChecksum(binaryChecksum)
@@ -59,20 +63,21 @@ func ClientBinaryDecode(message []any, cache BinaryEncodingCache, strategy *Clie
 		return nil, BinaryEncoderUnavailableError{}
 	}
 
-	var workingBody map[any]any
+	workingBody := encodedBody
 	if isStrictTrue(headers["@pac_"]) {
-		packed, packErr := UnpackBody(encodedBody)
+		packed, packErr := UnpackBody(encodedBody, encoder)
 		if packErr != nil {
 			return nil, packErr
 		}
 		workingBody = packed
-	} else {
-		workingBody = encodedBody
 	}
 
 	decodedBody, decodeErr := DecodeBody(workingBody, encoder)
 	if decodeErr != nil {
 		return nil, decodeErr
+	}
+	if isStrictTrue(headers["@pac_"]) {
+		decodedBody = UnpackDecodedBody(decodedBody, encoder)
 	}
 
 	return []any{headers, decodedBody}, nil
@@ -81,7 +86,15 @@ func ClientBinaryDecode(message []any, cache BinaryEncodingCache, strategy *Clie
 func ensureAnyMap(value any) (map[any]any, error) {
 	switch typed := value.(type) {
 	case map[any]any:
-		return typed, nil
+		result := make(map[any]any, len(typed))
+		for key, val := range typed {
+			if intKey, ok := toInt(key); ok {
+				result[intKey] = val
+			} else {
+				result[key] = val
+			}
+		}
+		return result, nil
 	case map[string]any:
 		result := make(map[any]any, len(typed))
 		for key, val := range typed {
@@ -156,6 +169,77 @@ func toStringIntMap(value any) (map[string]int, error) {
 	default:
 		return nil, fmt.Errorf("invalid binary encoding map type: %T", value)
 	}
+}
+
+func toBinaryPackSiteDataList(value any) ([]BinaryPackSiteData, error) {
+	if value == nil {
+		return []BinaryPackSiteData{}, nil
+	}
+
+	rawSites, ok := value.([]any)
+	if !ok {
+		return nil, fmt.Errorf("invalid packed site list type: %T", value)
+	}
+
+	result := make([]BinaryPackSiteData, 0, len(rawSites))
+	for _, rawSite := range rawSites {
+		rawPair, ok := rawSite.([]any)
+		if !ok || len(rawPair) != 2 {
+			return nil, fmt.Errorf("invalid packed site entry: %v", rawSite)
+		}
+
+		path, err := toStringSlice(rawPair[0])
+		if err != nil {
+			return nil, err
+		}
+		header, err := toBinaryPackHeader(rawPair[1])
+		if err != nil {
+			return nil, err
+		}
+		result = append(result, BinaryPackSiteData{Path: path, Header: header})
+	}
+
+	return result, nil
+}
+
+func toStringSlice(value any) ([]string, error) {
+	switch typed := value.(type) {
+	case []string:
+		return append([]string{}, typed...), nil
+	case []any:
+		result := make([]string, 0, len(typed))
+		for _, entry := range typed {
+			stringValue, ok := entry.(string)
+			if !ok {
+				return nil, fmt.Errorf("invalid packed path segment: %v", entry)
+			}
+			result = append(result, stringValue)
+		}
+		return result, nil
+	default:
+		return nil, fmt.Errorf("invalid packed path type: %T", value)
+	}
+}
+
+func toBinaryPackHeader(value any) (BinaryPackHeader, error) {
+	rawHeader, ok := value.([]any)
+	if !ok {
+		return nil, fmt.Errorf("invalid packed header type: %T", value)
+	}
+
+	result := make(BinaryPackHeader, len(rawHeader))
+	for i, entry := range rawHeader {
+		if nested, ok := entry.([]any); ok {
+			cloned, err := toBinaryPackHeader(nested)
+			if err != nil {
+				return nil, err
+			}
+			result[i] = cloned
+		} else {
+			result[i] = entry
+		}
+	}
+	return result, nil
 }
 
 func toInt(value any) (int, bool) {

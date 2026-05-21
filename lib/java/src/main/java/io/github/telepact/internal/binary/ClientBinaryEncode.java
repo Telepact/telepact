@@ -54,7 +54,7 @@ public class ClientBinaryEncode {
 
         final Map<Object, Object> finalEncodedMessageBody;
         if (Objects.equals(true, headers.get("@pac_"))) {
-            finalEncodedMessageBody = packBody(encodedMessageBody);
+            finalEncodedMessageBody = packBody(encodedMessageBody, binaryEncoding);
         } else {
             finalEncodedMessageBody = encodedMessageBody;
         }

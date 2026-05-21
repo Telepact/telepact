@@ -16,6 +16,9 @@
 
 package io.github.telepact.internal.binary;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class BinaryEncoding {
@@ -23,11 +26,16 @@ public class BinaryEncoding {
     public final Map<String, Integer> encodeMap;
     public final String[] decodeTable;
     public final Integer checksum;
+    public final List<BinaryPackSite> packedSites;
 
     public BinaryEncoding(Map<String, Integer> binaryEncodingMap, Integer checksum) {
-        this.encodeMap = binaryEncodingMap;
-        this.decodeTable = new String[binaryEncodingMap.size()];
-        for (final var entry : binaryEncodingMap.entrySet()) {
+        this(binaryEncodingMap, checksum, List.of());
+    }
+
+    public BinaryEncoding(Map<String, Integer> binaryEncodingMap, Integer checksum, List<List<Object>> packedSites) {
+        this.encodeMap = new HashMap<>(binaryEncodingMap);
+        this.decodeTable = new String[this.encodeMap.size()];
+        for (final var entry : this.encodeMap.entrySet()) {
             final var keyId = entry.getValue();
             if (keyId < 0 || keyId >= this.decodeTable.length) {
                 throw new IllegalArgumentException("Binary encoding ids must be dense sequential integers");
@@ -43,5 +51,16 @@ public class BinaryEncoding {
             }
         }
         this.checksum = checksum;
+        this.packedSites = packedSites.stream()
+                .map((site) -> new BinaryPackSite(site, this.encodeMap))
+                .toList();
+    }
+
+    public List<Object> toPackedSiteData() {
+        final var data = new ArrayList<Object>(this.packedSites.size());
+        for (final var packedSite : this.packedSites) {
+            data.add(packedSite.toData());
+        }
+        return data;
     }
 }

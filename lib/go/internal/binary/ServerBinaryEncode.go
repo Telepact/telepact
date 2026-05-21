@@ -57,7 +57,7 @@ func ServerBinaryEncode(message []any, binaryEncoding *BinaryEncoding) ([]any, e
 
 	checksumKnown := false
 	for _, checksum := range clientKnown {
-		if binaryEncoding != nil && checksum == binaryEncoding.Checksum {
+		if checksum == binaryEncoding.Checksum {
 			checksumKnown = true
 			break
 		}
@@ -69,6 +69,7 @@ func ServerBinaryEncode(message []any, binaryEncoding *BinaryEncoding) ([]any, e
 			encodeMapCopy[key] = value
 		}
 		headers["@enc_"] = encodeMapCopy
+		headers["@pck_"] = binaryEncoding.PackedSiteData()
 	}
 
 	headers["@bin_"] = []int{binaryEncoding.Checksum}
@@ -80,7 +81,7 @@ func ServerBinaryEncode(message []any, binaryEncoding *BinaryEncoding) ([]any, e
 
 	finalEncodedBody := encodedBody
 	if isStrictTrue(headers["@pac_"]) {
-		packedBody, err := PackBody(encodedBody)
+		packedBody, err := PackBody(encodedBody, binaryEncoding)
 		if err != nil {
 			return nil, err
 		}

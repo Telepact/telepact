@@ -64,7 +64,7 @@ func ClientBinaryEncode(message []any, cache BinaryEncodingCache, strategy *Clie
 
 	var finalBody map[any]any
 	if isStrictTrue(headers["@pac_"]) {
-		packedBody, packErr := PackBody(encodedBody)
+		packedBody, packErr := PackBody(encodedBody, encoding)
 		if packErr != nil {
 			return nil, packErr
 		}

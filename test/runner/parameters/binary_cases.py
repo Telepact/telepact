@@ -14,28 +14,32 @@
 #|  limitations under the License.
 #|
 
-from msgpack import ExtType
-
 _BINARY_ENCODING = {
     'Ok_': 0,
-    'api': 1,
-    'data': 2,
-    'fn.api_': 3,
-    'fn.example': 4,
-    'fn.ping_': 5,
-    'id': 6,
-    'includeExamples!': 7,
-    'includeInternal!': 8,
-    'name': 9,
+    'active': 1,
+    'api': 2,
+    'code': 3,
+    'data': 4,
+    'flags': 5,
+    'fn.api_': 6,
+    'fn.example': 7,
+    'fn.ping_': 8,
+    'id': 9,
+    'includeExamples!': 10,
+    'includeInternal!': 11,
+    'label': 12,
+    'meta': 13,
+    'name': 14,
 }
-_BINARY_CHECKSUM = 1059755324
+_BINARY_CHECKSUM = -1780699065
+_PACKED_SITES = [[['Ok_', 'data'], [None, 9, 14, [13, 3, [5, 1, 12]]]]]
 
 cases = {
     'binary': [
-        [[{'@bin_': []}, {'fn.ping_': {}}], [{'@enc_': _BINARY_ENCODING, '@bin_': [_BINARY_CHECKSUM]}, {0: {}}]],
+        [[{'@bin_': []}, {'fn.ping_': {}}], [{'@assert_': {'skipPackedSiteCheck': True}, '@enc_': _BINARY_ENCODING, '@bin_': [_BINARY_CHECKSUM]}, {0: {}}]],
         [[{'@msgpack': True, '@bin_': [0]}, {0: {}}], [{}, {'ErrorParseFailure_': {'reasons': [{'IncompatibleBinaryEncoding': {}}]}}]],
-        [[{'@msgpack': True, '@bin_': [_BINARY_CHECKSUM]}, {5: {}}], [{'@bin_': [_BINARY_CHECKSUM]}, {0: {}}]],
-        [[{'@msgpack': True, '@bin_': [_BINARY_CHECKSUM], '@pac_': True, '@ok_': {'data': [{'id': 1, 'name': 'one'}, {'id': 2, 'name': 'two'}]}}, {4: {}}], [{'@bin_': [_BINARY_CHECKSUM], '@pac_': True}, {0: {2: [ExtType(17, b''), [None, 6, 9], [1, 'one'], [2, 'two']]}}]],
+        [[{'@msgpack': True, '@bin_': [_BINARY_CHECKSUM]}, {8: {}}], [{'@bin_': [_BINARY_CHECKSUM]}, {0: {}}]],
+        [[{'@msgpack': True, '@bin_': [_BINARY_CHECKSUM], '@ok_': {'data': [{'id': 1, 'name': 'one', 'meta': {'code': 7, 'flags': {'active': True, 'label': 'alpha'}}}, {'id': 2, 'name': 'two', 'meta': {'code': 8, 'flags': {'active': False, 'label': 'beta'}}}]}}, {7: {}}], [{'@bin_': [_BINARY_CHECKSUM]}, {0: {4: [{9: 1, 14: 'one', 13: {3: 7, 5: {1: True, 12: 'alpha'}}}, {9: 2, 14: 'two', 13: {3: 8, 5: {1: False, 12: 'beta'}}}]}}]],
         [[{'@msgpack': True, '@bin_': [_BINARY_CHECKSUM]}, {255: {}}], [{}, {'ErrorParseFailure_': {'reasons': [{'BinaryDecodeFailure': {}}]}}]],
         [[{'@bin_': None}, {'fn.ping_': {}}], [{}, {'ErrorInvalidRequestHeaders_': {'cases': [{'path': ['@bin_'], 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Array': {}}}}}]}}]],
         [[{'@bin_': False}, {'fn.ping_': {}}], [{}, {'ErrorInvalidRequestHeaders_': {'cases': [{'path': ['@bin_'], 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Array': {}}}}}]}}]],

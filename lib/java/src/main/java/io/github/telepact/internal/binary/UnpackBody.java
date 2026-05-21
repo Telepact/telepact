@@ -16,20 +16,39 @@
 
 package io.github.telepact.internal.binary;
 
-import static io.github.telepact.internal.binary.Unpack.unpack;
-
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class UnpackBody {
-    static Map<Object, Object> unpackBody(Map<Object, Object> body) {
-        final var result = new HashMap<Object, Object>();
+    static Map<Object, Object> unpackBody(Map<Object, Object> body, BinaryEncoding binaryEncoding) {
+        final var result = new HashMap<Object, Object>(body);
 
-        for (final var entry : body.entrySet()) {
-            final var unpackedValue = unpack(entry.getValue());
-            result.put(entry.getKey(), unpackedValue);
+        for (final var packedSite : binaryEncoding.packedSites) {
+            final var parentMap = getParentMap(result, packedSite.encodedPath);
+            if (parentMap == null || packedSite.encodedPath.isEmpty()) {
+                continue;
+            }
+
+            final var targetKey = packedSite.encodedPath.get(packedSite.encodedPath.size() - 1);
+            final var value = parentMap.get(targetKey);
+            if (value instanceof final List<?> listValue) {
+                parentMap.put(targetKey, UnpackList.unpackList((List<Object>) listValue, packedSite.header));
+            }
         }
 
         return result;
+    }
+
+    private static Map<Object, Object> getParentMap(Map<Object, Object> root, List<Integer> path) {
+        Map<Object, Object> current = root;
+        for (int index = 0; index < path.size() - 1; index += 1) {
+            final var next = current.get(path.get(index));
+            if (!(next instanceof final Map<?, ?> nextMap)) {
+                return null;
+            }
+            current = (Map<Object, Object>) nextMap;
+        }
+        return current;
     }
 }

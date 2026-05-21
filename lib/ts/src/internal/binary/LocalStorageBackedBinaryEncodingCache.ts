@@ -14,12 +14,19 @@
 //|  limitations under the License.
 //|
 
+import { BinaryEncoding, BinaryPackSiteData } from "./BinaryEncoding.js";
 import { BinaryEncodingCache } from "../../internal/binary/BinaryEncodingCache.js";
-import { BinaryEncoding } from "./BinaryEncoding.js";
+
+type StoredBinaryEncoding = {
+    encodeMap: Record<string, number>;
+    packedSites: BinaryPackSiteData[];
+};
+
+type LegacyStoredBinaryEncoding = Record<string, number>;
 
 export class LocalStorageBackedBinaryEncodingCache extends BinaryEncodingCache {
     private recentBinaryEncoders: Map<number, BinaryEncoding>;
-    private recentBinaryEncodersJson: Record<string, Record<string, number>>;
+    private recentBinaryEncodersJson: Record<string, StoredBinaryEncoding | LegacyStoredBinaryEncoding>;
     private namespace: string;
 
     constructor(namespace: string) {
@@ -27,26 +34,27 @@ export class LocalStorageBackedBinaryEncodingCache extends BinaryEncodingCache {
 
         this.namespace = 'telepact-api-encoding:' + namespace
 
-        // Load initial state of recentBinaryEncodersJson from local storage
         const storedJson = localStorage.getItem(this.namespace);
 
         console.log(`Binary Encoding loaded from local storage for ${this.namespace}: ${storedJson}`);
 
-        let jsonFromLocalStorage: Record<string, Record<string, number>> = storedJson 
-            ? JSON.parse(storedJson) 
+        const jsonFromLocalStorage = storedJson
+            ? JSON.parse(storedJson) as Record<string, StoredBinaryEncoding | LegacyStoredBinaryEncoding>
             : {};
 
         this.recentBinaryEncodersJson = jsonFromLocalStorage;
         this.recentBinaryEncoders = this.mapJsonToObject(jsonFromLocalStorage);
     }
 
-    add(checksum: number, binaryEncodingMap: Map<string, number>): void {
+    add(checksum: number, binaryEncodingMap: Map<string, number>, packedSites: BinaryPackSiteData[] = []): void {
         const binaryEncodingJson = Object.fromEntries(binaryEncodingMap);
-        this.recentBinaryEncodersJson[`${checksum}`] = binaryEncodingJson;
+        this.recentBinaryEncodersJson[`${checksum}`] = {
+            encodeMap: binaryEncodingJson,
+            packedSites,
+        };
 
         this.recentBinaryEncoders = this.mapJsonToObject(this.recentBinaryEncodersJson);
 
-        // Save recentBinaryEncodersJson to local storage
         localStorage.setItem(this.namespace, JSON.stringify(this.recentBinaryEncodersJson));
     }
 
@@ -59,7 +67,6 @@ export class LocalStorageBackedBinaryEncodingCache extends BinaryEncodingCache {
 
         this.recentBinaryEncoders = this.mapJsonToObject(this.recentBinaryEncodersJson);
 
-        // Save recentBinaryEncodersJson to local storage
         localStorage.setItem(this.namespace, JSON.stringify(this.recentBinaryEncodersJson));
     }
 
@@ -67,17 +74,32 @@ export class LocalStorageBackedBinaryEncodingCache extends BinaryEncodingCache {
         return Array.from(this.recentBinaryEncoders.keys());
     }
 
-    private mapJsonToObject(json: Record<string, Record<string, number>>): Map<number, BinaryEncoding> {
-        let newMap = new Map<number, BinaryEncoding>();
+    private mapJsonToObject(json: Record<string, StoredBinaryEncoding | LegacyStoredBinaryEncoding>): Map<number, BinaryEncoding> {
+        const newMap = new Map<number, BinaryEncoding>();
 
-        for (var [k, v] of Object.entries(json)) {
-            let checksum = parseInt(k);
-            let binaryEncodingRecord = v as Record<string, number>;
-            let binaryEncodingMap = new Map(Object.entries(binaryEncodingRecord));
-            let binaryEncoding = new BinaryEncoding(binaryEncodingMap, checksum);
+        for (const [key, value] of Object.entries(json)) {
+            const checksum = parseInt(key, 10);
+            const { encodeMap, packedSites } = this.normalizeStoredBinaryEncoding(value);
+            const binaryEncodingMap = new Map(Object.entries(encodeMap));
+            const binaryEncoding = new BinaryEncoding(binaryEncodingMap, checksum, packedSites);
             newMap.set(checksum, binaryEncoding);
         }
 
         return newMap;
+    }
+
+    private normalizeStoredBinaryEncoding(value: StoredBinaryEncoding | LegacyStoredBinaryEncoding): StoredBinaryEncoding {
+        if ('encodeMap' in value) {
+            const storedValue = value as StoredBinaryEncoding;
+            return {
+                encodeMap: storedValue.encodeMap,
+                packedSites: storedValue.packedSites ?? [],
+            };
+        }
+
+        return {
+            encodeMap: value,
+            packedSites: [],
+        };
     }
 }

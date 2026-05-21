@@ -36,7 +36,7 @@ public class ServerBinaryDecode {
 
         final Map<Object, Object> finalEncodedMessageBody;
         if (Objects.equals(true, headers.get("@pac_"))) {
-            finalEncodedMessageBody = unpackBody(encodedMessageBody);
+            finalEncodedMessageBody = unpackBody(encodedMessageBody, binaryEncoder);
         } else {
             finalEncodedMessageBody = encodedMessageBody;
         }

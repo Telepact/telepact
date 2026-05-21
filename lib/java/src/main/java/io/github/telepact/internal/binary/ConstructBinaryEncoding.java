@@ -21,11 +21,15 @@ import static io.github.telepact.internal.binary.CreateChecksum.createChecksum;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
 
 import io.github.telepact.TelepactSchema;
 import io.github.telepact.internal.types.TArray;
+import io.github.telepact.internal.types.TFieldDeclaration;
 import io.github.telepact.internal.types.TObject;
 import io.github.telepact.internal.types.TStruct;
 import io.github.telepact.internal.types.TTypeDeclaration;
@@ -33,42 +37,232 @@ import io.github.telepact.internal.types.TUnion;
 
 public class ConstructBinaryEncoding {
 
-    private static List<String> traceType(TTypeDeclaration typeDeclaration) {
+    private static List<String> sortedKeys(Map<String, ?> input) {
+        final var keys = new ArrayList<>(input.keySet());
+        Collections.sort(keys);
+        return keys;
+    }
+
+    private static List<String> traceType(TTypeDeclaration typeDeclaration, Set<String> visitedTypeNames) {
         final var thisAllKeys = new ArrayList<String>();
 
         if (typeDeclaration.type instanceof TArray) {
-            final var theseKeys2 = traceType(typeDeclaration.typeParameters.get(0));
-            thisAllKeys.addAll(theseKeys2);
+            thisAllKeys.addAll(traceType(typeDeclaration.typeParameters.get(0), visitedTypeNames));
         } else if (typeDeclaration.type instanceof TObject) {
-            final var theseKeys2 = traceType(typeDeclaration.typeParameters.get(0));
-            thisAllKeys.addAll(theseKeys2);
+            thisAllKeys.addAll(traceType(typeDeclaration.typeParameters.get(0), visitedTypeNames));
         } else if (typeDeclaration.type instanceof TStruct s) {
-            final var structFields = s.fields;
-            for (final var entry : structFields.entrySet()) {
-                final var structFieldKey = entry.getKey();
-                final var structField = entry.getValue();
-                thisAllKeys.add(structFieldKey);
-                final var moreKeys = traceType(structField.typeDeclaration);
-                thisAllKeys.addAll(moreKeys);
+            if (visitedTypeNames.contains(s.name)) {
+                return thisAllKeys;
+            }
+            final var nextVisitedTypeNames = new HashSet<>(visitedTypeNames);
+            nextVisitedTypeNames.add(s.name);
+            for (final var fieldKey : sortedKeys(s.fields)) {
+                final var field = s.fields.get(fieldKey);
+                thisAllKeys.add(fieldKey);
+                thisAllKeys.addAll(traceType(field.typeDeclaration, nextVisitedTypeNames));
             }
         } else if (typeDeclaration.type instanceof TUnion u) {
-            final var unionTags = u.tags;
-            for (final var entry : unionTags.entrySet()) {
-                final var tagKey = entry.getKey();
-                final var tagValue = entry.getValue();
+            if (visitedTypeNames.contains(u.name)) {
+                return thisAllKeys;
+            }
+            final var nextVisitedTypeNames = new HashSet<>(visitedTypeNames);
+            nextVisitedTypeNames.add(u.name);
+            for (final var tagKey : sortedKeys(u.tags)) {
                 thisAllKeys.add(tagKey);
-                final var structFields = tagValue.fields;
-                for (final var fieldEntry : structFields.entrySet()) {
-                    final var structFieldKey = fieldEntry.getKey();
-                    final var structField = fieldEntry.getValue();
-                    thisAllKeys.add(structFieldKey);
-                    final var moreKeys = traceType(structField.typeDeclaration);
-                    thisAllKeys.addAll(moreKeys);
+                final var tagValue = u.tags.get(tagKey);
+                for (final var fieldKey : sortedKeys(tagValue.fields)) {
+                    final var field = tagValue.fields.get(fieldKey);
+                    thisAllKeys.add(fieldKey);
+                    thisAllKeys.addAll(traceType(field.typeDeclaration, nextVisitedTypeNames));
                 }
             }
         }
 
         return thisAllKeys;
+    }
+
+    private static boolean isDeterministicPackedStruct(TTypeDeclaration typeDeclaration, Set<String> visitingTypeNames) {
+        if (typeDeclaration.type instanceof TArray) {
+            final var childType = typeDeclaration.typeParameters.get(0);
+            return !(childType.type instanceof TStruct || childType.type instanceof TUnion);
+        }
+
+        if (typeDeclaration.type instanceof TObject) {
+            return true;
+        }
+
+        if (typeDeclaration.type instanceof TStruct s) {
+            if (visitingTypeNames.contains(s.name)) {
+                return false;
+            }
+            final var nextVisitingTypeNames = new HashSet<>(visitingTypeNames);
+            nextVisitingTypeNames.add(s.name);
+            for (final var field : s.fields.values()) {
+                if (!isDeterministicPackedStruct(field.typeDeclaration, nextVisitingTypeNames)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        if (typeDeclaration.type instanceof TUnion u) {
+            if (visitingTypeNames.contains(u.name)) {
+                return false;
+            }
+            final var nextVisitingTypeNames = new HashSet<>(visitingTypeNames);
+            nextVisitingTypeNames.add(u.name);
+            for (final var tagValue : u.tags.values()) {
+                for (final var field : tagValue.fields.values()) {
+                    if (!isDeterministicPackedStruct(field.typeDeclaration, nextVisitingTypeNames)) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        return true;
+    }
+
+    private static Integer getEncodedKey(Map<String, Integer> binaryEncoding, String key) {
+        final var encodedKey = binaryEncoding.get(key);
+        if (encodedKey == null) {
+            throw new IllegalArgumentException("Missing binary encoding for key " + key);
+        }
+        return encodedKey;
+    }
+
+    private static Object buildNestedHeader(String key, TTypeDeclaration typeDeclaration, Map<String, Integer> binaryEncoding) {
+        final var encodedKey = getEncodedKey(binaryEncoding, key);
+
+        if (typeDeclaration.type instanceof TStruct s) {
+            final var header = new ArrayList<Object>();
+            header.add(encodedKey);
+            for (final var fieldKey : sortedKeys(s.fields)) {
+                final var field = s.fields.get(fieldKey);
+                header.add(buildNestedHeader(fieldKey, field.typeDeclaration, binaryEncoding));
+            }
+            return header;
+        }
+
+        if (typeDeclaration.type instanceof TUnion u) {
+            final var header = new ArrayList<Object>();
+            header.add(encodedKey);
+            for (final var tagKey : sortedKeys(u.tags)) {
+                final var tagValue = u.tags.get(tagKey);
+                final var tagHeader = new ArrayList<Object>();
+                tagHeader.add(getEncodedKey(binaryEncoding, tagKey));
+                for (final var fieldKey : sortedKeys(tagValue.fields)) {
+                    final var field = tagValue.fields.get(fieldKey);
+                    tagHeader.add(buildNestedHeader(fieldKey, field.typeDeclaration, binaryEncoding));
+                }
+                header.add(tagHeader);
+            }
+            return header;
+        }
+
+        return encodedKey;
+    }
+
+    private static List<Object> buildPackHeader(TStruct structType, Map<String, Integer> binaryEncoding) {
+        final var header = new ArrayList<Object>();
+        header.add(null);
+        for (final var fieldKey : sortedKeys(structType.fields)) {
+            final var field = structType.fields.get(fieldKey);
+            header.add(buildNestedHeader(fieldKey, field.typeDeclaration, binaryEncoding));
+        }
+        return header;
+    }
+
+    private static void collectPackedSites(List<String> path, TTypeDeclaration typeDeclaration,
+            Map<String, Integer> binaryEncoding, List<List<Object>> packedSites, Set<String> visitedTypeNames) {
+        if (typeDeclaration.type instanceof TArray) {
+            final var childType = typeDeclaration.typeParameters.get(0);
+            if (childType.type instanceof final TStruct s && isDeterministicPackedStruct(childType, new HashSet<>())) {
+                packedSites.add(new ArrayList<>(List.of(new ArrayList<>(path), buildPackHeader(s, binaryEncoding))));
+            }
+            return;
+        }
+
+        if (typeDeclaration.type instanceof TObject) {
+            return;
+        }
+
+        if (typeDeclaration.type instanceof TStruct s) {
+            if (visitedTypeNames.contains(s.name)) {
+                return;
+            }
+            final var nextVisitedTypeNames = new HashSet<>(visitedTypeNames);
+            nextVisitedTypeNames.add(s.name);
+            for (final var fieldKey : sortedKeys(s.fields)) {
+                final var field = s.fields.get(fieldKey);
+                final var nextPath = new ArrayList<>(path);
+                nextPath.add(fieldKey);
+                collectPackedSites(nextPath, field.typeDeclaration, binaryEncoding, packedSites, nextVisitedTypeNames);
+            }
+            return;
+        }
+
+        if (typeDeclaration.type instanceof TUnion u) {
+            if (visitedTypeNames.contains(u.name)) {
+                return;
+            }
+            final var nextVisitedTypeNames = new HashSet<>(visitedTypeNames);
+            nextVisitedTypeNames.add(u.name);
+            for (final var tagKey : sortedKeys(u.tags)) {
+                final var tagValue = u.tags.get(tagKey);
+                for (final var fieldKey : sortedKeys(tagValue.fields)) {
+                    final var field = tagValue.fields.get(fieldKey);
+                    final var nextPath = new ArrayList<>(path);
+                    nextPath.add(tagKey);
+                    nextPath.add(fieldKey);
+                    collectPackedSites(nextPath, field.typeDeclaration, binaryEncoding, packedSites, nextVisitedTypeNames);
+                }
+            }
+        }
+    }
+
+    private static void addRootPackedSites(List<String> rootPath, Map<String, TFieldDeclaration> fields,
+            Map<String, Integer> binaryEncoding, List<List<Object>> packedSites) {
+        for (final var fieldKey : sortedKeys(fields)) {
+            final var field = fields.get(fieldKey);
+            final var nextPath = new ArrayList<>(rootPath);
+            nextPath.add(fieldKey);
+            collectPackedSites(nextPath, field.typeDeclaration, binaryEncoding, packedSites, new HashSet<>());
+        }
+    }
+
+    private static List<List<Object>> dedupePackedSites(List<List<Object>> packedSites) {
+        final var deduped = new ArrayList<List<Object>>();
+        final var pathToIndex = new HashMap<List<String>, Integer>();
+        final var conflictingPaths = new HashSet<List<String>>();
+
+        for (final var site : packedSites) {
+            final var path = new ArrayList<>((List<String>) site.get(0));
+            if (conflictingPaths.contains(path)) {
+                continue;
+            }
+
+            final var existingIndex = pathToIndex.get(path);
+            if (existingIndex == null) {
+                pathToIndex.put(path, deduped.size());
+                deduped.add(site);
+                continue;
+            }
+
+            if (!deduped.get(existingIndex).get(1).equals(site.get(1))) {
+                deduped.remove((int) existingIndex);
+                pathToIndex.remove(path);
+                conflictingPaths.add(path);
+                for (final var entry : pathToIndex.entrySet()) {
+                    if (entry.getValue() > existingIndex) {
+                        entry.setValue(entry.getValue() - 1);
+                    }
+                }
+            }
+        }
+
+        return deduped;
     }
 
     public static BinaryEncoding constructBinaryEncoding(TelepactSchema telepactSchema) {
@@ -80,26 +274,27 @@ public class ConstructBinaryEncoding {
 
             if (key.endsWith(".->") && value instanceof TUnion u) {
                 final var result = u.tags.get("Ok_");
+                if (result == null) {
+                    continue;
+                }
                 allKeys.add("Ok_");
-                for (final var fieldEntry : result.fields.entrySet()) {
-                    final var fieldKey = fieldEntry.getKey();
-                    final var field = fieldEntry.getValue();
+                for (final var fieldKey : sortedKeys(result.fields)) {
+                    final var field = result.fields.get(fieldKey);
                     allKeys.add(fieldKey);
-                    final var keys = traceType(field.typeDeclaration);
-                    keys.forEach(allKeys::add);
+                    traceType(field.typeDeclaration, new HashSet<>()).forEach(allKeys::add);
                 }
             } else if (key.startsWith("fn.") && value instanceof TUnion u)  {
                 allKeys.add(key);
                 final var args = u.tags.get(key);
-                for (final var fieldEntry : args.fields.entrySet()) {
-                    final var fieldKey = fieldEntry.getKey();
-                    final var field = fieldEntry.getValue();
+                if (args == null) {
+                    continue;
+                }
+                for (final var fieldKey : sortedKeys(args.fields)) {
+                    final var field = args.fields.get(fieldKey);
                     allKeys.add(fieldKey);
-                    final var keys = traceType(field.typeDeclaration);
-                    keys.forEach(allKeys::add);
+                    traceType(field.typeDeclaration, new HashSet<>()).forEach(allKeys::add);
                 }
             }
-
         }
 
         final var sortedAllKeys = new ArrayList<>(allKeys);
@@ -107,13 +302,30 @@ public class ConstructBinaryEncoding {
 
         final var binaryEncoding = new HashMap<String, Integer>();
         for (int index = 0; index < sortedAllKeys.size(); index++) {
-            final var key = sortedAllKeys.get(index);
-            binaryEncoding.put(key, index);
+            binaryEncoding.put(sortedAllKeys.get(index), index);
+        }
+
+        final var packedSites = new ArrayList<List<Object>>();
+        for (final var entry : telepactSchema.parsed.entrySet()) {
+            final var key = entry.getKey();
+            final var value = entry.getValue();
+
+            if (key.endsWith(".->") && value instanceof TUnion u) {
+                final var result = u.tags.get("Ok_");
+                if (result != null) {
+                    addRootPackedSites(new ArrayList<>(List.of("Ok_")), result.fields, binaryEncoding, packedSites);
+                }
+            } else if (key.startsWith("fn.") && value instanceof TUnion u) {
+                final var args = u.tags.get(key);
+                if (args != null) {
+                    addRootPackedSites(new ArrayList<>(List.of(key)), args.fields, binaryEncoding, packedSites);
+                }
+            }
         }
 
         final var finalString = String.join("\n", sortedAllKeys);
         final var checksum = createChecksum(finalString);
 
-        return new BinaryEncoding(binaryEncoding, checksum);
+        return new BinaryEncoding(binaryEncoding, checksum, dedupePackedSites(packedSites));
     }
 }

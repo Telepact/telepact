@@ -18,6 +18,7 @@ import { decodeBody } from "../../internal/binary/DecodeBody.js";
 import { unpackBody } from "../../internal/binary/UnpackBody.js";
 import { convertMapsToObjects } from "./ConvertMapsToObjects.js";
 import { BinaryEncodingCache } from "./BinaryEncodingCache.js";
+import { BinaryPackSiteData } from "./BinaryEncoding.js";
 import { ClientBinaryStrategy } from "./ClientBinaryStrategy.js";
 
 export function clientBinaryDecode(
@@ -32,7 +33,8 @@ export function clientBinaryDecode(
 
     if (headers.has("@enc_")) {
         const binaryEncoding = headers.get("@enc_") as Map<string, number>;
-        binaryEncodingCache.add(binaryChecksum, binaryEncoding);
+        const packedSites = headers.get("@pck_") as BinaryPackSiteData[] | undefined;
+        binaryEncodingCache.add(binaryChecksum, binaryEncoding, packedSites ?? []);
     }
 
     binaryChecksumStrategy.updateChecksum(binaryChecksum);
@@ -40,14 +42,11 @@ export function clientBinaryDecode(
 
     const binaryEncoder = binaryEncodingCache.get(newCurrentChecksumStrategy[0]);
 
-    let finalEncodedMessageBody: Map<any, any>;
-    if (headers.get("@pac_") === true) {
-        finalEncodedMessageBody = unpackBody(encodedMessageBody);
-    } else {
-        finalEncodedMessageBody = encodedMessageBody;
-    }
+    const finalEncodedMessageBody = headers.get("@pac_") === true
+        ? unpackBody(encodedMessageBody, binaryEncoder!)
+        : encodedMessageBody;
 
     const messageHeader = convertMapsToObjects(headers);
-    const messageBody = decodeBody(finalEncodedMessageBody, binaryEncoder);
+    const messageBody = decodeBody(finalEncodedMessageBody, binaryEncoder!);
     return [messageHeader, messageBody];
 }

@@ -275,6 +275,10 @@ async def verify_server_case(nats_client, request, expected_response, frontdoor_
             assert case_id != ''
             response[1]['ErrorUnknown_']['caseId'] = '<caseId>'
 
+        if assert_rules.get('skipPackedSiteCheck', False):
+            expected_response[0].pop('@pck_', None)
+            response[0].pop('@pck_', None)
+
         if assert_rules.get('setCompare', False):
             expected_response = convert_lists_to_sets(expected_response)
             response = convert_lists_to_sets(response)
@@ -335,6 +339,7 @@ async def verify_client_case(nats_client, request, expected_response, client_fro
 
     binary_was_used = response[0].pop('@bin_', None) is not None
     response[0].pop('@enc_', None)
+    response[0].pop('@pck_', None)
     response[0].pop('@pac_', None)
     base64_was_used = response[0].pop('@base64_', None) is not None
     client_returned_binary = response[0].pop('@clientReturnedBinary', False)

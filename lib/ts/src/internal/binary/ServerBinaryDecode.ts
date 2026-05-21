@@ -32,7 +32,7 @@ export function serverBinaryDecode(message: any[], binaryEncoder: BinaryEncoding
 
     let finalEncodedMessageBody: Map<any, any>;
     if (headers.get("@pac_") === true) {
-        finalEncodedMessageBody = unpackBody(encodedMessageBody);
+        finalEncodedMessageBody = unpackBody(encodedMessageBody, binaryEncoder);
     } else {
         finalEncodedMessageBody = encodedMessageBody;
     }

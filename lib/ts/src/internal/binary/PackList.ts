@@ -14,11 +14,9 @@
 //|  limitations under the License.
 //|
 
-import { BinaryPackNode } from './BinaryPackNode.js';
-import { pack } from './Pack.js';
-import { packMap } from './PackMap.js';
-import { CannotPack } from './CannotPack.js';
 import { addExtension } from 'msgpackr';
+import { BinaryPackHeader } from './BinaryEncoding.js';
+import { MSGPACK_UNDEFINED_VALUE } from './PackMap.js';
 
 const PACKED_BYTE = 17;
 const EMPTY_BUFFER = new Uint8Array(0);
@@ -41,38 +39,64 @@ const MSGPACK_PACKED_EXT = {
 };
 addExtension(MSGPACK_PACKED_EXT);
 
-export function packList(list: any[]): any[] {
-    if (list.length === 0) {
+function packRow(m: Map<any, any>, header: BinaryPackHeader): any[] | undefined {
+    const row = new Array<any>(header.length - 1);
+    const expectedKeys = new Set<any>();
+
+    for (let index = 1; index < header.length; index += 1) {
+        const headerEntry = header[index]!;
+        const key = Array.isArray(headerEntry) ? headerEntry[0] : headerEntry;
+        expectedKeys.add(key);
+
+        if (!m.has(key)) {
+            row[index - 1] = MSGPACK_UNDEFINED_VALUE;
+            continue;
+        }
+
+        const value = m.get(key);
+        if (Array.isArray(headerEntry)) {
+            if (!(value instanceof Map)) {
+                return undefined;
+            }
+            const nestedRow = packRow(value, headerEntry);
+            if (nestedRow === undefined) {
+                return undefined;
+            }
+            row[index - 1] = nestedRow;
+        } else {
+            row[index - 1] = value;
+        }
+    }
+
+    for (const key of m.keys()) {
+        if (!expectedKeys.has(key)) {
+            return undefined;
+        }
+    }
+
+    while (row.length > 0 && row[row.length - 1] === MSGPACK_UNDEFINED_VALUE) {
+        row.pop();
+    }
+
+    return row;
+}
+
+export function packList(list: any[], header?: BinaryPackHeader): any[] {
+    if (list.length === 0 || header === undefined) {
         return list;
     }
 
-    const packedList: any[] = [];
-    const header: any[] = [];
-
-    packedList.push(MSGPACK_PACKED_VALUE);
-
-    header.push(null);
-
-    packedList.push(header);
-
-    const keyIndexMap: Map<number, BinaryPackNode> = new Map();
-    try {
-        for (const e of list) {
-            if (e instanceof Map) {
-                const row = packMap(e, header, keyIndexMap);
-
-                packedList.push(row);
-            } else {
-                // This list cannot be packed, abort
-                throw new CannotPack();
-            }
+    const packedList: any[] = [MSGPACK_PACKED_VALUE];
+    for (const entry of list) {
+        if (!(entry instanceof Map)) {
+            return list;
         }
-        return packedList;
-    } catch (ex) {
-        const newList: any[] = [];
-        for (const e of list) {
-            newList.push(pack(e));
+        const packedRow = packRow(entry, header);
+        if (packedRow === undefined) {
+            return list;
         }
-        return newList;
+        packedList.push(packedRow);
     }
+
+    return packedList;
 }

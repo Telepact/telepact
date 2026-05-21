@@ -16,49 +16,88 @@
 
 package binary
 
-import "fmt"
-
 // UnpackList converts packed list representation back into standard pseudo-JSON arrays.
-func UnpackList(lst []any) ([]any, error) {
-	if len(lst) == 0 {
+func UnpackList(lst []any, headers ...BinaryPackHeader) ([]any, error) {
+	if len(lst) == 0 || len(headers) == 0 {
 		return lst, nil
 	}
 
-	switch lst[0].(type) {
-	case *packedListExt:
-		if len(lst) < 2 {
-			return nil, fmt.Errorf("invalid packed list: missing header")
-		}
+	header := headers[0]
 
-		header, ok := lst[1].([]any)
+	startIndex := 0
+	if isPackedMarker(lst[0]) {
+		startIndex = 1
+	} else if len(lst) > 1 {
+		if _, ok := toAnySlice(lst[1]); ok {
+			startIndex = 1
+		} else {
+			return lst, nil
+		}
+	} else {
+		return lst, nil
+	}
+
+	unpacked := make([]any, 0, len(lst)-startIndex)
+	for i := startIndex; i < len(lst); i++ {
+		row, ok := lst[i].([]any)
 		if !ok {
-			return nil, fmt.Errorf("invalid packed list header type: %T", lst[1])
+			unpacked = append(unpacked, lst[i])
+			continue
 		}
 
-		unpacked := make([]any, 0, len(lst)-2)
-		for i := 2; i < len(lst); i++ {
-			row, ok := lst[i].([]any)
-			if !ok {
-				return nil, fmt.Errorf("invalid packed row type: %T", lst[i])
-			}
+		unpackedMap, err := unpackRow(row, header)
+		if err != nil {
+			return nil, err
+		}
+		unpacked = append(unpacked, unpackedMap)
+	}
 
-			unpackedMap, err := UnpackMap(row, header)
+	return unpacked, nil
+}
+
+func unpackRow(row []any, header BinaryPackHeader) (map[any]any, error) {
+	finalMap := make(map[any]any, len(row))
+	for i, value := range row {
+		if i+1 >= len(header) {
+			continue
+		}
+
+		headerEntry := header[i+1]
+		if isUndefinedMarker(value) {
+			continue
+		}
+
+		if nestedHeader, ok := headerEntry.([]any); ok {
+			nestedRow, ok := value.([]any)
+			if !ok || len(nestedHeader) == 0 {
+				continue
+			}
+			nestedMap, err := unpackRow(nestedRow, BinaryPackHeader(nestedHeader))
 			if err != nil {
 				return nil, err
 			}
-			unpacked = append(unpacked, unpackedMap)
+			finalMap[nestedHeader[0]] = nestedMap
+		} else {
+			finalMap[headerEntry] = value
 		}
+	}
+	return finalMap, nil
+}
 
-		return unpacked, nil
+func isPackedMarker(value any) bool {
+	switch value.(type) {
+	case *packedListExt, packedListExt:
+		return true
 	default:
-		result := make([]any, len(lst))
-		for i, item := range lst {
-			unpacked, err := Unpack(item)
-			if err != nil {
-				return nil, err
-			}
-			result[i] = unpacked
-		}
-		return result, nil
+		return false
+	}
+}
+
+func isUndefinedMarker(value any) bool {
+	switch value.(type) {
+	case *undefinedExt, undefinedExt:
+		return true
+	default:
+		return false
 	}
 }

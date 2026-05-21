@@ -14,15 +14,51 @@
 //|  limitations under the License.
 //|
 
+export type BinaryPackHeader = Array<number | null | BinaryPackHeader>;
+export type BinaryPackSiteData = [string[], BinaryPackHeader];
+
+function cloneBinaryPackHeader(header: BinaryPackHeader): BinaryPackHeader {
+    return header.map((entry) => Array.isArray(entry)
+        ? cloneBinaryPackHeader(entry)
+        : entry) as BinaryPackHeader;
+}
+
+function cloneBinaryPackSiteData(site: BinaryPackSiteData): BinaryPackSiteData {
+    return [[...site[0]], cloneBinaryPackHeader(site[1])];
+}
+
+export class BinaryPackSite {
+    public readonly path: string[];
+    public readonly encodedPath: number[];
+    public readonly header: BinaryPackHeader;
+
+    constructor(site: BinaryPackSiteData, binaryEncodingMap: Map<string, number>) {
+        this.path = [...site[0]];
+        this.encodedPath = this.path.map((segment) => {
+            const encodedSegment = binaryEncodingMap.get(segment);
+            if (encodedSegment === undefined) {
+                throw new Error(`Missing binary encoding for packed path segment ${segment}`);
+            }
+            return encodedSegment;
+        });
+        this.header = cloneBinaryPackHeader(site[1]);
+    }
+
+    toData(): BinaryPackSiteData {
+        return [[...this.path], cloneBinaryPackHeader(this.header)];
+    }
+}
+
 export class BinaryEncoding {
     public readonly encodeMap: Map<string, number>;
     public readonly decodeTable: string[];
     public readonly checksum: number;
+    public readonly packedSites: BinaryPackSite[];
 
-    constructor(binaryEncodingMap: Map<string, number>, checksum: number) {
-        this.encodeMap = binaryEncodingMap;
-        const decodeTable = new Array<string | undefined>(binaryEncodingMap.size);
-        for (const [key, value] of binaryEncodingMap.entries()) {
+    constructor(binaryEncodingMap: Map<string, number>, checksum: number, packedSites: BinaryPackSiteData[] = []) {
+        this.encodeMap = new Map(binaryEncodingMap);
+        const decodeTable = new Array<string | undefined>(this.encodeMap.size);
+        for (const [key, value] of this.encodeMap.entries()) {
             if (value < 0 || value >= decodeTable.length) {
                 throw new Error('Binary encoding ids must be dense sequential integers');
             }
@@ -36,5 +72,10 @@ export class BinaryEncoding {
         }
         this.decodeTable = decodeTable as string[];
         this.checksum = checksum;
+        this.packedSites = packedSites.map((site) => new BinaryPackSite(site, this.encodeMap));
+    }
+
+    toPackedSiteData(): BinaryPackSiteData[] {
+        return this.packedSites.map((site) => site.toData());
     }
 }

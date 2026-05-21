@@ -14,14 +14,14 @@
 #|  limitations under the License.
 #|
 
-from typing import List, Dict, Tuple, Set, Union
 from typing import TYPE_CHECKING
 
-from ...internal.binary.BinaryEncoding import BinaryEncoding
+from ...internal.binary.BinaryEncoding import BinaryEncoding, BinaryPackHeader, BinaryPackSiteData
 from ...internal.binary.CreateChecksum import create_checksum
 
 if TYPE_CHECKING:
     from ...TelepactSchema import TelepactSchema
+    from ..types.TFieldDeclaration import TFieldDeclaration
     from ..types.TTypeDeclaration import TTypeDeclaration
 
 
@@ -37,34 +37,179 @@ def trace_type(type_declaration: 'TTypeDeclaration', visited_type_names: set[str
     this_all_keys: list[str] = []
 
     if isinstance(type_declaration.type, TArray):
-        these_keys2 = trace_type(type_declaration.type_parameters[0], visited_type_names)
-        this_all_keys.extend(these_keys2)
+        child_type = type_declaration.type_parameters[0]
+        this_all_keys.extend(trace_type(child_type, visited_type_names))
     elif isinstance(type_declaration.type, TObject):
-        these_keys2 = trace_type(type_declaration.type_parameters[0], visited_type_names)
-        this_all_keys.extend(these_keys2)
+        child_type = type_declaration.type_parameters[0]
+        this_all_keys.extend(trace_type(child_type, visited_type_names))
     elif isinstance(type_declaration.type, TStruct):
         if type_declaration.type.name in visited_type_names:
             return this_all_keys
+        visited_type_names = set(visited_type_names)
         visited_type_names.add(type_declaration.type.name)
-        struct_fields = type_declaration.type.fields
-        for struct_field_key, struct_field in struct_fields.items():
+        for struct_field_key, struct_field in type_declaration.type.fields.items():
             this_all_keys.append(struct_field_key)
-            more_keys = trace_type(struct_field.type_declaration, visited_type_names)
-            this_all_keys.extend(more_keys)
+            this_all_keys.extend(trace_type(struct_field.type_declaration, visited_type_names))
     elif isinstance(type_declaration.type, TUnion):
         if type_declaration.type.name in visited_type_names:
             return this_all_keys
+        visited_type_names = set(visited_type_names)
         visited_type_names.add(type_declaration.type.name)
-        union_tags = type_declaration.type.tags
-        for tag_key, tag_value in union_tags.items():
+        for tag_key, tag_value in type_declaration.type.tags.items():
             this_all_keys.append(tag_key)
-            struct_fields = tag_value.fields
-            for struct_field_key, struct_field in struct_fields.items():
+            for struct_field_key, struct_field in tag_value.fields.items():
                 this_all_keys.append(struct_field_key)
-                more_keys = trace_type(struct_field.type_declaration, visited_type_names)
-                this_all_keys.extend(more_keys)
+                this_all_keys.extend(trace_type(struct_field.type_declaration, visited_type_names))
 
     return this_all_keys
+
+
+def is_deterministic_packed_struct(type_declaration: 'TTypeDeclaration', visiting_type_names: set[str]) -> bool:
+    from ..types.TArray import TArray
+    from ..types.TObject import TObject
+    from ..types.TStruct import TStruct
+    from ..types.TUnion import TUnion
+
+    if isinstance(type_declaration.type, TArray):
+        child_type = type_declaration.type_parameters[0]
+        return not isinstance(child_type.type, (TStruct, TUnion))
+
+    if isinstance(type_declaration.type, TObject):
+        return True
+
+    if isinstance(type_declaration.type, TStruct):
+        if type_declaration.type.name in visiting_type_names:
+            return False
+        next_visiting = set(visiting_type_names)
+        next_visiting.add(type_declaration.type.name)
+        return all(
+            is_deterministic_packed_struct(field.type_declaration, next_visiting)
+            for field in type_declaration.type.fields.values()
+        )
+
+    if isinstance(type_declaration.type, TUnion):
+        if type_declaration.type.name in visiting_type_names:
+            return False
+        next_visiting = set(visiting_type_names)
+        next_visiting.add(type_declaration.type.name)
+        return all(
+            is_deterministic_packed_struct(field.type_declaration, next_visiting)
+            for tag_value in type_declaration.type.tags.values()
+            for field in tag_value.fields.values()
+        )
+
+    return True
+
+
+def get_encoded_key(binary_encoding: dict[str, int], key: str) -> int:
+    return binary_encoding[key]
+
+
+def build_nested_header(key: str, type_declaration: 'TTypeDeclaration', binary_encoding: dict[str, int]) -> int | BinaryPackHeader:
+    from ..types.TStruct import TStruct
+    from ..types.TUnion import TUnion
+
+    encoded_key = get_encoded_key(binary_encoding, key)
+
+    if isinstance(type_declaration.type, TStruct):
+        header: BinaryPackHeader = [encoded_key]
+        for field_key, field in type_declaration.type.fields.items():
+            header.append(build_nested_header(field_key, field.type_declaration, binary_encoding))
+        return header
+
+    if isinstance(type_declaration.type, TUnion):
+        header = [encoded_key]
+        for tag_key, tag_value in type_declaration.type.tags.items():
+            tag_header: BinaryPackHeader = [get_encoded_key(binary_encoding, tag_key)]
+            for field_key, field in tag_value.fields.items():
+                tag_header.append(build_nested_header(field_key, field.type_declaration, binary_encoding))
+            header.append(tag_header)
+        return header
+
+    return encoded_key
+
+
+def build_pack_header(struct_type: object, binary_encoding: dict[str, int]) -> BinaryPackHeader:
+    header: BinaryPackHeader = [None]
+    for field_key, field in struct_type.fields.items():
+        header.append(build_nested_header(field_key, field.type_declaration, binary_encoding))
+    return header
+
+
+def collect_packed_sites(
+    path: list[str],
+    type_declaration: 'TTypeDeclaration',
+    binary_encoding: dict[str, int],
+    packed_sites: list[BinaryPackSiteData],
+    visited_type_names: set[str] | None = None,
+) -> None:
+    from ..types.TArray import TArray
+    from ..types.TObject import TObject
+    from ..types.TStruct import TStruct
+    from ..types.TUnion import TUnion
+
+    if visited_type_names is None:
+        visited_type_names = set()
+
+    if isinstance(type_declaration.type, TArray):
+        child_type = type_declaration.type_parameters[0]
+        if isinstance(child_type.type, TStruct) and is_deterministic_packed_struct(child_type, set()):
+            packed_sites.append((list(path), build_pack_header(child_type.type, binary_encoding)))
+        return
+
+    if isinstance(type_declaration.type, TObject):
+        return
+
+    if isinstance(type_declaration.type, TStruct):
+        if type_declaration.type.name in visited_type_names:
+            return
+        next_visited = set(visited_type_names)
+        next_visited.add(type_declaration.type.name)
+        for field_key, field in type_declaration.type.fields.items():
+            collect_packed_sites(path + [field_key], field.type_declaration, binary_encoding, packed_sites, next_visited)
+        return
+
+    if isinstance(type_declaration.type, TUnion):
+        if type_declaration.type.name in visited_type_names:
+            return
+        next_visited = set(visited_type_names)
+        next_visited.add(type_declaration.type.name)
+        for tag_key, tag_value in type_declaration.type.tags.items():
+            for field_key, field in tag_value.fields.items():
+                collect_packed_sites(path + [tag_key, field_key], field.type_declaration, binary_encoding, packed_sites, next_visited)
+
+
+def add_root_packed_sites(
+    root_path: list[str],
+    fields: dict[str, 'TFieldDeclaration'],
+    binary_encoding: dict[str, int],
+    packed_sites: list[BinaryPackSiteData],
+) -> None:
+    for field_key, field in fields.items():
+        collect_packed_sites(root_path + [field_key], field.type_declaration, binary_encoding, packed_sites)
+
+
+def dedupe_packed_sites(packed_sites: list[BinaryPackSiteData]) -> list[BinaryPackSiteData]:
+    deduped: list[BinaryPackSiteData] = []
+    paths_by_key: dict[tuple[str, ...], int | None] = {}
+
+    for site in packed_sites:
+        path_key = tuple(site[0])
+        existing_index = paths_by_key.get(path_key)
+        if existing_index is None and path_key in paths_by_key:
+            continue
+        if existing_index is None:
+            paths_by_key[path_key] = len(deduped)
+            deduped.append(site)
+            continue
+        if deduped[existing_index][1] != site[1]:
+            deduped.pop(existing_index)
+            paths_by_key[path_key] = None
+            for other_path_key, other_index in list(paths_by_key.items()):
+                if isinstance(other_index, int) and other_index > existing_index:
+                    paths_by_key[other_path_key] = other_index - 1
+
+    return deduped
 
 
 def construct_binary_encoding(telepact_schema: 'TelepactSchema') -> 'BinaryEncoding':
@@ -73,28 +218,37 @@ def construct_binary_encoding(telepact_schema: 'TelepactSchema') -> 'BinaryEncod
     all_keys: set[str] = set()
 
     for key, value in telepact_schema.parsed.items():
-
         if key.endswith('.->') and isinstance(value, TUnion):
-            result = value.tags['Ok_']
+            result = value.tags.get('Ok_')
+            if result is None:
+                continue
             all_keys.add('Ok_')
             for field_key, field in result.fields.items():
                 all_keys.add(field_key)
-                keys = trace_type(field.type_declaration)
-                for key in keys:
-                    all_keys.add(key)
-
+                all_keys.update(trace_type(field.type_declaration))
         elif key.startswith('fn.') and isinstance(value, TUnion):
             all_keys.add(key)
-            args = value.tags[key]
+            args = value.tags.get(key)
+            if args is None:
+                continue
             for field_key, field in args.fields.items():
                 all_keys.add(field_key)
-                keys = trace_type(field.type_declaration)
-                for key in keys:
-                    all_keys.add(key)
+                all_keys.update(trace_type(field.type_declaration))
 
     sorted_all_keys = sorted(all_keys)
-
     binary_encoding = {key: i for i, key in enumerate(sorted_all_keys)}
+
+    packed_sites: list[BinaryPackSiteData] = []
+    for key, value in telepact_schema.parsed.items():
+        if key.endswith('.->') and isinstance(value, TUnion):
+            result = value.tags.get('Ok_')
+            if result is not None:
+                add_root_packed_sites(['Ok_'], result.fields, binary_encoding, packed_sites)
+        elif key.startswith('fn.') and isinstance(value, TUnion):
+            args = value.tags.get(key)
+            if args is not None:
+                add_root_packed_sites([key], args.fields, binary_encoding, packed_sites)
+
     final_string = "\n".join(sorted_all_keys)
     checksum = create_checksum(final_string)
-    return BinaryEncoding(binary_encoding, checksum)
+    return BinaryEncoding(binary_encoding, checksum, dedupe_packed_sites(packed_sites))

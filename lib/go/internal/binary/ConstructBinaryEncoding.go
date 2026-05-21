@@ -64,20 +64,40 @@ func ConstructBinaryEncoding(parsed map[string]types.TType) (*BinaryEncoding, er
 		encodingMap[key] = index
 	}
 
+	packedSites := make([]BinaryPackSiteData, 0)
+	for key, value := range parsed {
+		unionType, ok := value.(*types.TUnion)
+		if !ok {
+			continue
+		}
+
+		if strings.HasSuffix(key, ".->") {
+			resultStruct, ok := unionType.Tags["Ok_"]
+			if ok {
+				addRootPackedSites([]string{"Ok_"}, resultStruct.Fields, encodingMap, &packedSites)
+			}
+		} else if strings.HasPrefix(key, "fn.") {
+			argsStruct, ok := unionType.Tags[key]
+			if ok {
+				addRootPackedSites([]string{key}, argsStruct.Fields, encodingMap, &packedSites)
+			}
+		}
+	}
+
 	checksum := CreateChecksum(strings.Join(sortedKeys, "\n"))
-	return NewBinaryEncoding(encodingMap, checksum), nil
+	return NewBinaryEncoding(encodingMap, checksum, dedupePackedSites(packedSites)), nil
 }
 
 func appendStructKeys(fields map[string]*types.TFieldDeclaration, allKeys map[string]struct{}) {
 	for fieldKey, field := range fields {
 		allKeys[fieldKey] = struct{}{}
-		for _, nestedKey := range traceType(field.TypeDeclaration) {
+		for _, nestedKey := range traceType(field.TypeDeclaration, map[string]struct{}{}) {
 			allKeys[nestedKey] = struct{}{}
 		}
 	}
 }
 
-func traceType(typeDeclaration *types.TTypeDeclaration) []string {
+func traceType(typeDeclaration *types.TTypeDeclaration, visitedTypeNames map[string]struct{}) []string {
 	if typeDeclaration == nil {
 		return nil
 	}
@@ -87,26 +107,245 @@ func traceType(typeDeclaration *types.TTypeDeclaration) []string {
 	switch typed := typeDeclaration.Type.(type) {
 	case *types.TArray:
 		if len(typeDeclaration.TypeParameters) > 0 {
-			keys = append(keys, traceType(typeDeclaration.TypeParameters[0])...)
+			keys = append(keys, traceType(typeDeclaration.TypeParameters[0], visitedTypeNames)...)
 		}
 	case *types.TObject:
 		if len(typeDeclaration.TypeParameters) > 0 {
-			keys = append(keys, traceType(typeDeclaration.TypeParameters[0])...)
+			keys = append(keys, traceType(typeDeclaration.TypeParameters[0], visitedTypeNames)...)
 		}
 	case *types.TStruct:
+		if _, seen := visitedTypeNames[typed.Name]; seen {
+			return keys
+		}
+		nextVisited := copyVisitedTypeNames(visitedTypeNames)
+		nextVisited[typed.Name] = struct{}{}
 		for structFieldKey, structField := range typed.Fields {
 			keys = append(keys, structFieldKey)
-			keys = append(keys, traceType(structField.TypeDeclaration)...)
+			keys = append(keys, traceType(structField.TypeDeclaration, nextVisited)...)
 		}
 	case *types.TUnion:
+		if _, seen := visitedTypeNames[typed.Name]; seen {
+			return keys
+		}
+		nextVisited := copyVisitedTypeNames(visitedTypeNames)
+		nextVisited[typed.Name] = struct{}{}
 		for tagKey, tagStruct := range typed.Tags {
 			keys = append(keys, tagKey)
 			for structFieldKey, structField := range tagStruct.Fields {
 				keys = append(keys, structFieldKey)
-				keys = append(keys, traceType(structField.TypeDeclaration)...)
+				keys = append(keys, traceType(structField.TypeDeclaration, nextVisited)...)
 			}
 		}
 	}
 
+	return keys
+}
+
+func isDeterministicPackedStruct(typeDeclaration *types.TTypeDeclaration, visitingTypeNames map[string]struct{}) bool {
+	if typeDeclaration == nil {
+		return true
+	}
+
+	switch typed := typeDeclaration.Type.(type) {
+	case *types.TArray:
+		if len(typeDeclaration.TypeParameters) == 0 {
+			return true
+		}
+		switch typeDeclaration.TypeParameters[0].Type.(type) {
+		case *types.TStruct, *types.TUnion:
+			return false
+		default:
+			return true
+		}
+	case *types.TObject:
+		return true
+	case *types.TStruct:
+		if _, seen := visitingTypeNames[typed.Name]; seen {
+			return false
+		}
+		nextVisiting := copyVisitedTypeNames(visitingTypeNames)
+		nextVisiting[typed.Name] = struct{}{}
+		for _, field := range typed.Fields {
+			if !isDeterministicPackedStruct(field.TypeDeclaration, nextVisiting) {
+				return false
+			}
+		}
+		return true
+	case *types.TUnion:
+		if _, seen := visitingTypeNames[typed.Name]; seen {
+			return false
+		}
+		nextVisiting := copyVisitedTypeNames(visitingTypeNames)
+		nextVisiting[typed.Name] = struct{}{}
+		for _, tagStruct := range typed.Tags {
+			for _, field := range tagStruct.Fields {
+				if !isDeterministicPackedStruct(field.TypeDeclaration, nextVisiting) {
+					return false
+				}
+			}
+		}
+		return true
+	default:
+		return true
+	}
+}
+
+func buildPackHeader(structType *types.TStruct, encodingMap map[string]int) BinaryPackHeader {
+	header := BinaryPackHeader{nil}
+	for _, fieldKey := range sortedMapKeys(structType.Fields) {
+		field := structType.Fields[fieldKey]
+		header = append(header, buildNestedHeader(fieldKey, field.TypeDeclaration, encodingMap))
+	}
+	return header
+}
+
+func buildNestedHeader(key string, typeDeclaration *types.TTypeDeclaration, encodingMap map[string]int) any {
+	encodedKey := encodingMap[key]
+	if typeDeclaration == nil {
+		return encodedKey
+	}
+
+	switch typed := typeDeclaration.Type.(type) {
+	case *types.TStruct:
+		header := BinaryPackHeader{encodedKey}
+		for _, fieldKey := range sortedMapKeys(typed.Fields) {
+			field := typed.Fields[fieldKey]
+			header = append(header, buildNestedHeader(fieldKey, field.TypeDeclaration, encodingMap))
+		}
+		return header
+	case *types.TUnion:
+		header := BinaryPackHeader{encodedKey}
+		for _, tagKey := range sortedMapKeys(typed.Tags) {
+			tagStruct := typed.Tags[tagKey]
+			tagHeader := BinaryPackHeader{encodingMap[tagKey]}
+			for _, fieldKey := range sortedMapKeys(tagStruct.Fields) {
+				field := tagStruct.Fields[fieldKey]
+				tagHeader = append(tagHeader, buildNestedHeader(fieldKey, field.TypeDeclaration, encodingMap))
+			}
+			header = append(header, tagHeader)
+		}
+		return header
+	default:
+		return encodedKey
+	}
+}
+
+func collectPackedSites(path []string, typeDeclaration *types.TTypeDeclaration, encodingMap map[string]int, packedSites *[]BinaryPackSiteData, visitedTypeNames map[string]struct{}) {
+	if typeDeclaration == nil {
+		return
+	}
+
+	switch typed := typeDeclaration.Type.(type) {
+	case *types.TArray:
+		if len(typeDeclaration.TypeParameters) == 0 {
+			return
+		}
+		if structType, ok := typeDeclaration.TypeParameters[0].Type.(*types.TStruct); ok && isDeterministicPackedStruct(typeDeclaration.TypeParameters[0], map[string]struct{}{}) {
+			*packedSites = append(*packedSites, BinaryPackSiteData{
+				Path:   append([]string{}, path...),
+				Header: buildPackHeader(structType, encodingMap),
+			})
+		}
+	case *types.TObject:
+		return
+	case *types.TStruct:
+		if _, seen := visitedTypeNames[typed.Name]; seen {
+			return
+		}
+		nextVisited := copyVisitedTypeNames(visitedTypeNames)
+		nextVisited[typed.Name] = struct{}{}
+		for _, fieldKey := range sortedMapKeys(typed.Fields) {
+			field := typed.Fields[fieldKey]
+			collectPackedSites(append(path, fieldKey), field.TypeDeclaration, encodingMap, packedSites, nextVisited)
+		}
+	case *types.TUnion:
+		if _, seen := visitedTypeNames[typed.Name]; seen {
+			return
+		}
+		nextVisited := copyVisitedTypeNames(visitedTypeNames)
+		nextVisited[typed.Name] = struct{}{}
+		for _, tagKey := range sortedMapKeys(typed.Tags) {
+			tagStruct := typed.Tags[tagKey]
+			for _, fieldKey := range sortedMapKeys(tagStruct.Fields) {
+				field := tagStruct.Fields[fieldKey]
+				collectPackedSites(append(append(path, tagKey), fieldKey), field.TypeDeclaration, encodingMap, packedSites, nextVisited)
+			}
+		}
+	}
+}
+
+func addRootPackedSites(rootPath []string, fields map[string]*types.TFieldDeclaration, encodingMap map[string]int, packedSites *[]BinaryPackSiteData) {
+	for _, fieldKey := range sortedMapKeys(fields) {
+		field := fields[fieldKey]
+		collectPackedSites(append(rootPath, fieldKey), field.TypeDeclaration, encodingMap, packedSites, map[string]struct{}{})
+	}
+}
+
+func dedupePackedSites(packedSites []BinaryPackSiteData) []BinaryPackSiteData {
+	deduped := make([]BinaryPackSiteData, 0, len(packedSites))
+	pathToIndex := make(map[string]*int, len(packedSites))
+
+	for _, site := range packedSites {
+		pathKey := strings.Join(site.Path, "\x00")
+		existingIndexPtr, seen := pathToIndex[pathKey]
+		if seen && existingIndexPtr == nil {
+			continue
+		}
+		if !seen {
+			index := len(deduped)
+			pathToIndex[pathKey] = &index
+			deduped = append(deduped, site)
+			continue
+		}
+		existingIndex := *existingIndexPtr
+		if !headersEqual(deduped[existingIndex].Header, site.Header) {
+			deduped = append(deduped[:existingIndex], deduped[existingIndex+1:]...)
+			pathToIndex[pathKey] = nil
+			for otherPathKey, otherIndexPtr := range pathToIndex {
+				if otherIndexPtr != nil && *otherIndexPtr > existingIndex {
+					updated := *otherIndexPtr - 1
+					pathToIndex[otherPathKey] = &updated
+				}
+			}
+		}
+	}
+
+	return deduped
+}
+
+func headersEqual(left BinaryPackHeader, right BinaryPackHeader) bool {
+	if len(left) != len(right) {
+		return false
+	}
+	for index := range left {
+		leftNested, leftIsNested := left[index].([]any)
+		rightNested, rightIsNested := right[index].([]any)
+		if leftIsNested || rightIsNested {
+			if !leftIsNested || !rightIsNested || !headersEqual(BinaryPackHeader(leftNested), BinaryPackHeader(rightNested)) {
+				return false
+			}
+			continue
+		}
+		if left[index] != right[index] {
+			return false
+		}
+	}
+	return true
+}
+
+func copyVisitedTypeNames(input map[string]struct{}) map[string]struct{} {
+	result := make(map[string]struct{}, len(input))
+	for key := range input {
+		result[key] = struct{}{}
+	}
+	return result
+}
+
+func sortedMapKeys[T any](input map[string]T) []string {
+	keys := make([]string, 0, len(input))
+	for key := range input {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
 	return keys
 }

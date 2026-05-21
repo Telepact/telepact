@@ -51,7 +51,7 @@ export function clientBinaryEncode(
 
     let finalEncodedMessageBody: Map<any, any>;
     if (headers["@pac_"] === true) {
-        finalEncodedMessageBody = packBody(encodedMessageBody);
+        finalEncodedMessageBody = packBody(encodedMessageBody, binaryEncoding);
     } else {
         finalEncodedMessageBody = encodedMessageBody;
     }

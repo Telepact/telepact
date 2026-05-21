@@ -14,29 +14,42 @@
 //|  limitations under the License.
 //|
 
+import { BinaryPackHeader } from './BinaryEncoding.js';
 import { MsgpackPacked } from './PackList.js';
-import { unpack } from './Unpack.js';
-import { unpackMap } from './UnpackMap.js';
+import { MsgpackUndefined } from './PackMap.js';
 
-export function unpackList(list: any[]): any[] {
-    if (list.length === 0) {
+function unpackRow(row: any[], header: BinaryPackHeader): Map<any, any> {
+    const finalMap = new Map<any, any>();
+
+    for (let index = 0; index < row.length; index += 1) {
+        const headerEntry = header[index + 1];
+        const value = row[index];
+
+        if (headerEntry === undefined || value instanceof MsgpackUndefined) {
+            continue;
+        }
+
+        if (Array.isArray(headerEntry)) {
+            if (Array.isArray(value)) {
+                finalMap.set(headerEntry[0], unpackRow(value, headerEntry));
+            }
+        } else {
+            finalMap.set(headerEntry, value);
+        }
+    }
+
+    return finalMap;
+}
+
+export function unpackList(list: any[], header?: BinaryPackHeader): any[] {
+    if (list.length === 0 || header === undefined || !(list[0] instanceof MsgpackPacked)) {
         return list;
     }
 
-    if (!(list[0] instanceof MsgpackPacked)) {
-        const newList = new Array(list.length);
-        for (let index = 0; index < list.length; index += 1) {
-            newList[index] = unpack(list[index]);
-        }
-        return newList;
-    }
-
-    const unpackedList = new Array(list.length - 2);
-    const headers: any[] = list[1];
-
-    for (let i = 2; i < list.length; i += 1) {
-        const row: any[] = list[i];
-        unpackedList[i - 2] = unpackMap(row, headers);
+    const unpackedList = new Array(list.length - 1);
+    for (let index = 1; index < list.length; index += 1) {
+        const row = list[index];
+        unpackedList[index - 1] = Array.isArray(row) ? unpackRow(row, header) : row;
     }
 
     return unpackedList;

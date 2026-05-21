@@ -16,11 +16,7 @@
 
 package binary
 
-import (
-	"errors"
-
-	"github.com/vmihailenco/msgpack/v5"
-)
+import "github.com/vmihailenco/msgpack/v5"
 
 const (
 	// PackedByte is the msgpack extension type used to denote a packed list header.
@@ -59,48 +55,87 @@ func init() {
 	msgpack.RegisterExt(int8(UndefinedByte), (*undefinedExt)(nil))
 }
 
-// PackList attempts to pack a list of maps into the compact representation used by the Telepact binary encoder.
-func PackList(lst []any) ([]any, error) {
-	if len(lst) == 0 {
+// PackList packs a list of maps using a precomputed header.
+func PackList(lst []any, headers ...BinaryPackHeader) ([]any, error) {
+	if len(lst) == 0 || len(headers) == 0 {
 		return lst, nil
 	}
 
-	header := []any{nil}
-	packedList := []any{packedListMarker, header}
-	keyIndexMap := make(map[int]*BinaryPackNode)
-
+	header := headers[0]
+	packedList := []any{packedListMarker}
 	for _, item := range lst {
 		mapValue, ok := toIntKeyMap(item)
 		if !ok {
-			return fallbackPackList(lst)
+			return lst, nil
 		}
 
-		row, err := PackMap(mapValue, &header, keyIndexMap)
+		row, ok, err := packRow(mapValue, header)
 		if err != nil {
-			var cannotPack CannotPack
-			if errors.As(err, &cannotPack) {
-				return fallbackPackList(lst)
-			}
 			return nil, err
 		}
-
+		if !ok {
+			return lst, nil
+		}
 		packedList = append(packedList, row)
 	}
 
-	packedList[1] = header
 	return packedList, nil
 }
 
-func fallbackPackList(lst []any) ([]any, error) {
-	result := make([]any, len(lst))
-	for i, item := range lst {
-		packed, err := Pack(item)
-		if err != nil {
-			return nil, err
+func packRow(m map[int]any, header BinaryPackHeader) ([]any, bool, error) {
+	row := make([]any, len(header)-1)
+	expectedKeys := make(map[int]struct{}, len(header)-1)
+	for i := 1; i < len(header); i++ {
+		headerEntry := header[i]
+		keyAny := headerEntry
+		if nestedHeader, ok := headerEntry.([]any); ok && len(nestedHeader) > 0 {
+			keyAny = nestedHeader[0]
 		}
-		result[i] = packed
+		key, ok := toInt(keyAny)
+		if !ok {
+			return nil, false, nil
+		}
+		expectedKeys[key] = struct{}{}
+
+		value, ok := m[key]
+		if !ok {
+			row[i-1] = undefinedMarker
+			continue
+		}
+
+		if nestedHeader, ok := headerEntry.([]any); ok {
+			nestedMap, ok := toIntKeyMap(value)
+			if !ok {
+				return nil, false, nil
+			}
+			packedValue, nestedOk, err := packRow(nestedMap, BinaryPackHeader(nestedHeader))
+			if err != nil {
+				return nil, false, err
+			}
+			if !nestedOk {
+				return nil, false, nil
+			}
+			row[i-1] = packedValue
+		} else {
+			row[i-1] = value
+		}
 	}
-	return result, nil
+
+	for key := range m {
+		if _, ok := expectedKeys[key]; !ok {
+			return nil, false, nil
+		}
+	}
+
+	for len(row) > 0 {
+		if _, ok := row[len(row)-1].(*undefinedExt); ok {
+			row = row[:len(row)-1]
+			continue
+		}
+		break
+	}
+
+	return row, true, nil
 }
 
 func toIntKeyMap(value any) (map[int]any, bool) {

@@ -14,7 +14,9 @@
 #|  limitations under the License.
 #|
 
-from typing import cast, TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
+
+from .BinaryEncoding import BinaryPackSiteData
 
 if TYPE_CHECKING:
     from .ClientBinaryStrategy import ClientBinaryStrategy
@@ -32,21 +34,21 @@ def client_binary_decode(message: list[object], binary_encoding_cache: 'BinaryEn
     binary_checksums = cast(list[int], headers.get("@bin_", []))
     binary_checksum = binary_checksums[0]
 
-    # If there is a binary encoding included on this message, cache it
     if "@enc_" in headers:
         binary_encoding = cast(dict[str, int], headers["@enc_"])
-        binary_encoding_cache.add(binary_checksum, binary_encoding)
+        packed_sites = cast(list[BinaryPackSiteData], headers.get("@pck_", []))
+        binary_encoding_cache.add(binary_checksum, binary_encoding, packed_sites)
 
     binary_checksum_strategy.update_checksum(binary_checksum)
     new_current_checksum_strategy = binary_checksum_strategy.get_current_checksums()
 
     binary_encoder = binary_encoding_cache.get(new_current_checksum_strategy[0])
 
-    final_encoded_message_body: dict[object, object]
-    if headers.get("@pac_") is True:
-        final_encoded_message_body = unpack_body(encoded_message_body)
-    else:
-        final_encoded_message_body = encoded_message_body
+    final_encoded_message_body = (
+        unpack_body(encoded_message_body, binary_encoder)
+        if headers.get("@pac_") is True
+        else encoded_message_body
+    )
 
     message_body = decode_body(final_encoded_message_body, binary_encoder)
     return [headers, message_body]
