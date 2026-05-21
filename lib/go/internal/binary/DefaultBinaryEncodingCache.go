@@ -32,7 +32,7 @@ func NewDefaultBinaryEncodingCache() *DefaultBinaryEncodingCache {
 }
 
 // Add registers a BinaryEncoding for the provided checksum.
-func (c *DefaultBinaryEncodingCache) Add(checksum int, binaryEncodingMap map[string]int) {
+func (c *DefaultBinaryEncodingCache) Add(checksum int, binaryEncodingMap map[string]int, packSites []any) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
@@ -40,7 +40,7 @@ func (c *DefaultBinaryEncodingCache) Add(checksum int, binaryEncodingMap map[str
 		c.cache = make(map[int]*BinaryEncoding)
 	}
 
-	encoding := NewBinaryEncoding(binaryEncodingMap, checksum)
+	encoding := NewBinaryEncoding(binaryEncodingMap, checksum, packSites)
 	c.cache[checksum] = encoding
 }
 

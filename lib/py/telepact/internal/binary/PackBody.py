@@ -26,9 +26,11 @@ _MISSING = object()
 
 def _pack_row(value: dict[object, object], header: list[object]) -> list[object] | None:
     row: list[object] = [UNDEFINED_EXT] * (len(header) - 1)
+    allowed_keys: set[object] = set()
     for index, header_entry in enumerate(header[1:]):
         if isinstance(header_entry, list):
             nested_key = header_entry[0]
+            allowed_keys.add(nested_key)
             nested_value = value.get(nested_key, _MISSING)
             if nested_value is _MISSING:
                 continue
@@ -42,10 +44,14 @@ def _pack_row(value: dict[object, object], header: list[object]) -> list[object]
                 return None
             row[index] = packed_nested_value
             continue
+        allowed_keys.add(header_entry)
         header_value = value.get(header_entry, _MISSING)
         if header_value is _MISSING:
             continue
         row[index] = header_value
+    for key in value.keys():
+        if key not in allowed_keys:
+            return None
     return row
 
 

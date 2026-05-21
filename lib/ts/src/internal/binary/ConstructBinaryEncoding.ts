@@ -21,6 +21,7 @@ import { TUnion } from '../types/TUnion.js';
 import { TStruct } from '../types/TStruct.js';
 import { TArray } from '../types/TArray.js';
 import { TObject } from '../types/TObject.js';
+import { TAny } from '../types/TAny.js';
 import { TTypeDeclaration } from '../types/TTypeDeclaration.js';
 
 function traceType(typeDeclaration: TTypeDeclaration): string[] {
@@ -29,6 +30,8 @@ function traceType(typeDeclaration: TTypeDeclaration): string[] {
     if (typeDeclaration.type instanceof TArray) {
         const theseKeys2 = traceType(typeDeclaration.typeParameters[0]);
         thisAllKeys.push(...theseKeys2);
+    } else if (typeDeclaration.type instanceof TAny) {
+        return thisAllKeys;
     } else if (typeDeclaration.type instanceof TObject) {
         const theseKeys2 = traceType(typeDeclaration.typeParameters[0]);
         thisAllKeys.push(...theseKeys2);
@@ -55,8 +58,68 @@ function traceType(typeDeclaration: TTypeDeclaration): string[] {
     return thisAllKeys;
 }
 
+function buildPackHeader(typeDeclaration: TTypeDeclaration, rootKey: string | null = null): any[] {
+    const header: any[] = [rootKey];
+    if (!(typeDeclaration.type instanceof TStruct)) {
+        return header;
+    }
+    for (const [fieldKey, field] of Object.entries(typeDeclaration.type.fields)) {
+        if (field.typeDeclaration.type instanceof TStruct) {
+            header.push(buildPackHeader(field.typeDeclaration, fieldKey));
+        } else {
+            header.push(fieldKey);
+        }
+    }
+    return header;
+}
+
+function collectPackSites(
+    typeDeclaration: TTypeDeclaration,
+    path: string[],
+    packSites: any[][],
+    activeTypeNames: Set<string> = new Set(),
+    underGenericList = false,
+): void {
+    if (typeDeclaration.type instanceof TArray) {
+        const itemType = typeDeclaration.typeParameters[0];
+        if (!underGenericList && itemType.type instanceof TStruct) {
+            packSites.push([[...path], buildPackHeader(itemType)]);
+            return;
+        }
+        collectPackSites(itemType, path, packSites, activeTypeNames, true);
+        return;
+    }
+    if (typeDeclaration.type instanceof TAny || typeDeclaration.type instanceof TObject) {
+        return;
+    }
+    if (typeDeclaration.type instanceof TStruct) {
+        if (activeTypeNames.has(typeDeclaration.type.name)) {
+            return;
+        }
+        const nextActive = new Set(activeTypeNames);
+        nextActive.add(typeDeclaration.type.name);
+        for (const [fieldKey, field] of Object.entries(typeDeclaration.type.fields)) {
+            collectPackSites(field.typeDeclaration, [...path, fieldKey], packSites, nextActive, underGenericList);
+        }
+        return;
+    }
+    if (typeDeclaration.type instanceof TUnion) {
+        if (activeTypeNames.has(typeDeclaration.type.name)) {
+            return;
+        }
+        const nextActive = new Set(activeTypeNames);
+        nextActive.add(typeDeclaration.type.name);
+        for (const [tagKey, tagValue] of Object.entries(typeDeclaration.type.tags)) {
+            for (const [fieldKey, field] of Object.entries(tagValue.fields)) {
+                collectPackSites(field.typeDeclaration, [...path, tagKey, fieldKey], packSites, nextActive, underGenericList);
+            }
+        }
+    }
+}
+
 export function constructBinaryEncoding(telepactSchema: TelepactSchema): BinaryEncoding {
     const allKeys: Set<string> = new Set();
+    const packSites: any[][] = [];
 
     for (const [key, value] of Object.entries(telepactSchema.parsed)) {
 
@@ -67,6 +130,7 @@ export function constructBinaryEncoding(telepactSchema: TelepactSchema): BinaryE
                 allKeys.add(fieldKey);
                 const keys = traceType(field.typeDeclaration);
                 keys.forEach((key) => allKeys.add(key));
+                collectPackSites(field.typeDeclaration, ['Ok_', fieldKey], packSites);
             });
     
         } else if (key.startsWith('fn.') && value instanceof TUnion) {
@@ -76,6 +140,7 @@ export function constructBinaryEncoding(telepactSchema: TelepactSchema): BinaryE
                 allKeys.add(fieldKey);
                 const keys = traceType(field.typeDeclaration);
                 keys.forEach((key) => allKeys.add(key));
+                collectPackSites(field.typeDeclaration, [key, fieldKey], packSites);
             });
         }
     }
@@ -90,5 +155,5 @@ export function constructBinaryEncoding(telepactSchema: TelepactSchema): BinaryE
     const finalString = sortedAllKeys.join('\n');
     const checksum = createChecksum(finalString);
 
-    return new BinaryEncoding(binaryEncoding, checksum);
+    return new BinaryEncoding(binaryEncoding, checksum, packSites as any);
 }

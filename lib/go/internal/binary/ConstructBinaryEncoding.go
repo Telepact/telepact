@@ -26,6 +26,7 @@ import (
 // ConstructBinaryEncoding builds a BinaryEncoding from the supplied parsed Telepact schema types.
 func ConstructBinaryEncoding(parsed map[string]types.TType) (*BinaryEncoding, error) {
 	allKeys := make(map[string]struct{})
+	packSites := make([]any, 0)
 
 	for key, value := range parsed {
 		unionType, ok := value.(*types.TUnion)
@@ -41,6 +42,9 @@ func ConstructBinaryEncoding(parsed map[string]types.TType) (*BinaryEncoding, er
 
 			allKeys["Ok_"] = struct{}{}
 			appendStructKeys(resultStruct.Fields, allKeys)
+			for fieldKey, field := range resultStruct.Fields {
+				packSites = collectPackSites(field.TypeDeclaration, []string{"Ok_", fieldKey}, packSites, map[string]struct{}{}, false)
+			}
 		} else if strings.HasPrefix(key, "fn.") {
 			allKeys[key] = struct{}{}
 
@@ -50,6 +54,9 @@ func ConstructBinaryEncoding(parsed map[string]types.TType) (*BinaryEncoding, er
 			}
 
 			appendStructKeys(argsStruct.Fields, allKeys)
+			for fieldKey, field := range argsStruct.Fields {
+				packSites = collectPackSites(field.TypeDeclaration, []string{key, fieldKey}, packSites, map[string]struct{}{}, false)
+			}
 		}
 	}
 
@@ -65,7 +72,7 @@ func ConstructBinaryEncoding(parsed map[string]types.TType) (*BinaryEncoding, er
 	}
 
 	checksum := CreateChecksum(strings.Join(sortedKeys, "\n"))
-	return NewBinaryEncoding(encodingMap, checksum), nil
+	return NewBinaryEncoding(encodingMap, checksum, packSites), nil
 }
 
 func appendStructKeys(fields map[string]*types.TFieldDeclaration, allKeys map[string]struct{}) {
@@ -89,6 +96,8 @@ func traceType(typeDeclaration *types.TTypeDeclaration) []string {
 		if len(typeDeclaration.TypeParameters) > 0 {
 			keys = append(keys, traceType(typeDeclaration.TypeParameters[0])...)
 		}
+	case *types.TAny:
+		return keys
 	case *types.TObject:
 		if len(typeDeclaration.TypeParameters) > 0 {
 			keys = append(keys, traceType(typeDeclaration.TypeParameters[0])...)
@@ -109,4 +118,78 @@ func traceType(typeDeclaration *types.TTypeDeclaration) []string {
 	}
 
 	return keys
+}
+
+func buildPackHeader(typeDeclaration *types.TTypeDeclaration, rootKey any) []any {
+	header := []any{rootKey}
+	structType, ok := typeDeclaration.Type.(*types.TStruct)
+	if !ok {
+		return header
+	}
+	for fieldKey, field := range structType.Fields {
+		if _, ok := field.TypeDeclaration.Type.(*types.TStruct); ok {
+			header = append(header, buildPackHeader(field.TypeDeclaration, fieldKey))
+			continue
+		}
+		header = append(header, fieldKey)
+	}
+	return header
+}
+
+func collectPackSites(typeDeclaration *types.TTypeDeclaration, path []string, packSites []any, activeTypeNames map[string]struct{}, underGenericList bool) []any {
+	switch typed := typeDeclaration.Type.(type) {
+	case *types.TArray:
+		if len(typeDeclaration.TypeParameters) == 0 {
+			return packSites
+		}
+		itemType := typeDeclaration.TypeParameters[0]
+		if !underGenericList {
+			if _, ok := itemType.Type.(*types.TStruct); ok {
+				return append(packSites, []any{stringSliceToAny(path), buildPackHeader(itemType, nil)})
+			}
+		}
+		return collectPackSites(itemType, path, packSites, activeTypeNames, true)
+	case *types.TAny, *types.TObject:
+		return packSites
+	case *types.TStruct:
+		if _, seen := activeTypeNames[typed.Name]; seen {
+			return packSites
+		}
+		nextActive := copyStringSet(activeTypeNames)
+		nextActive[typed.Name] = struct{}{}
+		for fieldKey, field := range typed.Fields {
+			packSites = collectPackSites(field.TypeDeclaration, append(append([]string{}, path...), fieldKey), packSites, nextActive, underGenericList)
+		}
+		return packSites
+	case *types.TUnion:
+		if _, seen := activeTypeNames[typed.Name]; seen {
+			return packSites
+		}
+		nextActive := copyStringSet(activeTypeNames)
+		nextActive[typed.Name] = struct{}{}
+		for tagKey, tagStruct := range typed.Tags {
+			for fieldKey, field := range tagStruct.Fields {
+				packSites = collectPackSites(field.TypeDeclaration, append(append([]string{}, path...), tagKey, fieldKey), packSites, nextActive, underGenericList)
+			}
+		}
+		return packSites
+	default:
+		return packSites
+	}
+}
+
+func copyStringSet(src map[string]struct{}) map[string]struct{} {
+	dst := make(map[string]struct{}, len(src))
+	for key := range src {
+		dst[key] = struct{}{}
+	}
+	return dst
+}
+
+func stringSliceToAny(value []string) []any {
+	result := make([]any, len(value))
+	for i, entry := range value {
+		result[i] = entry
+	}
+	return result
 }

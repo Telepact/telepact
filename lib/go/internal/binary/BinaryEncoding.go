@@ -22,10 +22,11 @@ type BinaryEncoding struct {
 	EncodeMap   map[string]int
 	DecodeTable []string
 	Checksum    int
+	PackSites   []any
 }
 
 // NewBinaryEncoding constructs a BinaryEncoding from the provided encoding map and checksum.
-func NewBinaryEncoding(binaryEncodingMap map[string]int, checksum int) *BinaryEncoding {
+func NewBinaryEncoding(binaryEncodingMap map[string]int, checksum int, packSites []any) *BinaryEncoding {
 	encodeMap := make(map[string]int, len(binaryEncodingMap))
 	for key, value := range binaryEncodingMap {
 		encodeMap[key] = value
@@ -53,5 +54,6 @@ func NewBinaryEncoding(binaryEncodingMap map[string]int, checksum int) *BinaryEn
 		EncodeMap:   encodeMap,
 		DecodeTable: decodeTable,
 		Checksum:    checksum,
+		PackSites:   packSites,
 	}
 }

@@ -29,6 +29,7 @@ export class MsgpackPacked {
     }
 }
 const MSGPACK_PACKED_VALUE = new MsgpackPacked();
+export { MSGPACK_PACKED_VALUE };
 const MSGPACK_PACKED_EXT = {
     Class: MsgpackPacked,
     type: PACKED_BYTE,

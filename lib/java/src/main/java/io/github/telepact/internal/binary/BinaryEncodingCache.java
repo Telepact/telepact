@@ -17,6 +17,7 @@
 package io.github.telepact.internal.binary;
 
 import java.util.Map;
+import java.util.List;
 import java.util.Optional;
 
 public interface BinaryEncodingCache {
@@ -26,7 +27,7 @@ public interface BinaryEncodingCache {
      * @param checksum The checksum of the binary encoding.
      * @param binaryEncodingMap The binary encoding map.
      */
-    void add(int checksum, Map<String, Integer> binaryEncodingMap);
+    void add(int checksum, Map<String, Integer> binaryEncodingMap, List<Object> packSites);
 
     /**
      * Get a binary encoding from the cache.

@@ -33,6 +33,7 @@ export function serverBinaryEncode(message: any[], binaryEncoder: BinaryEncoding
 
     if (clientKnownBinaryChecksums === undefined || !clientKnownBinaryChecksums.includes(binaryEncoder.checksum)) {
         headers['@enc_'] = binaryEncoder.encodeMap;
+        headers['@encp_'] = binaryEncoder.packSites;
     }
 
     headers['@bin_'] = [binaryEncoder.checksum];
@@ -40,7 +41,7 @@ export function serverBinaryEncode(message: any[], binaryEncoder: BinaryEncoding
 
     let finalEncodedMessageBody: { [key: string]: any };
     if (headers['@pac_'] === true) {
-        finalEncodedMessageBody = packBody(encodedMessageBody);
+        finalEncodedMessageBody = packBody(encodedMessageBody, binaryEncoder);
     } else {
         finalEncodedMessageBody = encodedMessageBody;
     }

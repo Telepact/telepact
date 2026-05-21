@@ -45,7 +45,11 @@ func ClientBinaryDecode(message []any, cache BinaryEncodingCache, strategy *Clie
 		if castErr != nil {
 			return nil, castErr
 		}
-		cache.Add(binaryChecksum, encodingMap)
+		packSites, castErr := toPackSites(headers["@encp_"])
+		if castErr != nil {
+			return nil, castErr
+		}
+		cache.Add(binaryChecksum, encodingMap, packSites)
 	}
 
 	strategy.UpdateChecksum(binaryChecksum)
@@ -76,6 +80,29 @@ func ClientBinaryDecode(message []any, cache BinaryEncodingCache, strategy *Clie
 	}
 
 	return []any{headers, decodedBody}, nil
+}
+
+func toPackSites(value any) ([]any, error) {
+	if value == nil {
+		return []any{}, nil
+	}
+	rawList, ok := value.([]any)
+	if !ok {
+		return nil, fmt.Errorf("invalid binary pack sites type: %T", value)
+	}
+	return normalizeNestedAny(rawList), nil
+}
+
+func normalizeNestedAny(value []any) []any {
+	result := make([]any, len(value))
+	for i, entry := range value {
+		if nested, ok := entry.([]any); ok {
+			result[i] = normalizeNestedAny(nested)
+		} else {
+			result[i] = entry
+		}
+	}
+	return result
 }
 
 func ensureAnyMap(value any) (map[any]any, error) {

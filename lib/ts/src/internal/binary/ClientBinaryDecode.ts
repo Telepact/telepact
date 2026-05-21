@@ -32,7 +32,8 @@ export function clientBinaryDecode(
 
     if (headers.has("@enc_")) {
         const binaryEncoding = headers.get("@enc_") as Map<string, number>;
-        binaryEncodingCache.add(binaryChecksum, binaryEncoding);
+        const binaryPackSites = (headers.get("@encp_") ?? []) as any[][];
+        binaryEncodingCache.add(binaryChecksum, binaryEncoding, binaryPackSites);
     }
 
     binaryChecksumStrategy.updateChecksum(binaryChecksum);
@@ -42,7 +43,7 @@ export function clientBinaryDecode(
 
     let finalEncodedMessageBody: Map<any, any>;
     if (headers.get("@pac_") === true) {
-        finalEncodedMessageBody = unpackBody(encodedMessageBody);
+        finalEncodedMessageBody = unpackBody(encodedMessageBody, binaryEncoder!);
     } else {
         finalEncodedMessageBody = encodedMessageBody;
     }

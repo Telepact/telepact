@@ -17,14 +17,16 @@
 package io.github.telepact.internal.binary;
 
 import java.util.Map;
+import java.util.List;
 
 public class BinaryEncoding {
 
     public final Map<String, Integer> encodeMap;
     public final String[] decodeTable;
     public final Integer checksum;
+    public final List<Object> packSites;
 
-    public BinaryEncoding(Map<String, Integer> binaryEncodingMap, Integer checksum) {
+    public BinaryEncoding(Map<String, Integer> binaryEncodingMap, Integer checksum, List<Object> packSites) {
         this.encodeMap = binaryEncodingMap;
         this.decodeTable = new String[binaryEncodingMap.size()];
         for (final var entry : binaryEncodingMap.entrySet()) {
@@ -43,5 +45,6 @@ public class BinaryEncoding {
             }
         }
         this.checksum = checksum;
+        this.packSites = packSites;
     }
 }

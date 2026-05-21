@@ -22,10 +22,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeSet;
 
 import io.github.telepact.TelepactSchema;
 import io.github.telepact.internal.types.TArray;
+import io.github.telepact.internal.types.TAny;
 import io.github.telepact.internal.types.TObject;
 import io.github.telepact.internal.types.TStruct;
 import io.github.telepact.internal.types.TTypeDeclaration;
@@ -39,6 +41,8 @@ public class ConstructBinaryEncoding {
         if (typeDeclaration.type instanceof TArray) {
             final var theseKeys2 = traceType(typeDeclaration.typeParameters.get(0));
             thisAllKeys.addAll(theseKeys2);
+        } else if (typeDeclaration.type instanceof TAny) {
+            return thisAllKeys;
         } else if (typeDeclaration.type instanceof TObject) {
             final var theseKeys2 = traceType(typeDeclaration.typeParameters.get(0));
             thisAllKeys.addAll(theseKeys2);
@@ -71,8 +75,82 @@ public class ConstructBinaryEncoding {
         return thisAllKeys;
     }
 
+    private static List<Object> buildPackHeader(TTypeDeclaration typeDeclaration, Object rootKey) {
+        final var header = new ArrayList<Object>();
+        header.add(rootKey);
+        if (!(typeDeclaration.type instanceof TStruct s)) {
+            return header;
+        }
+        final var sortedFieldKeys = new TreeSet<>(s.fields.keySet());
+        for (final var fieldKey : sortedFieldKeys) {
+            final var field = s.fields.get(fieldKey);
+            if (field.typeDeclaration.type instanceof TStruct) {
+                header.add(buildPackHeader(field.typeDeclaration, fieldKey));
+            } else {
+                header.add(fieldKey);
+            }
+        }
+        return header;
+    }
+
+    private static List<Object> collectPackSites(
+            TTypeDeclaration typeDeclaration,
+            List<String> path,
+            List<Object> packSites,
+            Map<String, Boolean> activeTypeNames,
+            boolean underGenericList) {
+        if (typeDeclaration.type instanceof TArray) {
+            if (typeDeclaration.typeParameters.isEmpty()) {
+                return packSites;
+            }
+            final var itemType = typeDeclaration.typeParameters.get(0);
+            if (!underGenericList && itemType.type instanceof TStruct) {
+                packSites.add(List.of(new ArrayList<>(path), buildPackHeader(itemType, null)));
+                return packSites;
+            }
+            return collectPackSites(itemType, path, packSites, activeTypeNames, true);
+        }
+        if (typeDeclaration.type instanceof TAny || typeDeclaration.type instanceof TObject) {
+            return packSites;
+        }
+        if (typeDeclaration.type instanceof TStruct s) {
+            if (activeTypeNames.containsKey(s.name)) {
+                return packSites;
+            }
+            final var nextActive = new HashMap<>(activeTypeNames);
+            nextActive.put(s.name, true);
+            final var sortedFieldKeys = new TreeSet<>(s.fields.keySet());
+            for (final var fieldKey : sortedFieldKeys) {
+                final var nextPath = new ArrayList<>(path);
+                nextPath.add(fieldKey);
+                collectPackSites(s.fields.get(fieldKey).typeDeclaration, nextPath, packSites, nextActive, underGenericList);
+            }
+            return packSites;
+        }
+        if (typeDeclaration.type instanceof TUnion u) {
+            if (activeTypeNames.containsKey(u.name)) {
+                return packSites;
+            }
+            final var nextActive = new HashMap<>(activeTypeNames);
+            nextActive.put(u.name, true);
+            final var sortedTagKeys = new TreeSet<>(u.tags.keySet());
+            for (final var tagKey : sortedTagKeys) {
+                final var tagStruct = u.tags.get(tagKey);
+                final var sortedFieldKeys = new TreeSet<>(tagStruct.fields.keySet());
+                for (final var fieldKey : sortedFieldKeys) {
+                    final var nextPath = new ArrayList<>(path);
+                    nextPath.add(tagKey);
+                    nextPath.add(fieldKey);
+                    collectPackSites(tagStruct.fields.get(fieldKey).typeDeclaration, nextPath, packSites, nextActive, underGenericList);
+                }
+            }
+        }
+        return packSites;
+    }
+
     public static BinaryEncoding constructBinaryEncoding(TelepactSchema telepactSchema) {
         final var allKeys = new TreeSet<String>();
+        final var packSites = new ArrayList<Object>();
 
         for (final var entry : telepactSchema.parsed.entrySet()) {
             final var key = entry.getKey();
@@ -87,6 +165,7 @@ public class ConstructBinaryEncoding {
                     allKeys.add(fieldKey);
                     final var keys = traceType(field.typeDeclaration);
                     keys.forEach(allKeys::add);
+                    collectPackSites(field.typeDeclaration, new ArrayList<>(List.of("Ok_", fieldKey)), packSites, new HashMap<>(), false);
                 }
             } else if (key.startsWith("fn.") && value instanceof TUnion u)  {
                 allKeys.add(key);
@@ -97,6 +176,7 @@ public class ConstructBinaryEncoding {
                     allKeys.add(fieldKey);
                     final var keys = traceType(field.typeDeclaration);
                     keys.forEach(allKeys::add);
+                    collectPackSites(field.typeDeclaration, new ArrayList<>(List.of(key, fieldKey)), packSites, new HashMap<>(), false);
                 }
             }
 
@@ -114,6 +194,6 @@ public class ConstructBinaryEncoding {
         final var finalString = String.join("\n", sortedAllKeys);
         final var checksum = createChecksum(finalString);
 
-        return new BinaryEncoding(binaryEncoding, checksum);
+        return new BinaryEncoding(binaryEncoding, checksum, packSites);
     }
 }

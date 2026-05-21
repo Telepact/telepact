@@ -14,12 +14,30 @@
 //|  limitations under the License.
 //|
 
+export type BinaryPackHeaderEntry = number | null | BinaryPackHeader;
+export type BinaryPackHeader = BinaryPackHeaderEntry[];
+export type BinaryPackSite = [string[], any[]];
+
+function compilePackHeader(header: any[], encodeMap: Map<string, number>): BinaryPackHeader {
+    const compiledHeader: BinaryPackHeader = [header[0] === null ? null : encodeMap.get(header[0])!];
+    for (const entry of header.slice(1)) {
+        if (Array.isArray(entry)) {
+            compiledHeader.push(compilePackHeader(entry, encodeMap));
+        } else {
+            compiledHeader.push(encodeMap.get(entry)!);
+        }
+    }
+    return compiledHeader;
+}
+
 export class BinaryEncoding {
     public readonly encodeMap: Map<string, number>;
     public readonly decodeTable: string[];
     public readonly checksum: number;
+    public readonly packSites: BinaryPackSite[];
+    public readonly encodedPackSites: Array<[number[], BinaryPackHeader]>;
 
-    constructor(binaryEncodingMap: Map<string, number>, checksum: number) {
+    constructor(binaryEncodingMap: Map<string, number>, checksum: number, packSites: BinaryPackSite[] = []) {
         this.encodeMap = binaryEncodingMap;
         const decodeTable = new Array<string | undefined>(binaryEncodingMap.size);
         for (const [key, value] of binaryEncodingMap.entries()) {
@@ -36,5 +54,10 @@ export class BinaryEncoding {
         }
         this.decodeTable = decodeTable as string[];
         this.checksum = checksum;
+        this.packSites = packSites.map(([path, header]) => [[...path], header] as BinaryPackSite);
+        this.encodedPackSites = this.packSites.map(([path, header]) => [
+            path.map((key) => this.encodeMap.get(key)!),
+            compilePackHeader(header, this.encodeMap),
+        ]);
     }
 }

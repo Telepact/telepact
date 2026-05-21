@@ -69,6 +69,7 @@ func ServerBinaryEncode(message []any, binaryEncoding *BinaryEncoding) ([]any, e
 			encodeMapCopy[key] = value
 		}
 		headers["@enc_"] = encodeMapCopy
+		headers["@encp_"] = binaryEncoding.PackSites
 	}
 
 	headers["@bin_"] = []int{binaryEncoding.Checksum}

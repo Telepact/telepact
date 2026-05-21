@@ -61,7 +61,7 @@
     }
   },
   {
-    "///": "The `@bin_` header indicates the valid checksums of binary encodings\nnegotiated between the client and server. If the client sends a `@bin_`\nheader with any value, the server will respond with a `@bin_` header with an\narray containing the currently supported binary encoding checksum. If the\nclient's provided checksum does not match the server's checksum, the server\nwill also send an `@enc_` header containing the binary encoding, which is a\nmap of field names to field ids. The response body may also be encoded in\nbinary.\n\nThe `@pac_` header can also be used to indicate usage of 'packed' binary\nencoding strategy. If the client submits a `@pac_` header with a `true`\nvalue, the server will respond with a `@pac_` header with a `true` value.\n",
+    "///": "The `@bin_` header indicates the valid checksums of binary encodings\nnegotiated between the client and server. If the client sends a `@bin_`\nheader with any value, the server will respond with a `@bin_` header with an\narray containing the currently supported binary encoding checksum. If the\nclient's provided checksum does not match the server's checksum, the server\nwill also send an `@enc_` header containing the binary encoding, which is a\nmap of field names to field ids, along with an `@encp_` header containing\nthe pre-compiled packed-binary sites for that encoding. The response body\nmay also be encoded in binary.\n\nThe `@pac_` header can also be used to indicate usage of 'packed' binary\nencoding strategy. If the client submits a `@pac_` header with a `true`\nvalue, the server will respond with a `@pac_` header with a `true` value.\n",
     "headers.Binary_": {
       "@bin_": [
         "integer"
@@ -75,6 +75,7 @@
       "@enc_": {
         "string": "integer"
       },
+      "@encp_": "any",
       "@pac_": "boolean"
     }
   },

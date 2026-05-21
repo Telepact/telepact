@@ -38,6 +38,7 @@ public class ServerBinaryEncode {
 
         if (clientKnownBinaryChecksums == null || !clientKnownBinaryChecksums.contains(binaryEncoder.checksum)) {
             headers.put("@enc_", binaryEncoder.encodeMap);
+            headers.put("@encp_", binaryEncoder.packSites);
         }
 
         headers.put("@bin_", List.of(binaryEncoder.checksum));
