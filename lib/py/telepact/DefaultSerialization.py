@@ -21,17 +21,41 @@ from .Serialization import Serialization
 from .internal.binary.BinaryEncodedBody import BinaryEncodedBody
 
 
-def _encode_binary_value(value: object, binary_encoding: object) -> object:
-    encode_map = binary_encoding.encode_map
-
+def _pack_msgpack_value(
+    packer: msgpack.Packer,
+    value: object,
+    binary_encoding: object | None = None,
+) -> None:
+    if type(value) is BinaryEncodedBody:
+        _pack_msgpack_value(packer, value.value, value.binary_encoding)
+        return
     if type(value) is dict:
-        return {
-            encode_map.get(key, key): _encode_binary_value(item, binary_encoding)
-            for key, item in value.items()
-        }
+        _pack_binary_map(packer, value, binary_encoding)
+        return
     if type(value) is list:
-        return [_encode_binary_value(item, binary_encoding) for item in value]
-    return value
+        packer.pack_array_header(len(value))
+        for item in value:
+            _pack_msgpack_value(packer, item, binary_encoding)
+        return
+    try:
+        packer.pack(value)
+    except TypeError as e:
+        raise TypeError(
+            f"Cannot serialize object of type {type(value).__name__}"
+        ) from e
+
+
+def _pack_binary_map(
+    packer: msgpack.Packer,
+    value: dict[object, object],
+    binary_encoding: object | None,
+) -> None:
+    encode_map = binary_encoding.encode_map if binary_encoding is not None else {}
+
+    packer.pack_map_header(len(value))
+    for key, item in value.items():
+        packer.pack(encode_map.get(key, key))
+        _pack_msgpack_value(packer, item, binary_encoding)
 
 
 class DefaultSerialization(Serialization):
@@ -40,12 +64,9 @@ class DefaultSerialization(Serialization):
         return json.dumps(telepact_message).encode()
 
     def to_msgpack(self, telepact_message: object) -> bytes:
-        def default(value: object) -> object:
-            if type(value) is BinaryEncodedBody:
-                return _encode_binary_value(value.value, value.binary_encoding)
-            raise TypeError(f"Cannot serialize object of type {type(value).__name__}")
-
-        return msgpack.dumps(telepact_message, default=default)
+        packer = msgpack.Packer(autoreset=False)
+        _pack_msgpack_value(packer, telepact_message)
+        return packer.bytes()
 
     def from_json(self, bytes_: bytes) -> object:
         return json.loads(bytes_)
