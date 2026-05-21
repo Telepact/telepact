@@ -35,7 +35,8 @@ def client_binary_decode(message: list[object], binary_encoding_cache: 'BinaryEn
     # If there is a binary encoding included on this message, cache it
     if "@enc_" in headers:
         binary_encoding = cast(dict[str, int], headers["@enc_"])
-        binary_encoding_cache.add(binary_checksum, binary_encoding)
+        binary_pack_sites = cast(list[list[object]] | None, headers.get("@encp_"))
+        binary_encoding_cache.add(binary_checksum, binary_encoding, binary_pack_sites)
 
     binary_checksum_strategy.update_checksum(binary_checksum)
     new_current_checksum_strategy = binary_checksum_strategy.get_current_checksums()
@@ -44,7 +45,7 @@ def client_binary_decode(message: list[object], binary_encoding_cache: 'BinaryEn
 
     final_encoded_message_body: dict[object, object]
     if headers.get("@pac_") is True:
-        final_encoded_message_body = unpack_body(encoded_message_body)
+        final_encoded_message_body = unpack_body(encoded_message_body, binary_encoder)
     else:
         final_encoded_message_body = encoded_message_body
 
