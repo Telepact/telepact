@@ -18,6 +18,21 @@ import { BinaryEncoding, BinaryPackHeader } from './BinaryEncoding.js';
 import { MsgpackPacked } from './PackList.js';
 import { MsgpackUndefined } from './PackMap.js';
 
+function headersMatch(actual: any, expected: any): boolean {
+    if (Array.isArray(actual) && Array.isArray(expected)) {
+        if (actual.length !== expected.length) {
+            return false;
+        }
+        for (let index = 0; index < actual.length; index += 1) {
+            if (!headersMatch(actual[index], expected[index])) {
+                return false;
+            }
+        }
+        return true;
+    }
+    return actual === expected;
+}
+
 function unpackRow(row: any[], header: BinaryPackHeader): Map<any, any> {
     const unpackedRow = new Map<any, any>();
     for (let index = 1; index < header.length; index += 1) {
@@ -50,7 +65,7 @@ function unpackSite(value: any, header: BinaryPackHeader): any {
     if (!Array.isArray(value) || value.length < 2 || !(value[0] instanceof MsgpackPacked)) {
         return value;
     }
-    if (JSON.stringify(value[1]) !== JSON.stringify(header)) {
+    if (!headersMatch(value[1], header)) {
         return value;
     }
     return value.slice(2).filter(Array.isArray).map((row) => unpackRow(row, header));
