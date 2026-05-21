@@ -15,38 +15,49 @@
 //|
 
 import { BinaryEncodingCache } from "../../internal/binary/BinaryEncodingCache.js";
-import { BinaryEncoding } from "./BinaryEncoding.js";
+import { BinaryEncoding, BinaryPackSiteHeader } from "./BinaryEncoding.js";
+
+type StoredBinaryEncoding = {
+    "@enc_": Record<string, number>;
+    "@encp_": BinaryPackSiteHeader[];
+};
+
+type StoredBinaryEncodingCacheEntry = Record<string, number> | StoredBinaryEncoding;
+
+function isStoredBinaryEncoding(value: StoredBinaryEncodingCacheEntry): value is StoredBinaryEncoding {
+    return Object.prototype.hasOwnProperty.call(value, '@enc_');
+}
 
 export class LocalStorageBackedBinaryEncodingCache extends BinaryEncodingCache {
     private recentBinaryEncoders: Map<number, BinaryEncoding>;
-    private recentBinaryEncodersJson: Record<string, Record<string, number>>;
+    private recentBinaryEncodersJson: Record<string, StoredBinaryEncodingCacheEntry>;
     private namespace: string;
 
     constructor(namespace: string) {
         super();
 
-        this.namespace = 'telepact-api-encoding:' + namespace
+        this.namespace = 'telepact-api-encoding:' + namespace;
 
-        // Load initial state of recentBinaryEncodersJson from local storage
         const storedJson = localStorage.getItem(this.namespace);
 
         console.log(`Binary Encoding loaded from local storage for ${this.namespace}: ${storedJson}`);
 
-        let jsonFromLocalStorage: Record<string, Record<string, number>> = storedJson 
-            ? JSON.parse(storedJson) 
+        const jsonFromLocalStorage = storedJson
+            ? JSON.parse(storedJson) as Record<string, StoredBinaryEncodingCacheEntry>
             : {};
 
         this.recentBinaryEncodersJson = jsonFromLocalStorage;
         this.recentBinaryEncoders = this.mapJsonToObject(jsonFromLocalStorage);
     }
 
-    add(checksum: number, binaryEncodingMap: Map<string, number>): void {
+    add(checksum: number, binaryEncodingMap: Map<string, number>, packSitesHeader: BinaryPackSiteHeader[] = []): void {
         const binaryEncodingJson = Object.fromEntries(binaryEncodingMap);
-        this.recentBinaryEncodersJson[`${checksum}`] = binaryEncodingJson;
+        this.recentBinaryEncodersJson[`${checksum}`] = {
+            '@enc_': binaryEncodingJson,
+            '@encp_': packSitesHeader,
+        };
 
         this.recentBinaryEncoders = this.mapJsonToObject(this.recentBinaryEncodersJson);
-
-        // Save recentBinaryEncodersJson to local storage
         localStorage.setItem(this.namespace, JSON.stringify(this.recentBinaryEncodersJson));
     }
 
@@ -58,8 +69,6 @@ export class LocalStorageBackedBinaryEncodingCache extends BinaryEncodingCache {
         delete this.recentBinaryEncodersJson[checksum];
 
         this.recentBinaryEncoders = this.mapJsonToObject(this.recentBinaryEncodersJson);
-
-        // Save recentBinaryEncodersJson to local storage
         localStorage.setItem(this.namespace, JSON.stringify(this.recentBinaryEncodersJson));
     }
 
@@ -67,14 +76,16 @@ export class LocalStorageBackedBinaryEncodingCache extends BinaryEncodingCache {
         return Array.from(this.recentBinaryEncoders.keys());
     }
 
-    private mapJsonToObject(json: Record<string, Record<string, number>>): Map<number, BinaryEncoding> {
-        let newMap = new Map<number, BinaryEncoding>();
+    private mapJsonToObject(json: Record<string, StoredBinaryEncodingCacheEntry>): Map<number, BinaryEncoding> {
+        const newMap = new Map<number, BinaryEncoding>();
 
-        for (var [k, v] of Object.entries(json)) {
-            let checksum = parseInt(k);
-            let binaryEncodingRecord = v as Record<string, number>;
-            let binaryEncodingMap = new Map(Object.entries(binaryEncodingRecord));
-            let binaryEncoding = new BinaryEncoding(binaryEncodingMap, checksum);
+        for (const [checksumKey, entry] of Object.entries(json)) {
+            const checksum = parseInt(checksumKey, 10);
+            const storedEncoding = isStoredBinaryEncoding(entry)
+                ? entry
+                : { '@enc_': entry, '@encp_': [] };
+            const binaryEncodingMap = new Map<string, number>(Object.entries(storedEncoding['@enc_']));
+            const binaryEncoding = new BinaryEncoding(binaryEncodingMap, checksum, storedEncoding['@encp_'] || []);
             newMap.set(checksum, binaryEncoding);
         }
 

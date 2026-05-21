@@ -16,7 +16,6 @@
 
 import { BinaryEncoding } from '../../internal/binary/BinaryEncoding.js';
 import { encodeBody } from '../../internal/binary/EncodeBody.js';
-import { packBody } from '../../internal/binary/PackBody.js';
 import { BinaryEncoderUnavailableError } from '../../internal/binary/BinaryEncoderUnavailableError.js';
 
 export function serverBinaryEncode(message: any[], binaryEncoder: BinaryEncoding): any[] {
@@ -33,17 +32,10 @@ export function serverBinaryEncode(message: any[], binaryEncoder: BinaryEncoding
 
     if (clientKnownBinaryChecksums === undefined || !clientKnownBinaryChecksums.includes(binaryEncoder.checksum)) {
         headers['@enc_'] = binaryEncoder.encodeMap;
+        headers['@encp_'] = binaryEncoder.packSitesHeader;
     }
 
     headers['@bin_'] = [binaryEncoder.checksum];
-    const encodedMessageBody = encodeBody(messageBody, binaryEncoder);
-
-    let finalEncodedMessageBody: { [key: string]: any };
-    if (headers['@pac_'] === true) {
-        finalEncodedMessageBody = packBody(encodedMessageBody);
-    } else {
-        finalEncodedMessageBody = encodedMessageBody;
-    }
-
-    return [headers, finalEncodedMessageBody];
+    const encodedMessageBody = encodeBody(messageBody, binaryEncoder, headers['@pac_'] === true);
+    return [headers, encodedMessageBody];
 }

@@ -37,14 +37,9 @@ def server_binary_encode(message: list[object], binary_encoder: 'BinaryEncoding'
 
     if client_known_binary_checksums is None or binary_encoder.checksum not in client_known_binary_checksums:
         headers["@enc_"] = binary_encoder.encode_map
+        headers["@encp_"] = binary_encoder.pack_sites_header
 
     headers["@bin_"] = [binary_encoder.checksum]
-    encoded_message_body = encode_body(message_body, binary_encoder)
+    encoded_message_body = encode_body(message_body, binary_encoder, headers.get("@pac_") is True)
 
-    final_encoded_message_body: dict[object, object]
-    if headers.get("@pac_") is True:
-        final_encoded_message_body = pack_body(encoded_message_body)
-    else:
-        final_encoded_message_body = encoded_message_body
-
-    return [headers, final_encoded_message_body]
+    return [headers, encoded_message_body]

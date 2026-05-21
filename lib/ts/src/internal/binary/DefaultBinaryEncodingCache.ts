@@ -15,7 +15,7 @@
 //|
 
 import { BinaryEncodingCache } from "../../internal/binary/BinaryEncodingCache.js";
-import { BinaryEncoding } from "./BinaryEncoding.js";
+import { BinaryEncoding, BinaryPackSiteHeader } from "./BinaryEncoding.js";
 
 export class DefaultBinaryEncodingCache extends BinaryEncodingCache {
     private recentBinaryEncoders: Map<number, BinaryEncoding>;
@@ -25,8 +25,8 @@ export class DefaultBinaryEncodingCache extends BinaryEncodingCache {
         this.recentBinaryEncoders = new Map<number, BinaryEncoding>();
     }
 
-    add(checksum: number, binaryEncodingMap: Map<string, number>): void {
-        const binaryEncoding = new BinaryEncoding(binaryEncodingMap, checksum);
+    add(checksum: number, binaryEncodingMap: Map<string, number>, packSitesHeader: BinaryPackSiteHeader[] = []): void {
+        const binaryEncoding = new BinaryEncoding(binaryEncodingMap, checksum, packSitesHeader);
         this.recentBinaryEncoders.set(checksum, binaryEncoding);
     }
 
