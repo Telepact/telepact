@@ -6,10 +6,52 @@
         }
     },
     {
+        "struct.Contact": {
+            "email": "string",
+            "phone": "string"
+        }
+    },
+    {
+        "struct.NestedData": {
+            "id": "integer",
+            "name": "string",
+            "contact": "struct.Contact"
+        }
+    },
+    {
+        "struct.Message": {
+            "num": "integer",
+            "text": "string"
+        }
+    },
+    {
+        "struct.DeepData": {
+            "id": "integer",
+            "name": "string",
+            "messages": ["struct.Message"]
+        }
+    },
+    {
         "fn.example": {},
         "->": [{
             "Ok_": {
                 "data": ["struct.Data"]
+            }
+        }]
+    },
+    {
+        "fn.exampleNested": {},
+        "->": [{
+            "Ok_": {
+                "nestedData": ["struct.NestedData"]
+            }
+        }]
+    },
+    {
+        "fn.exampleNestedList": {},
+        "->": [{
+            "Ok_": {
+                "deepData": ["struct.DeepData"]
             }
         }]
     }

@@ -22,13 +22,15 @@ from .BinaryEncoding import BinaryEncoding
 class BinaryEncodingCache(metaclass=ABCMeta):
 
     @abstractmethod
-    def add(self, checksum: int, binary_encoding_map: dict[str, int]) -> None:
+    def add(self, checksum: int, binary_encoding_map: dict[str, int],
+            pack_site_tuples: list[list[object]] | None = None) -> None:
         """
         Set a binary encoding in the cache.
 
         Args:
             binary_encoding: The binary encoding.
             checksum: The checksum of the binary encoding.
+            pack_site_tuples: Precompiled packed-binary metadata for this encoding.
         """
         pass
 

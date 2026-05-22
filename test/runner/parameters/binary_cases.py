@@ -19,23 +19,53 @@ from msgpack import ExtType
 _BINARY_ENCODING = {
     'Ok_': 0,
     'api': 1,
-    'data': 2,
-    'fn.api_': 3,
-    'fn.example': 4,
-    'fn.ping_': 5,
-    'id': 6,
-    'includeExamples!': 7,
-    'includeInternal!': 8,
-    'name': 9,
+    'contact': 2,
+    'data': 3,
+    'deepData': 4,
+    'email': 5,
+    'fn.api_': 6,
+    'fn.example': 7,
+    'fn.exampleNested': 8,
+    'fn.exampleNestedList': 9,
+    'fn.ping_': 10,
+    'id': 11,
+    'includeExamples!': 12,
+    'includeInternal!': 13,
+    'messages': 14,
+    'name': 15,
+    'nestedData': 16,
+    'num': 17,
+    'phone': 18,
+    'text': 19,
 }
-_BINARY_CHECKSUM = 1059755324
+_BINARY_CHECKSUM = 1689129573
+
+_OK_ID = _BINARY_ENCODING['Ok_']
+_DATA_ID = _BINARY_ENCODING['data']
+_DEEP_DATA_ID = _BINARY_ENCODING['deepData']
+_FN_EXAMPLE_ID = _BINARY_ENCODING['fn.example']
+_FN_EXAMPLE_NESTED_ID = _BINARY_ENCODING['fn.exampleNested']
+_FN_EXAMPLE_NESTED_LIST_ID = _BINARY_ENCODING['fn.exampleNestedList']
+_FN_PING_ID = _BINARY_ENCODING['fn.ping_']
+_ID_ID = _BINARY_ENCODING['id']
+_NESTED_DATA_ID = _BINARY_ENCODING['nestedData']
+_NUM_ID = _BINARY_ENCODING['num']
+_TEXT_ID = _BINARY_ENCODING['text']
+
+_PACK_SITE_TUPLES = [
+    [['Ok_', 'data'], [None, 'id', 'name']],
+    [['Ok_', 'deepData'], [None, 'id', 'name', 'messages']],
+    [['Ok_', 'nestedData'], [None, 'id', 'name', ['contact', 'email', 'phone']]],
+]
 
 cases = {
     'binary': [
-        [[{'@bin_': []}, {'fn.ping_': {}}], [{'@enc_': _BINARY_ENCODING, '@bin_': [_BINARY_CHECKSUM]}, {0: {}}]],
+        [[{'@bin_': []}, {'fn.ping_': {}}], [{'@enc_': _BINARY_ENCODING, '@encp_': _PACK_SITE_TUPLES, '@bin_': [_BINARY_CHECKSUM]}, {_OK_ID: {}}]],
         [[{'@msgpack': True, '@bin_': [0]}, {0: {}}], [{}, {'ErrorParseFailure_': {'reasons': [{'IncompatibleBinaryEncoding': {}}]}}]],
-        [[{'@msgpack': True, '@bin_': [_BINARY_CHECKSUM]}, {5: {}}], [{'@bin_': [_BINARY_CHECKSUM]}, {0: {}}]],
-        [[{'@msgpack': True, '@bin_': [_BINARY_CHECKSUM], '@pac_': True, '@ok_': {'data': [{'id': 1, 'name': 'one'}, {'id': 2, 'name': 'two'}]}}, {4: {}}], [{'@bin_': [_BINARY_CHECKSUM], '@pac_': True}, {0: {2: [ExtType(17, b''), [None, 6, 9], [1, 'one'], [2, 'two']]}}]],
+        [[{'@msgpack': True, '@bin_': [_BINARY_CHECKSUM]}, {_FN_PING_ID: {}}], [{'@bin_': [_BINARY_CHECKSUM]}, {_OK_ID: {}}]],
+        [[{'@msgpack': True, '@bin_': [_BINARY_CHECKSUM], '@pac_': True, '@ok_': {'data': [{'id': 1, 'name': 'one'}, {'id': 2, 'name': 'two'}]}}, {_FN_EXAMPLE_ID: {}}], [{'@bin_': [_BINARY_CHECKSUM], '@pac_': True}, {_OK_ID: {_DATA_ID: [ExtType(17, b''), [1, 'one'], [2, 'two']]}}]],
+        [[{'@msgpack': True, '@bin_': [_BINARY_CHECKSUM], '@pac_': True, '@ok_': {'nestedData': [{'id': 1, 'name': 'one', 'contact': {'email': 'one@example.com', 'phone': '111-1111'}}, {'id': 2, 'name': 'two', 'contact': {'email': 'two@example.com', 'phone': '222-2222'}}]}}, {_FN_EXAMPLE_NESTED_ID: {}}], [{'@bin_': [_BINARY_CHECKSUM], '@pac_': True}, {_OK_ID: {_NESTED_DATA_ID: [ExtType(17, b''), [1, 'one', ['one@example.com', '111-1111']], [2, 'two', ['two@example.com', '222-2222']]]}}]],
+        [[{'@msgpack': True, '@bin_': [_BINARY_CHECKSUM], '@pac_': True, '@ok_': {'deepData': [{'id': 1, 'name': 'one', 'messages': [{'num': 11, 'text': 'hello'}, {'num': 12, 'text': 'world'}]}, {'id': 2, 'name': 'two', 'messages': [{'num': 21, 'text': 'apple'}, {'num': 22, 'text': 'banana'}]}]}}, {_FN_EXAMPLE_NESTED_LIST_ID: {}}], [{'@bin_': [_BINARY_CHECKSUM], '@pac_': True}, {_OK_ID: {_DEEP_DATA_ID: [ExtType(17, b''), [1, 'one', [{_NUM_ID: 11, _TEXT_ID: 'hello'}, {_NUM_ID: 12, _TEXT_ID: 'world'}]], [2, 'two', [{_NUM_ID: 21, _TEXT_ID: 'apple'}, {_NUM_ID: 22, _TEXT_ID: 'banana'}]]]}}]],
         [[{'@msgpack': True, '@bin_': [_BINARY_CHECKSUM]}, {255: {}}], [{}, {'ErrorParseFailure_': {'reasons': [{'BinaryDecodeFailure': {}}]}}]],
         [[{'@bin_': None}, {'fn.ping_': {}}], [{}, {'ErrorInvalidRequestHeaders_': {'cases': [{'path': ['@bin_'], 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Array': {}}}}}]}}]],
         [[{'@bin_': False}, {'fn.ping_': {}}], [{}, {'ErrorInvalidRequestHeaders_': {'cases': [{'path': ['@bin_'], 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Array': {}}}}}]}}]],

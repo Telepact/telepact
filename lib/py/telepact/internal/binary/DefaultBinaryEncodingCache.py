@@ -26,9 +26,10 @@ class DefaultBinaryEncodingCache(BinaryEncodingCache):
     def __init__(self) -> None:
         self.recent_binary_encoders: dict[int, 'BinaryEncoding'] = {}
 
-    def add(self, checksum: int, binary_encoding_map: dict[str, int]) -> None:
+    def add(self, checksum: int, binary_encoding_map: dict[str, int],
+            pack_site_tuples: list[list[object]] | None = None) -> None:
         from .BinaryEncoding import BinaryEncoding        
-        binary_encoding = BinaryEncoding(binary_encoding_map, checksum)
+        binary_encoding = BinaryEncoding(binary_encoding_map, checksum, pack_site_tuples)
         self.recent_binary_encoders[checksum] = binary_encoding
 
     def get(self, checksum: int) -> 'BinaryEncoding':

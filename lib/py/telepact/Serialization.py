@@ -16,6 +16,9 @@
 
 from abc import ABCMeta, abstractmethod
 
+if False:
+    from .internal.binary.BinaryEncoding import BinaryEncoding
+
 
 class Serialization(metaclass=ABCMeta):
     """
@@ -35,9 +38,23 @@ class Serialization(metaclass=ABCMeta):
         pass
 
     @abstractmethod
+    def to_binary_msgpack(self, headers: dict[str, object], body: dict[str, object],
+                          binary_encoding: 'BinaryEncoding', packed: bool) -> bytes:
+        pass
+
+    @abstractmethod
     def from_json(self, bytes_: bytes) -> object:
         pass
 
     @abstractmethod
     def from_msgpack(self, bytes_: bytes) -> object:
+        pass
+
+    @abstractmethod
+    def split_msgpack_message(self, bytes_: bytes) -> tuple[object, bytes]:
+        pass
+
+    @abstractmethod
+    def from_binary_msgpack_body(self, bytes_: bytes, binary_encoding: 'BinaryEncoding',
+                                 packed: bool) -> dict[str, object]:
         pass

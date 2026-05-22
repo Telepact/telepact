@@ -15,14 +15,38 @@
 #|
 
 from abc import ABCMeta, abstractmethod
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from ...Serialization import Serialization
+    from .BinaryEncoding import BinaryEncoding
+
+
+class PreparedBinaryMessage:
+    __slots__ = ("headers", "body", "binary_encoding", "packed")
+
+    def __init__(self, headers: dict[str, object], body: dict[str, object],
+                 binary_encoding: 'BinaryEncoding', packed: bool) -> None:
+        self.headers = headers
+        self.body = body
+        self.binary_encoding = binary_encoding
+        self.packed = packed
+
+
+class BinaryWireMessage:
+    __slots__ = ("headers", "body_bytes")
+
+    def __init__(self, headers: dict[str, object], body_bytes: bytes) -> None:
+        self.headers = headers
+        self.body_bytes = body_bytes
 
 
 class BinaryEncoder(metaclass=ABCMeta):
 
     @abstractmethod
-    def encode(self, message: list[object]) -> list[object]:
+    def encode(self, message: list[object]) -> 'PreparedBinaryMessage':
         pass
 
     @abstractmethod
-    def decode(self, message: list[object]) -> list[object]:
+    def decode(self, message: 'BinaryWireMessage', serializer: 'Serialization') -> list[object]:
         pass

@@ -28,10 +28,10 @@ class ClientBinaryEncoder(BinaryEncoder):
         self.binary_encoding_cache = binary_encoding_cache
         self.binaryChecksumStrategy = ClientBinaryStrategy(binary_encoding_cache)
 
-    def encode(self, message: list[object]) -> list[object]:
+    def encode(self, message: list[object]):
         from ...internal.binary.ClientBinaryEncode import client_binary_encode
         return client_binary_encode(message, self.binary_encoding_cache, self.binaryChecksumStrategy)
 
-    def decode(self, message: list[object]) -> list[object]:
+    def decode(self, message, serializer):
         from ...internal.binary.ClientBinaryDecode import client_binary_decode
-        return client_binary_decode(message, self.binary_encoding_cache, self.binaryChecksumStrategy)
+        return client_binary_decode(message, serializer, self.binary_encoding_cache, self.binaryChecksumStrategy)
