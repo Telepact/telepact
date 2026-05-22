@@ -41,6 +41,12 @@ prepare-java:
 run: prepare
 	uv run python -m perf_harness.run
 
+run-fixed-schema-py: prepare-py
+	uv run python -m perf_harness.fixed_schema_python_benchmark
+
+compare-fixed-schema-py:
+	uv run python -m perf_harness.compare_fixed_schema_results
+
 clean:
 	rm -f telepact.tar.gz
 	rm -rf .venv
@@ -50,4 +56,4 @@ clean:
 	$(MAKE) -C ts clean
 	$(MAKE) -C java clean
 
-.PHONY: all prepare prepare-py dep-py prepare-ts prepare-java run clean
+.PHONY: all prepare prepare-py dep-py prepare-ts prepare-java run run-fixed-schema-py compare-fixed-schema-py clean
