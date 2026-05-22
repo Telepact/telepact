@@ -52,20 +52,20 @@ _NESTED_DATA_ID = _BINARY_ENCODING['nestedData']
 _NUM_ID = _BINARY_ENCODING['num']
 _TEXT_ID = _BINARY_ENCODING['text']
 
-_PACK_SITE_TUPLES = [
-    [['Ok_', 'data'], [None, 'id', 'name']],
-    [['Ok_', 'deepData'], [None, 'id', 'name', 'messages']],
-    [['Ok_', 'nestedData'], [None, 'id', 'name', ['contact', 'email', 'phone']]],
-]
+_PACK_SITE_TREE = {
+    'fn.example': {'->': {'Ok_': {'data': [None, 'id', 'name']}}},
+    'fn.exampleNested': {'->': {'Ok_': {'nestedData': [None, 'id', 'name', ['contact', 'email', 'phone']]}}},
+    'fn.exampleNestedList': {'->': {'Ok_': {'deepData': [None, 'id', 'name', 'messages']}}},
+}
 
 cases = {
     'binary': [
-        [[{'@bin_': []}, {'fn.ping_': {}}], [{'@enc_': _BINARY_ENCODING, '@encp_': _PACK_SITE_TUPLES, '@bin_': [_BINARY_CHECKSUM]}, {_OK_ID: {}}]],
+        [[{'@bin_': []}, {'fn.ping_': {}}], [{'@enc_': _BINARY_ENCODING, '@encp_': _PACK_SITE_TREE, '@bin_': [_BINARY_CHECKSUM], '@fn_': 'fn.ping_'}, {_OK_ID: {}}]],
         [[{'@msgpack': True, '@bin_': [0]}, {0: {}}], [{}, {'ErrorParseFailure_': {'reasons': [{'IncompatibleBinaryEncoding': {}}]}}]],
-        [[{'@msgpack': True, '@bin_': [_BINARY_CHECKSUM]}, {_FN_PING_ID: {}}], [{'@bin_': [_BINARY_CHECKSUM]}, {_OK_ID: {}}]],
-        [[{'@msgpack': True, '@bin_': [_BINARY_CHECKSUM], '@pac_': True, '@ok_': {'data': [{'id': 1, 'name': 'one'}, {'id': 2, 'name': 'two'}]}}, {_FN_EXAMPLE_ID: {}}], [{'@bin_': [_BINARY_CHECKSUM], '@pac_': True}, {_OK_ID: {_DATA_ID: [ExtType(17, b''), [1, 'one'], [2, 'two']]}}]],
-        [[{'@msgpack': True, '@bin_': [_BINARY_CHECKSUM], '@pac_': True, '@ok_': {'nestedData': [{'id': 1, 'name': 'one', 'contact': {'email': 'one@example.com', 'phone': '111-1111'}}, {'id': 2, 'name': 'two', 'contact': {'email': 'two@example.com', 'phone': '222-2222'}}]}}, {_FN_EXAMPLE_NESTED_ID: {}}], [{'@bin_': [_BINARY_CHECKSUM], '@pac_': True}, {_OK_ID: {_NESTED_DATA_ID: [ExtType(17, b''), [1, 'one', ['one@example.com', '111-1111']], [2, 'two', ['two@example.com', '222-2222']]]}}]],
-        [[{'@msgpack': True, '@bin_': [_BINARY_CHECKSUM], '@pac_': True, '@ok_': {'deepData': [{'id': 1, 'name': 'one', 'messages': [{'num': 11, 'text': 'hello'}, {'num': 12, 'text': 'world'}]}, {'id': 2, 'name': 'two', 'messages': [{'num': 21, 'text': 'apple'}, {'num': 22, 'text': 'banana'}]}]}}, {_FN_EXAMPLE_NESTED_LIST_ID: {}}], [{'@bin_': [_BINARY_CHECKSUM], '@pac_': True}, {_OK_ID: {_DEEP_DATA_ID: [ExtType(17, b''), [1, 'one', [{_NUM_ID: 11, _TEXT_ID: 'hello'}, {_NUM_ID: 12, _TEXT_ID: 'world'}]], [2, 'two', [{_NUM_ID: 21, _TEXT_ID: 'apple'}, {_NUM_ID: 22, _TEXT_ID: 'banana'}]]]}}]],
+        [[{'@msgpack': True, '@bin_': [_BINARY_CHECKSUM]}, {_FN_PING_ID: {}}], [{'@bin_': [_BINARY_CHECKSUM], '@fn_': 'fn.ping_'}, {_OK_ID: {}}]],
+        [[{'@msgpack': True, '@bin_': [_BINARY_CHECKSUM], '@pac_': True, '@ok_': {'data': [{'id': 1, 'name': 'one'}, {'id': 2, 'name': 'two'}]}}, {_FN_EXAMPLE_ID: {}}], [{'@bin_': [_BINARY_CHECKSUM], '@pac_': True, '@fn_': 'fn.example'}, {_OK_ID: {_DATA_ID: [ExtType(17, b''), [1, 'one'], [2, 'two']]}}]],
+        [[{'@msgpack': True, '@bin_': [_BINARY_CHECKSUM], '@pac_': True, '@ok_': {'nestedData': [{'id': 1, 'name': 'one', 'contact': {'email': 'one@example.com', 'phone': '111-1111'}}, {'id': 2, 'name': 'two', 'contact': {'email': 'two@example.com', 'phone': '222-2222'}}]}}, {_FN_EXAMPLE_NESTED_ID: {}}], [{'@bin_': [_BINARY_CHECKSUM], '@pac_': True, '@fn_': 'fn.exampleNested'}, {_OK_ID: {_NESTED_DATA_ID: [ExtType(17, b''), [1, 'one', ['one@example.com', '111-1111']], [2, 'two', ['two@example.com', '222-2222']]]}}]],
+        [[{'@msgpack': True, '@bin_': [_BINARY_CHECKSUM], '@pac_': True, '@ok_': {'deepData': [{'id': 1, 'name': 'one', 'messages': [{'num': 11, 'text': 'hello'}, {'num': 12, 'text': 'world'}]}, {'id': 2, 'name': 'two', 'messages': [{'num': 21, 'text': 'apple'}, {'num': 22, 'text': 'banana'}]}]}}, {_FN_EXAMPLE_NESTED_LIST_ID: {}}], [{'@bin_': [_BINARY_CHECKSUM], '@pac_': True, '@fn_': 'fn.exampleNestedList'}, {_OK_ID: {_DEEP_DATA_ID: [ExtType(17, b''), [1, 'one', [{_NUM_ID: 11, _TEXT_ID: 'hello'}, {_NUM_ID: 12, _TEXT_ID: 'world'}]], [2, 'two', [{_NUM_ID: 21, _TEXT_ID: 'apple'}, {_NUM_ID: 22, _TEXT_ID: 'banana'}]]]}}]],
         [[{'@msgpack': True, '@bin_': [_BINARY_CHECKSUM]}, {255: {}}], [{}, {'ErrorParseFailure_': {'reasons': [{'BinaryDecodeFailure': {}}]}}]],
         [[{'@bin_': None}, {'fn.ping_': {}}], [{}, {'ErrorInvalidRequestHeaders_': {'cases': [{'path': ['@bin_'], 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Array': {}}}}}]}}]],
         [[{'@bin_': False}, {'fn.ping_': {}}], [{}, {'ErrorInvalidRequestHeaders_': {'cases': [{'path': ['@bin_'], 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Array': {}}}}}]}}]],

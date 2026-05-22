@@ -32,5 +32,9 @@ def server_binary_decode(message, serializer, binary_encoder: 'BinaryEncoding') 
         raise BinaryEncoderUnavailableError()
 
     message_body = serializer.from_binary_msgpack_body(
-        message.body_bytes, binary_encoder, headers.get("@pac_") is True)
+        message.body_bytes,
+        binary_encoder,
+        headers.get("@pac_") is True,
+        binary_encoder.pack_site_tree,
+    )
     return [headers, message_body]

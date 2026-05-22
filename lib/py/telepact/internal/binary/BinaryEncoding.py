@@ -17,9 +17,25 @@
 from typing import cast
 
 
+def _normalize_pack_site_node(node: object) -> object:
+    if type(node) is list:
+        return cast(list[object], node)
+
+    if type(node) is not dict:
+        raise ValueError("pack site metadata must be a nested dict tree terminating in header lists")
+
+    normalized: dict[str, object] = {}
+    for raw_key, child in cast(dict[object, object], node).items():
+        if type(raw_key) is not str:
+            raise ValueError("pack site tree keys must be strings")
+        normalized[raw_key] = _normalize_pack_site_node(child)
+
+    return normalized
+
+
 class BinaryEncoding:
     def __init__(self, binary_encoding_map: dict[str, int], checksum: int,
-                 pack_site_tuples: list[list[object]] | None = None) -> None:
+                 pack_site_tree: dict[str, object] | None = None) -> None:
         self.encode_map: dict[str, int] = binary_encoding_map
         decode_table: list[str | None] = [None] * len(binary_encoding_map)
         for key, value in binary_encoding_map.items():
@@ -32,17 +48,15 @@ class BinaryEncoding:
             raise ValueError("binary encoding ids must be dense sequential integers")
         self.decode_table: list[str] = [key for key in decode_table if key is not None]
         self.checksum: int = checksum
-        self.pack_site_tuples: list[list[object]] = []
-        self.pack_site_lookup: dict[tuple[str, ...], list[object]] = {}
+        self.pack_site_tree: dict[str, object] = cast(
+            dict[str, object], _normalize_pack_site_node(pack_site_tree or {}))
 
-        for pack_site_tuple in pack_site_tuples or []:
-            if len(pack_site_tuple) != 2:
-                raise ValueError("pack site tuples must contain a path and header")
+    def get_response_pack_site_root(self, function_name: object) -> object | None:
+        if type(function_name) is not str:
+            return None
 
-            raw_path = cast(list[object], pack_site_tuple[0])
-            path = tuple(cast(str, part) for part in raw_path)
-            header = cast(list[object], pack_site_tuple[1])
-            normalized_pack_site_tuple = [list(path), header]
+        function_pack_sites = self.pack_site_tree.get(function_name)
+        if type(function_pack_sites) is not dict:
+            return None
 
-            self.pack_site_tuples.append(normalized_pack_site_tuple)
-            self.pack_site_lookup[path] = header
+        return cast(dict[str, object], function_pack_sites).get("->")

@@ -34,14 +34,19 @@ def client_binary_decode(message: 'BinaryWireMessage', serializer: 'Serializatio
     # If there is a binary encoding included on this message, cache it
     if "@enc_" in headers:
         binary_encoding = cast(dict[str, int], headers["@enc_"])
-        pack_site_tuples = cast(list[list[object]] | None, headers.get("@encp_"))
-        binary_encoding_cache.add(binary_checksum, binary_encoding, pack_site_tuples)
+        pack_site_tree = cast(dict[str, object] | None, headers.get("@encp_"))
+        binary_encoding_cache.add(binary_checksum, binary_encoding, pack_site_tree)
 
     binary_checksum_strategy.update_checksum(binary_checksum)
     new_current_checksum_strategy = binary_checksum_strategy.get_current_checksums()
 
     binary_encoder = binary_encoding_cache.get(new_current_checksum_strategy[0])
+    response_function_name = headers.pop("@fn_", None)
 
     message_body = serializer.from_binary_msgpack_body(
-        message.body_bytes, binary_encoder, headers.get("@pac_") is True)
+        message.body_bytes,
+        binary_encoder,
+        headers.get("@pac_") is True,
+        binary_encoder.get_response_pack_site_root(response_function_name),
+    )
     return [headers, message_body]

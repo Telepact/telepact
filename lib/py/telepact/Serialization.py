@@ -56,5 +56,5 @@ class Serialization(metaclass=ABCMeta):
 
     @abstractmethod
     def from_binary_msgpack_body(self, body_value: bytes | object, binary_encoding: 'BinaryEncoding',
-                                 packed: bool) -> dict[str, object]:
+                                 packed: bool, pack_site_root: object | None = None) -> dict[str, object]:
         pass

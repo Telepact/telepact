@@ -30,6 +30,7 @@ if TYPE_CHECKING:
     from ..internal.validation.ValidationFailure import ValidationFailure
     from .types.TType import TType
     from ..TelepactSchema import TelepactSchema
+    from .types.TUnion import TUnion
 
 _UNAUTHENTICATED_MESSAGE = "Valid authentication is required."
 
@@ -134,6 +135,7 @@ async def handle_message(
             list[object], request_headers["@bin_"])
 
         response_headers["@binary_"] = True
+        response_headers["@fn_"] = function_name
         response_headers["@clientKnownBinaryChecksums_"] = client_known_binary_checksums
 
         if "@pac_" in request_headers:

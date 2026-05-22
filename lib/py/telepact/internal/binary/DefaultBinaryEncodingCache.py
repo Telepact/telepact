@@ -14,7 +14,7 @@
 #|  limitations under the License.
 #|
 
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 from ...internal.binary.BinaryEncodingCache import BinaryEncodingCache
 
@@ -27,9 +27,9 @@ class DefaultBinaryEncodingCache(BinaryEncodingCache):
         self.recent_binary_encoders: dict[int, 'BinaryEncoding'] = {}
 
     def add(self, checksum: int, binary_encoding_map: dict[str, int],
-            pack_site_tuples: list[list[object]] | None = None) -> None:
-        from .BinaryEncoding import BinaryEncoding        
-        binary_encoding = BinaryEncoding(binary_encoding_map, checksum, pack_site_tuples)
+            pack_site_tree: dict[str, object] | None = None) -> None:
+        from .BinaryEncoding import BinaryEncoding
+        binary_encoding = BinaryEncoding(binary_encoding_map, checksum, pack_site_tree)
         self.recent_binary_encoders[checksum] = binary_encoding
 
     def get(self, checksum: int) -> 'BinaryEncoding':

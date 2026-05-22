@@ -26,6 +26,7 @@ def server_binary_encode(message: list[object], binary_encoder: 'BinaryEncoding'
 
     headers = cast(dict[str, object], message[0])
     message_body = cast(dict[str, object], message[1])
+    function_name = cast(str | None, headers.pop("@fn_", None))
     client_known_binary_checksums = cast(list[int], headers.pop(
         "@clientKnownBinaryChecksums_", None))
 
@@ -36,7 +37,9 @@ def server_binary_encode(message: list[object], binary_encoder: 'BinaryEncoding'
 
     if client_known_binary_checksums is None or binary_encoder.checksum not in client_known_binary_checksums:
         headers["@enc_"] = binary_encoder.encode_map
-        headers["@encp_"] = binary_encoder.pack_site_tuples
+        headers["@encp_"] = binary_encoder.pack_site_tree
 
     headers["@bin_"] = [binary_encoder.checksum]
+    if function_name is not None:
+        headers["@fn_"] = function_name
     return PreparedBinaryMessage(headers, message_body, binary_encoder, headers.get("@pac_") is True)

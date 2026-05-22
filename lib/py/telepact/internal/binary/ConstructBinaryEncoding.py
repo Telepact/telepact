@@ -86,6 +86,30 @@ def build_pack_header(field_key: str | None, type_declaration: 'TTypeDeclaration
     return header
 
 
+def insert_pack_site(pack_site_tree: dict[str, object], path: list[str], header: list[object]) -> None:
+    cursor = pack_site_tree
+
+    for part in path[:-1]:
+        existing = cursor.get(part)
+        if existing is None:
+            child: dict[str, object] = {}
+            cursor[part] = child
+            cursor = child
+            continue
+
+        if type(existing) is not dict:
+            raise ValueError("pack site tree cannot branch beneath a pack header leaf")
+
+        cursor = cast(dict[str, object], existing)
+
+    leaf_key = path[-1]
+    existing_leaf = cursor.get(leaf_key)
+    if existing_leaf is not None:
+        raise ValueError(f"duplicate pack site path: {'/'.join(path)}")
+
+    cursor[leaf_key] = header
+
+
 def collect_pack_sites(type_declaration: 'TTypeDeclaration', path: list[str],
                        under_generic_list: bool = False,
                        under_object_map: bool = False) -> list[list[object]]:
@@ -136,20 +160,22 @@ def construct_binary_encoding(telepact_schema: 'TelepactSchema') -> 'BinaryEncod
     from ..types.TUnion import TUnion
 
     all_keys: set[str] = set()
-
-    pack_site_tuples: list[list[object]] = []
+    pack_site_tree: dict[str, object] = {}
 
     for key, value in telepact_schema.parsed.items():
 
         if key.endswith('.->') and isinstance(value, TUnion):
+            function_name = key[:-3]
             result = value.tags['Ok_']
+            all_keys.add(function_name)
             all_keys.add('Ok_')
             for field_key, field in result.fields.items():
                 all_keys.add(field_key)
                 keys = trace_type(field.type_declaration)
-                for key in keys:
-                    all_keys.add(key)
-                pack_site_tuples.extend(collect_pack_sites(field.type_declaration, ['Ok_', field_key]))
+                for nested_key in keys:
+                    all_keys.add(nested_key)
+                for pack_site in collect_pack_sites(field.type_declaration, [function_name, '->', 'Ok_', field_key]):
+                    insert_pack_site(pack_site_tree, cast(list[str], pack_site[0]), cast(list[object], pack_site[1]))
 
         elif key.startswith('fn.') and isinstance(value, TUnion):
             all_keys.add(key)
@@ -157,14 +183,14 @@ def construct_binary_encoding(telepact_schema: 'TelepactSchema') -> 'BinaryEncod
             for field_key, field in args.fields.items():
                 all_keys.add(field_key)
                 keys = trace_type(field.type_declaration)
-                for key in keys:
-                    all_keys.add(key)
-                pack_site_tuples.extend(collect_pack_sites(field.type_declaration, [key, field_key]))
+                for nested_key in keys:
+                    all_keys.add(nested_key)
+                for pack_site in collect_pack_sites(field.type_declaration, [key, field_key]):
+                    insert_pack_site(pack_site_tree, cast(list[str], pack_site[0]), cast(list[object], pack_site[1]))
 
     sorted_all_keys = sorted(all_keys)
 
     binary_encoding = {key: i for i, key in enumerate(sorted_all_keys)}
-    pack_site_tuples.sort(key=lambda site: tuple(cast(list[str], site[0])))
     final_string = "\n".join(sorted_all_keys)
     checksum = create_checksum(final_string)
-    return BinaryEncoding(binary_encoding, checksum, pack_site_tuples)
+    return BinaryEncoding(binary_encoding, checksum, pack_site_tree)
