@@ -35,8 +35,8 @@ def deserialize_internal(message_bytes: bytes, serializer: 'Serialization',
     try:
         if message_bytes[0] == 0x92:  # MsgPack
             is_msg_pack = True
-            headers, body_bytes = serializer.split_msgpack_message(message_bytes)
-            message_as_pseudo_json = [headers, body_bytes]
+            headers, body_value = serializer.split_msgpack_message(message_bytes)
+            message_as_pseudo_json = [headers, body_value]
         else:
             is_msg_pack = False
             message_as_pseudo_json = serializer.from_json(message_bytes)
@@ -57,12 +57,10 @@ def deserialize_internal(message_bytes: bytes, serializer: 'Serialization',
 
         if not isinstance(message_as_pseudo_json_list[0], dict):
             raise InvalidMessage()
-        if not isinstance(message_as_pseudo_json_list[1], bytes):
-            raise InvalidMessage()
 
         final_message_as_pseudo_json_list = binary_encoder.decode(
             BinaryWireMessage(cast(dict[str, object], message_as_pseudo_json_list[0]),
-                              cast(bytes, message_as_pseudo_json_list[1])),
+                              message_as_pseudo_json_list[1]),
             serializer)
     else:
         final_message_as_pseudo_json_list = base64_encoder.decode(message_as_pseudo_json_list)

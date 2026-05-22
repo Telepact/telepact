@@ -51,10 +51,10 @@ class Serialization(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def split_msgpack_message(self, bytes_: bytes) -> tuple[object, bytes]:
+    def split_msgpack_message(self, bytes_: bytes) -> tuple[object, object]:
         pass
 
     @abstractmethod
-    def from_binary_msgpack_body(self, bytes_: bytes, binary_encoding: 'BinaryEncoding',
+    def from_binary_msgpack_body(self, body_value: bytes | object, binary_encoding: 'BinaryEncoding',
                                  packed: bool) -> dict[str, object]:
         pass

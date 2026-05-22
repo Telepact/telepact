@@ -36,7 +36,7 @@ class PreparedBinaryMessage:
 class BinaryWireMessage:
     __slots__ = ("headers", "body_bytes")
 
-    def __init__(self, headers: dict[str, object], body_bytes: bytes) -> None:
+    def __init__(self, headers: dict[str, object], body_bytes: object) -> None:
         self.headers = headers
         self.body_bytes = body_bytes
 
