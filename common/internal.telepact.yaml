@@ -30,9 +30,9 @@
   fn.api_:
     includeInternal!: "boolean"
     includeExamples!: "boolean"
-    ->:
-      - Ok_:
-          api: [{"string": "any"}]
+  ->:
+    - Ok_:
+        api: [{"string": "any"}]
 
 - ///: |
     `_ext.Select_` is the selection object used by the `@select_` header. Use
