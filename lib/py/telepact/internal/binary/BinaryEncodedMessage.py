@@ -14,13 +14,21 @@
 #|  limitations under the License.
 #|
 
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from ...internal.binary.BinaryEncoding import BinaryEncoding
+    from .BinaryEncoding import BinaryEncoding
 
 
-def decode_body(encoded_message_body: dict[object, object], binary_encoder: 'BinaryEncoding') -> dict[str, object]:
-    from ...internal.binary.DecodeKeys import decode_keys
-
-    return cast(dict[str, object], decode_keys(encoded_message_body, binary_encoder))
+class BinaryEncodedMessage:
+    def __init__(
+        self,
+        headers: dict[str, object],
+        body: dict[str, object],
+        binary_encoding: 'BinaryEncoding',
+        pack_tree: dict[str, object] | None,
+    ) -> None:
+        self.headers = headers
+        self.body = body
+        self.binary_encoding = binary_encoding
+        self.pack_tree = pack_tree

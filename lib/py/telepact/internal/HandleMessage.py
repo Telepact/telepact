@@ -135,6 +135,7 @@ async def handle_message(
 
         response_headers["@binary_"] = True
         response_headers["@clientKnownBinaryChecksums_"] = client_known_binary_checksums
+        response_headers["@binaryFunction_"] = function_name
 
         if "@pac_" in request_headers:
             response_headers["@pac_"] = request_headers["@pac_"]

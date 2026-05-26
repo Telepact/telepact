@@ -20,15 +20,15 @@ if TYPE_CHECKING:
     from ...internal.binary.BinaryEncoding import BinaryEncoding
 
 
-def server_binary_encode(message: list[object], binary_encoder: 'BinaryEncoding') -> list[object]:
-    from ...internal.binary.EncodeBody import encode_body
-    from ...internal.binary.PackBody import pack_body
+def server_binary_encode(message: list[object], binary_encoder: 'BinaryEncoding') -> object:
     from ...internal.binary.BinaryEncoderUnavailableError import BinaryEncoderUnavailableError
+    from ...internal.binary.BinaryEncodedMessage import BinaryEncodedMessage
 
     headers = cast(dict[str, object], message[0])
     message_body = cast(dict[str, object], message[1])
     client_known_binary_checksums = cast(list[int], headers.pop(
         "@clientKnownBinaryChecksums_", None))
+    function_name = cast(str | None, headers.pop("@binaryFunction_", None))
 
     result_tag = list(message_body.keys())[0]
 
@@ -37,14 +37,13 @@ def server_binary_encode(message: list[object], binary_encoder: 'BinaryEncoding'
 
     if client_known_binary_checksums is None or binary_encoder.checksum not in client_known_binary_checksums:
         headers["@enc_"] = binary_encoder.encode_map
+        headers["@encp_"] = binary_encoder.pack_encoding
 
     headers["@bin_"] = [binary_encoder.checksum]
-    encoded_message_body = encode_body(message_body, binary_encoder)
+    pack_tree: dict[str, object] | None = None
+    if headers.get("@pac_") is True and function_name is not None:
+        response_pack_tree = binary_encoder.response_pack_trees.get(function_name)
+        if isinstance(response_pack_tree, dict):
+            pack_tree = response_pack_tree
 
-    final_encoded_message_body: dict[object, object]
-    if headers.get("@pac_") is True:
-        final_encoded_message_body = pack_body(encoded_message_body)
-    else:
-        final_encoded_message_body = encoded_message_body
-
-    return [headers, final_encoded_message_body]
+    return BinaryEncodedMessage(headers, message_body, binary_encoder, pack_tree)

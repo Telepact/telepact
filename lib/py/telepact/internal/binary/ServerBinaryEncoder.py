@@ -27,7 +27,7 @@ class ServerBinaryEncoder(BinaryEncoder):
     def __init__(self, binary_encoder: 'BinaryEncoding'):
         self.binary_encoder = binary_encoder
 
-    def encode(self, message: list[object]) -> list[object]:
+    def encode(self, message: list[object]) -> object:
         from ...internal.binary.ServerBinaryEncode import server_binary_encode
         return server_binary_encode(message, self.binary_encoder)
 

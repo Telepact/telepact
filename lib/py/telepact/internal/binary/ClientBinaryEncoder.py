@@ -15,6 +15,7 @@
 #|
 
 from typing import TYPE_CHECKING
+from contextvars import ContextVar
 
 from ...internal.binary.BinaryEncoder import BinaryEncoder
 
@@ -27,11 +28,25 @@ class ClientBinaryEncoder(BinaryEncoder):
         from .ClientBinaryStrategy import ClientBinaryStrategy
         self.binary_encoding_cache = binary_encoding_cache
         self.binaryChecksumStrategy = ClientBinaryStrategy(binary_encoding_cache)
+        self.current_function_name: ContextVar[str | None] = ContextVar(
+            "telepact_current_binary_function_name",
+            default=None,
+        )
 
-    def encode(self, message: list[object]) -> list[object]:
+    def encode(self, message: list[object]) -> object:
         from ...internal.binary.ClientBinaryEncode import client_binary_encode
-        return client_binary_encode(message, self.binary_encoding_cache, self.binaryChecksumStrategy)
+        return client_binary_encode(
+            message,
+            self.binary_encoding_cache,
+            self.binaryChecksumStrategy,
+            self.current_function_name,
+        )
 
     def decode(self, message: list[object]) -> list[object]:
         from ...internal.binary.ClientBinaryDecode import client_binary_decode
-        return client_binary_decode(message, self.binary_encoding_cache, self.binaryChecksumStrategy)
+        return client_binary_decode(
+            message,
+            self.binary_encoding_cache,
+            self.binaryChecksumStrategy,
+            self.current_function_name,
+        )

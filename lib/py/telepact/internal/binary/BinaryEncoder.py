@@ -20,7 +20,7 @@ from abc import ABCMeta, abstractmethod
 class BinaryEncoder(metaclass=ABCMeta):
 
     @abstractmethod
-    def encode(self, message: list[object]) -> list[object]:
+    def encode(self, message: list[object]) -> object:
         pass
 
     @abstractmethod

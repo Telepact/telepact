@@ -22,8 +22,7 @@ if TYPE_CHECKING:
 
 def server_binary_decode(message: list[object], binary_encoder: 'BinaryEncoding') -> list[object]:
     from ...internal.binary.BinaryEncoderUnavailableError import BinaryEncoderUnavailableError
-    from ...internal.binary.DecodeBody import decode_body
-    from ...internal.binary.UnpackBody import unpack_body
+    from ...DefaultSerialization import DefaultSerialization
 
     headers = cast(dict[str, object], message[0])
     encoded_message_body = cast(dict[object, object], message[1])
@@ -34,12 +33,10 @@ def server_binary_decode(message: list[object], binary_encoder: 'BinaryEncoding'
     if binary_checksum_used_by_client_on_this_message != binary_encoder.checksum:
         raise BinaryEncoderUnavailableError()
 
-    final_encoded_message_body: dict[object, object]
-    if headers.get("@pac_") is True:
-        final_encoded_message_body = unpack_body(encoded_message_body)
-    else:
-        final_encoded_message_body = encoded_message_body
-
-    message_body: dict[str, object] = decode_body(
-        final_encoded_message_body, binary_encoder)
+    pack_tree = binary_encoder.request_pack_tree if headers.get("@pac_") is True else None
+    message_body = cast(dict[str, object], DefaultSerialization.decode_binary_body(
+        encoded_message_body,
+        binary_encoder,
+        pack_tree,
+    ))
     return [headers, message_body]

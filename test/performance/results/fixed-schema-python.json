@@ -1,0 +1,126 @@
+{
+  "iterations": 200,
+  "warmupIterations": 25,
+  "scenarios": [
+    {
+      "dataShape": "typical",
+      "collectionShape": "big-list",
+      "legacySizeBytes": 2225,
+      "streamingSizeBytes": 2218,
+      "legacySerialize": {
+        "medianNs": 64437.5,
+        "meanNs": 67410.17,
+        "minNs": 62916,
+        "maxNs": 135584
+      },
+      "streamingSerialize": {
+        "medianNs": 57020.5,
+        "meanNs": 58968.285,
+        "minNs": 56042,
+        "maxNs": 88917
+      },
+      "legacyDeserialize": {
+        "medianNs": 63354.0,
+        "meanNs": 63084.35,
+        "minNs": 58083,
+        "maxNs": 104708
+      },
+      "streamingDeserialize": {
+        "medianNs": 37500.0,
+        "meanNs": 38864.825,
+        "minNs": 33459,
+        "maxNs": 164000
+      }
+    },
+    {
+      "dataShape": "typical",
+      "collectionShape": "really-big-list",
+      "legacySizeBytes": 17529,
+      "streamingSizeBytes": 17522,
+      "legacySerialize": {
+        "medianNs": 543459.0,
+        "meanNs": 550947.26,
+        "minNs": 508375,
+        "maxNs": 2320833
+      },
+      "streamingSerialize": {
+        "medianNs": 445229.0,
+        "meanNs": 443621.235,
+        "minNs": 415833,
+        "maxNs": 537500
+      },
+      "legacyDeserialize": {
+        "medianNs": 516541.0,
+        "meanNs": 523048.31,
+        "minNs": 481000,
+        "maxNs": 1812125
+      },
+      "streamingDeserialize": {
+        "medianNs": 299562.5,
+        "meanNs": 315877.94,
+        "minNs": 282375,
+        "maxNs": 1781875
+      }
+    },
+    {
+      "dataShape": "all-strings",
+      "collectionShape": "really-big-list",
+      "legacySizeBytes": 23075,
+      "streamingSizeBytes": 23068,
+      "legacySerialize": {
+        "medianNs": 555438.0,
+        "meanNs": 562605.855,
+        "minNs": 519250,
+        "maxNs": 1958792
+      },
+      "streamingSerialize": {
+        "medianNs": 451667.0,
+        "meanNs": 452148.935,
+        "minNs": 420792,
+        "maxNs": 613708
+      },
+      "legacyDeserialize": {
+        "medianNs": 533917.0,
+        "meanNs": 550959.0,
+        "minNs": 499334,
+        "maxNs": 2076500
+      },
+      "streamingDeserialize": {
+        "medianNs": 316875.0,
+        "meanNs": 331112.075,
+        "minNs": 297917,
+        "maxNs": 1547166
+      }
+    },
+    {
+      "dataShape": "all-numbers",
+      "collectionShape": "really-big-list",
+      "legacySizeBytes": 18186,
+      "streamingSizeBytes": 18179,
+      "legacySerialize": {
+        "medianNs": 537125.0,
+        "meanNs": 545831.85,
+        "minNs": 498167,
+        "maxNs": 1994792
+      },
+      "streamingSerialize": {
+        "medianNs": 452646.0,
+        "meanNs": 490989.795,
+        "minNs": 411375,
+        "maxNs": 666416
+      },
+      "legacyDeserialize": {
+        "medianNs": 516583.5,
+        "meanNs": 534846.285,
+        "minNs": 480167,
+        "maxNs": 2173583
+      },
+      "streamingDeserialize": {
+        "medianNs": 290208.0,
+        "meanNs": 299146.435,
+        "minNs": 272250,
+        "maxNs": 1545042
+      }
+    }
+  ]
+}

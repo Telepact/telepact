@@ -15,21 +15,23 @@
 #|
 
 from typing import cast, TYPE_CHECKING
-from ...internal.binary.BinaryEncoding import BinaryEncoding
 from ...internal.binary.BinaryEncoderUnavailableError import BinaryEncoderUnavailableError
 
 if TYPE_CHECKING:
+    from contextvars import ContextVar
     from .BinaryEncodingCache import BinaryEncodingCache
     from .ClientBinaryStrategy import ClientBinaryStrategy
 
 
 def client_binary_encode(message: list[object], binary_encoding_cache: 'BinaryEncodingCache',
-                         binary_checksum_strategy: 'ClientBinaryStrategy') -> list[object]:
-    from ...internal.binary.EncodeBody import encode_body
-    from ...internal.binary.PackBody import pack_body
+                         binary_checksum_strategy: 'ClientBinaryStrategy',
+                         current_function_name: 'ContextVar[str | None]') -> object:
+    from ...internal.binary.BinaryEncodedMessage import BinaryEncodedMessage
 
     headers = cast(dict[str, object], message[0])
     message_body = cast(dict[str, object], message[1])
+    function_name = cast(str, next(iter(message_body)))
+    current_function_name.set(function_name)
     force_send_json = headers.pop("_forceSendJson", None)
 
     checksums = binary_checksum_strategy.get_current_checksums()
@@ -46,9 +48,10 @@ def client_binary_encode(message: list[object], binary_encoding_cache: 'BinaryEn
     if not binary_encoding:
         raise BinaryEncoderUnavailableError()
 
-    encoded_message_body = encode_body(message_body, binary_encoding)
+    pack_tree = (
+        binary_encoding.request_pack_tree
+        if headers.get("@pac_") == True
+        else None
+    )
 
-    final_encoded_message_body = pack_body(encoded_message_body) if headers.get(
-        "@pac_") == True else encoded_message_body
-
-    return [headers, final_encoded_message_body]
+    return BinaryEncodedMessage(headers, message_body, binary_encoding, pack_tree)

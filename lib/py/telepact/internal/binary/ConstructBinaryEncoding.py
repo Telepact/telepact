@@ -14,7 +14,6 @@
 #|  limitations under the License.
 #|
 
-from typing import List, Dict, Tuple, Set, Union
 from typing import TYPE_CHECKING
 
 from ...internal.binary.BinaryEncoding import BinaryEncoding
@@ -23,6 +22,7 @@ from ...internal.binary.CreateChecksum import create_checksum
 if TYPE_CHECKING:
     from ...TelepactSchema import TelepactSchema
     from ..types.TTypeDeclaration import TTypeDeclaration
+    from ..types.TStruct import TStruct
 
 
 def trace_type(type_declaration: 'TTypeDeclaration', visited_type_names: set[str] | None = None) -> list[str]:
@@ -97,4 +97,145 @@ def construct_binary_encoding(telepact_schema: 'TelepactSchema') -> 'BinaryEncod
     binary_encoding = {key: i for i, key in enumerate(sorted_all_keys)}
     final_string = "\n".join(sorted_all_keys)
     checksum = create_checksum(final_string)
-    return BinaryEncoding(binary_encoding, checksum)
+    pack_encoding = construct_binary_pack_encoding(telepact_schema)
+    return BinaryEncoding(binary_encoding, checksum, pack_encoding)
+
+
+def construct_binary_pack_encoding(telepact_schema: 'TelepactSchema') -> dict[str, object]:
+    from ..types.TUnion import TUnion
+
+    pack_encoding: dict[str, object] = {}
+
+    for key, value in telepact_schema.parsed.items():
+        if not key.startswith("fn.") or key.endswith(".->") or not isinstance(value, TUnion):
+            continue
+
+        function_pack_encoding: dict[str, object] = {}
+
+        request_struct = value.tags.get(key)
+        if request_struct is not None:
+            request_tree: dict[str, object] = {}
+            _collect_pack_sites_in_struct(request_struct, [key], request_tree, set())
+            if request_tree:
+                function_pack_encoding[key] = request_tree[key]
+
+        result_union = telepact_schema.parsed.get(key + ".->")
+        if isinstance(result_union, TUnion):
+            response_tree: dict[str, object] = {}
+            ok_struct = result_union.tags.get("Ok_")
+            if ok_struct is not None:
+                _collect_pack_sites_in_struct(ok_struct, ["Ok_"], response_tree, set())
+            if response_tree:
+                function_pack_encoding["->"] = response_tree
+
+        if function_pack_encoding:
+            pack_encoding[key] = function_pack_encoding
+
+    return pack_encoding
+
+
+def _collect_pack_sites_in_union(
+    union: object,
+    path: list[str],
+    tree: dict[str, object],
+    visited: set[str],
+) -> None:
+    from ..types.TUnion import TUnion
+
+    if not isinstance(union, TUnion):
+        return
+
+    if union.name in visited:
+        return
+
+    next_visited = set(visited)
+    next_visited.add(union.name)
+
+    for tag_key, tag_struct in union.tags.items():
+        _collect_pack_sites_in_struct(tag_struct, path + [tag_key], tree, next_visited)
+
+
+def _collect_pack_sites_in_struct(
+    struct: 'TStruct',
+    path: list[str],
+    tree: dict[str, object],
+    visited: set[str],
+) -> None:
+    if struct.name in visited:
+        return
+
+    next_visited = set(visited)
+    next_visited.add(struct.name)
+
+    for field_key, field in struct.fields.items():
+        _collect_pack_sites_in_type_declaration(
+            field.type_declaration,
+            path + [field_key],
+            tree,
+            next_visited,
+        )
+
+
+def _collect_pack_sites_in_type_declaration(
+    type_declaration: 'TTypeDeclaration',
+    path: list[str],
+    tree: dict[str, object],
+    visited: set[str],
+) -> None:
+    from ..types.TArray import TArray
+    from ..types.TObject import TObject
+    from ..types.TStruct import TStruct
+    from ..types.TUnion import TUnion
+
+    type_ = type_declaration.type
+
+    if isinstance(type_, TArray):
+        element_type_declaration = type_declaration.type_parameters[0]
+        element_type = element_type_declaration.type
+        if isinstance(element_type, TStruct):
+            _insert_pack_site(tree, path, _build_pack_header(element_type, set()))
+        return
+
+    if isinstance(type_, TObject):
+        return
+
+    if isinstance(type_, TStruct):
+        _collect_pack_sites_in_struct(type_, path, tree, visited)
+        return
+
+    if isinstance(type_, TUnion):
+        _collect_pack_sites_in_union(type_, path, tree, visited)
+
+
+def _build_pack_header(struct: 'TStruct', visited: set[str]) -> list[object]:
+    from ..types.TStruct import TStruct
+
+    header: list[object] = [None]
+
+    if struct.name in visited:
+        return header
+
+    next_visited = set(visited)
+    next_visited.add(struct.name)
+
+    for field_key, field in struct.fields.items():
+        field_type = field.type_declaration.type
+        if isinstance(field_type, TStruct) and field_type.name not in next_visited:
+            nested_header = _build_pack_header(field_type, next_visited)
+            nested_header[0] = field_key
+            header.append(nested_header)
+        else:
+            header.append(field_key)
+
+    return header
+
+
+def _insert_pack_site(tree: dict[str, object], path: list[str], header: list[object]) -> None:
+    current = tree
+    for key in path[:-1]:
+        next_value = current.get(key)
+        if not isinstance(next_value, dict):
+            next_value = {}
+            current[key] = next_value
+        current = next_value
+    current[path[-1]] = header

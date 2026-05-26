@@ -17,15 +17,16 @@
 from typing import cast, TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from contextvars import ContextVar
     from .ClientBinaryStrategy import ClientBinaryStrategy
     from .BinaryEncodingCache import BinaryEncodingCache
 
 
 def client_binary_decode(message: list[object], binary_encoding_cache: 'BinaryEncodingCache',
                          binary_checksum_strategy: 'ClientBinaryStrategy',
+                         current_function_name: 'ContextVar[str | None]',
                          ) -> list[object]:
-    from ...internal.binary.DecodeBody import decode_body
-    from ...internal.binary.UnpackBody import unpack_body
+    from ...DefaultSerialization import DefaultSerialization
 
     headers = cast(dict[str, object], message[0])
     encoded_message_body = cast(dict[object, object], message[1])
@@ -35,18 +36,24 @@ def client_binary_decode(message: list[object], binary_encoding_cache: 'BinaryEn
     # If there is a binary encoding included on this message, cache it
     if "@enc_" in headers:
         binary_encoding = cast(dict[str, int], headers["@enc_"])
-        binary_encoding_cache.add(binary_checksum, binary_encoding)
+        binary_pack_encoding = cast(dict[str, object], headers.get("@encp_", {}))
+        binary_encoding_cache.add(binary_checksum, binary_encoding, binary_pack_encoding)
 
     binary_checksum_strategy.update_checksum(binary_checksum)
     new_current_checksum_strategy = binary_checksum_strategy.get_current_checksums()
 
     binary_encoder = binary_encoding_cache.get(new_current_checksum_strategy[0])
 
-    final_encoded_message_body: dict[object, object]
-    if headers.get("@pac_") is True:
-        final_encoded_message_body = unpack_body(encoded_message_body)
-    else:
-        final_encoded_message_body = encoded_message_body
+    pack_tree: dict[str, object] | None = None
+    function_name = current_function_name.get()
+    if headers.get("@pac_") is True and function_name is not None:
+        response_pack_tree = binary_encoder.response_pack_trees.get(function_name)
+        if isinstance(response_pack_tree, dict):
+            pack_tree = response_pack_tree
 
-    message_body = decode_body(final_encoded_message_body, binary_encoder)
+    message_body = cast(dict[str, object], DefaultSerialization.decode_binary_body(
+        encoded_message_body,
+        binary_encoder,
+        pack_tree,
+    ))
     return [headers, message_body]
