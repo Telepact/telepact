@@ -34,12 +34,22 @@ async def process_bytes(request_message_bytes: bytes, update_headers: 'UpdateHea
                          on_response: Callable[['Message'], None], on_auth: 'AuthHandler',
                          middleware: 'Middleware', function_router: 'FunctionRouter') -> 'Response':
     from ..internal.HandleMessage import handle_message
-    from ..internal.ParseRequestMessage import parse_request_message
+    from ..internal.ParseRequestMessage import RequestParseFailure, parse_request_message
     from ..Response import Response
 
     try:
-        request_message = parse_request_message(
+        request_parse_result = parse_request_message(
             request_message_bytes, serializer, telepact_schema, on_error)
+
+        if isinstance(request_parse_result, RequestParseFailure):
+            response_message = Message(
+                request_parse_result.response_headers,
+                {"ErrorParseFailure_": {"reasons": request_parse_result.parse_failures}},
+            )
+            response_bytes = serializer.serialize(response_message)
+            return Response(response_bytes, response_message.headers)
+
+        request_message = request_parse_result.message
 
         try:
             on_request(request_message)

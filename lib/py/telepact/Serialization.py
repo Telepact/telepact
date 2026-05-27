@@ -31,7 +31,7 @@ class Serialization(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def to_msgpack(self, message: object) -> bytes:
+    def to_msgpack(self, message: object, binary: bool = False) -> bytes:
         pass
 
     @abstractmethod

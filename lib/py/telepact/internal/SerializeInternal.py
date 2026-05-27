@@ -22,10 +22,9 @@ from ..SerializationError import SerializationError
 if TYPE_CHECKING:
     from ..Serialization import Serialization
     from ..Message import Message
-    from ..internal.binary.BinaryEncoder import BinaryEncoder
     from ..internal.binary.Base64Encoder import Base64Encoder
 
-def serialize_internal(message: 'Message', binary_encoder: 'BinaryEncoder',
+def serialize_internal(message: 'Message',
                        base64_encoder: 'Base64Encoder',
                        serializer: 'Serialization') -> bytes:
     headers: dict[str, object] = message.headers
@@ -42,8 +41,7 @@ def serialize_internal(message: 'Message', binary_encoder: 'BinaryEncoder',
     try:
         if serialize_as_binary:
             try:
-                encoded_message = binary_encoder.encode(message_as_pseudo_json)
-                return serializer.to_msgpack(encoded_message)
+                return serializer.to_msgpack(message_as_pseudo_json, binary=True)
             except BinaryEncoderUnavailableError:
                 # We can still submit as json
                 base_64_encoded_message = base64_encoder.encode(message_as_pseudo_json)

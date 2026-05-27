@@ -19,7 +19,6 @@ from typing import Callable, TYPE_CHECKING, Awaitable
 from .DefaultSerialization import DefaultSerialization
 from .FunctionRouter import FunctionRoute, FunctionRouter
 from .Serializer import Serializer
-from .internal.binary.ServerBinaryEncoder import ServerBinaryEncoder
 from .internal.binary.ServerBase64Encoder import ServerBase64Encoder
 from .internal.CreateInternalFunctionRoutes import create_internal_function_routes
 
@@ -72,9 +71,10 @@ class Server:
         self.telepact_schema = telepact_schema
 
         binary_encoding = construct_binary_encoding(self.telepact_schema)
-        binary_encoder = ServerBinaryEncoder(binary_encoding)
+        if hasattr(options.serialization, "configure_server_binary"):
+            options.serialization.configure_server_binary(binary_encoding)
         base64_encoder = ServerBase64Encoder()
-        self.serializer = Serializer(options.serialization, binary_encoder, base64_encoder)
+        self.serializer = Serializer(options.serialization, base64_encoder)
 
         if "union.Auth_" not in self.telepact_schema.parsed and options.auth_required:
             raise RuntimeError(

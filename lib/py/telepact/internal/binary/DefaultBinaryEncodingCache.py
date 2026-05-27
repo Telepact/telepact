@@ -14,7 +14,7 @@
 #|  limitations under the License.
 #|
 
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 from ...internal.binary.BinaryEncodingCache import BinaryEncodingCache
 
@@ -24,15 +24,21 @@ if TYPE_CHECKING:
 class DefaultBinaryEncodingCache(BinaryEncodingCache):
 
     def __init__(self) -> None:
-        self.recent_binary_encoders: dict[int, 'BinaryEncoding'] = {}
+        self.recent_binary_encodings: dict[int, 'BinaryEncoding'] = {}
 
-    def add(self, checksum: int, binary_encoding_map: dict[str, int]) -> None:
-        from .BinaryEncoding import BinaryEncoding        
-        binary_encoding = BinaryEncoding(binary_encoding_map, checksum)
-        self.recent_binary_encoders[checksum] = binary_encoding
+    def add(
+        self,
+        checksum: int,
+        binary_encoding_map: dict[str, int],
+        pack_encoding: dict[str, object] | None = None,
+    ) -> None:
+        from .BinaryEncoding import BinaryEncoding
+
+        binary_encoding = BinaryEncoding(binary_encoding_map, checksum, pack_encoding)
+        self.recent_binary_encodings[checksum] = binary_encoding
 
     def get(self, checksum: int) -> 'BinaryEncoding':
-        return self.recent_binary_encoders[checksum]
+        return self.recent_binary_encodings[checksum]
 
     def remove(self, checksum: int) -> None:
-        self.recent_binary_encoders.pop(checksum, None)
+        self.recent_binary_encodings.pop(checksum, None)

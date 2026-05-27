@@ -15,7 +15,12 @@
 #|
 
 class BinaryEncoding:
-    def __init__(self, binary_encoding_map: dict[str, int], checksum: int) -> None:
+    def __init__(
+        self,
+        binary_encoding_map: dict[str, int],
+        checksum: int,
+        pack_encoding: dict[str, object] | None = None,
+    ) -> None:
         self.encode_map: dict[str, int] = binary_encoding_map
         decode_table: list[str | None] = [None] * len(binary_encoding_map)
         for key, value in binary_encoding_map.items():
@@ -28,3 +33,18 @@ class BinaryEncoding:
             raise ValueError("binary encoding ids must be dense sequential integers")
         self.decode_table: list[str] = [key for key in decode_table if key is not None]
         self.checksum: int = checksum
+        self.pack_encoding: dict[str, object] = pack_encoding or {}
+        self.request_pack_tree: dict[str, object] = {}
+        self.response_pack_trees: dict[str, object] = {}
+
+        for function_name, function_pack_encoding in self.pack_encoding.items():
+            if not isinstance(function_pack_encoding, dict):
+                continue
+
+            request_pack_tree = function_pack_encoding.get(function_name)
+            if isinstance(request_pack_tree, dict):
+                self.request_pack_tree[function_name] = request_pack_tree
+
+            response_pack_tree = function_pack_encoding.get("->")
+            if isinstance(response_pack_tree, dict):
+                self.response_pack_trees[function_name] = response_pack_tree

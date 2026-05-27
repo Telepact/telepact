@@ -20,7 +20,6 @@ from concurrent.futures import Future
 from .internal.binary.DefaultBinaryEncodingCache import DefaultBinaryEncodingCache
 from .DefaultSerialization import DefaultSerialization
 from .Serializer import Serializer
-from .internal.binary.ClientBinaryEncoder import ClientBinaryEncoder
 from .internal.binary.ClientBase64Encoder import ClientBase64Encoder
 
 if TYPE_CHECKING:
@@ -42,10 +41,11 @@ class Client:
         self.timeout_ms_default = options.timeout_ms_default
 
         binary_encoding_cache = DefaultBinaryEncodingCache()
-        binary_encoder = ClientBinaryEncoder(binary_encoding_cache)
+        if hasattr(options.serialization_impl, "configure_client_binary"):
+            options.serialization_impl.configure_client_binary(binary_encoding_cache)
         base64_encoder = ClientBase64Encoder()
 
-        self.serializer = Serializer(options.serialization_impl, binary_encoder, base64_encoder)
+        self.serializer = Serializer(options.serialization_impl, base64_encoder)
 
     async def request(self, request_message: 'Message') -> 'Message':
         from .internal.ClientHandleMessage import client_handle_message

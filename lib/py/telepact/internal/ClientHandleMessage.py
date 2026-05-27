@@ -49,11 +49,16 @@ async def client_handle_message(request_message: 'Message',
             response_message = await adapter(request_message, serializer)
 
         if response_message.body == {"ErrorParseFailure_": {"reasons": [{"IncompatibleBinaryEncoding": {}}]}}:
-            header["@binary_"] = True
-            header["_forceSendJson"] = True
+            refreshed = False
+            serialization_impl = serializer.serialization_impl
+            if hasattr(serialization_impl, "cache_binary_headers"):
+                refreshed = bool(serialization_impl.cache_binary_headers(response_message.headers))
 
-            async with asyncio.timeout(timeout_ms / 1000):
-                return await adapter(request_message, serializer)
+            if refreshed:
+                header["@binary_"] = True
+
+                async with asyncio.timeout(timeout_ms / 1000):
+                    return await adapter(request_message, serializer)
 
         return response_message
     except Exception as e:

@@ -15,14 +15,18 @@
 #|
 
 from abc import ABCMeta, abstractmethod
-from typing import Any
 
 from .BinaryEncoding import BinaryEncoding
 
 class BinaryEncodingCache(metaclass=ABCMeta):
 
     @abstractmethod
-    def add(self, checksum: int, binary_encoding_map: dict[str, int]) -> None:
+    def add(
+        self,
+        checksum: int,
+        binary_encoding_map: dict[str, int],
+        pack_encoding: dict[str, object] | None = None,
+    ) -> None:
         """
         Set a binary encoding in the cache.
 

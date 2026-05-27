@@ -14,7 +14,7 @@
 #|  limitations under the License.
 #|
 
-.PHONY: all clean
+.PHONY: all clean benchmark
 
 SRC_FILES := $(shell find telepact -type f)
 COMMON_SCHEMA_FILES := $(shell find ../../common -type f \( -name '*.json' -o -name '*.yaml' \))
@@ -36,6 +36,10 @@ clean:
 	rm -f ./LICENSE ./NOTICE
 	rm -rf .venv
 	rm -f uv.lock
+
+benchmark:
+	uv sync --all-groups
+	uv run python benchmark_roundtrip.py
 
 deploy: $(TAR_GZ)
 	uv publish

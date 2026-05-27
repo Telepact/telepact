@@ -17,17 +17,42 @@
 from typing import cast, TYPE_CHECKING
 
 from ..Message import Message
+from ..internal.binary.BinaryEncoderUnavailableError import BinaryEncoderUnavailableError
+from ..internal.binary.BinaryEncodingMissing import BinaryEncodingMissing
 from ..internal.validation.InvalidMessage import InvalidMessage
 from ..internal.validation.InvalidMessageBody import InvalidMessageBody
 
 if TYPE_CHECKING:
     from ..Serialization import Serialization
-    from ..internal.binary.BinaryEncoder import BinaryEncoder
     from ..internal.binary.Base64Encoder import Base64Encoder
 
 
+class RequestDeserializeError(Exception):
+    def __init__(self, cause: Exception, response_headers: dict[str, object]):
+        super().__init__(str(cause))
+        self.cause = cause
+        self.response_headers = response_headers
+
+
+def _get_recoverable_response_headers(headers: object) -> dict[str, object]:
+    if not isinstance(headers, dict):
+        return {}
+
+    call_id = headers.get("@id_")
+    if call_id is None:
+        return {}
+
+    return {"@id_": call_id}
+
+
+def _get_exception_response_headers(error: Exception) -> dict[str, object]:
+    response_headers = getattr(error, "response_headers", None)
+    if not isinstance(response_headers, dict):
+        return {}
+    return {key: value for key, value in response_headers.items() if isinstance(key, str)}
+
+
 def deserialize_internal(message_bytes: bytes, serializer: 'Serialization',
-                         binary_encoder: 'BinaryEncoder',
                          base64_encoder: 'Base64Encoder') -> 'Message':
     message_as_pseudo_json: object
     is_msg_pack: bool
@@ -39,6 +64,11 @@ def deserialize_internal(message_bytes: bytes, serializer: 'Serialization',
         else:
             is_msg_pack = False
             message_as_pseudo_json = serializer.from_json(message_bytes)
+    except (BinaryEncoderUnavailableError, BinaryEncodingMissing) as e:
+        response_headers = _get_exception_response_headers(e)
+        if response_headers:
+            raise RequestDeserializeError(e, response_headers) from e
+        raise
     except Exception as e:
         raise InvalidMessage() from e
 
@@ -50,27 +80,31 @@ def deserialize_internal(message_bytes: bytes, serializer: 'Serialization',
     if len(message_as_pseudo_json_list) != 2:
         raise InvalidMessage()
 
+    response_headers = _get_recoverable_response_headers(message_as_pseudo_json_list[0])
+
     final_message_as_pseudo_json_list: list[object]
-    if is_msg_pack:
-        final_message_as_pseudo_json_list = binary_encoder.decode(
-            message_as_pseudo_json_list)
-    else:
-        final_message_as_pseudo_json_list = base64_encoder.decode(message_as_pseudo_json_list)
+    try:
+        if is_msg_pack:
+            final_message_as_pseudo_json_list = message_as_pseudo_json_list
+        else:
+            final_message_as_pseudo_json_list = base64_encoder.decode(message_as_pseudo_json_list)
 
-    if not isinstance(final_message_as_pseudo_json_list[0], dict):
-        raise InvalidMessage()
+        if not isinstance(final_message_as_pseudo_json_list[0], dict):
+            raise InvalidMessage()
 
-    headers = cast(dict[str, object], final_message_as_pseudo_json_list[0])
+        headers = cast(dict[str, object], final_message_as_pseudo_json_list[0])
 
-    if not isinstance(final_message_as_pseudo_json_list[1], dict):
-        raise InvalidMessage()
+        if not isinstance(final_message_as_pseudo_json_list[1], dict):
+            raise InvalidMessage()
 
-    body = cast(dict[str, object], final_message_as_pseudo_json_list[1])
+        body = cast(dict[str, object], final_message_as_pseudo_json_list[1])
 
-    if len(body) != 1:
-        raise InvalidMessageBody()
+        if len(body) != 1:
+            raise InvalidMessageBody()
 
-    if not isinstance(next(iter(body.values())), dict):
-        raise InvalidMessageBody()
+        if not isinstance(next(iter(body.values())), dict):
+            raise InvalidMessageBody()
+    except Exception as e:
+        raise RequestDeserializeError(e, response_headers) from e
 
     return Message(headers, body)

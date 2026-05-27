@@ -54,6 +54,16 @@ class ClientBinaryStrategy:
 
             self.last_update = datetime.now()
 
+    def pin_checksum(self, new_checksum: int) -> None:
+        with self.lock:
+            expired_checksum = self.secondary
+            self.primary = Checksum(new_checksum, 0)
+            self.secondary = None
+            self.last_update = datetime.now()
+
+            if expired_checksum and expired_checksum.value != new_checksum:
+                self.binary_encoding_cache.remove(expired_checksum.value)
+
     def get_current_checksums(self) -> list[int]:
         with self.lock:
             if self.primary is None:

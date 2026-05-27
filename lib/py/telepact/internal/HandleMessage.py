@@ -84,16 +84,6 @@ async def handle_message(
     if call_id is not None:
         response_headers["@id_"] = call_id
 
-    if "_parseFailures" in request_headers:
-        parse_failures = cast(list[object], request_headers["_parseFailures"])
-        new_error_result: dict[str, object] = {
-            "ErrorParseFailure_": {"reasons": parse_failures}
-        }
-
-        validate_result(result_union_type, new_error_result)
-
-        return Message(response_headers, new_error_result)
-
     request_header_validation_failures: list[ValidationFailure] = validate_headers(
         request_headers, telepact_schema.parsed_request_headers, function_name
     )
