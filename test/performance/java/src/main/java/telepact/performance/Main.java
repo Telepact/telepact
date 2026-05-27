@@ -20,32 +20,23 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.protobuf.MessageLite;
 import io.github.telepact.Client;
-import io.github.telepact.FunctionRoute;
 import io.github.telepact.FunctionRouter;
 import io.github.telepact.Message;
+import io.github.telepact.Serializer;
 import io.github.telepact.Server;
 import io.github.telepact.TelepactSchema;
-import io.nats.client.Connection;
-import io.nats.client.Dispatcher;
-import io.nats.client.Nats;
-import io.nats.client.Options;
 import java.io.File;
+import java.lang.reflect.Field;
 import java.nio.file.Path;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.UUID;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
-import java.util.function.BiFunction;
 import telepact.performance.v1.Benchmark;
 
 public class Main {
-    private static final List<String> NETWORKS = List.of("close", "far");
     private static final List<String> DATA_SHAPES = List.of("typical", "all-strings", "all-numbers");
     private static final List<String> COLLECTION_SHAPES = List.of("single", "small-list", "big-list", "really-big-list", "huge-list");
     private static final List<String> METHODS = List.of("telepact-json", "telepact-binary", "telepact-packed-binary", "protobuf", "plain-json");
@@ -57,58 +48,43 @@ public class Main {
             "typical", "roundTripTypical",
             "all-strings", "roundTripStrings",
             "all-numbers", "roundTripNumbers");
-    private static final Duration NATS_TIMEOUT = Duration.ofSeconds(15);
-    private static final int NATS_REQUEST_ADDITIONAL_RETRIES = 2;
-    private static final Duration NATS_RETRY_DELAY = Duration.ofMillis(250);
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    record Scenario(String networkLatency, String dataShape, String collectionShape, String method) {}
-    record ServerMetrics(long requestNetworkArrivalNs, long serverRequestDeserializationTimeNs, long serverResponseSerializationTimeNs, long responseSentAtNs) {}
+    record Scenario(String dataShape, String collectionShape, String method) {}
 
     public static void main(String[] args) throws Exception {
         var parsed = parseArgs(args);
         var iterations = Integer.parseInt(parsed.get("iterations"));
         var warmupIterations = Integer.parseInt(parsed.get("warmup-iterations"));
-        var localNatsUrl = parsed.get("local-nats-url");
-        var remoteNatsUrl = parsed.get("remote-nats-url");
+        var dataShapes = parseCsv(parsed.get("data-shapes"), DATA_SHAPES);
+        var collectionShapes = parseCsv(parsed.get("collection-shapes"), COLLECTION_SHAPES);
+        var methods = parseCsv(parsed.get("methods"), METHODS);
         var output = parsed.get("output");
         var payloads = loadPayloads();
         var scenarios = new ArrayList<Object>();
 
-        for (var networkLatency : NETWORKS) {
-            var natsUrl = Objects.equals(networkLatency, "close") ? localNatsUrl : remoteNatsUrl;
-            var options = new Options.Builder().server(natsUrl).build();
-            try (var clientConnection = Nats.connect(options); var serverConnection = Nats.connect(options)) {
-                for (var dataShape : DATA_SHAPES) {
-                    for (var collectionShape : COLLECTION_SHAPES) {
-                        for (var method : METHODS) {
-                            var scenario = new Scenario(networkLatency, dataShape, collectionShape, method);
-                            var payload = (List<Map<String, Object>>) ((Map<String, Object>) payloads.get(dataShape)).get(collectionShape);
-                            var queue = new ArrayBlockingQueue<ServerMetrics>(1);
-                            var subject = "perf.java." + UUID.randomUUID();
-                            var runner = createRunner(serverConnection, clientConnection, subject, scenario, queue);
-                            try {
-                                for (int i = 0; i < warmupIterations; i += 1) {
-                                    runner.requestOnce(payload);
-                                }
-                                var samples = new ArrayList<Object>();
-                                for (int i = 0; i < iterations; i += 1) {
-                                    samples.add(runner.requestOnce(payload));
-                                }
-                                scenarios.add(Map.of(
-                                        "language", "java",
-                                        "networkLatency", networkLatency,
-                                        "dataShape", dataShape,
-                                        "collectionShape", collectionShape,
-                                        "method", method,
-                                        "iterations", iterations,
-                                        "warmupIterations", warmupIterations,
-                                        "samples", samples));
-                            } finally {
-                                runner.close();
-                            }
-                        }
+        for (var dataShape : dataShapes) {
+            for (var collectionShape : collectionShapes) {
+                for (var method : methods) {
+                    var scenario = new Scenario(dataShape, collectionShape, method);
+                    var payload = (List<Map<String, Object>>) ((Map<String, Object>) payloads.get(dataShape)).get(collectionShape);
+                    var benchmark = createBenchmark(scenario);
+                    var scenarioWarmupIterations = warmupIterationsForScenario(scenario, warmupIterations);
+                    for (int i = 0; i < scenarioWarmupIterations; i += 1) {
+                        benchmark.run(payload);
                     }
+                    var samples = new ArrayList<Object>();
+                    for (int i = 0; i < iterations; i += 1) {
+                        samples.add(benchmark.run(payload));
+                    }
+                    scenarios.add(Map.of(
+                            "language", "java",
+                            "dataShape", dataShape,
+                            "collectionShape", collectionShape,
+                            "method", method,
+                            "iterations", iterations,
+                            "warmupIterations", scenarioWarmupIterations,
+                            "samples", samples));
                 }
             }
         }
@@ -119,188 +95,194 @@ public class Main {
                         "generatedAt", java.time.OffsetDateTime.now().toString(),
                         "iterations", iterations,
                         "warmupIterations", warmupIterations,
-                        "localNatsUrl", localNatsUrl,
-                        "remoteNatsUrl", remoteNatsUrl),
+                        "dataShapes", dataShapes,
+                        "collectionShapes", collectionShapes,
+                        "methods", methods),
                 "scenarios", scenarios));
     }
 
-    private static Runner createRunner(Connection serverConnection, Connection clientConnection, String subject, Scenario scenario, ArrayBlockingQueue<ServerMetrics> queue) throws Exception {
+    private static int warmupIterationsForScenario(Scenario scenario, int warmupIterations) {
+        if (Objects.equals(scenario.method(), "telepact-binary") || Objects.equals(scenario.method(), "telepact-packed-binary")) {
+            return warmupIterations;
+        }
+        return 0;
+    }
+
+    private static BenchmarkRun createBenchmark(Scenario scenario) throws Exception {
         return switch (scenario.method()) {
-            case "plain-json" -> createPlainJsonRunner(serverConnection, clientConnection, subject, scenario, queue);
-            case "protobuf" -> createProtobufRunner(serverConnection, clientConnection, subject, scenario, queue);
-            default -> createTelepactRunner(serverConnection, clientConnection, subject, scenario, queue);
+            case "plain-json" -> createPlainJsonBenchmark(scenario);
+            case "protobuf" -> createProtobufBenchmark(scenario);
+            default -> createTelepactBenchmark(scenario);
         };
     }
 
-    private static Runner createPlainJsonRunner(Connection serverConnection, Connection clientConnection, String subject, Scenario scenario, ArrayBlockingQueue<ServerMetrics> queue) {
-        var dispatcher = serverConnection.createDispatcher(msg -> {
-            try {
-                long receivedAt = System.nanoTime();
-                var request = OBJECT_MAPPER.readValue(msg.getData(), new TypeReference<Map<String, Object>>() {});
-                long afterDeserialize = System.nanoTime();
-                var response = Map.of("function", request.get("function"), "items", request.get("items"));
-                long beforeSerialize = System.nanoTime();
-                var responseBytes = OBJECT_MAPPER.writeValueAsBytes(response);
-                long responseSentAt = System.nanoTime();
-                queue.put(new ServerMetrics(receivedAt, afterDeserialize - receivedAt, responseSentAt - beforeSerialize, responseSentAt));
-                serverConnection.publish(msg.getReplyTo(), responseBytes);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
-        dispatcher.subscribe(subject);
-        return new Runner(dispatcher, payload -> {
+    private static BenchmarkRun createPlainJsonBenchmark(Scenario scenario) {
+        return payload -> {
             var request = Map.of("function", PLAIN_FUNCTION_NAMES.get(scenario.dataShape()), "items", payload);
-            long serializeStart = System.nanoTime();
+            long requestSerializeStart = System.nanoTime();
             var requestBytes = OBJECT_MAPPER.writeValueAsBytes(request);
-            long serializeEnd = System.nanoTime();
-            long sentAt = System.nanoTime();
-            var response = requestWithRetry(clientConnection, subject, requestBytes);
-            long receivedAt = System.nanoTime();
-            long deserializeStart = System.nanoTime();
-            var responseMap = OBJECT_MAPPER.readValue(response.getData(), new TypeReference<Map<String, Object>>() {});
-            long deserializeEnd = System.nanoTime();
-            if (((List<?>) responseMap.get("items")).size() != payload.size()) {
+            long requestSerializeEnd = System.nanoTime();
+            long requestDeserializeStart = System.nanoTime();
+            var requestRoundTrip = OBJECT_MAPPER.readValue(requestBytes, new TypeReference<Map<String, Object>>() {});
+            long requestDeserializeEnd = System.nanoTime();
+            if (!Objects.equals(requestRoundTrip.get("items"), payload)) {
                 throw new IllegalStateException("plain-json payload mismatch");
             }
-            var serverMetrics = queue.take();
-            return sample(serializeEnd - serializeStart, requestBytes.length, serverMetrics.requestNetworkArrivalNs() - sentAt,
-                    serverMetrics.serverRequestDeserializationTimeNs(), serverMetrics.serverResponseSerializationTimeNs(),
-                    response.getData().length, receivedAt - serverMetrics.responseSentAtNs(), deserializeEnd - deserializeStart);
-        });
+
+            var response = Map.of("function", requestRoundTrip.get("function"), "items", requestRoundTrip.get("items"));
+            long responseSerializeStart = System.nanoTime();
+            var responseBytes = OBJECT_MAPPER.writeValueAsBytes(response);
+            long responseSerializeEnd = System.nanoTime();
+            long responseDeserializeStart = System.nanoTime();
+            var responseRoundTrip = OBJECT_MAPPER.readValue(responseBytes, new TypeReference<Map<String, Object>>() {});
+            long responseDeserializeEnd = System.nanoTime();
+            if (!Objects.equals(responseRoundTrip.get("items"), payload)) {
+                throw new IllegalStateException("plain-json response mismatch");
+            }
+
+            return sample(
+                    requestSerializeEnd - requestSerializeStart,
+                    requestDeserializeEnd - requestDeserializeStart,
+                    responseSerializeEnd - responseSerializeStart,
+                    responseDeserializeEnd - responseDeserializeStart,
+                    requestBytes.length,
+                    responseBytes.length);
+        };
     }
 
-    private static Runner createProtobufRunner(Connection serverConnection, Connection clientConnection, String subject, Scenario scenario, ArrayBlockingQueue<ServerMetrics> queue) {
-        var dispatcher = serverConnection.createDispatcher(msg -> {
-            try {
-                long receivedAt = System.nanoTime();
-                byte[] responseBytes;
-                long afterDeserialize;
-                long beforeSerialize;
-                switch (scenario.dataShape()) {
-                    case "typical" -> {
-                        var request = Benchmark.TypicalRequest.parseFrom(msg.getData());
-                        afterDeserialize = System.nanoTime();
-                        var response = Benchmark.TypicalResponse.newBuilder().addAllItems(request.getItemsList()).build();
-                        beforeSerialize = System.nanoTime();
-                        responseBytes = response.toByteArray();
-                    }
-                    case "all-strings" -> {
-                        var request = Benchmark.StringsRequest.parseFrom(msg.getData());
-                        afterDeserialize = System.nanoTime();
-                        var response = Benchmark.StringsResponse.newBuilder().addAllItems(request.getItemsList()).build();
-                        beforeSerialize = System.nanoTime();
-                        responseBytes = response.toByteArray();
-                    }
-                    default -> {
-                        var request = Benchmark.NumbersRequest.parseFrom(msg.getData());
-                        afterDeserialize = System.nanoTime();
-                        var response = Benchmark.NumbersResponse.newBuilder().addAllItems(request.getItemsList()).build();
-                        beforeSerialize = System.nanoTime();
-                        responseBytes = response.toByteArray();
-                    }
-                }
-                long responseSentAt = System.nanoTime();
-                queue.put(new ServerMetrics(receivedAt, afterDeserialize - receivedAt, responseSentAt - beforeSerialize, responseSentAt));
-                serverConnection.publish(msg.getReplyTo(), responseBytes);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
-        dispatcher.subscribe(subject);
-        return new Runner(dispatcher, payload -> {
+    private static BenchmarkRun createProtobufBenchmark(Scenario scenario) {
+        return payload -> {
             MessageLite requestMessage;
             switch (scenario.dataShape()) {
                 case "typical" -> requestMessage = buildTypicalRequest(payload);
                 case "all-strings" -> requestMessage = buildStringsRequest(payload);
                 default -> requestMessage = buildNumbersRequest(payload);
             }
-            long serializeStart = System.nanoTime();
+
+            long requestSerializeStart = System.nanoTime();
             var requestBytes = requestMessage.toByteArray();
-            long serializeEnd = System.nanoTime();
-            long sentAt = System.nanoTime();
-            var response = requestWithRetry(clientConnection, subject, requestBytes);
-            long receivedAt = System.nanoTime();
-            long deserializeStart = System.nanoTime();
-            int responseCount;
+            long requestSerializeEnd = System.nanoTime();
+            long requestDeserializeStart = System.nanoTime();
+            MessageLite requestRoundTrip;
             switch (scenario.dataShape()) {
-                case "typical" -> responseCount = Benchmark.TypicalResponse.parseFrom(response.getData()).getItemsCount();
-                case "all-strings" -> responseCount = Benchmark.StringsResponse.parseFrom(response.getData()).getItemsCount();
-                default -> responseCount = Benchmark.NumbersResponse.parseFrom(response.getData()).getItemsCount();
+                case "typical" -> requestRoundTrip = Benchmark.TypicalRequest.parseFrom(requestBytes);
+                case "all-strings" -> requestRoundTrip = Benchmark.StringsRequest.parseFrom(requestBytes);
+                default -> requestRoundTrip = Benchmark.NumbersRequest.parseFrom(requestBytes);
             }
-            long deserializeEnd = System.nanoTime();
-            if (responseCount != payload.size()) {
+            long requestDeserializeEnd = System.nanoTime();
+
+            MessageLite responseMessage;
+            int requestCount;
+            switch (scenario.dataShape()) {
+                case "typical" -> {
+                    var typedRequest = (Benchmark.TypicalRequest) requestRoundTrip;
+                    requestCount = typedRequest.getItemsCount();
+                    responseMessage = Benchmark.TypicalResponse.newBuilder().addAllItems(typedRequest.getItemsList()).build();
+                }
+                case "all-strings" -> {
+                    var typedRequest = (Benchmark.StringsRequest) requestRoundTrip;
+                    requestCount = typedRequest.getItemsCount();
+                    responseMessage = Benchmark.StringsResponse.newBuilder().addAllItems(typedRequest.getItemsList()).build();
+                }
+                default -> {
+                    var typedRequest = (Benchmark.NumbersRequest) requestRoundTrip;
+                    requestCount = typedRequest.getItemsCount();
+                    responseMessage = Benchmark.NumbersResponse.newBuilder().addAllItems(typedRequest.getItemsList()).build();
+                }
+            }
+            if (requestCount != payload.size()) {
                 throw new IllegalStateException("protobuf payload mismatch");
             }
-            var serverMetrics = queue.take();
-            return sample(serializeEnd - serializeStart, requestBytes.length, serverMetrics.requestNetworkArrivalNs() - sentAt,
-                    serverMetrics.serverRequestDeserializationTimeNs(), serverMetrics.serverResponseSerializationTimeNs(),
-                    response.getData().length, receivedAt - serverMetrics.responseSentAtNs(), deserializeEnd - deserializeStart);
-        });
+
+            long responseSerializeStart = System.nanoTime();
+            var responseBytes = responseMessage.toByteArray();
+            long responseSerializeEnd = System.nanoTime();
+            long responseDeserializeStart = System.nanoTime();
+            int responseCount;
+            switch (scenario.dataShape()) {
+                case "typical" -> responseCount = Benchmark.TypicalResponse.parseFrom(responseBytes).getItemsCount();
+                case "all-strings" -> responseCount = Benchmark.StringsResponse.parseFrom(responseBytes).getItemsCount();
+                default -> responseCount = Benchmark.NumbersResponse.parseFrom(responseBytes).getItemsCount();
+            }
+            long responseDeserializeEnd = System.nanoTime();
+            if (responseCount != payload.size()) {
+                throw new IllegalStateException("protobuf response mismatch");
+            }
+
+            return sample(
+                    requestSerializeEnd - requestSerializeStart,
+                    requestDeserializeEnd - requestDeserializeStart,
+                    responseSerializeEnd - responseSerializeStart,
+                    responseDeserializeEnd - responseDeserializeStart,
+                    requestBytes.length,
+                    responseBytes.length);
+        };
     }
 
-    private static Runner createTelepactRunner(Connection serverConnection, Connection clientConnection, String subject, Scenario scenario, ArrayBlockingQueue<ServerMetrics> queue) throws Exception {
-        var telepactSchema = TelepactSchema.fromDirectory(Path.of("..", "schema", "telepact").toString());
-        var state = new HashMap<String, Long>();
-        FunctionRoute route = (functionName, requestMessage) -> new Message(Map.of(), Map.of("Ok_", Map.of("items", ((Map<String, Object>) requestMessage.body.get(functionName)).get("items"))));
-        var routes = new HashMap<String, FunctionRoute>();
-        routes.put("fn.roundTripTypical", route);
-        routes.put("fn.roundTripStrings", route);
-        routes.put("fn.roundTripNumbers", route);
-        var options = new Server.Options();
-        options.authRequired = false;
-        options.onRequest = message -> state.put("afterDeserializeNs", System.nanoTime());
-        options.onResponse = message -> state.put("beforeSerializeNs", System.nanoTime());
-        var server = new Server(telepactSchema, new FunctionRouter(routes), options);
-        var dispatcher = serverConnection.createDispatcher(msg -> {
-            try {
-                long receivedAt = System.nanoTime();
-                state.clear();
-                var response = server.process(msg.getData());
-                long responseSentAt = System.nanoTime();
-                queue.put(new ServerMetrics(receivedAt, state.getOrDefault("afterDeserializeNs", responseSentAt) - receivedAt,
-                        responseSentAt - state.getOrDefault("beforeSerializeNs", receivedAt), responseSentAt));
-                serverConnection.publish(msg.getReplyTo(), response.bytes);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
-        dispatcher.subscribe(subject);
+    private static BenchmarkRun createTelepactBenchmark(Scenario scenario) throws Exception {
+        var client = new Client((message, serializer) -> CompletableFuture.failedFuture(new UnsupportedOperationException("unused benchmark adapter")), new Client.Options());
+        var serverOptions = new Server.Options();
+        serverOptions.authRequired = false;
+        var server = new Server(TelepactSchema.fromDirectory(Path.of("..", "schema", "telepact").toString()), new FunctionRouter(new HashMap<>()), serverOptions);
+        var clientSerializer = extractSerializer(client);
+        var serverSerializer = extractSerializer(server);
+        var functionName = FUNCTION_NAMES.get(scenario.dataShape());
 
-        final Map<String, Object>[] lastSample = new Map[] { null };
-        BiFunction<Message, io.github.telepact.Serializer, Future<Message>> adapter = (message, serializer) -> CompletableFuture.supplyAsync(() -> {
-            try {
-                long serializeStart = System.nanoTime();
-                var requestBytes = serializer.serialize(message);
-                long serializeEnd = System.nanoTime();
-                long sentAt = System.nanoTime();
-                var response = requestWithRetry(clientConnection, subject, requestBytes);
-                long receivedAt = System.nanoTime();
-                long deserializeStart = System.nanoTime();
-                var responseMessage = serializer.deserialize(response.getData());
-                long deserializeEnd = System.nanoTime();
-                var serverMetrics = queue.take();
-                lastSample[0] = sample(serializeEnd - serializeStart, requestBytes.length, serverMetrics.requestNetworkArrivalNs() - sentAt,
-                        serverMetrics.serverRequestDeserializationTimeNs(), serverMetrics.serverResponseSerializationTimeNs(),
-                        response.getData().length, receivedAt - serverMetrics.responseSentAtNs(), deserializeEnd - deserializeStart);
-                return responseMessage;
-            } catch (Exception e) {
-                throw new RuntimeException(e);
+        return payload -> {
+            var requestHeaders = new HashMap<String, Object>();
+            if (!Objects.equals(scenario.method(), "telepact-json")) {
+                requestHeaders.put("@binary_", true);
             }
-        });
-        var clientOptions = new Client.Options();
-        clientOptions.useBinary = !Objects.equals(scenario.method(), "telepact-json");
-        clientOptions.alwaysSendJson = Objects.equals(scenario.method(), "telepact-json");
-        var client = new Client(adapter, clientOptions);
-        return new Runner(dispatcher, payload -> {
-            var headers = Objects.equals(scenario.method(), "telepact-packed-binary") ? new HashMap<String, Object>(Map.of("@pac_", true)) : new HashMap<String, Object>();
-            var response = client.request(new Message(headers, Map.of(FUNCTION_NAMES.get(scenario.dataShape()), Map.of("items", payload))));
-            var ok = (Map<String, Object>) response.body.get("Ok_");
-            if (((List<?>) ok.get("items")).size() != payload.size()) {
+            if (Objects.equals(scenario.method(), "telepact-packed-binary")) {
+                requestHeaders.put("@pac_", true);
+            }
+
+            var requestMessage = new Message(requestHeaders, Map.of(functionName, Map.of("items", payload)));
+            long requestSerializeStart = System.nanoTime();
+            var requestBytes = clientSerializer.serialize(requestMessage);
+            long requestSerializeEnd = System.nanoTime();
+            long requestDeserializeStart = System.nanoTime();
+            var requestRoundTrip = serverSerializer.deserialize(requestBytes);
+            long requestDeserializeEnd = System.nanoTime();
+            var requestItems = (List<?>) ((Map<String, Object>) requestRoundTrip.body.get(functionName)).get("items");
+            if (requestItems.size() != payload.size()) {
                 throw new IllegalStateException("telepact payload mismatch");
             }
-            return lastSample[0];
-        });
+
+            var responseHeaders = new HashMap<String, Object>();
+            if (requestRoundTrip.headers.containsKey("@bin_")) {
+                responseHeaders.put("@binary_", true);
+                responseHeaders.put("@clientKnownBinaryChecksums_", requestRoundTrip.headers.get("@bin_"));
+            }
+            if (requestRoundTrip.headers.containsKey("@pac_")) {
+                responseHeaders.put("@pac_", requestRoundTrip.headers.get("@pac_"));
+            }
+            var responseMessage = new Message(responseHeaders, Map.of("Ok_", Map.of("items", requestItems)));
+            long responseSerializeStart = System.nanoTime();
+            var responseBytes = serverSerializer.serialize(responseMessage);
+            long responseSerializeEnd = System.nanoTime();
+            long responseDeserializeStart = System.nanoTime();
+            var responseRoundTrip = clientSerializer.deserialize(responseBytes);
+            long responseDeserializeEnd = System.nanoTime();
+            var responseItems = (List<?>) ((Map<String, Object>) responseRoundTrip.body.get("Ok_")).get("items");
+            if (responseItems.size() != payload.size()) {
+                throw new IllegalStateException("telepact response mismatch");
+            }
+
+            return sample(
+                    requestSerializeEnd - requestSerializeStart,
+                    requestDeserializeEnd - requestDeserializeStart,
+                    responseSerializeEnd - responseSerializeStart,
+                    responseDeserializeEnd - responseDeserializeStart,
+                    requestBytes.length,
+                    responseBytes.length);
+        };
+    }
+
+    private static Serializer extractSerializer(Object target) throws Exception {
+        Field serializerField = target.getClass().getDeclaredField("serializer");
+        serializerField.setAccessible(true);
+        return (Serializer) serializerField.get(target);
     }
 
     private static Map<String, Object> loadPayloads() throws Exception {
@@ -315,31 +297,29 @@ public class Main {
         return parsed;
     }
 
-    private static io.nats.client.Message requestWithRetry(Connection connection, String subject, byte[] requestBytes) throws Exception {
-        for (int attempt = 0; attempt <= NATS_REQUEST_ADDITIONAL_RETRIES; attempt += 1) {
-            var response = connection.request(subject, requestBytes, NATS_TIMEOUT);
-            if (response != null) {
-                return response;
-            }
-            if (attempt < NATS_REQUEST_ADDITIONAL_RETRIES) {
-                Thread.sleep(NATS_RETRY_DELAY.toMillis());
+    private static List<String> parseCsv(String value, List<String> allowed) {
+        if (value == null || value.isBlank()) {
+            return allowed;
+        }
+        var selected = new ArrayList<String>();
+        for (var part : value.split(",")) {
+            if (!part.isBlank()) {
+                selected.add(part);
             }
         }
-        throw new IllegalStateException("nats request failed");
+        return selected.isEmpty() ? allowed : selected;
     }
 
-    private static Map<String, Object> sample(long clientRequestSerializationTimeNs, long serializedRequestSizeBytes,
-            long requestNetworkTransitTimeNs, long serverRequestDeserializationTimeNs, long serverResponseSerializationTimeNs,
-            long serializedResponseSizeBytes, long responseNetworkTransitTimeNs, long clientResponseDeserializationTimeNs) {
+    private static Map<String, Object> sample(long requestSerializationTimeNs, long requestDeserializationTimeNs,
+            long responseSerializationTimeNs, long responseDeserializationTimeNs,
+            long serializedRequestSizeBytes, long serializedResponseSizeBytes) {
         return Map.of(
-                "clientRequestSerializationTimeNs", clientRequestSerializationTimeNs,
+                "requestSerializationTimeNs", requestSerializationTimeNs,
+                "requestDeserializationTimeNs", requestDeserializationTimeNs,
+                "responseSerializationTimeNs", responseSerializationTimeNs,
+                "responseDeserializationTimeNs", responseDeserializationTimeNs,
                 "serializedRequestSizeBytes", serializedRequestSizeBytes,
-                "requestNetworkTransitTimeNs", requestNetworkTransitTimeNs,
-                "serverRequestDeserializationTimeNs", serverRequestDeserializationTimeNs,
-                "serverResponseSerializationTimeNs", serverResponseSerializationTimeNs,
-                "serializedResponseSizeBytes", serializedResponseSizeBytes,
-                "responseNetworkTransitTimeNs", responseNetworkTransitTimeNs,
-                "clientResponseDeserializationTimeNs", clientResponseDeserializationTimeNs);
+                "serializedResponseSizeBytes", serializedResponseSizeBytes);
     }
 
     private static Benchmark.TypicalRequest buildTypicalRequest(List<Map<String, Object>> payload) {
@@ -384,18 +364,8 @@ public class Main {
         return builder.build();
     }
 
-    private record Runner(Dispatcher dispatcher, Requester requester) {
-        Map<String, Object> requestOnce(List<Map<String, Object>> payload) throws Exception {
-            return requester.requestOnce(payload);
-        }
-
-        void close() throws Exception {
-            dispatcher.drain(Duration.ofSeconds(1)).get();
-        }
-    }
-
     @FunctionalInterface
-    private interface Requester {
-        Map<String, Object> requestOnce(List<Map<String, Object>> payload) throws Exception;
+    private interface BenchmarkRun {
+        Map<String, Object> run(List<Map<String, Object>> payload) throws Exception;
     }
 }
