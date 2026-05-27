@@ -15,7 +15,6 @@
 //|
 
 import { Client, ClientOptions, FunctionRouter, Message, Server, ServerOptions, TelepactSchema } from "telepact";
-import { connect, NatsConnection, Subscription } from "nats";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import process from "node:process";
@@ -24,34 +23,23 @@ import { telepact as proto } from "./generated/benchmark.js";
 type JsonMap = Record<string, any>;
 
 type Scenario = {
-    networkLatency: string;
     dataShape: string;
     collectionShape: string;
     method: string;
 };
 
 type Sample = {
-    clientRequestSerializationTimeNs: number;
+    requestSerializationTimeNs: number;
+    requestDeserializationTimeNs: number;
+    responseSerializationTimeNs: number;
+    responseDeserializationTimeNs: number;
     serializedRequestSizeBytes: number;
-    requestNetworkTransitTimeNs: number;
-    serverRequestDeserializationTimeNs: number;
-    serverResponseSerializationTimeNs: number;
     serializedResponseSizeBytes: number;
-    responseNetworkTransitTimeNs: number;
-    clientResponseDeserializationTimeNs: number;
 };
 
-type ServerMetrics = {
-    requestNetworkArrivalNs: number;
-    serverRequestDeserializationTimeNs: number;
-    serverResponseSerializationTimeNs: number;
-    responseSentAtNs: number;
-};
-
-const NETWORKS = ["close", "far"];
-const DATA_SHAPES = ["typical", "all-strings", "all-numbers"];
-const COLLECTION_SHAPES = ["single", "small-list", "big-list", "really-big-list", "huge-list"];
-const METHODS = ["telepact-json", "telepact-binary", "telepact-packed-binary", "protobuf", "plain-json"];
+const DATA_SHAPES = ["typical", "all-strings", "all-numbers"] as const;
+const COLLECTION_SHAPES = ["single", "small-list", "big-list", "really-big-list", "huge-list"] as const;
+const METHODS = ["telepact-json", "telepact-binary", "telepact-packed-binary", "protobuf", "plain-json"] as const;
 const FUNCTION_NAMES: Record<string, string> = {
     "typical": "fn.roundTripTypical",
     "all-strings": "fn.roundTripStrings",
@@ -67,31 +55,6 @@ const PROTO_TYPES: Record<string, { request: any; response: any }> = {
     "all-strings": { request: proto.performance.v1.StringsRequest, response: proto.performance.v1.StringsResponse },
     "all-numbers": { request: proto.performance.v1.NumbersRequest, response: proto.performance.v1.NumbersResponse },
 };
-const NATS_REQUEST_TIMEOUT_MS = 15000;
-const NATS_REQUEST_ADDITIONAL_RETRIES = 2;
-const NATS_REQUEST_RETRY_DELAY_MS = 250;
-
-class MetricsQueue {
-    private items: ServerMetrics[] = [];
-    private waiters: Array<(value: ServerMetrics) => void> = [];
-
-    push(value: ServerMetrics): void {
-        const waiter = this.waiters.shift();
-        if (waiter) {
-            waiter(value);
-            return;
-        }
-        this.items.push(value);
-    }
-
-    async shift(): Promise<ServerMetrics> {
-        const value = this.items.shift();
-        if (value) {
-            return value;
-        }
-        return await new Promise<ServerMetrics>((resolve) => this.waiters.push(resolve));
-    }
-}
 
 function nowNs(): number {
     return Number(process.hrtime.bigint());
@@ -105,10 +68,17 @@ function parseArgs(): Record<string, string> {
     return parsed;
 }
 
+function parseCsv(value: string | undefined, fallback: readonly string[]): string[] {
+    if (!value) {
+        return [...fallback];
+    }
+    const selected = value.split(",").filter(Boolean);
+    return selected.length > 0 ? selected : [...fallback];
+}
+
 function scenarioRecord(scenario: Scenario, iterations: number, warmupIterations: number, samples: Sample[]) {
     return {
         language: "typescript",
-        networkLatency: scenario.networkLatency,
         dataShape: scenario.dataShape,
         collectionShape: scenario.collectionShape,
         method: scenario.method,
@@ -127,209 +97,152 @@ function schemaPath(): string {
     return path.resolve(process.cwd(), "../schema/telepact");
 }
 
-async function requestWithRetry(connection: NatsConnection, subject: string, payload: Uint8Array) {
-    for (let attempt = 0; attempt <= NATS_REQUEST_ADDITIONAL_RETRIES; attempt += 1) {
-        try {
-            return await connection.request(subject, payload, { timeout: NATS_REQUEST_TIMEOUT_MS });
-        } catch (error) {
-            if (attempt >= NATS_REQUEST_ADDITIONAL_RETRIES) {
-                throw error;
-            }
-            await new Promise((resolve) => setTimeout(resolve, NATS_REQUEST_RETRY_DELAY_MS));
-        }
-    }
-    throw new Error("unreachable");
+function warmupIterationsForScenario(scenario: Scenario, warmupIterations: number): number {
+    return scenario.method === "telepact-binary" || scenario.method === "telepact-packed-binary"
+        ? warmupIterations
+        : 0;
 }
 
-async function createPlainJsonRunner(serverConnection: NatsConnection, clientConnection: NatsConnection, subject: string, scenario: Scenario, queue: MetricsQueue) {
-    const sub = serverConnection.subscribe(subject);
-    (async () => {
-        for await (const msg of sub) {
-            const receivedAt = nowNs();
-            const requestObject = JSON.parse(new TextDecoder().decode(msg.data));
-            const afterDeserialize = nowNs();
-            const responseObject = { function: requestObject.function, items: requestObject.items };
-            const beforeSerialize = nowNs();
-            const responseBytes = new TextEncoder().encode(JSON.stringify(responseObject));
-            const responseSentAt = nowNs();
-            queue.push({
-                requestNetworkArrivalNs: receivedAt,
-                serverRequestDeserializationTimeNs: afterDeserialize - receivedAt,
-                serverResponseSerializationTimeNs: responseSentAt - beforeSerialize,
-                responseSentAtNs: responseSentAt,
-            });
-            msg.respond(responseBytes);
+function createPlainJsonBenchmark(scenario: Scenario) {
+    return (payload: JsonMap[]): Sample => {
+        const requestObject = { function: PLAIN_FUNCTION_NAMES[scenario.dataShape], items: payload };
+        const requestSerializeStart = nowNs();
+        const requestBytes = new TextEncoder().encode(JSON.stringify(requestObject));
+        const requestSerializeEnd = nowNs();
+        const requestDeserializeStart = nowNs();
+        const requestRoundTrip = JSON.parse(new TextDecoder().decode(requestBytes));
+        const requestDeserializeEnd = nowNs();
+        if (JSON.stringify(requestRoundTrip.items) !== JSON.stringify(payload)) {
+            throw new Error("plain-json payload mismatch");
         }
-    })();
 
-    return {
-        subscription: sub,
-        requestOnce: async (payload: JsonMap[]): Promise<Sample> => {
-            const requestObject = { function: PLAIN_FUNCTION_NAMES[scenario.dataShape], items: payload };
-            const serializeStart = nowNs();
-            const requestBytes = new TextEncoder().encode(JSON.stringify(requestObject));
-            const serializeEnd = nowNs();
-            const sentAt = nowNs();
-            const response = await requestWithRetry(clientConnection, subject, requestBytes);
-            const receivedAt = nowNs();
-            const deserializeStart = nowNs();
-            const responseObject = JSON.parse(new TextDecoder().decode(response.data));
-            const deserializeEnd = nowNs();
-            if (JSON.stringify(responseObject.items) !== JSON.stringify(payload)) {
-                throw new Error("plain-json payload mismatch");
-            }
-            const serverMetrics = await queue.shift();
-            return {
-                clientRequestSerializationTimeNs: serializeEnd - serializeStart,
-                serializedRequestSizeBytes: requestBytes.length,
-                requestNetworkTransitTimeNs: serverMetrics.requestNetworkArrivalNs - sentAt,
-                serverRequestDeserializationTimeNs: serverMetrics.serverRequestDeserializationTimeNs,
-                serverResponseSerializationTimeNs: serverMetrics.serverResponseSerializationTimeNs,
-                serializedResponseSizeBytes: response.data.length,
-                responseNetworkTransitTimeNs: receivedAt - serverMetrics.responseSentAtNs,
-                clientResponseDeserializationTimeNs: deserializeEnd - deserializeStart,
-            };
-        },
+        const responseObject = { function: requestRoundTrip.function, items: requestRoundTrip.items };
+        const responseSerializeStart = nowNs();
+        const responseBytes = new TextEncoder().encode(JSON.stringify(responseObject));
+        const responseSerializeEnd = nowNs();
+        const responseDeserializeStart = nowNs();
+        const responseRoundTrip = JSON.parse(new TextDecoder().decode(responseBytes));
+        const responseDeserializeEnd = nowNs();
+        if (JSON.stringify(responseRoundTrip.items) !== JSON.stringify(payload)) {
+            throw new Error("plain-json response mismatch");
+        }
+
+        return {
+            requestSerializationTimeNs: requestSerializeEnd - requestSerializeStart,
+            requestDeserializationTimeNs: requestDeserializeEnd - requestDeserializeStart,
+            responseSerializationTimeNs: responseSerializeEnd - responseSerializeStart,
+            responseDeserializationTimeNs: responseDeserializeEnd - responseDeserializeStart,
+            serializedRequestSizeBytes: requestBytes.length,
+            serializedResponseSizeBytes: responseBytes.length,
+        };
     };
 }
 
-async function createProtobufRunner(serverConnection: NatsConnection, clientConnection: NatsConnection, subject: string, scenario: Scenario, queue: MetricsQueue) {
+function createProtobufBenchmark(scenario: Scenario) {
     const requestType = PROTO_TYPES[scenario.dataShape]!.request;
     const responseType = PROTO_TYPES[scenario.dataShape]!.response;
-    const sub = serverConnection.subscribe(subject);
-    (async () => {
-        for await (const msg of sub) {
-            const receivedAt = nowNs();
-            const requestMessage = requestType.decode(msg.data);
-            const afterDeserialize = nowNs();
-            const responseMessage = responseType.create({ items: requestMessage.items });
-            const beforeSerialize = nowNs();
-            const responseBytes = responseType.encode(responseMessage).finish();
-            const responseSentAt = nowNs();
-            queue.push({
-                requestNetworkArrivalNs: receivedAt,
-                serverRequestDeserializationTimeNs: afterDeserialize - receivedAt,
-                serverResponseSerializationTimeNs: responseSentAt - beforeSerialize,
-                responseSentAtNs: responseSentAt,
-            });
-            msg.respond(responseBytes);
+
+    return (payload: JsonMap[]): Sample => {
+        const requestMessage = requestType.create({ items: payload });
+        const requestSerializeStart = nowNs();
+        const requestBytes = requestType.encode(requestMessage).finish();
+        const requestSerializeEnd = nowNs();
+        const requestDeserializeStart = nowNs();
+        const requestRoundTrip = requestType.decode(requestBytes);
+        const requestDeserializeEnd = nowNs();
+        if ((requestRoundTrip.items ?? []).length !== payload.length) {
+            throw new Error("protobuf payload mismatch");
         }
-    })();
 
-    return {
-        subscription: sub,
-        requestOnce: async (payload: JsonMap[]): Promise<Sample> => {
-            const requestMessage = requestType.create({ items: payload });
-            const serializeStart = nowNs();
-            const requestBytes = requestType.encode(requestMessage).finish();
-            const serializeEnd = nowNs();
-            const sentAt = nowNs();
-            const response = await requestWithRetry(clientConnection, subject, requestBytes);
-            const receivedAt = nowNs();
-            const deserializeStart = nowNs();
-            const responseMessage = responseType.decode(response.data);
-            const deserializeEnd = nowNs();
-            if ((responseMessage.items ?? []).length !== payload.length) {
-                throw new Error("protobuf payload mismatch");
-            }
-            const serverMetrics = await queue.shift();
-            return {
-                clientRequestSerializationTimeNs: serializeEnd - serializeStart,
-                serializedRequestSizeBytes: requestBytes.length,
-                requestNetworkTransitTimeNs: serverMetrics.requestNetworkArrivalNs - sentAt,
-                serverRequestDeserializationTimeNs: serverMetrics.serverRequestDeserializationTimeNs,
-                serverResponseSerializationTimeNs: serverMetrics.serverResponseSerializationTimeNs,
-                serializedResponseSizeBytes: response.data.length,
-                responseNetworkTransitTimeNs: receivedAt - serverMetrics.responseSentAtNs,
-                clientResponseDeserializationTimeNs: deserializeEnd - deserializeStart,
-            };
-        },
-    };
-}
-
-async function createTelepactRunner(serverConnection: NatsConnection, clientConnection: NatsConnection, subject: string, scenario: Scenario, queue: MetricsQueue) {
-    const telepactSchema = TelepactSchema.fromDirectory(schemaPath(), fs, path);
-    const serverState: { afterDeserializeNs?: number; beforeSerializeNs?: number } = {};
-    const functionRoutes = {
-        "fn.roundTripTypical": async (functionName: string, requestMessage: Message): Promise<Message> => new Message({}, { Ok_: { items: requestMessage.body[functionName].items } }),
-        "fn.roundTripStrings": async (functionName: string, requestMessage: Message): Promise<Message> => new Message({}, { Ok_: { items: requestMessage.body[functionName].items } }),
-        "fn.roundTripNumbers": async (functionName: string, requestMessage: Message): Promise<Message> => new Message({}, { Ok_: { items: requestMessage.body[functionName].items } }),
-    };
-    const options = new ServerOptions();
-    options.authRequired = false;
-    options.onRequest = () => { serverState.afterDeserializeNs = nowNs(); };
-    options.onResponse = () => { serverState.beforeSerializeNs = nowNs(); };
-    const server = new Server(telepactSchema, new FunctionRouter(functionRoutes), options);
-
-    const sub = serverConnection.subscribe(subject);
-    (async () => {
-        for await (const msg of sub) {
-            const receivedAt = nowNs();
-            serverState.afterDeserializeNs = undefined;
-            serverState.beforeSerializeNs = undefined;
-            const response = await server.process(msg.data);
-            const responseSentAt = nowNs();
-            queue.push({
-                requestNetworkArrivalNs: receivedAt,
-                serverRequestDeserializationTimeNs: (serverState.afterDeserializeNs ?? responseSentAt) - receivedAt,
-                serverResponseSerializationTimeNs: responseSentAt - (serverState.beforeSerializeNs ?? receivedAt),
-                responseSentAtNs: responseSentAt,
-            });
-            msg.respond(response.bytes);
+        const responseMessage = responseType.create({ items: requestRoundTrip.items });
+        const responseSerializeStart = nowNs();
+        const responseBytes = responseType.encode(responseMessage).finish();
+        const responseSerializeEnd = nowNs();
+        const responseDeserializeStart = nowNs();
+        const responseRoundTrip = responseType.decode(responseBytes);
+        const responseDeserializeEnd = nowNs();
+        if ((responseRoundTrip.items ?? []).length !== payload.length) {
+            throw new Error("protobuf response mismatch");
         }
-    })();
 
-    let lastSample: Sample | null = null;
-    const adapter = async (message: Message, serializer: any): Promise<Message> => {
-        const serializeStart = nowNs();
-        const requestBytes = serializer.serialize(message);
-        const serializeEnd = nowNs();
-        const sentAt = nowNs();
-        const response = await requestWithRetry(clientConnection, subject, requestBytes);
-        const receivedAt = nowNs();
-        const deserializeStart = nowNs();
-        const responseMessage = serializer.deserialize(response.data);
-        const deserializeEnd = nowNs();
-        const serverMetrics = await queue.shift();
-        lastSample = {
-            clientRequestSerializationTimeNs: serializeEnd - serializeStart,
+        return {
+            requestSerializationTimeNs: requestSerializeEnd - requestSerializeStart,
+            requestDeserializationTimeNs: requestDeserializeEnd - requestDeserializeStart,
+            responseSerializationTimeNs: responseSerializeEnd - responseSerializeStart,
+            responseDeserializationTimeNs: responseDeserializeEnd - responseDeserializeStart,
             serializedRequestSizeBytes: requestBytes.length,
-            requestNetworkTransitTimeNs: serverMetrics.requestNetworkArrivalNs - sentAt,
-            serverRequestDeserializationTimeNs: serverMetrics.serverRequestDeserializationTimeNs,
-            serverResponseSerializationTimeNs: serverMetrics.serverResponseSerializationTimeNs,
-            serializedResponseSizeBytes: response.data.length,
-            responseNetworkTransitTimeNs: receivedAt - serverMetrics.responseSentAtNs,
-            clientResponseDeserializationTimeNs: deserializeEnd - deserializeStart,
+            serializedResponseSizeBytes: responseBytes.length,
         };
-        return responseMessage;
-    };
-    const clientOptions = new ClientOptions();
-    clientOptions.useBinary = scenario.method !== "telepact-json";
-    clientOptions.alwaysSendJson = scenario.method === "telepact-json";
-    const client = new Client(adapter, clientOptions);
-
-    return {
-        subscription: sub,
-        requestOnce: async (payload: JsonMap[]): Promise<Sample> => {
-            const headers = scenario.method === "telepact-packed-binary" ? { "@pac_": true } : {};
-            const functionName = FUNCTION_NAMES[scenario.dataShape]!;
-            const response = await client.request(new Message(headers, { [functionName]: { items: payload } }));
-            if (JSON.stringify(response.body.Ok_.items) !== JSON.stringify(payload)) {
-                throw new Error("telepact payload mismatch");
-            }
-            return lastSample!;
-        },
     };
 }
 
-async function createRunner(serverConnection: NatsConnection, clientConnection: NatsConnection, subject: string, scenario: Scenario, queue: MetricsQueue) {
+function createTelepactBenchmark(scenario: Scenario) {
+    const client = new Client(async () => { throw new Error("unused benchmark adapter"); }, new ClientOptions());
+    const serverOptions = new ServerOptions();
+    serverOptions.authRequired = false;
+    const server = new Server(TelepactSchema.fromDirectory(schemaPath(), fs, path), new FunctionRouter({}), serverOptions);
+    const clientSerializer = (client as any).serializer;
+    const serverSerializer = (server as any).serializer;
+    const functionName = FUNCTION_NAMES[scenario.dataShape]!;
+
+    return (payload: JsonMap[]): Sample => {
+        const requestHeaders: Record<string, any> = {};
+        if (scenario.method !== "telepact-json") {
+            requestHeaders["@binary_"] = true;
+        }
+        if (scenario.method === "telepact-packed-binary") {
+            requestHeaders["@pac_"] = true;
+        }
+
+        const requestMessage = new Message(requestHeaders, { [functionName]: { items: payload } });
+        const requestSerializeStart = nowNs();
+        const requestBytes = clientSerializer.serialize(requestMessage);
+        const requestSerializeEnd = nowNs();
+        const requestDeserializeStart = nowNs();
+        const requestRoundTrip = serverSerializer.deserialize(requestBytes);
+        const requestDeserializeEnd = nowNs();
+        if (JSON.stringify(requestRoundTrip.body[functionName].items) !== JSON.stringify(payload)) {
+            throw new Error("telepact payload mismatch");
+        }
+
+        const responseHeaders: Record<string, any> = {};
+        if ("@bin_" in requestRoundTrip.headers) {
+            responseHeaders["@binary_"] = true;
+            responseHeaders["@clientKnownBinaryChecksums_"] = requestRoundTrip.headers["@bin_"];
+        }
+        if ("@pac_" in requestRoundTrip.headers) {
+            responseHeaders["@pac_"] = requestRoundTrip.headers["@pac_"];
+        }
+        const responseMessage = new Message(responseHeaders, { Ok_: { items: requestRoundTrip.body[functionName].items } });
+        const responseSerializeStart = nowNs();
+        const responseBytes = serverSerializer.serialize(responseMessage);
+        const responseSerializeEnd = nowNs();
+        const responseDeserializeStart = nowNs();
+        const responseRoundTrip = clientSerializer.deserialize(responseBytes);
+        const responseDeserializeEnd = nowNs();
+        if (JSON.stringify(responseRoundTrip.body.Ok_.items) !== JSON.stringify(payload)) {
+            throw new Error("telepact response mismatch");
+        }
+
+        return {
+            requestSerializationTimeNs: requestSerializeEnd - requestSerializeStart,
+            requestDeserializationTimeNs: requestDeserializeEnd - requestDeserializeStart,
+            responseSerializationTimeNs: responseSerializeEnd - responseSerializeStart,
+            responseDeserializationTimeNs: responseDeserializeEnd - responseDeserializeStart,
+            serializedRequestSizeBytes: requestBytes.length,
+            serializedResponseSizeBytes: responseBytes.length,
+        };
+    };
+}
+
+function createBenchmark(scenario: Scenario) {
     switch (scenario.method) {
         case "plain-json":
-            return await createPlainJsonRunner(serverConnection, clientConnection, subject, scenario, queue);
+            return createPlainJsonBenchmark(scenario);
         case "protobuf":
-            return await createProtobufRunner(serverConnection, clientConnection, subject, scenario, queue);
+            return createProtobufBenchmark(scenario);
         default:
-            return await createTelepactRunner(serverConnection, clientConnection, subject, scenario, queue);
+            return createTelepactBenchmark(scenario);
     }
 }
 
@@ -337,43 +250,29 @@ async function main() {
     const args = parseArgs();
     const iterations = Number(args["iterations"]);
     const warmupIterations = Number(args["warmup-iterations"]);
-    const localNatsUrl = args["local-nats-url"];
-    const remoteNatsUrl = args["remote-nats-url"];
+    const dataShapes = parseCsv(args["data-shapes"], DATA_SHAPES);
+    const collectionShapes = parseCsv(args["collection-shapes"], COLLECTION_SHAPES);
+    const methods = parseCsv(args["methods"], METHODS);
     const output = args["output"];
     const payloads = loadPayloads();
     const scenarios: any[] = [];
 
-    for (const networkLatency of NETWORKS) {
-        const natsUrl = networkLatency === "close" ? localNatsUrl : remoteNatsUrl;
-        const clientConnection = await connect({ servers: natsUrl });
-        const serverConnection = await connect({ servers: natsUrl });
-        try {
-            for (const dataShape of DATA_SHAPES) {
-                for (const collectionShape of COLLECTION_SHAPES) {
-                    for (const method of METHODS) {
-                        const scenario: Scenario = { networkLatency, dataShape, collectionShape, method };
-                        const queue = new MetricsQueue();
-                        const subject = `perf.ts.${Date.now()}.${Math.random().toString(16).slice(2)}`;
-                        const runner = await createRunner(serverConnection, clientConnection, subject, scenario, queue);
-                        const payload = payloads[dataShape]![collectionShape]!;
-                        try {
-                            for (let index = 0; index < warmupIterations; index += 1) {
-                                await runner.requestOnce(payload);
-                            }
-                            const samples: Sample[] = [];
-                            for (let index = 0; index < iterations; index += 1) {
-                                samples.push(await runner.requestOnce(payload));
-                            }
-                            scenarios.push(scenarioRecord(scenario, iterations, warmupIterations, samples));
-                        } finally {
-                            await runner.subscription.drain();
-                        }
-                    }
+    for (const dataShape of dataShapes) {
+        for (const collectionShape of collectionShapes) {
+            for (const method of methods) {
+                const scenario: Scenario = { dataShape, collectionShape, method };
+                const benchmarkOnce = createBenchmark(scenario);
+                const payload = payloads[dataShape]![collectionShape]!;
+                const scenarioWarmupIterations = warmupIterationsForScenario(scenario, warmupIterations);
+                for (let index = 0; index < scenarioWarmupIterations; index += 1) {
+                    benchmarkOnce(payload);
                 }
+                const samples: Sample[] = [];
+                for (let index = 0; index < iterations; index += 1) {
+                    samples.push(benchmarkOnce(payload));
+                }
+                scenarios.push(scenarioRecord(scenario, iterations, scenarioWarmupIterations, samples));
             }
-        } finally {
-            await clientConnection.close();
-            await serverConnection.close();
         }
     }
 
@@ -383,8 +282,9 @@ async function main() {
             generatedAt: new Date().toISOString(),
             iterations,
             warmupIterations,
-            localNatsUrl,
-            remoteNatsUrl,
+            dataShapes,
+            collectionShapes,
+            methods,
         },
         scenarios,
     }, null, 2) + "\n");

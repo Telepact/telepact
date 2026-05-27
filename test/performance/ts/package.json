@@ -8,7 +8,6 @@
     "benchmark": "node dist/main.js"
   },
   "dependencies": {
-    "nats": "^2.29.3",
     "protobufjs": "^8.2.0",
     "telepact": "file:telepact.tgz"
   },

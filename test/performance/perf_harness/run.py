@@ -18,36 +18,37 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 from pathlib import Path
 import shlex
 import shutil
-import signal
 import subprocess
-import sys
 from typing import Sequence
 
-from .common import LANGUAGES, PERFORMANCE_ROOT, RESULTS_DIR, summarize_scenarios, utc_now_iso, write_json, write_summary_csv, write_summary_markdown
+from .common import (
+    COLLECTION_SHAPES,
+    DATA_SHAPES,
+    LANGUAGES,
+    METHODS,
+    PERFORMANCE_ROOT,
+    RESULTS_DIR,
+    summarize_scenarios,
+    utc_now_iso,
+    write_json,
+    write_summary_csv,
+    write_summary_markdown,
+)
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--iterations", type=int, default=60)
-    parser.add_argument("--warmup-iterations", type=int, default=6)
-    parser.add_argument("--local-nats-url", default="nats://127.0.0.1:4222")
-    parser.add_argument("--remote-nats-url", default="nats://demo.nats.io:4222")
+    parser.add_argument("--iterations", type=int, default=20)
+    parser.add_argument("--warmup-iterations", type=int, default=1)
     parser.add_argument("--languages", nargs="*", default=list(LANGUAGES), choices=list(LANGUAGES))
+    parser.add_argument("--data-shapes", nargs="*", default=list(DATA_SHAPES), choices=list(DATA_SHAPES))
+    parser.add_argument("--collection-shapes", nargs="*", default=list(COLLECTION_SHAPES), choices=list(COLLECTION_SHAPES))
+    parser.add_argument("--methods", nargs="*", default=list(METHODS), choices=list(METHODS))
     parser.add_argument("--output-dir", type=Path, default=RESULTS_DIR)
     return parser.parse_args()
-
-
-def start_local_nats() -> subprocess.Popen[str]:
-    return subprocess.Popen(
-        ["nats-server", "-p", "4222"],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.STDOUT,
-        text=True,
-    )
 
 
 def run_command(command: Sequence[str], cwd: Path) -> None:
@@ -58,8 +59,9 @@ def worker_command(language: str, args: argparse.Namespace, output_path: Path) -
     base_args = [
         "--iterations", str(args.iterations),
         "--warmup-iterations", str(args.warmup_iterations),
-        "--local-nats-url", args.local_nats_url,
-        "--remote-nats-url", args.remote_nats_url,
+        "--data-shapes", ",".join(args.data_shapes),
+        "--collection-shapes", ",".join(args.collection_shapes),
+        "--methods", ",".join(args.methods),
         "--output", str(output_path),
     ]
     if language == "python":
@@ -80,35 +82,31 @@ def main() -> None:
         shutil.rmtree(output_dir)
     raw_dir.mkdir(parents=True, exist_ok=True)
 
-    nats_process = start_local_nats()
-    try:
-        raw_paths: list[Path] = []
-        for language in args.languages:
-            raw_output = raw_dir / f"{language}.json"
-            command, cwd = worker_command(language, args, raw_output)
-            run_command(command, cwd)
-            raw_paths.append(raw_output)
+    raw_paths: list[Path] = []
+    for language in args.languages:
+        raw_output = raw_dir / f"{language}.json"
+        command, cwd = worker_command(language, args, raw_output)
+        run_command(command, cwd)
+        raw_paths.append(raw_output)
 
-        combined_raw: list[dict[str, object]] = []
-        for raw_path in raw_paths:
-            combined_raw.extend(json.loads(raw_path.read_text())["scenarios"])
+    combined_raw: list[dict[str, object]] = []
+    for raw_path in raw_paths:
+        combined_raw.extend(json.loads(raw_path.read_text())["scenarios"])
 
-        summarized = summarize_scenarios(combined_raw)
-        metadata = {
-            "generatedAt": utc_now_iso(),
-            "iterations": args.iterations,
-            "warmupIterations": args.warmup_iterations,
-            "localNatsUrl": args.local_nats_url,
-            "remoteNatsUrl": args.remote_nats_url,
-            "languages": args.languages,
-        }
-        write_json(output_dir / "raw-results.json", {"metadata": metadata, "scenarios": combined_raw})
-        write_json(output_dir / "summary.json", {"metadata": metadata, "scenarios": summarized})
-        write_summary_csv(output_dir / "summary.csv", summarized)
-        write_summary_markdown(output_dir / "summary.md", summarized)
-    finally:
-        nats_process.send_signal(signal.SIGTERM)
-        nats_process.wait(timeout=20)
+    summarized = summarize_scenarios(combined_raw)
+    metadata = {
+        "generatedAt": utc_now_iso(),
+        "iterations": args.iterations,
+        "warmupIterations": args.warmup_iterations,
+        "languages": args.languages,
+        "dataShapes": args.data_shapes,
+        "collectionShapes": args.collection_shapes,
+        "methods": args.methods,
+    }
+    write_json(output_dir / "raw-results.json", {"metadata": metadata, "scenarios": combined_raw})
+    write_json(output_dir / "summary.json", {"metadata": metadata, "scenarios": summarized})
+    write_summary_csv(output_dir / "summary.csv", summarized)
+    write_summary_markdown(output_dir / "summary.md", summarized)
 
 
 if __name__ == "__main__":
