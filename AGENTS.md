@@ -1,60 +1,27 @@
-# Agent Instructions
+# Telepact
 
-This document provides guidance for AI agents working within the Telepact codebase.
+Telepact is an API ecosystem for all synchronous inter-process communication. It intends to make it as easy as possible to set up client-server semantics across any inter-process communication boundary.
 
-## Developer Workflow
+## Motiviation
 
-The entire project uses a hierarchical `Makefile` system. The root `Makefile` delegates tasks to the `Makefile`s within each component's directory.
+The state of software automated QA is not great. The utility of CI tests depends on the stability of the interfaces it interacts with, and our most stable interfaces that sit at the IPC boundaries have too many design concessions. Each modern major industry API technology, whether that is REST, gRPRC, or GraphQL, over-indexes on a particular goal that compromises other important categories that erode trust at the interface and therefore trust in any automated tests built on those interfaces. Trust is our stable IPC interfaces is so bad due to aesthetics/ergonomics/predictability that many devs are actively avoiding them and building tests on inherently unstable implementation interfaces all because it feels better in the short term. This hurts automated QA in the long term, because you cannot trust a test built on an unstable interface that can easily be thrown away in the future on a whim.
 
-### Building
+Telepact is an ambitious attempt to unseat the industry's most common API technologies so that automated QA actually starts to work, where devs finally feel comfortable binding tests to stable IPC interfaces. Telepact aims to usher in a world where automated tests finally sit at the stable interfaces where they are most likely to survive software evolution so that they are still there, relevant and credible at the time when a bug needs to be caught.
 
--   To build a specific library, navigate to its directory or use the root makefile. For example, to build the Java library:
-    ```sh
-    make java
-    # or
-    cd lib/java && make
-    ```
--   Similarly for other components: `make ts`, `make py`, `make cli`, etc.
+## Values
 
-### Testing
+Telepact most values the interface description and toolchain-free ergonimics. When the interface can be accurately described in a portable manner, that unlocks trust that extends across the developer ecosystem. When the toolchain-free experience (i.e. JSON) is first-class, API accessibilty is maximized. All of the major players compromise either one or both of these values.
 
--   Run tests from the `/test/runner` directory:
-    ```sh
-    uv run python -m pytest -s -vv -k <test_name>
-    ```
+gRPC over-indexes on binary, which devs pay for with a burden-some code-generation heavy toolchains, and the JSON-proxy offering lacks the ergonomics of a first-class citizen design.
 
--   NOTE: You need the `-s` flag to show all request/response payloads for debugging.
-    HOWEVER, avoid using `-s` when `-k` is not specified, as it will produce excessive output.
+REST over-indexes on tradition, which devs pay for by being forced to work with type-unsafe everything-is-a-string url abstractions, and the json-schema attempt does not reign-in the wild-west of patterns and poor type-safety.
 
--   The `test/runner` suite uses per-language test consumers in `test/lib/{go,java,py,ts}`.
-    Those directories often install or package artifacts built from `lib/{lang}`, so they are not always reading `lib/{lang}` source files directly at test time.
+GraphQL over-indexes on client-ergonomics, which devs pay for with unpredictable server-side performance and security implications, and there is no toolchain-free out of the everything-is-a-string type-unsafe experience.
 
--   If you change `lib/<lang>`, prefer running the matching root target such as `make test-py`, `make test-ts`, `make test-java`, or `make test-go` before trusting `test/runner` results.
-    These targets rebuild the library artifact, refresh the corresponding `test/lib/<lang>` consumer, and then run the matching runner shard.
+Telepact starts with a reliable interface description schema, complete with rich but non-redundant typing abstractions, and adds features from there. Because Telepact focuses first on API schema credibility and portability, things like schema-powered mocks are possible. With a strong foundation, opt-in features are added without compromising the base JSON-first API experience.
 
--   If you only need to refresh the per-language test consumer without running pytest, use `make prepare-test-py`, `make prepare-test-ts`, `make prepare-test-java`, or `make prepare-test-go`.
+## Guidelines
 
--   If you only need to run the matching runner shard without rebuilding the consumer first, use `make test-py-run`, `make test-ts-run`, `make test-java-run`, or `make test-go-run`.
+Keep all of the core runtimes in `lib/` as tight implementation mirrors of one another. They all support the same Telepact spec, and should have predictable implementation that have the same file/folder patterns.
 
--   If test environments may be stale, run `make clean-test` first, then rerun the appropriate `make test-<lang>` target.
-
--   Be careful running `uv run python -m pytest ...` directly in `test/runner` after a library change.
-    That is only reliable if the corresponding `test/lib/<lang>` consumer has already been rebuilt.
-
--   Do not create tests in `lib/` or in `test/lib`. All test cases should be defined in `test/runner`, and test harnesses in `test/lib`.
-
-### Final Verification
-
--   If you have made changes to `lib/`, it is a good idea to run `make local-ci` from the repository root.
-    This target cleans the shared workspace, rebuilds the primary CI targets in order, and catches issues that only show up when the repo is exercised end-to-end in one environment.
-
-### Key Files & Directories
-
--   `Makefile`: The entry point for all build, test, and deploy operations.
--   `lib/{go,java,py,ts}`: The core libraries. Changes here impact the fundamental behavior of Telepact.
--   `bind/dart`: Language-specific bindings for Dart.
--   `test/runner`: The cross-language integration test suite. This is the best place to understand how different language implementations are expected to behave and interact.
--   `common/*.telepact.yaml`: The common schema files that define the internal APIs used by Telepact itself.
--   `sdk/console`: A React and Vite TypeScript project for the developer console.
--   `sdk/cli`: A Python/uv project for the command-line interface.
--   `sdk/prettier`: A project for the Prettier plugin.
+Keep Telepact runtime testing in `test/`, not in `lib/`. All of the runtimes must be held to the same standard to prevent behavior drift, so a single test harness that is applied equally to each runtime language implementation best ensures this consistency.
