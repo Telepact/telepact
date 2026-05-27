@@ -19,21 +19,16 @@ package telepact.performance;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.protobuf.MessageLite;
-import io.github.telepact.Client;
-import io.github.telepact.FunctionRouter;
 import io.github.telepact.Message;
-import io.github.telepact.Serializer;
-import io.github.telepact.Server;
+import io.github.telepact.SerializerFactory;
 import io.github.telepact.TelepactSchema;
 import java.io.File;
-import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
 import telepact.performance.v1.Benchmark;
 
 public class Main {
@@ -220,12 +215,9 @@ public class Main {
     }
 
     private static BenchmarkRun createTelepactBenchmark(Scenario scenario) throws Exception {
-        var client = new Client((message, serializer) -> CompletableFuture.failedFuture(new UnsupportedOperationException("unused benchmark adapter")), new Client.Options());
-        var serverOptions = new Server.Options();
-        serverOptions.authRequired = false;
-        var server = new Server(TelepactSchema.fromDirectory(Path.of("..", "schema", "telepact").toString()), new FunctionRouter(new HashMap<>()), serverOptions);
-        var clientSerializer = extractSerializer(client);
-        var serverSerializer = extractSerializer(server);
+        var schema = TelepactSchema.fromDirectory(Path.of("..", "schema", "telepact").toString());
+        var clientSerializer = SerializerFactory.createClientSerializer();
+        var serverSerializer = SerializerFactory.createServerSerializer(schema);
         var functionName = FUNCTION_NAMES.get(scenario.dataShape());
 
         return payload -> {
@@ -277,12 +269,6 @@ public class Main {
                     requestBytes.length,
                     responseBytes.length);
         };
-    }
-
-    private static Serializer extractSerializer(Object target) throws Exception {
-        Field serializerField = target.getClass().getDeclaredField("serializer");
-        serializerField.setAccessible(true);
-        return (Serializer) serializerField.get(target);
     }
 
     private static Map<String, Object> loadPayloads() throws Exception {

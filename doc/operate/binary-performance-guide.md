@@ -27,11 +27,11 @@ The generated artifacts live in:
 
 | Method | Median request size (bytes) | Median response size (bytes) | Median total codec time (ms) |
 | --- | ---: | ---: | ---: |
-| Telepact JSON | 6349.0 | 6333.0 | 0.2855 |
-| Telepact binary | 2528.0 | 2528.0 | 0.3284 |
-| Telepact packed binary | 2225.0 | 2225.0 | 0.6117 |
-| protobuf | 2379.0 | 2379.0 | 0.1486 |
-| plain JSON | 6350.0 | 6350.0 | 0.2113 |
+| Telepact JSON | 6349.0 | 6333.0 | 0.2867 |
+| Telepact binary | 2528.0 | 2528.0 | 0.3477 |
+| Telepact packed binary | 2225.0 | 2225.0 | 0.6082 |
+| protobuf | 2379.0 | 2379.0 | 0.1258 |
+| plain JSON | 6350.0 | 6350.0 | 0.2187 |
 
 The broad pattern is:
 
@@ -46,31 +46,31 @@ The broad pattern is:
 
 | Method | Request bytes | Response bytes | Total codec time (ms) |
 | --- | ---: | ---: | ---: |
-| Telepact JSON | 50519 | 50503 | 2.1241 |
-| Telepact binary | 20072 | 20072 | 2.3609 |
-| Telepact packed binary | 17529 | 17529 | 4.7284 |
-| protobuf | 19027 | 19027 | 0.8051 |
-| plain JSON | 50520 | 50520 | 1.2587 |
+| Telepact JSON | 50519 | 50503 | 2.1295 |
+| Telepact binary | 20072 | 20072 | 2.3309 |
+| Telepact packed binary | 17529 | 17529 | 4.7427 |
+| protobuf | 19027 | 19027 | 0.8218 |
+| plain JSON | 50520 | 50520 | 1.6267 |
 
 ### All-numbers data, really big list (median across Python, TypeScript, Java)
 
 | Method | Request bytes | Response bytes | Total codec time (ms) |
 | --- | ---: | ---: | ---: |
-| Telepact JSON | 42920 | 42904 | 1.1395 |
-| Telepact binary | 20729 | 20729 | 2.3320 |
-| Telepact packed binary | 18186 | 18186 | 1.5034 |
-| protobuf | 18354 | 18354 | 0.6332 |
-| plain JSON | 42921 | 42921 | 1.0910 |
+| Telepact JSON | 42920 | 42904 | 1.1773 |
+| Telepact binary | 20729 | 20729 | 2.3045 |
+| Telepact packed binary | 18186 | 18186 | 1.0027 |
+| protobuf | 18354 | 18354 | 0.5312 |
+| plain JSON | 42921 | 42921 | 1.1241 |
 
 ### Typical data, single item (median across Python, TypeScript, Java)
 
 | Method | Request bytes | Response bytes | Total codec time (ms) |
 | --- | ---: | ---: | ---: |
-| Telepact JSON | 137 | 121 | 0.0272 |
-| Telepact binary | 57 | 57 | 0.0486 |
-| Telepact packed binary | 69 | 69 | 0.0604 |
-| protobuf | 36 | 36 | 0.0305 |
-| plain JSON | 138 | 138 | 0.0137 |
+| Telepact JSON | 137 | 121 | 0.0270 |
+| Telepact binary | 57 | 57 | 0.0489 |
+| Telepact packed binary | 69 | 69 | 0.0615 |
+| protobuf | 36 | 36 | 0.0347 |
+| plain JSON | 138 | 138 | 0.0138 |
 
 ## 3. Practical recommendations
 
