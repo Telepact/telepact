@@ -1,27 +1,27 @@
 # Telepact
 
-Telepact is an API ecosystem for all synchronous inter-process communication. It intends to make it as easy as possible to set up client-server semantics across any inter-process communication boundary.
+Telepact is an API ecosystem for synchronous inter-process communication. It aims to make it easy to set up client-server semantics across IPC boundaries.
 
-## Motiviation
+## Motivation
 
-The state of software automated QA is not great. The utility of CI tests depends on the stability of the interfaces it interacts with, and our most stable interfaces that sit at the IPC boundaries have too many design concessions. Each modern major industry API technology, whether that is REST, gRPRC, or GraphQL, over-indexes on a particular goal that compromises other important categories that erode trust at the interface and therefore trust in any automated tests built on those interfaces. Trust is our stable IPC interfaces is so bad due to aesthetics/ergonomics/predictability that many devs are actively avoiding them and building tests on inherently unstable implementation interfaces all because it feels better in the short term. This hurts automated QA in the long term, because you cannot trust a test built on an unstable interface that can easily be thrown away in the future on a whim.
+The state of automated software QA is not great. The utility of CI tests depends on the stability of the interfaces they interact with, but many IPC boundary technologies make tradeoffs that reduce long-term trust and maintainability. Modern API technologies such as REST, gRPC, and GraphQL each optimize heavily for specific goals while compromising other important qualities like predictability, portability, or ergonomics. As a result, developers often build tests against unstable implementation details instead of stable interfaces, which reduces the longevity and reliability of automated tests.
 
-Telepact is an ambitious attempt to unseat the industry's most common API technologies so that automated QA actually starts to work, where devs finally feel comfortable binding tests to stable IPC interfaces. Telepact aims to usher in a world where automated tests finally sit at the stable interfaces where they are most likely to survive software evolution so that they are still there, relevant and credible at the time when a bug needs to be caught.
+Telepact is an attempt to improve the stability and usability of IPC interfaces so that automated QA can more reliably depend on them. The goal is to make stable IPC contracts practical and ergonomic enough that developers are comfortable building long-lived tests against them.
 
 ## Values
 
-Telepact most values the interface description and toolchain-free ergonimics. When the interface can be accurately described in a portable manner, that unlocks trust that extends across the developer ecosystem. When the toolchain-free experience (i.e. JSON) is first-class, API accessibilty is maximized. All of the major players compromise either one or both of these values.
+Telepact prioritizes strong interface descriptions and toolchain-free ergonomics. When interfaces can be described accurately in a portable manner, trust and interoperability improve across the developer ecosystem. When the toolchain-free experience (for example, JSON) is treated as a first-class workflow, accessibility improves as well. Existing API technologies often compromise one or both of these values.
 
-gRPC over-indexes on binary, which devs pay for with a burden-some code-generation heavy toolchains, and the JSON-proxy offering lacks the ergonomics of a first-class citizen design.
+gRPC prioritizes binary efficiency, but this often comes with code-generation-heavy toolchains, and its JSON proxy support lacks the ergonomics of a first-class design.
 
-REST over-indexes on tradition, which devs pay for by being forced to work with type-unsafe everything-is-a-string url abstractions, and the json-schema attempt does not reign-in the wild-west of patterns and poor type-safety.
+REST prioritizes compatibility and convention, but developers are frequently left working with loosely typed URL abstractions, and JSON Schema alone does not fully standardize patterns or improve type safety.
 
-GraphQL over-indexes on client-ergonomics, which devs pay for with unpredictable server-side performance and security implications, and there is no toolchain-free out of the everything-is-a-string type-unsafe experience.
+GraphQL prioritizes client ergonomics, but this can introduce unpredictable server-side performance and security considerations, while still relying heavily on string-based query semantics.
 
-Telepact starts with a reliable interface description schema, complete with rich but non-redundant typing abstractions, and adds features from there. Because Telepact focuses first on API schema credibility and portability, things like schema-powered mocks are possible. With a strong foundation, opt-in features are added without compromising the base JSON-first API experience.
+Telepact starts with a reliable interface description schema, including rich but non-redundant typing abstractions, and builds features from there. A strong schema foundation enables capabilities such as schema-powered mocks while preserving a JSON-first API experience.
 
 ## Guidelines
 
-Keep all of the core runtimes in `lib/` as tight implementation mirrors of one another. They all support the same Telepact spec, and should have predictable implementation that have the same file/folder patterns.
+Keep all core runtimes in `lib/` as tight implementation mirrors of one another. They should all support the same Telepact specification and follow predictable file and folder patterns.
 
-Keep Telepact runtime testing in `test/`, not in `lib/`. All of the runtimes must be held to the same standard to prevent behavior drift, so a single test harness that is applied equally to each runtime language implementation best ensures this consistency.
+Keep Telepact runtime testing in `test/`, not in `lib/`. All runtimes should be held to the same standard to prevent behavior drift, so a shared test harness applied equally to each runtime implementation best ensures consistency.
