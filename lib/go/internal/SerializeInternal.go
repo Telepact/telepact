@@ -56,6 +56,20 @@ func SerializeInternal(
 	message := []any{headers, body}
 
 	if serializeAsBinary {
+		if binarySerializer, ok := serializer.(binary.BinaryMsgpackSerialization); ok {
+			if msgpackEncoder, ok := binaryEncoder.(binary.MsgpackBinaryEncoder); ok {
+				payload, err := msgpackEncoder.EncodeToMsgpack(message, binarySerializer)
+				if err == nil {
+					return payload, nil
+				}
+				var unavailableErr binary.BinaryEncoderUnavailableError
+				if !errors.As(err, &unavailableErr) {
+					return nil, wrap(err, "encode msgpack")
+				}
+				return serializeAsJSON(message, base64Encoder, serializer, wrap)
+			}
+		}
+
 		encoded, err := binaryEncoder.Encode(message)
 		if err != nil {
 			var unavailableErr binary.BinaryEncoderUnavailableError

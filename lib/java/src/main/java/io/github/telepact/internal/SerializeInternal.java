@@ -44,8 +44,7 @@ public class SerializeInternal {
         try {
             if (serializeAsBinary) {
                 try {
-                    final var encodedMessage = binaryEncoder.encode(messageAsPseudoJson);
-                    return serializer.toMsgPack(encodedMessage);
+                    return binaryEncoder.encodeToMsgPack(messageAsPseudoJson, serializer);
                 } catch (BinaryEncoderUnavailableError e) {
                     // We can still submit as json
                     final var base64EncodedMessage = base64Encoder.encode(messageAsPseudoJson);

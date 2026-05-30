@@ -32,6 +32,32 @@ class ClientBinaryEncoder(BinaryEncoder):
         from ...internal.binary.ClientBinaryEncode import client_binary_encode
         return client_binary_encode(message, self.binary_encoding_cache, self.binaryChecksumStrategy)
 
+    def encode_msgpack(self, message: list[object], serializer: object) -> bytes:
+        from ...internal.binary.BinaryEncoderUnavailableError import BinaryEncoderUnavailableError
+
+        if not hasattr(serializer, "to_binary_msgpack"):
+            return serializer.to_msgpack(self.encode(message))
+
+        headers = message[0]
+        body = message[1]
+        force_send_json = headers.pop("_forceSendJson", None)
+
+        checksums = self.binaryChecksumStrategy.get_current_checksums()
+        headers["@bin_"] = checksums
+
+        if force_send_json is True or len(checksums) > 1:
+            raise BinaryEncoderUnavailableError()
+
+        binary_encoding = self.binary_encoding_cache.get(checksums[0]) if checksums else None
+        if not binary_encoding:
+            raise BinaryEncoderUnavailableError()
+
+        return serializer.to_binary_msgpack(headers, body, binary_encoding)
+
     def decode(self, message: list[object]) -> list[object]:
         from ...internal.binary.ClientBinaryDecode import client_binary_decode
         return client_binary_decode(message, self.binary_encoding_cache, self.binaryChecksumStrategy)
+
+    def decode_msgpack(self, message_bytes: bytes, serializer: object) -> list[object]:
+        from ...internal.binary.ClientBinaryDecode import client_binary_decode_msgpack
+        return client_binary_decode_msgpack(message_bytes, self.binary_encoding_cache, self.binaryChecksumStrategy, serializer)

@@ -27,7 +27,9 @@ export function clientBinaryEncode(
     const headers = message[0] as Record<string, any>;
     const messageBody = message[1] as Record<string, any>;
     const forceSendJson = headers["_forceSendJson"];
-    delete headers["_forceSendJson"];
+    if (forceSendJson !== undefined) {
+        delete headers["_forceSendJson"];
+    }
 
     const checksums = binaryChecksumStrategy.getCurrentChecksums()
     headers["@bin_"] = checksums;

@@ -25,7 +25,7 @@ public class EncodeKeys {
         if (given == null) {
             return given;
         } else if (given instanceof final Map<?, ?> m) {
-            final var newMap = new HashMap<Object, Object>();
+            final var newMap = new HashMap<Object, Object>(m.size());
 
             for (final var e : m.entrySet()) {
                 final var key = e.getKey();
@@ -37,14 +37,19 @@ public class EncodeKeys {
                     finalKey = key;
                 }
 
-                final var encodedValue = encodeKeys(e.getValue(), binaryEncoding);
+                final var value = e.getValue();
+                final var encodedValue = value instanceof Map<?, ?> || value instanceof List<?> ? encodeKeys(value, binaryEncoding) : value;
 
                 newMap.put(finalKey, encodedValue);
             }
 
             return newMap;
         } else if (given instanceof List<?> l) {
-            return l.stream().map(e -> encodeKeys(e, binaryEncoding)).toList();
+            final var newList = new java.util.ArrayList<Object>(l.size());
+            for (final var item : l) {
+                newList.add(item instanceof Map<?, ?> || item instanceof List<?> ? encodeKeys(item, binaryEncoding) : item);
+            }
+            return newList;
         } else {
             return given;
         }

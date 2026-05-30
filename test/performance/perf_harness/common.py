@@ -26,7 +26,7 @@ import json
 import statistics
 from typing import Any, Iterable
 
-LANGUAGES = ("python", "typescript", "java")
+LANGUAGES = ("python", "typescript", "java", "go")
 DATA_SHAPES = ("typical", "all-strings", "all-numbers")
 COLLECTION_SHAPES = ("single", "small-list", "big-list", "really-big-list", "huge-list")
 METHODS = (

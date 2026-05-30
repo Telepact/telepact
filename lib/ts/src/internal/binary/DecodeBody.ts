@@ -17,6 +17,6 @@
 import { BinaryEncoding } from '../../internal/binary/BinaryEncoding.js';
 import { decodeKeys } from '../../internal/binary/DecodeKeys.js';
 
-export function decodeBody(encodedMessageBody: Map<any, any>, binaryEncoder: BinaryEncoding): Record<string, any> {
+export function decodeBody(encodedMessageBody: Map<any, any> | Record<string, any>, binaryEncoder: BinaryEncoding): Record<string, any> {
     return decodeKeys(encodedMessageBody, binaryEncoder);
 }

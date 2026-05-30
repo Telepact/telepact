@@ -23,7 +23,7 @@ import java.util.Map;
 public class DecodeKeys {
     static Object decodeKeys(Object given, BinaryEncoding binaryEncoder) {
         if (given instanceof Map<?, ?> m) {
-            final var newMap = new HashMap<String, Object>();
+            final var newMap = new HashMap<String, Object>(m.size());
 
             for (final var e : m.entrySet()) {
                 final String key;
@@ -38,14 +38,19 @@ public class DecodeKeys {
                 } else {
                     throw new BinaryEncodingMissing(e.getKey());
                 }
-                final var encodedValue = decodeKeys(e.getValue(), binaryEncoder);
+                final var value = e.getValue();
+                final var encodedValue = value instanceof Map<?, ?> || value instanceof List<?> ? decodeKeys(value, binaryEncoder) : value;
 
                 newMap.put(key, encodedValue);
             }
 
             return newMap;
         } else if (given instanceof final List<?> l) {
-            return l.stream().map(e -> decodeKeys(e, binaryEncoder)).toList();
+            final var newList = new java.util.ArrayList<Object>(l.size());
+            for (final var item : l) {
+                newList.add(item instanceof Map<?, ?> || item instanceof List<?> ? decodeKeys(item, binaryEncoder) : item);
+            }
+            return newList;
         } else {
             return given;
         }

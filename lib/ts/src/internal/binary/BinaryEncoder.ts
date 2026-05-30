@@ -14,7 +14,17 @@
 //|  limitations under the License.
 //|
 
+import { Serialization } from '../../Serialization.js';
+
 export abstract class BinaryEncoder {
-    abstract encode(message: object[]): object[];
-    abstract decode(message: object[]): object[];
+    abstract encode(message: any[]): any[];
+    abstract decode(message: any[]): any[];
+
+    encodeToMsgpack(message: any[], serializer: Serialization): Uint8Array {
+        return serializer.toMsgpack(this.encode(message));
+    }
+
+    decodeMsgpack(messageBytes: Uint8Array, serializer: Serialization): any[] {
+        return this.decode(serializer.fromMsgpack(messageBytes));
+    }
 }

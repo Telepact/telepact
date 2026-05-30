@@ -19,14 +19,18 @@ import { encodeBody } from '../../internal/binary/EncodeBody.js';
 import { BinaryEncoderUnavailableError } from '../../internal/binary/BinaryEncoderUnavailableError.js';
 
 export function serverBinaryEncode(message: any[], binaryEncoder: BinaryEncoding): any[] {
-    const headers: { [key: string]: any } = message[0];
+    const inputHeaders: { [key: string]: any } = message[0];
     const messageBody: { [key: string]: any } = message[1];
-    const clientKnownBinaryChecksums: number[] | undefined = headers['@clientKnownBinaryChecksums_'];
-    delete headers['@clientKnownBinaryChecksums_'];
+    const clientKnownBinaryChecksums: number[] | undefined = inputHeaders['@clientKnownBinaryChecksums_'];
+    delete inputHeaders['@clientKnownBinaryChecksums_'];
+    const headers: { [key: string]: any } = {};
+    for (const key in inputHeaders) {
+        if (Object.prototype.hasOwnProperty.call(inputHeaders, key)) {
+            headers[key] = inputHeaders[key];
+        }
+    }
 
-    const resultTag = Object.keys(messageBody)[0];
-
-    if (resultTag !== 'Ok_') {
+    if (!Object.prototype.hasOwnProperty.call(messageBody, 'Ok_')) {
         throw new BinaryEncoderUnavailableError();
     }
 

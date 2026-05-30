@@ -18,11 +18,15 @@ import { BinaryEncoder } from './BinaryEncoder.js';
 import { BinaryEncoding } from './BinaryEncoding.js';
 import { serverBinaryEncode } from './ServerBinaryEncode.js';
 import { serverBinaryDecode } from './ServerBinaryDecode.js';
+import { Serialization } from '../../Serialization.js';
+import { isBinaryMsgpackSerialization } from './BinaryMsgpackSerialization.js';
+import { BinaryEncoderUnavailableError } from './BinaryEncoderUnavailableError.js';
 
-export class ServerBinaryEncoder implements BinaryEncoder {
+export class ServerBinaryEncoder extends BinaryEncoder {
     private binaryEncoder: BinaryEncoding;
 
     constructor(binaryEncoder: BinaryEncoding) {
+        super();
         this.binaryEncoder = binaryEncoder;
     }
 
@@ -32,5 +36,50 @@ export class ServerBinaryEncoder implements BinaryEncoder {
 
     decode(message: any[]): any[] {
         return serverBinaryDecode(message, this.binaryEncoder);
+    }
+
+    encodeToMsgpack(message: any[], serializer: Serialization): Uint8Array {
+        if (!isBinaryMsgpackSerialization(serializer)) {
+            return super.encodeToMsgpack(message, serializer);
+        }
+
+        const inputHeaders = message[0] as Record<string, any>;
+        const body = message[1] as Record<string, any>;
+        const clientKnownBinaryChecksums = inputHeaders['@clientKnownBinaryChecksums_'] as number[] | undefined;
+        delete inputHeaders['@clientKnownBinaryChecksums_'];
+        const headers: Record<string, any> = {};
+        for (const key in inputHeaders) {
+            if (Object.prototype.hasOwnProperty.call(inputHeaders, key)) {
+                headers[key] = inputHeaders[key];
+            }
+        }
+
+        if (!Object.prototype.hasOwnProperty.call(body, 'Ok_')) {
+            throw new BinaryEncoderUnavailableError();
+        }
+
+        if (clientKnownBinaryChecksums === undefined || !clientKnownBinaryChecksums.includes(this.binaryEncoder.checksum)) {
+            headers['@enc_'] = this.binaryEncoder.encodeMap;
+        }
+
+        headers['@bin_'] = [this.binaryEncoder.checksum];
+        return serializer.toBinaryMsgpack(headers, body, this.binaryEncoder);
+    }
+
+    decodeMsgpack(messageBytes: Uint8Array, serializer: Serialization): any[] {
+        if (!isBinaryMsgpackSerialization(serializer)) {
+            return super.decodeMsgpack(messageBytes, serializer);
+        }
+
+        const headers = serializer.fromMsgpackHeaders(messageBytes);
+        const clientKnownBinaryChecksums = headers.headers['@bin_'] as number[];
+        const binaryChecksumUsedByClientOnThisMessage = clientKnownBinaryChecksums[0];
+
+        if (binaryChecksumUsedByClientOnThisMessage !== this.binaryEncoder.checksum) {
+            throw new BinaryEncoderUnavailableError();
+        }
+
+        const body = serializer.fromMsgpackBody(messageBytes, headers.bodyOffset, this.binaryEncoder);
+        return [headers.headers, body];
     }
 }

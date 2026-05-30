@@ -43,3 +43,23 @@ def client_binary_decode(message: list[object], binary_encoding_cache: 'BinaryEn
 
     message_body = decode_body(encoded_message_body, binary_encoder)
     return [headers, message_body]
+
+
+def client_binary_decode_msgpack(message_bytes: bytes, binary_encoding_cache: 'BinaryEncodingCache',
+                                 binary_checksum_strategy: 'ClientBinaryStrategy',
+                                 serializer: object) -> list[object]:
+    headers, body_offset = serializer.from_msgpack_headers(message_bytes)
+    binary_checksums = cast(list[int], headers.get("@bin_", []))
+    binary_checksum = binary_checksums[0]
+
+    if "@enc_" in headers:
+        binary_encoding = cast(dict[str, int], headers["@enc_"])
+        binary_encoding_cache.add(binary_checksum, binary_encoding)
+
+    binary_checksum_strategy.update_checksum(binary_checksum)
+    new_current_checksum_strategy = binary_checksum_strategy.get_current_checksums()
+
+    binary_encoder = binary_encoding_cache.get(new_current_checksum_strategy[0])
+
+    message_body = serializer.from_msgpack_body(message_bytes, body_offset, binary_encoder)
+    return [headers, message_body]

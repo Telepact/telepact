@@ -24,13 +24,13 @@ export function clientBinaryDecode(
     binaryEncodingCache: BinaryEncodingCache,
     binaryChecksumStrategy: ClientBinaryStrategy,
 ): any[] {
-    const headers = message[0] as Map<string, any>;
-    const encodedMessageBody = message[1] as Map<any, any>;
-    const binaryChecksums = headers.get("@bin_") as number[];
+    const headers = message[0] as Map<string, any> | Record<string, any>;
+    const encodedMessageBody = message[1] as Map<any, any> | Record<string, any>;
+    const binaryChecksums = getHeader(headers, "@bin_") as number[];
     const binaryChecksum = binaryChecksums[0]!;
 
-    if (headers.has("@enc_")) {
-        const binaryEncoding = headers.get("@enc_") as Map<string, number>;
+    if (hasHeader(headers, "@enc_")) {
+        const binaryEncoding = getHeader(headers, "@enc_") as Map<string, number> | Record<string, number>;
         binaryEncodingCache.add(binaryChecksum, binaryEncoding);
     }
 
@@ -42,4 +42,12 @@ export function clientBinaryDecode(
     const messageHeader = convertMapsToObjects(headers);
     const messageBody = decodeBody(encodedMessageBody, binaryEncoder);
     return [messageHeader, messageBody];
+}
+
+function getHeader(headers: Map<string, any> | Record<string, any>, key: string): any {
+    return headers instanceof Map ? headers.get(key) : headers[key];
+}
+
+function hasHeader(headers: Map<string, any> | Record<string, any>, key: string): boolean {
+    return headers instanceof Map ? headers.has(key) : Object.prototype.hasOwnProperty.call(headers, key);
 }

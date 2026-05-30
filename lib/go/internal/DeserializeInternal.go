@@ -17,6 +17,7 @@
 package internal
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/telepact/telepact/lib/go/internal/binary"
@@ -37,16 +38,34 @@ func DeserializeInternal(
 	var (
 		messageAsPseudoJSON any
 		err                 error
+		optimizedMsgpack    bool
 	)
 
 	isMsgpack := messageBytes[0] == 0x92
 
 	if isMsgpack {
-		messageAsPseudoJSON, err = serializer.FromMsgpack(messageBytes)
+		if binarySerializer, ok := serializer.(binary.BinaryMsgpackSerialization); ok {
+			if msgpackEncoder, ok := binaryEncoder.(binary.MsgpackBinaryEncoder); ok {
+				messageAsPseudoJSON, err = msgpackEncoder.DecodeMsgpack(messageBytes, binarySerializer)
+				optimizedMsgpack = err == nil
+			} else {
+				messageAsPseudoJSON, err = serializer.FromMsgpack(messageBytes)
+			}
+		} else {
+			messageAsPseudoJSON, err = serializer.FromMsgpack(messageBytes)
+		}
 	} else {
 		messageAsPseudoJSON, err = serializer.FromJSON(messageBytes)
 	}
 	if err != nil {
+		var unavailableErr binary.BinaryEncoderUnavailableError
+		if errors.As(err, &unavailableErr) {
+			return nil, nil, err
+		}
+		var missingErr *binary.BinaryEncodingMissing
+		if errors.As(err, &missingErr) {
+			return nil, nil, err
+		}
 		return nil, nil, types.NewInvalidMessage(err)
 	}
 
@@ -57,11 +76,23 @@ func DeserializeInternal(
 
 	var finalList []any
 	if isMsgpack {
-		finalList, err = binaryEncoder.Decode(messageList)
+		if optimizedMsgpack {
+			finalList = messageList
+		} else {
+			finalList, err = binaryEncoder.Decode(messageList)
+		}
 	} else {
 		finalList, err = base64Encoder.Decode(messageList)
 	}
 	if err != nil {
+		var unavailableErr binary.BinaryEncoderUnavailableError
+		if errors.As(err, &unavailableErr) {
+			return nil, nil, err
+		}
+		var missingErr *binary.BinaryEncodingMissing
+		if errors.As(err, &missingErr) {
+			return nil, nil, err
+		}
 		return nil, nil, types.NewInvalidMessage(err)
 	}
 

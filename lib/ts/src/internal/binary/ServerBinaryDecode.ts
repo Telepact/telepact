@@ -20,9 +20,9 @@ import { decodeBody } from "../../internal/binary/DecodeBody.js";
 import { convertMapsToObjects } from "./ConvertMapsToObjects.js";
 
 export function serverBinaryDecode(message: any[], binaryEncoder: BinaryEncoding): any[] {
-    const headers = message[0] as Map<string, any>;
-    const encodedMessageBody = message[1] as Map<any, any>;
-    const clientKnownBinaryChecksums = headers.get("@bin_") as number[];
+    const headers = message[0] as Map<string, any> | Record<string, any>;
+    const encodedMessageBody = message[1] as Map<any, any> | Record<string, any>;
+    const clientKnownBinaryChecksums = getHeader(headers, "@bin_") as number[];
     const binaryChecksumUsedByClientOnThisMessage = clientKnownBinaryChecksums[0];
 
     if (binaryChecksumUsedByClientOnThisMessage !== binaryEncoder.checksum) {
@@ -32,4 +32,8 @@ export function serverBinaryDecode(message: any[], binaryEncoder: BinaryEncoding
     const messageHeader = convertMapsToObjects(headers);
     const messageBody = decodeBody(encodedMessageBody, binaryEncoder);
     return [messageHeader, messageBody];
+}
+
+function getHeader(headers: Map<string, any> | Record<string, any>, key: string): any {
+    return headers instanceof Map ? headers.get(key) : headers[key];
 }

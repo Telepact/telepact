@@ -29,13 +29,42 @@ def encode_keys(given: object, binary_encoding: 'BinaryEncoding') -> object:
 
         value_type = type(value)
 
+        if value_type is list:
+            uniform_result = try_encode_uniform_dict_list(value)
+            if uniform_result is not None:
+                return uniform_result
+            return [encode_keys_recursive(item) for item in value]
         if value_type is dict:
             return {
                 encode_map.get(key, key): encode_keys_recursive(item)
                 for key, item in value.items()
             }
-        if value_type is list:
-            return [encode_keys_recursive(item) for item in value]
         return value
+
+    def try_encode_uniform_dict_list(value: list[object]) -> list[dict[object, object]] | None:
+        if len(value) < 16:
+            return None
+
+        first = value[0]
+        if type(first) is not dict or not first:
+            return None
+
+        keys = list(first.keys())
+        encoded_keys: list[object] = []
+        for key in keys:
+            encoded = encode_map.get(key)
+            if encoded is None:
+                return None
+            encoded_keys.append(encoded)
+
+        result: list[dict[object, object]] = []
+        for item in value:
+            if type(item) is not dict:
+                return None
+            result.append({
+                encoded_keys[index]: encode_keys_recursive(item.get(keys[index]))
+                for index in range(len(keys))
+            })
+        return result
 
     return encode_keys_recursive(given)
