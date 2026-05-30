@@ -59,18 +59,7 @@ func ClientBinaryDecode(message []any, cache BinaryEncodingCache, strategy *Clie
 		return nil, BinaryEncoderUnavailableError{}
 	}
 
-	var workingBody map[any]any
-	if isStrictTrue(headers["@pac_"]) {
-		packed, packErr := UnpackBody(encodedBody)
-		if packErr != nil {
-			return nil, packErr
-		}
-		workingBody = packed
-	} else {
-		workingBody = encodedBody
-	}
-
-	decodedBody, decodeErr := DecodeBody(workingBody, encoder)
+	decodedBody, decodeErr := DecodeBody(encodedBody, encoder)
 	if decodeErr != nil {
 		return nil, decodeErr
 	}

@@ -32,7 +32,6 @@ COLLECTION_SHAPES = ("single", "small-list", "big-list", "really-big-list", "hug
 METHODS = (
     "telepact-json",
     "telepact-binary",
-    "telepact-packed-binary",
     "protobuf",
     "plain-json",
 )

@@ -17,7 +17,6 @@
 from util import verify_client_case, ping_req, startup_check, Constants as c
 import pytest
 import json
-from copy import deepcopy as dc
 
 
 @pytest.fixture(scope="module")
@@ -74,7 +73,7 @@ def test_load_binary_case(loop, load_binary_server_proc, nats_client):
 
     async def t():
         for _ in range(50):
-            req = [{'@pac_': True}, {'fn.getData': {}}]
+            req = [{}, {'fn.getData': {}}]
             await verify_client_case(nats_client, req, None, topics[0], None, topics[1], None)
 
     loop.run_until_complete(t())
