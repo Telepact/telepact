@@ -24,12 +24,12 @@ import (
 // Serializer converts Telepact messages between pseudo-JSON and serialized bytes.
 type Serializer struct {
 	serializationImpl Serialization
-	binaryEncoder     binary.BinaryEncoder
+	binaryEncoder     binary.MsgpackBinaryEncoder
 	base64Encoder     binary.Base64Encoder
 }
 
 // NewSerializer constructs a Serializer with the provided serialization and encoding strategies.
-func NewSerializer(serializationImpl Serialization, binaryEncoder binary.BinaryEncoder, base64Encoder binary.Base64Encoder) *Serializer {
+func NewSerializer(serializationImpl Serialization, binaryEncoder binary.MsgpackBinaryEncoder, base64Encoder binary.Base64Encoder) *Serializer {
 	return &Serializer{
 		serializationImpl: serializationImpl,
 		binaryEncoder:     binaryEncoder,
