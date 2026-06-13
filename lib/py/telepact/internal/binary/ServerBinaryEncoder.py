@@ -27,15 +27,8 @@ class ServerBinaryEncoder(BinaryEncoder):
     def __init__(self, binary_encoder: 'BinaryEncoding'):
         self.binary_encoder = binary_encoder
 
-    def encode(self, message: list[object]) -> list[object]:
-        from ...internal.binary.ServerBinaryEncode import server_binary_encode
-        return server_binary_encode(message, self.binary_encoder)
-
     def encode_msgpack(self, message: list[object], serializer: object) -> bytes:
         from ...internal.binary.BinaryEncoderUnavailableError import BinaryEncoderUnavailableError
-
-        if not hasattr(serializer, "to_binary_msgpack"):
-            return serializer.to_msgpack(self.encode(message))
 
         input_headers = message[0]
         body = message[1]
@@ -53,10 +46,6 @@ class ServerBinaryEncoder(BinaryEncoder):
 
         headers["@bin_"] = [self.binary_encoder.checksum]
         return serializer.to_binary_msgpack(headers, body, self.binary_encoder)
-
-    def decode(self, message: list[object]) -> list[object]:
-        from ...internal.binary.ServerBinaryDecode import server_binary_decode
-        return server_binary_decode(message, self.binary_encoder)
 
     def decode_msgpack(self, message_bytes: bytes, serializer: object) -> list[object]:
         from ...internal.binary.ServerBinaryDecode import server_binary_decode_msgpack

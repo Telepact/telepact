@@ -20,15 +20,7 @@ import java.util.List;
 import io.github.telepact.Serialization;
 
 public interface BinaryEncoder {
-    List<Object> encode(List<Object> message);
+    byte[] encodeToMsgPack(List<Object> message, Serialization serializer) throws Throwable;
 
-    List<Object> decode(List<Object> message);
-
-    default byte[] encodeToMsgPack(List<Object> message, Serialization serializer) throws Throwable {
-        return serializer.toMsgPack(encode(message));
-    }
-
-    default List<Object> decodeMsgPack(byte[] messageBytes, Serialization serializer) throws Throwable {
-        return decode((List<Object>) serializer.fromMsgPack(messageBytes));
-    }
+    List<Object> decodeMsgPack(byte[] messageBytes, Serialization serializer) throws Throwable;
 }

@@ -17,13 +17,10 @@
 import { BinaryEncoding } from './BinaryEncoding.js';
 import { BinaryEncodingMissing } from './BinaryEncodingMissing.js';
 import type { MsgpackHeaders } from './BinaryMsgpackSerialization.js';
-import { Unpackr } from 'msgpackr';
-import { decodeKeys } from './DecodeKeys.js';
 
 export class BinaryMsgpackCodec {
     private readonly textEncoder = new TextEncoder();
     private readonly textDecoder = new TextDecoder();
-    private readonly unpackr = new Unpackr({ mapsAsObjects: false, useRecords: false });
     private readonly encodedStrings = new Map<string, Uint8Array>();
 
     public toBinaryMsgpack(headers: Record<string, any>, body: Record<string, any>, binaryEncoding: BinaryEncoding): Uint8Array {
@@ -45,8 +42,8 @@ export class BinaryMsgpackCodec {
     }
 
     public fromMsgpackBody(bytes: Uint8Array, offset: number, binaryEncoding: BinaryEncoding): Record<string, any> {
-        const encodedBody = this.unpackr.decode(bytes.subarray(offset));
-        return decodeKeys(encodedBody, binaryEncoding) as Record<string, any>;
+        const reader = new MsgpackReader(bytes, this.textDecoder, offset);
+        return reader.unpackValue(binaryEncoding, true) as Record<string, any>;
     }
 }
 

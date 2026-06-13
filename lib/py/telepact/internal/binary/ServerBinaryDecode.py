@@ -20,24 +20,6 @@ if TYPE_CHECKING:
     from ...internal.binary.BinaryEncoding import BinaryEncoding
 
 
-def server_binary_decode(message: list[object], binary_encoder: 'BinaryEncoding') -> list[object]:
-    from ...internal.binary.BinaryEncoderUnavailableError import BinaryEncoderUnavailableError
-    from ...internal.binary.DecodeBody import decode_body
-
-    headers = cast(dict[str, object], message[0])
-    encoded_message_body = cast(dict[object, object], message[1])
-    client_known_binary_checksums = cast(list[int], headers.get("@bin_", []))
-    binary_checksum_used_by_client_on_this_message = cast(
-        int, client_known_binary_checksums[0])
-
-    if binary_checksum_used_by_client_on_this_message != binary_encoder.checksum:
-        raise BinaryEncoderUnavailableError()
-
-    message_body: dict[str, object] = decode_body(
-        encoded_message_body, binary_encoder)
-    return [headers, message_body]
-
-
 def server_binary_decode_msgpack(message_bytes: bytes, binary_encoder: 'BinaryEncoding', serializer: object) -> list[object]:
     from ...internal.binary.BinaryEncoderUnavailableError import BinaryEncoderUnavailableError
 

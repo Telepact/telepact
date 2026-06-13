@@ -16,9 +16,6 @@
 
 package io.github.telepact.internal.binary;
 
-import static io.github.telepact.internal.binary.ServerBinaryDecode.serverBinaryDecode;
-import static io.github.telepact.internal.binary.ServerBinaryEncode.serverBinaryEncode;
-
 import io.github.telepact.Serialization;
 import java.util.List;
 import java.util.Map;
@@ -33,19 +30,9 @@ public class ServerBinaryEncoder implements BinaryEncoder {
     }
 
     @Override
-    public List<Object> encode(List<Object> message) {
-        return serverBinaryEncode(message, binaryEncoder);
-    }
-
-    @Override
-    public List<Object> decode(List<Object> message) {
-        return serverBinaryDecode(message, binaryEncoder);
-    }
-
-    @Override
     public byte[] encodeToMsgPack(List<Object> message, Serialization serializer) throws Throwable {
         if (!(serializer instanceof BinaryMsgPackSerialization binarySerialization)) {
-            return BinaryEncoder.super.encodeToMsgPack(message, serializer);
+            throw new IllegalArgumentException("binary MsgPack serialization is required");
         }
         if (binaryEncoder == null) {
             throw new BinaryEncoderUnavailableError();
@@ -71,7 +58,7 @@ public class ServerBinaryEncoder implements BinaryEncoder {
     @Override
     public List<Object> decodeMsgPack(byte[] messageBytes, Serialization serializer) throws Throwable {
         if (!(serializer instanceof BinaryMsgPackSerialization binarySerialization)) {
-            return BinaryEncoder.super.decodeMsgPack(messageBytes, serializer);
+            throw new IllegalArgumentException("binary MsgPack serialization is required");
         }
 
         final var headers = binarySerialization.fromMsgPackHeaders(messageBytes);

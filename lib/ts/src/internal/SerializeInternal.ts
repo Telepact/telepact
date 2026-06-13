@@ -19,6 +19,7 @@ import { Serialization } from '../Serialization.js';
 import { Message } from '../Message.js';
 import { BinaryEncoder } from '../internal/binary/BinaryEncoder.js';
 import { Base64Encoder } from './binary/Base64Encoder.js';
+import { BinaryEncoderUnavailableError } from './binary/BinaryEncoderUnavailableError.js';
 
 export function serializeInternal(
     message: Message,
@@ -53,6 +54,9 @@ export function serializeInternal(
             try {
                 return binaryEncoder.encodeToMsgpack(messageAsPseudoJson, serializer);
             } catch (error) {
+                if (!(error instanceof BinaryEncoderUnavailableError)) {
+                    throw error;
+                }
                 // We can still submit as JSON
                 const base64EncodedMessage = base64Encoder.encode(messageAsPseudoJson);
                 return serializer.toJson(base64EncodedMessage);

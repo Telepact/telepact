@@ -15,8 +15,6 @@
 //|
 
 import { ClientBinaryStrategy } from './ClientBinaryStrategy.js';
-import { clientBinaryEncode } from '../../internal/binary/ClientBinaryEncode.js';
-import { clientBinaryDecode } from '../../internal/binary/ClientBinaryDecode.js';
 import { BinaryEncoder } from './BinaryEncoder.js';
 import { BinaryEncodingCache } from './BinaryEncodingCache.js';
 import { Serialization } from '../../Serialization.js';
@@ -33,17 +31,9 @@ export class ClientBinaryEncoder extends BinaryEncoder {
         this.binaryChecksumStrategy = new ClientBinaryStrategy(binaryEncodingCache);
     }
 
-    encode(message: any[]): any[] {
-        return clientBinaryEncode(message, this.binaryEncodingCache, this.binaryChecksumStrategy);
-    }
-
-    decode(message: any[]): any[] {
-        return clientBinaryDecode(message, this.binaryEncodingCache, this.binaryChecksumStrategy);
-    }
-
     encodeToMsgpack(message: any[], serializer: Serialization): Uint8Array {
         if (!isBinaryMsgpackSerialization(serializer)) {
-            return super.encodeToMsgpack(message, serializer);
+            throw new Error('binary MsgPack serialization is required');
         }
 
         const headers = message[0] as Record<string, any>;
@@ -70,7 +60,7 @@ export class ClientBinaryEncoder extends BinaryEncoder {
 
     decodeMsgpack(messageBytes: Uint8Array, serializer: Serialization): any[] {
         if (!isBinaryMsgpackSerialization(serializer)) {
-            return super.decodeMsgpack(messageBytes, serializer);
+            throw new Error('binary MsgPack serialization is required');
         }
 
         const headers = serializer.fromMsgpackHeaders(messageBytes);

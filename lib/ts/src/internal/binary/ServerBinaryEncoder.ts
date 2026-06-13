@@ -16,8 +16,6 @@
 
 import { BinaryEncoder } from './BinaryEncoder.js';
 import { BinaryEncoding } from './BinaryEncoding.js';
-import { serverBinaryEncode } from './ServerBinaryEncode.js';
-import { serverBinaryDecode } from './ServerBinaryDecode.js';
 import { Serialization } from '../../Serialization.js';
 import { isBinaryMsgpackSerialization } from './BinaryMsgpackSerialization.js';
 import { BinaryEncoderUnavailableError } from './BinaryEncoderUnavailableError.js';
@@ -30,17 +28,9 @@ export class ServerBinaryEncoder extends BinaryEncoder {
         this.binaryEncoder = binaryEncoder;
     }
 
-    encode(message: any[]): any[] {
-        return serverBinaryEncode(message, this.binaryEncoder);
-    }
-
-    decode(message: any[]): any[] {
-        return serverBinaryDecode(message, this.binaryEncoder);
-    }
-
     encodeToMsgpack(message: any[], serializer: Serialization): Uint8Array {
         if (!isBinaryMsgpackSerialization(serializer)) {
-            return super.encodeToMsgpack(message, serializer);
+            throw new Error('binary MsgPack serialization is required');
         }
 
         const inputHeaders = message[0] as Record<string, any>;
@@ -68,7 +58,7 @@ export class ServerBinaryEncoder extends BinaryEncoder {
 
     decodeMsgpack(messageBytes: Uint8Array, serializer: Serialization): any[] {
         if (!isBinaryMsgpackSerialization(serializer)) {
-            return super.decodeMsgpack(messageBytes, serializer);
+            throw new Error('binary MsgPack serialization is required');
         }
 
         const headers = serializer.fromMsgpackHeaders(messageBytes);

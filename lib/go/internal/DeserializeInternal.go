@@ -28,7 +28,7 @@ import (
 func DeserializeInternal(
 	messageBytes []byte,
 	serializer Serialization,
-	binaryEncoder binary.BinaryEncoder,
+	binaryEncoder binary.MsgpackBinaryEncoder,
 	base64Encoder binary.Base64Encoder,
 ) (map[string]any, map[string]any, error) {
 	if len(messageBytes) == 0 {
@@ -38,21 +38,16 @@ func DeserializeInternal(
 	var (
 		messageAsPseudoJSON any
 		err                 error
-		optimizedMsgpack    bool
 	)
 
 	isMsgpack := messageBytes[0] == 0x92
 
 	if isMsgpack {
-		if binarySerializer, ok := serializer.(binary.BinaryMsgpackSerialization); ok {
-			if msgpackEncoder, ok := binaryEncoder.(binary.MsgpackBinaryEncoder); ok {
-				messageAsPseudoJSON, err = msgpackEncoder.DecodeMsgpack(messageBytes, binarySerializer)
-				optimizedMsgpack = err == nil
-			} else {
-				messageAsPseudoJSON, err = serializer.FromMsgpack(messageBytes)
-			}
+		binarySerializer, ok := serializer.(binary.BinaryMsgpackSerialization)
+		if !ok {
+			err = fmt.Errorf("binary MsgPack serialization is required")
 		} else {
-			messageAsPseudoJSON, err = serializer.FromMsgpack(messageBytes)
+			messageAsPseudoJSON, err = binaryEncoder.DecodeMsgpack(messageBytes, binarySerializer)
 		}
 	} else {
 		messageAsPseudoJSON, err = serializer.FromJSON(messageBytes)
@@ -76,11 +71,7 @@ func DeserializeInternal(
 
 	var finalList []any
 	if isMsgpack {
-		if optimizedMsgpack {
-			finalList = messageList
-		} else {
-			finalList, err = binaryEncoder.Decode(messageList)
-		}
+		finalList = messageList
 	} else {
 		finalList, err = base64Encoder.Decode(messageList)
 	}

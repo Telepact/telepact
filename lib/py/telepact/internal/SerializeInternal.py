@@ -46,10 +46,7 @@ def serialize_internal(message: 'Message', binary_encoder: 'BinaryEncoder',
     try:
         if serialize_as_binary:
             try:
-                if hasattr(binary_encoder, "encode_msgpack"):
-                    return binary_encoder.encode_msgpack(message_as_pseudo_json, serializer)
-                encoded_message = binary_encoder.encode(message_as_pseudo_json)
-                return serializer.to_msgpack(encoded_message)
+                return binary_encoder.encode_msgpack(message_as_pseudo_json, serializer)
             except BinaryEncoderUnavailableError:
                 # We can still submit as json
                 base_64_encoded_message = base64_encoder.encode(message_as_pseudo_json)

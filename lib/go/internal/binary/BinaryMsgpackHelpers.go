@@ -16,75 +16,23 @@
 
 package binary
 
-import "fmt"
+import (
+	"fmt"
+	"sort"
+)
 
-// ClientBinaryDecode decodes a Telepact client message using the provided binary encoding cache and strategy.
-func ClientBinaryDecode(message []any, cache BinaryEncodingCache, strategy *ClientBinaryStrategy) ([]any, error) {
-	if len(message) < 2 {
-		return nil, fmt.Errorf("invalid message: expected headers and body, got %d elements", len(message))
-	}
-
-	headers, err := ensureStringMap(message[0])
-	if err != nil {
-		return nil, err
-	}
-
-	encodedBody, err := ensureAnyMap(message[1])
-	if err != nil {
-		return nil, err
-	}
-
-	checksums, err := extractIntSlice(headers["@bin_"])
-	if err != nil || len(checksums) == 0 {
-		return nil, BinaryEncoderUnavailableError{}
-	}
-	binaryChecksum := checksums[0]
-
-	if encodingRaw, ok := headers["@enc_"]; ok {
-		encodingMap, castErr := toStringIntMap(encodingRaw)
-		if castErr != nil {
-			return nil, castErr
-		}
-		cache.Add(binaryChecksum, encodingMap)
-	}
-
-	strategy.UpdateChecksum(binaryChecksum)
-	currentChecksums := strategy.GetCurrentChecksums()
-	if len(currentChecksums) == 0 {
-		return nil, BinaryEncoderUnavailableError{}
-	}
-
-	encoder := cache.Get(currentChecksums[0])
-	if encoder == nil {
-		return nil, BinaryEncoderUnavailableError{}
-	}
-
-	decodedBody, decodeErr := DecodeBody(encodedBody, encoder)
-	if decodeErr != nil {
-		return nil, decodeErr
-	}
-
-	return []any{headers, decodedBody}, nil
-}
-
-func ensureAnyMap(value any) (map[any]any, error) {
+func ensureStringMap(value any) (map[string]any, error) {
 	switch typed := value.(type) {
-	case map[any]any:
-		return typed, nil
 	case map[string]any:
-		result := make(map[any]any, len(typed))
+		return typed, nil
+	case map[any]any:
+		result := make(map[string]any, len(typed))
 		for key, val := range typed {
-			result[key] = val
-		}
-		return result, nil
-	case map[int]any:
-		result := make(map[any]any, len(typed))
-		for key, val := range typed {
-			result[key] = val
+			result[fmt.Sprint(key)] = val
 		}
 		return result, nil
 	default:
-		return nil, fmt.Errorf("expected map for encoded body, got %T", value)
+		return nil, fmt.Errorf("expected map[string]any, got %T", value)
 	}
 }
 
@@ -176,4 +124,22 @@ func toInt(value any) (int, bool) {
 	default:
 		return 0, false
 	}
+}
+
+func isStrictTrue(value any) bool {
+	boolVal, ok := value.(bool)
+	return ok && boolVal
+}
+
+func firstKey(m map[string]any) string {
+	if len(m) == 0 {
+		return ""
+	}
+
+	keys := make([]string, 0, len(m))
+	for key := range m {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+	return keys[0]
 }

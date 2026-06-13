@@ -17,14 +17,7 @@
 import { Serialization } from '../../Serialization.js';
 
 export abstract class BinaryEncoder {
-    abstract encode(message: any[]): any[];
-    abstract decode(message: any[]): any[];
+    abstract encodeToMsgpack(message: any[], serializer: Serialization): Uint8Array;
 
-    encodeToMsgpack(message: any[], serializer: Serialization): Uint8Array {
-        return serializer.toMsgpack(this.encode(message));
-    }
-
-    decodeMsgpack(messageBytes: Uint8Array, serializer: Serialization): any[] {
-        return this.decode(serializer.fromMsgpack(messageBytes));
-    }
+    abstract decodeMsgpack(messageBytes: Uint8Array, serializer: Serialization): any[];
 }

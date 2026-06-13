@@ -18,7 +18,7 @@ package binary
 
 import "fmt"
 
-// ServerBinaryEncoder adapts ServerBinaryEncode and ServerBinaryDecode to the BinaryEncoder interface.
+// ServerBinaryEncoder handles direct binary MessagePack server messages.
 type ServerBinaryEncoder struct {
 	binaryEncoding *BinaryEncoding
 }
@@ -26,16 +26,6 @@ type ServerBinaryEncoder struct {
 // NewServerBinaryEncoder constructs a ServerBinaryEncoder.
 func NewServerBinaryEncoder(binaryEncoding *BinaryEncoding) *ServerBinaryEncoder {
 	return &ServerBinaryEncoder{binaryEncoding: binaryEncoding}
-}
-
-// Encode encodes the provided message using the underlying binary encoding.
-func (e *ServerBinaryEncoder) Encode(message []any) ([]any, error) {
-	return ServerBinaryEncode(message, e.binaryEncoding)
-}
-
-// Decode decodes the provided message using the underlying binary encoding.
-func (e *ServerBinaryEncoder) Decode(message []any) ([]any, error) {
-	return ServerBinaryDecode(message, e.binaryEncoding)
 }
 
 // EncodeToMsgpack encodes a server response directly to MessagePack while translating body keys.
