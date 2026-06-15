@@ -7,11 +7,11 @@
   "type": "module",
   "dependencies": {
     "crc-32": "^1.2.2",
-    "msgpackr": "^1.11.13"
+    "msgpackr": "^1.12.1"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^29.0.3",
-    "rollup": "4.61.1"
+    "rollup": "4.62.0"
   },
   "overrides": {
     "picomatch": "^4.0.4"
