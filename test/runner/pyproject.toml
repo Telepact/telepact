@@ -6,9 +6,9 @@ dependencies = []
 
 [dependency-groups]
 dev = [
-    "msgpack>=1.1.2,<2",
+    "msgpack>=1.2.0,<2",
     "nats-py>=2.15.0,<3",
-    "pytest>=9.0.3,<10",
+    "pytest>=9.1.0,<10",
     "prometheus-client>=0.25.0,<0.26",
 ]
 
