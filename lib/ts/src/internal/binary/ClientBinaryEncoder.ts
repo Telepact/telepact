@@ -15,26 +15,72 @@
 //|
 
 import { ClientBinaryStrategy } from './ClientBinaryStrategy.js';
-import { clientBinaryEncode } from '../../internal/binary/ClientBinaryEncode.js';
-import { clientBinaryDecode } from '../../internal/binary/ClientBinaryDecode.js';
 import { BinaryEncoder } from './BinaryEncoder.js';
-import { BinaryEncoding } from './BinaryEncoding.js';
 import { BinaryEncodingCache } from './BinaryEncodingCache.js';
+import { Serialization } from '../../Serialization.js';
+import { isBinaryMsgpackSerialization } from './BinaryMsgpackSerialization.js';
+import { BinaryEncoderUnavailableError } from './BinaryEncoderUnavailableError.js';
 
-export class ClientBinaryEncoder implements BinaryEncoder {
+export class ClientBinaryEncoder extends BinaryEncoder {
     private readonly binaryEncodingCache: BinaryEncodingCache;
     private readonly binaryChecksumStrategy: ClientBinaryStrategy;
 
     constructor(binaryEncodingCache: BinaryEncodingCache) {
+        super();
         this.binaryEncodingCache = binaryEncodingCache;
         this.binaryChecksumStrategy = new ClientBinaryStrategy(binaryEncodingCache);
     }
 
-    encode(message: any[]): any[] {
-        return clientBinaryEncode(message, this.binaryEncodingCache, this.binaryChecksumStrategy);
+    encodeToMsgpack(message: any[], serializer: Serialization): Uint8Array {
+        if (!isBinaryMsgpackSerialization(serializer)) {
+            throw new Error('binary MsgPack serialization is required');
+        }
+
+        const headers = message[0] as Record<string, any>;
+        const body = message[1] as Record<string, any>;
+        const forceSendJson = headers['_forceSendJson'];
+        if (forceSendJson !== undefined) {
+            delete headers['_forceSendJson'];
+        }
+
+        const checksums = this.binaryChecksumStrategy.getCurrentChecksums();
+        headers['@bin_'] = checksums;
+
+        if (forceSendJson === true || checksums.length > 1) {
+            throw new BinaryEncoderUnavailableError();
+        }
+
+        const binaryEncoding = checksums.length > 0 ? this.binaryEncodingCache.get(checksums[0]) : undefined;
+        if (!binaryEncoding) {
+            throw new BinaryEncoderUnavailableError();
+        }
+
+        return serializer.toBinaryMsgpack(headers, body, binaryEncoding);
     }
 
-    decode(message: any[]): any[] {
-        return clientBinaryDecode(message, this.binaryEncodingCache, this.binaryChecksumStrategy);
+    decodeMsgpack(messageBytes: Uint8Array, serializer: Serialization): any[] {
+        if (!isBinaryMsgpackSerialization(serializer)) {
+            throw new Error('binary MsgPack serialization is required');
+        }
+
+        const headers = serializer.fromMsgpackHeaders(messageBytes);
+        const binaryChecksums = headers.headers['@bin_'] as number[];
+        const binaryChecksum = binaryChecksums[0]!;
+
+        if (Object.prototype.hasOwnProperty.call(headers.headers, '@enc_')) {
+            const binaryEncoding = headers.headers['@enc_'] as Record<string, number>;
+            this.binaryEncodingCache.add(binaryChecksum, binaryEncoding);
+        }
+
+        this.binaryChecksumStrategy.updateChecksum(binaryChecksum);
+        const newCurrentChecksumStrategy = this.binaryChecksumStrategy.getCurrentChecksums();
+
+        const binaryEncoder = this.binaryEncodingCache.get(newCurrentChecksumStrategy[0]);
+        if (!binaryEncoder) {
+            throw new BinaryEncoderUnavailableError();
+        }
+
+        const body = serializer.fromMsgpackBody(messageBytes, headers.bodyOffset, binaryEncoder);
+        return [headers.headers, body];
     }
 }

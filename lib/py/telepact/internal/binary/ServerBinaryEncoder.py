@@ -27,10 +27,26 @@ class ServerBinaryEncoder(BinaryEncoder):
     def __init__(self, binary_encoder: 'BinaryEncoding'):
         self.binary_encoder = binary_encoder
 
-    def encode(self, message: list[object]) -> list[object]:
-        from ...internal.binary.ServerBinaryEncode import server_binary_encode
-        return server_binary_encode(message, self.binary_encoder)
+    def encode_msgpack(self, message: list[object], serializer: object) -> bytes:
+        from ...internal.binary.BinaryEncoderUnavailableError import BinaryEncoderUnavailableError
 
-    def decode(self, message: list[object]) -> list[object]:
-        from ...internal.binary.ServerBinaryDecode import server_binary_decode
-        return server_binary_decode(message, self.binary_encoder)
+        input_headers = message[0]
+        body = message[1]
+        client_known_binary_checksums = input_headers.pop("@clientKnownBinaryChecksums_", None)
+        headers = {
+            key: value
+            for key, value in input_headers.items()
+        }
+
+        if "Ok_" not in body:
+            raise BinaryEncoderUnavailableError()
+
+        if client_known_binary_checksums is None or self.binary_encoder.checksum not in client_known_binary_checksums:
+            headers["@enc_"] = self.binary_encoder.encode_map
+
+        headers["@bin_"] = [self.binary_encoder.checksum]
+        return serializer.to_binary_msgpack(headers, body, self.binary_encoder)
+
+    def decode_msgpack(self, message_bytes: bytes, serializer: object) -> list[object]:
+        from ...internal.binary.ServerBinaryDecode import server_binary_decode_msgpack
+        return server_binary_decode_msgpack(message_bytes, self.binary_encoder, serializer)

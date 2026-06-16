@@ -17,6 +17,8 @@
 from typing import cast, TYPE_CHECKING
 
 from ..Message import Message
+from ..internal.binary.BinaryEncoderUnavailableError import BinaryEncoderUnavailableError
+from ..internal.binary.BinaryEncodingMissing import BinaryEncodingMissing
 from ..internal.validation.InvalidMessage import InvalidMessage
 from ..internal.validation.InvalidMessageBody import InvalidMessageBody
 
@@ -35,10 +37,17 @@ def deserialize_internal(message_bytes: bytes, serializer: 'Serialization',
     try:
         if message_bytes[0] == 0x92:  # MsgPack
             is_msg_pack = True
-            message_as_pseudo_json = serializer.from_msgpack(message_bytes)
+            try:
+                message_as_pseudo_json = binary_encoder.decode_msgpack(message_bytes, serializer)
+            except (BinaryEncoderUnavailableError, BinaryEncodingMissing):
+                raise
+            except Exception as e:
+                raise InvalidMessage() from e
         else:
             is_msg_pack = False
             message_as_pseudo_json = serializer.from_json(message_bytes)
+    except (BinaryEncoderUnavailableError, BinaryEncodingMissing):
+        raise
     except Exception as e:
         raise InvalidMessage() from e
 
@@ -52,8 +61,7 @@ def deserialize_internal(message_bytes: bytes, serializer: 'Serialization',
 
     final_message_as_pseudo_json_list: list[object]
     if is_msg_pack:
-        final_message_as_pseudo_json_list = binary_encoder.decode(
-            message_as_pseudo_json_list)
+        final_message_as_pseudo_json_list = message_as_pseudo_json_list
     else:
         final_message_as_pseudo_json_list = base64_encoder.decode(message_as_pseudo_json_list)
 
