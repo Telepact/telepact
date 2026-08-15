@@ -18,13 +18,20 @@ import { BinaryEncoding } from './BinaryEncoding.js';
 import { BinaryEncodingMissing } from './BinaryEncodingMissing.js';
 import type { MsgpackHeaders } from './BinaryMsgpackSerialization.js';
 
+const MIN_UNIFORM_OBJECT_ARRAY_LENGTH = 16;
+const MIN_CACHED_ASCII_STRING_LENGTH = 16;
+const MAX_CACHED_STRING_LENGTH = 64;
+const MAX_STRING_CACHE_ENTRIES = 4096;
+const MAX_SHORT_ASCII_LENGTH = 16;
+
 export class BinaryMsgpackCodec {
     private readonly textEncoder = new TextEncoder();
     private readonly textDecoder = new TextDecoder();
     private readonly encodedStrings = new Map<string, Uint8Array>();
+    private readonly seenStrings = new Set<string>();
 
     public toBinaryMsgpack(headers: Record<string, any>, body: Record<string, any>, binaryEncoding: BinaryEncoding): Uint8Array {
-        const writer = new MsgpackWriter(this.textEncoder, this.encodedStrings);
+        const writer = new MsgpackWriter(this.textEncoder, this.encodedStrings, this.seenStrings);
         writer.packArrayHeader(2);
         writer.packValue(headers, undefined, false);
         writer.packValue(body, binaryEncoding, true);
@@ -55,6 +62,7 @@ class MsgpackWriter {
     constructor(
         private readonly textEncoder: TextEncoder,
         private readonly encodedStrings: Map<string, Uint8Array>,
+        private readonly seenStrings: Set<string>,
     ) {}
 
     public toBytes(): Uint8Array {
@@ -144,7 +152,7 @@ class MsgpackWriter {
     }
 
     private tryPackUniformObjectArray(value: any[], binaryEncoding: BinaryEncoding): boolean {
-        if (value.length < 16) {
+        if (value.length < MIN_UNIFORM_OBJECT_ARRAY_LENGTH) {
             return false;
         }
 
@@ -203,13 +211,17 @@ class MsgpackWriter {
     }
 
     private packString(value: string): void {
-        let packed = this.encodedStrings.get(value);
-        if (packed !== undefined) {
-            this.writeBytes(packed);
+        const cached = this.encodedStrings.get(value);
+        if (cached !== undefined) {
+            this.writeBytes(cached);
             return;
         }
 
+        const stringStart = this.offset;
         if (this.packAsciiString(value)) {
+            if (value.length >= MIN_CACHED_ASCII_STRING_LENGTH && this.shouldCacheAsciiString(value)) {
+                this.encodedStrings.set(value, this.buffer.slice(stringStart, this.offset));
+            }
             return;
         }
 
@@ -225,7 +237,7 @@ class MsgpackWriter {
         } else {
             headerLength = 5;
         }
-        packed = new Uint8Array(headerLength + length);
+        const packed = new Uint8Array(headerLength + length);
         const view = new DataView(packed.buffer);
         if (length < 32) {
             packed[0] = 0xa0 | length;
@@ -240,8 +252,23 @@ class MsgpackWriter {
             view.setUint32(1, length);
         }
         packed.set(bytes, headerLength);
-        this.encodedStrings.set(value, packed);
+        if (this.encodedStrings.size < MAX_STRING_CACHE_ENTRIES) {
+            this.encodedStrings.set(value, packed);
+        }
         this.writeBytes(packed);
+    }
+
+    private shouldCacheAsciiString(value: string): boolean {
+        if (value.length > MAX_CACHED_STRING_LENGTH) {
+            return false;
+        }
+        if (this.seenStrings.delete(value)) {
+            return this.encodedStrings.size < MAX_STRING_CACHE_ENTRIES;
+        }
+        if (this.encodedStrings.size + this.seenStrings.size < MAX_STRING_CACHE_ENTRIES) {
+            this.seenStrings.add(value);
+        }
+        return false;
     }
 
     private packAsciiString(value: string): boolean {
@@ -533,10 +560,125 @@ class MsgpackReader {
 
     private readArray(length: number, binaryEncoding: BinaryEncoding | undefined, decodeKeys: boolean): any[] {
         const result = new Array(length);
+
+        if (decodeKeys && binaryEncoding !== undefined && length >= MIN_UNIFORM_OBJECT_ARRAY_LENGTH) {
+            const firstMapLength = this.tryReadMapHeader();
+            if (firstMapLength !== undefined) {
+                const first = this.readMapAndCreatePlan(firstMapLength, binaryEncoding);
+                result[0] = first.value;
+                for (let index = 1; index < length; index += 1) {
+                    const mapLength = this.tryReadMapHeader();
+                    result[index] = mapLength === undefined
+                        ? this.unpackValue(binaryEncoding, decodeKeys)
+                        : this.readMapWithPlan(mapLength, binaryEncoding, first.rawKeys, first.decodedKeys);
+                }
+                return result;
+            }
+        }
+
         for (let index = 0; index < length; index += 1) {
             result[index] = this.unpackValue(binaryEncoding, decodeKeys);
         }
         return result;
+    }
+
+    private tryReadMapHeader(): number | undefined {
+        const token = this.bytes[this.offset];
+        if (token === undefined) {
+            return undefined;
+        }
+        if (token >= 0x80 && token <= 0x8f) {
+            this.offset += 1;
+            return token & 0x0f;
+        }
+        if (token === 0xde) {
+            this.offset += 1;
+            return this.readUint16();
+        }
+        if (token === 0xdf) {
+            this.offset += 1;
+            return this.readUint32();
+        }
+        return undefined;
+    }
+
+    private readMapAndCreatePlan(length: number, binaryEncoding: BinaryEncoding): {
+        value: Record<string, any>;
+        rawKeys: any[];
+        decodedKeys: string[];
+    } {
+        const value: Record<string, any> = {};
+        const rawKeys = new Array<any>(length);
+        const decodedKeys = new Array<string>(length);
+        for (let index = 0; index < length; index += 1) {
+            const rawKey = this.unpackValue(undefined, false);
+            const decodedKey = this.decodeBinaryKey(rawKey, binaryEncoding);
+            rawKeys[index] = rawKey;
+            decodedKeys[index] = decodedKey;
+            value[decodedKey] = this.unpackValue(binaryEncoding, true);
+        }
+        return { value, rawKeys, decodedKeys };
+    }
+
+    private readMapWithPlan(
+        length: number,
+        binaryEncoding: BinaryEncoding,
+        rawKeys: any[],
+        decodedKeys: string[],
+    ): Record<string, any> {
+        const result: Record<string, any> = {};
+        const canReusePlan = length === rawKeys.length;
+        for (let index = 0; index < length; index += 1) {
+            let decodedKey: string;
+            if (canReusePlan && this.trySkipExpectedIntegerKey(rawKeys[index])) {
+                decodedKey = decodedKeys[index]!;
+            } else {
+                const rawKey = this.unpackValue(undefined, false);
+                decodedKey = canReusePlan && rawKey === rawKeys[index]
+                    ? decodedKeys[index]!
+                    : this.decodeBinaryKey(rawKey, binaryEncoding);
+            }
+            result[decodedKey] = this.unpackValue(binaryEncoding, true);
+        }
+        return result;
+    }
+
+    private trySkipExpectedIntegerKey(expected: any): boolean {
+        if (typeof expected !== 'number' || !Number.isInteger(expected) || expected < 0 || expected > 0xffffffff) {
+            return false;
+        }
+
+        const token = this.bytes[this.offset];
+        if (expected <= 0x7f) {
+            if (token !== expected) {
+                return false;
+            }
+            this.offset += 1;
+            return true;
+        }
+        if (expected <= 0xff) {
+            this.ensure(2);
+            if (token !== 0xcc || this.bytes[this.offset + 1] !== expected) {
+                return false;
+            }
+            this.offset += 2;
+            return true;
+        }
+        if (expected <= 0xffff) {
+            this.ensure(3);
+            if (token !== 0xcd || this.view.getUint16(this.offset + 1) !== expected) {
+                return false;
+            }
+            this.offset += 3;
+            return true;
+        }
+
+        this.ensure(5);
+        if (token !== 0xce || this.view.getUint32(this.offset + 1) !== expected) {
+            return false;
+        }
+        this.offset += 5;
+        return true;
     }
 
     private readMap(length: number, binaryEncoding: BinaryEncoding | undefined, decodeKeys: boolean): Record<string, any> {
@@ -575,9 +717,46 @@ class MsgpackReader {
     private readString(length: number): string {
         this.ensure(length);
         const end = this.offset + length;
+
+        if (length <= MAX_SHORT_ASCII_LENGTH) {
+            let index = this.offset;
+            while (index < end && this.bytes[index]! <= 0x7f) {
+                index += 1;
+            }
+            if (index === end) {
+                const value = this.readShortAsciiString(this.offset, length);
+                this.offset = end;
+                return value;
+            }
+        }
+
         const value = this.textDecoder.decode(this.bytes.subarray(this.offset, end));
         this.offset += length;
         return value;
+    }
+
+    private readShortAsciiString(start: number, length: number): string {
+        const bytes = this.bytes;
+        switch (length) {
+            case 0: return '';
+            case 1: return String.fromCharCode(bytes[start]!);
+            case 2: return String.fromCharCode(bytes[start]!, bytes[start + 1]!);
+            case 3: return String.fromCharCode(bytes[start]!, bytes[start + 1]!, bytes[start + 2]!);
+            case 4: return String.fromCharCode(bytes[start]!, bytes[start + 1]!, bytes[start + 2]!, bytes[start + 3]!);
+            case 5: return String.fromCharCode(bytes[start]!, bytes[start + 1]!, bytes[start + 2]!, bytes[start + 3]!, bytes[start + 4]!);
+            case 6: return String.fromCharCode(bytes[start]!, bytes[start + 1]!, bytes[start + 2]!, bytes[start + 3]!, bytes[start + 4]!, bytes[start + 5]!);
+            case 7: return String.fromCharCode(bytes[start]!, bytes[start + 1]!, bytes[start + 2]!, bytes[start + 3]!, bytes[start + 4]!, bytes[start + 5]!, bytes[start + 6]!);
+            case 8: return String.fromCharCode(bytes[start]!, bytes[start + 1]!, bytes[start + 2]!, bytes[start + 3]!, bytes[start + 4]!, bytes[start + 5]!, bytes[start + 6]!, bytes[start + 7]!);
+            case 9: return String.fromCharCode(bytes[start]!, bytes[start + 1]!, bytes[start + 2]!, bytes[start + 3]!, bytes[start + 4]!, bytes[start + 5]!, bytes[start + 6]!, bytes[start + 7]!, bytes[start + 8]!);
+            case 10: return String.fromCharCode(bytes[start]!, bytes[start + 1]!, bytes[start + 2]!, bytes[start + 3]!, bytes[start + 4]!, bytes[start + 5]!, bytes[start + 6]!, bytes[start + 7]!, bytes[start + 8]!, bytes[start + 9]!);
+            case 11: return String.fromCharCode(bytes[start]!, bytes[start + 1]!, bytes[start + 2]!, bytes[start + 3]!, bytes[start + 4]!, bytes[start + 5]!, bytes[start + 6]!, bytes[start + 7]!, bytes[start + 8]!, bytes[start + 9]!, bytes[start + 10]!);
+            case 12: return String.fromCharCode(bytes[start]!, bytes[start + 1]!, bytes[start + 2]!, bytes[start + 3]!, bytes[start + 4]!, bytes[start + 5]!, bytes[start + 6]!, bytes[start + 7]!, bytes[start + 8]!, bytes[start + 9]!, bytes[start + 10]!, bytes[start + 11]!);
+            case 13: return String.fromCharCode(bytes[start]!, bytes[start + 1]!, bytes[start + 2]!, bytes[start + 3]!, bytes[start + 4]!, bytes[start + 5]!, bytes[start + 6]!, bytes[start + 7]!, bytes[start + 8]!, bytes[start + 9]!, bytes[start + 10]!, bytes[start + 11]!, bytes[start + 12]!);
+            case 14: return String.fromCharCode(bytes[start]!, bytes[start + 1]!, bytes[start + 2]!, bytes[start + 3]!, bytes[start + 4]!, bytes[start + 5]!, bytes[start + 6]!, bytes[start + 7]!, bytes[start + 8]!, bytes[start + 9]!, bytes[start + 10]!, bytes[start + 11]!, bytes[start + 12]!, bytes[start + 13]!);
+            case 15: return String.fromCharCode(bytes[start]!, bytes[start + 1]!, bytes[start + 2]!, bytes[start + 3]!, bytes[start + 4]!, bytes[start + 5]!, bytes[start + 6]!, bytes[start + 7]!, bytes[start + 8]!, bytes[start + 9]!, bytes[start + 10]!, bytes[start + 11]!, bytes[start + 12]!, bytes[start + 13]!, bytes[start + 14]!);
+            case 16: return String.fromCharCode(bytes[start]!, bytes[start + 1]!, bytes[start + 2]!, bytes[start + 3]!, bytes[start + 4]!, bytes[start + 5]!, bytes[start + 6]!, bytes[start + 7]!, bytes[start + 8]!, bytes[start + 9]!, bytes[start + 10]!, bytes[start + 11]!, bytes[start + 12]!, bytes[start + 13]!, bytes[start + 14]!, bytes[start + 15]!);
+            default: throw new Error('short ASCII string length exceeded');
+        }
     }
 
     private readBinary(length: number): Uint8Array {
