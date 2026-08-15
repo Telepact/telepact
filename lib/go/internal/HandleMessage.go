@@ -155,9 +155,6 @@ func HandleMessage(
 	if clientKnownRaw, ok := requestHeaders["@bin_"]; ok {
 		responseHeaders["@binary_"] = true
 		responseHeaders["@clientKnownBinaryChecksums_"] = convertToAnySlice(clientKnownRaw)
-		if pac, ok := requestHeaders["@pac_"]; ok {
-			responseHeaders["@pac_"] = pac
-		}
 	}
 
 	selectStructFields := extractSelectStructFields(requestHeaders["@select_"])

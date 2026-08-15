@@ -1,7 +1,6 @@
 [
   {
-    "@bin_": [],
-    "@pac_": true
+    "@bin_": []
   },
   {
     "fn.listEvents": {

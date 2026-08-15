@@ -23,6 +23,8 @@ import io.github.telepact.Message;
 import io.github.telepact.Serialization;
 import io.github.telepact.internal.binary.Base64Encoder;
 import io.github.telepact.internal.binary.BinaryEncoder;
+import io.github.telepact.internal.binary.BinaryEncoderUnavailableError;
+import io.github.telepact.internal.binary.BinaryEncodingMissing;
 import io.github.telepact.internal.validation.InvalidMessage;
 import io.github.telepact.internal.validation.InvalidMessageBody;
 
@@ -36,11 +38,13 @@ public class DeserializeInternal {
         try {
             if (messageBytes[0] == (byte) 0x92) { // MsgPack
                 isMsgPack = true;
-                messageAsPseudoJson = serialization.fromMsgPack(messageBytes);
+                messageAsPseudoJson = binaryEncoder.decodeMsgPack(messageBytes, serialization);
             } else {
                 isMsgPack = false;
                 messageAsPseudoJson = serialization.fromJson(messageBytes);
             }
+        } catch (BinaryEncoderUnavailableError | BinaryEncodingMissing e) {
+            throw e;
         } catch (Throwable e) {
             throw new InvalidMessage(e);
         }
@@ -56,7 +60,7 @@ public class DeserializeInternal {
 
         final List<Object> finalMessageAsPseudoJsonList;
         if (isMsgPack) {
-            finalMessageAsPseudoJsonList = binaryEncoder.decode(messageAsPseudoJsonList);
+            finalMessageAsPseudoJsonList = messageAsPseudoJsonList;
         } else {
             finalMessageAsPseudoJsonList = base64Encoder.decode(messageAsPseudoJsonList);
         }

@@ -19,7 +19,7 @@ TAR_GZ := telepact.tar.gz
 
 all: prepare
 
-prepare: prepare-py prepare-ts prepare-java
+prepare: prepare-py prepare-ts prepare-java prepare-go
 
 prepare-py: $(TAR_GZ)
 	uv sync --all-groups
@@ -38,6 +38,9 @@ prepare-ts:
 prepare-java:
 	$(MAKE) -C java
 
+prepare-go:
+	$(MAKE) -C go
+
 run: prepare
 	uv run python -m perf_harness.run
 
@@ -49,5 +52,6 @@ clean:
 	mkdir -p results
 	$(MAKE) -C ts clean
 	$(MAKE) -C java clean
+	$(MAKE) -C go clean
 
-.PHONY: all prepare prepare-py dep-py prepare-ts prepare-java run clean
+.PHONY: all prepare prepare-py dep-py prepare-ts prepare-java prepare-go run clean

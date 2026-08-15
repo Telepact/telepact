@@ -183,9 +183,6 @@ def pytest_generate_tests(metafunc: pytest.Metafunc):
     elif 'test_binary_client_server_case' == metafunc.function.__name__:
         metafunc.parametrize('name,req,res', [(
             k, rq, rs) for k in basic_cases for rq, rs in basic_cases[k]], ids=increment())
-    elif 'test_pbinary_client_server_case' == metafunc.function.__name__:
-        metafunc.parametrize('name,req,res', [(
-            k, rq, rs) for k in basic_cases for rq, rs in basic_cases[k]], ids=increment())
     elif 'test_client_server_case' == metafunc.function.__name__:
         metafunc.parametrize('name,req,res', [(
             k, rq, rs) for k in basic_cases for rq, rs in basic_cases[k]], ids=increment())

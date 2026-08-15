@@ -39,7 +39,7 @@ type Sample = {
 
 const DATA_SHAPES = ["typical", "all-strings", "all-numbers"] as const;
 const COLLECTION_SHAPES = ["single", "small-list", "big-list", "really-big-list", "huge-list"] as const;
-const METHODS = ["telepact-json", "telepact-binary", "telepact-packed-binary", "protobuf", "plain-json"] as const;
+const METHODS = ["telepact-json", "telepact-binary", "protobuf", "plain-json"] as const;
 const FUNCTION_NAMES: Record<string, string> = {
     "typical": "fn.roundTripTypical",
     "all-strings": "fn.roundTripStrings",
@@ -98,7 +98,7 @@ function schemaPath(): string {
 }
 
 function warmupIterationsForScenario(scenario: Scenario, warmupIterations: number): number {
-    return scenario.method === "telepact-binary" || scenario.method === "telepact-packed-binary"
+    return scenario.method === "telepact-binary"
         ? warmupIterations
         : 0;
 }
@@ -190,9 +190,6 @@ function createTelepactBenchmark(scenario: Scenario) {
         if (scenario.method !== "telepact-json") {
             requestHeaders["@binary_"] = true;
         }
-        if (scenario.method === "telepact-packed-binary") {
-            requestHeaders["@pac_"] = true;
-        }
 
         const requestMessage = new Message(requestHeaders, { [functionName]: { items: payload } });
         const requestSerializeStart = nowNs();
@@ -209,9 +206,6 @@ function createTelepactBenchmark(scenario: Scenario) {
         if ("@bin_" in requestRoundTrip.headers) {
             responseHeaders["@binary_"] = true;
             responseHeaders["@clientKnownBinaryChecksums_"] = requestRoundTrip.headers["@bin_"];
-        }
-        if ("@pac_" in requestRoundTrip.headers) {
-            responseHeaders["@pac_"] = requestRoundTrip.headers["@pac_"];
         }
         const responseMessage = new Message(responseHeaders, { Ok_: { items: requestRoundTrip.body[functionName].items } });
         const responseSerializeStart = nowNs();

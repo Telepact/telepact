@@ -19,6 +19,7 @@ import { Serialization } from '../Serialization.js';
 import { Message } from '../Message.js';
 import { BinaryEncoder } from '../internal/binary/BinaryEncoder.js';
 import { Base64Encoder } from './binary/Base64Encoder.js';
+import { BinaryEncoderUnavailableError } from './binary/BinaryEncoderUnavailableError.js';
 
 export function serializeInternal(
     message: Message,
@@ -26,24 +27,21 @@ export function serializeInternal(
     base64Encoder: Base64Encoder,
     serializer: Serialization,
 ): Uint8Array {
-    const headers: Record<string, any> = message.headers;
+    const messageHeaders: Record<string, any> = { ...message.headers };
 
-    let serializeAsBinary: boolean;
-    if ('@binary_' in headers) {
-        serializeAsBinary = headers['@binary_'] === true;
-        delete headers['@binary_'];
-    } else {
-        serializeAsBinary = false;
-    }
+    const serializeAsBinary = messageHeaders['@binary_'] === true;
+    delete messageHeaders['@binary_'];
 
-    const messageAsPseudoJson: any[] = [message.headers, message.body];
+    const messageAsPseudoJson: any[] = [messageHeaders, message.body];
 
     try {
         if (serializeAsBinary) {
             try {
-                const encodedMessage = binaryEncoder.encode(messageAsPseudoJson);
-                return serializer.toMsgpack(encodedMessage);
+                return binaryEncoder.encodeToMsgpack(messageAsPseudoJson, serializer);
             } catch (error) {
+                if (!(error instanceof BinaryEncoderUnavailableError)) {
+                    throw error;
+                }
                 // We can still submit as JSON
                 const base64EncodedMessage = base64Encoder.encode(messageAsPseudoJson);
                 return serializer.toJson(base64EncodedMessage);

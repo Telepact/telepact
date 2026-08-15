@@ -19,39 +19,18 @@ package telepact
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
-	"math"
-	"strconv"
-	"strings"
 
-	"github.com/vmihailenco/msgpack/v5"
+	telepactbinary "github.com/telepact/telepact/lib/go/internal/binary"
 )
 
-const msgpackJSONNumberExtType = 0x2a
-
-type msgpackJSONNumber struct {
-	Value string
+// DefaultSerialization implements the Serialization interface using encoding/json and MessagePack.
+type DefaultSerialization struct {
+	binaryMsgpack *telepactbinary.BinaryMsgpackCodec
 }
-
-func (n *msgpackJSONNumber) MarshalMsgpack() ([]byte, error) {
-	return []byte(n.Value), nil
-}
-
-func (n *msgpackJSONNumber) UnmarshalMsgpack(data []byte) error {
-	n.Value = string(data)
-	return nil
-}
-
-func init() {
-	msgpack.RegisterExt(msgpackJSONNumberExtType, (*msgpackJSONNumber)(nil))
-}
-
-// DefaultSerialization implements the Serialization interface using encoding/json and vmihailenco/msgpack.
-type DefaultSerialization struct{}
 
 // NewDefaultSerialization constructs a DefaultSerialization instance.
 func NewDefaultSerialization() *DefaultSerialization {
-	return &DefaultSerialization{}
+	return &DefaultSerialization{binaryMsgpack: telepactbinary.NewBinaryMsgpackCodec()}
 }
 
 // ToJSON converts a pseudo-JSON object into its JSON-encoded bytes representation.
@@ -65,8 +44,7 @@ func (d *DefaultSerialization) ToJSON(message any) ([]byte, error) {
 
 // ToMsgpack converts a pseudo-JSON object into its MessagePack-encoded bytes representation.
 func (d *DefaultSerialization) ToMsgpack(message any) ([]byte, error) {
-	prepared := wrapJSONNumbers(message)
-	payload, err := msgpack.Marshal(prepared)
+	payload, err := d.binaryMsgpack.ToMsgpack(message)
 	if err != nil {
 		return nil, NewSerializationError(err, "encode msgpack")
 	}
@@ -82,144 +60,41 @@ func (d *DefaultSerialization) FromJSON(data []byte) (any, error) {
 	if err := decoder.Decode(&out); err != nil {
 		return nil, NewSerializationError(err, "decode JSON")
 	}
-	return normalizePseudoJSON(out), nil
+	return telepactbinary.NormalizePseudoJSON(out), nil
 }
 
 // FromMsgpack decodes MessagePack bytes into a pseudo-JSON object.
 func (d *DefaultSerialization) FromMsgpack(data []byte) (any, error) {
-	decoder := msgpack.NewDecoder(bytes.NewReader(data))
-	decoder.SetMapDecoder(func(dec *msgpack.Decoder) (any, error) {
-		length, err := dec.DecodeMapLen()
-		if err != nil {
-			return nil, err
-		}
-		result := make(map[any]any, length)
-		for i := 0; i < length; i++ {
-			key, err := dec.DecodeInterface()
-			if err != nil {
-				return nil, err
-			}
-			value, err := dec.DecodeInterface()
-			if err != nil {
-				return nil, err
-			}
-			result[key] = value
-		}
-		return result, nil
-	})
-
-	value, err := decoder.DecodeInterface()
+	value, err := d.binaryMsgpack.FromMsgpack(data)
 	if err != nil {
 		return nil, NewSerializationError(err, "decode msgpack")
 	}
-	return normalizePseudoJSON(unwrapJSONNumbers(value)), nil
+	return value, nil
 }
 
-func normalizePseudoJSON(value any) any {
-	switch v := value.(type) {
-	case map[string]any:
-		for key, val := range v {
-			v[key] = normalizePseudoJSON(val)
-		}
-		return v
-	case map[any]any:
-		result := make(map[string]any, len(v))
-		for key, val := range v {
-			result[fmt.Sprint(key)] = normalizePseudoJSON(val)
-		}
-		return result
-	case []any:
-		for i, val := range v {
-			v[i] = normalizePseudoJSON(val)
-		}
-		return v
-	case float64:
-		if math.Trunc(v) == v && v <= math.MaxInt64 && v >= math.MinInt64 {
-			return int64(v)
-		}
-		return v
-	case json.Number:
-		normalized, ok := normalizeJSONNumber(v)
-		if ok {
-			return normalized
-		}
-		return v
-	default:
-		return v
+// ToBinaryMsgpack packs a binary Telepact message while translating body keys in the same walk.
+func (d *DefaultSerialization) ToBinaryMsgpack(headers map[string]any, body map[string]any, encoding *telepactbinary.BinaryEncoding) ([]byte, error) {
+	payload, err := d.binaryMsgpack.ToBinaryMsgpack(headers, body, encoding)
+	if err != nil {
+		return nil, NewSerializationError(err, "encode binary msgpack")
 	}
+	return payload, nil
 }
 
-func wrapJSONNumbers(value any) any {
-	switch v := value.(type) {
-	case map[string]any:
-		result := make(map[string]any, len(v))
-		for key, val := range v {
-			result[key] = wrapJSONNumbers(val)
-		}
-		return result
-	case map[any]any:
-		result := make(map[any]any, len(v))
-		for key, val := range v {
-			result[key] = wrapJSONNumbers(val)
-		}
-		return result
-	case []any:
-		result := make([]any, len(v))
-		for i, val := range v {
-			result[i] = wrapJSONNumbers(val)
-		}
-		return result
-	case json.Number:
-		return &msgpackJSONNumber{Value: string(v)}
-	case *msgpackJSONNumber:
-		return v
-	default:
-		return value
+// FromMsgpackHeaders decodes the top-level headers and reports where the body starts.
+func (d *DefaultSerialization) FromMsgpackHeaders(data []byte) (telepactbinary.MsgpackHeaders, error) {
+	headers, err := d.binaryMsgpack.FromMsgpackHeaders(data)
+	if err != nil {
+		return telepactbinary.MsgpackHeaders{}, NewSerializationError(err, "decode msgpack headers")
 	}
+	return headers, nil
 }
 
-func unwrapJSONNumbers(value any) any {
-	switch v := value.(type) {
-	case map[string]any:
-		for key, val := range v {
-			v[key] = unwrapJSONNumbers(val)
-		}
-		return v
-	case map[any]any:
-		for key, val := range v {
-			v[key] = unwrapJSONNumbers(val)
-		}
-		return v
-	case []any:
-		for i, val := range v {
-			v[i] = unwrapJSONNumbers(val)
-		}
-		return v
-	case *msgpackJSONNumber:
-		if v == nil {
-			return nil
-		}
-		return json.Number(v.Value)
-	case msgpackJSONNumber:
-		return json.Number(v.Value)
-	default:
-		return value
+// FromMsgpackBody decodes the body while translating binary map keys.
+func (d *DefaultSerialization) FromMsgpackBody(data []byte, offset int, encoding *telepactbinary.BinaryEncoding) (map[string]any, error) {
+	body, err := d.binaryMsgpack.FromMsgpackBody(data, offset, encoding)
+	if err != nil {
+		return nil, NewSerializationError(err, "decode binary msgpack body")
 	}
-}
-
-func normalizeJSONNumber(value json.Number) (any, bool) {
-	raw := string(value)
-
-	if !strings.ContainsAny(raw, ".eE") {
-		if i, err := strconv.ParseInt(raw, 10, 64); err == nil {
-			return i, true
-		}
-		return nil, false
-	}
-
-	if f, err := strconv.ParseFloat(raw, 64); err == nil && !math.IsNaN(f) && !math.IsInf(f, 0) {
-		return f, true
-	}
-
-	return nil, false
+	return body, nil
 }

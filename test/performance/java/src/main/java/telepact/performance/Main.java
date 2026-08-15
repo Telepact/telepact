@@ -34,7 +34,7 @@ import telepact.performance.v1.Benchmark;
 public class Main {
     private static final List<String> DATA_SHAPES = List.of("typical", "all-strings", "all-numbers");
     private static final List<String> COLLECTION_SHAPES = List.of("single", "small-list", "big-list", "really-big-list", "huge-list");
-    private static final List<String> METHODS = List.of("telepact-json", "telepact-binary", "telepact-packed-binary", "protobuf", "plain-json");
+    private static final List<String> METHODS = List.of("telepact-json", "telepact-binary", "protobuf", "plain-json");
     private static final Map<String, String> FUNCTION_NAMES = Map.of(
             "typical", "fn.roundTripTypical",
             "all-strings", "fn.roundTripStrings",
@@ -97,7 +97,7 @@ public class Main {
     }
 
     private static int warmupIterationsForScenario(Scenario scenario, int warmupIterations) {
-        if (Objects.equals(scenario.method(), "telepact-binary") || Objects.equals(scenario.method(), "telepact-packed-binary")) {
+        if (Objects.equals(scenario.method(), "telepact-binary")) {
             return warmupIterations;
         }
         return 0;
@@ -225,9 +225,6 @@ public class Main {
             if (!Objects.equals(scenario.method(), "telepact-json")) {
                 requestHeaders.put("@binary_", true);
             }
-            if (Objects.equals(scenario.method(), "telepact-packed-binary")) {
-                requestHeaders.put("@pac_", true);
-            }
 
             var requestMessage = new Message(requestHeaders, Map.of(functionName, Map.of("items", payload)));
             long requestSerializeStart = System.nanoTime();
@@ -245,9 +242,6 @@ public class Main {
             if (requestRoundTrip.headers.containsKey("@bin_")) {
                 responseHeaders.put("@binary_", true);
                 responseHeaders.put("@clientKnownBinaryChecksums_", requestRoundTrip.headers.get("@bin_"));
-            }
-            if (requestRoundTrip.headers.containsKey("@pac_")) {
-                responseHeaders.put("@pac_", requestRoundTrip.headers.get("@pac_"));
             }
             var responseMessage = new Message(responseHeaders, Map.of("Ok_", Map.of("items", requestItems)));
             long responseSerializeStart = System.nanoTime();

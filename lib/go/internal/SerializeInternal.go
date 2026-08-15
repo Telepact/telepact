@@ -36,7 +36,7 @@ type Serialization interface {
 func SerializeInternal(
 	headers map[string]any,
 	body map[string]any,
-	binaryEncoder binary.BinaryEncoder,
+	binaryEncoder binary.MsgpackBinaryEncoder,
 	base64Encoder binary.Base64Encoder,
 	serializer Serialization,
 	wrap func(error, string) error,
@@ -45,31 +45,35 @@ func SerializeInternal(
 		return nil, wrap(fmt.Errorf("message headers or body is nil"), "serialize message")
 	}
 
+	messageHeaders := make(map[string]any, len(headers))
+	for key, value := range headers {
+		messageHeaders[key] = value
+	}
+
 	serializeAsBinary := false
-	if raw, ok := headers["@binary_"]; ok {
-		delete(headers, "@binary_")
+	if raw, ok := messageHeaders["@binary_"]; ok {
+		delete(messageHeaders, "@binary_")
 		if flag, ok := raw.(bool); ok && flag {
 			serializeAsBinary = true
 		}
 	}
 
-	message := []any{headers, body}
+	message := []any{messageHeaders, body}
 
 	if serializeAsBinary {
-		encoded, err := binaryEncoder.Encode(message)
-		if err != nil {
-			var unavailableErr binary.BinaryEncoderUnavailableError
-			if errors.As(err, &unavailableErr) {
-				return serializeAsJSON(message, base64Encoder, serializer, wrap)
-			}
-			return nil, wrap(err, "encode msgpack")
+		binarySerializer, ok := serializer.(binary.BinaryMsgpackSerialization)
+		if !ok {
+			return nil, wrap(fmt.Errorf("binary MsgPack serialization is required"), "encode msgpack")
 		}
-
-		payload, err := serializer.ToMsgpack(encoded)
-		if err != nil {
-			return nil, wrap(err, "encode msgpack")
+		payload, err := binaryEncoder.EncodeToMsgpack(message, binarySerializer)
+		if err == nil {
+			return payload, nil
 		}
-		return payload, nil
+		var unavailableErr binary.BinaryEncoderUnavailableError
+		if errors.As(err, &unavailableErr) {
+			return serializeAsJSON(message, base64Encoder, serializer, wrap)
+		}
+		return nil, wrap(err, "encode msgpack")
 	}
 
 	return serializeAsJSON(message, base64Encoder, serializer, wrap)

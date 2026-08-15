@@ -16,10 +16,10 @@
 
 package io.github.telepact.internal.binary;
 
-import static io.github.telepact.internal.binary.ServerBinaryDecode.serverBinaryDecode;
-import static io.github.telepact.internal.binary.ServerBinaryEncode.serverBinaryEncode;
-
+import io.github.telepact.Serialization;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 public class ServerBinaryEncoder implements BinaryEncoder {
 
@@ -30,12 +30,46 @@ public class ServerBinaryEncoder implements BinaryEncoder {
     }
 
     @Override
-    public List<Object> encode(List<Object> message) {
-        return serverBinaryEncode(message, binaryEncoder);
+    public byte[] encodeToMsgPack(List<Object> message, Serialization serializer) throws Throwable {
+        if (!(serializer instanceof BinaryMsgPackSerialization binarySerialization)) {
+            throw new IllegalArgumentException("binary MsgPack serialization is required");
+        }
+        if (binaryEncoder == null) {
+            throw new BinaryEncoderUnavailableError();
+        }
+
+        final var headers = (Map<String, Object>) message.get(0);
+        final var body = (Map<String, Object>) message.get(1);
+        final var clientKnownBinaryChecksums = (List<Integer>) headers.remove("@clientKnownBinaryChecksums_");
+        final var resultTag = body.keySet().iterator().next();
+
+        if (!Objects.equals(resultTag, "Ok_")) {
+            throw new BinaryEncoderUnavailableError();
+        }
+
+        if (clientKnownBinaryChecksums == null || !clientKnownBinaryChecksums.contains(binaryEncoder.checksum)) {
+            headers.put("@enc_", binaryEncoder.encodeMap);
+        }
+
+        headers.put("@bin_", List.of(binaryEncoder.checksum));
+        return binarySerialization.toBinaryMsgPack(headers, body, binaryEncoder);
     }
 
     @Override
-    public List<Object> decode(List<Object> message) {
-        return serverBinaryDecode(message, binaryEncoder);
+    public List<Object> decodeMsgPack(byte[] messageBytes, Serialization serializer) throws Throwable {
+        if (!(serializer instanceof BinaryMsgPackSerialization binarySerialization)) {
+            throw new IllegalArgumentException("binary MsgPack serialization is required");
+        }
+
+        final var headers = binarySerialization.fromMsgPackHeaders(messageBytes);
+        final var clientKnownBinaryChecksums = (List<Integer>) headers.headers().get("@bin_");
+        final var binaryChecksumUsedByClientOnThisMessage = clientKnownBinaryChecksums.get(0);
+
+        if (!Objects.equals(binaryChecksumUsedByClientOnThisMessage, binaryEncoder.checksum)) {
+            throw new BinaryEncoderUnavailableError();
+        }
+
+        final var body = binarySerialization.fromMsgPackBody(messageBytes, headers.bodyOffset(), binaryEncoder);
+        return List.of(headers.headers(), body);
     }
 }

@@ -18,18 +18,33 @@ import msgpack
 import json
 
 from .Serialization import Serialization
+from .internal.binary.BinaryMsgpackCodec import BinaryMsgpackCodec
+from .internal.binary.BinaryMsgpackSerialization import BinaryMsgpackSerialization
 
 
-class DefaultSerialization(Serialization):
+class DefaultSerialization(Serialization, BinaryMsgpackSerialization):
+
+    def __init__(self) -> None:
+        self._msgpack_packer = msgpack.Packer(autoreset=True)
+        self._binary_msgpack = BinaryMsgpackCodec()
 
     def to_json(self, telepact_message: object) -> bytes:
         return json.dumps(telepact_message).encode()
 
     def to_msgpack(self, telepact_message: object) -> bytes:
-        return msgpack.dumps(telepact_message)
+        return self._msgpack_packer.pack(telepact_message)
+
+    def to_binary_msgpack(self, headers: dict[str, object], body: dict[str, object], binary_encoding: object) -> bytes:
+        return self._binary_msgpack.to_binary_msgpack(headers, body, binary_encoding)
 
     def from_json(self, bytes_: bytes) -> object:
         return json.loads(bytes_)
 
     def from_msgpack(self, bytes_: bytes) -> object:
         return msgpack.loads(bytes_, strict_map_key=False)
+
+    def from_msgpack_headers(self, bytes_: bytes) -> tuple[dict[object, object], int]:
+        return self._binary_msgpack.from_msgpack_headers(bytes_)
+
+    def from_msgpack_body(self, bytes_: bytes, offset: int, binary_encoding: object) -> object:
+        return self._binary_msgpack.from_msgpack_body(bytes_, offset, binary_encoding)

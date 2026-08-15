@@ -16,12 +16,16 @@
 
 import { Packr, Unpackr } from 'msgpackr';
 import { Serialization } from './Serialization.js';
+import { BinaryEncoding } from './internal/binary/BinaryEncoding.js';
+import { BinaryMsgpackCodec } from './internal/binary/BinaryMsgpackCodec.js';
+import { BinaryMsgpackSerialization, MsgpackHeaders } from './internal/binary/BinaryMsgpackSerialization.js';
 
-export class DefaultSerialization implements Serialization {
+export class DefaultSerialization implements Serialization, BinaryMsgpackSerialization {
     private textEncoder = new TextEncoder();
     private textDecoder = new TextDecoder();
     private packr = new Packr({ mapsAsObjects: false, useRecords: false });
     private unpackr = new Unpackr({ mapsAsObjects: false, useRecords: false });
+    private binaryMsgpack = new BinaryMsgpackCodec();
 
     public toJson(telepactMessage: any): Uint8Array {
         const jsonStr = JSON.stringify(telepactMessage);
@@ -39,5 +43,17 @@ export class DefaultSerialization implements Serialization {
 
     public fromMsgpack(bytes: Uint8Array): any {
         return this.unpackr.decode(bytes);
+    }
+
+    public toBinaryMsgpack(headers: Record<string, any>, body: Record<string, any>, binaryEncoding: BinaryEncoding): Uint8Array {
+        return this.binaryMsgpack.toBinaryMsgpack(headers, body, binaryEncoding);
+    }
+
+    public fromMsgpackHeaders(bytes: Uint8Array): MsgpackHeaders {
+        return this.binaryMsgpack.fromMsgpackHeaders(bytes);
+    }
+
+    public fromMsgpackBody(bytes: Uint8Array, offset: number, binaryEncoding: BinaryEncoding): Record<string, any> {
+        return this.binaryMsgpack.fromMsgpackBody(bytes, offset, binaryEncoding);
     }
 }

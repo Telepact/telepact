@@ -3,8 +3,7 @@ Content-Type: application/octet-stream
 
 headers: {
   "@bin_": [38194217],
-  "@enc_": { ... negotiated field ids ... },
-  "@pac_": true
+  "@enc_": { ... negotiated field ids ... }
 }
 
 body: <MessagePack bytes>
