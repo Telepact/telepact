@@ -85,7 +85,7 @@ def create_http_server(host: str = '127.0.0.1', port: int = 0) -> ThreadingHTTPS
                     headers['@auth_'] = {'Session': {'token': session_token}}
 
             response = asyncio.run(telepact_server.process(request_bytes, update_headers))
-            content_type = 'application/octet-stream' if '@bin_' in response.headers else 'application/json'
+            content_type = 'application/octet-stream' if response.bytes[:1] == b'\x92' else 'application/json'
 
             self.send_response(200)
             self.send_header('Content-Type', content_type)

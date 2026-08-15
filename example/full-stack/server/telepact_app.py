@@ -297,7 +297,7 @@ def process_telepact_request(request_bytes: bytes, request_id: str, session_toke
                 headers['@auth_'] = {'Session': {'token': session_token}}
 
         response = loop.run_until_complete(telepact_server.process(request_bytes, update_headers))
-        content_type = 'application/octet-stream' if '@bin_' in response.headers else 'application/json'
+        content_type = 'application/octet-stream' if response.bytes[:1] == b'\x92' else 'application/json'
         return TelepactHttpResponse(response_bytes=response.bytes, content_type=content_type)
     finally:
         loop.close()
