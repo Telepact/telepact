@@ -45,15 +45,20 @@ func SerializeInternal(
 		return nil, wrap(fmt.Errorf("message headers or body is nil"), "serialize message")
 	}
 
+	messageHeaders := make(map[string]any, len(headers))
+	for key, value := range headers {
+		messageHeaders[key] = value
+	}
+
 	serializeAsBinary := false
-	if raw, ok := headers["@binary_"]; ok {
-		delete(headers, "@binary_")
+	if raw, ok := messageHeaders["@binary_"]; ok {
+		delete(messageHeaders, "@binary_")
 		if flag, ok := raw.(bool); ok && flag {
 			serializeAsBinary = true
 		}
 	}
 
-	message := []any{headers, body}
+	message := []any{messageHeaders, body}
 
 	if serializeAsBinary {
 		binarySerializer, ok := serializer.(binary.BinaryMsgpackSerialization)

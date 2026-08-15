@@ -27,25 +27,10 @@ export function serializeInternal(
     base64Encoder: Base64Encoder,
     serializer: Serialization,
 ): Uint8Array {
-    const headers: Record<string, any> = message.headers;
+    const messageHeaders: Record<string, any> = { ...message.headers };
 
-    let serializeAsBinary: boolean;
-    const hasBinaryHint = '@binary_' in headers;
-    if (hasBinaryHint) {
-        serializeAsBinary = headers['@binary_'] === true;
-    } else {
-        serializeAsBinary = false;
-    }
-
-    let messageHeaders = headers;
-    if (hasBinaryHint) {
-        messageHeaders = {};
-        for (const key in headers) {
-            if (Object.prototype.hasOwnProperty.call(headers, key) && key !== '@binary_') {
-                messageHeaders[key] = headers[key];
-            }
-        }
-    }
+    const serializeAsBinary = messageHeaders['@binary_'] === true;
+    delete messageHeaders['@binary_'];
 
     const messageAsPseudoJson: any[] = [messageHeaders, message.body];
 

@@ -254,6 +254,15 @@ additional_sel_cases = [
 
 ]
 
+_UNIFORM_ROWS_WITH_LATER_EXTRA_FIELD = (
+    [{'required': True}]
+    + [{'optional!': index % 2 == 0, 'required': index % 3 == 0} for index in range(15)]
+)
+_UNIFORM_ROWS_WITH_LATER_MISSING_FIELD = (
+    [{'optional!': True, 'required': True}]
+    + [{'required': index % 2 == 0} for index in range(15)]
+)
+
 cases = {
     'boolean': [v for v in generate_basic_cases('bool!', bool, [False, True])],
     'integer': [v for v in generate_basic_cases('int!', int, [0, -1, 1, 9223372036854775807, -9223372036854775808], additional_integer_cases)],
@@ -379,6 +388,10 @@ cases = {
     ],
     'big': [
         [[{'@ok_': {'items': [{'aF': True, 'bF': False, 'cF': True, 'dF': False}, {'aF': True, 'dF': False, 'cF': False, 'bF': True}, {'cF': False, 'bF': True, 'aF': True, 'dF': False}]}}, {'fn.getBigList': {}}], [{}, {'Ok_': {'items': [{'aF': True, 'bF': False, 'cF': True, 'dF': False}, {'aF': True, 'dF': False, 'cF': False, 'bF': True}, {'cF': False, 'bF': True, 'aF': True, 'dF': False}]}}]]
+    ],
+    'uniformArrayFallback': [
+        [[{'@ok_': {'value!': {'arrStruct!': _UNIFORM_ROWS_WITH_LATER_EXTRA_FIELD}}}, {'fn.test': {'value!': {'arrStruct!': _UNIFORM_ROWS_WITH_LATER_EXTRA_FIELD}}}], [{}, {'Ok_': {'value!': {'arrStruct!': _UNIFORM_ROWS_WITH_LATER_EXTRA_FIELD}}}]],
+        [[{'@ok_': {'value!': {'arrStruct!': _UNIFORM_ROWS_WITH_LATER_MISSING_FIELD}}}, {'fn.test': {'value!': {'arrStruct!': _UNIFORM_ROWS_WITH_LATER_MISSING_FIELD}}}], [{}, {'Ok_': {'value!': {'arrStruct!': _UNIFORM_ROWS_WITH_LATER_MISSING_FIELD}}}]],
     ],
     'customHeaders': [
         [[{'@ok_': {}, '@in': False, '@responseHeader': {'@out': False}}, {'fn.test': {}}], [{'@out': False}, {'Ok_': {}}]],

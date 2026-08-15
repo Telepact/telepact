@@ -28,17 +28,9 @@ if TYPE_CHECKING:
 def serialize_internal(message: 'Message', binary_encoder: 'BinaryEncoder',
                        base64_encoder: 'Base64Encoder',
                        serializer: 'Serialization') -> bytes:
-    headers: dict[str, object] = message.headers
+    message_headers: dict[str, object] = dict(message.headers)
 
-    has_binary_hint = "@binary_" in headers
-    serialize_as_binary = headers.get("@binary_") is True if has_binary_hint else False
-    message_headers = headers
-    if has_binary_hint:
-        message_headers = {
-            key: value
-            for key, value in headers.items()
-            if key != "@binary_"
-        }
+    serialize_as_binary = message_headers.pop("@binary_", None) is True
 
     message_as_pseudo_json: list[object] = [
         message_headers, message.body]

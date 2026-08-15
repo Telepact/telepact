@@ -17,6 +17,7 @@
 from typing import TYPE_CHECKING
 
 from ...internal.binary.BinaryEncoder import BinaryEncoder
+from ...internal.binary.BinaryMsgpackSerialization import BinaryMsgpackSerialization
 
 if TYPE_CHECKING:
     from .BinaryEncodingCache import BinaryEncodingCache
@@ -30,6 +31,9 @@ class ClientBinaryEncoder(BinaryEncoder):
 
     def encode_msgpack(self, message: list[object], serializer: object) -> bytes:
         from ...internal.binary.BinaryEncoderUnavailableError import BinaryEncoderUnavailableError
+
+        if not isinstance(serializer, BinaryMsgpackSerialization):
+            raise TypeError("binary MsgPack serialization is required")
 
         headers = message[0]
         body = message[1]
@@ -48,5 +52,8 @@ class ClientBinaryEncoder(BinaryEncoder):
         return serializer.to_binary_msgpack(headers, body, binary_encoding)
 
     def decode_msgpack(self, message_bytes: bytes, serializer: object) -> list[object]:
+        if not isinstance(serializer, BinaryMsgpackSerialization):
+            raise TypeError("binary MsgPack serialization is required")
+
         from ...internal.binary.ClientBinaryDecode import client_binary_decode_msgpack
         return client_binary_decode_msgpack(message_bytes, self.binary_encoding_cache, self.binaryChecksumStrategy, serializer)

@@ -24,6 +24,8 @@ const MAX_CACHED_STRING_LENGTH = 64;
 const MAX_STRING_CACHE_ENTRIES = 4096;
 const MAX_SHORT_ASCII_LENGTH = 16;
 
+class UniformObjectArrayMismatch extends Error {}
+
 export class BinaryMsgpackCodec {
     private readonly textEncoder = new TextEncoder();
     private readonly textDecoder = new TextDecoder();
@@ -31,7 +33,28 @@ export class BinaryMsgpackCodec {
     private readonly seenStrings = new Set<string>();
 
     public toBinaryMsgpack(headers: Record<string, any>, body: Record<string, any>, binaryEncoding: BinaryEncoding): Uint8Array {
-        const writer = new MsgpackWriter(this.textEncoder, this.encodedStrings, this.seenStrings);
+        try {
+            return this.packMessage(headers, body, binaryEncoding, true);
+        } catch (error) {
+            if (!(error instanceof UniformObjectArrayMismatch)) {
+                throw error;
+            }
+            return this.packMessage(headers, body, binaryEncoding, false);
+        }
+    }
+
+    private packMessage(
+        headers: Record<string, any>,
+        body: Record<string, any>,
+        binaryEncoding: BinaryEncoding,
+        allowUniformObjectArrays: boolean,
+    ): Uint8Array {
+        const writer = new MsgpackWriter(
+            this.textEncoder,
+            this.encodedStrings,
+            this.seenStrings,
+            allowUniformObjectArrays,
+        );
         writer.packArrayHeader(2);
         writer.packValue(headers, undefined, false);
         writer.packValue(body, binaryEncoding, true);
@@ -63,6 +86,7 @@ class MsgpackWriter {
         private readonly textEncoder: TextEncoder,
         private readonly encodedStrings: Map<string, Uint8Array>,
         private readonly seenStrings: Set<string>,
+        private readonly allowUniformObjectArrays: boolean,
     ) {}
 
     public toBytes(): Uint8Array {
@@ -103,7 +127,10 @@ class MsgpackWriter {
         }
 
         if (Array.isArray(value)) {
-            if (translateKeys && binaryEncoding !== undefined && this.tryPackUniformObjectArray(value, binaryEncoding)) {
+            if (this.allowUniformObjectArrays
+                && translateKeys
+                && binaryEncoding !== undefined
+                && this.tryPackUniformObjectArray(value, binaryEncoding)) {
                 return;
             }
             this.packArrayHeader(value.length);
@@ -178,6 +205,19 @@ class MsgpackWriter {
         this.packArrayHeader(value.length);
         for (let itemIndex = 0; itemIndex < value.length; itemIndex += 1) {
             const item = value[itemIndex]!;
+            if (item === null
+                || typeof item !== 'object'
+                || Array.isArray(item)
+                || item instanceof Map
+                || ArrayBuffer.isView(item)
+                || Object.keys(item).length !== keys.length) {
+                throw new UniformObjectArrayMismatch();
+            }
+            for (let keyIndex = 0; keyIndex < keys.length; keyIndex += 1) {
+                if (!Object.prototype.hasOwnProperty.call(item, keys[keyIndex]!)) {
+                    throw new UniformObjectArrayMismatch();
+                }
+            }
             this.packMapHeader(keys.length);
             for (let keyIndex = 0; keyIndex < keys.length; keyIndex += 1) {
                 this.packNumber(encodedKeys[keyIndex]!);
