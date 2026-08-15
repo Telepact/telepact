@@ -83,13 +83,11 @@ def _write_release_targets(repo_root: Path) -> None:
                 is_dependency_for: [cli]
               ts:
                 paths: [lib/ts]
-                is_dependency_for: [dart, console]
+                is_dependency_for: [console]
               cli:
                 paths: [sdk/cli]
               console:
                 paths: [sdk/console]
-              dart:
-                paths: [bind/dart]
               prettier:
                 paths: [sdk/prettier]
                 is_dependency_for: [console]
@@ -191,7 +189,7 @@ class ReleasePlanTests(unittest.TestCase):
 
             self.assertEqual(manifest.comparison, ReleaseComparison(base_commit="abc123", head_commit="def456"))
             self.assertEqual(manifest.direct_targets, ("prettier", "ts"))
-            self.assertEqual(manifest.targets, ("console", "dart", "prettier", "ts"))
+            self.assertEqual(manifest.targets, ("console", "prettier", "ts"))
             self.assertEqual(
                 manifest.changed_paths,
                 ("README.md", "lib/ts/src/main.ts", "sdk/prettier/package.json"),
@@ -220,7 +218,7 @@ class ReleasePlanTests(unittest.TestCase):
                     "comparison": {"base_commit": "abc123", "head_commit": "def456"},
                     "direct_targets": ["prettier", "ts"],
                     "pr_number": None,
-                    "targets": ["console", "dart", "prettier", "ts"],
+                    "targets": ["console", "prettier", "ts"],
                     "version": "1.0.0-alpha.215",
                 },
             )

@@ -23,18 +23,13 @@ from pathlib import Path
 import click
 import toml
 from lxml import etree as ET
-from ruamel.yaml import YAML
 
 from ..release_plan import ReleaseComparison, compute_release_manifest_for_comparison, git_ref_comparison
-
-yaml = YAML()
 
 PROJECT_FILES = [
     "lib/java/pom.xml",
     "lib/py/pyproject.toml",
     "lib/ts/package.json",
-    "bind/dart/pubspec.yaml",
-    "bind/dart/package.json",
     "sdk/cli/pyproject.toml",
     "sdk/prettier/package.json",
     "sdk/console/package.json",
@@ -80,10 +75,6 @@ def _get_version_from_project_file(project_file: str) -> str:
         return data["version"]
     if project_file.endswith("pyproject.toml"):
         return _project_version(_load_pyproject())
-    if project_file.endswith("pubspec.yaml"):
-        with open(project_file, "r") as f:
-            data = yaml.load(f)
-        return data["version"]
     raise ValueError(f"Unsupported project file type: {project_file}")
 
 
@@ -108,13 +99,6 @@ def _set_version_in_project_file(project_file: str, version: str) -> None:
         with open(project_file, "w") as f:
             toml.dump(data, f)
         return
-    if project_file.endswith("pubspec.yaml"):
-        with open(project_file, "r") as f:
-            data = yaml.load(f)
-        data["version"] = version
-        with open(project_file, "w") as f:
-            yaml.dump(data, f)
-        return
     raise ValueError(f"Unsupported project file type: {project_file}")
 
 
@@ -129,11 +113,6 @@ def _update_and_get_lock_file_path(project_file: str) -> str | None:
         subprocess.run(["uv", "lock"], cwd=project_dir, check=True)
         click.echo(f"Updated uv.lock in {project_dir}")
         return str(project_dir / "uv.lock")
-
-    if project_file.endswith("pubspec.yaml") and (project_dir / "pubspec.lock").exists():
-        subprocess.run(["dart", "pub", "get"], cwd=project_dir, check=True)
-        click.echo(f"Updated pubspec.lock in {project_dir}")
-        return str(project_dir / "pubspec.lock")
 
     return None
 
@@ -212,7 +191,7 @@ def create_version_bump_commit(
 
 @click.command()
 def get() -> None:
-    for project_file in ["pom.xml", "package.json", "pyproject.toml", "pubspec.yaml"]:
+    for project_file in ["pom.xml", "package.json", "pyproject.toml"]:
         if os.path.exists(project_file):
             click.echo(_get_version_from_project_file(project_file), nl=False)
             return
@@ -225,7 +204,7 @@ def get() -> None:
 def set_version(version: str) -> None:
     updated = False
 
-    for project_file in ["pom.xml", "package.json", "pyproject.toml", "pubspec.yaml"]:
+    for project_file in ["pom.xml", "package.json", "pyproject.toml"]:
         if os.path.exists(project_file):
             _set_version_in_project_file(project_file, version)
             _update_and_get_lock_file_path(project_file)
