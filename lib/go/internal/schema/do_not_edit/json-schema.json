@@ -1,245 +1,341 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "Telepact schema",
+    "description": "Structural validation for a Telepact schema document. Cross-definition references and name collisions are validated by the Telepact runtime parser.",
     "type": "array",
     "items": {
         "oneOf": [
-            {
-                "type": "object",
-                "additionalProperties": false,
-                "minProperties": 1,
-                "patternProperties": {
-                    "^info\\.[a-zA-Z_]\\w*": {
-                        "type": "object",
-                        "description": "Information about the API.",
-                        "additionalProperties": false
-                    }
-                },
-                "properties": {
-                    "///": {
-                        "anyOf": [{ "type": "string" }, { "type": "array", "items": { "type": "string" } }]
-                    }
-                }
-            },
-            {
-                "type": "object",
-                "additionalProperties": false,
-                "minProperties": 1,
-                "patternProperties": {
-                    "^struct\\.[a-zA-Z_]\\w*?": {
-                        "type": "object",
-                        "description": "A struct with 0 or more fields.",
-                        "additionalProperties": false,
-                        "patternProperties": {
-                            "^[a-z]\\w*!?$": {
-                                "$ref": "#/$defs/typeDeclaration"
-                            }
-                        }
-                    }
-                },
-                "properties": {
-                    "///": {
-                        "anyOf": [{ "type": "string" }, { "type": "array", "items": { "type": "string" } }]
-                    }
-                }
-            },
-            {
-                "type": "object",
-                "additionalProperties": false,
-                "minProperties": 1,
-                "patternProperties": {
-                    "union\\.[a-zA-Z_]\\w*$": {
-                        "type": "array",
-                        "items": {
-                            "type": "object",
-                            "description": "An union with 1 or more fields huzzah.",
-                            "minProperties": 1,
-                            "patternProperties": {
-                                "^[A-Z]\\w*?$": {
-                                    "type": "object",
-                                    "additionalProperties": false,
-                                    "patternProperties": {
-                                        "^[a-z]\\w*!?$": {
-                                            "$ref": "#/$defs/typeDeclaration"
-                                        }
-                                    }
-                                }
-                            },
-                            "properties": {
-                                "///": {
-                                    "anyOf": [{ "type": "string" }, { "type": "array", "items": { "type": "string" } }]
-                                }
-                            }
-                        }
-                    }
-                },
-                "properties": {
-                    "///": {
-                        "anyOf": [{ "type": "string" }, { "type": "array", "items": { "type": "string" } }]
-                    }
-                }
-            },
-            {
-                "type": "object",
-                "additionalProperties": false,
-                "minProperties": 2,
-                "patternProperties": {
-                    "^fn\\.[a-zA-Z_]\\w*": {
-                        "description": "A function that accepts an argument struct and returns a result union that is either an `Ok_` struct or an error struct.",
-                        "type": "object",
-                        "additionalProperties": false,
-                        "patternProperties": {
-                            "^[a-z]\\w*!?$": {
-                                "$ref": "#/$defs/typeDeclaration"
-                            }
-                        }
-                    }
-                },
-                "required": ["->"],
-                "properties": {
-                    "->": {
-                        "type": "array",
-                        "prefixItems": [
-                            {
-                                "type": "object",
-                                "required": ["Ok_"],
-                                "properties": {
-                                    "Ok_": {
-                                        "type": "object",
-                                        "additionalProperties": false,
-                                        "patternProperties": {
-                                            "^[a-z]\\w*!?$": {
-                                                "$ref": "#/$defs/typeDeclaration"
-                                            }
-                                        }
-                                    }
-                                },
-                                "additionalProperties": false
-                            }
-                        ],
-                        "items": {
-                            "type": "object",
-                            "patternProperties": {
-                                "^[A-Z]\\w*?$": {
-                                    "type": "object",
-                                    "additionalProperties": false,
-                                    "patternProperties": {
-                                        "^[a-z]\\w*!?$": {
-                                            "$ref": "#/$defs/typeDeclaration"
-                                        }
-                                    },
-                                    "properties": {
-                                        "///": {
-                                            "anyOf": [
-                                                { "type": "string" },
-                                                { "type": "array", "items": { "type": "string" } }
-                                            ]
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "///": {
-                        "anyOf": [{ "type": "string" }, { "type": "array", "items": { "type": "string" } }]
-                    }
-                }
-            },
-            {
-                "type": "object",
-                "additionalProperties": false,
-                "minProperties": 2,
-                "patternProperties": {
-                    "^headers\\.[a-zA-Z_]\\w*": {
-                        "description": "A function that accepts an argument struct and returns a result union that is either an `Ok_` struct or an error struct.",
-                        "type": "object",
-                        "additionalProperties": false,
-                        "patternProperties": {
-                            "^@[a-z]\\w*!?$": {
-                                "$ref": "#/$defs/typeDeclaration"
-                            }
-                        }
-                    }
-                },
-                "required": ["->"],
-                "properties": {
-                    "->": {
-                        "type": "object",
-                        "additionalProperties": false,
-                        "patternProperties": {
-                            "^@[a-z]\\w*!?$": {
-                                "$ref": "#/$defs/typeDeclaration"
-                            }
-                        }
-                    },
-                    "///": {
-                        "anyOf": [{ "type": "string" }, { "type": "array", "items": { "type": "string" } }]
-                    }
-                }
-            },
-            {
-                "type": "object",
-                "additionalProperties": false,
-                "minProperties": 1,
-                "patternProperties": {
-                    "^errors\\.[a-zA-Z_]\\w*": {
-                        "type": "array",
-                        "items": {
-                            "type": "object",
-                            "description": "An union with 1 or more fields huzzah.",
-                            "minProperties": 1,
-                            "patternProperties": {
-                                "^[A-Z]\\w*?$": {
-                                    "type": "object",
-                                    "additionalProperties": false,
-                                    "patternProperties": {
-                                        "^[a-z]\\w*!?$": {
-                                            "$ref": "#/$defs/typeDeclaration"
-                                        }
-                                    }
-                                }
-                            },
-                            "properties": {
-                                "///": {
-                                    "anyOf": [{ "type": "string" }, { "type": "array", "items": { "type": "string" } }]
-                                }
-                            }
-                        }
-                    }
-                },
-                "properties": {
-                    "///": {
-                        "anyOf": [{ "type": "string" }, { "type": "array", "items": { "type": "string" } }]
-                    }
-                }
-            }
+            { "$ref": "#/$defs/infoDefinition" },
+            { "$ref": "#/$defs/structDefinition" },
+            { "$ref": "#/$defs/unionDefinition" },
+            { "$ref": "#/$defs/functionDefinition" },
+            { "$ref": "#/$defs/headersDefinition" },
+            { "$ref": "#/$defs/errorsDefinition" },
+            { "$ref": "#/$defs/extensionDefinition" }
         ]
     },
     "$defs": {
+        "documentation": {
+            "oneOf": [
+                { "type": "string" },
+                {
+                    "type": "array",
+                    "items": { "type": "string" }
+                }
+            ]
+        },
         "typeDeclaration": {
             "oneOf": [
                 {
                     "type": "string",
-                    "pattern": "^((boolean|integer|number|string|any|bytes)|(fn|union|struct)\\.([a-zA-Z_]\\w*))(\\?)?$"
+                    "pattern": "^((boolean|integer|number|string|any|bytes)|((fn|union|struct|_ext)\\.[a-zA-Z_][a-zA-Z0-9_]*))(\\?)?$"
                 },
                 {
                     "type": "array",
                     "minItems": 1,
                     "maxItems": 1,
-                    "items": {
-                        "$ref": "#/$defs/typeDeclaration"
-                    }
+                    "items": { "$ref": "#/$defs/typeDeclaration" }
                 },
                 {
                     "type": "object",
                     "properties": {
-                        "string": {
-                            "$ref": "#/$defs/typeDeclaration"
-                        }
+                        "string": { "$ref": "#/$defs/typeDeclaration" }
                     },
                     "required": ["string"],
                     "additionalProperties": false
                 }
             ]
+        },
+        "structFields": {
+            "type": "object",
+            "additionalProperties": false,
+            "patternProperties": {
+                "^[a-z][a-zA-Z0-9_]*!?$": {
+                    "$ref": "#/$defs/typeDeclaration"
+                }
+            }
+        },
+        "headerFields": {
+            "type": "object",
+            "additionalProperties": false,
+            "patternProperties": {
+                "^@[a-z][a-zA-Z0-9_]*$": {
+                    "$ref": "#/$defs/typeDeclaration"
+                }
+            }
+        },
+        "taggedStruct": {
+            "type": "object",
+            "minProperties": 1,
+            "maxProperties": 2,
+            "properties": {
+                "///": { "$ref": "#/$defs/documentation" }
+            },
+            "patternProperties": {
+                "^[A-Z][a-zA-Z0-9_]*$": {
+                    "$ref": "#/$defs/structFields"
+                }
+            },
+            "additionalProperties": false,
+            "not": {
+                "propertyNames": { "enum": ["///"] }
+            },
+            "if": { "minProperties": 2 },
+            "then": {
+                "required": ["///"]
+            }
+        },
+        "taggedStructArray": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "$ref": "#/$defs/taggedStruct" }
+        },
+        "functionResult": {
+            "allOf": [
+                { "$ref": "#/$defs/taggedStructArray" },
+                {
+                    "contains": {
+                        "type": "object",
+                        "required": ["Ok_"]
+                    },
+                    "minContains": 1,
+                    "maxContains": 1
+                }
+            ]
+        },
+        "infoDefinition": {
+            "type": "object",
+            "minProperties": 1,
+            "maxProperties": 2,
+            "properties": {
+                "///": { "$ref": "#/$defs/documentation" }
+            },
+            "patternProperties": {
+                "^info\\.[a-zA-Z_][a-zA-Z0-9_]*$": {
+                    "type": "object",
+                    "description": "Information about the API.",
+                    "additionalProperties": false
+                }
+            },
+            "additionalProperties": false,
+            "not": {
+                "propertyNames": { "enum": ["///"] }
+            },
+            "if": { "minProperties": 2 },
+            "then": {
+                "required": ["///"]
+            }
+        },
+        "structDefinition": {
+            "type": "object",
+            "minProperties": 1,
+            "maxProperties": 2,
+            "properties": {
+                "///": { "$ref": "#/$defs/documentation" }
+            },
+            "patternProperties": {
+                "^struct\\.[a-zA-Z_][a-zA-Z0-9_]*$": {
+                    "$ref": "#/$defs/structFields"
+                }
+            },
+            "additionalProperties": false,
+            "not": {
+                "propertyNames": { "enum": ["///"] }
+            },
+            "if": { "minProperties": 2 },
+            "then": {
+                "required": ["///"]
+            }
+        },
+        "unionDefinition": {
+            "type": "object",
+            "minProperties": 1,
+            "maxProperties": 2,
+            "properties": {
+                "///": { "$ref": "#/$defs/documentation" }
+            },
+            "patternProperties": {
+                "^union\\.[a-zA-Z_][a-zA-Z0-9_]*$": {
+                    "$ref": "#/$defs/taggedStructArray"
+                }
+            },
+            "additionalProperties": false,
+            "not": {
+                "propertyNames": { "enum": ["///"] }
+            },
+            "if": { "minProperties": 2 },
+            "then": {
+                "required": ["///"]
+            }
+        },
+        "functionDefinition": {
+            "type": "object",
+            "minProperties": 2,
+            "maxProperties": 5,
+            "required": ["->"],
+            "properties": {
+                "///": { "$ref": "#/$defs/documentation" },
+                "$internal": { "type": "boolean" },
+                "_errors": { "type": "string" },
+                "->": { "$ref": "#/$defs/functionResult" }
+            },
+            "patternProperties": {
+                "^fn\\.[a-zA-Z_][a-zA-Z0-9_]*$": {
+                    "$ref": "#/$defs/structFields"
+                }
+            },
+            "additionalProperties": false,
+            "not": {
+                "propertyNames": {
+                    "enum": ["///", "$internal", "_errors", "->"]
+                }
+            },
+            "if": { "required": ["_errors"] },
+            "then": {
+                "anyOf": [
+                    {
+                        "required": ["$internal"],
+                        "properties": {
+                            "$internal": { "const": true }
+                        }
+                    },
+                    {
+                        "propertyNames": {
+                            "anyOf": [
+                                { "enum": ["///", "$internal", "_errors", "->"] },
+                                { "pattern": "^fn\\.[a-zA-Z_][a-zA-Z0-9_]*_$" }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "oneOf": [
+                {
+                    "not": {
+                        "anyOf": [
+                            { "required": ["///"] },
+                            { "required": ["$internal"] },
+                            { "required": ["_errors"] }
+                        ]
+                    },
+                    "maxProperties": 2
+                },
+                {
+                    "required": ["///"],
+                    "not": {
+                        "anyOf": [
+                            { "required": ["$internal"] },
+                            { "required": ["_errors"] }
+                        ]
+                    },
+                    "maxProperties": 3
+                },
+                {
+                    "required": ["$internal"],
+                    "not": {
+                        "anyOf": [
+                            { "required": ["///"] },
+                            { "required": ["_errors"] }
+                        ]
+                    },
+                    "maxProperties": 3
+                },
+                {
+                    "required": ["_errors"],
+                    "not": {
+                        "anyOf": [
+                            { "required": ["///"] },
+                            { "required": ["$internal"] }
+                        ]
+                    },
+                    "maxProperties": 3
+                },
+                {
+                    "required": ["///", "$internal"],
+                    "not": { "required": ["_errors"] },
+                    "maxProperties": 4
+                },
+                {
+                    "required": ["///", "_errors"],
+                    "not": { "required": ["$internal"] },
+                    "maxProperties": 4
+                },
+                {
+                    "required": ["$internal", "_errors"],
+                    "not": { "required": ["///"] },
+                    "maxProperties": 4
+                },
+                {
+                    "required": ["///", "$internal", "_errors"],
+                    "maxProperties": 5
+                }
+            ]
+        },
+        "headersDefinition": {
+            "type": "object",
+            "minProperties": 2,
+            "maxProperties": 3,
+            "required": ["->"],
+            "properties": {
+                "///": { "$ref": "#/$defs/documentation" },
+                "->": { "$ref": "#/$defs/headerFields" }
+            },
+            "patternProperties": {
+                "^headers\\.[a-zA-Z_][a-zA-Z0-9_]*$": {
+                    "$ref": "#/$defs/headerFields"
+                }
+            },
+            "additionalProperties": false,
+            "not": {
+                "propertyNames": { "enum": ["///", "->"] }
+            },
+            "if": { "minProperties": 3 },
+            "then": {
+                "required": ["///"]
+            }
+        },
+        "errorsDefinition": {
+            "type": "object",
+            "minProperties": 1,
+            "maxProperties": 2,
+            "properties": {
+                "///": { "$ref": "#/$defs/documentation" }
+            },
+            "patternProperties": {
+                "^errors\\.[a-zA-Z_][a-zA-Z0-9_]*$": {
+                    "$ref": "#/$defs/taggedStructArray"
+                }
+            },
+            "additionalProperties": false,
+            "not": {
+                "propertyNames": { "enum": ["///"] }
+            },
+            "if": { "minProperties": 2 },
+            "then": {
+                "required": ["///"]
+            }
+        },
+        "extensionDefinition": {
+            "type": "object",
+            "minProperties": 1,
+            "maxProperties": 2,
+            "properties": {
+                "///": { "$ref": "#/$defs/documentation" }
+            },
+            "patternProperties": {
+                "^_ext\\.[a-zA-Z_][a-zA-Z0-9_]*_$": {
+                    "type": "object",
+                    "maxProperties": 0
+                }
+            },
+            "additionalProperties": false,
+            "not": {
+                "propertyNames": { "enum": ["///"] }
+            },
+            "if": { "minProperties": 2 },
+            "then": {
+                "required": ["///"]
+            }
         }
     }
 }
