@@ -25,6 +25,28 @@ def usage
   exit 1
 end
 
+def pretty_json(value, depth = 0)
+  indent = '  ' * depth
+  child_indent = '  ' * (depth + 1)
+
+  case value
+  when Hash
+    return '{}' if value.empty?
+
+    entries = value.map do |key, child|
+      "#{child_indent}#{JSON.generate(key.to_s)}: #{pretty_json(child, depth + 1)}"
+    end
+    "{\n#{entries.join(",\n")}\n#{indent}}"
+  when Array
+    return '[]' if value.empty?
+
+    entries = value.map { |child| "#{child_indent}#{pretty_json(child, depth + 1)}" }
+    "[\n#{entries.join(",\n")}\n#{indent}]"
+  else
+    JSON.generate(value)
+  end
+end
+
 src_dir = ARGV[0]
 dest_dir = ARGV[1]
 
@@ -46,7 +68,7 @@ Dir.children(src_dir).sort.each do |filename|
     )
     target_filename = filename.sub(/\.telepact\.yaml$/, '.telepact.json')
     target_path = File.join(dest_dir, target_filename)
-    File.write(target_path, JSON.pretty_generate(parsed) + "\n")
+    File.write(target_path, pretty_json(parsed) + "\n")
   when /\.json$/
     FileUtils.cp(source_path, File.join(dest_dir, filename))
   end

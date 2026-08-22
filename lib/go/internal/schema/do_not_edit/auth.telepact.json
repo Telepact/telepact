@@ -4,8 +4,7 @@
     "headers.Auth_": {
       "@auth_": "union.Auth_"
     },
-    "->": {
-    }
+    "->": {}
   },
   {
     "///": "A standard error.",
