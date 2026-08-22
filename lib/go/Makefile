@@ -34,10 +34,7 @@ copy-common-assets:
 
 sync-schema-assets:
 	@$(MAKE) copy-common-assets
-	@if ! git diff --quiet -- $(SCHEMA_TARGET_DIR) || \
-		[ -n "$$(git ls-files --others --exclude-standard -- $(SCHEMA_TARGET_DIR))" ]; then \
-		git diff -- $(SCHEMA_TARGET_DIR); \
-		git ls-files --others --exclude-standard -- $(SCHEMA_TARGET_DIR); \
+	@if [ -n "$$(git status --porcelain $(SCHEMA_TARGET_DIR))" ]; then \
 		echo "ERROR: Schema assets updated. Please run 'make go' and commit the changes."; \
 		exit 1; \
 	fi
