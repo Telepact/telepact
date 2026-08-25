@@ -101,6 +101,9 @@ A struct definition itself can be used as a type reference.
 > Optionality is encoded in the field key itself, both in the schema and on
 > the wire. Note that in the above example `{"optionalField": true}` is invalid;
 > it must be `[{"optionalField!": true}]`
+>
+> **Mnemonic**: Interpret `!` as "watch out!" Optional fields might be absent, so
+> the exclamation point serves as a reminder to use caution around such fields.
 
 ### Union
 
