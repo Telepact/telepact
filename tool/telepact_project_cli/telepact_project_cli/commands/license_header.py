@@ -28,7 +28,7 @@ def _license_header_supported(file_path: str) -> bool:
     file_name = os.path.basename(file_path)
 
     return (
-        (file_name != "pubspec.yaml" and file_extension in [".py", ".java", ".ts", ".dart", ".sh", ".js", ".yaml", ".yml", ".html", ".css", ".svelte"])
+        file_extension in [".py", ".java", ".ts", ".sh", ".js", ".yaml", ".yml", ".html", ".css", ".svelte"]
         or file_name == "Dockerfile"
         or file_name == "Makefile"
     )
@@ -46,7 +46,7 @@ def _license_header_ignored(file_path: str) -> bool:
 def _get_comment_syntax(file_extension, file_name):
     if file_extension in [".py", ".sh", ".yaml", ".yml"] or file_name == "Dockerfile" or file_name == "Makefile":
         return "#|", ""
-    elif file_extension in [".java", ".ts", ".dart", ".js"]:
+    elif file_extension in [".java", ".ts", ".js"]:
         return "//|", ""
     elif file_extension in [".html", ".svelte"]:
         return "<!--|", "|-->"

@@ -67,12 +67,6 @@ jobs:
           name: build-py
           path: lib/py/dist
 
-      - name: Download dart artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: build-dart
-          path: bind/dart/dist
-
       - name: Download cli artifacts
         uses: actions/download-artifact@v4
         with:

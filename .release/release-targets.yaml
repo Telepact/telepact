@@ -30,14 +30,10 @@ projects:
     paths:
       - lib/ts
     is_dependency_for:
-      - dart
       - console
   go:
     paths:
       - lib/go
-  dart:
-    paths:
-      - bind/dart
   cli:
     paths:
       - sdk/cli

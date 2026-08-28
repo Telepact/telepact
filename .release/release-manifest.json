@@ -1,6 +1,5 @@
 {
   "changed_paths": [
-    "bind/dart/test/telepact_test.dart",
     "common/auth.telepact.yaml",
     "common/internal.telepact.yaml",
     "common/json-schema.json",
@@ -136,7 +135,6 @@
   "direct_targets": [
     "cli",
     "console",
-    "dart",
     "go",
     "java",
     "prettier",
@@ -147,7 +145,6 @@
   "targets": [
     "cli",
     "console",
-    "dart",
     "go",
     "java",
     "prettier",

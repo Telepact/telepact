@@ -21,7 +21,6 @@ import time
 from pathlib import Path
 
 import click
-import yaml
 from github import Github, GithubException
 from github.PullRequest import PullRequest
 
@@ -41,7 +40,6 @@ RELEASE_TARGET_ASSET_DIRECTORY_MAP = {
     "java": ["lib/java/target/central-publishing"],
     "py": ["lib/py/dist"],
     "ts": ["lib/ts/dist-tgz"],
-    "dart": ["bind/dart/dist"],
     "cli": ["sdk/cli/dist", "sdk/cli/dist-docker"],
     "console": ["sdk/console/dist-tgz", "sdk/console/dist-docker"],
     "prettier": ["sdk/prettier/dist-tgz"],
@@ -70,10 +68,6 @@ AUTOMERGE_ALLOWED_AUTHORS = ["dependabot[bot]"]
 SQUASH_PR_NUMBER_RE = re.compile(r"\(#(?P<pr_number>\d+)\)$")
 
 AUTOMERGE_ALLOWED_FILES = [
-    "bind/dart/package-lock.json",
-    "bind/dart/package.json",
-    "bind/dart/pubspec.lock",
-    "bind/dart/pubspec.yaml",
     "lib/java/pom.xml",
     "lib/py/uv.lock",
     "lib/py/pyproject.toml",
@@ -98,21 +92,6 @@ AUTOMERGE_ALLOWED_FILES = [
 ]
 
 
-def _read_pubspec_name(pubspec_path: Path) -> str:
-    try:
-        data = yaml.safe_load(pubspec_path.read_text(encoding="utf-8"))
-    except FileNotFoundError as exc:
-        raise click.ClickException(f"File not found: {pubspec_path}") from exc
-
-    if not isinstance(data, dict):
-        raise click.ClickException(f"Invalid YAML object in {pubspec_path}")
-
-    name = data.get("name")
-    if not isinstance(name, str) or not name:
-        raise click.ClickException(f"Missing/invalid package name in {pubspec_path}")
-    return name
-
-
 def _release_target_details(repo_root: Path, target: str) -> tuple[str, str, str]:
     match target:
         case "go":
@@ -124,8 +103,6 @@ def _release_target_details(repo_root: Path, target: str) -> tuple[str, str, str
             return ("Library (Python)", _read_pyproject_name(repo_root / "lib/py/pyproject.toml"), "PyPI")
         case "ts":
             return ("Library (TypeScript)", _read_package_json_name(repo_root / "lib/ts/package.json"), "npm")
-        case "dart":
-            return ("Binding (Dart)", _read_pubspec_name(repo_root / "bind/dart/pubspec.yaml"), "GitHub release assets")
         case "cli":
             return ("SDK (CLI)", _read_pyproject_name(repo_root / "sdk/cli/pyproject.toml"), "PyPI")
         case "console":

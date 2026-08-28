@@ -27,7 +27,6 @@ local-ci:
 	$(MAKE) clean-py
 	$(MAKE) clean-ts
 	$(MAKE) clean-go
-	$(MAKE) clean-dart
 	$(MAKE) clean-cli
 	$(MAKE) clean-console
 	$(MAKE) clean-prettier
@@ -37,7 +36,6 @@ local-ci:
 	$(MAKE) py
 	$(MAKE) ts
 	$(MAKE) go
-	$(MAKE) dart
 	$(MAKE) cli
 	$(MAKE) console
 	$(MAKE) prettier
@@ -160,15 +158,6 @@ clean-test:
 example-check:
 	$(MAKE) -C example check
 
-dart:
-	$(MAKE) -C bind/dart
-
-clean-dart:
-	$(MAKE) -C bind/dart clean
-
-test-dart:
-	$(MAKE) -C bind/dart test
-
 cli:
 	$(MAKE) -C sdk/cli
 
@@ -242,7 +231,6 @@ version:
 	cd lib/java && $(abspath $(PROJECT_CLI)) set-version ${VERSION}
 	cd lib/py && $(abspath $(PROJECT_CLI)) set-version ${VERSION}
 	cd lib/ts && $(abspath $(PROJECT_CLI)) set-version ${VERSION}
-	cd bind/dart && $(abspath $(PROJECT_CLI)) set-version ${VERSION}
 	cd sdk/cli && $(abspath $(PROJECT_CLI)) set-version ${VERSION}
 	cd sdk/prettier && $(abspath $(PROJECT_CLI)) set-version ${VERSION}
 	cd sdk/console && $(abspath $(PROJECT_CLI)) set-version ${VERSION}

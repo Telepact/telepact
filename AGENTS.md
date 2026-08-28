@@ -52,7 +52,6 @@ The entire project uses a hierarchical `Makefile` system. The root `Makefile` de
 
 -   `Makefile`: The entry point for all build, test, and deploy operations.
 -   `lib/{go,java,py,ts}`: The core libraries. Changes here impact the fundamental behavior of Telepact.
--   `bind/dart`: Language-specific bindings for Dart.
 -   `test/runner`: The cross-language integration test suite. This is the best place to understand how different language implementations are expected to behave and interact.
 -   `common/*.telepact.yaml`: The common schema files that define the internal APIs used by Telepact itself.
 -   `sdk/console`: A React and Vite TypeScript project for the developer console.
