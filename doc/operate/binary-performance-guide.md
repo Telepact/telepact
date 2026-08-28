@@ -3,15 +3,15 @@
 This page summarizes the serializer benchmark data produced by
 [`test/performance`](../../test/performance/).
 
-The harness now runs 225 combinations of:
+The harness now runs 180 combinations of:
 
 - 3 languages: Python, TypeScript, Java
 - 3 data shapes: typical, all strings, all numbers
 - 5 collection shapes: single, small list, big list, really big list, huge list
-- 5 methods: Telepact JSON, Telepact binary, Telepact packed binary, protobuf, plain JSON
+- 4 methods: Telepact JSON, Telepact binary, protobuf, plain JSON
 
 Each scenario records 20 steady-state serializer samples.
-Telepact binary and Telepact packed binary use one warmup round-trip to populate the
+Telepact binary uses one warmup round-trip to populate the
 binary encoding cache. No NATS or transport time is included: every sample measures only
 request serialize, request deserialize, response serialize, and response deserialize work.
 
@@ -29,16 +29,14 @@ The generated artifacts live in:
 | --- | ---: | ---: | ---: |
 | Telepact JSON | 6349.0 | 6333.0 | 0.2867 |
 | Telepact binary | 2528.0 | 2528.0 | 0.3477 |
-| Telepact packed binary | 2225.0 | 2225.0 | 0.6082 |
 | protobuf | 2379.0 | 2379.0 | 0.1258 |
 | plain JSON | 6350.0 | 6350.0 | 0.2187 |
 
 The broad pattern is:
 
 - Telepact binary cuts median payload size by about **60%** versus Telepact JSON.
-- Telepact packed binary cuts another **12%** versus plain Telepact binary.
 - protobuf is still the fastest codec overall in this harness.
-- Telepact packed binary is the smallest Telepact wire format, but it is not the fastest.
+- Telepact binary materially reduces wire size, but it is not the fastest codec.
 
 ## 2. Representative size and codec-time results
 
@@ -48,7 +46,6 @@ The broad pattern is:
 | --- | ---: | ---: | ---: |
 | Telepact JSON | 50519 | 50503 | 2.1295 |
 | Telepact binary | 20072 | 20072 | 2.3309 |
-| Telepact packed binary | 17529 | 17529 | 4.7427 |
 | protobuf | 19027 | 19027 | 0.8218 |
 | plain JSON | 50520 | 50520 | 1.6267 |
 
@@ -58,7 +55,6 @@ The broad pattern is:
 | --- | ---: | ---: | ---: |
 | Telepact JSON | 42920 | 42904 | 1.1773 |
 | Telepact binary | 20729 | 20729 | 2.3045 |
-| Telepact packed binary | 18186 | 18186 | 1.0027 |
 | protobuf | 18354 | 18354 | 0.5312 |
 | plain JSON | 42921 | 42921 | 1.1241 |
 
@@ -68,7 +64,6 @@ The broad pattern is:
 | --- | ---: | ---: | ---: |
 | Telepact JSON | 137 | 121 | 0.0270 |
 | Telepact binary | 57 | 57 | 0.0489 |
-| Telepact packed binary | 69 | 69 | 0.0615 |
 | protobuf | 36 | 36 | 0.0347 |
 | plain JSON | 138 | 138 | 0.0138 |
 
@@ -84,13 +79,6 @@ message model. It remains the easiest default when payload size is not your main
 Telepact binary is the best general-purpose Telepact size reduction in this run.
 Across the full benchmark it reduced the median request from **6349 B** to **2528 B**.
 That makes it a good fit for collection-heavy messages where wire size matters.
-
-### Use Telepact packed binary selectively for large repeated collections
-
-Packed binary pushed size lower again, but its time cost was mixed.
-It was most compelling on large number-heavy collections, where it nearly matched protobuf size
-while materially beating plain Telepact binary on bytes.
-It is still a poor default for small payloads.
 
 ### If raw serializer speed is the priority, protobuf still wins
 
@@ -110,7 +98,7 @@ uv run python -m perf_harness.run \
   --languages python \
   --data-shapes all-numbers \
   --collection-shapes huge-list \
-  --methods telepact-binary telepact-packed-binary
+  --methods telepact-binary protobuf
 ```
 
 ```bash

@@ -66,7 +66,7 @@ function readRequestBytes(request: IncomingMessage): Promise<Uint8Array> {
 
 function writeTelepactResponse(responseWriter: ServerResponse, response: Response): void {
     responseWriter.statusCode = 200;
-    responseWriter.setHeader('Content-Type', '@bin_' in response.headers ? 'application/octet-stream' : 'application/json');
+    responseWriter.setHeader('Content-Type', response.bytes[0] === 0x92 ? 'application/octet-stream' : 'application/json');
     responseWriter.end(Buffer.from(response.bytes));
 }
 

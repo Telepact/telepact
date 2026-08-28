@@ -75,7 +75,7 @@ class PythonWorker:
         return results
 
     def _warmup_iterations_for(self, scenario: Scenario) -> int:
-        if scenario.method in {"telepact-binary", "telepact-packed-binary"}:
+        if scenario.method == "telepact-binary":
             return self.warmup_iterations
         return 0
 
@@ -184,8 +184,6 @@ class PythonWorker:
             headers: dict[str, object] = {}
             if scenario.method != "telepact-json":
                 headers["@binary_"] = True
-            if scenario.method == "telepact-packed-binary":
-                headers["@pac_"] = True
             return Message(headers, {function_name: {"items": payload}})
 
         def build_response_message(request_message: Message) -> Message:
@@ -193,8 +191,6 @@ class PythonWorker:
             if "@bin_" in request_message.headers:
                 headers["@binary_"] = True
                 headers["@clientKnownBinaryChecksums_"] = request_message.headers["@bin_"]
-            if "@pac_" in request_message.headers:
-                headers["@pac_"] = request_message.headers["@pac_"]
             return Message(headers, {"Ok_": {"items": request_message.body[function_name]["items"]}})
 
         def benchmark_once(payload: list[dict[str, Any]]) -> dict[str, Any]:

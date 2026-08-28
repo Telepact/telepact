@@ -123,11 +123,7 @@ export async function handleMessage(
 
         responseHeaders['@binary_'] = true;
         responseHeaders['@clientKnownBinaryChecksums_'] = clientKnownBinaryChecksums;
-
-        if ('@pac_' in requestHeaders) {
-            responseHeaders['@pac_'] = requestHeaders['@pac_'];
     }
-}
 
 function buildUnauthenticatedErrorMessage(resultUnionType: TUnion, headers: Record<string, any>): Message {
     const result = {

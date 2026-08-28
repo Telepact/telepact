@@ -25,8 +25,11 @@ export class DefaultBinaryEncodingCache extends BinaryEncodingCache {
         this.recentBinaryEncoders = new Map<number, BinaryEncoding>();
     }
 
-    add(checksum: number, binaryEncodingMap: Map<string, number>): void {
-        const binaryEncoding = new BinaryEncoding(binaryEncodingMap, checksum);
+    add(checksum: number, binaryEncodingMap: Map<string, number> | Record<string, number>): void {
+        const finalMap = binaryEncodingMap instanceof Map
+            ? binaryEncodingMap
+            : new Map(Object.entries(binaryEncodingMap));
+        const binaryEncoding = new BinaryEncoding(finalMap, checksum);
         this.recentBinaryEncoders.set(checksum, binaryEncoding);
     }
 

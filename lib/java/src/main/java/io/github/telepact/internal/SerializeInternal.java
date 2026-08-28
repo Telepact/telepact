@@ -17,6 +17,7 @@
 package io.github.telepact.internal;
 
 import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.Objects;
 
 import io.github.telepact.Message;
@@ -30,7 +31,7 @@ public class SerializeInternal {
     public static byte[] serializeInternal(Message message, BinaryEncoder binaryEncoder,
             Base64Encoder base64Encoder,
             Serialization serializer) {
-        final var headers = message.headers;
+        final var headers = new LinkedHashMap<String, Object>(message.headers);
 
         final boolean serializeAsBinary;
         if (headers.containsKey("@binary_")) {
@@ -39,13 +40,12 @@ public class SerializeInternal {
             serializeAsBinary = false;
         }
 
-        final List<Object> messageAsPseudoJson = List.of(message.headers, message.body);
+        final List<Object> messageAsPseudoJson = List.of(headers, message.body);
 
         try {
             if (serializeAsBinary) {
                 try {
-                    final var encodedMessage = binaryEncoder.encode(messageAsPseudoJson);
-                    return serializer.toMsgPack(encodedMessage);
+                    return binaryEncoder.encodeToMsgPack(messageAsPseudoJson, serializer);
                 } catch (BinaryEncoderUnavailableError e) {
                     // We can still submit as json
                     final var base64EncodedMessage = base64Encoder.encode(messageAsPseudoJson);

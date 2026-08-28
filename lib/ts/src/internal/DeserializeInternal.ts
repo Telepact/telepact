@@ -20,6 +20,8 @@ import { Message } from '../Message.js';
 import { InvalidMessage } from '../internal/validation/InvalidMessage.js';
 import { InvalidMessageBody } from '../internal/validation/InvalidMessageBody.js';
 import { Base64Encoder } from './binary/Base64Encoder.js';
+import { BinaryEncoderUnavailableError } from './binary/BinaryEncoderUnavailableError.js';
+import { BinaryEncodingMissing } from './binary/BinaryEncodingMissing.js';
 
 export function deserializeInternal(
     messageBytes: Uint8Array,
@@ -33,12 +35,15 @@ export function deserializeInternal(
     try {
         if (messageBytes[0] === 0x92) {
             isMsgPack = true;
-            messageAsPseudoJson = serializer.fromMsgpack(messageBytes);
+            messageAsPseudoJson = binaryEncoder.decodeMsgpack(messageBytes, serializer);
         } else {
             isMsgPack = false;
             messageAsPseudoJson = serializer.fromJson(messageBytes);
         }
     } catch (e) {
+        if (e instanceof BinaryEncoderUnavailableError || e instanceof BinaryEncodingMissing) {
+            throw e;
+        }
         throw new InvalidMessage();
     }
 
@@ -54,7 +59,7 @@ export function deserializeInternal(
 
     let finalMessageAsPseudoJsonList: any[];
     if (isMsgPack) {
-        finalMessageAsPseudoJsonList = binaryEncoder.decode(messageAsPseudoJsonList);
+        finalMessageAsPseudoJsonList = messageAsPseudoJsonList;
     } else {
         finalMessageAsPseudoJsonList = base64Encoder.decode(messageAsPseudoJsonList);
     }

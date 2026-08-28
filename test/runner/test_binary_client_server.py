@@ -77,14 +77,3 @@ def test_binary_client_server_case(loop, binary_client_server_proc, nats_client,
         await verify_client_case(nats_client, dc(req), dc(res), *topics, assert_binary=True)
 
     loop.run_until_complete(t())
-
-
-def test_pbinary_client_server_case(loop, binary_client_server_proc, nats_client, name, req, res):
-    topics = binary_client_server_proc
-
-    req[0]['@pac_'] = True
-
-    async def t():
-        await verify_client_case(nats_client, dc(req), dc(res), *topics, assert_binary=True)
-
-    loop.run_until_complete(t())

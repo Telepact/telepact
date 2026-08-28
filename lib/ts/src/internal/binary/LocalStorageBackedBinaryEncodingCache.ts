@@ -40,8 +40,10 @@ export class LocalStorageBackedBinaryEncodingCache extends BinaryEncodingCache {
         this.recentBinaryEncoders = this.mapJsonToObject(jsonFromLocalStorage);
     }
 
-    add(checksum: number, binaryEncodingMap: Map<string, number>): void {
-        const binaryEncodingJson = Object.fromEntries(binaryEncodingMap);
+    add(checksum: number, binaryEncodingMap: Map<string, number> | Record<string, number>): void {
+        const binaryEncodingJson = binaryEncodingMap instanceof Map
+            ? Object.fromEntries(binaryEncodingMap)
+            : binaryEncodingMap;
         this.recentBinaryEncodersJson[`${checksum}`] = binaryEncodingJson;
 
         this.recentBinaryEncoders = this.mapJsonToObject(this.recentBinaryEncodersJson);

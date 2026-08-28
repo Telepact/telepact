@@ -6,10 +6,12 @@ dependencies = []
 
 [dependency-groups]
 dev = [
+    "jsonschema>=4.26.0,<5",
     "msgpack>=1.2.1,<2",
     "nats-py>=2.15.0,<3",
+    "pyyaml>=6.0.3,<7",
     "pytest>=9.1.1,<10",
-    "prometheus-client>=0.25.0,<0.26",
+    "prometheus-client>=0.26.0,<0.27",
 ]
 
 [tool.uv]

@@ -20,9 +20,9 @@ from abc import ABCMeta, abstractmethod
 class BinaryEncoder(metaclass=ABCMeta):
 
     @abstractmethod
-    def encode(self, message: list[object]) -> list[object]:
+    def encode_msgpack(self, message: list[object], serializer: object) -> bytes:
         pass
 
     @abstractmethod
-    def decode(self, message: list[object]) -> list[object]:
+    def decode_msgpack(self, message_bytes: bytes, serializer: object) -> list[object]:
         pass

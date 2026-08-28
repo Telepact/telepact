@@ -56,12 +56,18 @@ def run_command(command: Sequence[str], cwd: Path) -> None:
 
 
 def worker_command(language: str, args: argparse.Namespace, output_path: Path) -> tuple[list[str], Path]:
+    methods = args.methods
+    if language == "go":
+        methods = [method for method in args.methods if method != "protobuf"]
+        if not methods:
+            raise ValueError("go performance worker does not support protobuf")
+
     base_args = [
         "--iterations", str(args.iterations),
         "--warmup-iterations", str(args.warmup_iterations),
         "--data-shapes", ",".join(args.data_shapes),
         "--collection-shapes", ",".join(args.collection_shapes),
-        "--methods", ",".join(args.methods),
+        "--methods", ",".join(methods),
         "--output", str(output_path),
     ]
     if language == "python":
@@ -71,6 +77,8 @@ def worker_command(language: str, args: argparse.Namespace, output_path: Path) -
     if language == "java":
         joined = " ".join(shlex.quote(part) for part in base_args)
         return ["mvn", "-q", "-s", "settings.xml", f"-Dexec.args={joined}", "exec:java"], PERFORMANCE_ROOT / "java"
+    if language == "go":
+        return ["./bin/telepact-performance-go", *base_args], PERFORMANCE_ROOT / "go"
     raise ValueError(language)
 
 

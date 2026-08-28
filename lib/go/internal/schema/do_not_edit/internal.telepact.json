@@ -2,12 +2,10 @@
   {
     "///": "Ping the server.",
     "$internal": true,
-    "fn.ping_": {
-    },
+    "fn.ping_": {},
     "->": [
       {
-        "Ok_": {
-        }
+        "Ok_": {}
       }
     ]
   },
@@ -32,16 +30,14 @@
   },
   {
     "///": "`_ext.Select_` is the selection object used by the `@select_` header. Use\n`->` to narrow fields on the active result union, `struct.*` keys to narrow\nstruct fields, and `union.*` keys to narrow fields for specific union tags.\n\nSee https://raw.githubusercontent.com/Telepact/telepact/main/doc/design-apis/select-extension.md\nfor full `_ext.Select_` rules and end-to-end examples.\n",
-    "_ext.Select_": {
-    }
+    "_ext.Select_": {}
   },
   {
     "///": "The `@time_` header indicates the request timeout honored by the client.",
     "headers.Time_": {
       "@time_": "integer"
     },
-    "->": {
-    }
+    "->": {}
   },
   {
     "///": "If `@unsafe_` is set to `true`, response validation by the server will be\ndisabled. The server will reflect the client-provided value of the\n`@unsafe_` header in the response.\n",
@@ -57,16 +53,14 @@
     "headers.Select_": {
       "@select_": "_ext.Select_"
     },
-    "->": {
-    }
+    "->": {}
   },
   {
-    "///": "The `@bin_` header indicates the valid checksums of binary encodings\nnegotiated between the client and server. If the client sends a `@bin_`\nheader with any value, the server will respond with a `@bin_` header with an\narray containing the currently supported binary encoding checksum. If the\nclient's provided checksum does not match the server's checksum, the server\nwill also send an `@enc_` header containing the binary encoding, which is a\nmap of field names to field ids. The response body may also be encoded in\nbinary.\n\nThe `@pac_` header can also be used to indicate usage of 'packed' binary\nencoding strategy. If the client submits a `@pac_` header with a `true`\nvalue, the server will respond with a `@pac_` header with a `true` value.\n",
+    "///": "The `@bin_` header indicates the valid checksums of binary encodings\nnegotiated between the client and server. If the client sends a `@bin_`\nheader with any value, the server will respond with a `@bin_` header with an\narray containing the currently supported binary encoding checksum. If the\nclient's provided checksum does not match the server's checksum, the server\nwill also send an `@enc_` header containing the binary encoding, which is a\nmap of field names to field ids. The response body may also be encoded in\nbinary.\n",
     "headers.Binary_": {
       "@bin_": [
         "integer"
-      ],
-      "@pac_": "boolean"
+      ]
     },
     "->": {
       "@bin_": [
@@ -74,14 +68,12 @@
       ],
       "@enc_": {
         "string": "integer"
-      },
-      "@pac_": "boolean"
+      }
     }
   },
   {
     "///": "The `@warn_` header is used to send warnings to the client.",
-    "headers.Warning_": {
-    },
+    "headers.Warning_": {},
     "->": {
       "@warn_": [
         "any"
@@ -101,48 +93,37 @@
     "///": "A type.",
     "union.Type_": [
       {
-        "Null": {
-        }
+        "Null": {}
       },
       {
-        "Boolean": {
-        }
+        "Boolean": {}
       },
       {
-        "Integer": {
-        }
+        "Integer": {}
       },
       {
-        "Number": {
-        }
+        "Number": {}
       },
       {
-        "String": {
-        }
+        "String": {}
       },
       {
-        "Array": {
-        }
+        "Array": {}
       },
       {
-        "Object": {
-        }
+        "Object": {}
       },
       {
-        "Any": {
-        }
+        "Any": {}
       },
       {
-        "Base64String": {
-        }
+        "Base64String": {}
       },
       {
-        "Bytes": {
-        }
+        "Bytes": {}
       },
       {
-        "Unknown": {
-        }
+        "Unknown": {}
       }
     ]
   },
@@ -156,12 +137,10 @@
         }
       },
       {
-        "NullDisallowed": {
-        }
+        "NullDisallowed": {}
       },
       {
-        "ObjectKeyDisallowed": {
-        }
+        "ObjectKeyDisallowed": {}
       },
       {
         "RequiredObjectKeyPrefixMissing": {
@@ -169,12 +148,10 @@
         }
       },
       {
-        "ArrayElementDisallowed": {
-        }
+        "ArrayElementDisallowed": {}
       },
       {
-        "NumberOutOfRange": {
-        }
+        "NumberOutOfRange": {}
       },
       {
         "ObjectSizeUnexpected": {
@@ -206,8 +183,7 @@
         }
       },
       {
-        "FunctionUnknown": {
-        }
+        "FunctionUnknown": {}
       }
     ]
   },
@@ -215,25 +191,20 @@
     "///": "A parse failure.",
     "union.ParseFailure_": [
       {
-        "IncompatibleBinaryEncoding": {
-        }
+        "IncompatibleBinaryEncoding": {}
       },
       {
         "///": "The binary decoder encountered a field id that could not be mapped to a\nkey.\n",
-        "BinaryDecodeFailure": {
-        }
+        "BinaryDecodeFailure": {}
       },
       {
-        "JsonInvalid": {
-        }
+        "JsonInvalid": {}
       },
       {
-        "ExpectedJsonArrayOfAnObjectAndAnObjectOfOneObject": {
-        }
+        "ExpectedJsonArrayOfAnObjectAndAnObjectOfOneObject": {}
       },
       {
-        "ExpectedJsonArrayOfTwoObjects": {
-        }
+        "ExpectedJsonArrayOfTwoObjects": {}
       }
     ]
   },
