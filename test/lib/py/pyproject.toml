@@ -4,7 +4,7 @@ version = "0.1.0"
 requires-python = ">=3.11,<4"
 dependencies = [
     "build>=1.6.1,<2",
-    "msgpack>=1.2.2,<2",
+    "msgpack>=1.2.3,<2",
     "nats-py>=2.16.0,<3",
     "prometheus-client>=0.26.0,<0.27",
 ]
