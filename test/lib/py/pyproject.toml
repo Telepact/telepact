@@ -4,14 +4,14 @@ version = "0.1.0"
 requires-python = ">=3.11,<4"
 dependencies = [
     "build>=1.6.1,<2",
-    "msgpack>=1.2.3,<2",
+    "msgpack>=1.2.4,<2",
     "nats-py>=2.16.0,<3",
     "prometheus-client>=0.26.0,<0.27",
 ]
 
 [dependency-groups]
 dev = [
-    "pytest>=9.1.1,<10",
+    "pytest>=9.2.0,<10",
     "toml>=0.10.2,<0.11",
 ]
 
